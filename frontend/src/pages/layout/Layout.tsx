@@ -125,6 +125,10 @@ const Layout = () => {
           </div>
         </Stack>
       </Dialog>
+      <feedback-widget
+        only-save-rating-to-analytics="true"
+        show-comment-disclaimer="false"
+        skip-email-step="true"></feedback-widget>
     </div>
   )
 }
