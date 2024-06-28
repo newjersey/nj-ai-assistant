@@ -52,7 +52,7 @@ export const QuestionInput = ({ onSend, disabled, placeholder, clearOnSend, conv
       if (!isValidLength(question)) {
         setInputError(`Prompt cannot exceed ${MAX_INPUT_LENGTH} characters. Please try a smaller prompt.`)
         logEvent('submit_prompt_client_error_prompt_length', {
-          object_length: question.length
+          input_length: question.length
         })
         return
       }
