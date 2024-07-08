@@ -124,7 +124,16 @@ export const QuestionInput = ({ onSend, disabled, placeholder, clearOnSend, conv
   const onFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
-      if (file.size > 5 * 1024 * 1024) {
+      if (!ACCEPTED_FILE_TYPES.includes(file.type)) {
+        setInputError(
+          'Only the following file types are supported: .pdf, .jpeg, .png, .gif, .bmp, .tiff. Please try a different file.'
+        )
+        setSelectedFile(null)
+        if (fileInputRef?.current?.value) {
+          fileInputRef.current.value = ''
+        }
+        logEvent('submit_prompt_client_error_file_type', { object_type: file.type })
+      } else if (file.size > 5 * 1024 * 1024) {
         // 5MB limit
         setInputError('File size of attachments cannot exceed 5 MB. Please try a smaller file.')
         setSelectedFile(null)
