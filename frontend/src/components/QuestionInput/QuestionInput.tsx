@@ -151,22 +151,13 @@ export const QuestionInput = ({ onSend, disabled, placeholder, clearOnSend, conv
   const sendQuestionDisabled = disabled || !question.trim()
 
   return (
-    <Stack horizontal className={styles.questionInputContainer}>
+    <Stack horizontal={false} className={styles.questionInputContainer} wrap={true}>
       {inputError && (
         <div className={styles.errorText}>
           <img src={InfoIcon} alt="" />
           {inputError}
         </div>
       )}
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept={ACCEPTED_FILE_TYPES.join(',')}
-        onChange={onFileChange}
-        disabled={disabled}
-        className={styles.fileInput}
-        aria-label="Upload file"
-      />
       <TextField
         className={styles.questionInputTextArea}
         placeholder={placeholder}
@@ -179,18 +170,31 @@ export const QuestionInput = ({ onSend, disabled, placeholder, clearOnSend, conv
         ariaLabel="Type a question"
         inputClassName={styles.textAreaOverrides}
       />
-      <div
-        className={styles.questionInputSendButtonContainer}
-        role="button"
-        tabIndex={0}
-        aria-label="Ask question button"
-        onClick={sendQuestion}
-        onKeyDown={e => (e.key === 'Enter' || e.key === ' ' ? sendQuestion() : null)}>
-        {sendQuestionDisabled ? (
-          <SendRegular className={styles.questionInputSendButtonDisabled} />
-        ) : (
-          <img src={Send} className={styles.questionInputSendButton} alt="Send Button" />
-        )}
+      <div className={styles.questionInputChatButtons}>
+        <div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept={ACCEPTED_FILE_TYPES.join(',')}
+            onChange={onFileChange}
+            disabled={disabled}
+            className={styles.fileInput}
+            aria-label="Upload file"
+          />
+        </div>
+        <div
+          className={styles.questionInputSendButtonContainer}
+          role="button"
+          tabIndex={0}
+          aria-label="Ask question button"
+          onClick={sendQuestion}
+          onKeyDown={e => (e.key === 'Enter' || e.key === ' ' ? sendQuestion() : null)}>
+          {sendQuestionDisabled ? (
+            <SendRegular className={styles.questionInputSendButtonDisabled} />
+          ) : (
+            <img src={Send} className={styles.questionInputSendButton} alt="Send Button" />
+          )}
+        </div>
       </div>
       <div className={styles.questionInputBottomBorder} />
     </Stack>
