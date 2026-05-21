@@ -74,11 +74,33 @@ test('prompt submission', async ({ page }) => {
   // Login
   await page.goto('http://localhost:3080/login');
   const loginForm = page.locator('form[aria-label="Login form"]');
-  await loginForm.getByLabel('Email').fill('e2e-test@test.local');
+
+  // console.log('form html', await loginForm.evaluate((el) => el.outerHTML));
+
+  // //debugging
+  // console.log('login form count', await loginForm.count());
+  // console.log('email form count', await loginForm.getByLabel('Email').count());
+  // console.log('pwd form count', await loginForm.getByLabel('Password').count());
+  // await expect(loginForm).toBeVisible({ timeout: 15000 });
+
+  // //debugging flow
+  // await expect(loginForm).toBeVisible({ timeout: 15000 });
+  // const emailInput = loginForm.getByLabel('Email');
+  // await expect(emailInput).toBeVisible({ timeout: 15000 });
+  // await emailInput.fill('e2e-test@test.local');
+  // await loginForm.getByLabel('Password').fill('Test123!@');
+  // await loginForm.getByRole('button', { name: 'Continue' }).click();
+
+  // adding re: debug, etc.
+  const emailInput = loginForm.getByLabel('Email');
+  await expect(emailInput).toBeVisible({ timeout: 15000 });
+  await emailInput.fill('e2e-test@test.local');
+
+  // original flow - commented out to debug
+  // await loginForm.getByLabel('Email').fill('e2e-test@test.local'); commenting out in place of the two preceding lines to debug
   await loginForm.getByLabel('Password').fill('Test123!@');
   await loginForm.getByRole('button', { name: 'Continue' }).click();
 
-  // Wait for navigation to chat page
   await expect(page).toHaveURL(/c\/new/);
   await page.goto('http://localhost:3080/c/new', { timeout: 10000 });
 
