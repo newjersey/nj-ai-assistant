@@ -71,9 +71,9 @@ test('prompt submission', async ({ page }) => {
     });
   });
 
-  // Login: user flow
+  // Login
   await page.goto('http://localhost:3080/login');
-  const loginForm = page.getByLabel('Login form');
+  const loginForm = page.locator('form[aria-label="Login form"]');
   await loginForm.getByLabel('Email').fill('e2e-test@test.local');
   await loginForm.getByLabel('Password').fill('Test123!@');
   await loginForm.getByRole('button', { name: 'Continue' }).click();
