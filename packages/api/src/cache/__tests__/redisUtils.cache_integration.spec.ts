@@ -149,6 +149,66 @@ describe('redisUtils Integration Tests', () => {
       const deletedCount = await batchDeleteKeys(keyvRedisClient, []);
       expect(deletedCount).toBe(0);
     });
+
+    describe('CROSSSLOT fallback', () => {
+      let freshBatchDeleteKeys: typeof batchDeleteKeys;
+
+      beforeEach(async () => {
+        jest.resetModules();
+        const module = await import('../redisUtils');
+        freshBatchDeleteKeys = module.batchDeleteKeys;
+      });
+
+      const crosslotErrorMsg = "CROSSSLOT Keys in request don't hash to the same slot";
+
+      const mockClient = (delImpl: jest.Mock) =>
+        ({ del: delImpl }) as unknown as Parameters<typeof batchDeleteKeys>[0];
+
+      test('falls back to individual deletes on CROSSSLOT error and returns correct count', async () => {
+        const del = jest
+          .fn()
+          .mockRejectedValueOnce(new Error(crosslotErrorMsg))
+          .mockResolvedValue(1);
+
+        const deletedCount = await freshBatchDeleteKeys(mockClient(del), ['a', 'b', 'c'], 100);
+
+        expect(deletedCount).toBe(3);
+        // 1 batch attempt that throws + 3 individual retries
+        expect(del).toHaveBeenCalledTimes(4);
+        expect(del).toHaveBeenNthCalledWith(1, ['a', 'b', 'c']);
+        expect(del).toHaveBeenNthCalledWith(2, 'a');
+        expect(del).toHaveBeenNthCalledWith(3, 'b');
+        expect(del).toHaveBeenNthCalledWith(4, 'c');
+      });
+
+      test('subsequent calls skip batch path after CROSSSLOT is detected', async () => {
+        const del = jest
+          .fn()
+          .mockRejectedValueOnce(new Error(crosslotErrorMsg))
+          .mockResolvedValue(1);
+        const client = mockClient(del);
+
+        await freshBatchDeleteKeys(client, ['a'], 100);
+        del.mockClear();
+
+        await freshBatchDeleteKeys(client, ['b', 'c'], 100);
+
+        // Should call individually without a batch attempt first
+        expect(del).toHaveBeenCalledTimes(2);
+        expect(del).toHaveBeenCalledWith('b');
+        expect(del).toHaveBeenCalledWith('c');
+      });
+
+      test('re-throws non-CROSSSLOT errors without fallback', async () => {
+        const del = jest.fn().mockRejectedValue(new Error('ECONNREFUSED'));
+
+        await expect(freshBatchDeleteKeys(mockClient(del), ['a', 'b'], 100)).rejects.toThrow(
+          'ECONNREFUSED',
+        );
+        // Only the one batch attempt — no individual retry
+        expect(del).toHaveBeenCalledTimes(1);
+      });
+    });
   });
 
   describe('scanKeys', () => {

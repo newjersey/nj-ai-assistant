@@ -3,10 +3,37 @@ import { logger } from '@librechat/data-schemas';
 import { cacheConfig } from './cacheConfig';
 
 /**
+ * Set to true after a CROSSSLOT error is detected on a single-node connection.
+ * This happens with managed/proxy Redis services that enforce slot constraints
+ * internally but don't expose standard cluster topology discovery.
+ * Once detected, all subsequent deletes use individual-key mode automatically.
+ */
+let crossslotSafeMode = false;
+
+function isCrossslotError(err: unknown): boolean {
+  return err instanceof Error && err.message.includes('CROSSSLOT');
+}
+
+async function deleteIndividually(
+  client: RedisClientType | RedisClusterType,
+  keys: string[],
+  chunkSize: number,
+): Promise<number> {
+  let total = 0;
+  for (let i = 0; i < keys.length; i += chunkSize) {
+    const chunk = keys.slice(i, i + chunkSize);
+    const counts = await Promise.all(chunk.map((key) => client.del(key)));
+    total += counts.reduce((a, b) => a + b, 0);
+  }
+  return total;
+}
+
+/**
  * Efficiently deletes multiple Redis keys with support for both cluster and single-node modes.
  *
- * - Cluster mode: Deletes keys in parallel chunks to avoid CROSSSLOT errors
- * - Single-node mode: Uses batch DEL commands for efficiency
+ * - Cluster mode or crossslot-safe mode: Deletes keys individually in parallel chunks
+ * - Single-node mode: Uses batch DEL commands for efficiency; falls back to individual
+ *   deletes automatically if a CROSSSLOT error is detected (e.g. managed/proxy Redis)
  *
  * @param client - Redis client (node or cluster)
  * @param keys - Array of keys to delete
@@ -31,36 +58,38 @@ export async function batchDeleteKeys(
   }
 
   const size = chunkSize ?? cacheConfig.REDIS_DELETE_CHUNK_SIZE;
-  const mode = cacheConfig.USE_REDIS_CLUSTER ? 'cluster' : 'single-node';
-  const deletePromises = [];
 
-  if (cacheConfig.USE_REDIS_CLUSTER) {
-    // Cluster mode: Delete each key individually in parallel chunks to avoid CROSSSLOT errors
-    for (let i = 0; i < keys.length; i += size) {
-      const chunk = keys.slice(i, i + size);
-      deletePromises.push(Promise.all(chunk.map((key) => client.del(key))));
-    }
+  let deletedCount: number;
+  let mode: string;
+
+  if (cacheConfig.USE_REDIS_CLUSTER || crossslotSafeMode) {
+    mode = cacheConfig.USE_REDIS_CLUSTER ? 'cluster' : 'crossslot-safe';
+    deletedCount = await deleteIndividually(client, keys, size);
   } else {
-    // Single-node mode: Batch delete chunks using DEL with array
+    // Attempt to delete in single cluster mode, but fallback to safe crosslot mode if needed
+    mode = 'single-node';
+    const deletePromises = [];
     for (let i = 0; i < keys.length; i += size) {
-      const chunk = keys.slice(i, i + size);
-      deletePromises.push(client.del(chunk));
+      deletePromises.push(client.del(keys.slice(i, i + size)));
+    }
+    try {
+      const results = await Promise.all(deletePromises);
+      deletedCount = results.reduce((sum, count) => sum + count, 0);
+    } catch (err) {
+      if (!isCrossslotError(err)) {
+        throw err;
+      }
+      logger.warn(
+        '[Redis][batchDeleteKeys] CROSSSLOT error detected — switching to per-key delete mode for this Redis instance',
+      );
+      crossslotSafeMode = true;
+      mode = 'crossslot-safe';
+      deletedCount = await deleteIndividually(client, keys, size);
     }
   }
 
-  const results = await Promise.all(deletePromises);
-
-  // Sum up deleted counts (cluster returns array of individual counts, single-node returns total)
-  const deletedCount = results.reduce((sum: number, count: number | number[]): number => {
-    if (Array.isArray(count)) {
-      return sum + count.reduce((a, b) => a + b, 0);
-    }
-    return sum + count;
-  }, 0);
-
-  // Performance monitoring
   const duration = Date.now() - startTime;
-  const batchCount = deletePromises.length;
+  const batchCount = Math.ceil(keys.length / size);
 
   if (duration > 1000) {
     logger.warn(
