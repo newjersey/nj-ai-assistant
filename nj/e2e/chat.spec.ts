@@ -74,6 +74,9 @@ test('prompt submission', async ({ page }) => {
   // Login
   await page.goto('http://localhost:3080/login');
   const loginForm = page.locator('form[aria-label="Login form"]');
+  console.log('form', loginForm);
+  await expect(loginForm).toBeVisible();
+  await expect(loginForm).toBeAttached();
 
   // console.log('form html', await loginForm.evaluate((el) => el.outerHTML));
 
@@ -92,7 +95,8 @@ test('prompt submission', async ({ page }) => {
   // await loginForm.getByRole('button', { name: 'Continue' }).click();
 
   // adding re: debug, etc.
-  const emailInput = loginForm.getByLabel('Email');
+  // const emailInput = loginForm.getByLabel('Email');
+  const emailInput = loginForm.locator('input[name="email"]');
   await expect(emailInput).toBeVisible({ timeout: 15000 });
   await emailInput.fill('e2e-test@test.local');
 
