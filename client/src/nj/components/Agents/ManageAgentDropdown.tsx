@@ -79,12 +79,7 @@ export default function ManageAgentDropdown({
       }
 
       const currentAgent = updatedList.find((agent) => agent.id === conversationAgentId);
-
-      if (currentAgent) {
-        setCurrentAgentId(currentAgent.id);
-      }
-
-      setCurrentAgentId(firstAgent.id);
+      setCurrentAgentId(currentAgent?.id ?? firstAgent.id);
     },
     onError: (error) => {
       console.error(error);
