@@ -43,6 +43,7 @@ import { X } from 'lucide-react';
 import TipComponent from '~/nj/components/TipComponent';
 import FileContext from '~/nj/components/Agents/FileContext';
 import FileSearch from '~/nj/components/Agents/FileSearch';
+import { njInputClass } from '~/nj/components/Agents/agentInputStyle';
 
 const sectionLabelClass = 'text-sm font-semibold';
 const labelClass = 'mb-2 text-token-text-primary block text-sm font-semibold';
@@ -235,9 +236,6 @@ export default function AgentConfig() {
    *
    * Make sure to check that the LibreChat implementation hasn't drifted too far functionality-wise!
    */
-  const njInputClass =
-    'flex w-full rounded-md border border-[#454540] px-3 py-2 text-sm placeholder:text-text-secondary';
-
   return (
     <div className="h-auto pt-3">
       {/* Identity */}
