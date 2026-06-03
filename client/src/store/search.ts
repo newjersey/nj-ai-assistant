@@ -10,10 +10,10 @@ export type SearchState = {
 };
 
 // NJ: Disable the search bar until we actually support search (via Meili)
-export const search = constRecoilStateOpts<SearchState>({
+export const search = atom<SearchState>({
   key: 'search',
   default: {
-    enabled: false,
+    enabled: true,
     query: '',
     debouncedQuery: '',
     isSearching: false,
