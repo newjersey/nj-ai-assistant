@@ -29,10 +29,9 @@ export class MonitoringStack extends cdk.Stack {
   }
 
   private createSNSTopic() {
-    const topic = new sns.Topic(this, 'AlarmTopic', {
+    return new sns.Topic(this, 'AlarmTopic', {
       topicName: `${cdk.Stack.of(this).stackName}-alarms`,
     });
-    return topic;
   }
 
   private createAlarms(
@@ -201,32 +200,21 @@ export class MonitoringStack extends cdk.Stack {
       ['BedrockInvocationLatency', 'InvocationLatency', 'p50', 'ai-assistant-bedrock-invocation-latency-p50'],
       ['BedrockModelInvocations', 'ModelInvocations', 'Sum', 'ai-assistant-bedrock-model-invocations'],
     ] as const) {
-      new cloudwatch.CfnAlarm(this, id, {
+      const alarm = new cloudwatch.AnomalyDetectionAlarm(this, id, {
         alarmName,
-        comparisonOperator: 'GreaterThanUpperThreshold',
+        metric: new cloudwatch.Metric({
+          namespace: 'AWS/Bedrock',
+          metricName,
+          period: Duration.minutes(1),
+          statistic: stat,
+        }),
+        stdDevs: 2,
+        comparisonOperator: cloudwatch.ComparisonOperator.GREATER_THAN_UPPER_THRESHOLD,
         evaluationPeriods: 5,
         datapointsToAlarm: 3,
-        treatMissingData: 'notBreaching',
-        metrics: [
-          {
-            id: 'm1',
-            metricStat: {
-              metric: {
-                namespace: 'AWS/Bedrock',
-                metricName,
-              },
-              period: 60,
-              stat,
-            },
-          },
-          {
-            id: 'ad1',
-            expression: 'ANOMALY_DETECTION_BAND(m1, 2)',
-          },
-        ],
-        thresholdMetricId: 'ad1',
-        alarmActions: [topic.topicArn],
+        treatMissingData: cloudwatch.TreatMissingData.NOT_BREACHING,
       });
+      alarm.addAlarmAction(new cw_actions.SnsAction(topic));
     }
   }
 
@@ -235,33 +223,22 @@ export class MonitoringStack extends cdk.Stack {
       ['AlbLatencyP95', 'p95', 'ai-assistant-alb-latency-p95'],
       ['AlbLatencyP50', 'p50', 'ai-assistant-alb-latency-p50'],
     ] as const) {
-      new cloudwatch.CfnAlarm(this, id, {
+      const alarm = new cloudwatch.AnomalyDetectionAlarm(this, id, {
         alarmName,
-        comparisonOperator: 'GreaterThanUpperThreshold',
+        metric: new cloudwatch.Metric({
+          namespace: 'AWS/ApplicationELB',
+          metricName: 'TargetResponseTime',
+          period: Duration.minutes(1),
+          statistic: stat,
+          dimensionsMap: { LoadBalancer: loadBalancer.loadBalancerArn },
+        }),
+        stdDevs: 2,
+        comparisonOperator: cloudwatch.ComparisonOperator.GREATER_THAN_UPPER_THRESHOLD,
         evaluationPeriods: 5,
         datapointsToAlarm: 3,
-        treatMissingData: 'notBreaching',
-        metrics: [
-          {
-            id: 'm1',
-            metricStat: {
-              metric: {
-                namespace: 'AWS/ApplicationELB',
-                metricName: 'TargetResponseTime',
-                dimensions: [{ name: 'LoadBalancer', value: loadBalancer.loadBalancerArn }],
-              },
-              period: 60,
-              stat,
-            },
-          },
-          {
-            id: 'ad1',
-            expression: 'ANOMALY_DETECTION_BAND(m1, 2)',
-          },
-        ],
-        thresholdMetricId: 'ad1',
-        alarmActions: [topic.topicArn],
+        treatMissingData: cloudwatch.TreatMissingData.NOT_BREACHING,
       });
+      alarm.addAlarmAction(new cw_actions.SnsAction(topic));
     }
   }
 
@@ -308,33 +285,22 @@ export class MonitoringStack extends cdk.Stack {
       ['DocDbReadLatency', 'ReadLatency'],
       ['DocDbWriteLatency', 'WriteLatency'],
     ] as const) {
-      new cloudwatch.CfnAlarm(this, id, {
+      const alarm = new cloudwatch.AnomalyDetectionAlarm(this, id, {
         alarmName: `ai-assistant-docdb-${metricName.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()}`,
-        comparisonOperator: 'GreaterThanUpperThreshold',
+        metric: new cloudwatch.Metric({
+          namespace: 'AWS/DocDB',
+          metricName,
+          period: Duration.minutes(5),
+          statistic: 'Average',
+          dimensionsMap: docDbDimensions,
+        }),
+        stdDevs: 2,
+        comparisonOperator: cloudwatch.ComparisonOperator.GREATER_THAN_UPPER_THRESHOLD,
         evaluationPeriods: 5,
         datapointsToAlarm: 4,
-        treatMissingData: 'notBreaching',
-        metrics: [
-          {
-            id: 'm1',
-            metricStat: {
-              metric: {
-                namespace: 'AWS/DocDB',
-                metricName,
-                dimensions: [{ name: 'DBClusterIdentifier', value: clusterIdentifier }],
-              },
-              period: 300,
-              stat: 'Average',
-            },
-          },
-          {
-            id: 'ad1',
-            expression: 'ANOMALY_DETECTION_BAND(m1, 2)',
-          },
-        ],
-        thresholdMetricId: 'ad1',
-        alarmActions: [topic.topicArn],
+        treatMissingData: cloudwatch.TreatMissingData.NOT_BREACHING,
       });
+      alarm.addAlarmAction(new cw_actions.SnsAction(topic));
     }
   }
 }
