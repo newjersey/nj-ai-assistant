@@ -1,7 +1,7 @@
 import * as cdk from 'aws-cdk-lib';
 import { Duration } from 'aws-cdk-lib';
 import * as cloudwatch from 'aws-cdk-lib/aws-cloudwatch';
-import * as cw_actions from 'aws-cdk-lib/aws-cloudwatch-actions';
+import * as cwActions from 'aws-cdk-lib/aws-cloudwatch-actions';
 import * as sns from 'aws-cdk-lib/aws-sns';
 import * as ecsPatterns from 'aws-cdk-lib/aws-ecs-patterns';
 import * as elbv2 from 'aws-cdk-lib/aws-elasticloadbalancingv2';
@@ -52,7 +52,7 @@ export class MonitoringStack extends cdk.Stack {
       treatMissingData: cloudwatch.TreatMissingData.NOT_BREACHING,
       comparisonOperator: cloudwatch.ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
     });
-    unhealthyHostsAlarm.addAlarmAction(new cw_actions.SnsAction(topic));
+    unhealthyHostsAlarm.addAlarmAction(new cwActions.SnsAction(topic));
 
     const elb4xxAlarm = new cloudwatch.Alarm(this, 'AlbElb4xx', {
       alarmName: `ai-assistant-alb-elb-4xx`,
@@ -71,7 +71,7 @@ export class MonitoringStack extends cdk.Stack {
       treatMissingData: cloudwatch.TreatMissingData.NOT_BREACHING,
       comparisonOperator: cloudwatch.ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
     });
-    elb4xxAlarm.addAlarmAction(new cw_actions.SnsAction(topic));
+    elb4xxAlarm.addAlarmAction(new cwActions.SnsAction(topic));
 
     const elb5xxAlarm = new cloudwatch.Alarm(this, 'AlbElb5xx', {
       alarmName: `ai-assistant-alb-elb-5xx`,
@@ -90,7 +90,7 @@ export class MonitoringStack extends cdk.Stack {
       treatMissingData: cloudwatch.TreatMissingData.NOT_BREACHING,
       comparisonOperator: cloudwatch.ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
     });
-    elb5xxAlarm.addAlarmAction(new cw_actions.SnsAction(topic));
+    elb5xxAlarm.addAlarmAction(new cwActions.SnsAction(topic));
 
     const target5xxAlarm = new cloudwatch.Alarm(this, 'AlbTarget5xx', {
       alarmName: `ai-assistant-alb-target-5xx`,
@@ -110,7 +110,7 @@ export class MonitoringStack extends cdk.Stack {
       treatMissingData: cloudwatch.TreatMissingData.NOT_BREACHING,
       comparisonOperator: cloudwatch.ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
     });
-    target5xxAlarm.addAlarmAction(new cw_actions.SnsAction(topic));
+    target5xxAlarm.addAlarmAction(new cwActions.SnsAction(topic));
 
     if (props.rdsInstanceIdentifier) {
       this.createRdsAlarms(topic, props.rdsInstanceIdentifier);
@@ -143,7 +143,7 @@ export class MonitoringStack extends cdk.Stack {
       treatMissingData: cloudwatch.TreatMissingData.NOT_BREACHING,
       comparisonOperator: cloudwatch.ComparisonOperator.LESS_THAN_OR_EQUAL_TO_THRESHOLD,
     });
-    rdsFreeStorageAlarm.addAlarmAction(new cw_actions.SnsAction(topic));
+    rdsFreeStorageAlarm.addAlarmAction(new cwActions.SnsAction(topic));
 
     const rdsCpuAlarm = new cloudwatch.Alarm(this, 'RdsCpu', {
       alarmName: 'ai-assistant-rds-cpu',
@@ -160,7 +160,7 @@ export class MonitoringStack extends cdk.Stack {
       treatMissingData: cloudwatch.TreatMissingData.NOT_BREACHING,
       comparisonOperator: cloudwatch.ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
     });
-    rdsCpuAlarm.addAlarmAction(new cw_actions.SnsAction(topic));
+    rdsCpuAlarm.addAlarmAction(new cwActions.SnsAction(topic));
   }
 
   private createBedrockAlarms(topic: sns.Topic) {
@@ -178,7 +178,7 @@ export class MonitoringStack extends cdk.Stack {
       treatMissingData: cloudwatch.TreatMissingData.NOT_BREACHING,
       comparisonOperator: cloudwatch.ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
     });
-    bedrockThrottlesAlarm.addAlarmAction(new cw_actions.SnsAction(topic));
+    bedrockThrottlesAlarm.addAlarmAction(new cwActions.SnsAction(topic));
 
     const bedrockServerErrorsAlarm = new cloudwatch.Alarm(this, 'BedrockServerErrors', {
       alarmName: 'ai-assistant-bedrock-server-errors',
@@ -194,7 +194,7 @@ export class MonitoringStack extends cdk.Stack {
       treatMissingData: cloudwatch.TreatMissingData.NOT_BREACHING,
       comparisonOperator: cloudwatch.ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
     });
-    bedrockServerErrorsAlarm.addAlarmAction(new cw_actions.SnsAction(topic));
+    bedrockServerErrorsAlarm.addAlarmAction(new cwActions.SnsAction(topic));
 
     for (const [id, metricName, stat, alarmName] of [
       ['BedrockInvocationLatency', 'InvocationLatency', 'p50', 'ai-assistant-bedrock-invocation-latency-p50'],
@@ -214,7 +214,7 @@ export class MonitoringStack extends cdk.Stack {
         datapointsToAlarm: 3,
         treatMissingData: cloudwatch.TreatMissingData.NOT_BREACHING,
       });
-      alarm.addAlarmAction(new cw_actions.SnsAction(topic));
+      alarm.addAlarmAction(new cwActions.SnsAction(topic));
     }
   }
 
@@ -238,7 +238,7 @@ export class MonitoringStack extends cdk.Stack {
         datapointsToAlarm: 3,
         treatMissingData: cloudwatch.TreatMissingData.NOT_BREACHING,
       });
-      alarm.addAlarmAction(new cw_actions.SnsAction(topic));
+      alarm.addAlarmAction(new cwActions.SnsAction(topic));
     }
   }
 
@@ -258,7 +258,7 @@ export class MonitoringStack extends cdk.Stack {
       treatMissingData: cloudwatch.TreatMissingData.NOT_BREACHING,
       comparisonOperator: cloudwatch.ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
     });
-    currConnectionsAlarm.addAlarmAction(new cw_actions.SnsAction(topic));
+    currConnectionsAlarm.addAlarmAction(new cwActions.SnsAction(topic));
   }
 
   private createDocDbAlarms(topic: sns.Topic, clusterIdentifier: string) {
@@ -279,7 +279,7 @@ export class MonitoringStack extends cdk.Stack {
       treatMissingData: cloudwatch.TreatMissingData.NOT_BREACHING,
       comparisonOperator: cloudwatch.ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
     });
-    docDbCpuAlarm.addAlarmAction(new cw_actions.SnsAction(topic));
+    docDbCpuAlarm.addAlarmAction(new cwActions.SnsAction(topic));
 
     for (const [id, metricName] of [
       ['DocDbReadLatency', 'ReadLatency'],
@@ -300,7 +300,7 @@ export class MonitoringStack extends cdk.Stack {
         datapointsToAlarm: 4,
         treatMissingData: cloudwatch.TreatMissingData.NOT_BREACHING,
       });
-      alarm.addAlarmAction(new cw_actions.SnsAction(topic));
+      alarm.addAlarmAction(new cwActions.SnsAction(topic));
     }
   }
 }
