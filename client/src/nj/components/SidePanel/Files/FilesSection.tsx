@@ -44,7 +44,7 @@ export default function FilesSection({
         <h2 id={headingId}>
           {title} <span className="sr-only">files</span>
         </h2>
-        {shown > 0 && <div className="text-text-secondary">{showingText}</div>}
+        {shown > 0 && canCollapse && <div className="text-text-secondary">{showingText}</div>}
       </div>
 
       {/* Files (or empty text if none) */}
