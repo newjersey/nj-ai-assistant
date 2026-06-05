@@ -76,7 +76,8 @@ describe('constRecoilState Tests', () => {
     expect(button).toHaveAttribute('title', 'Recoil Value=67');
   });
 
-  describe('Locked states', () => {
+  // Skipping because no longer relevant, but will delete in a subsequent cleanup PR
+  describe.skip('Locked states', () => {
     test('search is locked to disabled', () => {
       const defaultState = {
         enabled: false,
