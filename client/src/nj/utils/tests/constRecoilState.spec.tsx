@@ -1,7 +1,10 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { atom, RecoilRoot, RecoilState, useRecoilState } from 'recoil';
 import { constRecoilState, constRecoilStateOpts } from '~/nj/utils/constRecoilState';
-import store from '~/store';
+// TODO: Will delete when file is deleted in subsequent cleanup PR
+// Note: This import is connected toartifacts.ts and other files, causing the
+// Test:Windows CI test to fail b/c of skipped test below
+// import store from '~/store';
 
 function TestRecoilState<T>({
   recoilState,
