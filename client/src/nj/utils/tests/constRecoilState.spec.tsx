@@ -1,10 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { atom, RecoilRoot, RecoilState, useRecoilState } from 'recoil';
 import { constRecoilState, constRecoilStateOpts } from '~/nj/utils/constRecoilState';
-// TODO: Will delete when file is deleted in subsequent cleanup PR
-// Note: This import is connected toartifacts.ts and other files, causing the
-// Test:Windows CI test to fail b/c of skipped test below
-// import store from '~/store';
+import store from '~/store';
 
 function TestRecoilState<T>({
   recoilState,
@@ -79,8 +76,7 @@ describe('constRecoilState Tests', () => {
     expect(button).toHaveAttribute('title', 'Recoil Value=67');
   });
 
-  // Skipping because no longer relevant, but will delete in a subsequent cleanup PR
-  describe.skip('Locked states', () => {
+  describe('Locked states', () => {
     test('search is locked to disabled', () => {
       const defaultState = {
         enabled: false,
