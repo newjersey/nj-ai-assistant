@@ -72,7 +72,7 @@ export default function FileSearch({
 
       {/* Header & explanation */}
       <div className="mx-3 mb-3">
-        <h3 className="text-sm font-semibold">{localize('com_assistants_file_search')}</h3>
+        <h3 className="font-semibold">{localize('com_assistants_file_search')}</h3>
         <p className="mt-1 text-sm text-text-secondary">
           Upload any documents you want the agent to search through — like policy documents,
           research papers, and other work files.
