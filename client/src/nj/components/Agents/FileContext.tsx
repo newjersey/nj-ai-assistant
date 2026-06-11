@@ -64,10 +64,10 @@ export default function FileContext({
 
   return (
     <div className="w-full">
-      <hr className="mb-2 border-border-heavy" />
+      <hr className="mb-2 border-border-light" />
 
       {/* Header & explanation */}
-      <div className="mx-3 mb-3">
+      <div className="mx-3">
         <h3 className="text-sm font-semibold">{localize('com_agents_file_context_label')}</h3>
         <p className="mt-1 text-sm text-text-secondary">
           Upload reference materials, examples, templates, or any other relevant instruction
@@ -75,9 +75,7 @@ export default function FileContext({
         </p>
       </div>
 
-      <hr className="border-border-heavy" />
-
-      <div className="flex flex-col gap-3 px-3 pb-4 pt-4">
+      <div className="flex flex-col gap-3 px-3 pb-4 pt-3">
         {/* File Search (RAG API) Files */}
         <FileRow
           files={files}

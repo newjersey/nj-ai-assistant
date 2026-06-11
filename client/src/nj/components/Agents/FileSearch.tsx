@@ -68,7 +68,7 @@ export default function FileSearch({
 
   return (
     <div className="w-full">
-      <hr className="mb-2 border-border-heavy" />
+      <hr className="mb-2 border-border-light" />
 
       {/* Header & explanation */}
       <div className="mx-3 mb-3">
@@ -80,10 +80,8 @@ export default function FileSearch({
         <FileSearchCheckbox />
       </div>
 
-      <hr className="border-border-heavy" />
-
       {fileSearchChecked && (
-        <div className="flex flex-col gap-3 px-3 pb-4 pt-4">
+        <div className="flex flex-col gap-3 px-3 pb-4">
           {/* File Search (RAG API) Files */}
           <FileRow
             files={files}

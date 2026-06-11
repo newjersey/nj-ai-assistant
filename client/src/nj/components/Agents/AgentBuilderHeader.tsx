@@ -28,8 +28,8 @@ export default function AgentBuilderHeader({
   const showAgentMarketplace = useShowMarketplace();
 
   return (
-    <div className="flex w-full flex-wrap gap-2">
-      <div className="mb-1 w-full">
+    <div className="flex w-full flex-wrap">
+      <div className="mb-2 w-full">
         <div className="flex w-full flex-row items-center justify-between px-3 pb-4 pt-4">
           <h2 className="py-1 text-xl font-bold">Agent Builder</h2>
 
@@ -46,12 +46,12 @@ export default function AgentBuilderHeader({
           )}
         </div>
 
-        <hr className="mb-4 border-border-medium" />
+        <hr className="mb-4 border-border-light" />
         <span className="mx-3 text-sm font-semibold">Select an agent to edit</span>
       </div>
 
       {/* Select agent to edit */}
-      <div className="mx-3 w-full">
+      <div className="mx-3 mb-1 w-full">
         <AgentSelect
           createMutation={createMutation}
           agentQuery={agentQuery}
@@ -62,7 +62,7 @@ export default function AgentBuilderHeader({
 
       {/* Show agent library & manage agent dropdown */}
       {showAgentMarketplace && (
-        <div className="mx-3 mt-1 flex w-full flex-row items-center justify-between">
+        <div className="mx-3 flex w-full flex-row items-center justify-between">
           <button
             type="button"
             className="rounded px-2 py-2 hover:bg-surface-active-alt"
@@ -86,7 +86,7 @@ export default function AgentBuilderHeader({
         </div>
       )}
 
-      <hr className="mt-1 w-full border-border-heavy" />
+      <hr className="mt-2 w-full border-border-light" />
     </div>
   );
 }

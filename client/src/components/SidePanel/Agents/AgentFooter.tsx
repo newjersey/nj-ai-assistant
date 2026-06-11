@@ -100,6 +100,8 @@ export default function AgentFooter({
    */
   return (
     <div>
+      {showButtons && <hr />}
+
       {/* Advanced settings */}
       {showButtons && (
         <div data-testid="advanced-button">

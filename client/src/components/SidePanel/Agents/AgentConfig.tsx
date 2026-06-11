@@ -243,14 +243,12 @@ export default function AgentConfig() {
   return (
     <div className="h-auto pt-3">
       {/* Identity */}
-      <div className="mx-3 pb-3">
+      <div className="mx-3">
         <h3 className={sectionLabelClass}>Identity</h3>
         <p className="mt-1 text-sm text-text-secondary">
           Give your agent a clear, descriptive name
         </p>
       </div>
-
-      <hr className="border-border-heavy" />
 
       <div className="px-3 pb-3 pt-4">
         <label className={labelClass} htmlFor="name">
@@ -308,7 +306,7 @@ export default function AgentConfig() {
         />
       </div>
 
-      <hr className="mb-4 border-border-heavy" />
+      <hr className="mb-4 border-border-light" />
 
       {/* Instructions */}
       <div className="mx-3 pb-3">
@@ -329,9 +327,7 @@ export default function AgentConfig() {
         </p>
       </div>
 
-      <hr className="border-border-heavy" />
-
-      <div className="px-3 py-4">
+      <div className="px-3 pb-4">
         <Instructions />
       </div>
 
