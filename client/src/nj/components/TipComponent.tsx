@@ -1,7 +1,7 @@
-import uswdsIcons from '@uswds/uswds/img/sprite.svg';
-import { X } from 'lucide-react';
 import React from 'react';
+import { X } from 'lucide-react';
 import { useRecoilState } from 'recoil';
+import uswdsIcons from '@uswds/uswds/img/sprite.svg';
 import { atomWithLocalStorage } from '~/store/utils';
 
 /**

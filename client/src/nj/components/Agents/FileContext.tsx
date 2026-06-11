@@ -6,8 +6,8 @@ import { EModelEndpoint, EToolResources } from 'librechat-data-provider';
 import type { ExtendedFile } from '~/common';
 import { useFileHandlingNoChatContext } from '~/hooks/Files/useFileHandling';
 import { useAgentFileConfig, useLazyEffect, useLocalize } from '~/hooks';
-import FileRow from '~/components/Chat/Input/Files/FileRow';
 import AddFilesButton from '~/nj/components/Agents/AddFilesButton';
+import FileRow from '~/components/Chat/Input/Files/FileRow';
 
 /**
  * New Jersey's customized FileContext UI (based on LibreChat's `FileContext.tsx`).

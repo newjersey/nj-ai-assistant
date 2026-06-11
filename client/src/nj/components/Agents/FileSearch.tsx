@@ -5,11 +5,11 @@ import React, { useMemo, useRef, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { AgentCapabilities, EModelEndpoint, EToolResources } from 'librechat-data-provider';
 import type { AgentForm, ExtendedFile } from '~/common';
+import FileSearchCheckbox from '~/components/SidePanel/Agents/FileSearchCheckbox';
 import { useFileHandlingNoChatContext } from '~/hooks/Files/useFileHandling';
 import { useAgentFileConfig, useLazyEffect, useLocalize } from '~/hooks';
-import FileRow from '~/components/Chat/Input/Files/FileRow';
-import FileSearchCheckbox from '~/components/SidePanel/Agents/FileSearchCheckbox';
 import AddFilesButton from '~/nj/components/Agents/AddFilesButton';
+import FileRow from '~/components/Chat/Input/Files/FileRow';
 
 /**
  * New Jersey's customized FileSearch UI (based on LibreChat's `FileSearch.tsx`).

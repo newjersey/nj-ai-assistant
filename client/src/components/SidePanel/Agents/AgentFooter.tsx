@@ -1,6 +1,7 @@
 /* eslint-disable i18next/no-literal-string */
 /* ^ We're not worried about i18n for this app ^ */
 
+import { useCallback } from 'react';
 import { Globe } from 'lucide-react';
 import { Spinner } from '@librechat/client';
 import { useWatch, useFormContext } from 'react-hook-form';
@@ -11,7 +12,6 @@ import {
   PermissionBits,
   PermissionTypes,
 } from 'librechat-data-provider';
-import { AgentForm, AgentPanelProps, isEphemeralAgent } from '~/common';
 import {
   useLocalize,
   useAuthContext,
@@ -19,6 +19,8 @@ import {
   useResourcePermissions,
   useSelectAgent,
 } from '~/hooks';
+import { AgentForm, AgentPanelProps, isEphemeralAgent } from '~/common';
+import NewJerseyPanelButton from '~/nj/components/NewJerseyPanelButton';
 import { GenericGrantAccessDialog } from '~/components/Sharing';
 import { useUpdateAgentMutation } from '~/data-provider';
 import AdvancedButton from './Advanced/AdvancedButton';
@@ -27,8 +29,6 @@ import DuplicateAgent from './DuplicateAgent';
 import AdminSettings from './AdminSettings';
 import DeleteButton from './DeleteButton';
 import { Panel } from '~/common';
-import NewJerseyPanelButton from '~/nj/components/NewJerseyPanelButton';
-import { useCallback } from 'react';
 
 export default function AgentFooter({
   activePanel,
