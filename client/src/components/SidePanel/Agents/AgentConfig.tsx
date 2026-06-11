@@ -314,21 +314,21 @@ export default function AgentConfig() {
         <p className="mt-1 text-sm text-text-secondary">
           Define what your agent does, how it behaves, and what it should focus on.
         </p>
-        <p className="mt-1 text-sm text-text-secondary">
-          Read example instructions in the{' '}
-          <a
-            href="https://innovation.nj.gov/skills/ai-how-tos/prompts-and-context"
-            className="text-blue-500 underline hover:text-blue-600"
-            target="_blank"
-            rel="noreferrer"
-          >
-            prompting guide
-          </a>
-        </p>
       </div>
 
-      <div className="px-3 pb-4">
+      <div className="px-3">
         <Instructions />
+      </div>
+
+      <div className="mb-3 mt-1 flex w-full justify-end pr-4">
+        <a
+          href="https://innovation.nj.gov/skills/ai-how-tos/prompts-and-context"
+          className="text-sm font-semibold text-blue-500 underline hover:text-blue-600"
+          target="_blank"
+          rel="noreferrer"
+        >
+          View the prompting guide
+        </a>
       </div>
 
       <TipComponent
