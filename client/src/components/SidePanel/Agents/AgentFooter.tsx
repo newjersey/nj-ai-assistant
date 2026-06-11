@@ -99,7 +99,7 @@ export default function AgentFooter({
    * Make sure to check that the LibreChat implementation hasn't drifted too far functionality-wise!
    */
   return (
-    <div className="bg-surface-tertiary-alt">
+    <div>
       {/* Advanced settings */}
       {showButtons && (
         <div data-testid="advanced-button">

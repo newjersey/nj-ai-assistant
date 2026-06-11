@@ -252,7 +252,7 @@ export default function AgentConfig() {
 
       <hr className="border-border-heavy" />
 
-      <div className="bg-surface-tertiary-alt px-3 pb-3 pt-4">
+      <div className="px-3 pb-3 pt-4">
         <label className={labelClass} htmlFor="name">
           Agent Name
           <span className="ml-1 text-red-500">*</span>
@@ -286,7 +286,7 @@ export default function AgentConfig() {
         />
       </div>
 
-      <div className="bg-surface-tertiary-alt px-3 pb-4">
+      <div className="px-3 pb-4">
         <label className={labelClass} htmlFor="description">
           Description
         </label>
@@ -331,7 +331,7 @@ export default function AgentConfig() {
 
       <hr className="border-border-heavy" />
 
-      <div className="bg-surface-tertiary-alt px-3 py-4">
+      <div className="px-3 py-4">
         <Instructions />
       </div>
 
