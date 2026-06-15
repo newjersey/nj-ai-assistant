@@ -172,10 +172,11 @@ Because we use these special **in region inference** models, we have to explicit
 That means you must update the comma-delimited env var `BEDROCK_AWS_MODELS` (in `nj.env.template` and locally for dev).
 
 We use [model specs](https://www.librechat.ai/docs/configuration/librechat_yaml/object_structure/model_specs) to
-explicitly define the list of models users are allowed to access. These are defined in `nj-librechat.yaml`.
+explicitly define the list of models users are allowed to access. These are defined in `nj-librechat.yaml` and need to
+be updated every time we add a new model
 
-Any AIA conversation started with model "XYZ" is linked to model "XYZ". As such, you should never remove old models from
-the model specs (or else old conversations will no longer accept new prompts).
+Warning: Any AIA conversation started with model "XYZ" is linked to model "XYZ". As such, **you should never remove old
+models from the model specs** (or else old conversations will no longer accept new prompts).
 
 ## Releasing to Prod
 
