@@ -42,6 +42,12 @@ export class EcsStack extends cdk.Stack {
   public readonly s3Bucket: s3.Bucket;
   public mongoService?: ecs.FargateService;
 
+  private readonly envFilesBucket = s3.Bucket.fromBucketArn(
+    this,
+    'EnvFilesBucket',
+    'arn:aws:s3:::nj-librechat-env-files',
+  );
+
   constructor(scope: Construct, id: string, props: EcsServicesProps) {
     super(scope, id, props);
     const vpc = ec2.Vpc.fromLookup(this, 'ExistingVpc', {
@@ -270,8 +276,7 @@ export class EcsStack extends cdk.Stack {
       secrets: envSecrets,
       environmentFiles: [
         ecs.EnvironmentFile.fromBucket(
-          s3.Bucket.fromBucketArn(this, 'EnvFilesBucket', 'arn:aws:s3:::nj-librechat-env-files'),
-          `${props.envVars.env}.env`,
+          s3.Bucket.fromBucketArn(this.envFilesBucket, `${props.envVars.env}.env`),
         ),
       ],
       portMappings: [{ containerPort: 3080 }],
@@ -620,14 +625,15 @@ export class EcsStack extends cdk.Stack {
       },
     });
 
+    const meiliImage = `${this.account}.dkr.ecr.${this.region}.amazonaws.com/newjersey/meilisearch:v1.35.1`;
+
     const meiliContainer = meiliTaskDef.addContainer('meilisearch', {
-      image: ecs.ContainerImage.fromRegistry('getmeili/meilisearch:v1.35.1'),
+      image: ecs.ContainerImage.fromRegistry(meiliImage),
       logging: ecs.LogDrivers.awsLogs({ streamPrefix: 'meilisearch' }),
       portMappings: [{ containerPort: 7700 }],
       environmentFiles: [
         ecs.EnvironmentFile.fromBucket(
-          s3.Bucket.fromBucketArn(this, 'EnvFilesBucket', 'arn:aws:s3:::nj-librechat-env-files'),
-          `${props.envVars.env}.env`,
+          s3.Bucket.fromBucketArn(this.envFilesBucket, `${props.envVars.env}.env`),
         ),
       ],
     });
