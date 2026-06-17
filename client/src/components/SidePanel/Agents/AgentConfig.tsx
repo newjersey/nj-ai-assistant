@@ -4,6 +4,7 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { useRecoilValue } from 'recoil';
+import { Link } from 'react-router-dom';
 import { Switch, useToastContext } from '@librechat/client';
 import { Controller, useWatch, useFormContext } from 'react-hook-form';
 import {
@@ -43,7 +44,6 @@ import AgentTool from './AgentTool';
 import CodeForm from './Code/Form';
 import MCPTools from './MCPTools';
 import store from '~/store';
-import { Link } from 'react-router-dom';
 
 const sectionLabelClass = 'font-semibold';
 const labelClass = 'mb-2 text-token-text-primary block text-sm font-semibold';

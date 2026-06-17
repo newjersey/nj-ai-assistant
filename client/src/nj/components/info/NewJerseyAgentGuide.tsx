@@ -1,5 +1,5 @@
-import LinkRenderer from '~/nj/components/info/LinkRenderer';
 import ReactMarkdown from 'react-markdown';
+import LinkRenderer from '~/nj/components/info/LinkRenderer';
 import agentGuide from '~/nj/content/agent-guide.md?raw';
 
 export default function NewJerseyAgentGuide() {
