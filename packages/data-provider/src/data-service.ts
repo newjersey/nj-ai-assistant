@@ -1,4 +1,5 @@
 import type { AxiosResponse } from 'axios';
+import type { TContextProjectionRequest, TContextUsageEvent } from './types/runs';
 import type { TFileConfig } from './file-config';
 import type * as t from './types';
 import { TPinConversationRequest, TPinConversationResponse } from 'src/nj/convos';
@@ -245,6 +246,16 @@ export const getStartupConfig = (
 
 export const getAIEndpoints = (): Promise<t.TEndpointsConfig> => {
   return request.get(endpoints.aiEndpoints());
+};
+
+export const getTokenConfig = (): Promise<t.TTokenConfigMap> => {
+  return request.get(endpoints.tokenConfig());
+};
+
+export const getContextProjection = (
+  payload: TContextProjectionRequest,
+): Promise<TContextUsageEvent | null> => {
+  return request.post(endpoints.contextProjection(), payload);
 };
 
 export const getModels = async (): Promise<t.TModelsConfig> => {
@@ -1090,6 +1101,29 @@ export const updateSkillNodeContent = (variables: {
     updatedAt: now,
   });
 };
+
+export function getGitHubSkillSyncStatus(): Promise<sk.TGitHubSkillSyncStatusResponse> {
+  return request.get(endpoints.adminSkillsSyncStatus());
+}
+
+export function runGitHubSkillSync(): Promise<sk.TGitHubSkillSyncManualRunResponse> {
+  return request.post(endpoints.adminSkillsSyncRun());
+}
+
+export function setGitHubSkillSyncCredential(variables: {
+  credentialKey: string;
+  token: string;
+}): Promise<sk.TGitHubSkillSyncCredentialSummary> {
+  return request.put(endpoints.adminSkillsSyncCredential(variables.credentialKey), {
+    token: variables.token,
+  } satisfies sk.TGitHubSkillSyncCredentialUpdateRequest);
+}
+
+export function deleteGitHubSkillSyncCredential(
+  credentialKey: string,
+): Promise<{ credentialKey: string; deleted: boolean }> {
+  return request.delete(endpoints.adminSkillsSyncCredential(credentialKey));
+}
 
 /* Roles */
 export function listRoles(): Promise<q.ListRolesResponse> {
