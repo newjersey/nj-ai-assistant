@@ -3080,15 +3080,6 @@ body {
   height: 4.5rem;
   width: 4.5rem;
 }
-/* NJ React Markdown styling (for agent guide ordered list) */
-.markdown-nj ol {
-  list-style-position: outside;
-  list-style-type: decimal;
-  padding-left: 2rem;
-  margin-bottom: 2rem;
-  margin-top: auto;
-  /* padding-top: 0rem; */
-}
 
 /* NJ React Markdown styling (for our release notes page) */
 .markdown-nj h1 {
@@ -3140,6 +3131,14 @@ body {
 
 .markdown-nj ul ul {
   margin-top: 0.5rem;
+}
+
+/* ordered list: used for agent guide */
+.markdown-nj ol {
+  list-style-position: outside;
+  list-style-type: decimal;
+  padding-left: 2rem;
+  margin-bottom: 2rem;
 }
 
 .markdown-nj li {
