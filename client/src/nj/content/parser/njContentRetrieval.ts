@@ -122,7 +122,7 @@ For maintenance purposes, the Platform team and OIT can access the information s
 * Start a new chat conversation by typing “@\\[agent name\\],” and the conversation starts with that agent   
 * Use an agent mid-conversation by typing “@\\[agent name\\]” to activate it. The agent name appears at the top. 
 
-Once you activate an agent, you can see its name at the top of the screen, regardless of activation method. See the ["How to Build & Use Agents" guide](https://ai-assistant.nj.gov/nj/agent-guide) to learn more. `,
+Once you activate an agent, you can see its name at the top of the screen, regardless of activation method. See the ["How to Build & Use Agents" guide](https://ai-assistant.nj.gov/nj/agent-guide) to learn more.`,
           },
           {
             question: 'How can I stop using an agent?',
