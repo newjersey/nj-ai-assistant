@@ -48,7 +48,7 @@ export function getGuideContent(): GuideContent {
 
 You can start using agents with the [Platform Agents](https://ai-assistant.nj.gov/agents) for common tasks, build your own, or customize an existing Platform Agent for what you need. 
 
-See the ["How to Build & Use Agents" guide](https://ai-assistant.nj.gov/nj/agent-guide) to learn more. `,
+See the ["How to Build & Use Agents" guide](https://ai-assistant.nj.gov/nj/agent-guide) to learn more.`,
           },
           {
             question: 'Can I customize the Platform Agents to hone the AI response?',
