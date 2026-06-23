@@ -4,7 +4,7 @@
 
 # Title
 
-Use Agents for Repeated Tasks and Skills! 
+Use agents for repeated tasks and skills\! 
 
 # Description
 
@@ -12,7 +12,7 @@ Save time with agents for repetitive tasks and specialized skills\! Agents remem
 
 # Release notes link text
 
-See the [How to Build & Use Agents Guide](https://ai-assistant.nj.gov/nj/agent-guide). 
+Learn how to build and use agents
 
 # Release notes link
 
