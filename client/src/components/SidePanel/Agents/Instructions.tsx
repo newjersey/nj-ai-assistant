@@ -4,6 +4,8 @@
 import React, { useState, useId } from 'react';
 import { PlusCircle } from 'lucide-react';
 import * as Menu from '@ariakit/react/menu';
+import { specialVariables } from 'librechat-data-provider';
+import { Controller, useFormContext } from 'react-hook-form';
 import {
   CircleHelpIcon,
   DropdownPopup,
@@ -13,13 +15,11 @@ import {
   HoverCardPortal,
   HoverCardTrigger,
 } from '@librechat/client';
-import { specialVariables } from 'librechat-data-provider';
-import { Controller, useFormContext } from 'react-hook-form';
 import type { TSpecialVarLabel } from 'librechat-data-provider';
 import type { AgentForm } from '~/common';
+import { njInputClass } from '~/nj/components/Agents/agentInputStyle';
 import { cn, defaultTextProps, removeFocusOutlines } from '~/utils';
 import { useLocalize } from '~/hooks';
-import { njInputClass } from '~/nj/components/Agents/agentInputStyle';
 
 const inputClass = cn(
   defaultTextProps,
