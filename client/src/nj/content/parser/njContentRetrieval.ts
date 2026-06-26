@@ -134,8 +134,7 @@ You will see the new name in the selector, which is how you know switching agent
           },
           {
             question: `What's the difference between “agents” and “Agentic AI”?`,
-            answer: `The NJ AI Assistant uses “agents”, an AI tool that responds to user requests by performing specific, scoped tasks based on pre-defined prompts. Agents only work when initiated by users and operate within clear boundaries. “Agentic AI” is not used in our tool, and agentic AI is a different type of AI tool with more autonomy in executing tasks. 
-            `,
+            answer: `The NJ AI Assistant uses “agents”, an AI tool that responds to user requests by performing specific, scoped tasks based on pre-defined prompts. Agents only work when initiated by users and operate within clear boundaries. “Agentic AI” is not used in our tool, and agentic AI is a different type of AI tool with more autonomy in executing tasks.`,
           },
         ],
       },
