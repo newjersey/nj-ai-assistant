@@ -12,7 +12,7 @@
     "doctor": "npx cdk doctor"
   },
   "devDependencies": {
-    "aws-cdk-lib": "2.229.1",
+    "aws-cdk-lib": "2.246.0",
     "constructs": "^10.3.0",
     "esbuild": "^0.28.0",
     "ts-node": "^10.9.1",
