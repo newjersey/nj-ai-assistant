@@ -101,7 +101,8 @@ export default function Instructions() {
             </HoverCardContent>
           </HoverCardPortal>
         </HoverCard>
-        <div className="ml-auto" title="Add variables to instructions">
+        {/* NJ: Use custom spacing around the buttons (and our classes on the buttons themselves) */}
+        <div className="ml-auto flex items-center gap-1" title="Add variables to instructions">
           <DropdownPopup
             portal={true}
             mountByState={true}
@@ -114,7 +115,7 @@ export default function Instructions() {
                 id="variables-menu-button"
                 aria-label="Add variable to instructions"
                 title="Add variable to instructions"
-                className="flex h-7 items-center gap-1 rounded-md border border-border-medium bg-surface-primary-alt px-2 py-0 text-sm text-text-primary transition-colors duration-200 hover:bg-surface-tertiary"
+                className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-surface-primary-alt text-text-primary transition-colors duration-200 hover:bg-surface-tertiary"
               >
                 <PlusCircle className="h-4 w-4" strokeWidth={1.75} aria-hidden={true} />
               </Menu.MenuButton>
@@ -128,7 +129,7 @@ export default function Instructions() {
             onClick={() => setIsDialogOpen(true)}
             aria-label={localize('com_ui_expand_editor')}
             title={localize('com_ui_expand_editor')}
-            className="inline-flex h-7 w-7 items-center justify-center rounded-lg text-text-secondary transition-colors hover:bg-surface-secondary hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring-primary"
+            className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-surface-primary-alt text-text-primary transition-colors duration-200 hover:bg-surface-tertiary"
           >
             <Maximize2 className="h-4 w-4" strokeWidth={1.75} aria-hidden={true} />
           </button>
