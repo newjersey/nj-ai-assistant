@@ -48,9 +48,7 @@ export default function AdvancedPanel() {
         >
           <ChevronLeft className="h-5 w-5" strokeWidth={1.75} aria-hidden="true" />
         </button>
-        <h2 className="text-center text-base font-semibold text-text-primary">
-          {localize('com_ui_advanced_settings')}
-        </h2>
+        <div className="mb-2 mt-2 text-xl font-medium">{localize('com_ui_advanced_settings')}</div>
         <span aria-hidden="true" className="h-10 w-10" />
       </header>
 
