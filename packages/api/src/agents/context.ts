@@ -96,13 +96,15 @@ export async function getMCPInstructionsForServers(
  * @returns {string | undefined} Combined instructions, or undefined if empty
  */
 export function buildAgentInstructions({
+  globalSystemPrompt,
   baseInstructions,
   mcpInstructions,
 }: {
+  globalSystemPrompt?: string;
   baseInstructions?: string;
   mcpInstructions?: string;
 }): string | undefined {
-  const parts = [baseInstructions, mcpInstructions].filter(Boolean);
+  const parts = [globalSystemPrompt, baseInstructions, mcpInstructions].filter(Boolean);
   const combined = parts.join('\n\n').trim();
   return combined || undefined;
 }
@@ -136,6 +138,8 @@ export function buildAgentAdditionalInstructions({
  * @param {Logger} [params.logger] - Optional logger instance
  * @returns {Promise<void>}
  */
+
+console.log('applyContextToAgent called');
 export async function applyContextToAgent({
   agent,
   sharedRunContext,
@@ -153,6 +157,12 @@ export async function applyContextToAgent({
   logger?: Logger;
   configServers?: Record<string, ParsedServerConfig>;
 }): Promise<void> {
+  const globalSystemPrompt = `You are an AI assistant built for our organization's employees. 
+    You are an advanced language model, NOT a human. 
+    When referring to yourself, do not use first-person pronouns.
+    Refer to yourself as "the NJ AI Assistant" or "NJ AIA" or "AIA".
+    Do not use first-person human phrasing like "I am feeling good today" or "As a person...". 
+    Always maintain an objective, helpful, and clearly non-human persona.`;
   const baseInstructions = agent.instructions || '';
   const additionalInstructions = agent.additional_instructions || '';
 
@@ -164,8 +174,10 @@ export async function applyContextToAgent({
       logger,
       configServers,
     );
+    console.log('before buildAgentInstructions');
 
     agent.instructions = buildAgentInstructions({
+      globalSystemPrompt,
       baseInstructions,
       mcpInstructions,
     });
@@ -174,11 +186,15 @@ export async function applyContextToAgent({
       sharedRunContext,
     });
 
+    logger?.debug('{AgentContext] Final agent instructions', agent.instructions);
+    console.log('Logging final agent instructions', agent.instructions);
+
     if (agentId && logger) {
       logger.debug(`[AgentContext] Applied context to agent: ${agentId}`);
     }
   } catch (error) {
     agent.instructions = buildAgentInstructions({
+      globalSystemPrompt,
       baseInstructions,
       mcpInstructions: '',
     });
