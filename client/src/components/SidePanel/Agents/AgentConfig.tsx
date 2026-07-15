@@ -26,7 +26,7 @@ import store from '~/store';
 
 const fieldClass = 'h-9';
 const sectionLabelClass = 'font-semibold';
-const labelClass = 'mb-2 text-token-text-primary block text-sm font-medium';
+const labelClass = 'mb-2 text-token-text-primary block text-sm font-semibold';
 
 export default function AgentConfig() {
   const localize = useLocalize();
@@ -138,7 +138,7 @@ export default function AgentConfig() {
               className={njInputClass}
               id="description"
               type="text"
-              placeholder={localize('com_agents_description_placeholder')}
+              placeholder="Optional: Describe your Agent here"
               aria-label="Agent description"
             />
           )}

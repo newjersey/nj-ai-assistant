@@ -46,17 +46,16 @@ export default function AdvancedPanel() {
   return (
     <div className="mb-1 flex w-full flex-col gap-4 text-sm">
       <header className="grid grid-cols-[auto_1fr_auto] items-center gap-2 pt-1">
+        {/* NJ: Use custom styling */}
         <button
           type="button"
           onClick={() => setActivePanel(Panel.builder)}
           aria-label={localize('com_ui_back_to_builder')}
-          className="inline-flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border border-border-light text-text-secondary transition-colors hover:bg-surface-secondary hover:text-text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-ring-primary"
+          className="btn btn-neutral relative"
         >
           <ChevronLeft className="h-5 w-5" strokeWidth={1.75} aria-hidden="true" />
         </button>
-        <h2 className="text-center text-base font-semibold text-text-primary">
-          {localize('com_ui_advanced_settings')}
-        </h2>
+        <div className="mb-2 mt-2 text-xl font-medium">{localize('com_ui_advanced_settings')}</div>
         <span aria-hidden="true" className="h-10 w-10" />
       </header>
 
