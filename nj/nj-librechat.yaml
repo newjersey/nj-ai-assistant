@@ -44,8 +44,10 @@ interface:
     users: false
     groups: false
     roles: false
-  presets: false
-  prompts: false
+  # presets: false
+  presets: true
+  # prompts: false
+  prompts: true
   runCode: false
   sidePanel: false
   webSearch: false
@@ -92,7 +94,6 @@ modelSpecs:
       preset:
         endpoint: 'bedrock'
         model: 'us.anthropic.claude-sonnet-4-5-20250929-v1:0'
-
 ocr:
   strategy: 'document_parser'
 
