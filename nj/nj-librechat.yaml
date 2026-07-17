@@ -64,7 +64,7 @@ endpoints:
   bedrock:
     availableRegions:
       - 'us-east-1'
-    titleModel: 'us.anthropic.claude-sonnet-4-6'
+    titleModel: 'us.anthropic.claude-sonnet-5'
     guardrailConfig:
       guardrailIdentifier: '${GUARDRAIL_ID}'
       guardrailVersion: '${GUARDRAIL_VERSION}'
@@ -81,6 +81,12 @@ endpoints:
 # We explicitly spec our models (since we only have a few models and this makes the selector simpler)
 modelSpecs:
   list:
+    - name: claude-sonnet-5
+      label: 'Claude Sonnet 5'
+      default: true
+      preset:
+        endpoint: 'bedrock'
+        model: 'us.anthropic.claude-sonnet-5'
     - name: claude-sonnet-4-6
       label: 'Claude Sonnet 4.6'
       preset:
@@ -88,7 +94,6 @@ modelSpecs:
         model: 'us.anthropic.claude-sonnet-4-6'
     - name: 'Claude Sonnet 4.5'
       label: 'Claude Sonnet 4.5'
-      default: true
       preset:
         endpoint: 'bedrock'
         model: 'us.anthropic.claude-sonnet-4-5-20250929-v1:0'
@@ -102,7 +107,7 @@ memory:
   agent:
     enabled: true
     provider: 'bedrock'
-    model: 'us.anthropic.claude-sonnet-4-6'
+    model: 'us.anthropic.claude-sonnet-5'
 
 fileConfig:
   serverFileSizeLimit: 15 # Global multer limit (MB)
