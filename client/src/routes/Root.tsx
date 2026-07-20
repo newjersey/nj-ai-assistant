@@ -43,7 +43,10 @@ function KeyboardShortcutsProvider() {
   useKeyboardShortcuts();
   return (
     <>
+      {/* NJ: Hiding keyboard shortcuts; it allows functioanlity 
+      we don't allow (e.g. delete conversation)
       <KeyboardShortcutsDialog />
+     */}
       <KeyboardDeleteDialog />
     </>
   );
