@@ -38,7 +38,8 @@ export default function MemoryCard({ memory, hasUpdateAccess }: MemoryCardProps)
             {memory.agentName ?? memory.agentId}
           </span>
         )}
-        {memory.tokenCount !== undefined && (
+        {/* NJ: Remove token count from memories UI */}
+        {memory.tokenCount !== undefined && false && (
           <span className="shrink-0 text-xs text-text-secondary">
             {memory.tokenCount}{' '}
             {localize(memory.tokenCount === 1 ? 'com_ui_token' : 'com_ui_tokens')}

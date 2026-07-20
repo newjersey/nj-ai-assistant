@@ -182,15 +182,15 @@ export default function MemoryPanel() {
                   description={localize('com_ui_create_memory')}
                   side="bottom"
                   render={
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="size-9 shrink-0 bg-transparent"
+                    // NJ: Customize the "Create Memory" button
+                    <button
+                      type="button"
+                      className="btn btn-secondary !px-1.5 !py-1.5"
                       aria-label={localize('com_ui_create_memory')}
                       onClick={() => setCreateDialogOpen(true)}
                     >
-                      <Plus className="size-4" aria-hidden="true" />
-                    </Button>
+                      <Plus className="size-5" aria-hidden="true" />
+                    </button>
                   }
                 />
               </OGDialogTrigger>

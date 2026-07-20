@@ -1,9 +1,9 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
-import MemoryArtifacts from '../MemoryArtifacts';
-import type { TAttachment, MemoryArtifact } from 'librechat-data-provider';
 import { Tools } from 'librechat-data-provider';
+import type { TAttachment, MemoryArtifact } from 'librechat-data-provider';
+import MemoryArtifacts from '../MemoryArtifacts';
 
 // Mock the localize hook
 jest.mock('~/hooks', () => ({
@@ -69,8 +69,8 @@ describe('MemoryArtifacts', () => {
       render(<MemoryArtifacts attachments={attachments} />);
 
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('text-text-secondary-alt');
-      expect(button).toHaveClass('hover:text-text-primary');
+      // NJ: Patch test for custom colors
+      expect(button).toHaveClass('text-jersey-blue');
       expect(button).not.toHaveClass('text-red-500');
     });
 
