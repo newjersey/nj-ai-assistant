@@ -1,10 +1,10 @@
 import { useMemo, useState, useEffect } from 'react';
-import { Plus } from 'lucide-react';
+import { useRecoilState } from 'recoil';
+import { Plus, Check } from 'lucide-react';
 import { matchSorter } from 'match-sorter';
 import { SystemRoles, PermissionTypes, Permissions } from 'librechat-data-provider';
 import {
   Button,
-  Checkbox,
   Spinner,
   Dropdown,
   FilterInput,
@@ -18,13 +18,19 @@ import {
   useMemoriesQuery,
   useGetUserQuery,
 } from '~/data-provider';
+import MemoryPanelSplash from '~/nj/components/SidePanel/Memories/MemoryPanelSplash';
 import { useLocalize, useAuthContext, useHasAccess } from '~/hooks';
 import MemoryCreateDialog from './MemoryCreateDialog';
+import { atomWithLocalStorage } from '~/store/utils';
 import MemoryUsageBadge from './MemoryUsageBadge';
 import AdminSettings from './AdminSettings';
 import MemoryList from './MemoryList';
+import { cn } from '~/utils';
 
 const pageSize = 10;
+
+// NJ: Show a one-time splash page introducing memories on first visit
+const showSplashPageState = atomWithLocalStorage('memoryPanelSplashPage', true);
 
 /** Partition filter sentinels; any other value is an agent id */
 const PARTITION_ALL = 'all';
@@ -41,6 +47,7 @@ export default function MemoryPanel() {
   const [partitionFilter, setPartitionFilter] = useState(PARTITION_ALL);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [referenceSavedMemories, setReferenceSavedMemories] = useState(true);
+  const [showSplashPage, setShowSplashPage] = useRecoilState(showSplashPageState);
 
   const updateMemoryPreferencesMutation = useUpdateMemoryPreferencesMutation({
     onSuccess: () => {
@@ -143,6 +150,11 @@ export default function MemoryPanel() {
     setPageIndex(0);
   }, [searchQuery, activePartition]);
 
+  // NJ: Show a splash page the first time a user accesses memories
+  if (showSplashPage) {
+    return <MemoryPanelSplash setShowSplashPage={setShowSplashPage} />;
+  }
+
   if (isLoading) {
     return (
       <div className="flex h-full w-full items-center justify-center p-4">
@@ -224,24 +236,34 @@ export default function MemoryPanel() {
 
             {/* Memory Toggle */}
             {hasOptOutAccess && (
-              <Button
-                size="sm"
-                variant="outline"
-                className={`ml-auto ${referenceSavedMemories ? 'bg-surface-hover hover:bg-surface-hover' : ''}`}
+              // NJ: Customize the memory toggle
+              <button
+                type="button"
+                className={cn(
+                  'btn !rounded-lg text-text-primary ring-offset-background focus-visible:ring-2',
+                  'ml-auto gap-2 !transition-none focus-visible:ring-ring focus-visible:ring-offset-2',
+                  referenceSavedMemories ? 'bg-surface-tertiary' : '!border-border-medium',
+                )}
                 onClick={() => handleMemoryToggle(!referenceSavedMemories)}
                 aria-label={localize('com_ui_use_memory')}
                 aria-pressed={referenceSavedMemories}
                 disabled={updateMemoryPreferencesMutation.isLoading}
               >
-                <Checkbox
-                  checked={referenceSavedMemories}
-                  tabIndex={-1}
+                <span
                   aria-hidden="true"
-                  aria-label={localize('com_ui_use_memory')}
-                  className="pointer-events-none mr-2"
-                />
+                  className={cn(
+                    'flex size-4 shrink-0 items-center justify-center rounded-[2px] border',
+                    referenceSavedMemories
+                      ? 'border-transparent bg-primary text-primary-foreground'
+                      : 'border-border-xheavy bg-transparent',
+                  )}
+                >
+                  {referenceSavedMemories && (
+                    <Check className="size-3" strokeWidth={3} aria-hidden="true" />
+                  )}
+                </span>
                 {localize('com_ui_use_memory')}
-              </Button>
+              </button>
             )}
           </div>
         )}
