@@ -1,3 +1,6 @@
+/* eslint-disable i18next/no-literal-string */
+/* ^ We're not worried about i18n for this app ^ */
+
 import React, { useState } from 'react';
 import { PermissionTypes, Permissions } from 'librechat-data-provider';
 import {
@@ -109,32 +112,33 @@ export default function MemoryCreateDialog({
         title={localize('com_ui_create_memory')}
         showCloseButton={false}
         className="w-11/12 md:max-w-lg"
+        // NJ: Renaming "Key" -> "Label", and "Value" -> "Details"
         main={
           <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="memory-key" className="text-sm font-medium text-text-primary">
-                {localize('com_ui_key')}
+                Label
               </Label>
               <Input
                 id="memory-key"
                 value={key}
                 onChange={(e) => setKey(e.target.value)}
                 onKeyDown={handleKeyPress}
-                placeholder={localize('com_ui_enter_key')}
+                placeholder="Enter label"
                 className="w-full"
               />
               <p className="text-xs text-text-secondary">{localize('com_ui_memory_key_hint')}</p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="memory-value" className="text-sm font-medium text-text-primary">
-                {localize('com_ui_value')}
+                Details
               </Label>
               <textarea
                 id="memory-value"
                 value={value}
                 onChange={(e) => setValue(e.target.value)}
                 onKeyDown={handleKeyPress}
-                placeholder={localize('com_ui_enter_value')}
+                placeholder="Enter details"
                 className="min-h-[100px] w-full resize-none rounded-lg border border-border-light bg-transparent px-3 py-2 text-sm text-text-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-border-heavy"
                 rows={4}
               />

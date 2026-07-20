@@ -30,12 +30,13 @@ export default function MemoryCardActions({ memory }: MemoryCardActionsProps) {
 
   const { mutate: deleteMemory, isLoading: isDeleting } = useDeleteMemoryMutation();
 
+  // NJ: Update styling slightly
   const buttonBaseClass = cn(
     'flex size-7 items-center justify-center rounded-md',
     'transition-colors duration-150',
-    'text-text-secondary hover:text-text-primary',
+    // 'text-text-secondary hover:text-text-primary',
     'hover:bg-surface-tertiary',
-    'focus:outline-none focus-visible:ring-2 focus-visible:ring-border-heavy',
+    ' bg-surface-primary-alt text-text-primary mx-0.5',
   );
 
   const confirmDelete = () => {

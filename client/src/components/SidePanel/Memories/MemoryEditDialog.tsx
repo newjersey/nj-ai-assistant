@@ -1,3 +1,6 @@
+/* eslint-disable i18next/no-literal-string */
+/* ^ We're not worried about i18n for this app ^ */
+
 import React, { useState, useEffect, useMemo } from 'react';
 import { PermissionTypes, Permissions } from 'librechat-data-provider';
 import {
@@ -148,9 +151,11 @@ export default function MemoryEditDialog({
         main={
           <div className="space-y-4">
             {/* Memory metadata */}
+            {/* NJ: remove token usage banner
             {memory && (
               <div className="flex items-center justify-between rounded-lg border border-border-light bg-surface-secondary px-3 py-2">
                 {/* Token count - Left */}
+            {/*
                 {memory.tokenCount !== undefined ? (
                   <span className="text-xs text-text-secondary">
                     {memory.tokenCount.toLocaleString()}{' '}
@@ -161,11 +166,13 @@ export default function MemoryEditDialog({
                 )}
 
                 {/* Date - Center */}
+            {/*
                 <span className="text-xs text-text-secondary">
                   {formatDateTime(memory.updated_at)}
                 </span>
 
                 {/* Usage badge - Right (memory-specific) */}
+            {/*
                 {memoryUsage ? (
                   <MemoryUsageBadge
                     percentage={memoryUsage.percentage}
@@ -178,34 +185,36 @@ export default function MemoryEditDialog({
                 )}
               </div>
             )}
-
+            */}
             {/* Key input */}
+            {/* NJ: Rename Key -> Label */}
             <div className="space-y-2">
               <Label htmlFor="memory-key" className="text-sm font-medium text-text-primary">
-                {localize('com_ui_key')}
+                Label
               </Label>
               <Input
                 id="memory-key"
                 value={key}
                 onChange={(e) => hasUpdateAccess && setKey(e.target.value)}
                 onKeyDown={handleKeyPress}
-                placeholder={localize('com_ui_enter_key')}
+                placeholder="Enter label"
                 className="w-full"
                 disabled={!hasUpdateAccess}
               />
             </div>
 
             {/* Value textarea */}
+            {/* NJ: Rename Value -> Details */}
             <div className="space-y-2">
               <Label htmlFor="memory-value" className="text-sm font-medium text-text-primary">
-                {localize('com_ui_value')}
+                Details
               </Label>
               <textarea
                 id="memory-value"
                 value={value}
                 onChange={(e) => hasUpdateAccess && setValue(e.target.value)}
                 onKeyDown={handleKeyPress}
-                placeholder={localize('com_ui_enter_value')}
+                placeholder="Enter details"
                 className="min-h-[100px] w-full resize-none rounded-lg border border-border-light bg-transparent px-3 py-2 text-sm text-text-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-border-heavy disabled:cursor-not-allowed disabled:opacity-50"
                 rows={4}
                 disabled={!hasUpdateAccess}
