@@ -226,6 +226,10 @@ also edit [`interface.ts`](interface.ts). Use calls to `getEnvBoolean()` to repl
 
 Make sure to remove the feature flag after the feature has been released!
 
+### Metrics
+
+For all things metrics-related, see the [Metrics README](nj/metrics/README.md).
+
 ### Content Security Policy
 
 The [Content Security Policy (CSP) header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CSP) determines
