@@ -42,6 +42,7 @@ You _should_ only need to do the following once:
    # Start Colima
    $ brew services start colima
    ```
+
    </details>
 
 2. Install `nvm` ([instructions](https://github.com/nvm-sh/nvm?tab=readme-ov-file#installing-and-updating)).
@@ -52,7 +53,7 @@ Once you've finished initial setup, you can start (or restart) containers using 
 
 ```
 docker compose -f nj-dev-docker-compose.yml up -d
-````
+```
 
 ### Building & Running NJ AIA (AIA)
 
@@ -61,8 +62,8 @@ Before running AIA, first create a `.env` file in the root directory & fill it w
 Afterwards, you can repeat these steps to get AIA running:
 
 1. Build everything: `npm run reinstall`
-    - _Note: after running this once, you can instead run `npm run frontend` to build w/o reinstalling node_modules to
-      save time, if you know packages haven't changed._
+   - _Note: after running this once, you can instead run `npm run frontend` to build w/o reinstalling node_modules to
+     save time, if you know packages haven't changed._
 2. Start the backend (w/ live rebuilds): `npm run backend:dev`
 3. Start the frontend (w/ live rebuilds): `npm run frontend:dev`
 4. Visit AIA @ http://localhost:3090
@@ -214,11 +215,11 @@ We use environment variables for flags, which allows us to turn a feature on or 
 dev, prod). There are a few files to edit for that:
 
 - [`render-env.yml`](render-env.yml), which determines the flag's value for each environment.
-    - Example: `export FOO_FLAG=$([[ "${{ inputs.environment }}" == "dev" ]] && echo true || echo false)`
+  - Example: `export FOO_FLAG=$([[ "${{ inputs.environment }}" == "dev" ]] && echo true || echo false)`
 - [`nj.env.template`](nj.env.template), which puts the env vars defined in `render-env.yml` into our environment.
-    - Example: `FOO_FLAG=$FOO_FLAG`
+  - Example: `FOO_FLAG=$FOO_FLAG`
 - Your personal `.env` file, for local development.
-    - Example: `FOO_FLAG=true`
+  - Example: `FOO_FLAG=true`
 
 If you want the environment variable to drive a setting in [`nj-librechat.yaml`](nj-librechat.yaml), then you'll want to
 also edit [`interface.ts`](interface.ts). Use calls to `getEnvBoolean()` to replace the given configuration value.
@@ -297,8 +298,8 @@ setting a non-existent tag. The infra deploy workflow will still need to be ran 
 
 - From the Github Actions tab, select the Deploy AI Assistant Infrastructure workflow
 - Select Run Workflow
-    - Branch: `newjersey`
-    - Environment: `prod`
+  - Branch: `newjersey`
+  - Environment: `prod`
 - Wait for the cdk-diff job to complete
 - REVIEW THE OUTPUT. When you approve the cdk-deploy job, you are responsible for the changes that roll out.
 - Approve and wait for the fireworks. You can watch the deployment from the Cloudformation console if so desired.
