@@ -40,16 +40,16 @@ declare global {
 
 /** Isolates keyboard shortcut listeners so they only mount after auth. */
 function KeyboardShortcutsProvider() {
-  /* NJ: Hides keyboard shortcuts; they enable unsupported functionality (e.g. deleting chats). */
+  /* NJ: return early to disable keyboard shortcuts, which allow unsupported functionality (e.g. deleting chats). */
   return null;
 
-  // useKeyboardShortcuts();
-  // return (
-  //   <>
-  //     <KeyboardShortcutsDialog />
-  //     <KeyboardDeleteDialog />
-  //   </>
-  // );
+  useKeyboardShortcuts();
+  return (
+    <>
+      <KeyboardShortcutsDialog />
+      <KeyboardDeleteDialog />
+    </>
+  );
 }
 
 export default function Root() {
