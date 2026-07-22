@@ -2,7 +2,7 @@
 
 ---
 
-## July 21, 2026
+## July 22, 2026
 
 Features released:
 
