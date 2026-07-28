@@ -214,9 +214,9 @@ Feature flags allow us to deploy releases without having to reveal features stil
 We use environment variables for flags, which allows us to turn a feature on or off for an entire environment (local,
 dev, prod). There are a few files to edit for that:
 
-- [`render-env.yml`](render-env.yml), which determines the flag's value for each environment.
+- [`nj-render-env.yml`](./.github/workflows/nj-render-env.yml), which determines the flag's value for each environment.
   - Example: `export FOO_FLAG=$([[ "${{ inputs.environment }}" == "dev" ]] && echo true || echo false)`
-- [`nj.env.template`](nj.env.template), which puts the env vars defined in `render-env.yml` into our environment.
+- [`nj.env.template`](nj.env.template), which puts the env vars defined in `render-env` into our environment.
   - Example: `FOO_FLAG=$FOO_FLAG`
 - Your personal `.env` file, for local development.
   - Example: `FOO_FLAG=true`
@@ -255,7 +255,7 @@ Prod release happens in two steps:
 
 1. Create a [release](https://github.com/newjersey/nj-ai-assistant/releases) in Github, and wait for it to build and
    push
-2. [OPTIONAL] If environment variables have changed, run the [render-env workflow](./.github/workflows/render-env.yml)
+2. [OPTIONAL] If environment variables have changed, run the [render-env workflow](./.github/workflows/nj-render-env.yml)
 3. Run the [infra deploy workflow](./.github/workflows/nj-infra-deploy.yml) on the prod environment.
 
 ### Create a new release
@@ -280,7 +280,7 @@ The new release & tag will initiate the tag build and update the `ai-assistant/p
 
 ### Updating Environment Files
 
-Environment files are rendered and uploaded by [this workflow](./.github/workflows/render-env.yml). It
+Environment files are rendered and uploaded by [this workflow](./.github/workflows/nj-render-env.yml). It
 takes [the nj template](./nj/nj.env.template) and performs `envsubst`, pulling in values from Github environment
 secrets. TechOps support will likely be needed to update those environment secrets, but Josh can do it for right now.
 

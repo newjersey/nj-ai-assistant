@@ -1,4 +1,5 @@
 name: Deploy AI Assistant Infrastructure
+run-name: "Deploy ${{ inputs.environment }}${{ inputs.environment == 'dev' && format(' (kitchensink: {0})', inputs.deploy_kitchensink) || '' }}"
 
 on:
   workflow_dispatch:
