@@ -214,21 +214,23 @@ Feature flags allow us to deploy releases without having to reveal features stil
 We use environment variables for flags, which allows us to turn a feature on or off for an entire environment (local,
 dev, prod). There are a few files to edit for that:
 
-- [`nj-render-env.yml`](./.github/workflows/nj-render-env.yml), which determines the flag's value for each environment.
+- [`nj-render-env.yml`](/.github/workflows/nj-render-env.yml), which determines the flag's value for each environment.
   - Example: `export FOO_FLAG=$([[ "${{ inputs.environment }}" == "dev" ]] && echo true || echo false)`
-- [`nj.env.template`](nj.env.template), which puts the env vars defined in `render-env` into our environment.
+- [`nj.env.template`](/nj/nj.env.template), which puts the env vars defined in `render-env` into our environment.
   - Example: `FOO_FLAG=$FOO_FLAG`
 - Your personal `.env` file, for local development.
   - Example: `FOO_FLAG=true`
 
-If you want the environment variable to drive a setting in [`nj-librechat.yaml`](nj-librechat.yaml), then you'll want to
-also edit [`interface.ts`](interface.ts). Use calls to `getEnvBoolean()` to replace the given configuration value.
+If you want the environment variable to drive a setting in [`nj-librechat.yaml`](/nj/nj-librechat.yaml), then you'll
+want to also edit [`interface.ts`](/packages/data-schemas/src/app/interface.ts) and/or
+[`service.ts`](/packages/data-schemas/src/app/service.ts). Use calls to `getEnvBoolean()` to replace the given
+configuration value.
 
 Make sure to remove the feature flag after the feature has been released!
 
 ### Metrics
 
-For all things metrics-related, see the [Metrics README](nj/metrics/README.md).
+For all things metrics-related, see the [Metrics README](/nj/metrics/README.md).
 
 ### Content Security Policy
 
@@ -237,7 +239,7 @@ which resources can be loaded onto our website. It's important to know about CSP
 resources (such as serving files from a CDN). It's especially important to know because, when developing locally,
 CSP doesn't actually block anything - thus something that seems to work fine during development breaks when deployed.
 
-If you need to modify our CSP, it's located in [`nj-helment.js`](nj-helment.js).
+If you need to modify our CSP, it's located in [`nj-helment.js`](/api/nj/nj-helmet.js).
 
 _(Keep in mind that Imperva also adds its own CSP headers, so the CSP may look different deployed behind Imperva than it
 does when running locally.)_
@@ -255,8 +257,8 @@ Prod release happens in two steps:
 
 1. Create a [release](https://github.com/newjersey/nj-ai-assistant/releases) in Github, and wait for it to build and
    push
-2. [OPTIONAL] If environment variables have changed, run the [render-env workflow](./.github/workflows/nj-render-env.yml)
-3. Run the [infra deploy workflow](./.github/workflows/nj-infra-deploy.yml) on the prod environment.
+2. [OPTIONAL] If environment variables have changed, run the [render-env workflow](/.github/workflows/nj-render-env.yml)
+3. Run the [infra deploy workflow](/.github/workflows/nj-infra-deploy.yml) on the prod environment.
 
 ### Create a new release
 
@@ -280,8 +282,8 @@ The new release & tag will initiate the tag build and update the `ai-assistant/p
 
 ### Updating Environment Files
 
-Environment files are rendered and uploaded by [this workflow](./.github/workflows/nj-render-env.yml). It
-takes [the nj template](./nj/nj.env.template) and performs `envsubst`, pulling in values from Github environment
+Environment files are rendered and uploaded by [this workflow](/.github/workflows/nj-render-env.yml). It
+takes [the nj template](/nj/nj.env.template) and performs `envsubst`, pulling in values from Github environment
 secrets. TechOps support will likely be needed to update those environment secrets, but Josh can do it for right now.
 
 If either the template or the secret values have been updated, you can update the env vars by:
