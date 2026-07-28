@@ -5,15 +5,27 @@ on:
     types: ['labeled']
 
 jobs:
-  pr-review:
+  pr-review--team-member:
     if: contains(github.event.pull_request.labels.*.name, 'pr-review')
     uses: newjersey/innovation-shared-actions/.github/workflows/pickaroo.yml@main
     secrets: inherit # required because the underlying workflow accesses org secrets
     permissions: {} # we're not using the default GITHUB_TOKEN
     with:
       include_users: 'AnJuHyppolite casewalker'
-      number_of_reviewers: 2 # should always pick the other two members of the team
+      number_of_reviewers: 1 # should always pick one member of the team
       channel_id: 'C0590CD1EE8' # resx-eng
+  pr-review--other-reviewer:
+    if: contains(github.event.pull_request.labels.*.name, 'pr-review')
+    needs: pr-review--team-member
+    uses: newjersey/innovation-shared-actions/.github/workflows/pickaroo.yml@main
+    secrets: inherit # required because the underlying workflow accesses org secrets
+    permissions: {} # we're not using the default GITHUB_TOKEN
+    with:
+      include_teams: 'innovation-engineering-resx'
+      exclude_users: 'AnJuHyppolite casewalker'
+      number_of_reviewers: 1 # pick 1 other reviewer from ResX Engineers
+      channel_id: 'C0590CD1EE8' # resx-eng
+      extras: false
   pr-show:
     if: contains(github.event.pull_request.labels.*.name, 'pr-show')
     uses: newjersey/innovation-shared-actions/.github/workflows/pickaroo.yml@main
