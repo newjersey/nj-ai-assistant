@@ -187,3 +187,4 @@ codedb.snapshot
 cdk.out/
 **/*.env
 **/cdk.context.json
+!.env.nj-*
