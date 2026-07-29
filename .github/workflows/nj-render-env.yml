@@ -1,5 +1,5 @@
 name: Render and upload env file
-run-name: "Render ${{ inputs.environment }}${{ inputs.environment == 'dev' && format(' (kitchensink: {0})', inputs.deploy_kitchensink) || '' }}"
+run-name: "Render: ${{ inputs.environment == 'prod' && 'prod' || inputs.deploy_kitchensink && 'kitchensink' || 'dev' }}"
 
 on:
   workflow_dispatch:
