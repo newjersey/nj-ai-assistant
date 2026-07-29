@@ -99,5 +99,5 @@ jobs:
             --base newjersey \
             --head "${{ steps.vars.outputs.branch }}" \
             --title "chore: sync upstream LibreChat main (${{ steps.vars.outputs.date }})" \
-            --label "pr-review" \
+            --reviewer casewalker --reviewer AnJuHyppolite \
             --body "$BODY"
