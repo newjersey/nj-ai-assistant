@@ -59,7 +59,7 @@ docker compose -f nj-dev-docker-compose.yml up -d
 
 Before running AIA, first create a `.env` file in the root directory & fill it with our `.env` from Bitwarden.
 
-Afterwards, you can repeat these steps to get AIA running:
+Afterward, you can repeat these steps to get AIA running:
 
 1. Build everything: `npm run reinstall`
    - _Note: after running this once, you can instead run `npm run frontend` to build w/o reinstalling node_modules to
@@ -106,7 +106,7 @@ AI Assistant is a fork of LibreChat, which at times is an intimidatingly large p
 Here are some tips for navigating such a large repository:
 
 - The repo is compartmentalized into different modules. Focus on just one module at a time to avoid getting lost.
-- It is often easiest to find a React component either by searching for any visible text. The second easiest way is to
+- It is often easiest to find a React component either by searching for any visible text. The second-easiest way is to
   inspect the component then look for its CSS classes; that often narrows it down to just a handful of possible
   components.
 - Use a debugger to walk through how the code works. A debugger can be used both on the backend and frontend.
@@ -185,8 +185,8 @@ Depending on the urgency of the change, there are two strategies you can use for
 "Static content" are things like the "about" & "guide" pages, release notes, or the landing page.
 
 We try to make as much of this content updateable by non-engineers (by using Google Docs → Markdown conversion &
-rendering the markdown). You can
-see [the static markdown files & how to update them here](https://github.com/newjersey/nj-ai-assistant/tree/newjersey/client/src/nj/content).
+rendering the Markdown). You can
+see [the static Markdown files & how to update them here](https://github.com/newjersey/nj-ai-assistant/tree/newjersey/client/src/nj/content).
 
 Some static content (like the landing page) is too complex to use Markdown, so it's just coded into the client.
 
@@ -239,7 +239,7 @@ which resources can be loaded onto our website. It's important to know about CSP
 resources (such as serving files from a CDN). It's especially important to know because, when developing locally,
 CSP doesn't actually block anything - thus something that seems to work fine during development breaks when deployed.
 
-If you need to modify our CSP, it's located in [`nj-helment.js`](/api/nj/nj-helmet.js).
+If you need to modify our CSP, it's located in [`nj-helmet.js`](/api/nj/nj-helmet.js).
 
 _(Keep in mind that Imperva also adds its own CSP headers, so the CSP may look different deployed behind Imperva than it
 does when running locally.)_
@@ -255,10 +255,10 @@ We just close any Dependabot updates as a result, and rely on upstream merges fo
 
 Prod release happens in two steps:
 
-1. Create a [release](https://github.com/newjersey/nj-ai-assistant/releases) in Github, and wait for it to build and
+1. Create a [release](https://github.com/newjersey/nj-ai-assistant/releases) in GitHub, and wait for it to build and
    push
 2. [OPTIONAL] If environment variables have changed, run the [render-env workflow](/.github/workflows/nj-render-env.yml)
-3. Run the [infra deploy workflow](/.github/workflows/nj-infra-deploy.yml) on the prod environment.
+3. Run the [infra-deploy workflow](/.github/workflows/nj-infra-deploy.yml) on the prod environment.
 
 ### Create a new release
 
@@ -283,7 +283,7 @@ The new release & tag will initiate the tag build and update the `ai-assistant/p
 ### Updating Environment Files
 
 Environment files are rendered and uploaded by [this workflow](/.github/workflows/nj-render-env.yml). It
-takes [the nj template](/nj/nj.env.template) and performs `envsubst`, pulling in values from Github environment
+takes [the nj template](/nj/nj.env.template) and performs `envsubst`, pulling in values from GitHub environment
 secrets. TechOps support will likely be needed to update those environment secrets, but Josh can do it for right now.
 
 If either the template or the secret values have been updated, you can update the env vars by:
@@ -297,18 +297,18 @@ If either the template or the secret values have been updated, you can update th
 #### Manually set release tag for prod (Rollback Strategy, DANGER)
 
 In the event that we need to set prod to a specific release tag, we can run the `Set prod release tag` workflow in
-Github Actions. This takes a text input for the release tag, and includes a verification step to ensure we're not
-setting a non-existent tag. The infra deploy workflow will still need to be ran to deploy the new tag.
+GitHub Actions. This takes a text input for the release tag, and includes a verification step to ensure we're not
+setting a non-existent tag. The infra-deploy workflow will still need to be run to deploy the new tag.
 
-### Run the infra deploy workflow
+### Run the infra-deploy workflow
 
-- From the Github Actions tab, select the Deploy AI Assistant Infrastructure workflow
+- From the GitHub Actions tab, select the Deploy AI Assistant Infrastructure workflow
 - Select Run Workflow
   - Branch: `newjersey`
   - Environment: `prod`
 - Wait for the cdk-diff job to complete
 - REVIEW THE OUTPUT. When you approve the cdk-deploy job, you are responsible for the changes that roll out.
-- Approve and wait for the fireworks. You can watch the deployment from the Cloudformation console if so desired.
+- Approve and wait for the fireworks. You can watch the deployment from the CloudFormation console if so desired.
 
 ## ClickOps Components
 
@@ -324,12 +324,12 @@ The remaining infrastructure is deployed by CDK.
 Guardrail configs are managed per-environment through the AWS console. To manage them:
 
 1. Log into the desired AWS account
-2. Navigate to Bedrock -> Guardrails
+2. Navigate to Bedrock → Guardrails
 3. Select "Working Draft"
 4. Perform updates
 5. Select "Publish Version"
 6. Note the latest version number
-7. In GitHub, go to Environment -> <env_to_change> -> Secrets
+7. In GitHub, go to Environment → <env_to_change> → Secrets
 8. Change `GUARDRAIL_VERSION`, supply the new value
 9. Run the steps for `Updating Environment Files` above.
 
