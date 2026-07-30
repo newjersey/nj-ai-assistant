@@ -37,7 +37,7 @@ interface:
   fileSearch: true
   marketplace:
     use: true
-{% if NJ_FF_MEMORY_ENABLED == "true" %}
+{% if NJ_FF_MEMORY_ENABLED === "true" %}
   memories: true
 {% else %}
   memories: false
@@ -100,7 +100,7 @@ modelSpecs:
 ocr:
   strategy: 'document_parser'
 
-{% if NJ_FF_MEMORY_ENABLED == "true" %}
+{% if NJ_FF_MEMORY_ENABLED === "true" %}
 memory:
   tokenLimit: 2000
   agent:
