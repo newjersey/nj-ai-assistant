@@ -1,0 +1,24 @@
+{
+  "name": "librechat-configs",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "test": "tsc && jest",
+    "render": "tsc && node dist/render.js",
+    "render:local": "tsc && node dist/render.js --local"
+  },
+  "dependencies": {
+    "dotenv": "17.4.2",
+    "js-yaml": "4.3.0",
+    "librechat-data-provider": "*",
+    "nunjucks": "3.2.4"
+  },
+  "devDependencies": {
+    "@types/jest": "30.0.0",
+    "@types/js-yaml": "4.0.9",
+    "@types/node": "24.13.3",
+    "@types/nunjucks": "3.2.6",
+    "jest": "30.4.2",
+    "typescript": "7.0.2"
+  }
+}
