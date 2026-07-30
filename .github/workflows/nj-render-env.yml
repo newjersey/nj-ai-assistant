@@ -49,32 +49,26 @@ jobs:
         run: |
           set -euo pipefail
 
-          export DEBUG=$([[ "${{ inputs.environment }}" == "dev" ]] && echo true || echo false)
-          export CONFIG_PATH=$([[ "${{ inputs.deploy_kitchensink }}" == "true" ]] && echo "/app/nj/kitchensink-librechat.yaml" || echo "nj/nj-librechat.yaml")
-          export DOMAIN=$([[ "${{ inputs.deploy_kitchensink }}" == "true" ]] && echo "https://kitchensink.ai-assistant.nj.gov" || echo "${{ secrets.DOMAIN }}")
-          export ALLOW_SOCIAL_LOGIN=$([[ "${{ inputs.deploy_kitchensink }}" == "true" ]] && echo "false" || echo "true") # disable social login for kitchensink
-          export ALLOW_EMAIL_LOGIN=$([[ "${{ inputs.deploy_kitchensink }}" == "true" ]] && echo "true" || echo "false") # enable email login for kitchensink 
-          export ALLOW_PASSWORD_RESET=$([[ "${{ inputs.deploy_kitchensink }}" == "true" ]] && echo "true" || echo "false") # enable email login for kitchensink 
+          # Export secrets
+          export DOMAIN="${{ secrets.DOMAIN }}"
           export AWS_REGION="${{ secrets.AWS_REGION }}"
           export AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}"
           export AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}"
-          if [[ "${{ inputs.deploy_kitchensink }}" != "true" ]]; then
-            export OPENID_CLIENT_ID="${{ secrets.OPENID_CLIENT_ID }}"
-            export OPENID_CLIENT_SECRET="${{ secrets.OPENID_CLIENT_SECRET }}"
-            export OPENID_ISSUER="${{ secrets.OPENID_ISSUER }}"
-            export OPENID_SESSION_SECRET="${{ secrets.OPENID_SESSION_SECRET }}"
-          fi
+          export OPENID_CLIENT_ID="${{ secrets.OPENID_CLIENT_ID }}"
+          export OPENID_CLIENT_SECRET="${{ secrets.OPENID_CLIENT_SECRET }}"
+          export OPENID_ISSUER="${{ secrets.OPENID_ISSUER }}"
+          export OPENID_SESSION_SECRET="${{ secrets.OPENID_SESSION_SECRET }}"
           export JWT_SECRET="${{ secrets.JWT_SECRET }}"
           export JWT_REFRESH_SECRET="${{ secrets.JWT_REFRESH_SECRET }}"
           export ANALYTICS_GTM_ID="${{ secrets.ANALYTICS_GTM_ID }}"
           export GUARDRAIL_ID="${{ secrets.GUARDRAIL_ID }}"
           export GUARDRAIL_VERSION="${{ secrets.GUARDRAIL_VERSION }}"
+          export MEILI_MASTER_KEY="${{ secrets.MEILI_MASTER_KEY }}"
 
-          export NJ_FF_MEMORY_ENABLED=$([[ "${{ inputs.environment }}" == "prod" ]] && echo false || echo true)
-          export SEARCH=$([[ "${{ inputs.environment }}" == "prod" ]] && echo false || echo true)
-          export MEILI_NO_ANALYTICS=true
-          export MEILI_HOST=$([[ "${{ inputs.deploy_kitchensink }}" == "true" ]] && echo "http://meilisearch.kitchensink:7700" || echo "http://meilisearch.internal:7700")
-          export MEILI_MASTER_KEY="${{ secrets.MEILI_MASTER_KEY }}" 
+          # Export overrides per-environment (`set -a` auto-exports)
+          # (Exported after secrets because kitchensink overrides DOMAIN and blanks out the OPENID vars)
+          TARGET=$([[ "${{ inputs.deploy_kitchensink }}" == "true" ]] && echo "kitchensink" || echo "${{ inputs.environment }}")
+          set -a; source ".env.nj-$TARGET"; set +a
 
           ENV_FILE_NAME=$([[ "${{ inputs.deploy_kitchensink }}" == "true" ]] && echo "librechat.env" || echo "${{ inputs.environment }}.env")
 
