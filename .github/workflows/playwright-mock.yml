@@ -1,13 +1,13 @@
 name: Playwright E2E Tests
 
 on:
-# NJ: Commenting this workflow on PR, E2E tests not working right now, check back in a few weeks
-#  pull_request:
-#    paths:
-#      - '**'
-#      - '!**.md'
-#      - '!.github/workflows/**'
-#      - '.github/workflows/playwright-mock.yml'
+  # NJ: Commenting this workflow on PR, E2E tests not working right now, check back in a few weeks
+  #  pull_request:
+  #    paths:
+  #      - '**'
+  # - '!**.md'
+  # - '!.github/workflows/**'
+  # - '.github/workflows/playwright-mock.yml'
   workflow_dispatch:
     inputs:
       reason:
