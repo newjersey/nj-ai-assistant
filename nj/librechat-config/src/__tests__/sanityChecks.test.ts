@@ -27,4 +27,10 @@ describe('LibreChat config parsing', () => {
       expect(() => configSchema.strict().parse(jsObject)).not.toThrow();
     },
   );
+
+  it("kitchensink's hard-coded config is a valid LibreChat Zod config schema", () => {
+    const kitchenSinkYaml = path.resolve(PARENT_DIR, 'librechat.kitchensink.yaml');
+    const jsObject = yaml.load(fs.readFileSync(kitchenSinkYaml, 'utf8'));
+    expect(() => configSchema.strict().parse(jsObject)).not.toThrow();
+  });
 });
