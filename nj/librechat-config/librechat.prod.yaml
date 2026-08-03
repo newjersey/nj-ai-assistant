@@ -1,5 +1,5 @@
 # WARNING: This is an auto-generated file, do not edit it manually!
-# To edit this file, edit the librechat.yaml.njk template and then run: npm run render
+# To edit this file, edit the librechat.yaml.njk template and then run: npm run nj-render-configs
 
 ###############################################################################
 # New Jersey LibreChat Config File

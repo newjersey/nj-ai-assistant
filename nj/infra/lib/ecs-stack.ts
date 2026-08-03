@@ -231,7 +231,6 @@ export class EcsStack extends cdk.Stack {
       LOG_LEVEL: 'info',
       MEILI_HOST: 'http://meilisearch.internal:7700',
       RAG_API_URL: 'http://rag_api.internal:8000',
-      CONFIG_PATH: '/app/nj/nj-librechat.yaml',
       AWS_BUCKET_NAME: this.s3Bucket.bucketName,
       AWS_REGION: this.region,
 

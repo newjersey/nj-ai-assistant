@@ -12,7 +12,8 @@ on:
       - 'client/**'
       - 'config/**'
       - 'packages/**'
-      - 'nj/nj-librechat.yaml'
+      - 'nj/librechat-config/librechat.dev.yaml'
+      - 'nj/librechat-config/librechat.prod.yaml'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
