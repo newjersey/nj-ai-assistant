@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "test": "tsc && jest",
-    "render": "tsc && node dist/render.js",
-    "render:local": "tsc && node dist/render.js --local"
+    "nj-render-configs": "tsc && node dist/render.js",
+    "nj-render-local-config": "tsc && node dist/render.js --local"
   },
   "dependencies": {
     "dotenv": "17.4.2",

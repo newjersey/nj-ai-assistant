@@ -8,7 +8,7 @@ const TEST_TEMPLATE = 'src/__tests__/resources/librechat-test.yaml.njk';
 const ENABLED_ENV = 'src/__tests__/resources/enabled-feature.env';
 const EXPECTED_ENABLED_YAML = `
 # WARNING: This is an auto-generated file, do not edit it manually!
-# To edit this file, edit the librechat.yaml.njk template and then run: npm run render
+# To edit this file, edit the librechat.yaml.njk template and then run: npm run nj-render-configs
 
 name: my-app
 feature:
@@ -19,7 +19,7 @@ trailing: 12345
 const DISABLED_ENV = 'src/__tests__/resources/disabled-feature.env';
 const EXPECTED_DISABLED_YAML = `
 # WARNING: This is an auto-generated file, do not edit it manually!
-# To edit this file, edit the librechat.yaml.njk template and then run: npm run render
+# To edit this file, edit the librechat.yaml.njk template and then run: npm run nj-render-configs
 
 name: my-app2
 trailing: 12345

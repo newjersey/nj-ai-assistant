@@ -201,32 +201,67 @@ Because we use these special **in region inference** models, we have to explicit
 That means you must update the comma-delimited env var `BEDROCK_AWS_MODELS` (in `nj.env.template` and locally for dev).
 
 We use [model specs](https://www.librechat.ai/docs/configuration/librechat_yaml/object_structure/model_specs) to
-explicitly define the list of models users are allowed to access. These are defined in `nj-librechat.yaml` and need to
-be updated every time we add a new model
+explicitly define the list of models users are allowed to access. These are defined in
+[`librechat.yaml.njk`](/nj/librechat-config/librechat.yaml.njk) (the template we render our per-environment config
+from) and need to be updated every time we add a new model.
 
 Warning: Any AIA conversation started with model "XYZ" is linked to model "XYZ". As such, **you should never remove old
 models from the model specs** (or else old conversations will no longer accept new prompts).
 
 ### Adding Feature Flags
 
-Feature flags allow us to deploy releases without having to reveal features still in development.
+Feature flags allow us to deploy releases without having to reveal features that may still be in development.
 
-We use environment variables for flags, which allows us to turn a feature on or off for an entire environment (local,
-dev, prod). There are a few files to edit for that:
+We use environment variables for feature flags (overlapping LibreChat's use of environment variables), which allows us
+to turn a feature on or off for an entire environment (local, dev, or prod). Feature flags (as well as unique
+environment variables) are defined in `.env*` files, with one file for each deployment target:
+- `.env` for local development
+- [`.env.nj-kitchensink`](/.env.nj-kitchensink)
+- [`.env.nj-dev`](/.env.nj-dev)
+- [`.env.nj-prod`](/.env.nj-prod)
 
-- [`nj-render-env.yml`](/.github/workflows/nj-render-env.yml), which determines the flag's value for each environment.
-  - Example: `export FOO_FLAG=$([[ "${{ inputs.environment }}" == "dev" ]] && echo true || echo false)`
-- [`nj.env.template`](/nj/nj.env.template), which puts the env vars defined in `render-env` into our environment.
-  - Example: `FOO_FLAG=$FOO_FLAG`
-- Your personal `.env` file, for local development.
-  - Example: `FOO_FLAG=true`
+For example, `.env.nj-dev` might contain `FOO_FLAG=true` to enable the _FOO_ feature in dev, while `.env.nj-prod` may
+have `FOO_FLAG=false` to disable _FOO_ in production.
 
-If you want the environment variable to drive a setting in [`nj-librechat.yaml`](/nj/nj-librechat.yaml), then you'll
-want to also edit [`interface.ts`](/packages/data-schemas/src/app/interface.ts) and/or
-[`service.ts`](/packages/data-schemas/src/app/service.ts). Use calls to `getEnvBoolean()` to replace the given
-configuration value.
+#### Flags to Configure `librechat.yaml`
 
-Make sure to remove the feature flag after the feature has been released!
+Some environment variables are only used to control the main application configuration file, which is some flavor of
+`librechat.yaml`. Our configuration file lives as a template:
+[`librechat.yaml.njk`](/nj/librechat-config/librechat.yaml.njk). This template is then rendered into target
+`librechat.yaml` files:
+- `librechat.local.yaml` (uncommitted)
+- [`librechat.dev.yaml`](/nj/librechat-config/librechat.dev.yaml)
+- [`librechat.prod.yaml`](/nj/librechat-config/librechat.prod.yaml)
+
+Render the local file with:
+```shell
+npm run nj-render-local-config
+```
+(This is also triggered whenever you run `backend:dev`.)
+
+Render the dev and prod files with:
+```shell
+npm run nj-render-configs
+```
+
+If a developer edits `env` files or the `njk` template but forgets to re-render, a unit test will detect this drift and
+fail.
+
+_**Note**_: The [`librechat.kitchensink.yaml`](/nj/librechat-config/librechat.kitchensink.yaml) file is **not
+rendered**, it is a manually edited file, thus allowing KitchenSink to easily be completely different from the others.
+
+#### Flags Read at Runtime
+
+Other feature flags must be exported in the environment which runs the application. Once these feature flags are added
+into the necessary `env` files, the variable must also be added to [`nj.env.template`](/nj/nj.env.template). The
+[`render-env`](/.github/workflows/nj-render-env.yml) GitHub workflow populates placeholders in this file to generate the
+environment variable files to be used in kitchensink, dev, and prod.
+
+If you have a feature flag which the code checks for with `process.env.FEATURE_FLAG`, then:
+- The `nj.env.template` file should contain a line like: `FEATURE_FLAG=$FEATURE_FLAG`
+- The respective `env` files should set that environment variable, e.g. `FEATURE_FLAG=true`
+
+P.S. Make sure to remove the feature flag after the feature has been released!
 
 ### Metrics
 
@@ -284,9 +319,10 @@ The new release & tag will initiate the tag build and update the `ai-assistant/p
 
 Environment files are rendered and uploaded by [this workflow](/.github/workflows/nj-render-env.yml). It
 takes [the nj template](/nj/nj.env.template) and performs `envsubst`, pulling in values from GitHub environment
-secrets. TechOps support will likely be needed to update those environment secrets, but Josh can do it for right now.
+secrets as well as the `.env.nj-*` environment files. TechOps support will likely be needed to update the environment
+secrets.
 
-If either the template or the secret values have been updated, you can update the env vars by:
+If the template, the `env` files, or the secret values have been updated, you can update the env vars by:
 
 1. Navigate to the Actions tab in the repo
 2. Select "Render and upload env file"

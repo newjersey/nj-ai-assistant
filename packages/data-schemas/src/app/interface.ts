@@ -68,22 +68,3 @@ export async function loadDefaultInterface({
 
   return loadedInterface;
 }
-
-/**
- * Helper for NJ feature flags.
- *
- * If you want feature flags to control app config, you can use this pattern (e.g. for file search):
- *
- * ```
- * const loadedInterface: AppConfig['interfaceConfig'] = removeNullishValues({
- *   ...
- *   fileSearch: getEnvBoolean('INTERFACE_FILE_SEARCH') ?? interfaceConfig?.fileSearch,
- *   ...
- * });
- * ```
- */
-function getEnvBoolean(envVar: string): boolean | undefined {
-  const value = process.env[envVar];
-  if (value === undefined) return undefined;
-  return value.toLowerCase().trim() === 'true';
-}

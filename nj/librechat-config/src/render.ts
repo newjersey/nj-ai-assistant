@@ -12,7 +12,7 @@ export const LIBRECHAT_YAML_TEMPLATE = 'librechat.yaml.njk';
 export const PARENT_DIR = path.resolve(__dirname, '..');
 const REPO_ROOT = path.resolve(PARENT_DIR, '..', '..');
 const RENDERED_FILE_WARNING = `# WARNING: This is an auto-generated file, do not edit it manually!
-# To edit this file, edit the librechat.yaml.njk template and then run: npm run render
+# To edit this file, edit the librechat.yaml.njk template and then run: npm run nj-render-configs
 `;
 
 const NUNJUCKS_ENV = new njk.Environment(new njk.FileSystemLoader(PARENT_DIR), {

@@ -6,7 +6,7 @@ import { ENV_TARGETS, LIBRECHAT_YAML_TEMPLATE, PARENT_DIR, renderLibreChatYaml }
 
 describe('Render & Repo File drift detection', () => {
   it.each(Object.entries(ENV_TARGETS))(
-    "librechat.%s.yaml doesn't match: make sure you run: `npm run render`!",
+    "librechat.%s.yaml doesn't match: make sure you run: `npm run nj-render-configs`!",
     (_env, target) => {
       const repoFileContents = fs.readFileSync(
         path.resolve(PARENT_DIR, target.outputFilename),
@@ -27,4 +27,10 @@ describe('LibreChat config parsing', () => {
       expect(() => configSchema.strict().parse(jsObject)).not.toThrow();
     },
   );
+
+  it("kitchensink's hard-coded config is a valid LibreChat Zod config schema", () => {
+    const kitchenSinkYaml = path.resolve(PARENT_DIR, 'librechat.kitchensink.yaml');
+    const jsObject = yaml.load(fs.readFileSync(kitchenSinkYaml, 'utf8'));
+    expect(() => configSchema.strict().parse(jsObject)).not.toThrow();
+  });
 });
