@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "build": "tsc",
+    "typecheck": "tsc --noEmit",
     "watch": "tsc -w",
     "synth": "npx cdk synth",
     "deploy": "npx cdk deploy",
