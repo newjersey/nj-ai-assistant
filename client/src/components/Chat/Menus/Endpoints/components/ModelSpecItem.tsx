@@ -93,9 +93,7 @@ export function renderModelSpecs(specs: TModelSpec[], selectedSpec: string) {
     return null;
   }
 
-  return specs
-    .filter((spec) => spec.default) // NJ: Only render default model spec (for now)
-    .map((spec) => (
-      <ModelSpecItem key={spec.name} spec={spec} isSelected={selectedSpec === spec.name} />
-    ));
+  return specs.map((spec) => (
+    <ModelSpecItem key={spec.name} spec={spec} isSelected={selectedSpec === spec.name} />
+  ));
 }
