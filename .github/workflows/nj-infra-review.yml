@@ -1,10 +1,8 @@
-name: NJ Config Tests
+name: NJ Infra Tests
 on:
   pull_request:
     paths:
-      - 'nj/librechat-config/**'
-      - '.env.nj-dev'
-      - '.env.nj-prod'
+      - 'nj/infra/**'
 
 permissions:
   contents: read
@@ -14,13 +12,13 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test-config:
-    name: Check librechat.yaml files for drift + schema validation
+  typecheck-infra:
+    name: TypeScript type checks (nj-infra)
     runs-on: ubuntu-latest
     timeout-minutes: 10
     defaults:
       run:
-        working-directory: nj/librechat-config
+        working-directory: nj/infra
     steps:
       - uses: actions/checkout@v7
 
@@ -32,5 +30,5 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run drift + schema tests
-        run: npm test
+      - name: Type check infra
+        run: npm run typecheck
