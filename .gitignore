@@ -193,3 +193,5 @@ cdk.out/
 !.env.nj-*
 !nj/librechat-config/src/__tests__/resources/*.env
 nj/librechat-config/librechat.local.yaml
+nj/librechat-config/librechat.dev.yaml
+nj/librechat-config/librechat.prod.yaml
