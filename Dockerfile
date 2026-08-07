@@ -1,5 +1,12 @@
 # v0.8.7
 
+# NJ: Render the librechat.(dev|prod).yaml files, to be copied into the LC image
+FROM node:24.16.0-alpine AS config-render
+WORKDIR /app
+COPY nj/librechat-config ./nj/librechat-config
+COPY .env.nj-dev .env.nj-prod ./
+RUN cd nj/librechat-config && npm ci && npm run nj-render-configs
+
 # Base node image
 FROM node:24.16.0-alpine AS node
 
@@ -52,6 +59,9 @@ RUN \
     done
 
 COPY --chown=node:node . .
+
+# NJ: Now copy the dev and prod librechat.yaml files in
+COPY --chown=node:node --from=config-render /app/nj/librechat-config/librechat.dev.yaml /app/nj/librechat-config/librechat.prod.yaml /app/nj/librechat-config/
 
 RUN \
     # React client build with configurable memory

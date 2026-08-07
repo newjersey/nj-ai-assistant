@@ -203,10 +203,31 @@ That means you must update the comma-delimited env var `BEDROCK_AWS_MODELS` (in 
 We use [model specs](https://www.librechat.ai/docs/configuration/librechat_yaml/object_structure/model_specs) to
 explicitly define the list of models users are allowed to access. These are defined in
 [`librechat.yaml.njk`](/nj/librechat-config/librechat.yaml.njk) (the template we render our per-environment config
-from) and need to be updated every time we add a new model.
+from, also separately in [`librechat.kitchensink.yaml`](/nj/librechat-config/librechat.kitchensink.yaml) for the Kitchen
+Sink) and need to be updated every time we add a new model.
 
 Warning: Any AIA conversation started with model "XYZ" is linked to model "XYZ". As such, **you should never remove old
 models from the model specs** (or else old conversations will no longer accept new prompts).
+
+### Managing the librechat.yaml configuration
+
+The main application config file is usually called `librechat.yaml`. We store a hard file in the repo to configure the
+Kitchen Sink environment: [`librechat.kitchensink.yaml`](/nj/librechat-config/librechat.kitchensink.yaml). However, the
+configuration used for local development as well as the files for dev and prod are not stored in the repo, they are
+rendered dynamically based on merging the `.env*` files with our
+[`librechat.yaml.njk`](/nj/librechat-config/librechat.yaml.njk) template. The rendered output is written to the same
+directory as Kitchen Sink's file:
+- `nj/librechat-config/librechat.local.yaml`
+- `nj/librechat-config/librechat.dev.yaml`
+- `nj/librechat-config/librechat.prod.yaml`
+
+The dev and prod files are rendered by the [Dockerfile](/Dockerfile) while building the Docker image. The local file is
+rendered automatically as part of calling `npm run backend:dev`.  A developer can render these files with either the
+`npm run nj-render-configs` command or the `npm run nj-render-local-config` command, respectively, to spot-check their
+contents.
+
+A unit test checks the dev and prod configurations as well as the Kitchen Sink configuration against LibreChat's own zod
+schema to validate that the configuration shapes are valid.
 
 ### Adding Feature Flags
 
@@ -223,32 +244,24 @@ environment variables) are defined in `.env*` files, with one file for each depl
 For example, `.env.nj-dev` might contain `FOO_FLAG=true` to enable the _FOO_ feature in dev, while `.env.nj-prod` may
 have `FOO_FLAG=false` to disable _FOO_ in production.
 
-#### Flags to Configure `librechat.yaml`
+#### Flags to Configure `librechat.*.yaml`
 
-Some environment variables are only used to control the main application configuration file, which is some flavor of
-`librechat.yaml`. Our configuration file lives as a template:
-[`librechat.yaml.njk`](/nj/librechat-config/librechat.yaml.njk). This template is then rendered into target
-`librechat.yaml` files:
-- `librechat.local.yaml` (uncommitted)
-- [`librechat.dev.yaml`](/nj/librechat-config/librechat.dev.yaml)
-- [`librechat.prod.yaml`](/nj/librechat-config/librechat.prod.yaml)
+Some environment variables are only used to control the main application configuration file. The config-template
+[`librechat.yaml.njk`](/nj/librechat-config/librechat.yaml.njk) can be written to produce different configurations based
+on feature flag configurations.
 
-Render the local file with:
+Render the local configuration file with:
 ```shell
 npm run nj-render-local-config
 ```
-(This is also triggered whenever you run `backend:dev`.)
 
 Render the dev and prod files with:
 ```shell
 npm run nj-render-configs
 ```
 
-If a developer edits `env` files or the `njk` template but forgets to re-render, a unit test will detect this drift and
-fail.
-
-_**Note**_: The [`librechat.kitchensink.yaml`](/nj/librechat-config/librechat.kitchensink.yaml) file is **not
-rendered**, it is a manually edited file, thus allowing KitchenSink to easily be completely different from the others.
+If a developer edits `env` files or the `njk` template, modifications will be made to the `librechat.*.yaml` files
+configuring the app.
 
 #### Flags Read at Runtime
 
