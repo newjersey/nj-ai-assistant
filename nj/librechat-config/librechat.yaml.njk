@@ -67,7 +67,7 @@ endpoints:
   bedrock:
     availableRegions:
       - 'us-east-1'
-    titleModel: 'us.anthropic.claude-sonnet-4-6'
+    titleModel: current_model
     guardrailConfig:
       guardrailIdentifier: '${GUARDRAIL_ID}'
       guardrailVersion: '${GUARDRAIL_VERSION}'
@@ -84,6 +84,14 @@ endpoints:
 # We explicitly spec our models (since we only have a few models and this makes the selector simpler)
 modelSpecs:
   list:
+{% if NJ_FF_INCLUDE_SONNET_5 === "true" %}
+    - name: claude-sonnet-5
+      label: 'Claude Sonnet 5'
+      default: true
+      preset:
+        endpoint: 'bedrock'
+        model: 'us.anthropic.claude-sonnet-5'
+{% endif %}
     - name: claude-sonnet-4-6
       label: 'Claude Sonnet 4.6'
       showInMenu: false
@@ -92,7 +100,9 @@ modelSpecs:
         model: 'us.anthropic.claude-sonnet-4-6'
     - name: 'Claude Sonnet 4.5'
       label: 'Claude Sonnet 4.5'
+{% if NJ_FF_INCLUDE_SONNET_5 !== "true" %}
       default: true
+{% endif %}
       preset:
         endpoint: 'bedrock'
         model: 'us.anthropic.claude-sonnet-4-5-20250929-v1:0'
