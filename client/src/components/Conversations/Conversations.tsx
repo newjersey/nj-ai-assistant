@@ -15,8 +15,8 @@ import {
   useShowMarketplace,
   useElementSize,
 } from '~/hooks';
-import { clearMessagesCache, cn, groupConversationsByDate } from '~/utils';
 import FavoritesList from '~/components/Nav/Favorites/FavoritesList';
+import { groupConversationsByDate, cn } from '~/utils';
 import { useActiveJobs } from '~/data-provider';
 import Convo from './Convo';
 import store from '~/store';
@@ -91,24 +91,12 @@ interface ChatsHeaderProps {
   onToggle: () => void;
 }
 
-const headerIconButtonClassName =
-  'flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-text-secondary outline-none transition-colors hover:bg-surface-active-alt hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-black dark:focus-visible:ring-white';
-
 /** Collapsible header for the Chats section */
 const ChatsHeader: FC<ChatsHeaderProps> = memo(({ isExpanded, onToggle }) => {
   const localize = useLocalize();
-  const queryClient = useQueryClient();
-  const { newConversation } = useNewConvo();
-  const conversation = useRecoilValue(store.conversationByIndex(0));
-
-  const handleNewChat = useCallback(() => {
-    clearMessagesCache(queryClient, conversation?.conversationId);
-    queryClient.invalidateQueries([QueryKeys.messages]);
-    newConversation();
-  }, [conversation?.conversationId, newConversation, queryClient]);
 
   return (
-    <div className="flex h-8 w-full items-center gap-0.5 pr-2">
+    <div className="flex h-8 w-full items-center pr-2">
       <button
         onClick={onToggle}
         className="group flex min-w-0 flex-1 items-center gap-1 rounded-lg px-1 py-2 text-sm font-bold text-text-secondary outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-black dark:focus-visible:ring-white"
