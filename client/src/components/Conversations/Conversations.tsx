@@ -1,21 +1,21 @@
-import { type FC, memo, useCallback, useEffect, useMemo, useRef } from 'react';
+import { useMemo, memo, type FC, useCallback, useEffect, useRef } from 'react';
 import throttle from 'lodash/throttle';
 import { useRecoilValue } from 'recoil';
 import { ChevronDown } from 'lucide-react';
 import { QueryKeys } from 'librechat-data-provider';
 import { useQueryClient } from '@tanstack/react-query';
-import { CellMeasurer, CellMeasurerCache, List } from 'react-virtualized';
-import { NewChatIcon, Spinner, TooltipAnchor, useMediaQuery } from '@librechat/client';
+import { List, CellMeasurer, CellMeasurerCache } from 'react-virtualized';
+import { Button, Spinner, TooltipAnchor, NewChatIcon, useMediaQuery } from '@librechat/client';
 import type { TConversation } from 'librechat-data-provider';
 import {
+  useLocalize,
   TranslationKeys,
   useFavorites,
-  useLocalize,
-  useNewConvo,
   useShowMarketplace,
+  useNewConvo,
   useElementSize,
 } from '~/hooks';
-import { clearMessagesCache, cn, groupConversationsByDate } from '~/utils';
+import { groupConversationsByDate, clearMessagesCache, cn } from '~/utils';
 import FavoritesList from '~/components/Nav/Favorites/FavoritesList';
 import { useActiveJobs } from '~/data-provider';
 import Convo from './Convo';
@@ -128,14 +128,15 @@ const ChatsHeader: FC<ChatsHeaderProps> = memo(({ isExpanded, onToggle }) => {
       <TooltipAnchor
         description={localize('com_ui_new_chat')}
         render={
-          <button
-            type="button"
+          <Button
+            variant="ghost"
+            size="icon"
             aria-label={localize('com_ui_new_chat')}
             className={headerIconButtonClassName}
             onClick={handleNewChat}
           >
             <NewChatIcon className="h-4 w-4" />
-          </button>
+          </Button>
         }
       />
        */}
