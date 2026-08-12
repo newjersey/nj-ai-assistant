@@ -4,7 +4,11 @@
 import React from 'react';
 import { Link, Pin, PinOff } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
+<<<<<<< HEAD
 import { Button, OGDialogContent, useToastContext } from '@librechat/client';
+=======
+import { OGDialogContent, Button, TooltipAnchor, useToastContext } from '@librechat/client';
+>>>>>>> upstream/main
 import {
   AgentListResponse,
   Constants,
@@ -145,6 +149,7 @@ const AgentDetailContent: React.FC<AgentDetailContentProps> = ({ agent }) => {
 
       {/* Action button */}
       <div className="mb-4 mt-6 flex justify-center gap-2">
+<<<<<<< HEAD
         <Button
           variant="outline"
           size="icon"
@@ -171,6 +176,34 @@ const AgentDetailContent: React.FC<AgentDetailContentProps> = ({ agent }) => {
         <Button variant="outline" onClick={handleDuplicate} disabled={!agent}>
           Duplicate<span className="sr-only"> agent {agent?.name}</span>
         </Button>
+=======
+        <TooltipAnchor
+          description={isFavorite ? localize('com_ui_unpin') : localize('com_ui_pin')}
+          render={
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={handleFavoriteClick}
+              aria-label={isFavorite ? localize('com_ui_unpin') : localize('com_ui_pin')}
+            >
+              {isFavorite ? <PinOff className="h-4 w-4" /> : <Pin className="h-4 w-4" />}
+            </Button>
+          }
+        />
+        <TooltipAnchor
+          description={localize('com_agents_copy_link')}
+          render={
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={handleCopyLink}
+              aria-label={localize('com_agents_copy_link')}
+            >
+              <Link className="h-4 w-4" aria-hidden="true" />
+            </Button>
+          }
+        />
+>>>>>>> upstream/main
         <Button
           variant="submit"
           className="w-auto max-w-xs"

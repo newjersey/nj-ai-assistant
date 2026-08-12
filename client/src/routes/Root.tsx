@@ -130,6 +130,7 @@ export default function Root() {
                 </div>
               </div>
             </PromptGroupsProvider>
+            <KeyboardShortcutsProvider />
           </AgentsMapContext.Provider>
           {config?.interface?.termsOfService?.modalAcceptance === true && (
             <TermsAndConditionsModal
@@ -141,7 +142,6 @@ export default function Root() {
               modalContent={config.interface.termsOfService.modalContent}
             />
           )}
-          <KeyboardShortcutsProvider />
         </AssistantsMapContext.Provider>
       </FileMapContext.Provider>
     </SetConvoProvider>

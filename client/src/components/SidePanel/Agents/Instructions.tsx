@@ -7,7 +7,9 @@ import { Maximize2, PlusCircle } from 'lucide-react';
 import { specialVariables } from 'librechat-data-provider';
 import { Controller, useFormContext } from 'react-hook-form';
 import {
+  Label,
   Button,
+<<<<<<< HEAD
   CircleHelpIcon,
   DropdownPopup,
   ESide,
@@ -15,20 +17,21 @@ import {
   HoverCardContent,
   HoverCardPortal,
   HoverCardTrigger,
+=======
+>>>>>>> upstream/main
   OGDialog,
+  Textarea,
+  DropdownPopup,
   OGDialogClose,
-  OGDialogContent,
-  OGDialogHeader,
+  TooltipAnchor,
   OGDialogTitle,
+  OGDialogHeader,
+  OGDialogContent,
 } from '@librechat/client';
 import type { TSpecialVarLabel } from 'librechat-data-provider';
 import type { AgentForm } from '~/common';
 import { njInputClass } from '~/nj/components/Agents/agentInputStyle';
 import { useLocalize } from '~/hooks';
-import { cn } from '~/utils';
-
-const textareaClass =
-  'lc-field flex w-full rounded-lg border border-border-light bg-surface-secondary px-3 py-2 text-text-primary placeholder:text-text-secondary focus-visible:outline-none focus-visible:border-border-medium focus-visible:ring-2 focus-visible:ring-ring-primary disabled:cursor-not-allowed disabled:opacity-50';
 
 interface VariableOption {
   label: TSpecialVarLabel;
@@ -66,14 +69,21 @@ export default function Instructions() {
   }));
 
   return (
+<<<<<<< HEAD
     <div>
       <div className="mb-2 flex items-center">
         {/* NJ: Customize how we explain the Instructions feature
         <label
+=======
+    <div className="mb-3 flex flex-col">
+      <div className="mb-1 flex items-center justify-between">
+        <Label
+>>>>>>> upstream/main
           className="block text-[11px] font-medium uppercase tracking-wide text-text-secondary"
           htmlFor="instructions"
         >
           {localize('com_ui_instructions')}
+<<<<<<< HEAD
         </label>
         */}
         <label
@@ -103,6 +113,10 @@ export default function Instructions() {
         </HoverCard>
         {/* NJ: Use custom spacing around the buttons (and our classes on the buttons themselves) */}
         <div className="ml-auto flex items-center gap-1" title="Add variables to instructions">
+=======
+        </Label>
+        <div className="flex items-center gap-0.5">
+>>>>>>> upstream/main
           <DropdownPopup
             portal={true}
             mountByState={true}
@@ -124,6 +138,7 @@ export default function Instructions() {
             menuId={menuId}
             className="pointer-events-auto z-30"
           />
+<<<<<<< HEAD
           <button
             type="button"
             onClick={() => setIsDialogOpen(true)}
@@ -133,6 +148,21 @@ export default function Instructions() {
           >
             <Maximize2 className="h-4 w-4" strokeWidth={1.75} aria-hidden={true} />
           </button>
+=======
+          <TooltipAnchor
+            description={localize('com_ui_expand_editor')}
+            render={
+              <Button
+                variant="ghost"
+                onClick={() => setIsDialogOpen(true)}
+                aria-label={localize('com_ui_expand_editor')}
+                className="h-7 w-7 p-0 text-text-secondary hover:bg-surface-secondary hover:text-text-primary"
+              >
+                <Maximize2 className="h-4 w-4" strokeWidth={1.75} aria-hidden={true} />
+              </Button>
+            }
+          />
+>>>>>>> upstream/main
         </div>
       </div>
       <Controller
@@ -142,10 +172,14 @@ export default function Instructions() {
         rules={{ required: true }}
         render={({ field, fieldState: { error } }) => (
           <>
-            <textarea
+            <Textarea
               {...field}
               value={field.value ?? ''}
+<<<<<<< HEAD
               className={cn(njInputClass, 'min-h-[118px] resize-y')}
+=======
+              className="min-h-[88px] resize-y"
+>>>>>>> upstream/main
               id="instructions"
               placeholder={localize('com_agents_instructions_placeholder')}
               rows={3}
@@ -155,7 +189,7 @@ export default function Instructions() {
             />
             {error && (
               <span
-                className="mt-1 text-xs text-red-500 transition duration-300 ease-in-out"
+                className="mt-1 text-xs text-text-destructive transition duration-300 ease-in-out"
                 role="alert"
               >
                 {/* NJ: custom message for required agent
@@ -181,13 +215,10 @@ export default function Instructions() {
             name="instructions"
             control={control}
             render={({ field }) => (
-              <textarea
+              <Textarea
                 {...field}
                 value={field.value ?? ''}
-                className={cn(
-                  textareaClass,
-                  'min-h-0 flex-1 resize-none text-base leading-relaxed',
-                )}
+                className="min-h-0 flex-1 resize-none text-base leading-relaxed"
                 placeholder={localize('com_agents_instructions_placeholder')}
                 aria-label={localize('com_ui_instructions')}
               />
