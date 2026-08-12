@@ -1,25 +1,28 @@
 /* eslint-disable i18next/no-literal-string */
 /* ^ We're not worried about i18n for this app ^ */
 
-import { useId, useState } from 'react';
+import { useState, useId } from 'react';
 import * as Menu from '@ariakit/react/menu';
-import { Maximize2, PlusCircle } from 'lucide-react';
+import { PlusCircle, Maximize2 } from 'lucide-react';
 import { specialVariables } from 'librechat-data-provider';
 import { Controller, useFormContext } from 'react-hook-form';
 import {
+  Label,
   Button,
-  CircleHelpIcon,
+  OGDialog,
+  Textarea,
   DropdownPopup,
+  OGDialogClose,
+  TooltipAnchor,
+  OGDialogTitle,
+  OGDialogHeader,
+  OGDialogContent,
+  CircleHelpIcon,
   ESide,
   HoverCard,
   HoverCardContent,
   HoverCardPortal,
   HoverCardTrigger,
-  OGDialog,
-  OGDialogClose,
-  OGDialogContent,
-  OGDialogHeader,
-  OGDialogTitle,
 } from '@librechat/client';
 import type { TSpecialVarLabel } from 'librechat-data-provider';
 import type { AgentForm } from '~/common';
@@ -74,7 +77,7 @@ export default function Instructions() {
           htmlFor="instructions"
         >
           {localize('com_ui_instructions')}
-        </label>
+        </Label>
         */}
         <label
           className="text-token-text-primary block text-sm font-semibold"
@@ -124,15 +127,19 @@ export default function Instructions() {
             menuId={menuId}
             className="pointer-events-auto z-30"
           />
-          <button
-            type="button"
-            onClick={() => setIsDialogOpen(true)}
-            aria-label={localize('com_ui_expand_editor')}
-            title={localize('com_ui_expand_editor')}
-            className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-surface-primary-alt text-text-primary transition-colors duration-200 hover:bg-surface-tertiary"
-          >
-            <Maximize2 className="h-4 w-4" strokeWidth={1.75} aria-hidden={true} />
-          </button>
+          <TooltipAnchor
+            description={localize('com_ui_expand_editor')}
+            render={
+              <Button
+                variant="ghost"
+                onClick={() => setIsDialogOpen(true)}
+                aria-label={localize('com_ui_expand_editor')}
+                className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-surface-primary-alt p-0 text-text-primary transition-colors duration-200 hover:bg-surface-tertiary"
+              >
+                <Maximize2 className="h-4 w-4" strokeWidth={1.75} aria-hidden={true} />
+              </Button>
+            }
+          />
         </div>
       </div>
       <Controller
@@ -142,7 +149,7 @@ export default function Instructions() {
         rules={{ required: true }}
         render={({ field, fieldState: { error } }) => (
           <>
-            <textarea
+            <Textarea
               {...field}
               value={field.value ?? ''}
               className={cn(njInputClass, 'min-h-[118px] resize-y')}
@@ -181,7 +188,7 @@ export default function Instructions() {
             name="instructions"
             control={control}
             render={({ field }) => (
-              <textarea
+              <Textarea
                 {...field}
                 value={field.value ?? ''}
                 className={cn(

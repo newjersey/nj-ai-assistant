@@ -54,10 +54,7 @@ describe('MemoryArtifacts', () => {
       render(<MemoryArtifacts attachments={attachments} />);
 
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('text-red-500');
-      expect(button).toHaveClass('hover:text-red-600');
-      expect(button).toHaveClass('dark:text-red-400');
-      expect(button).toHaveClass('dark:hover:text-red-500');
+      expect(button).toHaveClass('text-status-error');
     });
 
     test('displays normal styling when no errors present', () => {
@@ -121,7 +118,7 @@ describe('MemoryArtifacts', () => {
       render(<MemoryArtifacts attachments={attachments} />);
 
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('text-red-500');
+      expect(button).toHaveClass('text-status-error');
       expect(screen.getByText('Memory Error')).toBeInTheDocument();
     });
   });
@@ -190,7 +187,7 @@ describe('MemoryArtifacts', () => {
       render(<MemoryArtifacts attachments={attachments} />);
 
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('text-red-500');
+      expect(button).toHaveClass('text-status-error');
       expect(screen.getByText('Memory Error')).toBeInTheDocument();
     });
   });
