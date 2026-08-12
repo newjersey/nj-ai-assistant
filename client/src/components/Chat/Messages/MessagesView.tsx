@@ -125,7 +125,11 @@ function MessagesViewContent({
           >
             <div
               ref={contentRef}
+<<<<<<< HEAD
               className="flex flex-col pb-9 pt-20 dark:bg-transparent"
+=======
+              className="flex flex-col pb-9 pt-14"
+>>>>>>> upstream/main
               style={
                 steerOverlayHeight > 0
                   ? { paddingBottom: `calc(2.25rem + ${steerOverlayHeight}px)` }
@@ -143,7 +147,7 @@ function MessagesViewContent({
                 </div>
               ) : (
                 <>
-                  <div ref={screenshotTargetRef}>
+                  <div ref={screenshotTargetRef} data-testid="screenshot-target">
                     <MultiMessage
                       messagesTree={_messagesTree}
                       messageId={conversationId ?? null}

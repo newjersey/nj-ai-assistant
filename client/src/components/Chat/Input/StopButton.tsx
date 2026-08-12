@@ -20,7 +20,11 @@ export default memo(function StopButton({
           type="button"
           data-testid="stop-generation-button"
           className={cn(
+<<<<<<< HEAD
             'h-8 w-8 rounded-md bg-[#0076D6] text-text-primary outline-offset-4 transition-all duration-200 disabled:cursor-not-allowed disabled:text-text-secondary disabled:opacity-10',
+=======
+            'size-theme-control rounded-theme-control-round bg-text-primary p-theme-compact text-text-primary outline-offset-4 transition-all duration-theme-normal disabled:cursor-not-allowed disabled:text-text-secondary disabled:opacity-10',
+>>>>>>> upstream/main
           )}
           aria-label={localize('com_nav_stop_generating')}
           onClick={(e) => {

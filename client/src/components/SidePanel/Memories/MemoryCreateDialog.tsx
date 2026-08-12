@@ -10,6 +10,7 @@ import {
   Label,
   Input,
   Spinner,
+  Textarea,
   useToastContext,
 } from '@librechat/client';
 import { useCreateMemoryMutation } from '~/data-provider';
@@ -133,7 +134,7 @@ export default function MemoryCreateDialog({
               <Label htmlFor="memory-value" className="text-sm font-medium text-text-primary">
                 Details
               </Label>
-              <textarea
+              <Textarea
                 id="memory-value"
                 value={value}
                 onChange={(e) => setValue(e.target.value)}
@@ -151,7 +152,6 @@ export default function MemoryCreateDialog({
             variant="submit"
             onClick={handleSave}
             disabled={isLoading || !key.trim() || !value.trim()}
-            className="text-white"
             aria-label={localize('com_ui_create_memory')}
           >
             {isLoading ? <Spinner className="size-4" /> : localize('com_ui_create')}
