@@ -1,8 +1,8 @@
 import { useMemo, useState, useRef, useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { useToastContext } from '@librechat/client';
 import { ChevronLeft, Check, Copy } from 'lucide-react';
 import { AgentCapabilities } from 'librechat-data-provider';
+import { Button, TooltipAnchor, useToastContext } from '@librechat/client';
 import type { AgentForm } from '~/common';
 import { sectionLabelClass, groupHeadingClass } from './ui';
 import { useAgentPanelContext } from '~/Providers';
@@ -71,23 +71,27 @@ export default function AdvancedPanel() {
         {currentAgentId && (
           <div className="flex items-center justify-between gap-2 border-t border-border-light pt-3">
             <span className={sectionLabelClass}>{localize('com_ui_agent_id')}</span>
-            <button
-              type="button"
-              onClick={handleCopyAgentId}
-              title={currentAgentId}
-              aria-label={localize('com_ui_agent_id_copy')}
-              className="inline-flex items-center gap-1.5 rounded-lg px-2 py-1 text-text-secondary transition-colors hover:bg-surface-secondary hover:text-text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-ring-primary"
-            >
-              <code className="max-w-[150px] truncate font-mono text-xs">{currentAgentId}</code>
-              <span className="t-icon-swap" data-state={copied ? 'b' : 'a'} aria-hidden="true">
-                <span className="t-icon" data-icon="a">
-                  <Copy className="h-3.5 w-3.5" aria-hidden="true" />
-                </span>
-                <span className="t-icon" data-icon="b">
-                  <Check className="h-3.5 w-3.5 text-green-500" aria-hidden="true" />
-                </span>
-              </span>
-            </button>
+            <TooltipAnchor
+              description={currentAgentId}
+              render={
+                <Button
+                  variant="ghost"
+                  onClick={handleCopyAgentId}
+                  aria-label={localize('com_ui_agent_id_copy')}
+                  className="h-auto gap-1.5 rounded-lg px-2 py-1 text-text-secondary hover:bg-surface-secondary hover:text-text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-text-primary"
+                >
+                  <code className="max-w-[150px] truncate font-mono text-xs">{currentAgentId}</code>
+                  <span className="t-icon-swap" data-state={copied ? 'b' : 'a'} aria-hidden="true">
+                    <span className="t-icon" data-icon="a">
+                      <Copy className="h-3.5 w-3.5" aria-hidden="true" />
+                    </span>
+                    <span className="t-icon" data-icon="b">
+                      <Check className="h-3.5 w-3.5 text-green-500" aria-hidden="true" />
+                    </span>
+                  </span>
+                </Button>
+              }
+            />
           </div>
         )}
       </div>
