@@ -83,7 +83,7 @@ export function AddAgentSelect({ options, onSelect, placeholder, ariaLabel }: Ad
       selectPlaceholder={placeholder}
       searchPlaceholder={localize('com_ui_agent_var', { 0: localize('com_ui_search') })}
       items={options}
-      className="h-9 w-full border-dashed border-border-light text-center text-text-secondary hover:text-text-primary"
+      className="h-9 w-full border-dashed border-border-heavy text-center text-text-secondary hover:text-text-primary"
       containerClassName="px-0"
       SelectIcon={<PlusCircle size={16} className="text-text-secondary" />}
     />

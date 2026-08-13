@@ -77,7 +77,8 @@ describe('ThemeProvider', () => {
     act(() => screen.getByRole('button', { name: 'Dark' }).click());
 
     await waitFor(() => {
-      expect(document.documentElement).toHaveClass('dark');
+      // NJ: We don't support dark mode, it will be light
+      expect(document.documentElement).toHaveClass('light');
     });
     expect(document.documentElement.style.getPropertyValue('--accent-primary')).toBe('1 2 3');
     expect(document.documentElement.style.getPropertyValue('--text-primary')).toBe('9 9 9');
@@ -404,7 +405,8 @@ describe('ThemeProvider', () => {
       expect(document.documentElement.dataset.theme).toBe('second');
     });
     expect(document.documentElement.style.getPropertyValue('--accent-primary')).toBe('4 5 6');
-    expect(document.documentElement).toHaveClass('dark');
+    // NJ: We don't support dark mode, it will be light
+    expect(document.documentElement).toHaveClass('light');
     expect(JSON.parse(localStorage.getItem('theme-colors') ?? '{}')).toEqual(secondColors);
 
     rerender(

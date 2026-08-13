@@ -11,12 +11,12 @@ import {
 } from '@librechat/client';
 import type { TConversation, TMessage, TFeedback } from 'librechat-data-provider';
 import { useGenerationsByLatest, useLocalize } from '~/hooks';
+import { logCopyEvent } from '~/nj/analytics/logHelpers';
 import { Fork } from '~/components/Conversations';
 import MessageAudio from './MessageAudio';
 import Feedback from './Feedback';
 import { cn } from '~/utils';
 import store from '~/store';
-import { logCopyEvent } from '~/nj/analytics/logHelpers';
 
 type THoverButtons = {
   isEditing: boolean;

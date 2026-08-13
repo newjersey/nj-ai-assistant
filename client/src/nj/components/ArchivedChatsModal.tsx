@@ -25,7 +25,7 @@ export default function ArchivedChatsModal({
         title={localize('com_nav_archived_chats')}
         className="max-w-[1000px]"
         showCancelButton={false}
-        main={<ArchivedChatsTable onOpenChange={onOpenChange} />}
+        main={<ArchivedChatsTable />}
       />
     </OGDialog>
   );
