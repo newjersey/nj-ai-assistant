@@ -113,11 +113,13 @@ export default function MemoryCreateDialog({
         title={localize('com_ui_create_memory')}
         showCloseButton={false}
         className="w-11/12 md:max-w-lg"
-        // NJ: Renaming "Key" -> "Label", and "Value" -> "Details"
         main={
           <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="memory-key" className="text-sm font-medium text-text-primary">
+                {/* NJ: Rename "Key" -> "Label"
+                {localize('com_ui_key')}
+                */}
                 Label
               </Label>
               <Input
@@ -125,6 +127,7 @@ export default function MemoryCreateDialog({
                 value={key}
                 onChange={(e) => setKey(e.target.value)}
                 onKeyDown={handleKeyPress}
+                // placeholder={localize('com_ui_enter_key')} // NJ: Rename Key -> Label
                 placeholder="Enter label"
                 className="w-full"
               />
@@ -132,6 +135,9 @@ export default function MemoryCreateDialog({
             </div>
             <div className="space-y-2">
               <Label htmlFor="memory-value" className="text-sm font-medium text-text-primary">
+                {/* NJ: Rename "Value" -> "Details"
+                {localize('com_ui_value')}
+                */}
                 Details
               </Label>
               <Textarea
@@ -139,6 +145,7 @@ export default function MemoryCreateDialog({
                 value={value}
                 onChange={(e) => setValue(e.target.value)}
                 onKeyDown={handleKeyPress}
+                // placeholder={localize('com_ui_enter_value')} // NJ: Rename Value -> Details
                 placeholder="Enter details"
                 className="min-h-[100px] w-full resize-none rounded-lg border border-border-light bg-transparent px-3 py-2 text-sm text-text-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-border-heavy"
                 rows={4}

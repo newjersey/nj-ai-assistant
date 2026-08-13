@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useCallback, useState, useEffect, useRef } from 'react';
+import { easings } from '@react-spring/web';
 import { EModelEndpoint } from 'librechat-data-provider';
 import { BirthdayIcon, TooltipAnchor, SplitText } from '@librechat/client';
 import {
@@ -9,12 +10,12 @@ import {
   CONFIG_HTML_MEDIA_TAGS,
   CONFIG_HTML_MEDIA_ATTR,
 } from '~/utils';
-import { useAgentsMapContext, useAssistantsMapContext, useChatContext } from '~/Providers';
+import { useChatContext, useAgentsMapContext, useAssistantsMapContext } from '~/Providers';
 import { useGetEndpointsQuery, useGetStartupConfig } from '~/data-provider';
 import { NewJerseyLanding } from '~/nj/components/NewJerseyLanding';
+import { useLocalize, useAuthContext, useGreeting } from '~/hooks';
 import AgentContact from '~/components/Agents/AgentContact';
 import ConvoIcon from '~/components/Endpoints/ConvoIcon';
-import { useAuthContext, useLocalize } from '~/hooks';
 
 const containerClassName =
   'shadow-stroke relative flex h-full items-center justify-center rounded-full bg-presentation text-text-primary dark:after:shadow-none ';
@@ -97,42 +98,12 @@ export default function Landing({ centerFormOnLanding }: { centerFormOnLanding: 
   const selectedAgent =
     isAgent && conversation?.agent_id != null ? agentsMap?.[conversation.agent_id] : undefined;
 
-  const getGreeting = useCallback(() => {
-    if (typeof startupConfig?.interface?.customWelcome === 'string') {
-      const customWelcome = startupConfig.interface.customWelcome;
-      // Replace {{user.name}} with actual user name if available
-      if (user?.name && customWelcome.includes('{{user.name}}')) {
-        return customWelcome.replace(/{{user.name}}/g, user.name);
-      }
-      return customWelcome;
-    }
+  const customWelcome =
+    typeof startupConfig?.interface?.customWelcome === 'string'
+      ? startupConfig.interface.customWelcome
+      : undefined;
 
-    const now = new Date();
-    const hours = now.getHours();
-
-    const dayOfWeek = now.getDay();
-    const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
-
-    // Early morning (midnight to 4:59 AM)
-    if (hours >= 0 && hours < 5) {
-      return localize('com_ui_late_night');
-    }
-    // Morning (6 AM to 11:59 AM)
-    else if (hours < 12) {
-      if (isWeekend) {
-        return localize('com_ui_weekend_morning');
-      }
-      return localize('com_ui_good_morning');
-    }
-    // Afternoon (12 PM to 4:59 PM)
-    else if (hours < 17) {
-      return localize('com_ui_good_afternoon');
-    }
-    // Evening (5 PM to 8:59 PM)
-    else {
-      return localize('com_ui_good_evening');
-    }
-  }, [localize, startupConfig?.interface?.customWelcome, user?.name]);
+  const scheduledGreeting = useGreeting(user?.name);
 
   const handleLineCountChange = useCallback((count: number) => {
     setTextHasMultipleLines(count > 1);
@@ -165,10 +136,12 @@ export default function Landing({ centerFormOnLanding }: { centerFormOnLanding: 
     return margin;
   }, [lineCount, description, textHasMultipleLines, contentHeight]);
 
-  const greetingText =
-    typeof startupConfig?.interface?.customWelcome === 'string'
-      ? getGreeting()
-      : getGreeting() + (user?.name ? ', ' + user.name : '');
+  const resolvedWelcome =
+    customWelcome != null && user?.name
+      ? customWelcome.replace(/{{user.name}}/g, user.name)
+      : customWelcome;
+
+  const greetingText = resolvedWelcome ?? scheduledGreeting;
 
   // NJ: We normally fully customize the landing page, but if you're talking to an agent,
   // we want to make it more obvious what's going on, so we partially revert to normal layout

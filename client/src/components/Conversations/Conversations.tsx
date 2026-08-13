@@ -2,21 +2,18 @@ import { useMemo, memo, type FC, useCallback, useEffect, useRef } from 'react';
 import throttle from 'lodash/throttle';
 import { useRecoilValue } from 'recoil';
 import { ChevronDown } from 'lucide-react';
-import { QueryKeys } from 'librechat-data-provider';
-import { useQueryClient } from '@tanstack/react-query';
+import { Spinner, useMediaQuery } from '@librechat/client';
 import { List, CellMeasurer, CellMeasurerCache } from 'react-virtualized';
-import { Button, Spinner, TooltipAnchor, NewChatIcon, useMediaQuery } from '@librechat/client';
 import type { TConversation } from 'librechat-data-provider';
 import {
   useLocalize,
   TranslationKeys,
   useFavorites,
   useShowMarketplace,
-  useNewConvo,
   useElementSize,
 } from '~/hooks';
-import { groupConversationsByDate, clearMessagesCache, cn } from '~/utils';
 import FavoritesList from '~/components/Nav/Favorites/FavoritesList';
+import { groupConversationsByDate, cn } from '~/utils';
 import { useActiveJobs } from '~/data-provider';
 import Convo from './Convo';
 import store from '~/store';
@@ -97,15 +94,6 @@ const headerIconButtonClassName =
 /** Collapsible header for the Chats section */
 const ChatsHeader: FC<ChatsHeaderProps> = memo(({ isExpanded, onToggle }) => {
   const localize = useLocalize();
-  const queryClient = useQueryClient();
-  const { newConversation } = useNewConvo();
-  const conversation = useRecoilValue(store.conversationByIndex(0));
-
-  const handleNewChat = useCallback(() => {
-    clearMessagesCache(queryClient, conversation?.conversationId);
-    queryClient.invalidateQueries([QueryKeys.messages]);
-    newConversation();
-  }, [conversation?.conversationId, newConversation, queryClient]);
 
   return (
     <div className="flex h-8 w-full items-center gap-0.5 pr-2">

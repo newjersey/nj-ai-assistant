@@ -31,6 +31,7 @@ export interface IThemeRGB {
   'rgb-surface-active-alt'?: string;
   'rgb-surface-hover'?: string;
   'rgb-surface-hover-alt'?: string;
+  'rgb-surface-composer-hover'?: string;
   'rgb-surface-primary'?: string;
   'rgb-surface-primary-alt'?: string;
   'rgb-surface-primary-contrast'?: string;
@@ -39,6 +40,7 @@ export interface IThemeRGB {
   'rgb-surface-tertiary'?: string;
   'rgb-surface-tertiary-alt'?: string;
   'rgb-surface-dialog'?: string;
+  'rgb-surface-overlay'?: string;
   'rgb-surface-submit'?: string;
   'rgb-surface-submit-hover'?: string;
   'rgb-surface-destructive'?: string;
@@ -63,18 +65,23 @@ export interface IThemeRGB {
   'rgb-status-success'?: string;
   'rgb-status-success-subtle'?: string;
   'rgb-status-success-border'?: string;
+  'rgb-status-success-strong'?: string;
   'rgb-status-info'?: string;
   'rgb-status-info-subtle'?: string;
   'rgb-status-info-border'?: string;
+  'rgb-status-info-strong'?: string;
   'rgb-status-warning'?: string;
   'rgb-status-warning-subtle'?: string;
   'rgb-status-warning-border'?: string;
+  'rgb-status-warning-strong'?: string;
   'rgb-status-error'?: string;
   'rgb-status-error-subtle'?: string;
   'rgb-status-error-border'?: string;
+  'rgb-status-error-strong'?: string;
   'rgb-status-neutral'?: string;
   'rgb-status-neutral-subtle'?: string;
   'rgb-status-neutral-border'?: string;
+  'rgb-text-on-status'?: string;
 
   // Brand colors
   'rgb-brand-purple'?: string;
@@ -106,6 +113,7 @@ export interface IThemeVariables {
   '--surface-active-alt': string;
   '--surface-hover': string;
   '--surface-hover-alt': string;
+  '--surface-composer-hover': string;
   '--surface-primary': string;
   '--surface-primary-alt': string;
   '--surface-primary-contrast': string;
@@ -114,6 +122,7 @@ export interface IThemeVariables {
   '--surface-tertiary': string;
   '--surface-tertiary-alt': string;
   '--surface-dialog': string;
+  '--surface-overlay': string;
   '--surface-submit': string;
   '--surface-submit-hover': string;
   '--surface-destructive': string;
@@ -138,18 +147,23 @@ export interface IThemeVariables {
   '--status-success': string;
   '--status-success-subtle': string;
   '--status-success-border': string;
+  '--status-success-strong': string;
   '--status-info': string;
   '--status-info-subtle': string;
   '--status-info-border': string;
+  '--status-info-strong': string;
   '--status-warning': string;
   '--status-warning-subtle': string;
   '--status-warning-border': string;
+  '--status-warning-strong': string;
   '--status-error': string;
   '--status-error-subtle': string;
   '--status-error-border': string;
+  '--status-error-strong': string;
   '--status-neutral': string;
   '--status-neutral-subtle': string;
   '--status-neutral-border': string;
+  '--text-on-status': string;
   '--brand-purple': string;
   '--presentation': string;
 }
@@ -177,6 +191,7 @@ export interface IThemeColors {
   'surface-active-alt'?: string;
   'surface-hover'?: string;
   'surface-hover-alt'?: string;
+  'surface-composer-hover'?: string;
   'surface-primary'?: string;
   'surface-primary-alt'?: string;
   'surface-primary-contrast'?: string;
@@ -185,6 +200,7 @@ export interface IThemeColors {
   'surface-tertiary'?: string;
   'surface-tertiary-alt'?: string;
   'surface-dialog'?: string;
+  'surface-overlay'?: string;
   'surface-submit'?: string;
   'surface-submit-hover'?: string;
   'surface-destructive'?: string;
@@ -205,18 +221,23 @@ export interface IThemeColors {
   'status-success'?: string;
   'status-success-subtle'?: string;
   'status-success-border'?: string;
+  'status-success-strong'?: string;
   'status-info'?: string;
   'status-info-subtle'?: string;
   'status-info-border'?: string;
+  'status-info-strong'?: string;
   'status-warning'?: string;
   'status-warning-subtle'?: string;
   'status-warning-border'?: string;
+  'status-warning-strong'?: string;
   'status-error'?: string;
   'status-error-subtle'?: string;
   'status-error-border'?: string;
+  'status-error-strong'?: string;
   'status-neutral'?: string;
   'status-neutral-subtle'?: string;
   'status-neutral-border'?: string;
+  'text-on-status'?: string;
   'brand-purple'?: string;
   presentation?: string;
 
@@ -230,4 +251,40 @@ export interface IThemeColors {
 export interface Theme {
   name: string;
   colors: IThemeRGB;
+}
+
+export type ThemeMode = 'light' | 'dark';
+
+export interface IThemeAppearance {
+  controlRadius: string;
+  roundControlRadius: string;
+  surfaceRadius: string;
+  largeSurfaceRadius: string;
+  controlHeight: string;
+  spaceCompact: string;
+  spaceNormal: string;
+  fontFamily: string;
+  elevationSurface: string;
+  motionFast: string;
+  motionNormal: string;
+}
+
+export interface ThemeModeDefinition {
+  colors?: IThemeRGB;
+  appearance?: Partial<IThemeAppearance>;
+}
+
+/** Versioned, data-only theme input. Missing values resolve against LibreChat defaults. */
+export interface ThemeDefinition {
+  version: 1;
+  name: string;
+  modes: Partial<Record<ThemeMode, ThemeModeDefinition>>;
+}
+
+export interface ResolvedThemeDefinition {
+  version: 1;
+  name: string;
+  mode: ThemeMode;
+  colors: Required<IThemeRGB>;
+  appearance: IThemeAppearance;
 }
