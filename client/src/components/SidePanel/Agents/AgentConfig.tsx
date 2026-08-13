@@ -91,7 +91,7 @@ export default function AgentConfig() {
       <div className="px-3 pb-3 pt-4">
         <label className={labelClass} htmlFor="name">
           Agent Name
-          <span className="ml-1 text-red-500">*</span>
+          <span className="ml-1 text-status-error">*</span>
         </label>
         <Controller
           name="name"
@@ -110,7 +110,7 @@ export default function AgentConfig() {
               />
               <div
                 className={cn(
-                  'mt-1 w-56 text-sm text-red-500',
+                  'mt-1 w-56 text-sm text-status-error',
                   errors.name ? 'visible h-auto' : 'invisible h-0',
                 )}
                 role="alert"
