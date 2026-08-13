@@ -84,7 +84,7 @@ export default function Instructions() {
           htmlFor="instructions"
         >
           Give your agent a task
-          <span className="ml-1 text-red-500">*</span>
+          <span className="ml-1 text-status-error">*</span>
         </label>
         <HoverCard openDelay={50}>
           <HoverCardTrigger asChild>
