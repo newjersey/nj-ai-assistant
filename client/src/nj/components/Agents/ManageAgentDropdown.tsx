@@ -109,7 +109,7 @@ export default function ManageAgentDropdown({
           deleteAgent.mutate({ agent_id: agent.id });
         }
       },
-      icon: <Trash className="size-4 text-red-500" />,
+      icon: <Trash className="size-4 text-status-error" />,
     },
   ];
 
