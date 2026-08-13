@@ -623,6 +623,7 @@ const ChatForm = memo(function ChatForm({
                       onClick={handleFocusOrClick}
                       style={{ height: 44, overflowY: 'auto' }}
                       className={cn(
+                        'lc-field', // NJ: Enforce focus-ring removal on the prompt textarea
                         baseClasses,
                         removeFocusRings,
                         'scrollbar-hover transition-[max-height] duration-200 disabled:cursor-not-allowed',
