@@ -1,6 +1,6 @@
 import { useId } from 'react';
 import * as Ariakit from '@ariakit/react';
-import { DropdownPopup, useToastContext } from '@librechat/client';
+import { DropdownPopup, TooltipAnchor, useToastContext } from '@librechat/client';
 import { Ellipsis, Pen, Pin } from 'lucide-react';
 import type { MouseEvent } from 'react';
 import type { TFile } from 'librechat-data-provider';
@@ -59,17 +59,22 @@ export default function FileOptions({
       isOpen={isPopoverActive}
       setIsOpen={setIsPopoverActive}
       trigger={
-        <Ariakit.MenuButton
-          aria-label={`File menu options for "${file.filename}"`}
-          aria-expanded={isPopoverActive}
-          className="inline-flex h-7 w-7 items-center justify-center rounded-md p-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
-          onClick={(e: MouseEvent<HTMLButtonElement>) => e.stopPropagation()}
-          onKeyDown={(e: React.KeyboardEvent<HTMLButtonElement>) => {
-            if (e.key === 'Enter' || e.key === ' ') e.stopPropagation();
-          }}
-        >
-          <Ellipsis className="icon-md text-text-secondary" aria-hidden={true} />
-        </Ariakit.MenuButton>
+        <TooltipAnchor
+          description={`File options for "${file.filename}"`}
+          render={
+            <Ariakit.MenuButton
+              aria-label={`File menu options for "${file.filename}"`}
+              aria-expanded={isPopoverActive}
+              className="inline-flex h-7 w-7 items-center justify-center rounded-md p-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+              onClick={(e: MouseEvent<HTMLButtonElement>) => e.stopPropagation()}
+              onKeyDown={(e: React.KeyboardEvent<HTMLButtonElement>) => {
+                if (e.key === 'Enter' || e.key === ' ') e.stopPropagation();
+              }}
+            >
+              <Ellipsis className="icon-md text-text-secondary" aria-hidden={true} />
+            </Ariakit.MenuButton>
+          }
+        />
       }
       items={dropdownItems}
     />
