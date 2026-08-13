@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 import { AnimatePresence, motion } from 'framer-motion';
+import { TooltipAnchor } from '@librechat/client';
 import { newUpdatesWidgetDismissed } from '~/nj/store/landing';
 import { logEvent } from '~/nj/analytics/logEvent';
 import icons from '@uswds/uswds/img/sprite.svg';
@@ -46,19 +47,25 @@ function CollapsedWidget({ onExpand }: CollapsedWidgetProps) {
   const content = getUpdateWidgetContent();
 
   return (
-    <motion.button
-      key="collapsed"
-      initial={{ scale: 0.9 }}
-      animate={{ scale: 1 }}
-      exit={{ scale: 0.9 }}
-      transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
-      onClick={handleExpand}
-      className="hover:bg-text-primary/90 flex items-center gap-2 rounded-full bg-text-primary px-4 py-2 text-sm font-medium text-surface-primary shadow-lg"
-    >
-      <Icon name="notifications" style={{ color: '#FFBE2E' }} />
-      <span>{content.title}</span>
-      <Icon name="expand_more" />
-    </motion.button>
+    <TooltipAnchor
+      description="Expand"
+      render={
+        <motion.button
+          key="collapsed"
+          initial={{ scale: 0.9 }}
+          animate={{ scale: 1 }}
+          exit={{ scale: 0.9 }}
+          transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+          onClick={handleExpand}
+          aria-label="Expand"
+          className="hover:bg-text-primary/90 flex items-center gap-2 rounded-full bg-text-primary px-4 py-2 text-sm font-medium text-surface-primary shadow-lg"
+        >
+          <Icon name="notifications" style={{ color: '#FFBE2E' }} />
+          <span>{content.title}</span>
+          <Icon name="expand_more" />
+        </motion.button>
+      }
+    />
   );
 }
 
@@ -96,15 +103,20 @@ function ExpandedWidget({ onClose, onDismiss }: ExpandedWidgetProps) {
           <Icon name="notifications" style={{ color: '#FFBE2E' }} />
           <h3 className="text-base font-semibold">{content.title}</h3>
         </div>
-        <button
-          onClick={onClose}
-          className="hover:text-surface-primary/80 text-surface-primary"
-          aria-label="Close"
-        >
-          <div className="rotate-180">
-            <Icon name="expand_more" />
-          </div>
-        </button>
+        <TooltipAnchor
+          description="Close"
+          render={
+            <button
+              onClick={onClose}
+              className="hover:text-surface-primary/80 text-surface-primary"
+              aria-label="Close"
+            >
+              <div className="rotate-180">
+                <Icon name="expand_more" />
+              </div>
+            </button>
+          }
+        />
       </div>
 
       <div className="mb-5 pl-5">
