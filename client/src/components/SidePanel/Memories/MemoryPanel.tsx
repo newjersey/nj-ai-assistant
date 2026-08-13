@@ -1,4 +1,5 @@
 import { useMemo, useState, useEffect } from 'react';
+import { useRecoilState } from 'recoil';
 import { Plus, Check } from 'lucide-react';
 import { matchSorter } from 'match-sorter';
 import { SystemRoles, PermissionTypes, Permissions } from 'librechat-data-provider';
@@ -17,17 +18,16 @@ import {
   useMemoriesQuery,
   useGetUserQuery,
 } from '~/data-provider';
+import MemoryPanelSplash from '~/nj/components/SidePanel/Memories/MemoryPanelSplash';
 import { useLocalize, useAuthContext, useHasAccess } from '~/hooks';
 import { PanelFooter, PanelContent } from '~/components/ui';
 import MemoryCardSkeleton from './MemoryCardSkeleton';
 import MemoryCreateDialog from './MemoryCreateDialog';
+import { atomWithLocalStorage } from '~/store/utils';
 import MemoryUsageBadge from './MemoryUsageBadge';
 import AdminSettings from './AdminSettings';
 import MemoryList from './MemoryList';
 import { cn } from '~/utils';
-import MemoryPanelSplash from '~/nj/components/SidePanel/Memories/MemoryPanelSplash';
-import { atomWithLocalStorage } from '~/store/utils';
-import { useRecoilState } from 'recoil';
 
 // NJ: Show a one-time splash page introducing memories on first visit
 const showSplashPageState = atomWithLocalStorage('memoryPanelSplashPage', true);

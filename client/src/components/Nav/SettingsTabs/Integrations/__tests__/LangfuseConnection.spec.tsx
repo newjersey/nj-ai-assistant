@@ -105,7 +105,8 @@ describe('LangfuseConnection', () => {
     expect(screen.queryByText('com_ui_langfuse_test')).not.toBeInTheDocument();
     expect(screen.getByText('com_ui_langfuse_status_not_configured')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'com_ui_cancel' })).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'com_ui_save' })).toHaveClass('bg-surface-submit');
+    // NJ: Use NJ class instead of 'bg-surface-submit'
+    expect(screen.getByRole('button', { name: 'com_ui_save' })).toHaveClass('bg-jersey-button');
     expect(screen.getByTestId('langfuse-connection-status')).toHaveTextContent(
       'com_ui_langfuse_status_not_configured',
     );

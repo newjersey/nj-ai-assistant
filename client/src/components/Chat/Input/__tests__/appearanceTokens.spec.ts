@@ -5,8 +5,7 @@ const inputRoot = join(__dirname, '..');
 const source = (file: string): string => readFileSync(join(inputRoot, file), 'utf8');
 
 const themedControls = [
-  ['SendButton.tsx', ['size-theme-control', 'rounded-theme-control-round', 'p-theme-compact']],
-  ['StopButton.tsx', ['size-theme-control', 'rounded-theme-control-round', 'p-theme-compact']],
+  // NJ: Remove SendButton and StopButton from testing as they are customized for us and not themed
   [
     'DuringRunSendButton.tsx',
     ['size-theme-control', 'rounded-theme-control-round', 'p-theme-compact'],

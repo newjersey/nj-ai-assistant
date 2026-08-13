@@ -2,9 +2,9 @@ import React, { forwardRef } from 'react';
 import { useWatch } from 'react-hook-form';
 import { SendIcon, TooltipAnchor } from '@librechat/client';
 import type { Control } from 'react-hook-form';
+import NewJerseySendIcon from '~/nj/svgs/NewJerseySendIcon';
 import { useLocalize } from '~/hooks';
 import { cn } from '~/utils';
-import NewJerseySendIcon from '~/nj/svgs/NewJerseySendIcon';
 
 type SendButtonProps = {
   disabled: boolean;
