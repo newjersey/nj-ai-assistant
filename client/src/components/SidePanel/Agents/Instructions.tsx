@@ -105,7 +105,7 @@ export default function Instructions() {
           </HoverCardPortal>
         </HoverCard>
         {/* NJ: Use custom spacing around the buttons (and our classes on the buttons themselves) */}
-        <div className="ml-auto flex items-center gap-1" title="Add variables to instructions">
+        <div className="ml-auto flex items-center gap-1">
           <DropdownPopup
             portal={true}
             mountByState={true}
@@ -114,14 +114,18 @@ export default function Instructions() {
             isOpen={isMenuOpen}
             setIsOpen={setIsMenuOpen}
             trigger={
-              <Menu.MenuButton
-                id="variables-menu-button"
-                aria-label="Add variable to instructions"
-                title="Add variable to instructions"
-                className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-surface-primary-alt text-text-primary transition-colors duration-200 hover:bg-surface-tertiary"
-              >
-                <PlusCircle className="h-4 w-4" strokeWidth={1.75} aria-hidden={true} />
-              </Menu.MenuButton>
+              <TooltipAnchor
+                description="Add variable to instructions"
+                render={
+                  <Menu.MenuButton
+                    id="variables-menu-button"
+                    aria-label="Add variable to instructions"
+                    className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-surface-primary-alt text-text-primary transition-colors duration-200 hover:bg-surface-tertiary"
+                  >
+                    <PlusCircle className="h-4 w-4" strokeWidth={1.75} aria-hidden={true} />
+                  </Menu.MenuButton>
+                }
+              />
             }
             items={variableItems}
             menuId={menuId}
@@ -152,7 +156,7 @@ export default function Instructions() {
             <Textarea
               {...field}
               value={field.value ?? ''}
-              className={cn(njInputClass, 'min-h-[118px] resize-y')}
+              className={cn(njInputClass, 'min-h-[118px] resize-y bg-white')}
               id="instructions"
               placeholder={localize('com_agents_instructions_placeholder')}
               rows={3}
