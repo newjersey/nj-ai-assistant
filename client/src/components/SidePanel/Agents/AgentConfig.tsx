@@ -1,27 +1,27 @@
 /* eslint-disable i18next/no-literal-string */
 /* ^ We're not worried about i18n for this app ^ */
 
-import { useEffect } from 'react';
-import { useRecoilValue } from 'recoil';
-import { Link } from 'react-router-dom';
-import { Input } from '@librechat/client';
-import { Controller, useFormContext, useWatch } from 'react-hook-form';
+import { Input, Label } from '@librechat/client';
+import { Controller, useWatch, useFormContext } from 'react-hook-form';
 import { EModelEndpoint, getEndpointField } from 'librechat-data-provider';
 import type { AgentForm, IconComponentTypes } from '~/common';
-import { cn, getIconKey, validateEmail, createProviderOption } from '~/utils';
-import useAgentCapabilities from '~/hooks/Agents/useAgentCapabilities';
-import FileContext from '~/nj/components/Agents/FileContext';
 import AgentCategorySelector from './AgentCategorySelector';
-import FileSearch from '~/nj/components/Agents/FileSearch';
-import TipComponent from '~/nj/components/TipComponent';
+import { useLocalize, useAgentCapabilities } from '~/hooks';
+import { validateEmail, getIconKey, cn, createProviderOption } from '~/utils';
 import { useAgentFileEntries } from './Tools/hooks';
 import { useAgentPanelContext } from '~/Providers';
 import ToolsSection from './Tools/ToolsSection';
 import { icons } from '~/hooks/Endpoint/Icons';
 import Instructions from './Instructions';
+import FileContext from '~/nj/components/Agents/FileContext';
 import AgentAvatar from './AgentAvatar';
-import { useLocalize } from '~/hooks';
 import { Panel } from '~/common';
+import { useEffect } from 'react';
+import { useRecoilValue } from 'recoil';
+import { Link } from 'react-router-dom';
+import FileSearch from '~/nj/components/Agents/FileSearch';
+import { njInputClass } from '~/nj/components/Agents/agentInputStyle';
+import TipComponent from '~/nj/components/TipComponent';
 import store from '~/store';
 
 const fieldClass = 'h-9';
@@ -76,9 +76,6 @@ export default function AgentConfig() {
    *
    * Make sure to check that the LibreChat implementation hasn't drifted too far functionality-wise!
    */
-  const njInputClass =
-    'flex w-full rounded-md border border-[#454540] px-3 py-2 text-sm placeholder:text-text-secondary';
-
   return (
     <div className="h-auto pt-3">
       {/* Identity */}
@@ -92,7 +89,7 @@ export default function AgentConfig() {
       <div className="px-3 pb-3 pt-4">
         <label className={labelClass} htmlFor="name">
           Agent Name
-          <span className="ml-1 text-red-500">*</span>
+          <span className="ml-1 text-status-error">*</span>
         </label>
         <Controller
           name="name"
@@ -111,7 +108,7 @@ export default function AgentConfig() {
               />
               <div
                 className={cn(
-                  'mt-1 w-56 text-sm text-red-500',
+                  'mt-1 w-56 text-sm text-status-error',
                   errors.name ? 'visible h-auto' : 'invisible h-0',
                 )}
                 role="alert"
@@ -238,12 +235,12 @@ export default function AgentConfig() {
       {/* MODEL + CATEGORY — balanced 2-column grid */}
       <div className="mb-3 grid grid-cols-2 gap-2">
         <div className="flex min-w-0 flex-col">
-          <label
+          <Label
             className="mb-1 block text-[11px] font-medium uppercase tracking-wide text-text-secondary"
             htmlFor="provider"
           >
             {localize('com_ui_model')} <span className="text-red-500">*</span>
-          </label>
+          </Label>
           <button
             type="button"
             onClick={() => setActivePanel(Panel.model)}
@@ -273,12 +270,12 @@ export default function AgentConfig() {
           </button>
         </div>
         <div className="flex flex-col">
-          <label
+          <Label
             className="mb-1 block text-[11px] font-medium uppercase tracking-wide text-text-secondary"
             htmlFor="category-selector"
           >
             {localize('com_ui_category')} <span className="text-red-500">*</span>
-          </label>
+          </Label>
           <AgentCategorySelector className="w-full rounded-lg" />
         </div>
       </div>
@@ -298,9 +295,9 @@ export default function AgentConfig() {
 
       {/* SUPPORT CONTACT */}
       <div className="mb-3 flex flex-col">
-        <label className="mb-1 block text-[11px] font-medium uppercase tracking-wide text-text-secondary">
+        <Label className="mb-1 block text-[11px] font-medium uppercase tracking-wide text-text-secondary">
           {localize('com_ui_support_contact')}
-        </label>
+        </Label>
         <div className="space-y-2">
           <Controller
             name="support_contact.name"

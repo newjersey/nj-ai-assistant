@@ -1,9 +1,9 @@
 import { CopyPlus } from 'lucide-react';
-import { useToastContext, Button } from '@librechat/client';
-import { logAgentDuplication } from '~/nj/analytics/logHelpers';
+import { useToastContext, TooltipAnchor, Button } from '@librechat/client';
 import { useDuplicateAgentMutation } from '~/data-provider';
 import { isEphemeralAgent } from '~/common';
 import { useLocalize } from '~/hooks';
+import { logAgentDuplication } from '~/nj/analytics/logHelpers';
 
 export default function DuplicateAgent({ agent_id }: { agent_id: string }) {
   const localize = useLocalize();
@@ -35,17 +35,22 @@ export default function DuplicateAgent({ agent_id }: { agent_id: string }) {
   };
 
   return (
-    <Button
-      size="sm"
-      variant="outline"
-      aria-label={localize('com_ui_duplicate_agent')}
-      title={localize('com_ui_duplicate_agent')}
-      type="button"
-      onClick={handleDuplicate}
-    >
-      <div className="flex w-full items-center justify-center gap-2 text-primary">
-        <CopyPlus className="size-4" />
-      </div>
-    </Button>
+    <TooltipAnchor
+      description={localize('com_ui_duplicate_agent')}
+      side="top"
+      render={
+        <Button
+          size="sm"
+          variant="outline"
+          aria-label={localize('com_ui_duplicate_agent')}
+          type="button"
+          onClick={handleDuplicate}
+        >
+          <div className="flex w-full items-center justify-center gap-2 text-text-primary">
+            <CopyPlus className="size-4" />
+          </div>
+        </Button>
+      }
+    />
   );
 }

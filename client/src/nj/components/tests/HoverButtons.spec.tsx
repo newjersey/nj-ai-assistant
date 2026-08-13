@@ -46,14 +46,14 @@ describe('HoverButtons NJ customizations', () => {
     const forkButton = dom.container.querySelector('[aria-label="Fork"]');
     expect(forkButton).not.toBeInTheDocument();
 
-    const thumbsUpButton = screen.queryByTitle('Love this');
+    const thumbsUpButton = screen.queryByLabelText('Love this');
     expect(thumbsUpButton).not.toBeInTheDocument();
 
-    const thumbsDownButton = screen.queryByTitle('Needs improvement');
+    const thumbsDownButton = screen.queryByLabelText('Needs improvement');
     expect(thumbsDownButton).not.toBeInTheDocument();
 
     // Assert that buttons are rendering *at all* (otherwise test might be buggy)
-    const copyButton = screen.queryByTitle('Copy to clipboard');
+    const copyButton = screen.queryByLabelText('Copy to clipboard');
     expect(copyButton).toBeInTheDocument();
   });
 
@@ -62,7 +62,7 @@ describe('HoverButtons NJ customizations', () => {
 
     renderHoverButtons();
 
-    const copyButton = await screen.findByTitle('Copy to clipboard');
+    const copyButton = await screen.findByLabelText('Copy to clipboard');
     await userEvent.click(copyButton);
 
     expect(logEventSpy).toHaveBeenCalledWith('copy_response_text');
