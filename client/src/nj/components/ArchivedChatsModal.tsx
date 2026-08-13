@@ -1,7 +1,7 @@
-import { OGDialog, OGDialogTemplate } from '@librechat/client';
-import { useLocalize } from '~/hooks';
-import ArchivedChatsTable from '~/components/Nav/SettingsTabs/General/ArchivedChatsTable';
 import React from 'react';
+import { OGDialog, OGDialogTemplate } from '@librechat/client';
+import ArchivedChatsTable from '~/components/Nav/SettingsTabs/General/ArchivedChatsTable';
+import { useLocalize } from '~/hooks';
 
 /**
  * Similar to `ArchivedChats`, but only contains the modal (no buttons for accessing it).
@@ -25,7 +25,7 @@ export default function ArchivedChatsModal({
         title={localize('com_nav_archived_chats')}
         className="max-w-[1000px]"
         showCancelButton={false}
-        main={<ArchivedChatsTable onOpenChange={onOpenChange} />}
+        main={<ArchivedChatsTable />}
       />
     </OGDialog>
   );

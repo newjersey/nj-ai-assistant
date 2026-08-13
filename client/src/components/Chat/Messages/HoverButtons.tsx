@@ -11,12 +11,12 @@ import {
 } from '@librechat/client';
 import type { TConversation, TMessage, TFeedback } from 'librechat-data-provider';
 import { useGenerationsByLatest, useLocalize } from '~/hooks';
+import { logCopyEvent } from '~/nj/analytics/logHelpers';
 import { Fork } from '~/components/Conversations';
 import MessageAudio from './MessageAudio';
 import Feedback from './Feedback';
 import { cn } from '~/utils';
 import store from '~/store';
-import { logCopyEvent } from '~/nj/analytics/logHelpers';
 
 type THoverButtons = {
   isEditing: boolean;
@@ -99,8 +99,11 @@ const HoverButton = memo(
       'hover:text-text-primary hover:bg-surface-hover',
       'group-hover:visible group-focus-within:visible group-[.final-completion]:visible',
       !isLast &&
+        isVisible &&
         'group-hover:opacity-100 group-focus-within:opacity-100 [@media(hover:hover)]:opacity-0',
-      !isVisible && 'opacity-0',
+      /** `!` is load-bearing: the shared Button sets `disabled:opacity-50`, which outranks a
+       *  plain `opacity-0` and would leave a dimmed ghost of the hidden action on screen. */
+      !isVisible && 'pointer-events-none !opacity-0',
       'focus-visible:ring-2 focus-visible:ring-text-primary focus-visible:outline-none',
       isActive && isVisible && 'active text-text-primary bg-surface-hover',
       className,
