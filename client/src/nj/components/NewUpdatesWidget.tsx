@@ -58,7 +58,7 @@ function CollapsedWidget({ onExpand }: CollapsedWidgetProps) {
           transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
           onClick={handleExpand}
           aria-label="Expand"
-          className="hover:bg-text-primary/90 flex items-center gap-2 rounded-full bg-text-primary px-4 py-2 text-sm font-medium text-surface-primary shadow-lg"
+          className="flex items-center gap-2 rounded-full bg-text-primary px-4 py-2 text-sm font-medium text-surface-primary shadow-lg hover:bg-text-primary/90"
         >
           <Icon name="notifications" style={{ color: '#FFBE2E' }} />
           <span>{content.title}</span>
@@ -108,7 +108,7 @@ function ExpandedWidget({ onClose, onDismiss }: ExpandedWidgetProps) {
           render={
             <button
               onClick={onClose}
-              className="hover:text-surface-primary/80 text-surface-primary"
+              className="text-surface-primary hover:text-surface-primary/80"
               aria-label="Close"
             >
               <div className="rotate-180">
@@ -138,7 +138,7 @@ function ExpandedWidget({ onClose, onDismiss }: ExpandedWidgetProps) {
       <div className="pl-5 pr-5">
         <button
           onClick={handleDismiss}
-          className="hover:bg-surface-primary/10 w-full rounded border-2 border-surface-primary bg-transparent py-2 text-sm font-medium text-surface-primary"
+          className="w-full rounded border-2 border-surface-primary bg-transparent py-2 text-sm font-medium text-surface-primary hover:bg-surface-primary/10"
         >
           Dismiss
         </button>
