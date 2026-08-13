@@ -240,8 +240,8 @@ export default function MemoryPanel() {
               <button
                 type="button"
                 className={cn(
-                  'btn !rounded-lg text-text-primary ring-offset-background focus-visible:ring-2',
-                  'ml-auto gap-2 !transition-none focus-visible:ring-ring focus-visible:ring-offset-2',
+                  'btn !rounded-lg text-text-primary ring-offset-surface-primary focus-visible:ring-2',
+                  'ml-auto gap-2 !transition-none focus-visible:ring-text-primary focus-visible:ring-offset-2',
                   referenceSavedMemories ? 'bg-surface-tertiary' : '!border-border-medium',
                 )}
                 onClick={() => handleMemoryToggle(!referenceSavedMemories)}
@@ -254,7 +254,7 @@ export default function MemoryPanel() {
                   className={cn(
                     'flex size-4 shrink-0 items-center justify-center rounded-[2px] border',
                     referenceSavedMemories
-                      ? 'border-transparent bg-primary text-primary-foreground'
+                      ? 'border-transparent bg-gray-850 text-white'
                       : 'border-border-xheavy bg-transparent',
                   )}
                 >

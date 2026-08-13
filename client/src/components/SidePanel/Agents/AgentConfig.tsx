@@ -20,6 +20,7 @@ import { useEffect } from 'react';
 import { useRecoilValue } from 'recoil';
 import { Link } from 'react-router-dom';
 import FileSearch from '~/nj/components/Agents/FileSearch';
+import { njInputClass } from '~/nj/components/Agents/agentInputStyle';
 import TipComponent from '~/nj/components/TipComponent';
 import store from '~/store';
 
@@ -75,9 +76,6 @@ export default function AgentConfig() {
    *
    * Make sure to check that the LibreChat implementation hasn't drifted too far functionality-wise!
    */
-  const njInputClass =
-    'flex w-full rounded-md border border-[#454540] px-3 py-2 text-sm placeholder:text-text-secondary';
-
   return (
     <div className="h-auto pt-3">
       {/* Identity */}
