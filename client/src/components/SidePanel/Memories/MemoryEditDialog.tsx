@@ -188,9 +188,11 @@ export default function MemoryEditDialog({
             )}
             */}
             {/* Key input */}
-            {/* NJ: Rename Key -> Label */}
             <div className="space-y-2">
               <Label htmlFor="memory-key" className="text-sm font-medium text-text-primary">
+                {/* NJ: Rename Key -> Label
+                {localize('com_ui_key')}
+                */}
                 Label
               </Label>
               <Input
@@ -198,6 +200,7 @@ export default function MemoryEditDialog({
                 value={key}
                 onChange={(e) => hasUpdateAccess && setKey(e.target.value)}
                 onKeyDown={handleKeyPress}
+                // placeholder={localize('com_ui_enter_key')} // NJ: Rename Key -> Label
                 placeholder="Enter label"
                 className="w-full"
                 disabled={!hasUpdateAccess}
@@ -205,9 +208,11 @@ export default function MemoryEditDialog({
             </div>
 
             {/* Value textarea */}
-            {/* NJ: Rename Value -> Details */}
             <div className="space-y-2">
               <Label htmlFor="memory-value" className="text-sm font-medium text-text-primary">
+                {/* NJ: Rename Value -> Details
+                {localize('com_ui_value')}
+                */}
                 Details
               </Label>
               <Textarea
@@ -215,6 +220,7 @@ export default function MemoryEditDialog({
                 value={value}
                 onChange={(e) => hasUpdateAccess && setValue(e.target.value)}
                 onKeyDown={handleKeyPress}
+                // placeholder={localize('com_ui_enter_value')} // NJ: Rename Value -> Details
                 placeholder="Enter details"
                 className="min-h-[100px] w-full resize-none rounded-lg border border-border-light bg-transparent px-3 py-2 text-sm text-text-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-border-heavy disabled:cursor-not-allowed disabled:opacity-50"
                 rows={4}
