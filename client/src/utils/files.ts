@@ -272,7 +272,7 @@ export const validateFileSizes = ({
     );
     const incomingTotalSize = fileList.reduce((total, file) => total + file.size, 0);
     if (currentTotalSize + incomingTotalSize > totalSizeLimit) {
-      logCombinedFileSizeError(files, fileList); // TODO: Fix
+      logCombinedFileSizeError(Array.from(files.values()), fileList);
       setError(`Total file size limit exceeded: ${totalSizeLimit / megabyte} MB`);
       return false;
     }

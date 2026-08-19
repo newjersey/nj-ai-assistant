@@ -2,6 +2,7 @@ import { TooltipAnchor, Button, Sidebar } from '@librechat/client';
 import { useShortcutAriaKey, useShortcutHint } from '~/hooks/useKeyboardShortcuts';
 import useSidebarToggle from '~/hooks/Nav/useSidebarToggle';
 import { useLocalize } from '~/hooks';
+import { cn } from '~/utils';
 
 export const CLOSE_SIDEBAR_ID = 'close-sidebar-button';
 export const OPEN_SIDEBAR_ID = 'open-sidebar-button';
@@ -43,13 +44,14 @@ export default function OpenSidebar({
         <Button
           id={OPEN_SIDEBAR_ID}
           size="icon"
-          variant="header-action"
+          variant="outline"
           data-testid={testId}
           aria-label={localize('com_nav_open_sidebar')}
           aria-expanded={false}
           aria-controls="chat-history-nav"
           aria-keyshortcuts={ariaKey}
-          className={className}
+          // NJ: blend the toggle into the header instead of the upstream header-action variant
+          className={cn('rounded-xl bg-presentation duration-0 hover:bg-surface-active-alt', className)}
           onClick={handleClick}
         >
           <Sidebar className="icon-md" aria-hidden="true" />

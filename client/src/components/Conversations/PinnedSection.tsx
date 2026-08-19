@@ -35,7 +35,8 @@ const PinnedSection = ({ conversations, toggleNav }: PinnedSectionProps) => {
       <div className="flex h-8 w-full items-center pr-2">
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="group flex min-w-0 flex-1 items-center gap-1 rounded-lg px-1 py-2 text-xs font-bold text-text-secondary outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-text-primary"
+          // NJ: Customize size and focus-ring
+          className="group flex min-w-0 flex-1 items-center gap-1 rounded-lg px-1 py-2 text-sm font-bold text-text-secondary outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-black dark:focus-visible:ring-text-primary"
           type="button"
           aria-expanded={isExpanded}
         >
