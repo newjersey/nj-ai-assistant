@@ -3,12 +3,14 @@ import { useWatch } from 'react-hook-form';
 import { SendIcon, TooltipAnchor } from '@librechat/client';
 import type { Control } from 'react-hook-form';
 import NewJerseySendIcon from '~/nj/svgs/NewJerseySendIcon';
+import { cn, isSubmittableMessage } from '~/utils';
 import { useLocalize } from '~/hooks';
-import { cn } from '~/utils';
 
 type SendButtonProps = {
   disabled: boolean;
   control: Control<{ text: string }>;
+  /** Number of attached files; attachments allow sending without text */
+  fileCount?: number;
 };
 
 const SubmitButton = React.memo(
@@ -42,8 +44,8 @@ const SubmitButton = React.memo(
 const SendButton = React.memo(
   forwardRef((props: SendButtonProps, ref: React.ForwardedRef<HTMLButtonElement>) => {
     const data = useWatch({ control: props.control });
-    const content = data?.text?.trim();
-    return <SubmitButton ref={ref} disabled={props.disabled || !content} />;
+    const canSubmit = isSubmittableMessage(data?.text, props.fileCount);
+    return <SubmitButton ref={ref} disabled={props.disabled || !canSubmit} />;
   }),
 );
 

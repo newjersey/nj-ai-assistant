@@ -1,13 +1,13 @@
 /* eslint-disable i18next/no-literal-string */
 /* ^ We're not worried about i18n for this app ^ */
 
-import NewJerseyIcon from '~/nj/svgs/NewJerseyIcon';
-import { useQueryClient } from '@tanstack/react-query';
 import { QueryKeys } from 'librechat-data-provider';
+import { useQueryClient } from '@tanstack/react-query';
+import NewJerseyIcon from '~/nj/svgs/NewJerseyIcon';
 import { logEvent } from '~/nj/analytics/logEvent';
 import { clearMessagesCache } from '~/utils';
-import store from '~/store';
 import { useNewConvo } from '~/hooks';
+import store from '~/store';
 
 /**
  * Component that displays the New Jersey logo next to AI assistant text.
@@ -26,7 +26,7 @@ export default function NewJerseyLogo({ index = 0 }: { index?: number }) {
   };
 
   return (
-    <div role="button" className="flex items-center gap-3 p-2" onClick={onClick}>
+    <div role="button" className="flex items-center gap-3 pl-3 pr-2" onClick={onClick}>
       <NewJerseyIcon height={23} />
       <h1 className="font-semibold tracking-tight text-jersey-blue">NJ AI Assistant</h1>
     </div>
