@@ -2215,7 +2215,7 @@
   "com_ui_unsaved_changes": "Unsaved changes",
   "com_ui_update": "Update",
   "com_ui_update_mcp_server": "Update MCP server",
-  "com_ui_update_rerun": "Update & rerun",
+  "com_ui_update_rerun": "Save & Submit",
   "com_ui_update_shared_link": "Update link",
   "com_ui_update_shared_link_confirm_description": "This publishes the latest messages and your current file-sharing choice to the existing link. The URL stays the same, and anyone with access can see the updated snapshot.",
   "com_ui_update_shared_link_confirm_title": "Update shared link?",

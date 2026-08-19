@@ -26,7 +26,7 @@ export default function NewJerseyLogo({ index = 0 }: { index?: number }) {
   };
 
   return (
-    <div role="button" className="flex items-center gap-3 p-2" onClick={onClick}>
+    <div role="button" className="flex items-center gap-3 pl-3 pr-2" onClick={onClick}>
       <NewJerseyIcon height={23} />
       <h1 className="font-semibold tracking-tight text-jersey-blue">NJ AI Assistant</h1>
     </div>

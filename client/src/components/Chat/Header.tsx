@@ -62,14 +62,18 @@ function Header({
 
   return (
     <div className="absolute top-0 z-10 flex h-[52px] w-full items-center gap-2 bg-gradient-to-b from-presentation via-presentation/70 to-transparent p-2 font-semibold text-text-primary md:from-presentation/80 md:via-presentation/50 2xl:from-presentation/0 2xl:via-transparent">
-      <div className="flex flex-shrink-0 items-center md:hidden">
+      {/* NJ: keep the logo visible on desktop */}
+      <div className="flex flex-shrink-0 items-center">
         <NewJerseyLogo index={index} />
-        <OpenSidebar testId="header-open-sidebar-button" />
+        <div className="flex items-center md:hidden">
+          <OpenSidebar testId="header-open-sidebar-button" />
+        </div>
       </div>
 
       <div
         className={cn(
-          'flex min-w-0 flex-1 items-center gap-2 md:pl-3 md:transition-all md:duration-200 md:ease-in-out',
+          // NJ: Customize spacing
+          'flex min-w-0 flex-1 items-center gap-2 md:transition-all md:duration-200 md:ease-in-out',
           hiddenBehindNav,
         )}
       >
