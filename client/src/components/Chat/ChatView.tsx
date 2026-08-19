@@ -136,7 +136,12 @@ function ChatView({ index = 0, project }: { index?: number; project?: TChatProje
           <Presentation>
             <div className="relative flex h-full w-full flex-col">
               <h1 className="sr-only">{pageHeading}</h1>
-              <Header index={index} isLandingPage={isLandingPage} />
+              <Header
+                parentConversationId={parentConversationId}
+                readOnly={isSubagentThreadReadOnly}
+                index={index}
+                isLandingPage={isLandingPage}
+              />
               <>
                 <div
                   className={cn(

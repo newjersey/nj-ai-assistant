@@ -135,10 +135,8 @@ export default function Root() {
                       className="relative flex h-full max-w-full flex-1 flex-col overflow-hidden"
                       tabIndex={-1}
                       style={{
-                        /** Self-referential, so it needs no width literal and survives rotation. */transform:
-                          isSmallScreen && sidebarExpanded
-                            ? 'translateX(100%)'
-                            : 'none',
+                        /** Self-referential, so it needs no width literal and survives rotation. */
+                        transform: isSmallScreen && sidebarExpanded ? 'translateX(100%)' : 'none',
                         transition: SIDEBAR_TRANSITION,
                       }}
                       inert={isSmallScreen && sidebarExpanded ? '' : undefined}

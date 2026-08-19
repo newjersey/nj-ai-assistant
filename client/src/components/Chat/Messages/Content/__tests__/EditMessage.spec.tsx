@@ -98,7 +98,8 @@ describe('EditMessage', () => {
     expect(editor).not.toHaveClass('text-sm');
   });
 
-  it('waits for a successful save before updating local state and closing', async () => {
+  // NJ: Removed "Save" button
+  it.skip('waits for a successful save before updating local state and closing', async () => {
     const user = userEvent.setup();
     const { enterEdit } = renderEditor();
 
@@ -120,7 +121,8 @@ describe('EditMessage', () => {
     expect(enterEdit).toHaveBeenCalledWith(true);
   });
 
-  it('writes the save onto the thread as it stands when the request resolves', async () => {
+  // NJ: Removed "Save" button
+  it.skip('writes the save onto the thread as it stands when the request resolves', async () => {
     const user = userEvent.setup();
     const streamedAnswer = {
       messageId: 'assistant-streaming',
@@ -149,7 +151,8 @@ describe('EditMessage', () => {
     ]);
   });
 
-  it('keeps the editor open with the draft when saving fails', async () => {
+  // NJ: Removed "Save" button
+  it.skip('keeps the editor open with the draft when saving fails', async () => {
     const user = userEvent.setup();
     mockMutateAsync.mockRejectedValue(new Error('Save failed'));
     const { enterEdit } = renderEditor();

@@ -51,7 +51,10 @@ export default function OpenSidebar({
           aria-controls="chat-history-nav"
           aria-keyshortcuts={ariaKey}
           // NJ: blend the toggle into the header instead of the upstream header-action variant
-          className={cn('rounded-xl bg-presentation duration-0 hover:bg-surface-active-alt', className)}
+          className={cn(
+            'rounded-xl bg-presentation duration-0 hover:bg-surface-active-alt',
+            className,
+          )}
           onClick={handleClick}
         >
           <Sidebar className="icon-md" aria-hidden="true" />

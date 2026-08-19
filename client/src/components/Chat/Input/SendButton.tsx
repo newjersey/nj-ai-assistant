@@ -2,8 +2,8 @@ import React, { forwardRef } from 'react';
 import { useWatch } from 'react-hook-form';
 import { SendIcon, TooltipAnchor } from '@librechat/client';
 import type { Control } from 'react-hook-form';
-import { cn, isSubmittableMessage } from '~/utils';
 import NewJerseySendIcon from '~/nj/svgs/NewJerseySendIcon';
+import { cn, isSubmittableMessage } from '~/utils';
 import { useLocalize } from '~/hooks';
 
 type SendButtonProps = {

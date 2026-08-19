@@ -207,9 +207,8 @@ describe('TokenUsage Breakdown', () => {
       await userEvent.click(toggle());
 
       expect(
-        within(screen.getByTestId('token-usage-totals')).getByRole('heading', {
-          name: 'com_ui_context_totals',
-        }),
+        // NJ: Updated header to a plain span with different text
+        within(screen.getByTestId('token-usage-totals')).getByText('nj_ui_last_prompt_and_reply'),
       ).toBeInTheDocument();
     });
   });
