@@ -177,10 +177,10 @@ export default function Breakdown({
           data-testid="context-breakdown-toggle"
         >
           {/* NJ: custom styling - font weight*/}
-        <span className="whitespace-nowrap text-sm font-semibold text-text-primary">
-          {localize('com_ui_context_window')}
-        </span>
-        {/* NJ: custom styling*/}
+          <span className="whitespace-nowrap text-sm font-semibold text-text-primary">
+            {localize('com_ui_context_window')}
+          </span>
+          {/* NJ: custom styling*/}
           <span className="flex items-center gap-1 whitespace-nowrap text-sm text-text-primary">
             <span className={HOVER_INK}>
               {maxTokens != null
@@ -271,24 +271,29 @@ export default function Breakdown({
             )}
           </div>
 
-      {hasUsage && (
-        <>
-          <div className="border-t border-border-light" role="separator" />
-          <div className="space-y-1.5" data-testid="token-usage-totals">
-            <span className="text-sm font-semibold text-text-primary">
-              {localize('nj_ui_last_prompt_and_reply')}
-            </span>
-            <Row label={localize('com_ui_input')} value={branchUsage.input} />
-            <Row label={localize('com_ui_output')} value={branchUsage.output} />
-            {branchUsage.cacheRead > 0 && (
-              <Row label={localize('com_ui_cache_read')} value={branchUsage.cacheRead} />
-            )}
-            {branchUsage.cacheWrite > 0 && (
-              <Row label={localize('com_ui_cache_write')} value={branchUsage.cacheWrite} />
-            )}
-          </div>
-        </>
-      )}
+          {hasUsage && (
+            <>
+              <div className="border-t border-border-light" role="separator" />
+              <div className="space-y-1.5" data-testid="token-usage-totals">
+                {/* NJ: Replace with custom style and text
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-text-tertiary">
+                  {localize('com_ui_context_totals')}
+                </h3>
+                */}
+                <span className="text-sm font-semibold text-text-primary">
+                  {localize('nj_ui_last_prompt_and_reply')}
+                </span>
+                <Row label={localize('com_ui_input')} value={branchUsage.input} />
+                <Row label={localize('com_ui_output')} value={branchUsage.output} />
+                {branchUsage.cacheRead > 0 && (
+                  <Row label={localize('com_ui_cache_read')} value={branchUsage.cacheRead} />
+                )}
+                {branchUsage.cacheWrite > 0 && (
+                  <Row label={localize('com_ui_cache_write')} value={branchUsage.cacheWrite} />
+                )}
+              </div>
+            </>
+          )}
 
           {showCost && hasUsage && branchUsage.costKnown && (
             <>

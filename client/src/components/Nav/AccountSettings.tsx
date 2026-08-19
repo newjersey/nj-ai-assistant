@@ -1,6 +1,7 @@
 import { useState, memo, useRef } from 'react';
 import { useSetRecoilState } from 'recoil';
 import * as Menu from '@ariakit/react/menu';
+import icons from '@uswds/uswds/img/sprite.svg';
 import { GearIcon, DropdownMenuSeparator, Avatar } from '@librechat/client';
 import {
   Archive,
@@ -13,13 +14,12 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { ArchivedChatsModal } from '~/components/Nav/SettingsTabs/General/ArchivedChatsModal';
+import { NewJerseySelectItems } from '~/nj/components/NewJerseySelectItems';
 import { useGetStartupConfig, useGetUserBalance } from '~/data-provider';
 import { useAuthContext } from '~/hooks/AuthContext';
 import { useLocalize } from '~/hooks';
 import Settings from './Settings';
 import store from '~/store';
-import { NewJerseySelectItems } from '~/nj/components/NewJerseySelectItems';
-import icons from '@uswds/uswds/img/sprite.svg';
 
 function HelpSubmenu({
   helpAndFaqURL,

@@ -2,7 +2,9 @@ import { memo, useMemo } from 'react';
 import { useRecoilValue } from 'recoil';
 import { getConfigDefaults, PermissionTypes, Permissions } from 'librechat-data-provider';
 import { OpenSidebar, PresetsMenu, NewChat, HeaderMenu } from './Menus';
+import NewUpdatesWidget from '~/nj/components/NewUpdatesWidget';
 import ModelSelector from './Menus/Endpoints/ModelSelector';
+import NewJerseyLogo from '~/nj/components/NewJerseyLogo';
 import { useGetStartupConfig } from '~/data-provider';
 import ExportAndShareMenu from './ExportAndShareMenu';
 import SubagentThreadLink from './SubagentThreadLink';
@@ -12,8 +14,6 @@ import AddMultiConvo from './AddMultiConvo';
 import { useHasAccess } from '~/hooks';
 import { cn } from '~/utils';
 import store from '~/store';
-import NewJerseyLogo from '~/nj/components/NewJerseyLogo';
-import NewUpdatesWidget from '~/nj/components/NewUpdatesWidget';
 
 const defaultInterface = getConfigDefaults().interface;
 

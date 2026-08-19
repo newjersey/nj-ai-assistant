@@ -15,9 +15,9 @@ import {
   CustomMinimalIcon,
 } from '@librechat/client';
 import UnknownIcon from '~/hooks/Endpoint/UnknownIcon';
+import NewJerseyIcon from '~/nj/svgs/NewJerseyIcon';
 import { IconProps } from '~/common';
 import { cn } from '~/utils';
-import NewJerseyIcon from '~/nj/svgs/NewJerseyIcon';
 
 type EndpointIcon = {
   icon: React.ReactNode | React.JSX.Element;
