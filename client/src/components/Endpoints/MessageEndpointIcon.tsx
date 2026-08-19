@@ -185,6 +185,8 @@ const MessageEndpointIcon: React.FC<IconProps> = (props) => {
     return icon;
   }
 
+  const hasBackground = typeof bg === 'string' && bg.length > 0;
+
   return (
     <div
       title={name ?? ''}
@@ -194,7 +196,8 @@ const MessageEndpointIcon: React.FC<IconProps> = (props) => {
         height: size,
       }}
       className={cn(
-        'relative flex h-9 w-9 items-center justify-center rounded-sm p-1 text-white',
+        'relative flex h-9 w-9 items-center justify-center rounded-sm p-1',
+        hasBackground ? 'text-white' : 'text-text-primary',
         props.className ?? '',
       )}
     >

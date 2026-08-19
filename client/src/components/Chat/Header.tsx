@@ -1,11 +1,11 @@
 import { memo, useMemo } from 'react';
 import { useRecoilValue } from 'recoil';
-import { useMediaQuery } from '@librechat/client';
 import { getConfigDefaults, PermissionTypes, Permissions } from 'librechat-data-provider';
+import { OpenSidebar, PresetsMenu, NewChat, HeaderMenu } from './Menus';
 import ModelSelector from './Menus/Endpoints/ModelSelector';
 import { useGetStartupConfig } from '~/data-provider';
 import ExportAndShareMenu from './ExportAndShareMenu';
-import { OpenSidebar, PresetsMenu } from './Menus';
+import SubagentThreadLink from './SubagentThreadLink';
 import BookmarkMenu from './Menus/BookmarkMenu';
 import { TemporaryChat } from './TemporaryChat';
 import AddMultiConvo from './AddMultiConvo';
@@ -17,7 +17,23 @@ import NewUpdatesWidget from '~/nj/components/NewUpdatesWidget';
 
 const defaultInterface = getConfigDefaults().interface;
 
-function Header({ index = 0, isLandingPage = false }: { index?: number; isLandingPage?: boolean }) {
+/**
+ * Three zones in a single DOM order that serves both layouts: hidden items
+ * generate no flex gap, so each breakpoint collapses to the right row without
+ * reordering. Branching is CSS-only — `useMediaQuery` resolves after paint and
+ * would pop the row a frame late on every mount.
+ */
+function Header({
+  parentConversationId,
+  readOnly = false,
+  index = 0,
+  isLandingPage = false,
+}: {
+  parentConversationId?: string;
+  readOnly?: boolean;
+  index?: number;
+  isLandingPage?: boolean;
+}) {
   const { data: startupConfig } = useGetStartupConfig();
   const navVisible = useRecoilValue(store.sidebarExpanded);
 
@@ -41,50 +57,55 @@ function Header({ index = 0, isLandingPage = false }: { index?: number; isLandin
     permission: Permissions.USE,
   });
 
-  const isSmallScreen = useMediaQuery('(max-width: 768px)');
+  /** The drawer covers the header on mobile; keep its controls out of the tab order. */
+  const hiddenBehindNav = navVisible === true && 'max-md:hidden';
 
   return (
-    <div className="via-presentation/70 md:from-presentation/80 md:via-presentation/50 2xl:from-presentation/0 absolute top-0 z-10 flex h-[52px] w-full items-center justify-between bg-gradient-to-b from-presentation to-transparent p-2 font-semibold text-text-primary 2xl:via-transparent">
-      <div className="hide-scrollbar flex w-full items-center justify-between gap-2 overflow-x-auto">
-        <div className="mx-1 flex items-center">
-          <NewJerseyLogo index={index} />
-          {isSmallScreen ? <OpenSidebar /> : null}
-          {!(navVisible && isSmallScreen) && (
-            <div
-              className={cn(
-                'flex items-center gap-2 pl-2',
-                !isSmallScreen ? 'transition-all duration-200 ease-in-out' : '',
-              )}
-            >
-              <ModelSelector startupConfig={startupConfig} />
-              {interfaceConfig.presets === true && interfaceConfig.modelSelect && <PresetsMenu />}
-              {hasAccessToBookmarks === true && <BookmarkMenu />}
-              {hasAccessToMultiConvo === true && <AddMultiConvo />}
-              {/* NJ: We disable exporting/sharing */}
-              {isSmallScreen && false && (
-                <>
-                  <ExportAndShareMenu
-                    isSharedButtonEnabled={startupConfig?.sharedLinksEnabled ?? false}
-                  />
-                  {hasAccessToTemporaryChat === true && <TemporaryChat />}
-                </>
-              )}
-            </div>
-          )}
-        </div>
+    <div className="absolute top-0 z-10 flex h-[52px] w-full items-center gap-2 bg-gradient-to-b from-presentation via-presentation/70 to-transparent p-2 font-semibold text-text-primary md:from-presentation/80 md:via-presentation/50 2xl:from-presentation/0 2xl:via-transparent">
+      <div className="flex flex-shrink-0 items-center md:hidden">
+        <NewJerseyLogo index={index} />
+        <OpenSidebar testId="header-open-sidebar-button" />
+      </div>
 
-        {/* NJ: We disable exporting/sharing */}
-        {!isSmallScreen && false && (
-          <div className="flex items-center gap-2">
-            <ExportAndShareMenu
-              isSharedButtonEnabled={startupConfig?.sharedLinksEnabled ?? false}
-            />
-            {hasAccessToTemporaryChat === true && <TemporaryChat />}
+      <div
+        className={cn(
+          'flex min-w-0 flex-1 items-center gap-2 md:pl-3 md:transition-all md:duration-200 md:ease-in-out',
+          hiddenBehindNav,
+        )}
+      >
+        {parentConversationId != null && (
+          <SubagentThreadLink
+            threadId={parentConversationId}
+            relation="parent"
+            labelClassName="hidden lg:inline"
+          />
+        )}
+        {!readOnly && <ModelSelector startupConfig={startupConfig} />}
+        {!readOnly && interfaceConfig.presets === true && interfaceConfig.modelSelect === true && (
+          <PresetsMenu />
+        )}
+        {hasAccessToBookmarks === true && (
+          <div className="hidden items-center md:flex">
+            <BookmarkMenu />
+          </div>
+        )}
+        {hasAccessToMultiConvo === true && (
+          <div className="hidden items-center md:flex">
+            <AddMultiConvo />
           </div>
         )}
       </div>
-      {/* Empty div for spacing */}
-      <div />
+
+      <div className={cn('flex flex-shrink-0 items-center gap-2', hiddenBehindNav)}>
+        <NewChat className="md:hidden" />
+        <HeaderMenu startupConfig={startupConfig} className="md:hidden" />
+        {/* NJ: Disable export and share + temporary chat
+        <div className="hidden items-center gap-2 md:flex">
+          <ExportAndShareMenu isSharedButtonEnabled={startupConfig?.sharedLinksEnabled ?? false} />
+          {hasAccessToTemporaryChat === true && <TemporaryChat />}
+        </div>
+        */}
+      </div>
       {isLandingPage && <NewUpdatesWidget />}
     </div>
   );
