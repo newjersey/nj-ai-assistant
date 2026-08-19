@@ -1,10 +1,10 @@
-import { render } from 'test/layout-test-utils';
-import HoverButtons from '~/components/Chat/Messages/HoverButtons';
-import store from '~/store';
 import { RecoilRoot } from 'recoil';
 import { screen } from '@testing-library/dom';
 import userEvent from '@testing-library/user-event';
+import HoverButtons from '~/components/Chat/Messages/HoverButtons';
 import * as njLog from '~/nj/analytics/logEvent';
+import { render } from 'test/layout-test-utils';
+import store from '~/store';
 
 describe('HoverButtons NJ customizations', () => {
   const renderHoverButtons = () => {
@@ -34,6 +34,7 @@ describe('HoverButtons NJ customizations', () => {
           latestMessage={null}
           isLast={true}
           handleFeedback={() => {}}
+          getCanCopy={() => true}
         />
       </RecoilRoot>,
     );

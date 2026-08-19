@@ -59,6 +59,7 @@ export default function AgentBuilderHeader({
           agentQuery={agentQuery}
           setCurrentAgentId={setCurrentAgentId}
           selectedAgentId={agentQuery.isInitialLoading ? null : (agent_id ?? null)}
+          defaultStatefulCodeEnvironment={'user'}
         />
       </div>
 
