@@ -1,4 +1,5 @@
 import type { AxiosResponse } from 'axios';
+import type { TInsightsAccessResponse, TInsightsParams, TInsightsResponse } from './types/insights';
 import type { TFileConfig } from './file-config';
 import type * as t from './types';
 import * as permissions from './accessPermissions';
@@ -17,6 +18,21 @@ import request from './request';
 import * as s from './schemas';
 import * as r from './roles';
 
+export function getInsights(params: TInsightsParams = {}): Promise<TInsightsResponse> {
+  const query = new URLSearchParams();
+  for (const [key, value] of Object.entries(params)) {
+    if (value !== undefined && value !== null && value !== '') {
+      query.set(key, String(value));
+    }
+  }
+  const suffix = query.toString() ? `?${query.toString()}` : '';
+  return request.get(`${endpoints.insights()}${suffix}`);
+}
+
+export function getInsightsAccess(): Promise<TInsightsAccessResponse> {
+  return request.get(endpoints.insightsAccess());
+}
+
 export function getLangfuseConnection(): Promise<t.TLangfuseConnectionStatus> {
   return request.get(endpoints.adminLangfuseConnection());
 }
@@ -31,6 +47,12 @@ export function testLangfuseConnection(
   payload: t.TLangfuseConnectionTestRequest,
 ): Promise<t.TLangfuseConnectionTestResponse> {
   return request.post(endpoints.adminLangfuseConnectionTest(), payload);
+}
+
+export function getLangfuseSessionLink(
+  conversationId: string,
+): Promise<t.TLangfuseSessionLinkResponse> {
+  return request.get(endpoints.adminLangfuseSessionLink(conversationId));
 }
 
 export function revokeUserKey(name: string): Promise<unknown> {
@@ -165,6 +187,12 @@ export function getSearchEnabled(): Promise<boolean> {
 
 export function getUser(): Promise<t.TUser> {
   return request.get(endpoints.user());
+}
+
+export function updateUserPreferences(
+  preferences: t.TUpdateUserPreferencesRequest,
+): Promise<t.TUpdateUserPreferencesResponse> {
+  return request.patch(endpoints.userPreferences(), preferences);
 }
 
 export function getUserBalance(): Promise<t.TBalanceResponse> {
@@ -888,6 +916,10 @@ export function archiveConversation(
   payload: t.TArchiveConversationRequest,
 ): Promise<t.TArchiveConversationResponse> {
   return request.post(endpoints.archiveConversation(), { arg: payload });
+}
+
+export function archiveAllConversations(): Promise<t.TArchiveAllConversationsResponse> {
+  return request.post(endpoints.archiveAllConversations(), {});
 }
 
 export function listProjects(params?: q.ProjectListParams): Promise<q.ProjectListResponse> {
