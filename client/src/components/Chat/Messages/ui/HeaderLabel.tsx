@@ -45,8 +45,9 @@ const labelSlot =
 export default function HeaderLabel({ label, hoverLabel }: HeaderLabelProps) {
   const localize = useLocalize();
 
-  if (!hoverLabel || hoverLabel === label) {
-    return <span className="min-w-0 truncate">{label}</span>;
+  // NJ: Force the label to stay consistent, also restore previous text styling
+  if (!hoverLabel || hoverLabel === label || 1 === 1) {
+    return <span className="min-w-0 truncate text-base">{label}</span>;
   }
 
   return (
