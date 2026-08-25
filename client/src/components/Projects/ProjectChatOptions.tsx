@@ -79,6 +79,7 @@ function ProjectChatOptions({ conversation, isMenuOpen, setIsMenuOpen }: Project
           <FolderX className="size-4 text-text-secondary" aria-hidden="true" />
         ),
       },
+      /* NJ: Hide some elements of the project chat options
       {
         label: localize('com_ui_delete'),
         onClick: () => setShowDeleteDialog(true),
@@ -86,6 +87,7 @@ function ProjectChatOptions({ conversation, isMenuOpen, setIsMenuOpen }: Project
         render: (props) => <button {...props} />,
         icon: <Trash2 className="size-4 text-text-secondary" aria-hidden="true" />,
       },
+      */
     ];
   }, [
     assignConversationToProject,
