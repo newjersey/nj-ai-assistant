@@ -3,6 +3,7 @@ import { Feather } from 'lucide-react';
 import { EModelEndpoint, isAssistantsEndpoint } from 'librechat-data-provider';
 import { AssistantIcon, TooltipAnchor, ProviderAvatar } from '@librechat/client';
 import type { IconProps } from '~/common';
+import NewJerseyIcon from '~/nj/svgs/NewJerseyIcon';
 import { useProviderIcon } from '~/hooks/Endpoint';
 import { cn } from '~/utils';
 
@@ -91,6 +92,21 @@ const MessageEndpointIcon: React.FC<IconProps> = (props) => {
     return agentsIcon.icon;
   }
 
+  // NJ: Every other model is our Bedrock-backed NJ AI Assistant, so brand it with the NJ logo
+  return (
+    <div
+      title="NJ AI Assistant"
+      style={{ width: size, height: size }}
+      className={cn(
+        'relative flex h-9 w-9 items-center justify-center rounded-sm p-1 text-text-primary',
+        props.className ?? '',
+      )}
+    >
+      <NewJerseyIcon />
+      {errorBadge}
+    </div>
+  );
+
   if (imageURL != null) {
     return (
       <div
@@ -106,7 +122,9 @@ const MessageEndpointIcon: React.FC<IconProps> = (props) => {
       >
         <div className="h-6 w-6">
           <div className="overflow-hidden rounded-full">
+            {/* NJ: Comment this since it to TS error
             <img className="h-full w-full object-contain" src={imageURL} alt={`${endpoint} Icon`} />
+            */}
           </div>
         </div>
         {errorBadge}

@@ -111,7 +111,9 @@ function Header({
 
       <div className={cn('flex flex-shrink-0 items-center gap-2', hiddenBehindNav)}>
         {hasAccessToTemporaryChat === true && <TemporaryChatIndicator />}
+        {/* NJ: No New Chat button in the mobile header
         {!isNewChat && <NewChat className="md:hidden" />}
+        */}
         <HeaderMenu startupConfig={startupConfig} className="md:hidden" />
         {/* NJ: Disable export and share + temporary chat
         <div className="hidden items-center gap-2 md:flex">

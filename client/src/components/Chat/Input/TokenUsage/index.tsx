@@ -214,7 +214,8 @@ function TokenUsageIndicator({
           }
         }}
         className={cn(
-          'z-[200] rounded-xl border border-border-medium bg-surface-secondary p-3 shadow-lg focus:outline-none',
+          // NJ: Custom token meter card border + background
+          'z-[200] rounded-xl border border-[var(--border-warm-gray-12)] bg-surface-primary-alt p-3 shadow-lg focus:outline-none',
           'origin-bottom translate-y-1 scale-95 opacity-0 transition-[opacity,transform] duration-150 ease-out motion-reduce:transition-none',
           'data-[enter]:translate-y-0 data-[enter]:scale-100 data-[enter]:opacity-100',
           'data-[leave]:translate-y-1 data-[leave]:scale-95 data-[leave]:opacity-0',

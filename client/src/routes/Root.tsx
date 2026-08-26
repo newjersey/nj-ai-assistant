@@ -161,7 +161,8 @@ export default function Root() {
               <div className="flex h-dvh flex-col">
                 <SkipToContentLink targetRef={paneRef} />
                 <Banner onHeightChange={setBannerHeight} />
-                <div className="flex" style={{ height: `calc(100dvh - ${bannerHeight}px)` }}>
+                {/* NJ: Flex to fill the space between the banner and the feedback widget */}
+                <div className="flex min-h-0 flex-1">
                   <div
                     className="relative z-0 flex h-full w-full overflow-hidden"
                     /** The drawer and the pane both read this, so their travel
