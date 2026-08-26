@@ -1,5 +1,7 @@
 import { useMemo, useCallback, useState, useEffect, useRef } from 'react';
+import { useRecoilValue } from 'recoil';
 import { easings } from '@react-spring/web';
+import { MessageCircleDashed } from 'lucide-react';
 import { EModelEndpoint } from 'librechat-data-provider';
 import { BirthdayIcon, TooltipAnchor, SplitText } from '@librechat/client';
 import {
@@ -16,6 +18,7 @@ import { NewJerseyLanding } from '~/nj/components/NewJerseyLanding';
 import { useLocalize, useAuthContext, useGreeting } from '~/hooks';
 import AgentContact from '~/components/Agents/AgentContact';
 import ConvoIcon from '~/components/Endpoints/ConvoIcon';
+import temporaryStore from '~/store/temporary';
 
 const containerClassName =
   'shadow-stroke relative flex h-full items-center justify-center rounded-full bg-presentation text-text-primary dark:after:shadow-none ';
@@ -49,6 +52,7 @@ export default function Landing({ centerFormOnLanding }: { centerFormOnLanding: 
   const { data: endpointsConfig } = useGetEndpointsQuery();
   const { user } = useAuthContext();
   const localize = useLocalize();
+  const isTemporary = useRecoilValue(temporaryStore.isTemporary);
 
   const [textHasMultipleLines, setTextHasMultipleLines] = useState(false);
   const [lineCount, setLineCount] = useState(1);
@@ -82,9 +86,10 @@ export default function Landing({ centerFormOnLanding }: { centerFormOnLanding: 
 
   const brandedSpecLabel = modelSpec?.showOnLanding ? modelSpec.label : '';
   const brandedSpecDescription = (modelSpec?.showOnLanding && modelSpec.description) || '';
-  const name = entity?.name ?? brandedSpecLabel;
-  const description =
-    (entity?.description || brandedSpecDescription || conversation?.greeting) ?? '';
+  const name = isTemporary ? '' : (entity?.name ?? brandedSpecLabel);
+  const description = isTemporary
+    ? localize('com_ui_temporary_description')
+    : ((entity?.description || brandedSpecDescription || conversation?.greeting) ?? '');
   const descriptionIsHTML = description.trim().startsWith('<');
 
   const sanitizeDescription = useMemo(
@@ -141,7 +146,9 @@ export default function Landing({ centerFormOnLanding }: { centerFormOnLanding: 
       ? customWelcome.replace(/{{user.name}}/g, user.name)
       : customWelcome;
 
-  const greetingText = resolvedWelcome ?? scheduledGreeting;
+  const greetingText = isTemporary
+    ? localize('com_ui_temporary')
+    : (resolvedWelcome ?? scheduledGreeting);
 
   // NJ: We normally fully customize the landing page, but if you're talking to an agent,
   // we want to make it more obvious what's going on, so we partially revert to normal layout
@@ -168,16 +175,22 @@ export default function Landing({ centerFormOnLanding }: { centerFormOnLanding: 
           className={`flex ${textHasMultipleLines ? 'flex-col' : 'flex-col md:flex-row'} items-center justify-center gap-2`}
         >
           <div className={`relative size-10 justify-center ${textHasMultipleLines ? 'mb-2' : ''}`}>
-            <ConvoIcon
-              agentsMap={agentsMap}
-              assistantMap={assistantMap}
-              conversation={conversation}
-              endpointsConfig={endpointsConfig}
-              containerClassName={containerClassName}
-              context="landing"
-              className="h-2/3 w-2/3 text-text-primary"
-              size={41}
-            />
+            {isTemporary ? (
+              <div className={containerClassName}>
+                <MessageCircleDashed className="h-2/3 w-2/3 text-text-primary" aria-hidden="true" />
+              </div>
+            ) : (
+              <ConvoIcon
+                agentsMap={agentsMap}
+                assistantMap={assistantMap}
+                conversation={conversation}
+                endpointsConfig={endpointsConfig}
+                containerClassName={containerClassName}
+                context="landing"
+                className="h-2/3 w-2/3 text-text-primary"
+                size={41}
+              />
+            )}
             {startupConfig?.showBirthdayIcon && (
               <TooltipAnchor
                 className="absolute bottom-[27px] right-2"
@@ -227,11 +240,13 @@ export default function Landing({ centerFormOnLanding }: { centerFormOnLanding: 
               dangerouslySetInnerHTML={{ __html: sanitizeDescription(description) }}
             />
           ) : (
-            <div className="animate-fadeIn mt-4 max-w-md text-center text-sm font-normal text-text-primary">
+            <div
+              className={`animate-fadeIn mt-4 max-w-md text-center text-sm font-normal ${isTemporary ? 'text-text-secondary' : 'text-text-primary'}`}
+            >
               {description}
             </div>
           ))}
-        {selectedAgent && (
+        {selectedAgent && !isTemporary && (
           <AgentContact
             agent={selectedAgent}
             className="animate-fadeIn mt-2 max-w-md justify-center text-center text-sm"
