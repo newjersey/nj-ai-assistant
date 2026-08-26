@@ -25,7 +25,8 @@ describe('Agent Instructions', () => {
     const user = userEvent.setup();
     render(<InstructionsHarness />);
 
-    await user.click(screen.getByRole('button', { name: 'com_ui_variables' }));
+    // NJ: Patch test
+    await user.click(screen.getByRole('button', { name: 'Add variable to instructions' }));
     expect(
       await screen.findByRole('menuitem', { name: 'com_ui_special_var_current_date' }),
     ).toBeInTheDocument();

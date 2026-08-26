@@ -3,18 +3,25 @@ import * as Menu from '@ariakit/react/menu';
 import { PlusCircle, Maximize2 } from 'lucide-react';
 import { specialVariables } from 'librechat-data-provider';
 import {
+  ESide,
   Label,
   Button,
   OGDialog,
   Textarea,
+  HoverCard,
   DropdownPopup,
   OGDialogClose,
   TooltipAnchor,
   OGDialogTitle,
+  CircleHelpIcon,
   OGDialogHeader,
+  HoverCardPortal,
   OGDialogContent,
+  HoverCardContent,
+  HoverCardTrigger,
 } from '@librechat/client';
 import type { TSpecialVarLabel } from 'librechat-data-provider';
+import { njInputClass } from '~/nj/components/Agents/agentInputStyle';
 import { useLocalize } from '~/hooks';
 import { cn } from '~/utils';
 
@@ -39,6 +46,10 @@ interface VariableEditorProps {
   placeholder?: string;
   rows?: number;
   required?: boolean;
+  /** NJ: Support having a "help" hover card (e.g. for Agent Instructions) */
+  labelHelp?: React.ReactNode;
+  /** NJ: Tooltip/aria-label override for the variable-insert button */
+  variableTooltipText?: string;
   invalid?: boolean;
   describedBy?: string;
   className?: string;
@@ -70,6 +81,8 @@ export default function VariableEditor({
   placeholder,
   rows = 3,
   required,
+  labelHelp,
+  variableTooltipText,
   invalid,
   describedBy,
   className,
@@ -81,6 +94,8 @@ export default function VariableEditor({
   const menuId = useId();
   const dialogMenuId = useId();
   const localize = useLocalize();
+  // NJ: Customize the variable button tooltip
+  const variableButtonText = variableTooltipText ?? localize('com_ui_variables');
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDialogMenuOpen, setIsDialogMenuOpen] = useState(false);
@@ -101,9 +116,27 @@ export default function VariableEditor({
   return (
     <div className={cn('flex flex-col', containerClassName)}>
       <div className="mb-1 flex items-center justify-between">
-        <Label className={labelClassName} htmlFor={id}>
-          {label}
-        </Label>
+        {/* NJ: Pair the label with a required asterisk and an optional "help" hover card */}
+        <div className="flex items-center">
+          <Label className={labelClassName} htmlFor={id}>
+            {label}
+            {required === true && <span className="ml-1 text-status-error">*</span>}
+          </Label>
+          {labelHelp != null && (
+            <HoverCard openDelay={50}>
+              <HoverCardTrigger asChild>
+                <span className="ml-2">
+                  <CircleHelpIcon className="h-4 w-4 text-text-tertiary" />
+                </span>
+              </HoverCardTrigger>
+              <HoverCardPortal>
+                <HoverCardContent side={ESide.Top} className="w-80">
+                  {labelHelp}
+                </HoverCardContent>
+              </HoverCardPortal>
+            </HoverCard>
+          )}
+        </div>
         <div className="flex items-center gap-0.5">
           {showVariables && (
             <DropdownPopup
@@ -114,14 +147,19 @@ export default function VariableEditor({
               isOpen={isMenuOpen}
               setIsOpen={setIsMenuOpen}
               trigger={
-                <Menu.MenuButton
-                  id={`${id}-variables-menu-button`}
-                  aria-label={localize('com_ui_variables')}
-                  title={localize('com_ui_variables')}
-                  className="inline-flex h-7 w-7 items-center justify-center rounded-lg text-text-secondary transition-colors hover:bg-surface-secondary hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring-primary"
-                >
-                  <PlusCircle className="h-4 w-4" strokeWidth={1.75} aria-hidden={true} />
-                </Menu.MenuButton>
+                // NJ: Have a tooltip and different styling for consistency
+                <TooltipAnchor
+                  description={variableButtonText}
+                  render={
+                    <Menu.MenuButton
+                      id={`${id}-variables-menu-button`}
+                      aria-label={variableButtonText}
+                      className="mr-0.5 inline-flex h-7 w-7 items-center justify-center rounded-md bg-surface-primary-alt text-text-primary transition-colors duration-200 hover:bg-surface-tertiary"
+                    >
+                      <PlusCircle className="h-4 w-4" strokeWidth={1.75} aria-hidden={true} />
+                    </Menu.MenuButton>
+                  }
+                />
               }
               items={variableItems}
               menuId={menuId}
@@ -136,7 +174,8 @@ export default function VariableEditor({
                 variant="ghost"
                 onClick={() => setIsDialogOpen(true)}
                 aria-label={localize('com_ui_expand_editor')}
-                className="h-7 w-7 p-0 text-text-secondary hover:bg-surface-secondary hover:text-text-primary"
+                // NJ: Custom styling
+                className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-surface-primary-alt p-0 text-text-primary transition-colors duration-200 hover:bg-surface-tertiary"
               >
                 <Maximize2 className="h-4 w-4" strokeWidth={1.75} aria-hidden={true} />
               </Button>
@@ -150,7 +189,8 @@ export default function VariableEditor({
         value={value}
         onChange={(event) => onChange(event.target.value)}
         onBlur={onBlur}
-        className={className}
+        // NJ: Use NJ input styling
+        className={cn(njInputClass, className)}
         placeholder={placeholder}
         rows={rows}
         aria-label={label}

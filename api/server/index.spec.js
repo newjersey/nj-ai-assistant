@@ -283,8 +283,10 @@ describe('Server Configuration', () => {
     expect(response.status).toBe(200);
     expect(response.headers['x-frame-options']).toBe('SAMEORIGIN');
     expect(response.headers['x-content-type-options']).toBe('nosniff');
+    /* NJ: nj-helmet sets a global CSP
     expect(response.headers['content-security-policy']).toBeUndefined();
     expect(response.headers['content-security-policy-report-only']).toBeUndefined();
+    */
   });
 
   it('should not cache index page', async () => {

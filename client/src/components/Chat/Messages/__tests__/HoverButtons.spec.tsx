@@ -216,7 +216,8 @@ describe('HoverButtons edit affordance', () => {
   });
 });
 
-describe('HoverButtons feedback affordance', () => {
+// NJ: Feedback is disabled
+describe.skip('HoverButtons feedback affordance', () => {
   const assistantMessage = {
     ...userMessage,
     messageId: 'assistant-1',

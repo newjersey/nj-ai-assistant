@@ -94,7 +94,7 @@ function renderLanding({ isTemporary = false }: { isTemporary?: boolean } = {}) 
   );
 }
 
-// NJ: We've hidden this in the UI.
+// NJ: We've hidden this in the UI
 describe.skip('Landing agent contact', () => {
   beforeEach(() => {
     mockConversation = null;
@@ -159,7 +159,8 @@ describe.skip('Landing agent contact', () => {
   });
 });
 
-describe('Landing temporary chat empty state', () => {
+// NJ: Skip all temporary chat functionality
+describe.skip('Landing temporary chat empty state', () => {
   beforeEach(() => {
     mockConversation = null;
     mockAgentsMap = undefined;

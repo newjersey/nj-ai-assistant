@@ -30,12 +30,12 @@ import {
   useGetExpandedAgentByIdQuery,
   useUploadAgentAvatarMutation,
 } from '~/data-provider';
-import AgentBuilderHeader from '~/nj/components/Agents/AgentBuilderHeader';
 import {
   createProviderOption,
   getAvailableAgentSelection,
   getDefaultAgentFormValues,
 } from '~/utils';
+import AgentBuilderHeader from '~/nj/components/Agents/AgentBuilderHeader';
 import { useResourcePermissions } from '~/hooks/useResourcePermissions';
 import { useSelectAgent, useLocalize, useAuthContext } from '~/hooks';
 import { useAgentPanelContext } from '~/Providers/AgentPanelContext';

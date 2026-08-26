@@ -1,27 +1,27 @@
 /* eslint-disable i18next/no-literal-string */
 /* ^ We're not worried about i18n for this app ^ */
 
+import { useEffect } from 'react';
+import { useRecoilValue } from 'recoil';
+import { Link } from 'react-router-dom';
 import { Input, Label } from '@librechat/client';
 import { Controller, useWatch, useFormContext } from 'react-hook-form';
 import type { AgentForm } from '~/common';
 import { ResolvedProviderIcon } from '~/components/Endpoints/ResolvedProviderIcon';
+import { njInputClass } from '~/nj/components/Agents/agentInputStyle';
+import { validateEmail, cn, createProviderOption } from '~/utils';
+import FileContext from '~/nj/components/Agents/FileContext';
 import AgentCategorySelector from './AgentCategorySelector';
 import { useLocalize, useAgentCapabilities } from '~/hooks';
+import FileSearch from '~/nj/components/Agents/FileSearch';
+import TipComponent from '~/nj/components/TipComponent';
 import { useAgentFileEntries } from './Tools/hooks';
 import { useAgentPanelContext } from '~/Providers';
 import { useProviderIcon } from '~/hooks/Endpoint';
 import ToolsSection from './Tools/ToolsSection';
-import { validateEmail, getIconKey, cn, createProviderOption } from '~/utils';
 import Instructions from './Instructions';
-import FileContext from '~/nj/components/Agents/FileContext';
 import AgentAvatar from './AgentAvatar';
 import { Panel } from '~/common';
-import { useEffect } from 'react';
-import { useRecoilValue } from 'recoil';
-import { Link } from 'react-router-dom';
-import FileSearch from '~/nj/components/Agents/FileSearch';
-import { njInputClass } from '~/nj/components/Agents/agentInputStyle';
-import TipComponent from '~/nj/components/TipComponent';
 import store from '~/store';
 
 const fieldClass = 'h-9';
