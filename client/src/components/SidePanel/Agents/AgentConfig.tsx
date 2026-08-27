@@ -1,27 +1,27 @@
 /* eslint-disable i18next/no-literal-string */
 /* ^ We're not worried about i18n for this app ^ */
 
-import { Input, Label } from '@librechat/client';
-import { Controller, useWatch, useFormContext } from 'react-hook-form';
-import { EModelEndpoint, getEndpointField } from 'librechat-data-provider';
-import type { AgentForm, IconComponentTypes } from '~/common';
-import AgentCategorySelector from './AgentCategorySelector';
-import { useLocalize, useAgentCapabilities } from '~/hooks';
-import { validateEmail, getIconKey, cn, createProviderOption } from '~/utils';
-import { useAgentFileEntries } from './Tools/hooks';
-import { useAgentPanelContext } from '~/Providers';
-import ToolsSection from './Tools/ToolsSection';
-import { icons } from '~/hooks/Endpoint/Icons';
-import Instructions from './Instructions';
-import FileContext from '~/nj/components/Agents/FileContext';
-import AgentAvatar from './AgentAvatar';
-import { Panel } from '~/common';
 import { useEffect } from 'react';
 import { useRecoilValue } from 'recoil';
 import { Link } from 'react-router-dom';
-import FileSearch from '~/nj/components/Agents/FileSearch';
+import { Input, Label } from '@librechat/client';
+import { Controller, useWatch, useFormContext } from 'react-hook-form';
+import type { AgentForm } from '~/common';
+import { ResolvedProviderIcon } from '~/components/Endpoints/ResolvedProviderIcon';
 import { njInputClass } from '~/nj/components/Agents/agentInputStyle';
+import { validateEmail, cn, createProviderOption } from '~/utils';
+import FileContext from '~/nj/components/Agents/FileContext';
+import AgentCategorySelector from './AgentCategorySelector';
+import { useLocalize, useAgentCapabilities } from '~/hooks';
+import FileSearch from '~/nj/components/Agents/FileSearch';
 import TipComponent from '~/nj/components/TipComponent';
+import { useAgentFileEntries } from './Tools/hooks';
+import { useAgentPanelContext } from '~/Providers';
+import { useProviderIcon } from '~/hooks/Endpoint';
+import ToolsSection from './Tools/ToolsSection';
+import Instructions from './Instructions';
+import AgentAvatar from './AgentAvatar';
+import { Panel } from '~/common';
 import store from '~/store';
 
 const fieldClass = 'h-9';
@@ -54,22 +54,10 @@ export default function AgentConfig() {
   }, [defaultPreset, methods]);
 
   const providerValue = typeof provider === 'string' ? provider : provider?.value;
-  let Icon: IconComponentTypes | null | undefined;
-  let endpointType: EModelEndpoint | undefined;
-  let endpointIconURL: string | undefined;
-  let iconKey: string | undefined;
-
-  if (providerValue !== undefined) {
-    endpointType = getEndpointField(endpointsConfig, providerValue as string, 'type');
-    endpointIconURL = getEndpointField(endpointsConfig, providerValue as string, 'iconURL');
-    iconKey = getIconKey({
-      endpoint: providerValue as string,
-      endpointsConfig,
-      endpointType,
-      endpointIconURL,
-    });
-    Icon = icons[iconKey];
-  }
+  const { provider: providerId, imageURL } = useProviderIcon({
+    endpoint: providerValue as string,
+    endpointsConfig,
+  });
 
   /**
    * NJ: There are enough customizations that we simply return our own component lib
@@ -242,6 +230,7 @@ export default function AgentConfig() {
             {localize('com_ui_model')} <span className="text-red-500">*</span>
           </Label>
           <button
+            id="provider"
             type="button"
             onClick={() => setActivePanel(Panel.model)}
             title={model || undefined}
@@ -251,14 +240,14 @@ export default function AgentConfig() {
             )}
           >
             <div className="flex w-full min-w-0 items-center gap-2">
-              {Icon && (
+              {providerValue !== undefined && (
                 <div className="shadow-stroke relative flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-white text-black dark:bg-white">
                   {/* NJ: This block leads to TypeScript errors
-                  <Icon
+                  <ResolvedProviderIcon
+                    provider={providerId}
+                    imageURL={imageURL}
+                    size={16}
                     className="h-2/3 w-2/3"
-                    endpoint={providerValue as string}
-                    endpointType={endpointType}
-                    iconURL={endpointIconURL}
                   />
                   */}
                 </div>
