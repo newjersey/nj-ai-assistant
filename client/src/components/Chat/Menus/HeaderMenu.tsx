@@ -87,10 +87,13 @@ export default function HeaderMenu({
     });
   }
 
+  /* NJ: We disable exporting/sharing
   if (exportShare.show) {
     pushGroup(...exportShare.items);
   }
+  */
 
+  /* NJ: We disable temporary chat everywhere
   if (showTemporary) {
     pushGroup({
       id: 'header-temporary',
@@ -105,6 +108,7 @@ export default function HeaderMenu({
       onClick: temporary.toggle,
     });
   }
+  */
 
   if (items.length === 0) {
     return null;

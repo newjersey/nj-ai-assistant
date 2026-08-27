@@ -1,7 +1,14 @@
 import { memo, useMemo } from 'react';
 import { useRecoilValue } from 'recoil';
-import { getConfigDefaults, PermissionTypes, Permissions } from 'librechat-data-provider';
+import { useParams } from 'react-router-dom';
+import {
+  getConfigDefaults,
+  Constants,
+  PermissionTypes,
+  Permissions,
+} from 'librechat-data-provider';
 import { OpenSidebar, PresetsMenu, NewChat, HeaderMenu } from './Menus';
+import { TemporaryChat, TemporaryChatIndicator } from './TemporaryChat';
 import NewUpdatesWidget from '~/nj/components/NewUpdatesWidget';
 import ModelSelector from './Menus/Endpoints/ModelSelector';
 import NewJerseyLogo from '~/nj/components/NewJerseyLogo';
@@ -9,7 +16,6 @@ import { useGetStartupConfig } from '~/data-provider';
 import ExportAndShareMenu from './ExportAndShareMenu';
 import SubagentThreadLink from './SubagentThreadLink';
 import BookmarkMenu from './Menus/BookmarkMenu';
-import { TemporaryChat } from './TemporaryChat';
 import AddMultiConvo from './AddMultiConvo';
 import { useHasAccess } from '~/hooks';
 import { cn } from '~/utils';
@@ -36,6 +42,13 @@ function Header({
 }) {
   const { data: startupConfig } = useGetStartupConfig();
   const navVisible = useRecoilValue(store.sidebarExpanded);
+
+  /** The mobile row only offers a new chat when there is one to leave. Read
+   *  from the route rather than the context conversation, which still holds the
+   *  previous chat for a render after a history or link navigation. An unsaved
+   *  conversation has no id in the route yet, so absence counts as new too. */
+  const { conversationId: routeConversationId } = useParams();
+  const isNewChat = routeConversationId == null || routeConversationId === Constants.NEW_CONVO;
 
   const interfaceConfig = useMemo(
     () => startupConfig?.interface ?? defaultInterface,
@@ -78,11 +91,7 @@ function Header({
         )}
       >
         {parentConversationId != null && (
-          <SubagentThreadLink
-            threadId={parentConversationId}
-            relation="parent"
-            labelClassName="hidden lg:inline"
-          />
+          <SubagentThreadLink threadId={parentConversationId} labelClassName="hidden lg:inline" />
         )}
         {!readOnly && <ModelSelector startupConfig={startupConfig} />}
         {!readOnly && interfaceConfig.presets === true && interfaceConfig.modelSelect === true && (
@@ -101,7 +110,10 @@ function Header({
       </div>
 
       <div className={cn('flex flex-shrink-0 items-center gap-2', hiddenBehindNav)}>
-        <NewChat className="md:hidden" />
+        {hasAccessToTemporaryChat === true && <TemporaryChatIndicator />}
+        {/* NJ: No New Chat button in the mobile header
+        {!isNewChat && <NewChat className="md:hidden" />}
+        */}
         <HeaderMenu startupConfig={startupConfig} className="md:hidden" />
         {/* NJ: Disable export and share + temporary chat
         <div className="hidden items-center gap-2 md:flex">

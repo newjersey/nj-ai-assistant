@@ -11,6 +11,7 @@ type ButtonVariantOptions =
         | 'link'
         | 'submit'
         | 'outline'
+        | 'choice'
         | 'subtle'
         | 'destructive'
         | 'secondary'
@@ -33,6 +34,16 @@ const buttonVariantRecipe = cva(
         default: 'bg-surface-inverted text-text-inverted hover:bg-surface-inverted-hover',
         destructive: 'bg-surface-destructive text-white hover:bg-surface-destructive-hover',
         outline: 'text-jersey-blue bg-transparent hover:underline',
+        /**
+         * A selectable answer inside a question card. `outline` is wrong here:
+         * its `border-light` edge measures ~1.2:1 against the panel these sit
+         * on, well under WCAG 1.4.11's 3:1 for a UI component boundary, so a
+         * column of choices reads as flat text rather than as controls. Carries
+         * its own fill so the answers are a different colour from the prompt,
+         * and drops to `font-normal` so the question above stays the heading.
+         */
+        choice:
+          'border border-border-xheavy bg-surface-tertiary font-normal text-text-primary hover:bg-surface-hover hover:text-text-primary',
         subtle:
           'border border-border-light bg-transparent text-text-primary hover:bg-surface-secondary focus-visible:ring-ring-primary focus-visible:ring-offset-0',
         secondary: 'bg-surface-secondary text-text-primary hover:bg-surface-hover',
@@ -58,7 +69,7 @@ const buttonVariantRecipe = cva(
          * lag rather than polish.
          */
         'header-action':
-          'rounded-xl border border-border-light bg-presentation text-text-primary duration-0 hover:bg-surface-active-alt hover:text-text-primary',
+          'rounded-xl border border-border-light bg-transparent text-text-primary duration-0 hover:bg-surface-active-alt hover:text-text-primary',
       },
       size: {
         default: 'h-10 px-4 py-2',
