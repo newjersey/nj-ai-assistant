@@ -8,7 +8,6 @@ import { Button, useToastContext } from '@librechat/client';
 import { useWatch, useForm, FormProvider } from 'react-hook-form';
 import { useGetModelsQuery } from 'librechat-data-provider/react-query';
 import {
-  Tools,
   MemoryScope,
   SystemRoles,
   ResourceType,
@@ -16,6 +15,7 @@ import {
   LocalStorageKeys,
   PermissionBits,
   removeCodeExecutionCaller,
+  resolveModelCatalogKey,
   resolveStatefulCodeEnvironment,
   isAssistantsEndpoint,
 } from 'librechat-data-provider';
@@ -39,8 +39,12 @@ import AgentBuilderHeader from '~/nj/components/Agents/AgentBuilderHeader';
 import { useResourcePermissions } from '~/hooks/useResourcePermissions';
 import { useSelectAgent, useLocalize, useAuthContext } from '~/hooks';
 import { useAgentPanelContext } from '~/Providers/AgentPanelContext';
+<<<<<<< HEAD
 import { logAgentDuplication } from '~/nj/analytics/logHelpers';
 import { useDuplicateAgentMutation } from '~/data-provider';
+=======
+import { resolveCapabilityTools } from './Tools/items/capabilities';
+>>>>>>> upstream/main
 import AgentPanelSkeleton from './AgentPanelSkeleton';
 import AdvancedPanel from './Advanced/AdvancedPanel';
 import { Panel, isEphemeralAgent } from '~/common';
@@ -89,12 +93,15 @@ export function composeAgentUpdatePayload(data: AgentForm, agent_id?: string | n
     hide_sequential_outputs,
     stateful_code_sessions,
     stateful_code_environment,
+    code_environment_id,
     recursion_limit,
     category,
     support_contact,
     tool_options,
     skills,
     skills_enabled,
+    skill_authoring_enabled,
+    skills_scope,
     memory_scope,
     avatar_action: avatarActionState,
   } = data;
@@ -129,12 +136,15 @@ export function composeAgentUpdatePayload(data: AgentForm, agent_id?: string | n
       hide_sequential_outputs,
       stateful_code_sessions: normalizedStatefulCodeSessions,
       stateful_code_environment: normalizedStatefulCodeEnvironment,
+      code_environment_id: agent_id ? code_environment_id : (code_environment_id ?? undefined),
       recursion_limit,
       category,
       support_contact,
       tool_options: normalizedToolOptions,
       skills,
       skills_enabled,
+      skill_authoring_enabled,
+      skills_scope,
       /** A hidden stale 'agent' scope must not survive disabling memory —
        *  runtime partitioning keys off memory_scope alone. */
       memory_scope: data.memory === true ? memory_scope : MemoryScope.user,
@@ -590,20 +600,7 @@ export default function AgentPanel() {
 
   const onSubmit = useCallback(
     async (data: AgentForm) => {
-      const tools = data.tools ?? [];
-
-      if (data.execute_code === true) {
-        tools.push(Tools.execute_code);
-      }
-      if (data.file_search === true) {
-        tools.push(Tools.file_search);
-      }
-      if (data.web_search === true) {
-        tools.push(Tools.web_search);
-      }
-      if (data.memory === true) {
-        tools.push(Tools.memory);
-      }
+      const tools = Array.from(new Set([...(data.tools ?? []), ...resolveCapabilityTools(data)]));
 
       const { payload: basePayload, provider, model } = composeAgentUpdatePayload(data, agent_id);
 
@@ -642,7 +639,7 @@ export default function AgentPanel() {
           status: 'error',
         });
       }
-      if (!(models[provider] ?? []).includes(model)) {
+      if (!(models[resolveModelCatalogKey(provider, models)] ?? []).includes(model)) {
         return showToast({
           message: localize('com_error_model_not_found'),
           status: 'error',
