@@ -49,7 +49,11 @@ interface:
     roles: false
   presets: false
   prompts: false
+{% if NJ_FF_CODE_INTERPRETER_ENABLED === "true" %}
+  runCode: true
+{% else %}
   runCode: false
+{% endif %}
   sidePanel: false
   webSearch: false
   mcpServers:
@@ -80,6 +84,9 @@ endpoints:
       - 'ocr'
       - 'file_search'
       - 'chain'
+{% if NJ_FF_CODE_INTERPRETER_ENABLED === "true" %}
+      - 'execute_code'
+{% endif %}
 
 # We explicitly spec our models (since we only have a few models and this makes the selector simpler)
 modelSpecs:
