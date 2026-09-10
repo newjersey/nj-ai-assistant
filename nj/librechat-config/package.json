@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "dotenv": "17.4.2",
-    "js-yaml": "4.3.1",
+    "js-yaml": "4.3.2",
     "librechat-data-provider": "*",
     "nunjucks": "3.2.4"
   },
