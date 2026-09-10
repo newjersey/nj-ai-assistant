@@ -174,9 +174,10 @@ export function resolveDefaultLLMDeliveryPath(
     return canRecoverText(mimeType) ? 'text' : 'none';
   }
 
-  /** Bedrock's Converse document path natively accepts more than PDF, so on that
-   *  endpoint its document types belong on the provider path rather than being
-   *  extracted, which would drop non-text content and layout. */
+  /* NJ: Keep ALL Bedrock documents off the provider path (policy — see the commented
+     EModelEndpoint.bedrock in documentSupportedProviders, schemas.ts). Upstream's Converse
+     document special-case, which would route Bedrock document types to the provider, is
+     intentionally disabled:
   if (
     systemDefault !== 'provider' &&
     endpoint === EModelEndpoint.bedrock &&
@@ -184,6 +185,7 @@ export function resolveDefaultLLMDeliveryPath(
   ) {
     return 'provider';
   }
+  */
 
   /* The text fallback is only meaningful where text can be recovered. An archive or a
    * columnar data file reaching it would be decoded as UTF-8 into the prompt, so keep it

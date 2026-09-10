@@ -23,10 +23,10 @@ import {
 import type t from 'librechat-data-provider';
 import { renderAgentAvatar, clearMessagesCache, specDisplayFieldReset } from '~/utils';
 import { useLocalize, useDefaultConvo, useFavorites } from '~/hooks';
+import { logAgentDuplication } from '~/nj/analytics/logHelpers';
+import { useDuplicateAgentMutation } from '~/data-provider';
 import { useChatContext } from '~/Providers';
 import AgentContact from './AgentContact';
-import { useDuplicateAgentMutation } from '~/data-provider';
-import { logAgentDuplication } from '~/nj/analytics/logHelpers';
 
 interface AgentDetailContentProps {
   agent: t.Agent;

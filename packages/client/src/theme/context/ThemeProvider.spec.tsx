@@ -771,7 +771,8 @@ describe('ThemeProvider', () => {
     expect(localStorage.getItem('color-theme')).toBe('high-contrast-light');
   });
 
-  it('treats high contrast dark as a dark colour scheme', async () => {
+  // NJ: We don't support dark mode; high contrast resolves to light
+  it.skip('treats high contrast dark as a dark colour scheme', async () => {
     render(
       <ThemeProvider initialTheme="light">
         <Controls />
@@ -809,7 +810,8 @@ describe('ThemeProvider', () => {
     await waitFor(() => {
       expect(document.documentElement).toHaveClass('high-contrast');
     });
-    expect(root.style.getPropertyValue('color-scheme')).toBe('dark');
+    // NJ: We don't support dark mode; the HC-dark control resolves to light
+    expect(root.style.getPropertyValue('color-scheme')).toBe('light');
     expect(root.style.getPropertyPriority('color-scheme')).toBe('');
 
     act(() => screen.getByRole('button', { name: 'Light' }).click());
@@ -950,7 +952,8 @@ describe('ThemeProvider', () => {
   /** The same staleness for the scheme: with contrast already on, flipping the
    *  OS colour scheme leaves `theme` at `system` and `setHighContrast` a no-op,
    *  so nothing rerendered until the resolved mode was published too. */
-  it('reacts when the OS colour scheme changes under the system mode', async () => {
+  // NJ: We don't support dark mode; the OS dark preference is not honored
+  it.skip('reacts when the OS colour scheme changes under the system mode', async () => {
     const listeners: Array<() => void> = [];
     let prefersDark = false;
     window.matchMedia = jest.fn((query: string) => {
@@ -1018,7 +1021,8 @@ describe('ThemeProvider', () => {
         <Controls />
       </ThemeProvider>,
     );
-    expect(screen.getByTestId('resolved-mode')).toHaveTextContent('dark');
+    // NJ: We don't support dark mode; high-contrast-dark resolves to light
+    expect(screen.getByTestId('resolved-mode')).toHaveTextContent('light');
     expect(screen.getByTestId('high-contrast')).toHaveTextContent('true');
     explicit.unmount();
 
@@ -1030,7 +1034,8 @@ describe('ThemeProvider', () => {
         <Controls />
       </ThemeProvider>,
     );
-    expect(screen.getByTestId('resolved-mode')).toHaveTextContent('dark');
+    // NJ: We don't support dark mode; system resolves to light even when the OS reports dark
+    expect(screen.getByTestId('resolved-mode')).toHaveTextContent('light');
     expect(matchMediaSpy).toHaveBeenCalled();
   });
 });
