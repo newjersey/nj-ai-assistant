@@ -1,10 +1,14 @@
 export * from './app';
+export * from './acl/accessControlService';
+export * from './acl/insightsPermissions';
+export * from './acl/middleware';
 export * from './credentials';
 /* Artifacts */
 export * from './artifacts';
 /* Admin */
 export * from './admin';
 export * from './cdn';
+export * from './code';
 /* Auth */
 export * from './auth';
 /* API Keys */
@@ -20,11 +24,14 @@ export * from './mcp/oauth';
 export * from './mcp/auth';
 export * from './mcp/zod';
 export * from './mcp/errors';
+export * from './mcp/openid';
 export * from './mcp/cache';
 export * from './mcp/tools';
 export * from './mcp/catalog/store';
+export * from './mcp/catalog/recovery';
 export * from './mcp/assistants';
 export * from './mcp/request';
+export * from './mcp/icons';
 /* Utilities */
 export * from './mcp/utils';
 export * from './mcp/context';
@@ -78,6 +85,8 @@ export * from './plugins';
 export * from './endpoints';
 /* Files */
 export * from './files';
+/* Images */
+export * from './images';
 /* Storage */
 export * from './storage';
 /* Tools */
@@ -96,6 +105,7 @@ export * from './shared-links/service';
 export * from './shared-links/config';
 export * from './shared-links/http';
 export * from './shared-links/protection';
+export * from './shared-links/session';
 /* Stream */
 export * from './stream';
 /* Diagnostics */

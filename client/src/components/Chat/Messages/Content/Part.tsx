@@ -14,9 +14,11 @@ import {
   AgentUpdate,
   EmptyText,
   Reasoning,
+  ReasoningMarker,
   Summary,
   Text,
   SkillCall,
+  MemoryCall,
   ReadFileCall,
   FileAuthoringCall,
   BashCall,
@@ -83,6 +85,7 @@ const Part = memo(function Part({
         quotes={part.quotes}
         steerId={part.steerId}
         createdAt={part.createdAt}
+        isSubmitting={isSubmitting}
       />
     );
   }
@@ -145,6 +148,9 @@ const Part = memo(function Part({
     if (typeof reasoning !== 'string') {
       return null;
     }
+    if (reasoning.trim() === '' && part.reasoning_unavailable === true) {
+      return <ReasoningMarker label={part.reasoning_label} />;
+    }
     return (
       <Reasoning
         reasoning={reasoning}
@@ -159,7 +165,9 @@ const Part = memo(function Part({
         model={part.model}
         provider={part.provider}
         tokenCount={part.tokenCount}
+        initiatedBy={part.initiatedBy}
         summarizing={part.summarizing}
+        failed={part.failed}
       />
     );
   } else if (part.type === ContentTypes.ACTIVITY_LABEL) {
@@ -299,6 +307,21 @@ const Part = memo(function Part({
               hideAttachments={hideAttachments}
             />
           );
+        } else if (toolCall.name === 'set_memory' || toolCall.name === 'delete_memory') {
+          return (
+            <MemoryCall
+              toolName={toolCall.name}
+              args={toolCall.args}
+              output={toolCall.output ?? ''}
+              initialProgress={toolCall.progress ?? 0.1}
+              isSubmitting={isSubmitting}
+              runStepStatus={toolCall.runStepStatus}
+              runStepDurationMs={toolCall.runStepDurationMs}
+              attachments={attachments}
+              hideAttachments={hideAttachments}
+              onExpand={onToolExpand}
+            />
+          );
         } else if (toolCall.name === 'read_file') {
           return (
             <ReadFileCall
@@ -353,6 +376,7 @@ const Part = memo(function Part({
               isSubmitting={isSubmitting}
               runStepStatus={toolCall.runStepStatus}
               attachments={attachments}
+              hideAttachments={hideAttachments}
               isLast={isLast}
               onExpand={onToolExpand}
             />

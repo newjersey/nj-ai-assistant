@@ -194,7 +194,11 @@ export default function AgentConfig() {
                   aria-describedby={errors.name ? 'agent-name-error' : undefined}
                 />
                 {errors.name && (
-                  <div id="agent-name-error" className="mt-1 text-xs text-red-500" role="alert">
+                  <div
+                    id="agent-name-error"
+                    className="mt-1 text-xs text-text-destructive"
+                    role="alert"
+                  >
                     {errors.name.message}
                   </div>
                 )}
@@ -227,7 +231,7 @@ export default function AgentConfig() {
             className="mb-1 block text-[11px] font-medium uppercase tracking-wide text-text-secondary"
             htmlFor="provider"
           >
-            {localize('com_ui_model')} <span className="text-red-500">*</span>
+            {localize('com_ui_model')} <span className="text-text-destructive">*</span>
           </Label>
           <button
             id="provider"
@@ -263,7 +267,7 @@ export default function AgentConfig() {
             className="mb-1 block text-[11px] font-medium uppercase tracking-wide text-text-secondary"
             htmlFor="category-selector"
           >
-            {localize('com_ui_category')} <span className="text-red-500">*</span>
+            {localize('com_ui_category')} <span className="text-text-destructive">*</span>
           </Label>
           <AgentCategorySelector className="w-full rounded-lg" />
         </div>
@@ -302,7 +306,7 @@ export default function AgentConfig() {
                 <Input
                   {...field}
                   value={field.value ?? ''}
-                  className={cn(fieldClass, error && 'border-2 border-red-500')}
+                  className={cn(fieldClass, error && 'border-2 border-border-destructive')}
                   id="support-contact-name"
                   type="text"
                   placeholder={localize('com_ui_support_contact_name_placeholder')}
@@ -313,7 +317,7 @@ export default function AgentConfig() {
                 {error && (
                   <span
                     id="support-contact-name-error"
-                    className="mt-1 text-xs text-red-500"
+                    className="mt-1 text-xs text-text-destructive"
                     role="alert"
                     aria-live="polite"
                   >
@@ -335,7 +339,7 @@ export default function AgentConfig() {
                 <Input
                   {...field}
                   value={field.value ?? ''}
-                  className={cn(fieldClass, error && 'border-2 border-red-500')}
+                  className={cn(fieldClass, error && 'border-2 border-border-destructive')}
                   id="support-contact-email"
                   type="email"
                   placeholder={localize('com_ui_support_contact_email_placeholder')}
@@ -346,7 +350,7 @@ export default function AgentConfig() {
                 {error && (
                   <span
                     id="support-contact-email-error"
-                    className="mt-1 text-xs text-red-500"
+                    className="mt-1 text-xs text-text-destructive"
                     role="alert"
                     aria-live="polite"
                   >
