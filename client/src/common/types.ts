@@ -110,6 +110,7 @@ export type NavLink = {
   Component?: React.ComponentType;
   onClick?: (e?: React.MouseEvent) => void;
   variant?: 'default' | 'ghost';
+  disabled?: boolean;
   id: string;
 };
 
@@ -332,14 +333,23 @@ export type TAskProps = {
 export type TOptions = {
   editedMessageId?: string | null;
   editedContent?: t.TEditedContent;
-  editedText?: string | null;
   isRegenerate?: boolean;
   isContinued?: boolean;
   isEdited?: boolean;
+  /**
+   * Manual context compaction: a summarize-only turn hung off the branch's
+   * leaf (`messageId`). Shaped like a regenerate on the client — no new user
+   * bubble, the response placeholder parents onto the leaf — and sent with
+   * `compact: true` so the server runs the graph summarize-only.
+   */
+  compact?: boolean;
   overrideMessages?: t.TMessage[];
-  /** This value is only true when the user submits a message with "Update & rerun" for a user-created message */
-  isResubmission?: boolean;
-  /** Currently only utilized when `isResubmission === true`, uses that message's currently attached files */
+  /**
+   * Authoritative attachment list for this submission: a rerun replays the edited
+   * message's stored files, and an auto-drained queued message replays the ones taken
+   * out of the composer when it was queued. Authoritative even when empty, so a drain
+   * never vacuums up attachments the user staged for their next send.
+   */
   overrideFiles?: t.TMessage['files'];
   /**
    * Assistant message being regenerated. Used to derive the optimistic response
@@ -491,6 +501,7 @@ export type TAuthContext = {
   user: t.TUser | undefined;
   token: string | undefined;
   isAuthenticated: boolean;
+  isAuthReady: boolean;
   error: string | undefined;
   login: (data: t.TLoginUser) => void;
   logout: (redirect?: string) => void;
@@ -508,6 +519,7 @@ export type TUserContext = {
 export type TAuthConfig = {
   loginRedirect: string;
   test?: boolean;
+  optional?: boolean;
 };
 
 export type IconProps = Pick<t.TMessage, 'isCreatedByUser' | 'model'> &

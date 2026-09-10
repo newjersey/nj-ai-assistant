@@ -29,6 +29,7 @@ import {
   getConversationDraftId,
   scrollToEnd,
   hasRealTitle,
+  withoutListFlags,
   setDocumentTitle,
   requestChatFocus,
   getAllContentText,
@@ -568,10 +569,11 @@ export default function useEventHandlers({
         });
 
         if (!isTemporary) {
+          const sidebarUpdate = withoutListFlags(update);
           if (requestMessage.parentMessageId === Constants.NO_PARENT) {
-            upsertConvoInAllQueries(queryClient, update);
+            upsertConvoInAllQueries(queryClient, sidebarUpdate);
           } else {
-            updateConvoInAllQueries(queryClient, update.conversationId!, (_c) => update, true);
+            updateConvoInAllQueries(queryClient, update.conversationId!, () => sidebarUpdate, true);
           }
           if (update.chatProjectId) {
             queryClient.invalidateQueries([QueryKeys.projects]);
@@ -599,8 +601,6 @@ export default function useEventHandlers({
 
   const createdHandler = useCallback(
     (data: TResData, submission: EventSubmission) => {
-      queryClient.invalidateQueries([QueryKeys.mcpConnectionStatus]);
-      queryClient.invalidateQueries([QueryKeys.mcpTools]);
       const { messages, userMessage, isRegenerate = false, isTemporary = false } = submission;
       /**
        * The spread carries `manualSkills` through from
@@ -650,10 +650,11 @@ export default function useEventHandlers({
         });
 
         if (!isTemporary) {
+          const sidebarUpdate = withoutListFlags(update);
           if (parentMessageId === Constants.NO_PARENT) {
-            upsertConvoInAllQueries(queryClient, update);
+            upsertConvoInAllQueries(queryClient, sidebarUpdate);
           } else {
-            updateConvoInAllQueries(queryClient, update.conversationId!, (_c) => update, true);
+            updateConvoInAllQueries(queryClient, update.conversationId!, () => sidebarUpdate, true);
           }
           if (update.chatProjectId) {
             queryClient.invalidateQueries([QueryKeys.projects]);

@@ -7,6 +7,7 @@ require('module-alias')({ base: path.resolve(__dirname, '..') });
 const cors = require('cors');
 const axios = require('axios');
 const express = require('express');
+const mongoose = require('mongoose');
 const passport = require('passport');
 const compression = require('compression');
 const cookieParser = require('cookie-parser');
@@ -20,6 +21,7 @@ const {
   applyCspNonce,
   createCspPolicy,
   shellCacheHeaders,
+  escapeHtmlAttribute,
   ErrorController,
   memoryDiagnostics,
   createSecurityHeaders,
@@ -37,20 +39,25 @@ const {
   getDeploymentPluginHookCapabilities,
   registerDeploymentPluginHooks,
   hasDeploymentPluginHooks,
+  hasDeploymentPluginToolApprovalHooks,
   setPluginHookSource,
   loadToolApprovalHooks,
   maybeInjectQueryDevtoolsBootstrap,
   preAuthTenantMiddleware,
   requestContextMiddleware,
   registerShutdownTask,
+  getRemainingShutdownMs,
   configureServerTimeouts,
   setupGracefulShutdown,
   updateInterfacePermissions,
   configureMessageFilterRegexValidator,
   configureFileConfigRegexEngine,
   configureAgentEventRuntime,
+  createAgentEventTerminalHandler,
   createScheduleWriteGate,
+  startCodeEnvironmentLifecycleReconciler,
   waitForKeyvRedisClient,
+  warnOnUnreachableDeliveryPaths,
 } = require('@librechat/api');
 const { connectDb, indexSync } = require('~/db');
 const {
@@ -64,6 +71,7 @@ const { capabilityContextMiddleware } = require('./middleware/roles/capabilities
 const createValidateImageRequest = require('./middleware/validateImageRequest');
 const { initializeGitHubSkillSync } = require('./services/Skills/sync');
 const { initializeAgentTriggerService } = require('./services/Agents/triggers');
+const { resumeAgentEventDetachedAction } = require('./services/Agents/detachedActionResume');
 const { initializeScheduleEngine, recordExpiredScheduleApproval } = require('./services/Schedules');
 const { jwtLogin, ldapLogin, passportLogin } = require('~/strategies');
 const { startExpiredFileSweep } = require('./services/Files/process');
@@ -77,6 +85,7 @@ const { getAppConfig } = require('./services/Config');
 const staticCache = require('./utils/staticCache');
 const noIndex = require('./middleware/noIndex');
 const routes = require('./routes');
+const agentEventMethods = require('~/models');
 const { njContentSecurityPolicy } = require('~/nj/nj-helmet');
 const { njCronJobs } = require('~/nj/nj-cron');
 
@@ -125,6 +134,11 @@ const configureGenerationStreams = () => {
     cleanupOnComplete: !isEnabled(process.env.STREAM_KEEP_COMPLETED_JOBS),
   });
   GenerationJobManager.setApprovalExpiredHandler(recordExpiredScheduleApproval);
+  GenerationJobManager.setTerminalHostActionHandler(
+    createAgentEventTerminalHandler(agentEventMethods, {
+      resumeDetachedAction: resumeAgentEventDetachedAction,
+    }),
+  );
   GenerationJobManager.initialize();
   // Stop active generations and close their SSE streams while the HTTP server drains.
   registerShutdownTask(
@@ -135,16 +149,42 @@ const configureGenerationStreams = () => {
       priority: 100,
     },
   );
+  /** Spend the shutdown budget that is actually left waiting for detached generations to
+   *  record their own provider drains, holding back a reserve for the tasks after this one.
+   *  Abandoning an unrecorded drain fences the next generation permanently. */
+  const destroyGenerationJobManager = () => {
+    const remaining = getRemainingShutdownMs();
+    return GenerationJobManager.destroy(
+      remaining == null
+        ? undefined
+        : { settlementBudgetMs: Math.max(0, remaining - SHUTDOWN_TEARDOWN_RESERVE_MS) },
+    );
+  };
   // Tear down stream resources before shared caches and telemetry exporters shut down.
-  registerShutdownTask('generation job manager', () => GenerationJobManager.destroy(), {
-    priority: 100,
-  });
+  registerShutdownTask('generation job manager', destroyGenerationJobManager, { priority: 100 });
 };
+
+/** Reserved for the shutdown tasks that run after the generation job manager. */
+const SHUTDOWN_TEARDOWN_RESERVE_MS = 10_000;
 
 const startServer = async () => {
   await waitForKeyvRedisClient();
   await configureSubagentTaskRouting();
-  const { metricsMiddleware, metricsRouter } = createMetrics();
+  const { metricsMiddleware, metricsRouter } = createMetrics({
+    collectAgentEventActorStorageMetrics: () =>
+      runAsSystem(async () => {
+        const now = new Date();
+        const [receiptMetrics, reconciliationMetrics] = await Promise.all([
+          agentEventMethods.getAgentEventActorReceiptStorageMetrics(now),
+          agentEventMethods.getAgentEventActorReconciliationStorageMetrics(now),
+        ]);
+        return {
+          ...receiptMetrics,
+          pendingReconciliations: reconciliationMetrics.pending,
+          oldestPendingAgeSeconds: reconciliationMetrics.oldestPendingAgeSeconds,
+        };
+      }),
+  });
   if (!process.env.METRICS_SECRET) {
     logger.warn('[metrics] METRICS_SECRET is not set - /metrics will return 401 for all requests');
   }
@@ -155,6 +195,7 @@ const startServer = async () => {
   await connectDb();
 
   logger.info('Connected to MongoDB');
+  startCodeEnvironmentLifecycleReconciler({ mongoose });
   indexSync().catch((err) => {
     logger.error('[indexSync] Background sync failed:', err);
   });
@@ -190,6 +231,7 @@ const startServer = async () => {
   });
   const appConfig = await getAppConfig({ baseOnly: true });
   configureAgentEventRuntime(appConfig?.endpoints?.agents?.eventDriven);
+  warnOnUnreachableDeliveryPaths(appConfig);
   initializeFileStorage(appConfig);
   const projectRoot = path.resolve(__dirname, '../..');
   // Plugin hooks execute only when the operator opts in via DEPLOYMENT_PLUGIN_HOOKS;
@@ -202,6 +244,7 @@ const startServer = async () => {
   // agents -> plugins import (see agents/hooks/source.ts).
   setPluginHookSource({
     hasHooks: hasDeploymentPluginHooks,
+    hasToolApprovalHooks: hasDeploymentPluginToolApprovalHooks,
     register: registerDeploymentPluginHooks,
   });
   await initializeDeploymentSkills({
@@ -249,8 +292,8 @@ const startServer = async () => {
     res.vary(QUERY_DEVTOOLS_HEADER);
 
     const lang = req.cookies.lang || req.headers['accept-language']?.split(',')[0] || 'en-US';
-    const saneLang = lang.replace(/"/g, '&quot;');
-    let updatedIndexHtml = indexHTML.replace(/lang="en-US"/g, `lang="${saneLang}"`);
+    const saneLang = escapeHtmlAttribute(lang);
+    let updatedIndexHtml = indexHTML.replace(/lang="en-US"/g, () => `lang="${saneLang}"`);
     updatedIndexHtml = maybeInjectQueryDevtoolsBootstrap(updatedIndexHtml, req);
 
     /* Nonce last: every injected script above must be stamped too. */
@@ -342,9 +385,11 @@ const startServer = async () => {
   app.use('/oauth', preAuthTenantMiddleware, routes.oauth);
   /* API Endpoints */
   app.use('/api/auth', preAuthTenantMiddleware, routes.auth);
-  app.use('/api/admin/insights', routes.insights);
+  app.use('/api/insights', routes.insights);
   app.use('/api/admin', routes.adminAuth);
   app.use('/api/admin/config', routes.adminConfig);
+  app.use('/api/admin/code-environments', routes.adminCodeEnvironments);
+  app.use('/api/code-environments', routes.codeEnvironments);
   app.use('/api/admin/langfuse', routes.adminLangfuse);
   app.use('/api/admin/grants', routes.adminGrants);
   app.use('/api/admin/groups', routes.adminGroups);
@@ -370,7 +415,13 @@ const startServer = async () => {
   app.use('/api/config', preAuthTenantMiddleware, optionalJwtAuth, routes.config);
   app.use('/api/assistants', routes.assistants);
   app.use('/api/files', await routes.files.initialize());
-  app.use('/images/', createValidateImageRequest(appConfig.secureImageLinks), routes.staticRoute);
+  app.use(
+    '/images/',
+    createValidateImageRequest({
+      secureImageLinks: appConfig.secureImageLinks,
+    }),
+    routes.staticRoute,
+  );
   app.use('/api/share', preAuthTenantMiddleware, routes.share);
   app.use('/api/roles', routes.roles);
   app.use('/api/agents/chat', rejectChatStartsUntilReady);
