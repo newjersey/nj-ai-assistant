@@ -97,6 +97,9 @@ export function startScheduleEngine(deps: ScheduleEngineDeps): ScheduleEngine {
                 scheduleId: run.scheduleId,
                 scheduledFor: run.scheduledFor,
                 status,
+                ...(status === 'requires_action' && jobState?.checkpointNamespace != null
+                  ? { checkpointNamespace: jobState.checkpointNamespace }
+                  : {}),
                 // Pre-start aborts have a reserved id but no conversation was ever
                 // created; projecting it gives the card a link to a missing chat.
                 conversationId: opts?.omitConversationId ? undefined : run.conversationId,
@@ -222,6 +225,7 @@ export function startScheduleEngine(deps: ScheduleEngineDeps): ScheduleEngine {
               const deliveryStatus = delivery?.status;
               if (
                 deliveryStatus === 'staging' ||
+                deliveryStatus === 'batched' ||
                 deliveryStatus === 'pending' ||
                 deliveryStatus === 'leased'
               ) {
