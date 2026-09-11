@@ -17,7 +17,8 @@ import { cn } from '~/utils';
 const isUnlinkedMemoryArtifact = (
   attachment?: TAttachment,
 ): attachment is TAttachment & { [Tools.memory]: MemoryArtifact } =>
-  attachment?.[Tools.memory] != null && !attachment.toolCallId;
+  // NJ: show all — our memory is background, no inline MemoryCall
+  attachment?.[Tools.memory] != null;
 
 /** Layout-gate predicate for callers that arrange around this component
  * (e.g. the thinking-dot nudge). Must stay in agreement with the memo's

@@ -130,10 +130,8 @@ describe('MemoryArtifacts', () => {
       expect(screen.getByText('Memory Error')).toBeInTheDocument();
     });
 
-    test('ignores attachments already rendered as an inline memory tool card', () => {
-      /** A `set_memory`/`delete_memory` call routes to `MemoryCall`, which
-       *  shows the same key, value and outcome. Counting its attachment here
-       *  too rendered one mutation twice. `toolCallId` is the discriminator. */
+    // NJ: memory is background — no inline MemoryCall, so we don't dedup on toolCallId
+    test.skip('ignores attachments already rendered as an inline memory tool card', () => {
       const linked = {
         ...createMemoryAttachment('update', 'memory1'),
         toolCallId: 'call_abc123',
