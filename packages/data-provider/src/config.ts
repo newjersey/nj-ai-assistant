@@ -2730,6 +2730,15 @@ export const configSchema = z.object({
             .positive()
             .max(5 * 60_000)
             .default(3_000),
+          /** How long past `discoveryTimeoutMs` a stalled discovery may hold its catalog slot and
+           * coalesced requests. It is never cancelled, so OAuth tokens it redeemed still persist,
+           * and no other discovery for the same server state starts until it settles. */
+          discoverySettleGraceMs: z
+            .number()
+            .int()
+            .nonnegative()
+            .max(5 * 60_000)
+            .default(10_000),
           reauthRetryMs: z
             .number()
             .int()
@@ -2737,6 +2746,10 @@ export const configSchema = z.object({
             .max(24 * 60 * 60_000)
             .default(30 * 60_000),
           maxStateEntries: z.number().int().positive().max(1_000_000).default(10_000),
+          /** Process-wide: how many discoveries released past `discoverySettleGraceMs` may still be
+           * running before recovery starts no new discovery until one settles. The default matches
+           * the three catalog slots a stalled dependency could hold before discoveries were released. */
+          maxDetachedDiscoveries: z.number().int().positive().max(1_000).default(3),
           generationReadTimeoutMs: z.number().int().positive().max(10_000).default(500),
           authorizationFenceRetryMs: z
             .array(z.number().int().nonnegative().max(60_000))
