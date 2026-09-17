@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { TooltipAnchor } from '@librechat/client';
+import { composerSubmitClasses, TooltipAnchor } from '@librechat/client';
 import { useLocalize } from '~/hooks';
 import { cn } from '~/utils';
 
@@ -19,6 +19,7 @@ export default memo(function StopButton({
         <button
           type="button"
           data-testid="stop-generation-button"
+          // NJ: Blue square matching the NJ send button, no composerSubmitClasses()
           className={cn(
             'h-8 w-8 rounded-md bg-[#0076D6] text-text-primary outline-offset-4 transition-all duration-200 disabled:cursor-not-allowed disabled:text-text-secondary disabled:opacity-10',
           )}

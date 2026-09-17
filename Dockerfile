@@ -1,4 +1,4 @@
-# v0.8.8-rc2
+# v0.8.8-rc3
 
 # NJ: Render the librechat.(dev|prod).yaml files, to be copied into the LC image
 FROM node:24.16.0-alpine AS config-render
