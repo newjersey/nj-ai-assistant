@@ -1,12 +1,14 @@
 import { z } from 'zod';
-import type { TMessageContentParts, AgentSubagentGraph, FunctionTool } from './types/assistants';
+import type { TMessageContentParts } from './types/content';
+import type { AgentSubagentGraph } from './types/agents';
 import type { SearchResultData } from './types/web';
+import type { FunctionTool } from './types/tools';
 import type { TFile } from './types/files';
+import { CODE_ENVIRONMENT_MODES, CODE_WORKSPACE_ID_PATTERN } from './code/workspace';
 import { userSubmittedMessageFieldPathSchema } from './filters';
-import { CODE_WORKSPACE_ID_PATTERN } from './code/workspace';
 import { TFeedback, feedbackSchema } from './feedback';
 import { CODE_APPROVAL_MODES } from './code/approval';
-import { Tools } from './types/assistants';
+import { Tools } from './types/tools';
 
 export const isUUID = z.string().uuid();
 
@@ -387,6 +389,7 @@ export const defaultAgentFormValues = {
   [Tools.memory]: false,
   stateful_code_environment: 'user' as const,
   code_environment_id: undefined as string | null | undefined,
+  code_workspace_id: undefined as string | undefined,
   category: 'general',
   support_contact: {
     name: '',
@@ -1065,6 +1068,8 @@ export type TMessage = z.input<typeof tMessageSchema> & {
   siblingIndex?: number;
   attachments?: TAttachment[];
   clientTimestamp?: string;
+  /** Client-only durable branch anchor while this message is an optimistic response. */
+  clientQueueParentMessageId?: string;
   feedback?: TFeedback;
 };
 
@@ -1118,6 +1123,7 @@ export const tConversationSchema = z.object({
   /** Server-derived: an active shared link exists for this conversation. Not persisted. */
   isShared: z.boolean().optional(),
   codeApprovalMode: z.enum(CODE_APPROVAL_MODES).optional(),
+  codeEnvironmentMode: z.enum(CODE_ENVIRONMENT_MODES).optional(),
   codeWorkspaces: z
     .array(
       z

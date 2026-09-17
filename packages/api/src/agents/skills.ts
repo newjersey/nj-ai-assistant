@@ -2,8 +2,12 @@ import { logger } from '@librechat/data-schemas';
 import { HumanMessage } from '@librechat/agents/langchain/messages';
 import { SkillsScope, isEphemeralAgentId, resolveAgentSkillsScope } from 'librechat-data-provider';
 import { formatSkillCatalog, SkillToolDefinition, ReadFileToolDefinition } from '@librechat/agents';
+import type {
+  Agent,
+  CodeWorkspaceOperation,
+  CodeWorkspaceDescriptor,
+} from 'librechat-data-provider';
 import type { LCToolRegistry, LCTool, InjectedMessage } from '@librechat/agents';
-import type { Agent, CodeWorkspaceOperation } from 'librechat-data-provider';
 import type { BaseMessage } from '@librechat/agents/langchain/messages';
 import type { Types } from 'mongoose';
 import { createSkillContentDigest } from './compatibility';
@@ -434,6 +438,9 @@ export interface InjectSkillCatalogParams {
   workspaceTools?: boolean;
   /** Live operation ceiling for the selected attached workspace. */
   workspaceOperations?: ReadonlySet<CodeWorkspaceOperation>;
+  /** Deployment ceiling advertised on attached Bash tool definitions. */
+  workspaceCommandTimeoutMaxMs?: number;
+  workspaceEnvironment?: CodeWorkspaceDescriptor['environment'];
   /** Current user ID — used to determine skill ownership for active-state resolution. */
   userId?: string;
   /** Per-user skill overrides: `{ [skillId]: boolean }`. Missing entries use the default. */
@@ -662,6 +669,8 @@ export async function injectSkillCatalog(
     statefulSessions,
     workspaceTools,
     workspaceOperations,
+    workspaceCommandTimeoutMaxMs,
+    workspaceEnvironment,
     userId,
     skillStates,
     defaultActiveOnShare = false,
@@ -821,6 +830,8 @@ export async function injectSkillCatalog(
     statefulSessions: statefulSessions === true,
     workspaceTools: workspaceTools === true,
     workspaceOperations,
+    workspaceCommandTimeoutMaxMs,
+    workspaceEnvironment,
   });
   workingDefs = codeExecResult.toolDefinitions;
 

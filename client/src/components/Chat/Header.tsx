@@ -12,6 +12,7 @@ import { TemporaryChat, TemporaryChatIndicator } from './TemporaryChat';
 import NewUpdatesWidget from '~/nj/components/NewUpdatesWidget';
 import ModelSelector from './Menus/Endpoints/ModelSelector';
 import NewJerseyLogo from '~/nj/components/NewJerseyLogo';
+import { TraceButton, useTraceControl } from './Trace';
 import { useGetStartupConfig } from '~/data-provider';
 import ExportAndShareMenu from './ExportAndShareMenu';
 import SubagentThreadLink from './SubagentThreadLink';
@@ -42,6 +43,7 @@ function Header({
 }) {
   const { data: startupConfig } = useGetStartupConfig();
   const navVisible = useRecoilValue(store.sidebarExpanded);
+  const isSubmitting = useRecoilValue(store.isSubmittingFamily(0));
 
   /** The mobile row only offers a new chat when there is one to leave. Read
    *  from the route rather than the context conversation, which still holds the
@@ -68,6 +70,14 @@ function Header({
   const hasAccessToTemporaryChat = useHasAccess({
     permissionType: PermissionTypes.TEMPORARY_CHAT,
     permission: Permissions.USE,
+  });
+
+  /** Child threads are view-only records of their parent's run and have no trace of their own. */
+  const trace = useTraceControl({
+    conversationId: isNewChat ? null : routeConversationId,
+    traceViewer: interfaceConfig.traceViewer,
+    isSubmitting,
+    enabled: parentConversationId == null,
   });
 
   /** The drawer covers the header on mobile; keep its controls out of the tab order. */
@@ -114,9 +124,10 @@ function Header({
         {/* NJ: No New Chat button in the mobile header
         {!isNewChat && <NewChat className="md:hidden" />}
         */}
-        <HeaderMenu startupConfig={startupConfig} className="md:hidden" />
-        {/* NJ: Disable export and share + temporary chat
+        <HeaderMenu startupConfig={startupConfig} trace={trace} className="md:hidden" />
+        {/* NJ: Disable export, share, temporary chat, and user traces
         <div className="hidden items-center gap-2 md:flex">
+          {trace.show && <TraceButton onClick={trace.open} />}
           <ExportAndShareMenu isSharedButtonEnabled={startupConfig?.sharedLinksEnabled ?? false} />
           {hasAccessToTemporaryChat === true && <TemporaryChat />}
         </div>
