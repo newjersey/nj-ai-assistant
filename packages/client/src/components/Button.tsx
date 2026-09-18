@@ -77,8 +77,9 @@ const buttonVariantRecipe = cva(
          * section body, and it carries its own metrics through the compound
          * below, since a section heading is sized by its text.
          */
+        // NJ: Larger heading text, with py-1.5 keeping that 20px line inside the 32px header row
         'section-header':
-          'justify-start gap-1 rounded-lg px-1 py-2 text-xs font-bold text-text-secondary focus-visible:ring-inset focus-visible:ring-offset-0',
+          'justify-start gap-1 rounded-lg px-1 py-1.5 text-sm font-bold text-text-secondary focus-visible:ring-inset focus-visible:ring-offset-0',
         /**
          * A quiet icon action sitting beside a section heading in the sidebar.
          * Unlike `row-action`, it recedes until hovered so the heading stays
@@ -140,7 +141,8 @@ const buttonVariantRecipe = cva(
       {
         variant: 'section-header',
         size: 'default',
-        class: 'h-auto px-1 py-2',
+        // NJ: py-1.5 to match the variant, which the default size's py-2 would otherwise outrank
+        class: 'h-auto px-1 py-1.5',
       },
       /* `size: 'sm'` brings its own `rounded-lg`, emitted after the variant
        * and so winning the merge. A text-bearing header control keeps the

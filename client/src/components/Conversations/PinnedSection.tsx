@@ -720,12 +720,7 @@ const PinnedSection = ({
       >
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className={cn(
-            buttonVariants({ variant: 'section-header' }),
-            'group min-w-0 flex-1',
-            // NJ: Customize size and focus-ring
-            'text-sm focus-visible:ring-black dark:focus-visible:ring-text-primary',
-          )}
+          className={cn(buttonVariants({ variant: 'section-header' }), 'group min-w-0 flex-1')}
           type="button"
           aria-expanded={isExpanded}
         >
