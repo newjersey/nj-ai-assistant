@@ -37,6 +37,26 @@ jest.mock('@librechat/api', () => {
   const actualDataProvider = jest.requireActual('librechat-data-provider');
   const RetentionMode = actualDataProvider.RetentionMode ?? { ALL: 'all', TEMPORARY: 'temporary' };
   const getRetentionExpiry = jest.fn(() => ({}));
+  const createCodeApiRateLimitBudget = jest.fn(() => ({
+    limitMs: 20_000,
+    waitedMs: 0,
+    activeWaitEnds: new Set(),
+  }));
+  const getCodeApiUploadOptions = jest.fn(() => ({
+    scope: 'default:user-1',
+    concurrency: 3,
+    retryWaitMs: 20_000,
+  }));
+  const withCodeApiUploadRecovery = jest.fn(async ({ openSource, upload }) => {
+    try {
+      return await upload(await openSource());
+    } catch (error) {
+      if (error?.response?.status !== 429) {
+        throw error;
+      }
+      return upload(await openSource());
+    }
+  });
   const UPLOAD_EXTRACTED_TEXT_PLANS = {
     configuredOCR: 'configured_ocr',
     configuredRAG: 'configured_rag',
@@ -105,6 +125,9 @@ jest.mock('@librechat/api', () => {
     /** Grants both; these specs vary the capability set, not the role. */
     resolveToolRoleGrants: jest.fn(async () => ({ runCode: true, fileSearch: true })),
     parseText: jest.fn().mockResolvedValue({ text: '', bytes: 0 }),
+    /** Stores no fallback text unless a test opts in; its own rules are covered in packages/api. */
+    resolveUploadFallbackText: jest.fn(async () => undefined),
+    MAX_STORED_EXTRACTED_TEXT_BYTES: 15 * 1024 * 1024,
     processAudioFile: jest.fn(),
     extractInspectableFileText: jest.fn(async ({ extract }) => extract()),
     assertExtractedTextInspectable: jest.fn(),
@@ -131,6 +154,9 @@ jest.mock('@librechat/api', () => {
     }),
     getStorageMetadata: jest.fn(() => ({})),
     getRetentionExpiry,
+    createCodeApiRateLimitBudget,
+    getCodeApiUploadOptions,
+    withCodeApiUploadRecovery,
     getAgentFileRetentionExpiry: jest.fn(({ req, messageAttachment, toolResource }) => {
       const interfaceConfig = req?.config?.interfaceConfig;
       if (
@@ -145,6 +171,7 @@ jest.mock('@librechat/api', () => {
     }),
     sweepExpiredFiles: jest.fn().mockResolvedValue({ scanned: 0, deleted: 0, failed: 0 }),
     startExpiredFileSweep: jest.fn().mockReturnValue('sweep-interval'),
+    isLeader: jest.fn().mockResolvedValue(true),
   };
 });
 
@@ -259,6 +286,9 @@ const {
   extractInspectableFileText,
   assertExtractedTextInspectable,
   contentFilterBlockResponse,
+  createCodeApiRateLimitBudget,
+  getCodeApiUploadOptions,
+  withCodeApiUploadRecovery,
 } = require('@librechat/api');
 
 const PDF_MIME = 'application/pdf';
@@ -1346,6 +1376,33 @@ describe('processAgentFileUpload', () => {
       }).catch(() => {});
 
       expect(codeEnvUpload).toHaveBeenCalled();
+    });
+
+    it('retries a throttled eager upload with a fresh persisted stream', async () => {
+      const rateLimited = Object.assign(new Error('rate limited'), {
+        isAxiosError: true,
+        response: { status: 429, headers: { 'retry-after': '1' } },
+      });
+      const codeEnvUpload = setupCodeEnvUpload({ storage_session_id: 'sess-y', file_id: 'fid-y' });
+      codeEnvUpload
+        .mockRejectedValueOnce(rateLimited)
+        .mockResolvedValueOnce({ storage_session_id: 'sess-retry', file_id: 'fid-retry' });
+
+      await processAgentFileUpload({
+        req: agentsZipReq(),
+        res: mockRes,
+        metadata: {
+          agent_id: 'agent-abc',
+          tool_resource: EToolResources.execute_code,
+          file_id: 'file-throttled',
+        },
+      }).catch(() => {});
+
+      expect(getCodeApiUploadOptions).toHaveBeenCalledTimes(1);
+      expect(withCodeApiUploadRecovery).toHaveBeenCalledTimes(1);
+      expect(createCodeApiRateLimitBudget).toHaveBeenCalledTimes(1);
+      expect(codeEnvUpload).toHaveBeenCalledTimes(2);
+      expect(codeEnvUpload.mock.calls[0][0].stream).not.toBe(codeEnvUpload.mock.calls[1][0].stream);
     });
 
     it('defers an inferred file-search destination until tool execution', async () => {
@@ -2697,6 +2754,7 @@ describe('startExpiredFileSweep', () => {
       expect.objectContaining({
         sweepExpiredFiles: expect.any(Function),
         runAsSystem: expect.any(Function),
+        isLeader: expect.any(Function),
         logger: expect.objectContaining({
           error: expect.any(Function),
           info: expect.any(Function),
@@ -3133,5 +3191,106 @@ describe('filterFile endpoint resolution', () => {
     req.body.endpoint = 'Disabled Provider';
 
     expect(() => filterFile({ req, image: true, isAvatar: true })).not.toThrow();
+  });
+});
+
+describe('fallback text for uploads left to tools', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockRes.status.mockReturnThis();
+    mockRes.json.mockReturnValue({});
+    mergeFileConfig.mockReturnValue({
+      ...makeFileConfig(),
+      endpoints: {
+        'Custom Provider': {
+          defaultLLMDeliveryPath: { fallback: 'none' },
+          textFallbackWithoutTools: true,
+        },
+      },
+    });
+  });
+
+  const uploadCsv = (metadata) => {
+    const req = makeReq({ mimetype: 'text/csv', ocrConfig: null });
+    req.body.endpoint = EModelEndpoint.agents;
+    return {
+      req,
+      upload: processAgentFileUpload({
+        req,
+        res: mockRes,
+        metadata: {
+          agent_id: 'agent-abc',
+          message_file: 'true',
+          file_id: 'file-uuid-csv',
+          effectiveEndpoint: 'Custom Provider',
+          ...metadata,
+        },
+      }),
+    };
+  };
+
+  test('stores the text a turn without a reading tool can fall back to', async () => {
+    const { createFile } = require('~/models');
+    const { resolveUploadFallbackText } = require('@librechat/api');
+    setupStoredFileUpload();
+    resolveUploadFallbackText.mockResolvedValueOnce('region,total');
+
+    const { req, upload } = uploadCsv();
+    await upload;
+
+    expect(resolveUploadFallbackText).toHaveBeenCalledWith(
+      expect.objectContaining({
+        file: req.file,
+        fileId: 'file-uuid-csv',
+        deliveryPath: 'none',
+        destinationChosen: false,
+        isMessageAttachment: true,
+        endpointConfig: expect.objectContaining({ textFallbackWithoutTools: true }),
+      }),
+    );
+    expect(createFile).toHaveBeenCalledWith(
+      expect.objectContaining({ llmDeliveryPath: 'none', text: 'region,total' }),
+      true,
+    );
+  });
+
+  test('marks a legacy chooser upload as chosen, so no fallback text is extracted for it', async () => {
+    const { resolveUploadFallbackText } = require('@librechat/api');
+    mergeFileConfig.mockReturnValue({
+      ...makeFileConfig(),
+      endpoints: {
+        'Custom Provider': {
+          defaultLLMDeliveryPath: { fallback: 'none' },
+          textFallbackWithoutTools: true,
+          legacyFileUploadUX: true,
+        },
+      },
+    });
+    setupStoredFileUpload();
+
+    const { upload } = uploadCsv();
+    await upload;
+
+    expect(resolveUploadFallbackText).toHaveBeenCalledWith(
+      expect.objectContaining({ destinationChosen: true, isMessageAttachment: true }),
+    );
+  });
+
+  test('stores fallback text for an attachment filed under a tool a later turn may not run', async () => {
+    const { createFile } = require('~/models');
+    const { resolveUploadFallbackText } = require('@librechat/api');
+    setupStoredFileUpload();
+    resolveUploadFallbackText.mockResolvedValueOnce('region,total');
+
+    const { upload } = uploadCsv({ agentTools: [EToolResources.execute_code] });
+    await upload;
+
+    expect(resolveUploadFallbackText).toHaveBeenCalledWith(
+      expect.objectContaining({ destinationChosen: false, isMessageAttachment: true }),
+    );
+    expect(createFile).toHaveBeenCalledWith(
+      expect.objectContaining({ llmDeliveryPath: 'none', text: 'region,total' }),
+      true,
+    );
   });
 });

@@ -11,16 +11,19 @@ import store from '~/store';
 const showSplashPageState = atomWithLocalStorage('agentPanelSplashPage', true);
 
 export default function AgentPanelSwitch() {
+  const conversation = useRecoilValue(store.conversationByIndex(0));
+  const agentId = conversation?.agent_id ?? null;
   return (
-    <AgentPanelProvider>
-      <AgentPanelSwitchWithContext />
+    <AgentPanelProvider
+      observeToolAuthorization={conversation != null && !isEphemeralAgent(agentId)}
+    >
+      <AgentPanelSwitchWithContext agentId={agentId} />
     </AgentPanelProvider>
   );
 }
 
-function AgentPanelSwitchWithContext() {
+function AgentPanelSwitchWithContext({ agentId }: { agentId?: string | null }) {
   const { activePanel, setCurrentAgentId } = useAgentPanelContext();
-  const agentId = useRecoilValue(store.conversationAgentIdByIndex(0));
   const [showSplashPage, setShowSplashPage] = useRecoilState(showSplashPageState);
 
   useEffect(() => {
@@ -30,6 +33,7 @@ function AgentPanelSwitchWithContext() {
     }
   }, [setCurrentAgentId, agentId]);
 
+  // NJ: Show our agent builder splash page until dismissed
   if (showSplashPage) {
     return <AgentPanelSplash setShowSplashPage={setShowSplashPage} />;
   }
