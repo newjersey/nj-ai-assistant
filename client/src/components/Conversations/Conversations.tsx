@@ -134,12 +134,7 @@ const ChatsHeader: FC<ChatsHeaderProps> = memo(({ isExpanded, onToggle, trailing
     >
       <button
         onClick={onToggle}
-        className={cn(
-          buttonVariants({ variant: 'section-header' }),
-          'group min-w-0 flex-1',
-          // NJ: Larger heading text and our focus ring
-          'text-sm focus-visible:ring-black dark:focus-visible:ring-white',
-        )}
+        className={cn(buttonVariants({ variant: 'section-header' }), 'group min-w-0 flex-1')}
         type="button"
         aria-expanded={isExpanded}
       >

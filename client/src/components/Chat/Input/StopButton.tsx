@@ -22,6 +22,8 @@ export default memo(function StopButton({
           // NJ: Blue square matching the NJ send button, no composerSubmitClasses()
           className={cn(
             'h-8 w-8 rounded-md bg-[#0076D6] text-text-primary outline-offset-4 transition-all duration-200 disabled:cursor-not-allowed disabled:text-text-secondary disabled:opacity-10',
+            // NJ: The square stays 32px, so a transparent overlay carries the 44px thumb target
+            "relative touch:before:absolute touch:before:-inset-1.5 touch:before:content-['']",
           )}
           aria-label={localize('com_nav_stop_generating')}
           onClick={(e) => {

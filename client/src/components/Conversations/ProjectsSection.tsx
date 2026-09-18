@@ -152,8 +152,7 @@ const ProjectChatsInline = memo(function ProjectChatsInline({
           variant="ghost"
           size="sm"
           onClick={onShowAll}
-          // NJ: Our focus ring
-          className="ml-1 mt-0.5 h-auto rounded-md px-2 py-1 text-xs font-medium text-text-secondary outline-none transition-colors hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-black dark:focus-visible:ring-white"
+          className="ml-1 mt-0.5 h-auto rounded-md px-2 py-1 text-xs font-medium text-text-secondary transition-colors hover:text-text-primary"
         >
           {localize('com_ui_show_all')}
         </Button>
@@ -295,7 +294,7 @@ const ProjectItem = memo(
             onClick={() => setExpanded((prev) => !prev)}
             aria-expanded={expanded}
             aria-label={project.name}
-            className="flex min-w-0 flex-1 items-center gap-2 rounded-lg py-1.5 pl-1.5 pr-16 text-left outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-black dark:focus-visible:ring-white"
+            className="flex min-w-0 flex-1 items-center gap-2 rounded-lg py-1.5 pl-1.5 pr-16 text-left outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-text-primary"
           >
             <ChevronRight
               className={cn(
@@ -488,12 +487,7 @@ const ProjectsSection = ({ toggleNav, isAuthenticated }: ProjectsSectionProps) =
             setStoredExpanded(!isExpanded);
             setHasToggledSection(true);
           }}
-          className={cn(
-            buttonVariants({ variant: 'section-header' }),
-            'group min-w-0 flex-1',
-            // NJ: Larger heading text and our focus ring
-            'text-sm focus-visible:ring-black dark:focus-visible:ring-white',
-          )}
+          className={cn(buttonVariants({ variant: 'section-header' }), 'group min-w-0 flex-1')}
           aria-expanded={isExpanded}
         >
           <span className="select-none truncate">{localize('com_ui_projects')}</span>
