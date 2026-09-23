@@ -11,6 +11,10 @@ import {
   MOBILE_PANE_SHIFT,
 } from '~/components/UnifiedSidebar';
 import {
+  CodeHighlightThrottleContext,
+  normalizeCodeHighlightThrottleMs,
+} from '~/components/Chat/Messages/Content/Parts/useLazyHighlight';
+import {
   PromptGroupsProvider,
   AssistantsMapContext,
   AgentsMapContext,
@@ -129,6 +133,9 @@ export default function Root() {
   const { data: termsData } = useUserTermsQuery({
     enabled: isAuthenticated && config?.interface?.termsOfService?.modalAcceptance === true,
   });
+  const highlightThrottleMs = normalizeCodeHighlightThrottleMs(
+    config?.interface?.codeHighlightThrottleMs,
+  );
 
   useSearchEnabled(isAuthenticated);
 
@@ -152,6 +159,7 @@ export default function Root() {
   }
 
   return (
+<<<<<<< HEAD
     <SetConvoProvider>
       <FileMapContext.Provider value={fileMap}>
         <AssistantsMapContext.Provider value={assistantsMap}>
@@ -163,6 +171,16 @@ export default function Root() {
                 <Banner onHeightChange={setBannerHeight} />
                 {/* NJ: Flex to fill the space between the banner and the feedback widget */}
                 <div className="flex min-h-0 flex-1">
+=======
+    <CodeHighlightThrottleContext.Provider value={highlightThrottleMs}>
+      <SetConvoProvider>
+        <FileMapContext.Provider value={fileMap}>
+          <AssistantsMapContext.Provider value={assistantsMap}>
+            <AgentsMapContext.Provider value={agentsMap}>
+              <PromptGroupsProvider>
+                <Banner onHeightChange={setBannerHeight} />
+                <div className="flex" style={{ height: `calc(100dvh - ${bannerHeight}px)` }}>
+>>>>>>> upstream/main
                   <div
                     className="relative z-0 flex h-full w-full overflow-hidden"
                     /** The drawer and the pane both read this, so their travel
@@ -175,7 +193,14 @@ export default function Root() {
                       } as React.CSSProperties
                     }
                   >
+<<<<<<< HEAD
                     <UnifiedSidebar />
+=======
+                    {/* The drawer stops being painted once it is closed and
+                        settled, so it needs the same travel window the scrim and
+                        the pane's `inert` read. */}
+                    <UnifiedSidebar isSliding={isSliding} />
+>>>>>>> upstream/main
                     <div
                       ref={paneRef}
                       /** Focus target of last resort when the drawer closes on a
@@ -196,23 +221,29 @@ export default function Root() {
                     >
                       <Outlet />
                     </div>
+<<<<<<< HEAD
                   </div>
                   {/* Without the strip the scrim exists only for the travel:
+=======
+                    {/* Without the strip the scrim exists only for the travel:
+>>>>>>> upstream/main
                       through a close that began while the strip was still on
                       (disabling it unmounts the scrim at once, but the drawer
                       needs the whole transition to widen), and through an open
                       the deferred flip has not committed yet. Once expanded
                       lands, a full-width drawer covers it, so keeping it
                       mounted would only expose a duplicate dismiss control. */}
-                  {isSmallScreen && (drawerStrip || (isSliding && !sidebarExpanded)) && (
-                    <MobileDrawerScrim
-                      expanded={sidebarExpanded}
-                      isSliding={isSliding}
-                      prefersReducedMotion={prefersReducedMotion}
-                      onClick={onScrimClick}
-                    />
-                  )}
+                    {isSmallScreen && (drawerStrip || (isSliding && !sidebarExpanded)) && (
+                      <MobileDrawerScrim
+                        expanded={sidebarExpanded}
+                        isSliding={isSliding}
+                        prefersReducedMotion={prefersReducedMotion}
+                        onClick={onScrimClick}
+                      />
+                    )}
+                  </div>
                 </div>
+<<<<<<< HEAD
                 {/* For small screens, the widget blocks too much content, so hide then */}
                 <div className="hidden md:block">
                   <feedback-widget show-comment-disclaimer="false" skip-email-step="true" />
@@ -234,5 +265,24 @@ export default function Root() {
         </AssistantsMapContext.Provider>
       </FileMapContext.Provider>
     </SetConvoProvider>
+=======
+              </PromptGroupsProvider>
+              <KeyboardShortcutsProvider />
+            </AgentsMapContext.Provider>
+            {config?.interface?.termsOfService?.modalAcceptance === true && (
+              <TermsAndConditionsModal
+                open={showTerms}
+                onOpenChange={setShowTerms}
+                onAccept={handleAcceptTerms}
+                onDecline={handleDeclineTerms}
+                title={config.interface.termsOfService.modalTitle}
+                modalContent={config.interface.termsOfService.modalContent}
+              />
+            )}
+          </AssistantsMapContext.Provider>
+        </FileMapContext.Provider>
+      </SetConvoProvider>
+    </CodeHighlightThrottleContext.Provider>
+>>>>>>> upstream/main
   );
 }
