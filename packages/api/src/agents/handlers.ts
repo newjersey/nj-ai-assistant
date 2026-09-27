@@ -386,6 +386,7 @@ export interface ToolExecuteOptions {
      *  prior cache entry. */
     version: number;
     fileCount: number;
+    source?: 'inline' | 'github' | 'notion' | 'deployment';
     /** True for deployment-directory skills that are loaded in memory. */
     deployment?: boolean;
     /**
@@ -420,6 +421,7 @@ export interface ToolExecuteOptions {
     _id: Types.ObjectId;
     version: number;
     fileCount: number;
+    source?: 'inline' | 'github' | 'notion' | 'deployment';
     disableModelInvocation?: boolean;
   } | null>;
   /** Creates a skill from a tool-authored SKILL.md body. */
@@ -481,6 +483,8 @@ export interface ToolExecuteOptions {
     relativePath: string;
     content: string;
     mimeType: string;
+    expectedFileId?: string;
+    createOnly: boolean;
   }) => Promise<{
     bytes: number;
     relativePath: string;
@@ -535,6 +539,7 @@ export interface ToolExecuteOptions {
     skillId: Types.ObjectId | string,
     relativePath: string,
   ) => Promise<{
+    file_id?: string;
     content?: string;
     isBinary?: boolean;
     mimeType: string;
@@ -548,6 +553,7 @@ export interface ToolExecuteOptions {
     skillId: Types.ObjectId | string,
     relativePath: string,
     update: { content?: string; isBinary?: boolean },
+    expectedFileId?: string,
   ) => Promise<void>;
   /** Reads a bounded text range from an attached worker's logical workspace. */
   readWorkspaceFile?: (params: {
@@ -1025,12 +1031,12 @@ type MatchStatus =
   | { status: 'ambiguous'; strategy: string; count: number };
 
 type LoadedSkillText =
-  | { status: 'loaded'; content: string; bytes: number }
+  | { status: 'loaded'; content: string; bytes: number; fileId?: string }
   | { status: 'missing' }
   | { status: 'error'; message: string };
 
 type ExistingSkillFile =
-  | { status: 'present'; oldContent?: string }
+  | { status: 'present'; oldContent?: string; fileId?: string }
   | { status: 'missing' }
   | { status: 'error'; message: string };
 
@@ -3462,6 +3468,7 @@ async function loadSkillFileTextForAuthoring({
       status: 'loaded',
       content: file.content,
       bytes: Buffer.byteLength(file.content, 'utf8'),
+      fileId: file.file_id,
     };
   }
   if (file.bytes > MAX_CACHE_BYTES) {
@@ -3504,7 +3511,7 @@ async function loadSkillFileTextForAuthoring({
   for (let i = 0; i < checkLen; i++) {
     if (buffer[i] === 0) {
       if (updateSkillFileContent) {
-        updateSkillFileContent(skill._id, relativePath, { isBinary: true }).catch(
+        updateSkillFileContent(skill._id, relativePath, { isBinary: true }, file.file_id).catch(
           (err: unknown) => {
             logAxiosError({
               message: '[loadSkillFileTextForAuthoring] cache write failed',
@@ -3519,16 +3526,19 @@ async function loadSkillFileTextForAuthoring({
 
   const text = buffer.toString('utf-8');
   if (updateSkillFileContent) {
-    updateSkillFileContent(skill._id, relativePath, { content: text, isBinary: false }).catch(
-      (err: unknown) => {
-        logAxiosError({
-          message: '[loadSkillFileTextForAuthoring] cache write failed',
-          error: err,
-        });
-      },
-    );
+    updateSkillFileContent(
+      skill._id,
+      relativePath,
+      { content: text, isBinary: false },
+      file.file_id,
+    ).catch((err: unknown) => {
+      logAxiosError({
+        message: '[loadSkillFileTextForAuthoring] cache write failed',
+        error: err,
+      });
+    });
   }
-  return { status: 'loaded', content: text, bytes: buffer.length };
+  return { status: 'loaded', content: text, bytes: buffer.length, fileId: file.file_id };
 }
 
 async function inspectBundledSkillFileForCreate({
@@ -3552,13 +3562,13 @@ async function inspectBundledSkillFileForCreate({
     return { status: 'missing' };
   }
   if (file.isBinary === true || file.bytes > MAX_CACHE_BYTES) {
-    return { status: 'present' };
+    return { status: 'present', fileId: file.file_id };
   }
   if (file.content != null && file.content !== '') {
-    return { status: 'present', oldContent: file.content };
+    return { status: 'present', oldContent: file.content, fileId: file.file_id };
   }
   if (!options.getStrategyFunctions || !req) {
-    return { status: 'present' };
+    return { status: 'present', fileId: file.file_id };
   }
 
   const loaded = await loadSkillFileTextForAuthoring({
@@ -3571,9 +3581,9 @@ async function inspectBundledSkillFileForCreate({
     return { status: 'missing' };
   }
   if (loaded.status === 'error') {
-    return { status: 'present' };
+    return { status: 'present', fileId: file.file_id };
   }
-  return { status: 'present', oldContent: loaded.content };
+  return { status: 'present', oldContent: loaded.content, fileId: loaded.fileId };
 }
 
 async function ensureBundledSkillVersionCurrent({
@@ -3791,6 +3801,7 @@ async function writeBundledSkillFile({
   displayPath,
   content,
   oldContent,
+  fileId,
   created,
 }: {
   tc: ToolCallRequest;
@@ -3801,6 +3812,7 @@ async function writeBundledSkillFile({
   displayPath: string;
   content: string;
   oldContent?: string;
+  fileId?: string;
   created: boolean;
 }): AuthoringResult {
   const editDenied = await ensureCanEditSkill(tc, options, req, skill._id);
@@ -3809,6 +3821,15 @@ async function writeBundledSkillFile({
   }
   if (!req || !options.saveSkillFileContent) {
     return errorResult(tc, 'Skill file writing is not configured.');
+  }
+  if (skill.source != null && skill.source !== 'inline') {
+    return errorResult(tc, 'Externally managed skill files are read-only.');
+  }
+  if (!created && !fileId) {
+    return errorResult(
+      tc,
+      `File revision unavailable for ${displayPath}. Re-read the file and retry.`,
+    );
   }
   const staleDenied = await ensureBundledSkillVersionCurrent({
     tc,
@@ -3846,13 +3867,27 @@ async function writeBundledSkillFile({
     diff = undefined;
   }
 
-  await options.saveSkillFileContent({
-    req,
-    skillId: skill._id,
-    relativePath,
-    content,
-    mimeType: guessMimeType(relativePath),
-  });
+  try {
+    await options.saveSkillFileContent({
+      req,
+      skillId: skill._id,
+      relativePath,
+      content,
+      mimeType: guessMimeType(relativePath),
+      expectedFileId: fileId,
+      createOnly: created,
+    });
+  } catch (error) {
+    if (error instanceof Error && 'code' in error && error.code === 'SKILL_FILE_CONFLICT') {
+      return errorResult(
+        tc,
+        created
+          ? `File already exists: ${displayPath}. Re-read it and pass overwrite: true to replace.`
+          : `Skill file changed while editing. Re-read ${displayPath} and retry.`,
+      );
+    }
+    throw error;
+  }
   const action = created ? 'Created' : 'Updated';
   const summary = `${action} ${displayPath} (${content.length} chars).`;
   return successResult(tc, diff ? `${summary}\n\n${diff}` : summary, {
@@ -4355,6 +4390,7 @@ async function handleCreateFileCall(
     displayPath: parsed.displayPath,
     content: args.content,
     oldContent: current.status === 'present' ? current.oldContent : undefined,
+    fileId: current.status === 'present' ? current.fileId : undefined,
     created: current.status === 'missing',
   });
 }
@@ -4482,6 +4518,7 @@ async function handleEditFileCall(
     displayPath: parsed.displayPath,
     content: edited.content,
     oldContent: current.content,
+    fileId: current.fileId,
     created: false,
   });
   if (result.status === 'success') {
@@ -4975,7 +5012,7 @@ async function handleReadFileCall(
     if (isBinary) {
       // Cache the binary flag (first read only)
       if (file.isBinary == null && updateSkillFileContent) {
-        updateSkillFileContent(skill._id, relativePath, { isBinary: true }).catch(
+        updateSkillFileContent(skill._id, relativePath, { isBinary: true }, file.file_id).catch(
           (err: unknown) => {
             logAxiosError({
               message: '[handleReadFileCall] cache write failed',
@@ -5021,14 +5058,17 @@ async function handleReadFileCall(
 
     // Cache text on first read (skill files are immutable)
     if (file.content == null && updateSkillFileContent && buffer.length <= MAX_CACHE_BYTES) {
-      updateSkillFileContent(skill._id, relativePath, { content: text, isBinary: false }).catch(
-        (err: unknown) => {
-          logAxiosError({
-            message: '[handleReadFileCall] cache write failed',
-            error: err,
-          });
-        },
-      );
+      updateSkillFileContent(
+        skill._id,
+        relativePath,
+        { content: text, isBinary: false },
+        file.file_id,
+      ).catch((err: unknown) => {
+        logAxiosError({
+          message: '[handleReadFileCall] cache write failed',
+          error: err,
+        });
+      });
     }
 
     if (buffer.length > MAX_READABLE_BYTES) {
