@@ -97,6 +97,11 @@ import {
   isFileResourceToolName,
 } from './tools';
 import {
+  BACKGROUND_TASK_ABORT_GRACE_MS,
+  BACKGROUND_TASK_SHUTDOWN_MESSAGE,
+  BACKGROUND_TOOL_PRODUCER_HEARTBEAT_MS,
+} from './backgroundCompletion';
+import {
   createCodeApiRateLimitBudget,
   isAbortError,
   logAxiosError,
@@ -109,10 +114,6 @@ import {
   contentFilterModelBoundBlockResponse,
   isContentFilterError,
 } from '~/middleware/contentFilter';
-import {
-  BACKGROUND_TASK_ABORT_GRACE_MS,
-  BACKGROUND_TOOL_PRODUCER_HEARTBEAT_MS,
-} from './backgroundCompletion';
 import {
   WorkspaceToolHttpError,
   WORKSPACE_EDIT_MAX_COUNT,
@@ -5888,7 +5889,7 @@ export function createToolExecuteHandler(options: ToolExecuteOptions): EventHand
                 };
               }
               const backgroundAbortController = new AbortController();
-              let backgroundAbortSource: 'manual' | 'timeout' | undefined;
+              let backgroundAbortSource: 'manual' | 'timeout' | 'shutdown' | undefined;
               const created = backgroundTaskRegistry.create({
                 ...(detachedReservation?.status === 'reserved'
                   ? { taskId: detachedReservation.taskId }
@@ -5959,6 +5960,62 @@ export function createToolExecuteHandler(options: ToolExecuteOptions): EventHand
                     );
                   }
                 }
+                let durableReceiptWrite: Promise<boolean> | undefined;
+                let durableReceiptAmbiguous = false;
+                let durableResultConfirmed = false;
+                let resolveDurableReceipt: () => void = () => undefined;
+                const durableReceiptSettled = new Promise<void>((resolve) => {
+                  resolveDurableReceipt = resolve;
+                });
+                const confirmDurableResult = (): void => {
+                  durableResultConfirmed = true;
+                  resolveDurableReceipt();
+                };
+                /** One durable receipt per task. The task's own settlement and a
+                 *  shutdown flush share the first write, so neither can retire or
+                 *  contradict a receipt the other already stored. */
+                const writeDurableReceipt = (receipt: {
+                  status: 'completed' | 'error' | 'cancelled';
+                  output?: string;
+                  settledAt: Date;
+                }): Promise<boolean> => {
+                  if (durableReceiptWrite != null) {
+                    return durableReceiptWrite;
+                  }
+                  durableReceiptWrite = (async (): Promise<boolean> => {
+                    if (completionAdmission?.persistResult == null) {
+                      return false;
+                    }
+                    try {
+                      return await completionAdmission.persistResult({
+                        status: receipt.status,
+                        output: truncateMiddle(
+                          receipt.output ?? '',
+                          backgroundCompletionResultMaxChars,
+                        ),
+                        settledAt: receipt.settledAt,
+                      });
+                    } catch (receiptError) {
+                      durableReceiptAmbiguous = true;
+                      logger.warn(
+                        `[background] Failed to persist independent result receipt for task ${task.id}:`,
+                        receiptError,
+                      );
+                      return false;
+                    }
+                  })();
+                  void durableReceiptWrite.then((written) => {
+                    if (written) {
+                      confirmDurableResult();
+                    }
+                  });
+                  return durableReceiptWrite;
+                };
+                /** The task's own terminal result, recorded before its (possibly slow)
+                 *  persistence starts, so a shutdown flush can store it durably. */
+                let settledReceipt:
+                  | { status: 'completed' | 'error' | 'cancelled'; output?: string }
+                  | undefined;
                 /** Persists the settled result onto the dispatch turn's message
                  *  (patch the tool-call part's output, persist generated files,
                  *  append attachments), so a backgrounded code call reads like a
@@ -6021,37 +6078,18 @@ export function createToolExecuteHandler(options: ToolExecuteOptions): EventHand
                   );
                   const backgroundTask = resolveBackgroundTask();
                   let durableReceiptReady = false;
-                  let durableReceiptAmbiguous = false;
-                  const persistDurableReceipt = async (receipt: {
+                  const persistDurableReceipt = (receipt: {
                     status: 'completed' | 'error' | 'cancelled';
                     output?: string;
-                  }): Promise<boolean> => {
-                    if (completionAdmission?.persistResult == null) {
-                      return false;
-                    }
-                    try {
-                      return await completionAdmission.persistResult({
-                        status: receipt.status,
-                        output: truncateMiddle(
-                          receipt.output ?? '',
-                          backgroundCompletionResultMaxChars,
-                        ),
-                        settledAt: backgroundTask.settledAt,
-                      });
-                    } catch (receiptError) {
-                      durableReceiptAmbiguous = true;
-                      logger.warn(
-                        `[background] Failed to persist independent result receipt for task ${task.id}:`,
-                        receiptError,
-                      );
-                      return false;
-                    }
-                  };
+                  }): Promise<boolean> =>
+                    writeDurableReceipt({ ...receipt, settledAt: backgroundTask.settledAt });
                   const retireFailedPersistence = async (
                     reason: string,
                     certainty: 'definite' | 'ambiguous',
                   ): Promise<void> => {
-                    if (durableReceiptAmbiguous) {
+                    /** Never retire a delivery that already holds a durable receipt,
+                     *  including one a shutdown flush stored ahead of this path. */
+                    if (durableReceiptAmbiguous || (await durableReceiptWrite) === true) {
                       return;
                     }
                     if (completionAdmission == null) {
@@ -6136,6 +6174,7 @@ export function createToolExecuteHandler(options: ToolExecuteOptions): EventHand
                           'definite',
                         );
                       } else if (deliveryReady && !durableReceiptReady) {
+                        confirmDurableResult();
                         completionAdmission?.expedite?.();
                       }
                     } catch (persistError) {
@@ -6207,6 +6246,9 @@ export function createToolExecuteHandler(options: ToolExecuteOptions): EventHand
                         output: params.output ?? localTask?.result,
                       });
                     }
+                    if (persisted.deliveryReady !== false) {
+                      confirmDurableResult();
+                    }
                     if (persisted.deliveryReady === false) {
                       await retireFailedPersistence(
                         'background code result was not persisted',
@@ -6269,6 +6311,7 @@ export function createToolExecuteHandler(options: ToolExecuteOptions): EventHand
                   artifact?: unknown;
                   status: 'completed' | 'error' | 'cancelled';
                 }): Promise<void> => {
+                  settledReceipt = { status: params.status, output: params.output };
                   /** Held for the whole persist, including a code harvest that waits for
                    *  a long dispatch turn, so retention pressure cannot evict the task. */
                   backgroundTaskRegistry.markCompletionPersistencePending(
@@ -6431,7 +6474,7 @@ export function createToolExecuteHandler(options: ToolExecuteOptions): EventHand
                   }, BACKGROUND_TASK_ABORT_GRACE_MS);
                   producerRetirementTimeout.unref?.();
                 };
-                void (async () => {
+                const settlement = (async () => {
                   try {
                     const result = await withBackgroundTaskTimeout(
                       invokePromise,
@@ -6552,7 +6595,12 @@ export function createToolExecuteHandler(options: ToolExecuteOptions): EventHand
                         backgroundControlEnabled,
                       ),
                     );
-                    const errorOutput = policyError ?? message;
+                    /** Tools report an abort in their own words; a shutdown interrupt
+                     *  tells the agent why it happened and that it may retry. */
+                    const errorOutput =
+                      backgroundAbortSource === 'shutdown'
+                        ? BACKGROUND_TASK_SHUTDOWN_MESSAGE
+                        : (policyError ?? message);
                     const filteredError =
                       policyError == null
                         ? filteredToolOutputResult(tc, backgroundReq, {
@@ -6621,6 +6669,64 @@ export function createToolExecuteHandler(options: ToolExecuteOptions): EventHand
                     await stopProducerHeartbeat();
                   }
                 })();
+                void settlement.then(
+                  () => {
+                    if (completionAdmission?.persistResult == null || !completionPreregistered) {
+                      resolveDurableReceipt();
+                    }
+                  },
+                  () => undefined,
+                );
+                backgroundTaskRegistry.trackShutdown(task, {
+                  settled: durableReceiptSettled,
+                  interrupt: (reason) => {
+                    if (backgroundAbortSource != null || backgroundAbortController.signal.aborted) {
+                      return;
+                    }
+                    backgroundAbortSource = 'shutdown';
+                    backgroundAbortController.abort(new DOMException(reason, 'AbortError'));
+                  },
+                  flush: async (reason) => {
+                    await stopProducerHeartbeat();
+                    if (durableReceiptWrite != null) {
+                      await durableReceiptWrite;
+                    } else if (settledReceipt != null) {
+                      await writeDurableReceipt({ ...settledReceipt, settledAt: new Date() });
+                    } else {
+                      const failure = toBackgroundToolFailure(tc.name, reason);
+                      backgroundTaskRegistry.fail(
+                        backgroundUserId,
+                        backgroundConversationId,
+                        task.id,
+                        isCodeCall ? failure : reason,
+                        { harvestStarted: harvestEnabled },
+                      );
+                      try {
+                        await persistDetachedTerminal({ status: 'failed', error: failure });
+                      } catch (detachedError) {
+                        logger.warn(
+                          `[background] Failed to settle detached action for interrupted task ${task.id}:`,
+                          detachedError,
+                        );
+                      }
+                      await writeDurableReceipt({
+                        status: 'error',
+                        output: failure,
+                        settledAt: new Date(),
+                      });
+                    }
+                    if (durableResultConfirmed || completionAdmission?.persistResult == null) {
+                      return;
+                    }
+                    if (settledReceipt != null) {
+                      await settlement;
+                      if (durableResultConfirmed) {
+                        return;
+                      }
+                    }
+                    throw new Error(`Background task ${task.id} has no durable shutdown result`);
+                  },
+                });
                 if (
                   detachedReservation?.status === 'reserved' &&
                   eventActorDetachedAction != null &&
