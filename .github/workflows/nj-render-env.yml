@@ -64,6 +64,8 @@ jobs:
           export GUARDRAIL_ID="${{ secrets.GUARDRAIL_ID }}"
           export GUARDRAIL_VERSION="${{ secrets.GUARDRAIL_VERSION }}"
           export MEILI_MASTER_KEY="${{ secrets.MEILI_MASTER_KEY }}"
+          export CREDS_KEY="${{ secrets.CREDS_KEY }}"
+          export CREDS_IV="${{ secrets.CREDS_IV }}"
 
           # Export overrides per-environment (`set -a` auto-exports)
           # (Exported after secrets because kitchensink overrides DOMAIN and blanks out the OPENID vars)
