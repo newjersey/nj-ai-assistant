@@ -1299,6 +1299,15 @@ export const codeEnvironmentUserConfigSchema = z
       })
       .strict()
       .optional(),
+    edits: z
+      .object({
+        /** Whether a worker that negotiated `tolerant_match` may fall back from exact matching
+         * to whitespace-tolerant strategies, as skill and sandbox edits already do. Omission
+         * allows it; `false` requires every attached-workspace edit to match exactly. */
+        tolerantMatching: z.boolean().optional(),
+      })
+      .strict()
+      .optional(),
   })
   .strict();
 
