@@ -1,5 +1,6 @@
 import {
   CODE_ENVIRONMENT_ADMISSION_MAX_MS,
+  CODE_ENVIRONMENT_COMMAND_ADMISSION_DEFAULT_MS,
   CODE_ENVIRONMENT_QUEUE_WAIT_DEFAULT_MS,
   CODE_ENVIRONMENT_REQUEST_TIMEOUT_HARD_MAX_MS,
 } from 'librechat-data-provider';
@@ -31,6 +32,24 @@ const WORKSPACE_QUEUE_WAIT_HEADER = 'X-LibreChat-Workspace-Queue-Wait-Ms';
 export const WORKSPACE_QUEUE_MAX_WAIT_MS: number = CODE_ENVIRONMENT_QUEUE_WAIT_DEFAULT_MS;
 const WORKSPACE_QUEUE_RETRY_DELAY_MS = 1_000;
 const WORKSPACE_COMMAND_SETTLEMENT_GRACE_MS = 5_000;
+
+/**
+ * Longest command timeout a total HTTP budget can carry: the budget minus settlement and delivery
+ * grace and a minimum admission allowance. A command whose reserve reaches the budget is refused
+ * before dispatch, so a larger ceiling would only advertise timeouts that can never start.
+ */
+export function fitWorkspaceCommandTimeoutToBudget(
+  maxRequestTimeoutMs: number,
+  minCommandAdmissionMs: number = CODE_ENVIRONMENT_COMMAND_ADMISSION_DEFAULT_MS,
+): number {
+  return Math.max(
+    1,
+    maxRequestTimeoutMs -
+      WORKSPACE_COMMAND_SETTLEMENT_GRACE_MS -
+      WORKSPACE_COMMAND_TRANSPORT_GRACE_MS -
+      minCommandAdmissionMs,
+  );
+}
 const MAX_RESPONSE_BYTES = 4 * 1024 * 1024;
 const MAX_ERROR_BODY_BYTES = 4096;
 const ERROR_BODY_TIMEOUT_MS = 1000;
