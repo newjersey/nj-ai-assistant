@@ -867,6 +867,7 @@ export type AgentModelParameters = {
   frequency_penalty: AgentParameterValue;
   presence_penalty: AgentParameterValue;
   useResponsesApi?: boolean;
+  web_search?: boolean;
 };
 
 export interface AgentBaseResource {
@@ -1010,6 +1011,7 @@ export type Agent = {
   code_environment_id?: string | null;
   /** Default attached workspace for new chats; empty means no agent default. */
   code_workspace_id?: string;
+  repositoryInstructions?: 'prefer' | 'defer' | 'off';
   /** Non-secret Git authorship injected into this agent's sandboxed commands. */
   git_identity?: AgentGitIdentity | null;
   artifacts?: ArtifactModes;
@@ -1074,6 +1076,7 @@ export type AgentCreateParams = {
   | 'stateful_code_environment'
   | 'code_environment_id'
   | 'code_workspace_id'
+  | 'repositoryInstructions'
   | 'artifacts'
   | 'recursion_limit'
   | 'category'
@@ -1109,6 +1112,7 @@ export type AgentUpdateParams = {
   | 'code_environment_id'
   | 'git_identity'
   | 'code_workspace_id'
+  | 'repositoryInstructions'
   | 'artifacts'
   | 'recursion_limit'
   | 'category'
