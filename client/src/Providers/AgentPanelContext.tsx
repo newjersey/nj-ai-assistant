@@ -53,6 +53,7 @@ export function AgentPanelProvider({
       activateCatalog('mcpTools');
     }
   }, [panelVisible]);
+  const observeVisibleToolAuthorization = panelVisible && observeToolAuthorization;
   const [mcp, setMcp] = useState<MCP | undefined>(undefined);
   const [mcps, setMcps] = useState<MCP[] | undefined>(undefined);
   const [action, setAction] = useState<Action | undefined>(undefined);
@@ -61,7 +62,7 @@ export function AgentPanelProvider({
   const returnFocusRef = useRef<Panel | null>(null);
   const [agent_id, setCurrentAgentId] = useState<string | undefined>(undefined);
   const { availableMCPServers, isLoading, availableMCPServersMap, connectionStatus } =
-    useMCPServerManager({ observeToolAuthorization });
+    useMCPServerManager({ observeToolAuthorization: observeVisibleToolAuthorization });
   const { data: startupConfig } = useGetStartupConfig();
   const { data: actions } = useGetActionsQuery(EModelEndpoint.agents, {
     enabled: observeToolAuthorization,
@@ -74,9 +75,8 @@ export function AgentPanelProvider({
   const mcpToolsReady = useCatalogReady('mcpTools');
   useMCPRefresh({
     enabled:
-      panelVisible &&
       mcpToolsReady &&
-      observeToolAuthorization &&
+      observeVisibleToolAuthorization &&
       !isLoading &&
       availableMCPServers.length > 0,
     tools: true,
@@ -84,7 +84,7 @@ export function AgentPanelProvider({
   const { data: mcpData, isFetching: mcpToolsFetching } = useMCPToolsQuery({
     enabled:
       mcpToolsReady &&
-      observeToolAuthorization &&
+      observeVisibleToolAuthorization &&
       !isLoading &&
       availableMCPServers != null &&
       availableMCPServers.length > 0,
