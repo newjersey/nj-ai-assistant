@@ -1,12 +1,26 @@
 import './helpers/setupCredsEnv';
 import { logger } from '@librechat/data-schemas';
 import { setImmediate as realSetImmediate } from 'timers';
+<<<<<<< HEAD
+=======
+import {
+  DEFAULT_MCP_APPS_POLICY,
+  DEFAULT_MCP_APP_PERSISTED_BYTES,
+  DEFAULT_MCP_APP_ADMISSION_REQUESTS_PER_MINUTE,
+  DEFAULT_MCP_APP_MAX_ACTIVE_VIEWS,
+  DEFAULT_MCP_APP_ACTION_PREVIEW_CHARS,
+} from 'librechat-data-provider';
+>>>>>>> upstream/main
 import type * as t from '~/mcp/types';
 import {
   MCPServersRegistry,
   MCPConfigInitializationCanceledError,
 } from '~/mcp/registry/MCPServersRegistry';
 import { ServerConfigsCacheInMemory } from '~/mcp/registry/cache/ServerConfigsCacheInMemory';
+<<<<<<< HEAD
+=======
+import { getMCPAppToolsPublicationGeneration } from '~/mcp/toolsChanged';
+>>>>>>> upstream/main
 import { MCPServerInspector } from '~/mcp/registry/MCPServerInspector';
 import { MCPInspectionFailedError } from '~/mcp/errors';
 import { processMCPEnv } from '~/utils/env';
@@ -516,10 +530,25 @@ describe('MCPServersRegistry', () => {
       resolver?: (ctx?: { userId?: string; role?: string }) => Promise<{
         allowedDomains?: string[] | null;
         allowedAddresses?: string[] | null;
+<<<<<<< HEAD
       }>,
     ): MCPServersRegistry => {
       (MCPServersRegistry as unknown as { instance: undefined }).instance = undefined;
       MCPServersRegistry.createInstance(mockMongoose, allowedDomains, allowedAddresses, resolver);
+=======
+        mcpApps: { enabled: boolean; legacyHtmlEnabled: boolean };
+      }>,
+      mcpApps?: { enabled: boolean; legacyHtmlEnabled: boolean },
+    ): MCPServersRegistry => {
+      (MCPServersRegistry as unknown as { instance: undefined }).instance = undefined;
+      MCPServersRegistry.createInstance(
+        mockMongoose,
+        allowedDomains,
+        allowedAddresses,
+        resolver,
+        mcpApps,
+      );
+>>>>>>> upstream/main
       return MCPServersRegistry.getInstance();
     };
 
@@ -529,6 +558,17 @@ describe('MCPServersRegistry', () => {
         allowedDomains: ['yaml.com'],
         allowedAddresses: ['10.0.0.0/8'],
         useSSRFProtection: false,
+<<<<<<< HEAD
+=======
+        mcpApps: {
+          enabled: false,
+          legacyHtmlEnabled: true,
+          maxPersistedAppBytes: DEFAULT_MCP_APP_PERSISTED_BYTES,
+          maxAdmissionRequestsPerMinute: DEFAULT_MCP_APP_ADMISSION_REQUESTS_PER_MINUTE,
+          maxActiveViews: DEFAULT_MCP_APP_MAX_ACTIVE_VIEWS,
+          maxActionPreviewChars: DEFAULT_MCP_APP_ACTION_PREVIEW_CHARS,
+        },
+>>>>>>> upstream/main
       });
     });
 
@@ -538,6 +578,17 @@ describe('MCPServersRegistry', () => {
         allowedDomains: undefined,
         allowedAddresses: undefined,
         useSSRFProtection: true,
+<<<<<<< HEAD
+=======
+        mcpApps: {
+          enabled: false,
+          legacyHtmlEnabled: true,
+          maxPersistedAppBytes: DEFAULT_MCP_APP_PERSISTED_BYTES,
+          maxAdmissionRequestsPerMinute: DEFAULT_MCP_APP_ADMISSION_REQUESTS_PER_MINUTE,
+          maxActiveViews: DEFAULT_MCP_APP_MAX_ACTIVE_VIEWS,
+          maxActionPreviewChars: DEFAULT_MCP_APP_ACTION_PREVIEW_CHARS,
+        },
+>>>>>>> upstream/main
       });
     });
 
@@ -545,6 +596,10 @@ describe('MCPServersRegistry', () => {
       const resolver = jest.fn().mockResolvedValue({
         allowedDomains: ['admin-added.com'],
         allowedAddresses: ['172.16.0.0/12'],
+<<<<<<< HEAD
+=======
+        mcpApps: { enabled: true, legacyHtmlEnabled: true },
+>>>>>>> upstream/main
       });
       const reg = createWith(['yaml.com'], null, resolver);
 
@@ -555,6 +610,7 @@ describe('MCPServersRegistry', () => {
         allowedDomains: ['admin-added.com'],
         allowedAddresses: ['172.16.0.0/12'],
         useSSRFProtection: false,
+<<<<<<< HEAD
       });
     });
 
@@ -562,10 +618,26 @@ describe('MCPServersRegistry', () => {
       const resolver = jest.fn().mockRejectedValue(new Error('DB down'));
       const reg = createWith(['yaml.com'], null, resolver);
 
+=======
+        mcpApps: { enabled: true, legacyHtmlEnabled: true },
+      });
+    });
+
+    it('falls back to the YAML base allowlists but disables apps when the resolver throws', async () => {
+      const resolver = jest.fn().mockRejectedValue(new Error('DB down'));
+      const reg = createWith(['yaml.com'], null, resolver);
+
+      // Allowlists fall back to the operator baseline; apps fail closed because inline app HTML
+      // cannot be retracted once it reaches the transcript.
+>>>>>>> upstream/main
       await expect(reg.resolveAllowlists()).resolves.toEqual({
         allowedDomains: ['yaml.com'],
         allowedAddresses: null,
         useSSRFProtection: false,
+<<<<<<< HEAD
+=======
+        mcpApps: DEFAULT_MCP_APPS_POLICY,
+>>>>>>> upstream/main
       });
     });
 
@@ -573,6 +645,10 @@ describe('MCPServersRegistry', () => {
       const resolver = jest.fn().mockResolvedValue({
         allowedDomains: ['admin-added.com'],
         allowedAddresses: ['10.0.0.0/8'],
+<<<<<<< HEAD
+=======
+        mcpApps: { enabled: true, legacyHtmlEnabled: true },
+>>>>>>> upstream/main
       });
       const reg = createWith(['yaml-only.com'], null, resolver);
       const inspectSpy = jest.spyOn(MCPServerInspector, 'inspect');
@@ -617,6 +693,106 @@ describe('MCPServersRegistry', () => {
     });
   });
 
+<<<<<<< HEAD
+=======
+  describe('resolveCachedAppServerConfig', () => {
+    const rawConfig: t.MCPOptions = {
+      type: 'streamable-http',
+      url: 'https://config.example.com/mcp',
+    };
+    const allowlists = {
+      allowedDomains: ['config.example.com'],
+      allowedAddresses: null,
+    };
+
+    it('returns an exact healthy config-cache target without inspecting or connecting', async () => {
+      const cachedConfig = {
+        ...rawConfig,
+        source: 'config' as const,
+        requiresOAuth: false,
+      } as t.ParsedServerConfig;
+      const key = registry['configCacheKey']('srv', rawConfig, allowlists);
+      const { config: storedCachedConfig } = await registry['configCacheRepo'].add(
+        key,
+        cachedConfig,
+      );
+      const inspectSpy = jest.spyOn(MCPServerInspector, 'inspect');
+      inspectSpy.mockClear();
+
+      await expect(
+        registry.resolveCachedAppServerConfig({
+          serverName: 'srv',
+          userId: 'user-1',
+          role: 'USER',
+          mcpConfig: { srv: rawConfig },
+          ...allowlists,
+        }),
+      ).resolves.toEqual({
+        serverConfig: storedCachedConfig,
+        connectionOwner: 'principal',
+      });
+      expect(inspectSpy).not.toHaveBeenCalled();
+    });
+
+    it('keeps an absent or failed config-cache target unavailable instead of using a same-name base', async () => {
+      await registry['cacheConfigsRepo'].add('srv', {
+        type: 'streamable-http',
+        url: 'https://base.example.com/mcp',
+        requiresOAuth: false,
+        source: 'yaml',
+      });
+
+      await expect(
+        registry.resolveCachedAppServerConfig({
+          serverName: 'srv',
+          userId: 'user-1',
+          role: 'USER',
+          mcpConfig: { srv: rawConfig },
+          ...allowlists,
+        }),
+      ).resolves.toBeUndefined();
+
+      const key = registry['configCacheKey']('srv', rawConfig, allowlists);
+      await registry['configCacheRepo'].add(key, {
+        ...rawConfig,
+        source: 'config',
+        inspectionFailed: true,
+      } as t.ParsedServerConfig);
+      await expect(
+        registry.resolveCachedAppServerConfig({
+          serverName: 'srv',
+          userId: 'user-1',
+          role: 'USER',
+          mcpConfig: { srv: rawConfig },
+          ...allowlists,
+        }),
+      ).resolves.toBeUndefined();
+    });
+
+    it('uses the operator target for an admitted unmodified YAML config', async () => {
+      const yamlConfig = {
+        ...rawConfig,
+        source: 'yaml' as const,
+        requiresOAuth: false,
+      } as t.ParsedServerConfig;
+      const { config: storedYamlConfig } = await registry['cacheConfigsRepo'].add(
+        'srv',
+        yamlConfig,
+      );
+
+      await expect(
+        registry.resolveCachedAppServerConfig({
+          serverName: 'srv',
+          userId: 'user-1',
+          role: 'USER',
+          mcpConfig: { srv: rawConfig },
+          ...allowlists,
+        }),
+      ).resolves.toEqual({ serverConfig: storedYamlConfig, connectionOwner: 'operator' });
+    });
+  });
+
+>>>>>>> upstream/main
   describe('reset', () => {
     it('should clear all servers from cache repository', async () => {
       // Add servers to cache using the new API
@@ -732,6 +908,145 @@ describe('MCPServersRegistry', () => {
     });
   });
 
+<<<<<<< HEAD
+=======
+  describe('admin API key update binding', () => {
+    const bearerConfig: t.MCPOptions = {
+      type: 'streamable-http',
+      url: 'https://mcp.example.com/mcp',
+      proxy: 'http://proxy.example.com/',
+      apiKey: {
+        source: 'admin',
+        authorization_type: 'bearer',
+        key: 'owner-secret',
+      },
+    };
+    const customHeaderConfig: t.MCPOptions = {
+      ...bearerConfig,
+      apiKey: {
+        source: 'admin',
+        authorization_type: 'custom',
+        custom_header: 'X-Owner-Key',
+        key: 'owner-secret',
+      },
+    };
+    const rebindingCases: Array<[string, t.MCPOptions, t.MCPOptions, string[]]> = [
+      [
+        'URL',
+        bearerConfig,
+        {
+          ...bearerConfig,
+          url: 'https://attacker.example.com/mcp',
+          apiKey: { source: 'admin', authorization_type: 'bearer' },
+        },
+        ['url'],
+      ],
+      [
+        'transport',
+        bearerConfig,
+        {
+          ...bearerConfig,
+          type: 'sse',
+          apiKey: { source: 'admin', authorization_type: 'bearer' },
+        },
+        ['type'],
+      ],
+      [
+        'proxy',
+        bearerConfig,
+        {
+          ...bearerConfig,
+          proxy: 'http://attacker.example.com/',
+          apiKey: { source: 'admin', authorization_type: 'bearer' },
+        },
+        ['proxy'],
+      ],
+      [
+        'authorization type',
+        bearerConfig,
+        {
+          ...bearerConfig,
+          apiKey: { source: 'admin', authorization_type: 'basic' },
+        },
+        ['apiKey.authorization_type'],
+      ],
+      [
+        'custom-header binding',
+        customHeaderConfig,
+        {
+          ...customHeaderConfig,
+          apiKey: {
+            source: 'admin',
+            authorization_type: 'custom',
+            custom_header: 'X-Attacker-Key',
+          },
+        },
+        ['apiKey.custom_header'],
+      ],
+    ];
+
+    it.each(rebindingCases)(
+      'rejects an omitted-key %s rebinding before outbound inspection',
+      async (_label, existingConfig, update, changedFields) => {
+        jest.spyOn(registry['dbConfigsRepo'], 'get').mockResolvedValue(existingConfig);
+        const inspectSpy = jest.mocked(MCPServerInspector.inspect);
+        inspectSpy.mockClear();
+
+        await expect(
+          registry.inspectServerUpdate('shared-server', update, 'DB', 'editor-user'),
+        ).rejects.toMatchObject({
+          code: 'MCP_API_KEY_REENTRY_REQUIRED',
+          changedFields,
+        });
+
+        expect(inspectSpy).not.toHaveBeenCalled();
+      },
+    );
+
+    it('preserves the omitted key for an equivalent request boundary', async () => {
+      const existingConfig: t.MCPOptions = {
+        type: 'streamable-http',
+        url: 'https://mcp.example.com/mcp',
+        proxy: 'http://proxy.example.com/',
+        apiKey: {
+          source: 'admin',
+          authorization_type: 'custom',
+          custom_header: 'X-Api-Key',
+          key: 'owner-secret',
+        },
+      };
+      const equivalentUpdate: t.MCPOptions = {
+        ...existingConfig,
+        type: 'http',
+        url: 'https://MCP.EXAMPLE.COM:443/mcp',
+        proxy: 'http://PROXY.EXAMPLE.COM:80/',
+        description: 'Updated description',
+        apiKey: {
+          source: 'admin',
+          authorization_type: 'custom',
+          custom_header: 'x-api-key',
+        },
+      };
+      jest.spyOn(registry['dbConfigsRepo'], 'get').mockResolvedValue(existingConfig);
+      const inspectSpy = jest.mocked(MCPServerInspector.inspect);
+      inspectSpy.mockClear();
+
+      await registry.inspectServerUpdate('shared-server', equivalentUpdate, 'DB', 'editor-user');
+
+      expect(inspectSpy).toHaveBeenCalledTimes(1);
+      expect(inspectSpy).toHaveBeenCalledWith(
+        'shared-server',
+        expect.objectContaining({
+          apiKey: expect.objectContaining({ key: 'owner-secret' }),
+        }),
+        undefined,
+        undefined,
+        undefined,
+      );
+    });
+  });
+
+>>>>>>> upstream/main
   describe('reinspectServer', () => {
     const stubOptions: t.MCPOptions = {
       type: 'streamable-http',
@@ -787,7 +1102,15 @@ describe('MCPServersRegistry', () => {
         mockMongoose,
         null,
         null,
+<<<<<<< HEAD
         async (ctx) => ({ allowedDomains: [`${ctx?.userId}.example.com`], allowedAddresses: null }),
+=======
+        async (ctx) => ({
+          allowedDomains: [`${ctx?.userId}.example.com`],
+          allowedAddresses: null,
+          mcpApps: { enabled: false, legacyHtmlEnabled: false },
+        }),
+>>>>>>> upstream/main
       );
       await tenantRegistry.reset();
       await tenantRegistry.addServerStub('stub_server', stubOptions, 'CACHE');
@@ -920,7 +1243,15 @@ describe('MCPServersRegistry', () => {
             markResolving();
             await resolverHeld;
           }
+<<<<<<< HEAD
           return { allowedDomains: null, allowedAddresses: null };
+=======
+          return {
+            allowedDomains: null,
+            allowedAddresses: null,
+            mcpApps: { enabled: false, legacyHtmlEnabled: false },
+          };
+>>>>>>> upstream/main
         },
       );
       await slowRegistry.reset();
@@ -1413,6 +1744,80 @@ describe('MCPServersRegistry', () => {
         expect(cacheRepoGetAllSpy).toHaveBeenCalledTimes(3);
       });
     });
+<<<<<<< HEAD
+=======
+
+    /** A replica running older code fills these stores from its own DB reads, so a
+     *  cache hit has to carry the same normalization the repository applies. */
+    describe('configs stored by an older replica', () => {
+      const storedByOlderReplica = {
+        type: 'streamable-http',
+        url: 'https://example.com/mcp',
+        source: 'user',
+        dbId: 'db-legacy-1',
+        requiresOAuth: true,
+        headers: null,
+        requestHeaders: null,
+      } as unknown as t.ParsedServerConfig;
+
+      it('normalizes null header maps served from a per-server cache hit', async () => {
+        const dbGet = jest
+          .spyOn(registry['dbConfigsRepo'], 'get')
+          .mockResolvedValue(storedByOlderReplica);
+
+        await registry.getServerConfig('legacy_server', 'user-1');
+        expect(dbGet).toHaveBeenCalledTimes(1);
+
+        const cached = await registry.getServerConfig('legacy_server', 'user-1');
+        expect(dbGet).toHaveBeenCalledTimes(1);
+        expect(cached).toMatchObject({ dbId: 'db-legacy-1', source: 'user' });
+        expect(cached).not.toHaveProperty('headers');
+        expect(cached).not.toHaveProperty('requestHeaders');
+        expect(() => getMCPAppToolsPublicationGeneration(cached!)).not.toThrow();
+      });
+
+      it('normalizes null header maps served from an all-servers cache hit', async () => {
+        const dbGetAll = jest
+          .spyOn(registry['dbConfigsRepo'], 'getAll')
+          .mockResolvedValue({ legacy_server: storedByOlderReplica });
+
+        await registry.getAllServerConfigs('user-1');
+        expect(dbGetAll).toHaveBeenCalledTimes(1);
+
+        /** Drop this replica's process memo only; the shared entry stays as the
+         *  older replica encoded it, which is what another pod would read. */
+        registry['readThroughCacheAll']['memo'].clear();
+
+        const cached = (await registry.getAllServerConfigs('user-1')).legacy_server;
+        expect(dbGetAll).toHaveBeenCalledTimes(1);
+        expect(cached).toMatchObject({ dbId: 'db-legacy-1', source: 'user' });
+        expect(cached).not.toHaveProperty('headers');
+        expect(cached).not.toHaveProperty('requestHeaders');
+        expect(() => getMCPAppToolsPublicationGeneration(cached)).not.toThrow();
+      });
+
+      it('preserves populated header maps across both cache hits', async () => {
+        const headers = { 'X-Shared': 'value' };
+        const requestHeaders = { 'X-Request': 'value' };
+        const config = { ...storedByOlderReplica, headers, requestHeaders };
+        jest.spyOn(registry['dbConfigsRepo'], 'get').mockResolvedValue(config);
+        jest
+          .spyOn(registry['dbConfigsRepo'], 'getAll')
+          .mockResolvedValue({ header_server: config });
+
+        await registry.getServerConfig('header_server', 'user-1');
+        await registry.getAllServerConfigs('user-1');
+        registry['readThroughCacheAll']['memo'].clear();
+
+        const single = await registry.getServerConfig('header_server', 'user-1');
+        const all = (await registry.getAllServerConfigs('user-1')).header_server;
+        for (const cached of [single, all]) {
+          expect(cached).toMatchObject({ headers, requestHeaders });
+          expect(() => getMCPAppToolsPublicationGeneration(cached!)).not.toThrow();
+        }
+      });
+    });
+>>>>>>> upstream/main
   });
 
   describe('admin-panel overrides for YAML-defined servers', () => {
@@ -1448,6 +1853,23 @@ describe('MCPServersRegistry', () => {
       expect(result['langfuse-docs'].source).toBe('yaml');
     });
 
+<<<<<<< HEAD
+=======
+    it.each([
+      ['oauthRefreshWaitTimeout', 25000],
+      ['oauthPersistenceWaitTimeout', 60000],
+      ['oauthRefreshCoordination', true],
+    ] as const)('retains an admin-only %s override', async (field, value) => {
+      await registry['cacheConfigsRepo'].add('langfuse-docs', yamlLangfuseConfig);
+      const configServers = await registry.ensureConfigServers({
+        'langfuse-docs': { ...yamlLangfuseConfig, [field]: value },
+      });
+      expect(configServers['langfuse-docs'][field]).toBe(value);
+      const result = await registry.getAllServerConfigs('user-1', configServers);
+      expect(result['langfuse-docs'][field]).toBe(value);
+    });
+
+>>>>>>> upstream/main
     it('preserves user-DB tier (source: "user") over config-tier overrides', async () => {
       const userDbEntry: t.ParsedServerConfig = {
         type: 'streamable-http',

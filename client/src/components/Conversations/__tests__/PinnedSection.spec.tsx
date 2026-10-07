@@ -3,7 +3,12 @@ import { render, screen, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
+<<<<<<< HEAD
 import type { TConversation } from 'librechat-data-provider';
+=======
+import type { TConversation, TEndpointsConfig } from 'librechat-data-provider';
+import FavoriteItem from '~/components/Nav/Favorites/FavoriteItem';
+>>>>>>> upstream/main
 import PinnedSection from '../PinnedSection';
 
 const mockSetExpanded = jest.fn();
@@ -106,6 +111,7 @@ jest.mock('../Convo', () => {
 
 jest.mock('~/components/Nav/Favorites/FavoriteItem', () => ({
   __esModule: true,
+<<<<<<< HEAD
   default: ({
     item,
     type,
@@ -122,6 +128,26 @@ jest.mock('~/components/Nav/Favorites/FavoriteItem', () => ({
       </div>
     );
   },
+=======
+  default: jest.fn(
+    ({
+      item,
+      type,
+      keyShortcuts,
+    }: {
+      item: { model?: string; id?: string; label?: string };
+      type: string;
+      keyShortcuts?: string;
+    }) => {
+      const label = item.id ?? item.label ?? item.model ?? '';
+      return (
+        <div data-testid="favorite-item" data-type={type} aria-keyshortcuts={keyShortcuts}>
+          {label}
+        </div>
+      );
+    },
+  ),
+>>>>>>> upstream/main
 }));
 
 const pinnedConvo = (id: string, title: string) =>
@@ -159,6 +185,10 @@ describe('PinnedSection unified list', () => {
     mockFavoritesData.isAgentsLoading = false;
     mockFavoritesData.agentsMap = {};
     mockFavoritesData.specsMap = {};
+<<<<<<< HEAD
+=======
+    mockFavoritesData.endpointsConfig = {};
+>>>>>>> upstream/main
   });
 
   it('renders nothing when there are no favorites or pinned conversations', () => {
@@ -172,6 +202,31 @@ describe('PinnedSection unified list', () => {
     expect(itemLabels()).toEqual(['gpt-4o', 'Pinned Chat', 'Another Pin']);
   });
 
+<<<<<<< HEAD
+=======
+  it('forwards endpoint config to pinned models when the config loads', () => {
+    const item = { model: 'claude-sonnet-4-5', endpoint: 'AnthropicClaude' };
+    mockFavoritesData.favorites = [item];
+    const { rerender } = renderSection([]);
+
+    expect(FavoriteItem).toHaveBeenLastCalledWith(
+      expect.objectContaining({ type: 'model', item, endpointsConfig: {} }),
+      expect.anything(),
+    );
+
+    const endpointsConfig: TEndpointsConfig = {
+      AnthropicClaude: { iconURL: 'anthropic', order: 0 },
+    };
+    mockFavoritesData.endpointsConfig = endpointsConfig;
+    rerender(renderTree([]));
+
+    expect(FavoriteItem).toHaveBeenLastCalledWith(
+      expect.objectContaining({ type: 'model', item, endpointsConfig }),
+      expect.anything(),
+    );
+  });
+
+>>>>>>> upstream/main
   /* Chats and favorites are two independently ordered groups: an order saved
    * before that rule, with the two interleaved, is read back grouped. */
   it('orders each kind by the stored order and keeps the kinds grouped', () => {

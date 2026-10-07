@@ -1,8 +1,14 @@
 import { render, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
+<<<<<<< HEAD
 import DialogTemplate from './DialogTemplate';
 import { Dialog } from '@radix-ui/react-dialog';
 import { Provider } from 'jotai';
+=======
+import { Provider } from 'jotai';
+import { Dialog } from '@radix-ui/react-dialog';
+import DialogTemplate from './DialogTemplate';
+>>>>>>> upstream/main
 
 describe('DialogTemplate', () => {
   let mockSelectHandler: jest.Mock;

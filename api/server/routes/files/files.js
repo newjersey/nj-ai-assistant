@@ -5,9 +5,17 @@ const {
   logAxiosError,
   getSafeErrorMetadata,
   getApprovalTtlMs,
+<<<<<<< HEAD
   refreshS3FileUrls,
   handleFilesUsageRequest,
   buildDeleteFilesResponse,
+=======
+  handleFileListRequest,
+  refreshS3FileUrls,
+  handleFilesUsageRequest,
+  buildDeleteFilesResponse,
+  deleteAgentResourceFiles,
+>>>>>>> upstream/main
   shouldUseUploadSse,
   startUploadSseStream,
   sendUploadPolicyError,
@@ -23,9 +31,13 @@ const {
   resolveDownloadPath,
 } = require('@librechat/api');
 const {
+<<<<<<< HEAD
   Time,
   isUUID,
   CacheKeys,
+=======
+  isUUID,
+>>>>>>> upstream/main
   FileSources,
   ResourceType,
   EModelEndpoint,
@@ -54,8 +66,13 @@ const { hasCapability } = require('~/server/middleware/roles/capabilities');
 const { getRoleByName } = require('~/models');
 const { checkPermission } = require('~/server/services/PermissionService');
 const { cleanFileName, getContentDisposition } = require('~/server/utils/files');
+<<<<<<< HEAD
 const { getLogStores } = require('~/cache');
 const { Readable } = require('stream');
+=======
+const { Readable } = require('stream');
+const { getLogStores } = require('~/cache');
+>>>>>>> upstream/main
 const db = require('~/models');
 
 const router = express.Router();
@@ -70,6 +87,7 @@ const AGENT_TOOL_RESOURCE_KEYS = new Set([
 const isAgentToolResourceKey = (toolResource) =>
   typeof toolResource === 'string' && AGENT_TOOL_RESOURCE_KEYS.has(toolResource);
 
+<<<<<<< HEAD
 router.get('/', async (req, res) => {
   try {
     const appConfig = req.config;
@@ -87,6 +105,25 @@ router.get('/', async (req, res) => {
       }
     }
     res.status(200).send(files);
+=======
+/** Register the list endpoint as a thin adapter around the shared file-list policy. */
+router.get('/', async (req, res) => {
+  try {
+    const responseFiles = await handleFileListRequest({
+      userId: req.user.id,
+      rawLimit: req.query.limit,
+      fileStrategy: req.config?.fileStrategy,
+      maxLimit: req.config?.fileListLimit,
+      dependencies: {
+        getFiles: db.getFiles,
+        batchUpdateFiles: db.batchUpdateFiles,
+        refreshS3FileUrls,
+        getLogStores,
+        logger,
+      },
+    });
+    res.status(200).send(responseFiles);
+>>>>>>> upstream/main
   } catch (error) {
     logger.error('[/files] Error getting files:', error);
     res.status(400).json({ message: 'Error in request', error: error.message });
@@ -161,8 +198,11 @@ router.get('/config', async (req, res) => {
   }
 });
 
+<<<<<<< HEAD
 router.use('/', require('../../../nj/routes/files/files'));
 
+=======
+>>>>>>> upstream/main
 /**
  * POST /files/usage
  *
@@ -247,20 +287,52 @@ router.delete('/', async (req, res) => {
         });
       }
 
+<<<<<<< HEAD
       const toolResourceFiles = agent.tool_resources?.[req.body.tool_resource]?.file_ids ?? [];
       const agentFiles = files
         .filter((f) => toolResourceFiles.includes(f.file_id))
         .map((file) => ({ tool_resource: req.body.tool_resource, file_id: file.file_id }));
       if (agentFiles.length === 0) {
+=======
+      const agentDeletion = await deleteAgentResourceFiles(
+        {
+          agentId: req.body.agent_id,
+          agentObjectId: agent._id.toString(),
+          toolResource: req.body.tool_resource,
+          requestedFileIds: fileIds,
+          attachedFileIds: agent.tool_resources?.[req.body.tool_resource]?.file_ids ?? [],
+          files: dbFiles.map((file) => ({
+            file_id: file.file_id,
+            owner: file.user?.toString() ?? null,
+            file,
+          })),
+          userId: req.user.id.toString(),
+        },
+        {
+          getSharedResourceFileIds: db.getSharedResourceFileIds,
+          removeAgentResourceFiles: db.removeAgentResourceFiles,
+          deleteFiles: (agentFiles) => processDeleteRequest({ req, files: agentFiles }),
+        },
+      );
+
+      if (agentDeletion.outcome == null) {
+>>>>>>> upstream/main
         res.status(200).json({ message: 'File associations removed successfully from agent' });
         return;
       }
 
+<<<<<<< HEAD
       await db.removeAgentResourceFiles({
         agent_id: req.body.agent_id,
         files: agentFiles,
       });
       res.status(200).json({ message: 'File associations removed successfully from agent' });
+=======
+      logger.debug(
+        `[/files] Agent files deleted successfully: ${agentDeletion.destroyedFileIds.join(', ')}`,
+      );
+      sendDeleteResult(agentDeletion.outcome, 'Files deleted successfully');
+>>>>>>> upstream/main
       return;
     }
 

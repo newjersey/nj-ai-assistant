@@ -2,6 +2,14 @@ name: Cache Integration Tests
 
 on:
   pull_request:
+<<<<<<< HEAD
+=======
+    branches:
+      - main
+      - dev
+      - dev-staging
+      - release/*
+>>>>>>> upstream/main
     # The tested modules import across packages/api (e.g. mcp/oauth pulls in
     # flow/manager) and consume built data-provider and data-schemas, so the
     # whole src trees must trigger — subdirectory filters silently skip

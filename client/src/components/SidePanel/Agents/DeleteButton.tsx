@@ -104,14 +104,22 @@ function DeleteButton({
           title={localize('com_ui_delete_agent')}
           type="button"
         >
+<<<<<<< HEAD
           <div className="flex w-full items-center justify-center gap-2 text-text-destructive">
+=======
+          <div className="text-text-destructive flex w-full items-center justify-center gap-2">
+>>>>>>> upstream/main
             <TrashIcon />
           </div>
         </Button>
       </OGDialogTrigger>
       <OGDialogTemplate
         title={localize('com_ui_delete_agent')}
+<<<<<<< HEAD
         className="max-w-[450px]"
+=======
+        className="max-w-[28.125rem]"
+>>>>>>> upstream/main
         main={
           <>
             <div className="flex w-full flex-col items-center gap-2">

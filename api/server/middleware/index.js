@@ -1,11 +1,23 @@
+<<<<<<< HEAD
 const validatePasswordReset = require('./validatePasswordReset');
 const setTwoFactorTempUser = require('./setTwoFactorTempUser');
+=======
+const blockRetiredSetupToken = require('./blockRetiredSetupToken');
+const validatePasswordReset = require('./validatePasswordReset');
+const setTwoFactorTempUser = require('./setTwoFactorTempUser');
+const { setTwoFactorAcknowledgementTempUser, setTwoFactorFinalizationTempUser } =
+  setTwoFactorTempUser;
+>>>>>>> upstream/main
 const validateRegistration = require('./validateRegistration');
 const buildEndpointOption = require('./buildEndpointOption');
 const validateEmailLogin = require('./validateEmailLogin');
 const validateMessageReq = require('./validateMessageReq');
 const {
   canReadActiveJobConversation,
+<<<<<<< HEAD
+=======
+  createMessageRequestValidation,
+>>>>>>> upstream/main
   prepareMessageRequestValidation,
   sendValidationResponse,
 } = require('./messageValidation');
@@ -21,6 +33,10 @@ const checkInviteUser = require('./checkInviteUser');
 const requireJwtAuth = require('./requireJwtAuth');
 const { requireRumProxyAuth } = require('./requireJwtAuth');
 const configMiddleware = require('./config/app');
+<<<<<<< HEAD
+=======
+const { strictConfigMiddleware } = require('./config/app');
+>>>>>>> upstream/main
 const validateModel = require('./validateModel');
 const moderateText = require('./moderateText');
 const logHeaders = require('./logHeaders');
@@ -49,16 +65,30 @@ module.exports = {
   requireJwtAuth,
   requireRumProxyAuth,
   setTwoFactorTempUser,
+<<<<<<< HEAD
+=======
+  setTwoFactorAcknowledgementTempUser,
+  setTwoFactorFinalizationTempUser,
+  blockRetiredSetupToken,
+>>>>>>> upstream/main
   checkInviteUser,
   requireLdapAuth,
   requireLocalAuth,
   requireSameOrigin,
   canDeleteAccount,
   configMiddleware,
+<<<<<<< HEAD
+=======
+  strictConfigMiddleware,
+>>>>>>> upstream/main
   checkDomainAllowed,
   validateMessageReq,
   canReadActiveJobConversation,
   sendValidationResponse,
+<<<<<<< HEAD
+=======
+  createMessageRequestValidation,
+>>>>>>> upstream/main
   prepareMessageRequestValidation,
   buildEndpointOption,
   validateRegistration,

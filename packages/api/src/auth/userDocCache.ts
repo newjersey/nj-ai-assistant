@@ -1,11 +1,24 @@
 import { createHash } from 'crypto';
+<<<<<<< HEAD
 import { logger } from '@librechat/data-schemas';
 import { AUTH_USER_DOC_BY_ID_PREFIX, CacheKeys } from 'librechat-data-provider';
+=======
+import { logger, evictAuthUserDocs } from '@librechat/data-schemas';
+import {
+  CacheKeys,
+  AUTH_USER_DOC_BY_ID_PREFIX,
+  AUTH_USER_DOC_CACHE_TTL_MS,
+} from 'librechat-data-provider';
+>>>>>>> upstream/main
 import type { IUser } from '@librechat/data-schemas';
 import { cacheConfig } from '~/cache/cacheConfig';
 
 const AUTH_USER_DOC_CACHE_VERSION = 2;
+<<<<<<< HEAD
 export const AUTH_USER_DOC_CACHE_TTL_MS = 5000;
+=======
+export { AUTH_USER_DOC_CACHE_TTL_MS };
+>>>>>>> upstream/main
 
 export type AuthUserDocCacheMode = 'off' | 'on';
 
@@ -127,6 +140,11 @@ function sanitizeUserForCache(user: Partial<IUser>): CachedAuthUser {
   delete sanitized.pendingTotpSecret;
   delete sanitized.backupCodes;
   delete sanitized.pendingBackupCodes;
+<<<<<<< HEAD
+=======
+  delete sanitized.twoFactorAcknowledgementNonceHash;
+  delete sanitized.twoFactorFinalizationNonceHash;
+>>>>>>> upstream/main
   delete sanitized.federatedTokens;
   delete sanitized.openidTokens;
 
@@ -164,6 +182,13 @@ export async function getCachedAuthUserDoc(
   }
 }
 
+<<<<<<< HEAD
+=======
+/**
+ * The reverse index is written first and outlives every document it names, so eviction can
+ * always find a cached document: when the index write fails, the document is not cached.
+ */
+>>>>>>> upstream/main
 export async function setCachedAuthUserDoc(
   store: AuthUserDocCacheStore,
   cacheKey: string,
@@ -171,6 +196,13 @@ export async function setCachedAuthUserDoc(
 ): Promise<void> {
   try {
     const sanitized = sanitizeUserForCache(user);
+<<<<<<< HEAD
+=======
+    const userId = getUserId(sanitized);
+    if (userId) {
+      await rememberUserCacheKey(store, userId, cacheKey, AUTH_USER_DOC_CACHE_TTL_MS * 2);
+    }
+>>>>>>> upstream/main
     await store.set(
       cacheKey,
       {
@@ -180,10 +212,13 @@ export async function setCachedAuthUserDoc(
       } satisfies CachedAuthUserDoc,
       AUTH_USER_DOC_CACHE_TTL_MS,
     );
+<<<<<<< HEAD
     const userId = getUserId(sanitized);
     if (userId) {
       await rememberUserCacheKey(store, userId, cacheKey, AUTH_USER_DOC_CACHE_TTL_MS);
     }
+=======
+>>>>>>> upstream/main
   } catch (error) {
     logger.warn('[authUserDocCache] Cache write failed', {
       error: error instanceof Error ? error.message : String(error),
@@ -198,6 +233,7 @@ export async function invalidateCachedAuthUserDoc(
   if (!store) {
     return;
   }
+<<<<<<< HEAD
   try {
     const keys = new Set<string>();
     if (input.cacheKey) {
@@ -219,4 +255,7 @@ export async function invalidateCachedAuthUserDoc(
       error: error instanceof Error ? error.message : String(error),
     });
   }
+=======
+  await evictAuthUserDocs(store, input);
+>>>>>>> upstream/main
 }

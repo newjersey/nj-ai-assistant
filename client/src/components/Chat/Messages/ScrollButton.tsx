@@ -16,9 +16,17 @@ const visibilityDebounceRate = 150;
  * Stands down while a composer panel (an `ask_user_question` popover, a
  * tool-approval review) is open over the bottom of the thread: the panel
  * floats up from the composer and the button up from the thread's edge, so
+<<<<<<< HEAD
  * the two would meet on the panel's footer. The in-flight steer stack is the
  * one overlay the button lifts clear of instead — it publishes its height as
  * `overlayHeight` and stays short enough for that to read well.
+=======
+ * the two would meet on the panel's footer.
+ *
+ * `overlayHeight` lifts the button clear of a short overlay that floats over
+ * the thread's bottom edge. Nothing publishes one since pending steers moved
+ * inside the streaming reply, so it defaults to no lift.
+>>>>>>> upstream/main
  */
 const ScrollButton = memo(function ScrollButton({
   conversationId,
@@ -28,7 +36,11 @@ const ScrollButton = memo(function ScrollButton({
   messagesEndRef,
   scrollHandler,
   onNearBottomChange,
+<<<<<<< HEAD
   overlayHeight,
+=======
+  overlayHeight = 0,
+>>>>>>> upstream/main
 }: {
   conversationId: string;
   /** The user's show-scroll-button preference, handed down by the host. */
@@ -39,7 +51,11 @@ const ScrollButton = memo(function ScrollButton({
   messagesEndRef: React.RefObject<HTMLDivElement | null>;
   scrollHandler: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   onNearBottomChange: (isNearBottom: boolean) => void;
+<<<<<<< HEAD
   overlayHeight: number;
+=======
+  overlayHeight?: number;
+>>>>>>> upstream/main
 }) {
   const panelOpen = useAtomValue(composerOverlayCountFamily(conversationId)) > 0;
   const [showScrollButton, setShowScrollButton] = useState(false);

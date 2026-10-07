@@ -1,15 +1,42 @@
 import React from 'react';
+<<<<<<< HEAD
 import { getDefaultStore } from 'jotai';
 import { Constants } from 'librechat-data-provider';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { RecoilRoot, useRecoilValue, useSetRecoilState, type MutableSnapshot } from 'recoil';
+=======
+import { getDefaultStore, useAtomValue, useSetAtom } from 'jotai';
+import { act, renderHook, waitFor } from '@testing-library/react';
+import { Constants, ReasoningEffort } from 'librechat-data-provider';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { RecoilRoot, useSetRecoilState, type MutableSnapshot } from 'recoil';
+>>>>>>> upstream/main
 import type {
   DrainAfterAbort,
   RunEnd,
   QueuedMessage,
   SettledQueuedTurnReceipt,
+<<<<<<< HEAD
 } from '~/store/families';
+=======
+} from '~/hooks/Chat/queue';
+import {
+  settledQueuedTurnReceiptsByConvoId,
+  queuedMessagesByConvoId,
+  pendingRunEndByConvoId,
+  drainAfterAbortByIndex,
+  runEndByIndex,
+  resetQueueFamilies,
+} from '~/hooks/Chat/queue';
+import {
+  claimQueuedIntent,
+  releaseQueuedIntent,
+  acquireQueueSendLock,
+  releaseQueueSendLock,
+} from '~/utils/queueIntent';
+import { recoveryDispositionsFamily } from '~/components/Chat/Steering/recovery';
+>>>>>>> upstream/main
 import { revealedQueuedTurnFamily } from '~/store/steer';
 import useQueueDrain from '../useQueueDrain';
 import store from '~/store';
@@ -36,6 +63,10 @@ function setup(
     setNewConvoQueue?: (value: QueuedMessage[]) => void;
     setSettledReceipts?: (value: SettledQueuedTurnReceipt[]) => void;
     setInterruptFlag?: (value: DrainAfterAbort | false) => void;
+<<<<<<< HEAD
+=======
+    queueRef?: { current: QueuedMessage[] };
+>>>>>>> upstream/main
     queue?: QueuedMessage[];
     newConvoQueue?: QueuedMessage[];
     settledReceipts?: SettledQueuedTurnReceipt[];
@@ -43,6 +74,7 @@ function setup(
   } = {};
 
   function Harness() {
+<<<<<<< HEAD
     setters.setRunEnd = useSetRecoilState(store.runEndByIndex(INDEX));
     setters.setIsSubmitting = useSetRecoilState(store.isSubmittingFamily(INDEX));
     setters.setQueue = useSetRecoilState(store.queuedMessagesByConvoId(CONVO_ID));
@@ -57,6 +89,21 @@ function setup(
     setters.newConvoQueue = useRecoilValue(store.queuedMessagesByConvoId(Constants.NEW_CONVO));
     setters.settledReceipts = useRecoilValue(store.settledQueuedTurnReceiptsByConvoId(CONVO_ID));
     setters.runEnd = useRecoilValue(store.runEndByIndex(INDEX));
+=======
+    setters.setRunEnd = useSetAtom(runEndByIndex(INDEX));
+    setters.setIsSubmitting = useSetRecoilState(store.isSubmittingFamily(INDEX));
+    setters.setQueue = useSetAtom(queuedMessagesByConvoId(CONVO_ID));
+    setters.queueRef = {
+      current: useAtomValue(queuedMessagesByConvoId(CONVO_ID)),
+    };
+    setters.setNewConvoQueue = useSetAtom(queuedMessagesByConvoId(Constants.NEW_CONVO));
+    setters.setSettledReceipts = useSetAtom(settledQueuedTurnReceiptsByConvoId(CONVO_ID));
+    setters.setInterruptFlag = useSetAtom(drainAfterAbortByIndex(INDEX));
+    setters.queue = useAtomValue(queuedMessagesByConvoId(CONVO_ID));
+    setters.newConvoQueue = useAtomValue(queuedMessagesByConvoId(Constants.NEW_CONVO));
+    setters.settledReceipts = useAtomValue(settledQueuedTurnReceiptsByConvoId(CONVO_ID));
+    setters.runEnd = useAtomValue(runEndByIndex(INDEX));
+>>>>>>> upstream/main
     useQueueDrain(INDEX, activeConversationId, ask, revealQueuedTurn);
     return null;
   }
@@ -82,6 +129,10 @@ const emptyOverrides = expect.objectContaining({
   overrideFiles: [],
   overrideQuotes: [],
   overrideManualSkills: [],
+<<<<<<< HEAD
+=======
+  overrideReasoning: null,
+>>>>>>> upstream/main
   overrideQueuedMessageOrigin: expect.any(Object),
 });
 
@@ -99,6 +150,7 @@ const runEnd = (overrides: Partial<RunEnd> = {}): RunEnd => ({
   ...overrides,
 });
 
+<<<<<<< HEAD
 describe('useQueueDrain', () => {
   beforeEach(() => {
     mockMarkFilesUsage.mockClear();
@@ -107,6 +159,92 @@ describe('useQueueDrain', () => {
   it('drains exactly one queued message on clean completion', async () => {
     const { ask, setters } = setup(({ set }) => {
       set(store.queuedMessagesByConvoId(CONVO_ID), [
+=======
+beforeEach(() => resetQueueFamilies());
+
+describe('useQueueDrain', () => {
+  beforeEach(() => {
+    getDefaultStore().set(recoveryDispositionsFamily(CONVO_ID), {});
+    mockMarkFilesUsage.mockClear();
+  });
+
+  it('moves a held new-conversation head without spending its terminal boundary', async () => {
+    getDefaultStore().set(recoveryDispositionsFamily(CONVO_ID), { source: 'blocked' });
+    const held: QueuedMessage = {
+      id: 'held',
+      text: 'review before sending',
+      createdAt: 1,
+      recoverySteerId: 'source',
+    };
+    const next: QueuedMessage = { id: 'ordinary', text: 'send after review', createdAt: 2 };
+    const { ask, setters } = setup(({ set }) => {
+      getDefaultStore().set(queuedMessagesByConvoId(Constants.NEW_CONVO), [held]);
+      getDefaultStore().set(queuedMessagesByConvoId(CONVO_ID), [next]);
+      set(store.isSubmittingFamily(INDEX), false);
+    });
+    const end = runEnd({ startedAsNewConvo: true });
+    act(() => setters.setRunEnd!(end));
+    await waitFor(() => expect(setters.newConvoQueue).toEqual([]));
+    expect(setters.queue).toEqual([held, next]);
+    expect(setters.runEnd).toEqual(end);
+    expect(ask).not.toHaveBeenCalled();
+
+    act(() => setters.setQueue!([next]));
+    await waitFor(() => expect(ask).toHaveBeenCalledTimes(1));
+    expect(ask).toHaveBeenCalledWith({ text: next.text }, emptyOverrides);
+    expect(setters.queue).toEqual([]);
+    expect(setters.runEnd).toBeNull();
+  });
+
+  it('does not turn an aborted run into a send after a held row is dismissed', async () => {
+    getDefaultStore().set(recoveryDispositionsFamily(CONVO_ID), { source: 'blocked' });
+    const held: QueuedMessage = {
+      id: 'held',
+      text: 'review me',
+      createdAt: 1,
+      recoverySteerId: 'source',
+    };
+    const next: QueuedMessage = { id: 'ordinary', text: 'wait for next run', createdAt: 2 };
+    const { ask, setters } = setup(({ set }) => {
+      getDefaultStore().set(queuedMessagesByConvoId(CONVO_ID), [held, next]);
+      set(store.isSubmittingFamily(INDEX), false);
+    });
+    act(() => setters.setRunEnd!(runEnd({ outcome: 'aborted' })));
+    await waitFor(() => expect(setters.runEnd).toBeNull());
+    act(() => setters.setQueue!([next]));
+    expect(ask).not.toHaveBeenCalled();
+    expect(setters.queue).toEqual([next]);
+  });
+
+  it.each(['blocked', 'cancelling', 'cancelled', 'dismissed'] as const)(
+    'does not drain a %s recovery while its run-end boundary remains available',
+    async (disposition) => {
+      getDefaultStore().set(recoveryDispositionsFamily(CONVO_ID), { source: disposition });
+      const item = {
+        id: 'leftover',
+        text: 'original words',
+        createdAt: 1,
+        recoverySteerId: 'source',
+        clientRequestId: 'same-attempt',
+      };
+      const firstEnd = runEnd();
+      const { ask, setters } = setup(({ set }) => {
+        getDefaultStore().set(queuedMessagesByConvoId(CONVO_ID), [item]);
+        set(store.isSubmittingFamily(INDEX), false);
+        getDefaultStore().set(runEndByIndex(INDEX), firstEnd);
+      });
+      await waitFor(() => expect(setters.runEnd).toEqual(firstEnd));
+      act(() => setters.setRunEnd?.(runEnd({ generationCreatedAt: 42 })));
+      expect(setters.runEnd).toEqual(firstEnd);
+      expect(ask).not.toHaveBeenCalled();
+      expect(setters.queue).toEqual([item]);
+    },
+  );
+
+  it('drains exactly one queued message on clean completion', async () => {
+    const { ask, setters } = setup(() => {
+      getDefaultStore().set(queuedMessagesByConvoId(CONVO_ID), [
+>>>>>>> upstream/main
         queuedMessage('q1', 'first follow-up'),
         queuedMessage('q2', 'second follow-up'),
       ]);
@@ -120,9 +258,46 @@ describe('useQueueDrain', () => {
     expect(ask).toHaveBeenCalledWith({ text: 'first follow-up' }, emptyOverrides);
   });
 
+<<<<<<< HEAD
   it('does not locally drain or renew server-owned Agent rows', async () => {
     const { ask, setters } = setup(({ set }) => {
       set(store.queuedMessagesByConvoId(CONVO_ID), [
+=======
+  it('leaves a rejected steer for an explicit send and drains the row behind it', async () => {
+    const { ask, setters } = setup(() => {
+      getDefaultStore().set(queuedMessagesByConvoId(CONVO_ID), [
+        { ...queuedMessage('q-rejected', 'the server refused this'), needsExplicitSend: true },
+        queuedMessage('q2', 'second follow-up'),
+      ]);
+    });
+
+    act(() => {
+      setters.setRunEnd!(runEnd({ generationCreatedAt: 1234 }));
+    });
+
+    await waitFor(() => expect(ask).toHaveBeenCalledTimes(1));
+    expect(ask).toHaveBeenCalledWith({ text: 'second follow-up' }, emptyOverrides);
+  });
+
+  it('sends nothing when every queued row awaits an explicit send', async () => {
+    const { ask, setters } = setup(() => {
+      getDefaultStore().set(queuedMessagesByConvoId(CONVO_ID), [
+        { ...queuedMessage('q-rejected', 'the server refused this'), needsExplicitSend: true },
+      ]);
+    });
+
+    act(() => {
+      setters.setRunEnd!(runEnd({ generationCreatedAt: 1234 }));
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 25));
+    expect(ask).not.toHaveBeenCalled();
+  });
+
+  it('does not locally drain or renew server-owned Agent rows', async () => {
+    const { ask, setters } = setup(() => {
+      getDefaultStore().set(queuedMessagesByConvoId(CONVO_ID), [
+>>>>>>> upstream/main
         {
           ...queuedMessage('q-server', 'the server starts this turn'),
           files: [{ file_id: 'server-held-file' }],
@@ -151,8 +326,13 @@ describe('useQueueDrain', () => {
       server: { id: 'server-queue-1', status: 'queued' as const, revision: 1 },
     };
     const { ask, setters } = setup(
+<<<<<<< HEAD
       ({ set }) => {
         set(store.queuedMessagesByConvoId(CONVO_ID), [head]);
+=======
+      () => {
+        getDefaultStore().set(queuedMessagesByConvoId(CONVO_ID), [head]);
+>>>>>>> upstream/main
       },
       CONVO_ID,
       reveal,
@@ -183,8 +363,13 @@ describe('useQueueDrain', () => {
       server: { id: 'server-queue-2', status: 'queued' as const, revision: 2 },
     };
     const { setters } = setup(
+<<<<<<< HEAD
       ({ set }) => {
         set(store.queuedMessagesByConvoId(CONVO_ID), [first, second]);
+=======
+      () => {
+        getDefaultStore().set(queuedMessagesByConvoId(CONVO_ID), [first, second]);
+>>>>>>> upstream/main
       },
       CONVO_ID,
       reveal,
@@ -226,9 +411,15 @@ describe('useQueueDrain', () => {
       server: { id: 'server-queue-2', status: 'queued' as const, revision: 1 },
     };
     const { ask, setters } = setup(
+<<<<<<< HEAD
       ({ set }) => {
         set(store.queuedMessagesByConvoId(Constants.NEW_CONVO), [local]);
         set(store.queuedMessagesByConvoId(CONVO_ID), [serverRow]);
+=======
+      () => {
+        getDefaultStore().set(queuedMessagesByConvoId(Constants.NEW_CONVO), [local]);
+        getDefaultStore().set(queuedMessagesByConvoId(CONVO_ID), [serverRow]);
+>>>>>>> upstream/main
       },
       CONVO_ID,
       reveal,
@@ -246,8 +437,13 @@ describe('useQueueDrain', () => {
   it('reveals nothing on a stop, or when the completed run carries no response id', async () => {
     const reveal = jest.fn();
     const { setters } = setup(
+<<<<<<< HEAD
       ({ set }) => {
         set(store.queuedMessagesByConvoId(CONVO_ID), [
+=======
+      () => {
+        getDefaultStore().set(queuedMessagesByConvoId(CONVO_ID), [
+>>>>>>> upstream/main
           {
             ...queuedMessage('q-server', 'the server starts this turn'),
             clientRequestId: 'client-request-1',
@@ -281,8 +477,13 @@ describe('useQueueDrain', () => {
       },
       localSuccessor,
     ];
+<<<<<<< HEAD
     const { ask, setters } = setup(({ set }) => {
       set(store.queuedMessagesByConvoId(CONVO_ID), queue);
+=======
+    const { ask, setters } = setup(() => {
+      getDefaultStore().set(queuedMessagesByConvoId(CONVO_ID), queue);
+>>>>>>> upstream/main
     });
 
     act(() => {
@@ -307,8 +508,13 @@ describe('useQueueDrain', () => {
       ...queuedMessage('q-server-2', 'later server-owned turn'),
       server: { id: 'server-queue-2', status: 'queued', revision: 2 },
     };
+<<<<<<< HEAD
     const { ask, setters } = setup(({ set }) => {
       set(store.queuedMessagesByConvoId(CONVO_ID), [admittedServer, remainingServer]);
+=======
+    const { ask, setters } = setup(() => {
+      getDefaultStore().set(queuedMessagesByConvoId(CONVO_ID), [admittedServer, remainingServer]);
+>>>>>>> upstream/main
     });
 
     act(() => {
@@ -335,11 +541,19 @@ describe('useQueueDrain', () => {
   });
 
   it('discards a predecessor boundary already consumed by server admission', async () => {
+<<<<<<< HEAD
     const { ask, setters } = setup(({ set }) => {
       set(store.queuedMessagesByConvoId(CONVO_ID), [
         queuedMessage('q-local', 'must wait for the admitted run'),
       ]);
       set(store.settledQueuedTurnReceiptsByConvoId(CONVO_ID), [
+=======
+    const { ask, setters } = setup(() => {
+      getDefaultStore().set(queuedMessagesByConvoId(CONVO_ID), [
+        queuedMessage('q-local', 'must wait for the admitted run'),
+      ]);
+      getDefaultStore().set(settledQueuedTurnReceiptsByConvoId(CONVO_ID), [
+>>>>>>> upstream/main
         {
           clientRequestId: 'admission-1',
           status: 'admitted',
@@ -358,11 +572,19 @@ describe('useQueueDrain', () => {
   });
 
   it('consumes one admission when separate receipts share the same predecessor epoch', async () => {
+<<<<<<< HEAD
     const { ask, setters } = setup(({ set }) => {
       set(store.queuedMessagesByConvoId(CONVO_ID), [
         queuedMessage('q-local', 'wait for both admitted runs'),
       ]);
       set(store.settledQueuedTurnReceiptsByConvoId(CONVO_ID), [
+=======
+    const { ask, setters } = setup(() => {
+      getDefaultStore().set(queuedMessagesByConvoId(CONVO_ID), [
+        queuedMessage('q-local', 'wait for both admitted runs'),
+      ]);
+      getDefaultStore().set(settledQueuedTurnReceiptsByConvoId(CONVO_ID), [
+>>>>>>> upstream/main
         {
           clientRequestId: 'admission-1',
           status: 'admitted',
@@ -402,10 +624,17 @@ describe('useQueueDrain', () => {
   it('migrates the NEW_CONVO queue before discarding a consumed predecessor boundary', async () => {
     const queuedBeforeResolution = queuedMessage('q-new', 'wait for the admitted successor');
     const queuedAfterResolution = queuedMessage('q-resolved', 'still ordered after migration');
+<<<<<<< HEAD
     const { ask, setters } = setup(({ set }) => {
       set(store.queuedMessagesByConvoId(Constants.NEW_CONVO), [queuedBeforeResolution]);
       set(store.queuedMessagesByConvoId(CONVO_ID), [queuedAfterResolution]);
       set(store.settledQueuedTurnReceiptsByConvoId(CONVO_ID), [
+=======
+    const { ask, setters } = setup(() => {
+      getDefaultStore().set(queuedMessagesByConvoId(Constants.NEW_CONVO), [queuedBeforeResolution]);
+      getDefaultStore().set(queuedMessagesByConvoId(CONVO_ID), [queuedAfterResolution]);
+      getDefaultStore().set(settledQueuedTurnReceiptsByConvoId(CONVO_ID), [
+>>>>>>> upstream/main
         {
           clientRequestId: 'admission-1',
           status: 'admitted',
@@ -430,11 +659,19 @@ describe('useQueueDrain', () => {
   });
 
   it('lets the admitted successor terminal boundary release the next turn', async () => {
+<<<<<<< HEAD
     const { ask, setters } = setup(({ set }) => {
       set(store.queuedMessagesByConvoId(CONVO_ID), [
         queuedMessage('q-local', 'send after the admitted run'),
       ]);
       set(store.settledQueuedTurnReceiptsByConvoId(CONVO_ID), [
+=======
+    const { ask, setters } = setup(() => {
+      getDefaultStore().set(queuedMessagesByConvoId(CONVO_ID), [
+        queuedMessage('q-local', 'send after the admitted run'),
+      ]);
+      getDefaultStore().set(settledQueuedTurnReceiptsByConvoId(CONVO_ID), [
+>>>>>>> upstream/main
         {
           clientRequestId: 'admission-1',
           status: 'admitted',
@@ -452,11 +689,19 @@ describe('useQueueDrain', () => {
   });
 
   it('does not interpret a consumed predecessor as a timestamp range', async () => {
+<<<<<<< HEAD
     const { ask, setters } = setup(({ set }) => {
       set(store.queuedMessagesByConvoId(CONVO_ID), [
         queuedMessage('q-local', 'send after the lower-clock successor'),
       ]);
       set(store.settledQueuedTurnReceiptsByConvoId(CONVO_ID), [
+=======
+    const { ask, setters } = setup(() => {
+      getDefaultStore().set(queuedMessagesByConvoId(CONVO_ID), [
+        queuedMessage('q-local', 'send after the lower-clock successor'),
+      ]);
+      getDefaultStore().set(settledQueuedTurnReceiptsByConvoId(CONVO_ID), [
+>>>>>>> upstream/main
         {
           clientRequestId: 'admission-1',
           status: 'admitted',
@@ -484,8 +729,13 @@ describe('useQueueDrain', () => {
   });
 
   it('parks a mismatched signal instead of draining into the wrong conversation', async () => {
+<<<<<<< HEAD
     const { ask, setters } = setup(({ set }) => {
       set(store.queuedMessagesByConvoId(CONVO_ID), [queuedMessage('q1', 'stay put')]);
+=======
+    const { ask, setters } = setup(() => {
+      getDefaultStore().set(queuedMessagesByConvoId(CONVO_ID), [queuedMessage('q1', 'stay put')]);
+>>>>>>> upstream/main
     }, 'some-other-convo');
 
     act(() => {
@@ -499,9 +749,17 @@ describe('useQueueDrain', () => {
   });
 
   it('drains a parked signal when the user returns to that conversation', async () => {
+<<<<<<< HEAD
     const { ask } = setup(({ set }) => {
       set(store.queuedMessagesByConvoId(CONVO_ID), [queuedMessage('q1', 'welcome back')]);
       set(store.pendingRunEndByConvoId(CONVO_ID), runEnd());
+=======
+    const { ask } = setup(() => {
+      getDefaultStore().set(queuedMessagesByConvoId(CONVO_ID), [
+        queuedMessage('q1', 'welcome back'),
+      ]);
+      getDefaultStore().set(pendingRunEndByConvoId(CONVO_ID), runEnd());
+>>>>>>> upstream/main
     });
 
     await waitFor(() => expect(ask).toHaveBeenCalledTimes(1));
@@ -510,8 +768,13 @@ describe('useQueueDrain', () => {
 
   it('passes a queued message`s attachments through as overrideFiles', async () => {
     const files = [{ file_id: 'f1', filepath: '/uploads/f1.png', type: 'image/png' }];
+<<<<<<< HEAD
     const { ask, setters } = setup(({ set }) => {
       set(store.queuedMessagesByConvoId(CONVO_ID), [
+=======
+    const { ask, setters } = setup(() => {
+      getDefaultStore().set(queuedMessagesByConvoId(CONVO_ID), [
+>>>>>>> upstream/main
         { ...queuedMessage('q1', 'with media'), files },
       ]);
     });
@@ -536,8 +799,13 @@ describe('useQueueDrain', () => {
    *  pause for approval, so a hold taken once at enqueue would lapse before a
    *  deep queue finishes draining. */
   it('renews the TTL hold on attachments that stay queued', async () => {
+<<<<<<< HEAD
     const { setters } = setup(({ set }) => {
       set(store.queuedMessagesByConvoId(CONVO_ID), [
+=======
+    const { setters } = setup(() => {
+      getDefaultStore().set(queuedMessagesByConvoId(CONVO_ID), [
+>>>>>>> upstream/main
         {
           ...queuedMessage('q1', 'first'),
           files: [{ file_id: 'sent', type: 'image/png' }],
@@ -566,8 +834,13 @@ describe('useQueueDrain', () => {
   });
 
   it('does not renew when nothing with attachments stays queued', async () => {
+<<<<<<< HEAD
     const { setters } = setup(({ set }) => {
       set(store.queuedMessagesByConvoId(CONVO_ID), [
+=======
+    const { setters } = setup(() => {
+      getDefaultStore().set(queuedMessagesByConvoId(CONVO_ID), [
+>>>>>>> upstream/main
         {
           ...queuedMessage('q1', 'only one'),
           files: [{ file_id: 'sent', type: 'image/png' }],
@@ -592,8 +865,13 @@ describe('useQueueDrain', () => {
         file_id: `${prefix}-${i}`,
         type: 'image/png',
       }));
+<<<<<<< HEAD
     const { setters } = setup(({ set }) => {
       set(store.queuedMessagesByConvoId(CONVO_ID), [
+=======
+    const { setters } = setup(() => {
+      getDefaultStore().set(queuedMessagesByConvoId(CONVO_ID), [
+>>>>>>> upstream/main
         { ...queuedMessage('q1', 'first'), files: manyFiles('sent', 2) },
         { ...queuedMessage('q2', 'second'), files: manyFiles('a', 10) },
         { ...queuedMessage('q3', 'third'), files: manyFiles('b', 4) },
@@ -618,8 +896,13 @@ describe('useQueueDrain', () => {
   /** A refused send puts the item back with its run-end signal already
    *  consumed, so nothing else would touch it before the next drain. */
   it('renews a restored item when the send is refused', async () => {
+<<<<<<< HEAD
     const { ask, setters } = setup(({ set }) => {
       set(store.queuedMessagesByConvoId(CONVO_ID), [
+=======
+    const { ask, setters } = setup(() => {
+      getDefaultStore().set(queuedMessagesByConvoId(CONVO_ID), [
+>>>>>>> upstream/main
         {
           ...queuedMessage('q1', 'refused'),
           files: [{ file_id: 'restored', type: 'image/png' }],
@@ -642,8 +925,13 @@ describe('useQueueDrain', () => {
   it('renews on a heartbeat while items stay queued', async () => {
     jest.useFakeTimers();
     try {
+<<<<<<< HEAD
       setup(({ set }) => {
         set(store.queuedMessagesByConvoId(CONVO_ID), [
+=======
+      setup(() => {
+        getDefaultStore().set(queuedMessagesByConvoId(CONVO_ID), [
+>>>>>>> upstream/main
           {
             ...queuedMessage('q1', 'waiting'),
             files: [{ file_id: 'held', type: 'image/png' }],
@@ -672,8 +960,13 @@ describe('useQueueDrain', () => {
   it('emits no heartbeat when the queue holds no attachments', async () => {
     jest.useFakeTimers();
     try {
+<<<<<<< HEAD
       setup(({ set }) => {
         set(store.queuedMessagesByConvoId(CONVO_ID), [queuedMessage('q1', 'no files')]);
+=======
+      setup(() => {
+        getDefaultStore().set(queuedMessagesByConvoId(CONVO_ID), [queuedMessage('q1', 'no files')]);
+>>>>>>> upstream/main
       });
 
       act(() => {
@@ -689,14 +982,23 @@ describe('useQueueDrain', () => {
    *  run ends, so renewing only the active id would skip them for its whole
    *  duration. */
   it('renews the pre-migration NEW_CONVO queue alongside the active one', async () => {
+<<<<<<< HEAD
     setup(({ set }) => {
       set(store.queuedMessagesByConvoId(Constants.NEW_CONVO), [
+=======
+    setup(() => {
+      getDefaultStore().set(queuedMessagesByConvoId(Constants.NEW_CONVO), [
+>>>>>>> upstream/main
         {
           ...queuedMessage('n1', 'queued pre-migration'),
           files: [{ file_id: 'pending-migrate' }],
         },
       ]);
+<<<<<<< HEAD
       set(store.queuedMessagesByConvoId(CONVO_ID), [
+=======
+      getDefaultStore().set(queuedMessagesByConvoId(CONVO_ID), [
+>>>>>>> upstream/main
         {
           ...queuedMessage('q1', 'queued after'),
           files: [{ file_id: 'already-migrated' }],
@@ -711,8 +1013,13 @@ describe('useQueueDrain', () => {
   });
 
   it('does not double-count the queue before migration', async () => {
+<<<<<<< HEAD
     setup(({ set }) => {
       set(store.queuedMessagesByConvoId(Constants.NEW_CONVO), [
+=======
+    setup(() => {
+      getDefaultStore().set(queuedMessagesByConvoId(Constants.NEW_CONVO), [
+>>>>>>> upstream/main
         {
           ...queuedMessage('n1', 'new convo'),
           files: [{ file_id: 'only-once' }],
@@ -725,13 +1032,23 @@ describe('useQueueDrain', () => {
     expect(sent).toEqual(['only-once']);
   });
 
+<<<<<<< HEAD
   it('passes carried quotes + manual skills through as overrides', async () => {
     const { ask, setters } = setup(({ set }) => {
       set(store.queuedMessagesByConvoId(CONVO_ID), [
+=======
+  it('passes carried quotes, skills, and reasoning through as overrides', async () => {
+    const { ask, setters } = setup(() => {
+      getDefaultStore().set(queuedMessagesByConvoId(CONVO_ID), [
+>>>>>>> upstream/main
         {
           ...queuedMessage('q1', 'with context'),
           quotes: ['quoted excerpt'],
           manualSkills: ['skill-1'],
+<<<<<<< HEAD
+=======
+          reasoningOverride: { key: 'reasoning_effort', value: ReasoningEffort.high },
+>>>>>>> upstream/main
         },
       ]);
     });
@@ -747,14 +1064,23 @@ describe('useQueueDrain', () => {
         overrideFiles: [],
         overrideQuotes: ['quoted excerpt'],
         overrideManualSkills: ['skill-1'],
+<<<<<<< HEAD
+=======
+        overrideReasoning: { key: 'reasoning_effort', value: ReasoningEffort.high },
+>>>>>>> upstream/main
         overrideQueuedMessageOrigin: expect.any(Object),
       }),
     );
   });
 
   it('keeps the recovery user row stable while forwarding its per-attempt identity', async () => {
+<<<<<<< HEAD
     const { ask, setters } = setup(({ set }) => {
       set(store.queuedMessagesByConvoId(CONVO_ID), [
+=======
+    const { ask, setters } = setup(() => {
+      getDefaultStore().set(queuedMessagesByConvoId(CONVO_ID), [
+>>>>>>> upstream/main
         {
           ...queuedMessage('source-steer', 'recover once'),
           clientRequestId: 'attempt-uuid',
@@ -780,8 +1106,13 @@ describe('useQueueDrain', () => {
   });
 
   it('does not drain on user abort or error outcomes', async () => {
+<<<<<<< HEAD
     const { ask, setters } = setup(({ set }) => {
       set(store.queuedMessagesByConvoId(CONVO_ID), [queuedMessage('q1', 'kept')]);
+=======
+    const { ask, setters } = setup(() => {
+      getDefaultStore().set(queuedMessagesByConvoId(CONVO_ID), [queuedMessage('q1', 'kept')]);
+>>>>>>> upstream/main
     });
 
     act(() => {
@@ -796,9 +1127,17 @@ describe('useQueueDrain', () => {
   });
 
   it('drains on abort when the interrupt & send flag is armed, then disarms', async () => {
+<<<<<<< HEAD
     const { ask, setters } = setup(({ set }) => {
       set(store.queuedMessagesByConvoId(CONVO_ID), [queuedMessage('q1', 'interrupt text')]);
       set(store.drainAfterAbortByIndex(INDEX), {
+=======
+    const { ask, setters } = setup(() => {
+      getDefaultStore().set(queuedMessagesByConvoId(CONVO_ID), [
+        queuedMessage('q1', 'interrupt text'),
+      ]);
+      getDefaultStore().set(drainAfterAbortByIndex(INDEX), {
+>>>>>>> upstream/main
         conversationId: CONVO_ID,
         generationCreatedAt: 41,
       });
@@ -821,9 +1160,17 @@ describe('useQueueDrain', () => {
   });
 
   it('does not let a different generation consume an interrupt arm', async () => {
+<<<<<<< HEAD
     const { ask, setters } = setup(({ set }) => {
       set(store.queuedMessagesByConvoId(CONVO_ID), [queuedMessage('q1', 'epoch owner')]);
       set(store.drainAfterAbortByIndex(INDEX), {
+=======
+    const { ask, setters } = setup(() => {
+      getDefaultStore().set(queuedMessagesByConvoId(CONVO_ID), [
+        queuedMessage('q1', 'epoch owner'),
+      ]);
+      getDefaultStore().set(drainAfterAbortByIndex(INDEX), {
+>>>>>>> upstream/main
         conversationId: CONVO_ID,
         generationCreatedAt: 41,
       });
@@ -857,9 +1204,19 @@ describe('useQueueDrain', () => {
         <RecoilRoot
           initializeState={({ set }) => {
             set(store.isSubmittingFamily(INDEX), true);
+<<<<<<< HEAD
             set(store.queuedMessagesByConvoId(CONVO_A), [queuedMessage('qa', 'send for A')]);
             set(store.queuedMessagesByConvoId(CONVO_B), [queuedMessage('qb', 'send for B')]);
             set(store.drainAfterAbortByIndex(INDEX), {
+=======
+            getDefaultStore().set(queuedMessagesByConvoId(CONVO_A), [
+              queuedMessage('qa', 'send for A'),
+            ]);
+            getDefaultStore().set(queuedMessagesByConvoId(CONVO_B), [
+              queuedMessage('qb', 'send for B'),
+            ]);
+            getDefaultStore().set(drainAfterAbortByIndex(INDEX), {
+>>>>>>> upstream/main
               conversationId: CONVO_A,
               generationCreatedAt: 11,
             });
@@ -871,12 +1228,21 @@ describe('useQueueDrain', () => {
     );
     const { result, rerender } = renderHook(
       ({ activeConversationId }: { activeConversationId: string }) => {
+<<<<<<< HEAD
         setRunEnd = useSetRecoilState(store.runEndByIndex(INDEX));
         setIsSubmitting = useSetRecoilState(store.isSubmittingFamily(INDEX));
         useQueueDrain(INDEX, activeConversationId, ask);
         return {
           indexEnd: useRecoilValue(store.runEndByIndex(INDEX)),
           parkedA: useRecoilValue(store.pendingRunEndByConvoId(CONVO_A)),
+=======
+        setRunEnd = useSetAtom(runEndByIndex(INDEX));
+        setIsSubmitting = useSetRecoilState(store.isSubmittingFamily(INDEX));
+        useQueueDrain(INDEX, activeConversationId, ask);
+        return {
+          indexEnd: useAtomValue(runEndByIndex(INDEX)),
+          parkedA: useAtomValue(pendingRunEndByConvoId(CONVO_A)),
+>>>>>>> upstream/main
         };
       },
       { wrapper, initialProps: { activeConversationId: CONVO_B } },
@@ -932,7 +1298,11 @@ describe('useQueueDrain', () => {
 
   it('waits for isSubmitting to flip false before draining', async () => {
     const { ask, setters } = setup(({ set }) => {
+<<<<<<< HEAD
       set(store.queuedMessagesByConvoId(CONVO_ID), [queuedMessage('q1', 'deferred')]);
+=======
+      getDefaultStore().set(queuedMessagesByConvoId(CONVO_ID), [queuedMessage('q1', 'deferred')]);
+>>>>>>> upstream/main
       set(store.isSubmittingFamily(INDEX), true);
     });
 
@@ -949,8 +1319,13 @@ describe('useQueueDrain', () => {
   });
 
   it('migrates a NEW_CONVO-keyed queue when the run started as a new conversation', async () => {
+<<<<<<< HEAD
     const { ask, setters } = setup(({ set }) => {
       set(store.queuedMessagesByConvoId(Constants.NEW_CONVO), [
+=======
+    const { ask, setters } = setup(() => {
+      getDefaultStore().set(queuedMessagesByConvoId(Constants.NEW_CONVO), [
+>>>>>>> upstream/main
         queuedMessage('q1', 'queued before convo existed'),
         queuedMessage('q2', 'second'),
       ]);
@@ -965,12 +1340,41 @@ describe('useQueueDrain', () => {
     );
   });
 
+<<<<<<< HEAD
   it('keeps an interrupt queued after URL resolution ahead of pre-migration follow-ups', async () => {
     const { ask, setters } = setup(({ set }) => {
       set(store.queuedMessagesByConvoId(Constants.NEW_CONVO), [
         { id: 'ordinary-before-url', text: 'ordinary follow-up', createdAt: 1 },
       ]);
       set(store.queuedMessagesByConvoId(CONVO_ID), [
+=======
+  it('preserves a manually reordered NEW_CONVO queue during migration', async () => {
+    const { ask, setters } = setup(() => {
+      getDefaultStore().set(queuedMessagesByConvoId(Constants.NEW_CONVO), [
+        { id: 'second', text: 'send this first', createdAt: 2 },
+        { id: 'first', text: 'send this second', createdAt: 1 },
+      ]);
+      getDefaultStore().set(queuedMessagesByConvoId(CONVO_ID), [
+        { id: 'third', text: 'send this third', createdAt: 3 },
+      ]);
+    });
+
+    act(() => {
+      setters.setRunEnd!(runEnd({ startedAsNewConvo: true }));
+    });
+
+    await waitFor(() =>
+      expect(ask).toHaveBeenCalledWith({ text: 'send this first' }, emptyOverrides),
+    );
+  });
+
+  it('keeps an interrupt queued after URL resolution ahead of pre-migration follow-ups', async () => {
+    const { ask, setters } = setup(() => {
+      getDefaultStore().set(queuedMessagesByConvoId(Constants.NEW_CONVO), [
+        { id: 'ordinary-before-url', text: 'ordinary follow-up', createdAt: 1 },
+      ]);
+      getDefaultStore().set(queuedMessagesByConvoId(CONVO_ID), [
+>>>>>>> upstream/main
         {
           id: 'interrupt-after-url',
           text: 'interrupt next',
@@ -978,7 +1382,11 @@ describe('useQueueDrain', () => {
           priority: true,
         },
       ]);
+<<<<<<< HEAD
       set(store.drainAfterAbortByIndex(INDEX), {
+=======
+      getDefaultStore().set(drainAfterAbortByIndex(INDEX), {
+>>>>>>> upstream/main
         conversationId: CONVO_ID,
         generationCreatedAt: 41,
       });
@@ -1013,10 +1421,17 @@ describe('useQueueDrain', () => {
       } = {};
 
       function Harness() {
+<<<<<<< HEAD
         setters.setRunEnd = useSetRecoilState(store.runEndByIndex(INDEX));
         setters.setInterruptFlag = useSetRecoilState(store.drainAfterAbortByIndex(INDEX));
         state.newConvoQueue = useRecoilValue(store.queuedMessagesByConvoId(Constants.NEW_CONVO));
         state.parkedUnderOptimistic = useRecoilValue(store.pendingRunEndByConvoId(OPTIMISTIC_ID));
+=======
+        setters.setRunEnd = useSetAtom(runEndByIndex(INDEX));
+        setters.setInterruptFlag = useSetAtom(drainAfterAbortByIndex(INDEX));
+        state.newConvoQueue = useAtomValue(queuedMessagesByConvoId(Constants.NEW_CONVO));
+        state.parkedUnderOptimistic = useAtomValue(pendingRunEndByConvoId(OPTIMISTIC_ID));
+>>>>>>> upstream/main
         useQueueDrain(INDEX, Constants.NEW_CONVO as string, ask);
         return null;
       }
@@ -1037,8 +1452,13 @@ describe('useQueueDrain', () => {
     }
 
     it('leaves the NEW_CONVO queue in place and parks nothing under the optimistic id', async () => {
+<<<<<<< HEAD
       const { ask, setters, state } = setupNewConvo(({ set }) => {
         set(store.queuedMessagesByConvoId(Constants.NEW_CONVO), [
+=======
+      const { ask, setters, state } = setupNewConvo(() => {
+        getDefaultStore().set(queuedMessagesByConvoId(Constants.NEW_CONVO), [
+>>>>>>> upstream/main
           queuedMessage('q1', 'queued during first turn'),
         ]);
       });
@@ -1063,6 +1483,7 @@ describe('useQueueDrain', () => {
     });
 
     it('drains under NEW_CONVO when interrupt & send was armed', async () => {
+<<<<<<< HEAD
       const { ask } = setupNewConvo(({ set }) => {
         set(store.queuedMessagesByConvoId(Constants.NEW_CONVO), [
           queuedMessage('q1', 'interrupted first turn'),
@@ -1072,6 +1493,17 @@ describe('useQueueDrain', () => {
           generationCreatedAt: 41,
         });
         set(store.runEndByIndex(INDEX), {
+=======
+      const { ask } = setupNewConvo(() => {
+        getDefaultStore().set(queuedMessagesByConvoId(Constants.NEW_CONVO), [
+          queuedMessage('q1', 'interrupted first turn'),
+        ]);
+        getDefaultStore().set(drainAfterAbortByIndex(INDEX), {
+          conversationId: String(Constants.NEW_CONVO),
+          generationCreatedAt: 41,
+        });
+        getDefaultStore().set(runEndByIndex(INDEX), {
+>>>>>>> upstream/main
           conversationId: Constants.NEW_CONVO as string,
           outcome: 'aborted',
           startedAsNewConvo: false,
@@ -1088,8 +1520,13 @@ describe('useQueueDrain', () => {
   });
 
   it('consumes the run-end signal (no double fire on re-render)', async () => {
+<<<<<<< HEAD
     const { ask, setters } = setup(({ set }) => {
       set(store.queuedMessagesByConvoId(CONVO_ID), [
+=======
+    const { ask, setters } = setup(() => {
+      getDefaultStore().set(queuedMessagesByConvoId(CONVO_ID), [
+>>>>>>> upstream/main
         queuedMessage('q1', 'one'),
         queuedMessage('q2', 'two'),
       ]);
@@ -1110,4 +1547,105 @@ describe('useQueueDrain', () => {
     await new Promise((resolve) => setTimeout(resolve, 25));
     expect(ask).toHaveBeenCalledTimes(1);
   });
+<<<<<<< HEAD
+=======
+
+  /* Edit and Remove on the rail hand a row's words to the composer across an
+     await, and the run end can land inside that gap. Dequeuing there sent the
+     very message the user was in the middle of taking back. */
+  describe('rows the rail has claimed', () => {
+    afterEach(() => {
+      releaseQueuedIntent('q-claimed');
+      releaseQueuedIntent('q-only');
+    });
+
+    it('skips a claimed row and sends the next one instead', async () => {
+      claimQueuedIntent('q-claimed');
+      const { ask, setters } = setup(() => {
+        getDefaultStore().set(queuedMessagesByConvoId(CONVO_ID), [
+          queuedMessage('q-claimed', 'being taken back'),
+          queuedMessage('q-next', 'still wanted'),
+        ]);
+      });
+
+      act(() => {
+        setters.setRunEnd!(runEnd());
+      });
+      await waitFor(() =>
+        expect(ask).toHaveBeenCalledWith({ text: 'still wanted' }, emptyOverrides),
+      );
+      expect(ask).toHaveBeenCalledTimes(1);
+    });
+
+    it('restores a refused skipped row after its claimed predecessor', async () => {
+      claimQueuedIntent('q-claimed');
+      const { ask, setters } = setup(() => {
+        getDefaultStore().set(queuedMessagesByConvoId(CONVO_ID), [
+          queuedMessage('q-claimed', 'being taken back'),
+          queuedMessage('q-next', 'temporarily refused'),
+          queuedMessage('q-tail', 'still last'),
+        ]);
+      });
+      ask.mockReturnValue(false);
+
+      act(() => {
+        setters.setRunEnd!(runEnd());
+      });
+
+      await waitFor(() => expect(ask).toHaveBeenCalledTimes(1));
+      await waitFor(() =>
+        expect(setters.queueRef?.current.map((item) => item.id)).toEqual([
+          'q-claimed',
+          'q-next',
+          'q-tail',
+        ]),
+      );
+    });
+
+    it('sends nothing when the only queued row is claimed', async () => {
+      claimQueuedIntent('q-only');
+      const { ask, setters } = setup(() => {
+        getDefaultStore().set(queuedMessagesByConvoId(CONVO_ID), [
+          queuedMessage('q-only', 'mine for now'),
+        ]);
+      });
+
+      act(() => {
+        setters.setRunEnd!(runEnd());
+      });
+      await new Promise((resolve) => setTimeout(resolve, 25));
+      expect(ask).not.toHaveBeenCalled();
+    });
+  });
+
+  /* `isSubmitting` is a render-old read on both sides, so the rail's own Send
+     now can already have called `ask` for this pane in the current task. */
+  it('refuses to drain while a queued send holds the pane', async () => {
+    const held = acquireQueueSendLock(String(INDEX));
+    const { ask, setters } = setup(() => {
+      getDefaultStore().set(queuedMessagesByConvoId(CONVO_ID), [
+        queuedMessage('q-lock', 'after the hold'),
+      ]);
+    });
+
+    act(() => {
+      setters.setRunEnd!(runEnd());
+    });
+    await new Promise((resolve) => setTimeout(resolve, 25));
+    expect(ask).not.toHaveBeenCalled();
+
+    /* The signal was never consumed, so the queue is reconsidered rather than
+       dropped as soon as the pane's submission state moves again. */
+    releaseQueueSendLock(held);
+    act(() => {
+      setters.setIsSubmitting!(true);
+    });
+    act(() => {
+      setters.setIsSubmitting!(false);
+    });
+    await waitFor(() =>
+      expect(ask).toHaveBeenCalledWith({ text: 'after the hold' }, emptyOverrides),
+    );
+  });
+>>>>>>> upstream/main
 });

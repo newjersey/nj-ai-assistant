@@ -3,6 +3,10 @@ import type { AppConfig } from '@librechat/data-schemas';
 import type { CodeExecutionContext, CodeEnvironmentConfig } from '~/agents/execution';
 import {
   CodeWorkspaceSelectionError,
+<<<<<<< HEAD
+=======
+  isNativeSandboxProfile,
+>>>>>>> upstream/main
   resolveCodeExecutionWorkspaceContext,
   supportsProgrammaticCodeExecution,
 } from './capabilities';
@@ -172,6 +176,77 @@ describe('supportsProgrammaticCodeExecution', () => {
     expect(fetchSpy).not.toHaveBeenCalled();
   });
 
+<<<<<<< HEAD
+=======
+  it.each([
+    {
+      languages: ['bash'],
+      operation: 'execute_command',
+      workspaceId: 'project-a',
+      supported: true,
+    },
+    {
+      languages: undefined,
+      operation: 'execute_command',
+      workspaceId: 'project-a',
+      supported: false,
+    },
+    {
+      languages: ['python'],
+      operation: 'execute_command',
+      workspaceId: 'project-a',
+      supported: false,
+    },
+    { languages: ['bash'], operation: 'read_file', workspaceId: 'project-a', supported: false },
+    { languages: ['bash'], operation: 'execute_command', workspaceId: 'removed', supported: false },
+  ])(
+    'gates selected project PTC using the live capability: %j',
+    async ({ languages, operation, workspaceId, supported }) => {
+      process.env.TEST_CODE_CAPABILITY_TOKEN = JSON.stringify({
+        languages,
+        operation,
+        workspaceId,
+      });
+      jest.spyOn(globalThis, 'fetch').mockResolvedValue(
+        new Response(
+          JSON.stringify({
+            protocolVersion: 1,
+            workerId: 'worker',
+            online: true,
+            ready: true,
+            leaseExpiresInMs: 45000,
+            capabilities: {
+              statefulWorkspace: false,
+              sandboxProfile: 'anthropic-srt',
+              runtimes: [],
+              workspaceTools: {
+                protocolVersion: 1,
+                operations: ['execute_command', 'read_file'],
+                programmaticLanguages: languages,
+                workspaces: [{ id: 'project-a', operations: [operation] }],
+              },
+            },
+          }),
+        ),
+      );
+      expect(
+        await supportsProgrammaticCodeExecution(
+          {
+            ...context,
+            codeWorkspace: {
+              environmentId: 'personal',
+              workspaceId,
+              operations: ['execute_command', 'read_file'],
+            },
+          },
+          environments,
+          getAppConfig,
+        ),
+      ).toBe(supported);
+    },
+  );
+
+>>>>>>> upstream/main
   it('does not send credentials to a different execution route', async () => {
     process.env.TEST_CODE_CAPABILITY_TOKEN = 'route-token';
     const fetchSpy = jest
@@ -283,7 +358,15 @@ describe('resolveCodeExecutionWorkspaceContext', () => {
     delete process.env.TEST_CODE_CAPABILITY_TOKEN;
   });
 
+<<<<<<< HEAD
   function workspaceStatus(workspaces: unknown[], statefulWorkspace: boolean = true): Response {
+=======
+  function workspaceStatus(
+    workspaces: unknown[],
+    statefulWorkspace: boolean = true,
+    maxCommandTimeoutMs?: number,
+  ): Response {
+>>>>>>> upstream/main
     return new Response(
       JSON.stringify({
         protocolVersion: 1,
@@ -291,6 +374,10 @@ describe('resolveCodeExecutionWorkspaceContext', () => {
         online: true,
         ready: true,
         leaseExpiresInMs: 45_000,
+<<<<<<< HEAD
+=======
+        maxCommandTimeoutMs,
+>>>>>>> upstream/main
         capabilities: {
           statefulWorkspace,
           sandboxProfile: 'native-srt',
@@ -307,10 +394,21 @@ describe('resolveCodeExecutionWorkspaceContext', () => {
 
   it('binds the exact advertised workspace and its operation ceiling', async () => {
     jest.spyOn(globalThis, 'fetch').mockResolvedValue(
+<<<<<<< HEAD
       workspaceStatus([
         { id: 'project-a', name: 'Project A' },
         { id: 'docs', operations: ['read_file', 'list_files'] },
       ]),
+=======
+      workspaceStatus(
+        [
+          { id: 'project-a', name: 'Project A' },
+          { id: 'docs', operations: ['read_file', 'list_files'] },
+        ],
+        true,
+        120_000,
+      ),
+>>>>>>> upstream/main
     );
 
     await expect(
@@ -329,10 +427,62 @@ describe('resolveCodeExecutionWorkspaceContext', () => {
         environmentId: 'personal',
         workspaceId: 'docs',
         operations: ['read_file', 'list_files'],
+<<<<<<< HEAD
+=======
+        maxCommandTimeoutMs: 120_000,
+>>>>>>> upstream/main
       },
     });
   });
 
+<<<<<<< HEAD
+=======
+  it('carries the worker edit features into the selected workspace', async () => {
+    const response = workspaceStatus([{ id: 'docs' }]);
+    const body = await response.json();
+    body.capabilities.workspaceTools.editFileFeatures = ['expected_base_sha256', 'tolerant_match'];
+    jest.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(JSON.stringify(body)));
+
+    const resolved = await resolveCodeExecutionWorkspaceContext({
+      context,
+      requestedSelections: [{ environmentId: 'personal', workspaceId: 'docs' }],
+      environments,
+      getAppConfig,
+    });
+
+    expect(resolved.codeWorkspace?.editFileFeatures).toEqual([
+      'expected_base_sha256',
+      'tolerant_match',
+    ]);
+  });
+
+  it.each([
+    { sandboxProfile: 'anthropic-srt', nativeSandbox: true },
+    { sandboxProfile: 'anthropic-srt:trusted-vm', nativeSandbox: true },
+    { sandboxProfile: 'anthropic-srt-custom', nativeSandbox: undefined },
+    { sandboxProfile: 'native-srt', nativeSandbox: undefined },
+    { sandboxProfile: 'oci-docker', nativeSandbox: undefined },
+  ])(
+    'marks the native sandbox only for its advertised profile: $sandboxProfile',
+    async ({ sandboxProfile, nativeSandbox }) => {
+      const response = workspaceStatus([{ id: 'docs' }]);
+      const body = await response.json();
+      body.capabilities.sandboxProfile = sandboxProfile;
+      jest.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(JSON.stringify(body)));
+
+      const resolved = await resolveCodeExecutionWorkspaceContext({
+        context,
+        requestedSelections: [{ environmentId: 'personal', workspaceId: 'docs' }],
+        environments,
+        getAppConfig,
+      });
+
+      expect(resolved.codeWorkspace?.nativeSandbox).toBe(nativeSandbox);
+      expect(isNativeSandboxProfile(sandboxProfile)).toBe(nativeSandbox === true);
+    },
+  );
+
+>>>>>>> upstream/main
   it('carries validated project metadata from the selected workspace', async () => {
     const environment = {
       fingerprint: 'a'.repeat(64),
@@ -355,6 +505,165 @@ describe('resolveCodeExecutionWorkspaceContext', () => {
     expect(resolved.codeWorkspace?.environment).toEqual(environment);
   });
 
+<<<<<<< HEAD
+=======
+  it.each([
+    { checkout: 'source', linkedWorktrees: undefined, lanes: true },
+    { checkout: 'source', linkedWorktrees: true, lanes: true },
+    { checkout: 'source', linkedWorktrees: false, lanes: false },
+    { checkout: 'isolated', linkedWorktrees: undefined, lanes: false },
+    { checkout: 'isolated', linkedWorktrees: true, lanes: false },
+    { checkout: 'isolated', linkedWorktrees: false, lanes: false },
+  ] as const)(
+    'honors checkout $checkout with linkedWorktrees=$linkedWorktrees',
+    async ({ checkout, linkedWorktrees, lanes }) => {
+      jest.spyOn(globalThis, 'fetch').mockResolvedValue(
+        workspaceStatus([
+          {
+            id: 'worktree',
+            workspaceInstances: ['git_worktree'],
+            workspaceScopes: ['git_linked_worktree'],
+          },
+        ]),
+      );
+      const resolved = await resolveCodeExecutionWorkspaceContext({
+        context: {
+          ...context,
+          conversationWorkspaceInstanceId: 'c'.repeat(64),
+          codeEnvironmentConfigSchema: {
+            workspaces: { allowCheckoutSelection: true, linkedWorktrees },
+          },
+        },
+        requestedSelections: [{ environmentId: 'personal', workspaceId: 'worktree', checkout }],
+        environments,
+        getAppConfig,
+      });
+      expect(resolved.codeWorkspace?.checkout).toBe(checkout);
+      expect(resolved.codeWorkspace?.workspaceInstanceId).toBe(
+        checkout === 'isolated' ? 'c'.repeat(64) : undefined,
+      );
+      expect(resolved.codeWorkspace?.linkedWorktrees).toBe(lanes ? true : undefined);
+    },
+  );
+
+  it.each([
+    { enabled: false, capable: true, instance: 'c'.repeat(64) },
+    { enabled: true, capable: false, instance: 'c'.repeat(64) },
+    { enabled: true, capable: true, instance: undefined },
+  ])(
+    'refuses unsupported isolation instead of executing in the source: %j',
+    async ({ enabled, capable, instance }) => {
+      jest
+        .spyOn(globalThis, 'fetch')
+        .mockResolvedValue(
+          workspaceStatus([
+            { id: 'worktree', ...(capable ? { workspaceInstances: ['git_worktree'] } : {}) },
+          ]),
+        );
+      await expect(
+        resolveCodeExecutionWorkspaceContext({
+          context: {
+            ...context,
+            conversationWorkspaceInstanceId: instance,
+            codeEnvironmentConfigSchema: { workspaces: { allowCheckoutSelection: enabled } },
+          },
+          requestedSelections: [
+            { environmentId: 'personal', workspaceId: 'worktree', checkout: 'isolated' },
+          ],
+          environments,
+          getAppConfig,
+        }),
+      ).rejects.toMatchObject({ reason: 'unsupported' });
+    },
+  );
+
+  it('refuses a checkout choice that changes the sealed decision', async () => {
+    const selection = { environmentId: 'personal', workspaceId: 'worktree' };
+    await expect(
+      resolveCodeExecutionWorkspaceContext({
+        context,
+        persistedSelections: [{ ...selection, checkout: 'isolated' }],
+        requestedSelections: [{ ...selection, checkout: 'source' }],
+        environments,
+        getAppConfig,
+      }),
+    ).rejects.toMatchObject({ reason: 'locked' });
+  });
+
+  it('activates a server-derived instance only when the worker advertises worktree support', async () => {
+    const workspaceInstanceId = 'c'.repeat(64);
+    jest
+      .spyOn(globalThis, 'fetch')
+      .mockResolvedValue(
+        workspaceStatus([
+          { id: 'worktree', workspaceInstances: ['git_worktree'] },
+          { id: 'legacy' },
+        ]),
+      );
+
+    const supported = await resolveCodeExecutionWorkspaceContext({
+      context: { ...context, conversationWorkspaceInstanceId: workspaceInstanceId },
+      requestedSelections: [{ environmentId: 'personal', workspaceId: 'worktree' }],
+      environments,
+      getAppConfig,
+    });
+    const legacy = await resolveCodeExecutionWorkspaceContext({
+      context: { ...context, conversationWorkspaceInstanceId: workspaceInstanceId },
+      requestedSelections: [{ environmentId: 'personal', workspaceId: 'legacy' }],
+      environments,
+      getAppConfig,
+    });
+
+    expect(supported.codeWorkspace?.workspaceInstanceId).toBe(workspaceInstanceId);
+    expect(legacy.codeWorkspace).not.toHaveProperty('workspaceInstanceId');
+  });
+
+  it('routes linked worktrees into lanes unless disabled or a conversation instance owns the checkout', async () => {
+    const workspaceInstanceId = 'c'.repeat(64);
+    jest.spyOn(globalThis, 'fetch').mockImplementation(async () =>
+      workspaceStatus([
+        {
+          id: 'lanes',
+          workspaceInstances: ['git_worktree'],
+          workspaceScopes: ['git_linked_worktree'],
+        },
+        { id: 'legacy' },
+      ]),
+    );
+    const resolve = (workspaceId: string, instanceId?: string, linkedWorktrees = true) =>
+      resolveCodeExecutionWorkspaceContext({
+        context: {
+          ...context,
+          codeEnvironmentConfigSchema: {
+            workspaces: { linkedWorktrees, allowCheckoutSelection: false },
+          },
+          ...(instanceId ? { conversationWorkspaceInstanceId: instanceId } : {}),
+        },
+        requestedSelections: [{ environmentId: 'personal', workspaceId }],
+        environments,
+        getAppConfig,
+      });
+
+    const lanes = await resolve('lanes');
+    const disabled = await resolve('lanes', undefined, false);
+    const unconfigured = await resolveCodeExecutionWorkspaceContext({
+      context,
+      requestedSelections: [{ environmentId: 'personal', workspaceId: 'lanes' }],
+      environments,
+      getAppConfig,
+    });
+    const instance = await resolve('lanes', workspaceInstanceId);
+    const legacy = await resolve('legacy');
+
+    expect(lanes.codeWorkspace?.linkedWorktrees).toBe(true);
+    expect(disabled.codeWorkspace).not.toHaveProperty('linkedWorktrees');
+    expect(unconfigured.codeWorkspace?.linkedWorktrees).toBe(true);
+    expect(instance.codeWorkspace?.workspaceInstanceId).toBe(workspaceInstanceId);
+    expect(instance.codeWorkspace).not.toHaveProperty('linkedWorktrees');
+    expect(legacy.codeWorkspace).not.toHaveProperty('linkedWorktrees');
+  });
+
+>>>>>>> upstream/main
   it('admits native workspace tools without enabling programmatic runtime execution', async () => {
     jest
       .spyOn(globalThis, 'fetch')
@@ -499,6 +808,24 @@ describe('resolveCodeExecutionWorkspaceContext', () => {
     expect(fetchSpy).not.toHaveBeenCalled();
   });
 
+<<<<<<< HEAD
+=======
+  it('rejects changed agent ownership on a sealed selection before contacting Code API', async () => {
+    const fetchSpy = jest.spyOn(globalThis, 'fetch');
+    const selected = { environmentId: 'personal', workspaceId: 'project-a' };
+    await expect(
+      resolveCodeExecutionWorkspaceContext({
+        context,
+        requestedSelections: [{ ...selected, agentIds: ['reviewer'] }],
+        persistedSelections: [{ ...selected, agentIds: ['primary'] }],
+        environments,
+        getAppConfig,
+      }),
+    ).rejects.toMatchObject({ reason: 'locked' });
+    expect(fetchSpy).not.toHaveBeenCalled();
+  });
+
+>>>>>>> upstream/main
   it('fails when the saved workspace disappears instead of selecting another', async () => {
     jest.spyOn(globalThis, 'fetch').mockResolvedValue(workspaceStatus([{ id: 'replacement' }]));
 

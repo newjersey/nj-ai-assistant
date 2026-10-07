@@ -25,6 +25,11 @@ type ProjectButtonProps = {
   setShowProjectDialog?: (value: boolean) => void;
   triggerRef?: RefObject<HTMLButtonElement>;
   setMenuOpen?: (open: boolean) => void;
+<<<<<<< HEAD
+=======
+  /** Called with the new project once the assignment has landed. */
+  onAssigned?: (projectId: string) => void;
+>>>>>>> upstream/main
 };
 
 function ProjectConversationDialog({
@@ -32,11 +37,19 @@ function ProjectConversationDialog({
   chatProjectId,
   setMenuOpen,
   setShowProjectDialog,
+<<<<<<< HEAD
+=======
+  onAssigned,
+>>>>>>> upstream/main
 }: {
   conversationId: string;
   chatProjectId?: string | null;
   setMenuOpen?: (open: boolean) => void;
   setShowProjectDialog: (value: boolean) => void;
+<<<<<<< HEAD
+=======
+  onAssigned?: (projectId: string) => void;
+>>>>>>> upstream/main
 }) {
   const localize = useLocalize();
   const { showToast } = useToastContext();
@@ -59,7 +72,11 @@ function ProjectConversationDialog({
       projects.map((project) => ({
         label: project.name,
         value: project._id,
+<<<<<<< HEAD
         icon: <Folder className="h-4 w-4 text-text-secondary" aria-hidden="true" />,
+=======
+        icon: <Folder className="text-text-secondary h-4 w-4" aria-hidden="true" />,
+>>>>>>> upstream/main
       })),
     [projects],
   );
@@ -79,6 +96,10 @@ function ProjectConversationDialog({
       },
       {
         onSuccess: () => {
+<<<<<<< HEAD
+=======
+          onAssigned?.(selectedProjectId);
+>>>>>>> upstream/main
           setShowProjectDialog(false);
           setMenuOpen?.(false);
           showToast({
@@ -108,7 +129,11 @@ function ProjectConversationDialog({
         <OGDialogTitle>{localize('com_ui_change_project')}</OGDialogTitle>
       </OGDialogHeader>
       <div className="flex flex-col gap-2">
+<<<<<<< HEAD
         <Label htmlFor="change-project-select" className="text-sm font-medium text-text-primary">
+=======
+        <Label htmlFor="change-project-select" className="text-text-primary text-sm font-medium">
+>>>>>>> upstream/main
           {localize('com_ui_select_project')}
         </Label>
         <ControlCombobox
@@ -117,7 +142,11 @@ function ProjectConversationDialog({
           displayValue={selectedProject?.name}
           items={projectItems}
           setValue={setSelectedProjectId}
+<<<<<<< HEAD
           SelectIcon={<Folder className="h-4 w-4 text-text-secondary" aria-hidden="true" />}
+=======
+          SelectIcon={<Folder className="text-text-secondary h-4 w-4" aria-hidden="true" />}
+>>>>>>> upstream/main
           ariaLabel={localize('com_ui_select_project')}
           searchPlaceholder={localize('com_ui_search_projects')}
           selectPlaceholder={localize('com_ui_select_project')}
@@ -127,7 +156,11 @@ function ProjectConversationDialog({
           portal={false}
           matchTriggerWidth={true}
           containerClassName="w-full px-0"
+<<<<<<< HEAD
           className="h-10 w-full justify-start gap-2 rounded-xl border border-border-light bg-surface-tertiary px-3 text-sm text-text-primary hover:bg-surface-hover"
+=======
+          className="border-border-light bg-surface-tertiary text-text-primary hover:bg-surface-hover h-10 w-full justify-start gap-2 rounded-xl border px-3 text-sm"
+>>>>>>> upstream/main
         />
         {hasNextPage ? (
           <Button
@@ -162,6 +195,10 @@ export default function ProjectButton({
   showProjectDialog,
   setShowProjectDialog,
   triggerRef,
+<<<<<<< HEAD
+=======
+  onAssigned,
+>>>>>>> upstream/main
 }: ProjectButtonProps) {
   if (showProjectDialog === undefined || setShowProjectDialog === undefined) {
     return null;
@@ -178,6 +215,10 @@ export default function ProjectButton({
         chatProjectId={chatProjectId}
         setMenuOpen={setMenuOpen}
         setShowProjectDialog={setShowProjectDialog}
+<<<<<<< HEAD
+=======
+        onAssigned={onAssigned}
+>>>>>>> upstream/main
       />
     </OGDialog>
   );

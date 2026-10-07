@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { memo, lazy, Suspense, useEffect, useRef } from 'react';
 import { Button, Sidebar, Skeleton } from '@librechat/client';
 import type { NavLink } from '~/common';
@@ -8,6 +9,19 @@ import { useLocalize } from '~/hooks';
 import Switcher from './Switcher';
 
 const AccountSettings = lazy(() => import('~/components/Nav/AccountSettings'));
+=======
+import { memo, Suspense, useEffect, useRef } from 'react';
+import { Button, Sidebar, Skeleton } from '@librechat/client';
+import type { NavLink } from '~/common';
+import { CLOSE_SIDEBAR_ID } from '~/components/Chat/Menus/OpenSidebar';
+import { useShortcutAriaKey } from '~/hooks/useKeyboardShortcuts';
+import { lazyWithRecovery } from '~/lib/assets/lazy';
+import { useLocalize } from '~/hooks';
+import Switcher from './Switcher';
+import NewChat from './NewChat';
+
+const AccountSettings = lazyWithRecovery(() => import('~/components/Nav/AccountSettings'));
+>>>>>>> upstream/main
 
 /**
  * At full width there is nothing beside the drawer left to tap, so this close
@@ -21,12 +35,22 @@ function Header({
   links,
   expanded,
   onClose,
+<<<<<<< HEAD
+=======
+  onNewChat,
+  switchToHistory,
+>>>>>>> upstream/main
   onLeaveInsights,
   routeActiveId,
 }: {
   links: NavLink[];
   expanded: boolean;
   onClose: () => void;
+<<<<<<< HEAD
+=======
+  onNewChat: (afterSlide?: () => void) => void;
+  switchToHistory: boolean;
+>>>>>>> upstream/main
   onLeaveInsights?: () => void;
   routeActiveId?: string;
 }) {
@@ -45,7 +69,11 @@ function Header({
   }, [expanded]);
 
   return (
+<<<<<<< HEAD
     <div className="flex h-14 flex-shrink-0 items-center gap-2 border-b border-border-light px-2">
+=======
+    <div className="border-border-light flex h-14 shrink-0 items-center gap-2 border-b px-2">
+>>>>>>> upstream/main
       <Button
         ref={closeRef}
         /**
@@ -64,7 +92,11 @@ function Header({
         /** The only close control while open, so its binding must be discoverable here. */
         aria-keyshortcuts={toggleSidebarAriaKey}
         tabIndex={expanded ? 0 : -1}
+<<<<<<< HEAD
         className="flex-shrink-0"
+=======
+        className="shrink-0"
+>>>>>>> upstream/main
         onClick={onClose}
       >
         <Sidebar className="icon-md" aria-hidden="true" />
@@ -75,7 +107,11 @@ function Header({
         onNavigate={onClose}
         routeActiveId={routeActiveId}
       />
+<<<<<<< HEAD
       <AgentMarketplaceButton side="bottom" onNavigate={onClose} />
+=======
+      <NewChat onNewChat={onNewChat} switchToHistory={switchToHistory} />
+>>>>>>> upstream/main
       <Suspense fallback={<Skeleton className="size-9 rounded-lg" />}>
         <AccountSettings collapsed />
       </Suspense>

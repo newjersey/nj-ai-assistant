@@ -21,7 +21,11 @@ type ManagementApi = NonNullable<TAgentsEndpoint['managementApi']>;
 type ManagementAuth = NonNullable<ManagementApi['auth']>;
 type ManagementOidc = NonNullable<ManagementAuth['oidc']>;
 type ManagementClient = ManagementAuth['clients'][number];
+<<<<<<< HEAD
 type EnabledManagementOidc = ManagementOidc & { audience: string; issuer: string };
+=======
+type EnabledManagementOidc = ManagementOidc & { issuer: string };
+>>>>>>> upstream/main
 
 type PrincipalResolution =
   | { status: 'resolved'; user: IUser }
@@ -47,15 +51,27 @@ function getEnabledAuth(
   config: AppConfig,
 ): { auth: ManagementAuth; oidc: EnabledManagementOidc } | undefined {
   const auth = config.endpoints?.agents?.managementApi?.auth;
+<<<<<<< HEAD
   if (auth?.oidc?.enabled !== true || !auth.oidc.issuer || !auth.oidc.audience) {
+=======
+  const oidc = auth?.oidc;
+  const hasAudience = Boolean(oidc?.audience);
+  const hasScopedAccessToken = oidc?.tokenUse === 'access' && Boolean(oidc.requiredScopes?.length);
+  if (!auth || oidc?.enabled !== true || !oidc.issuer || (!hasAudience && !hasScopedAccessToken)) {
+>>>>>>> upstream/main
     return;
   }
   return {
     auth,
     oidc: {
+<<<<<<< HEAD
       ...auth.oidc,
       audience: auth.oidc.audience,
       issuer: auth.oidc.issuer,
+=======
+      ...oidc,
+      issuer: oidc.issuer,
+>>>>>>> upstream/main
     },
   };
 }

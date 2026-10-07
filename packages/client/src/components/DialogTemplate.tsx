@@ -7,7 +7,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from './Dialog';
+<<<<<<< HEAD
 import { cn } from '~/utils/';
+=======
+import { cn, disabledFillClasses } from '~/utils';
+>>>>>>> upstream/main
 
 type SelectionProps = {
   selectHandler?: () => void;
@@ -48,20 +52,35 @@ const DialogTemplate: ForwardRefExoticComponent<
   const { selectHandler, selectClasses, selectText } = selection || {};
   const Cancel = 'cancel';
 
+<<<<<<< HEAD
   const defaultSelect =
     'bg-surface-inverted text-text-inverted transition-colors hover:bg-surface-inverted-hover disabled:cursor-not-allowed disabled:opacity-50';
+=======
+  const defaultSelect = cn(
+    'bg-surface-inverted text-text-inverted transition-colors hover:bg-surface-inverted-hover disabled:cursor-not-allowed disabled:opacity-50',
+    disabledFillClasses,
+  );
+>>>>>>> upstream/main
   return (
     <DialogContent
       showCloseButton={showCloseButton}
       ref={ref}
       className={cn(
+<<<<<<< HEAD
         'bg-surface-dialog shadow-2xl high-contrast:border high-contrast:border-solid high-contrast:border-border-medium high-contrast:shadow-none',
+=======
+        'bg-surface-dialog high-contrast:border high-contrast:border-solid high-contrast:border-border-medium high-contrast:shadow-none shadow-2xl',
+>>>>>>> upstream/main
         className || '',
       )}
       onClick={(e) => e.stopPropagation()}
     >
       <DialogHeader className={cn(headerClassName ?? '')}>
+<<<<<<< HEAD
         <DialogTitle className="text-lg font-medium leading-6 text-text-primary">
+=======
+        <DialogTitle className="text-text-primary text-lg leading-6 font-medium">
+>>>>>>> upstream/main
           {title}
         </DialogTitle>
         {description && (

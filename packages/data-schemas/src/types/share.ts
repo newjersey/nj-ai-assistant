@@ -96,6 +96,10 @@ export type SharedMessage = Pick<
   | 'manualSkills'
   | 'alwaysAppliedSkills'
   | 'quotes'
+<<<<<<< HEAD
+=======
+  | 'reasoningOverride'
+>>>>>>> upstream/main
 > & {
   model?: string;
   files?: SharedFile[];

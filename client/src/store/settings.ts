@@ -2,6 +2,10 @@ import { atom } from 'recoil';
 import { SettingsViews, LocalStorageKeys } from 'librechat-data-provider';
 import type { TOptionSettings } from '~/common';
 import { CHAT_TITLE_IN_TAB_KEY } from '~/utils/documentTitle';
+<<<<<<< HEAD
+=======
+import { isDrawerViewport } from '~/utils/breakpoints';
+>>>>>>> upstream/main
 import { atomWithLocalStorage } from '~/store/utils';
 import { STTEndpoints } from '~/common';
 
@@ -34,23 +38,34 @@ const staticAtoms = {
   speechSettingsInitialized: atom<boolean>({ key: 'speechSettingsInitialized', default: false }),
 };
 
+<<<<<<< HEAD
 /** Read synchronously: `useMediaQuery` only resolves after the first paint. */
 function isSmallViewport(): boolean {
   return typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches;
 }
 
+=======
+>>>>>>> upstream/main
 const localStorageAtoms = {
   // General settings
   sidebarExpanded: atomWithLocalStorage(
     'unifiedSidebarExpanded',
+<<<<<<< HEAD
     !isSmallViewport(),
+=======
+    !isDrawerViewport(),
+>>>>>>> upstream/main
     /**
      * The mobile drawer covers the viewport, so a persisted open state would
      * launch the app into the navigation instead of the conversation.
      * Normalized during atom initialization so the closed state reaches the
      * first paint rather than animating shut after it.
      */
+<<<<<<< HEAD
     (saved) => (isSmallViewport() ? false : saved),
+=======
+    (saved) => (isDrawerViewport() ? false : saved),
+>>>>>>> upstream/main
   ),
   enableUserMsgMarkdown: atomWithLocalStorage<boolean>(
     LocalStorageKeys.ENABLE_USER_MSG_MARKDOWN,
@@ -62,6 +77,7 @@ const localStorageAtoms = {
 
   // Chat settings
   enterToSend: atomWithLocalStorage('enterToSend', true),
+<<<<<<< HEAD
   /** What Enter does while a run is generating: steer (inject mid-run) or queue (send after). */
   duringRunDefaultAction: atomWithLocalStorage<'steer' | 'queue'>(
     'duringRunDefaultAction',
@@ -75,6 +91,8 @@ const localStorageAtoms = {
    * regardless — this only governs the default Enter/steer route.
    */
   steerInterruptsByDefault: atomWithLocalStorage('steerInterruptsByDefault', false),
+=======
+>>>>>>> upstream/main
   maximizeChatSpace: atomWithLocalStorage('maximizeChatSpace', false),
   chatDirection: atomWithLocalStorage('chatDirection', 'LTR'),
   autoExpandTools: atomWithLocalStorage(LocalStorageKeys.AUTO_EXPAND_TOOLS, false),

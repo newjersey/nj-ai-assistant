@@ -16,7 +16,11 @@ export default function InlinePromptsView() {
   }
 
   return (
+<<<<<<< HEAD
     <div className="flex h-full w-full flex-col overflow-y-auto bg-presentation">
+=======
+    <div className="bg-surface-primary-alt flex h-full w-full flex-col overflow-y-auto">
+>>>>>>> upstream/main
       <PromptForm promptId={promptId} />
     </div>
   );

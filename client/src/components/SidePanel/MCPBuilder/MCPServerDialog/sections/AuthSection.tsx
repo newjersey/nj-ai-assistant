@@ -118,7 +118,11 @@ export default function AuthSection({ isEditMode, serverName }: AuthSectionProps
 
       {/* API Key Fields */}
       <Collapse open={authType === AuthTypeEnum.ServiceHttp} className="pt-3">
+<<<<<<< HEAD
         <div className="space-y-3 rounded-lg border border-border-light p-3">
+=======
+        <div className="bg-surface-secondary space-y-3 rounded-lg p-3">
+>>>>>>> upstream/main
           {/* User provides own key checkbox + admin-provided key */}
           <div>
             <div className="flex items-center gap-2">
@@ -193,7 +197,11 @@ export default function AuthSection({ isEditMode, serverName }: AuthSectionProps
 
       {/* OAuth Fields */}
       <Collapse open={authType === AuthTypeEnum.OAuth} className="pt-3">
+<<<<<<< HEAD
         <div className="space-y-3 rounded-lg border border-border-light p-3">
+=======
+        <div className="bg-surface-secondary space-y-3 rounded-lg p-3">
+>>>>>>> upstream/main
           {/* Client ID & Secret in a grid */}
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
@@ -228,7 +236,11 @@ export default function AuthSection({ isEditMode, serverName }: AuthSectionProps
                 <p
                   id="oauth-client-id-error"
                   role="alert"
+<<<<<<< HEAD
                   className="text-xs text-text-destructive"
+=======
+                  className="text-text-destructive text-xs"
+>>>>>>> upstream/main
                 >
                   {localize('com_ui_field_required')}
                 </p>
@@ -325,7 +337,11 @@ export default function AuthSection({ isEditMode, serverName }: AuthSectionProps
                   type="text"
                   readOnly
                   value={redirectUri}
+<<<<<<< HEAD
                   className="flex-1 text-xs text-text-secondary"
+=======
+                  className="text-text-secondary flex-1 text-xs"
+>>>>>>> upstream/main
                 />
                 <button
                   type="button"
@@ -334,7 +350,11 @@ export default function AuthSection({ isEditMode, serverName }: AuthSectionProps
                     if (!copyLink(setIsCopying)) return;
                     showToast({ message: localize('com_ui_copied_to_clipboard') });
                   }}
+<<<<<<< HEAD
                   className="flex size-10 shrink-0 items-center justify-center rounded-lg border border-border-light text-text-secondary transition-colors hover:bg-surface-hover hover:text-text-primary"
+=======
+                  className="border-border-light text-text-secondary hover:bg-surface-hover hover:text-text-primary flex size-10 shrink-0 items-center justify-center rounded-lg border transition-colors"
+>>>>>>> upstream/main
                   aria-label={localize('com_ui_copy_link')}
                 >
                   <MorphIcon icon={isCopying ? CopyCheck : Copy} className="size-4" />
@@ -347,7 +367,11 @@ export default function AuthSection({ isEditMode, serverName }: AuthSectionProps
 
       {/* OBO Fields */}
       <Collapse open={authType === AuthTypeEnum.OBO} className="pt-3">
+<<<<<<< HEAD
         <div className="space-y-3 rounded-lg border border-border-light p-3">
+=======
+        <div className="bg-surface-secondary space-y-3 rounded-lg p-3">
+>>>>>>> upstream/main
           <div className="space-y-1.5">
             <Label htmlFor="obo_scopes" className="text-sm font-medium">
               {localize('com_ui_obo_scopes')}{' '}
@@ -370,16 +394,28 @@ export default function AuthSection({ isEditMode, serverName }: AuthSectionProps
               className={cn(errors.auth?.obo_scopes && 'border-border-destructive')}
             />
             {errors.auth?.obo_scopes && (
+<<<<<<< HEAD
               <p role="alert" className="text-xs text-text-destructive">
+=======
+              <p role="alert" className="text-text-destructive text-xs">
+>>>>>>> upstream/main
                 {localize('com_ui_field_required')}
               </p>
             )}
             {canConfigureObo ? (
+<<<<<<< HEAD
               <p id="obo-scopes-description" className="text-xs text-text-secondary">
                 {localize('com_ui_obo_scopes_description')}
               </p>
             ) : (
               <p id="obo-scopes-readonly-description" className="text-xs text-text-secondary">
+=======
+              <p id="obo-scopes-description" className="text-text-secondary text-xs">
+                {localize('com_ui_obo_scopes_description')}
+              </p>
+            ) : (
+              <p id="obo-scopes-readonly-description" className="text-text-secondary text-xs">
+>>>>>>> upstream/main
                 {localize('com_ui_obo_readonly_no_permission')}
               </p>
             )}

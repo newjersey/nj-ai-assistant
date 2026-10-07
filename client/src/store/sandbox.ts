@@ -1,4 +1,9 @@
+<<<<<<< HEAD
 import { atomFamily } from 'recoil';
+=======
+import { atom } from 'jotai';
+import { atomFamily } from 'jotai/utils';
+>>>>>>> upstream/main
 
 /**
  * True while the backend reported the stateful code sandbox is cold-booting
@@ -7,7 +12,11 @@ import { atomFamily } from 'recoil';
  * "starting sandbox" message while set. Cleared when the tool call's run
  * step completes.
  */
+<<<<<<< HEAD
 export const sandboxStartingByToolCallId = atomFamily<boolean, string>({
   key: 'sandboxStartingByToolCallId',
   default: false,
 });
+=======
+export const sandboxStartingByToolCallId = atomFamily((_toolCallId: string) => atom(false));
+>>>>>>> upstream/main

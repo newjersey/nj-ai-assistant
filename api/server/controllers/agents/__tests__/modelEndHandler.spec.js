@@ -1,5 +1,9 @@
 jest.mock('@librechat/data-schemas', () => ({
+<<<<<<< HEAD
   logger: { error: jest.fn(), debug: jest.fn() },
+=======
+  logger: { error: jest.fn(), debug: jest.fn(), info: jest.fn() },
+>>>>>>> upstream/main
 }));
 jest.mock('@librechat/api', () => {
   const { getModelRefusalInfo } = jest.requireActual('@librechat/api');

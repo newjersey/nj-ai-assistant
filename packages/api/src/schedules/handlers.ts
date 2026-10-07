@@ -5,7 +5,16 @@ import {
   updateSchedulePayloadSchema,
   isCronCadence,
 } from 'librechat-data-provider';
+<<<<<<< HEAD
 import type { TScheduleCadence, TCreateSchedule, TUpdateSchedule } from 'librechat-data-provider';
+=======
+import type {
+  TScheduleCadence,
+  TCreateSchedule,
+  TUpdateSchedule,
+  TSchedule,
+} from 'librechat-data-provider';
+>>>>>>> upstream/main
 import type { ScheduleMethods, ISchedule, IScheduleRun } from '@librechat/data-schemas';
 import type { Response } from 'express';
 import type {
@@ -246,10 +255,18 @@ export type WireSchedule = Pick<
   | 'configRevision'
   | 'createdAt'
   | 'updatedAt'
+<<<<<<< HEAD
 > & {
   /** See `TSchedule.inFlight`: the generating occurrences, from their own run rows. */
   inFlight?: Array<{ conversationId: string }>;
 };
+=======
+> &
+  Pick<TSchedule, 'hasMCPConsent'> & {
+    /** See `TSchedule.inFlight`: the generating occurrences, from their own run rows. */
+    inFlight?: Array<{ conversationId: string }>;
+  };
+>>>>>>> upstream/main
 
 /** Only generating occurrences are read for the list. `ScheduleRun` is indexed by
  *  status, not by user, and `started` rows are bounded globally by the capacity
@@ -297,6 +314,10 @@ export function toWireSchedule(
 ): WireSchedule {
   return {
     id: schedule.id,
+<<<<<<< HEAD
+=======
+    ...(schedule.mcpConsent && { hasMCPConsent: true }),
+>>>>>>> upstream/main
     user: schedule.user,
     name: schedule.name,
     prompt: schedule.prompt,
@@ -392,6 +413,10 @@ export function createSchedulesHandlers(deps: SchedulesHandlersDeps): SchedulesH
     try {
       await deps.preflightMCP(agentId, requestUser(req), {
         scheduleId,
+<<<<<<< HEAD
+=======
+        stage: 'activation',
+>>>>>>> upstream/main
         signal,
         concurrency: limits.mcpPreflightConcurrency,
         deadlineMs: Date.now() + limits.mcpPreflightTimeoutMs,
@@ -583,6 +608,10 @@ export function createSchedulesHandlers(deps: SchedulesHandlersDeps): SchedulesH
       ),
       limits: {
         maxPerUser: limits.maxPerUser,
+<<<<<<< HEAD
+=======
+        ...(limits.mcpConsent?.enabled && { mcpConsent: true }),
+>>>>>>> upstream/main
         // minIntervalMinutes ships with the list so the dialog can refuse a cadence
         // the floor would reject, instead of surfacing it as a 400 after submit.
         minIntervalMinutes: limits.minIntervalMinutes,
@@ -1105,6 +1134,16 @@ export function createSchedulesHandlers(deps: SchedulesHandlersDeps): SchedulesH
     // loser simply retries against fresh state.
     const schedule = await deps.methods.updateScheduleById(existing.id, user.id, update, unset, {
       expectedConfigRevision: existing.configRevision,
+<<<<<<< HEAD
+=======
+      ...(existing.mcpConsent &&
+        existing.mcpConsent.scheduleRevision === existing.configRevision &&
+        Object.keys(editedFields).every((key) => key === 'enabled') &&
+        !clearsProject &&
+        (chatProjectId == null || chatProjectId === existing.chatProjectId) && {
+          preserveMCPConsentRevision: existing.mcpConsent.revision,
+        }),
+>>>>>>> upstream/main
     });
     if (schedule == null) {
       // Either the row is gone, or a concurrent edit moved the revision. Distinguish

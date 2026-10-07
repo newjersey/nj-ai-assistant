@@ -107,8 +107,12 @@ describe('EditMessage', () => {
     expect(editor).not.toHaveClass('text-sm');
   });
 
+<<<<<<< HEAD
   // NJ: Removed "Save" button
   it.skip('waits for a successful save before updating local state and closing', async () => {
+=======
+  it('waits for a successful save before updating local state and closing', async () => {
+>>>>>>> upstream/main
     const user = userEvent.setup();
     const { enterEdit } = renderEditor();
 
@@ -130,8 +134,34 @@ describe('EditMessage', () => {
     expect(enterEdit).toHaveBeenCalledWith(true);
   });
 
+<<<<<<< HEAD
   // NJ: Removed "Save" button
   it.skip('writes the save onto the thread as it stands when the request resolves', async () => {
+=======
+  it('clears the private revision when a protected message is saved', async () => {
+    const protectedMessage = { ...message, privacyRevision: 'previous-revision' };
+    mockGetMessages.mockReturnValue([protectedMessage]);
+    const user = userEvent.setup();
+    renderEditor({ editedMessage: protectedMessage });
+
+    await user.clear(screen.getByTestId('message-text-editor'));
+    await user.type(screen.getByTestId('message-text-editor'), 'Clean edited message');
+    await user.click(screen.getByRole('button', { name: 'com_ui_save' }));
+
+    await waitFor(() =>
+      expect(mockSetMessages).toHaveBeenCalledWith([
+        expect.objectContaining({
+          messageId: message.messageId,
+          text: 'Clean edited message',
+          privacyRevision: undefined,
+        }),
+      ]),
+    );
+    expect(protectedMessage.privacyRevision).toBe('previous-revision');
+  });
+
+  it('writes the save onto the thread as it stands when the request resolves', async () => {
+>>>>>>> upstream/main
     const user = userEvent.setup();
     const streamedAnswer = {
       messageId: 'assistant-streaming',
@@ -160,8 +190,12 @@ describe('EditMessage', () => {
     ]);
   });
 
+<<<<<<< HEAD
   // NJ: Removed "Save" button
   it.skip('keeps the editor open with the draft when saving fails', async () => {
+=======
+  it('keeps the editor open with the draft when saving fails', async () => {
+>>>>>>> upstream/main
     const user = userEvent.setup();
     mockMutateAsync.mockRejectedValue(new Error('Save failed'));
     const { enterEdit } = renderEditor();
@@ -210,8 +244,13 @@ describe('EditMessage', () => {
 
     const rerun = screen.getByRole('button', { name: 'com_ui_rerun' });
     expect(rerun).toBeEnabled();
+<<<<<<< HEAD
     // NJ: Removed "Save" button
     // expect(screen.getByRole('button', { name: 'com_ui_save' })).toBeDisabled();
+=======
+    /** Saving an untouched draft still has nothing to write. */
+    expect(screen.getByRole('button', { name: 'com_ui_save' })).toBeDisabled();
+>>>>>>> upstream/main
 
     await user.click(rerun);
 
@@ -329,8 +368,12 @@ describe('EditMessage', () => {
 
     expect(screen.queryByRole('button', { name: 'com_ui_rerun' })).toBeNull();
     expect(screen.queryByRole('button', { name: 'com_ui_update_rerun' })).toBeNull();
+<<<<<<< HEAD
     // NJ: Removed "Save" button
     // expect(screen.getByRole('button', { name: 'com_ui_save' })).toBeInTheDocument();
+=======
+    expect(screen.getByRole('button', { name: 'com_ui_save' })).toBeInTheDocument();
+>>>>>>> upstream/main
     /** The footer's status slot answers why the action it usually carries is gone. */
     expect(screen.getByText('com_ui_rerun_needs_user_turn')).toBeInTheDocument();
 
@@ -362,8 +405,12 @@ describe('EditMessage', () => {
 
     expect(screen.queryByRole('button', { name: 'com_ui_rerun' })).toBeNull();
     expect(screen.queryByRole('button', { name: 'com_ui_update_rerun' })).toBeNull();
+<<<<<<< HEAD
     // NJ: Removed "Save" button
     // expect(screen.getByRole('button', { name: 'com_ui_save' })).toBeInTheDocument();
+=======
+    expect(screen.getByRole('button', { name: 'com_ui_save' })).toBeInTheDocument();
+>>>>>>> upstream/main
     expect(screen.getByText('com_ui_rerun_needs_user_turn')).toBeInTheDocument();
 
     const editor = screen.getByTestId('message-text-editor');

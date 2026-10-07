@@ -2,7 +2,11 @@ import React from 'react';
 import { JSX } from 'react/jsx-runtime';
 
 export default function DotsIcon({
+<<<<<<< HEAD
   className = 'h-4 w-4 flex-shrink-0 text-text-secondary',
+=======
+  className = 'h-4 w-4 shrink-0 text-text-secondary',
+>>>>>>> upstream/main
 }: {
   className?: string;
 }): JSX.Element {

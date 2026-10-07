@@ -45,7 +45,13 @@ describe('useSpeechToText', () => {
 
   it('selects the externally seeded engine after settings change', () => {
     mockSpeechToTextEndpoint = 'browser';
+<<<<<<< HEAD
     const { result, rerender } = renderHook(() => useSpeechToText(jest.fn(), jest.fn()));
+=======
+    const { result, rerender } = renderHook(() =>
+      useSpeechToText(jest.fn(), jest.fn(), jest.fn(), -1),
+    );
+>>>>>>> upstream/main
 
     mockSpeechToTextEndpoint = 'external';
     rerender();
@@ -58,7 +64,11 @@ describe('useSpeechToText', () => {
 
   it('selects the browser engine', () => {
     mockSpeechToTextEndpoint = 'browser';
+<<<<<<< HEAD
     const { result } = renderHook(() => useSpeechToText(jest.fn(), jest.fn()));
+=======
+    const { result } = renderHook(() => useSpeechToText(jest.fn(), jest.fn(), jest.fn(), -1));
+>>>>>>> upstream/main
 
     act(() => result.current.startRecording());
 
@@ -68,7 +78,11 @@ describe('useSpeechToText', () => {
 
   it('selects the active engine stop handler', () => {
     mockExternalIsListening = true;
+<<<<<<< HEAD
     const { result } = renderHook(() => useSpeechToText(jest.fn(), jest.fn()));
+=======
+    const { result } = renderHook(() => useSpeechToText(jest.fn(), jest.fn(), jest.fn(), -1));
+>>>>>>> upstream/main
 
     act(() => result.current.stopRecording());
 

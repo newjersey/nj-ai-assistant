@@ -1,7 +1,13 @@
 import { nanoid } from 'nanoid';
+<<<<<<< HEAD
 import { EModelEndpoint } from 'librechat-data-provider';
 import { logger, type AppConfig } from '@librechat/data-schemas';
 import type { CodeWorkspaceSelection } from 'librechat-data-provider';
+=======
+import { logger, type AppConfig } from '@librechat/data-schemas';
+import { EModelEndpoint, isCodeWorkspaceCheckoutAvailable } from 'librechat-data-provider';
+import type { CodeEnvironmentMode, CodeWorkspaceSelection } from 'librechat-data-provider';
+>>>>>>> upstream/main
 import type { Response } from 'express';
 import type {
   CodeEnvironmentLifecycleTarget,
@@ -40,9 +46,18 @@ import {
   CodeEnvironmentSettingsValidationError,
   validateCodeEnvironmentUserSettings,
 } from './settings';
+<<<<<<< HEAD
 import { resolveConversationCodeEnvironmentMove } from './decision';
 import { resolveCodeWorkerEnrollmentLimit } from './enrollment';
 import { resolveCodeEnvironmentMoveVersion } from './config';
+=======
+import {
+  resolveCodeEnvironmentMoveVersion,
+  resolveCodeEnvironmentTransitionVersion,
+} from './config';
+import { resolveConversationCodeEnvironmentMove } from './decision';
+import { resolveCodeWorkerEnrollmentLimit } from './enrollment';
+>>>>>>> upstream/main
 import { CodeWorkspaceSelectionError } from './capabilities';
 import { getAppConfigOptionsFromUser } from '~/app/service';
 
@@ -88,8 +103,18 @@ export interface CodeEnvironmentConversationDeps {
   replaceDecision: (params: {
     user: string;
     conversationId: string;
+<<<<<<< HEAD
     expected: Pick<StoredConversationDecision, 'codeEnvironmentMode' | 'codeWorkspaces'>;
     codeWorkspaces: CodeWorkspaceSelection[];
+=======
+    expected: Pick<
+      StoredConversationDecision,
+      'codeEnvironmentMode' | 'codeWorkspaces' | 'codeEnvironmentRevision'
+    >;
+    codeEnvironmentMode: CodeEnvironmentMode;
+    /** Omitted by a detach, which leaves the conversation without any attached selection. */
+    codeWorkspaces?: CodeWorkspaceSelection[];
+>>>>>>> upstream/main
   }) => Promise<StoredConversationDecision | null>;
 }
 
@@ -325,6 +350,10 @@ export function createCodeEnvironmentHttpHandlers(deps: CodeEnvironmentHttpDeps)
   async function assertWorkspaceRegistered(
     policy: WorkerPolicy,
     selection: CodeWorkspaceSelection,
+<<<<<<< HEAD
+=======
+    previousWorkspaceId?: string,
+>>>>>>> upstream/main
   ): Promise<void> {
     const target = selectWorkerTarget(policy, selection.environmentId);
     if (target == null) {
@@ -340,6 +369,10 @@ export function createCodeEnvironmentHttpHandlers(deps: CodeEnvironmentHttpDeps)
         baseURL: target.controlPlane.baseURL,
         token,
         workerId: target.workerId,
+<<<<<<< HEAD
+=======
+        bypassCache: true,
+>>>>>>> upstream/main
       });
     } catch (error) {
       if (error instanceof CodeBridgeStatusError) {
@@ -353,6 +386,7 @@ export function createCodeEnvironmentHttpHandlers(deps: CodeEnvironmentHttpDeps)
     if (!current.workspaces || !current.operations) {
       throw new CodeWorkspaceSelectionError('unsupported');
     }
+<<<<<<< HEAD
     if (!current.workspaces.some(({ id }) => id === selection.workspaceId)) {
       throw new CodeWorkspaceSelectionError('missing');
     }
@@ -364,6 +398,42 @@ export function createCodeEnvironmentHttpHandlers(deps: CodeEnvironmentHttpDeps)
    * ingress can write its run-start decision back over a move. A move is still refused while a
    * generation is running, awaiting approval, or saving its response, so that generation does not
    * keep working in the previous environment after the conversation has left it.
+=======
+    const workspace = current.workspaces.find(({ id }) => id === selection.workspaceId);
+    if (workspace == null) {
+      throw new CodeWorkspaceSelectionError('missing');
+    }
+    const configuration = policy.configurations.find(({ id }) => id === selection.environmentId);
+    const effectiveEnvironment = configuration
+      ? configuredAttachedControlPlane(policy.effectiveConfig, configuration.controlPlaneId ?? '')
+      : configuredControlPlane(policy.effectiveConfig, selection.environmentId);
+    if (
+      !isCodeWorkspaceCheckoutAvailable(
+        selection,
+        workspace,
+        effectiveEnvironment?.configSchema?.workspaces?.allowCheckoutSelection === true,
+      )
+    ) {
+      throw new CodeWorkspaceSelectionError('unsupported');
+    }
+    if (
+      previousWorkspaceId != null &&
+      previousWorkspaceId !== selection.workspaceId &&
+      current.workspaces.some(({ id }) => id === previousWorkspaceId)
+    ) {
+      throw new CodeWorkspaceSelectionError('locked');
+    }
+  }
+
+  /**
+   * Replaces a conversation's sealed code-environment decision with the one its owner chose: a
+   * move onto the environments its agents now use, an attach for a chat that has been running
+   * without one, or a detach off a machine it can no longer reach. Applies only when the effective
+   * policy enables moves. Runs never rewrite a stored decision, so no run from any ingress can
+   * write its run-start decision back over one of these. Each is still refused while a generation
+   * is running, awaiting approval, or saving its response, so that generation does not keep
+   * working in the previous environment after the conversation has left it.
+>>>>>>> upstream/main
    */
   async function moveConversationDecision(req: ServerRequest, res: Response): Promise<Response> {
     const principal = actor(req);
@@ -404,15 +474,36 @@ export function createCodeEnvironmentHttpHandlers(deps: CodeEnvironmentHttpDeps)
     if (conversation == null) {
       return res.status(404).json({ error: 'Conversation was not found' });
     }
+<<<<<<< HEAD
     if (isGenerationActive(job) || conversationRunIds.length > 0) {
       return res
         .status(409)
         .json({ error: 'Wait for the current response to finish before moving this conversation' });
+=======
+    const busyResponse = () =>
+      res
+        .status(409)
+        .json({ error: 'Wait for the current response to finish before moving this conversation' });
+    if (isGenerationActive(job) || conversationRunIds.length > 0) {
+      return busyResponse();
+>>>>>>> upstream/main
     }
 
     let move: ConversationCodeEnvironmentMove;
     try {
       move = resolveConversationCodeEnvironmentMove({ conversation, from, to });
+<<<<<<< HEAD
+=======
+      if (
+        (conversation.codeEnvironmentMode === 'without_attached' ||
+          move.mode === 'without_attached') &&
+        resolveCodeEnvironmentTransitionVersion(policy.effectiveConfig) == null
+      ) {
+        return res
+          .status(403)
+          .json({ error: 'Conversation code environment attach/detach is disabled' });
+      }
+>>>>>>> upstream/main
     } catch (error) {
       if (error instanceof CodeWorkspaceSelectionError) {
         return selectionErrorResponse(error, res);
@@ -421,7 +512,19 @@ export function createCodeEnvironmentHttpHandlers(deps: CodeEnvironmentHttpDeps)
     }
     try {
       await Promise.all(
+<<<<<<< HEAD
         move.codeWorkspaces.map((selection) => assertWorkspaceRegistered(policy, selection)),
+=======
+        (move.codeWorkspaces ?? []).map((selection) =>
+          assertWorkspaceRegistered(
+            policy,
+            selection,
+            conversation.codeWorkspaces?.find(
+              ({ environmentId }) => environmentId === selection.environmentId,
+            )?.workspaceId,
+          ),
+        ),
+>>>>>>> upstream/main
       );
     } catch (error) {
       if (error instanceof CodeWorkspaceSelectionError) {
@@ -430,13 +533,34 @@ export function createCodeEnvironmentHttpHandlers(deps: CodeEnvironmentHttpDeps)
       throw error;
     }
 
+<<<<<<< HEAD
+=======
+    /** Worker checks are network round trips. Recheck long-lived work afterwards. Every admitted
+     * run advances the decision revision before reading, while its job remains active. The CAS
+     * below catches a run admitted after this final idle check; a run admitted after the CAS
+     * instead reads the new decision. */
+    const [pendingJob, pendingRunIds] = await Promise.all([
+      generations.getJob(conversationId),
+      generations.getCleanupBlockingJobIdsForConversations(userId, [conversationId], tenantId),
+    ]);
+    if (isGenerationActive(pendingJob) || pendingRunIds.length > 0) {
+      return busyResponse();
+    }
+
+>>>>>>> upstream/main
     const moved = await conversations.replaceDecision({
       user: userId,
       conversationId,
       expected: {
         codeEnvironmentMode: conversation.codeEnvironmentMode,
         codeWorkspaces: conversation.codeWorkspaces,
+<<<<<<< HEAD
       },
+=======
+        codeEnvironmentRevision: conversation.codeEnvironmentRevision,
+      },
+      codeEnvironmentMode: move.mode,
+>>>>>>> upstream/main
       codeWorkspaces: move.codeWorkspaces,
     });
     if (moved == null) {
@@ -444,8 +568,13 @@ export function createCodeEnvironmentHttpHandlers(deps: CodeEnvironmentHttpDeps)
     }
     return res.status(200).json({
       conversationId,
+<<<<<<< HEAD
       codeEnvironmentMode: 'attached',
       codeWorkspaces: move.codeWorkspaces,
+=======
+      codeEnvironmentMode: move.mode,
+      ...(move.codeWorkspaces != null && { codeWorkspaces: move.codeWorkspaces }),
+>>>>>>> upstream/main
     });
   }
 

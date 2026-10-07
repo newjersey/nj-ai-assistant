@@ -1,6 +1,10 @@
 const { logger } = require('@librechat/data-schemas');
 const { ViolationTypes } = require('librechat-data-provider');
+<<<<<<< HEAD
 const { isEnabled, math, removePorts } = require('@librechat/api');
+=======
+const { isEnabled, math, removePorts, getBanIp } = require('@librechat/api');
+>>>>>>> upstream/main
 const { deleteAllUserSessions } = require('~/models');
 const getLogStores = require('./getLogStores');
 
@@ -65,6 +69,10 @@ const banViolation = async (req, res, errorMessage) => {
   }
 
   req.ip = removePorts(req);
+<<<<<<< HEAD
+=======
+  const banIp = getBanIp(req);
+>>>>>>> upstream/main
   logger.info(
     `[BAN] Banning user ${user_id} ${req.ip ? `@ ${req.ip} ` : ''}for ${
       duration / 1000 / 60
@@ -73,8 +81,13 @@ const banViolation = async (req, res, errorMessage) => {
 
   const expiresAt = Date.now() + duration;
   await banLogs.set(user_id, { type, violation_count, duration, expiresAt });
+<<<<<<< HEAD
   if (req.ip) {
     await banLogs.set(req.ip, { type, user_id, violation_count, duration, expiresAt });
+=======
+  if (banIp) {
+    await banLogs.set(banIp, { type, user_id, violation_count, duration, expiresAt });
+>>>>>>> upstream/main
   }
 
   errorMessage.ban = true;

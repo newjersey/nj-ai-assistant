@@ -13,9 +13,17 @@ const {
   findOpenIDUser,
   getOpenIdEmail,
   getOpenIdIssuer,
+<<<<<<< HEAD
   getBalanceConfig,
   selectOpenIdRole,
   getTokenCacheTtlMs,
+=======
+  createOpenIDUser,
+  getBalanceConfig,
+  selectOpenIdRole,
+  getTokenCacheTtlMs,
+  applyOpenIDProfile,
+>>>>>>> upstream/main
   getAvatarSaveParams,
   isEmailDomainAllowed,
   getAvatarFileStrategy,
@@ -28,7 +36,17 @@ const {
 } = require('@librechat/api');
 const { getStrategyFunctions } = require('~/server/services/Files/strategies');
 const { resizeAvatar } = require('~/server/services/Files/images/avatar');
+<<<<<<< HEAD
 const { findUser, createUser, updateUser, findRolesByNames } = require('~/models');
+=======
+const {
+  findUser,
+  updateUser,
+  findRolesByNames,
+  findBalanceByUser,
+  createUserIfAbsent,
+} = require('~/models');
+>>>>>>> upstream/main
 const { getAppConfig } = require('~/server/services/Config');
 const getLogStores = require('~/cache/getLogStores');
 
@@ -580,14 +598,23 @@ async function processOpenIDAuth(tokenset, existingUsersOnly = false) {
     throw new Error('Email domain not allowed');
   }
 
+<<<<<<< HEAD
   const result = await findOpenIDUser({
+=======
+  const lookup = {
+>>>>>>> upstream/main
     findUser,
     email: email,
     openidId: claims.sub || userinfo.sub,
     openidIssuer,
     idOnTheSource: claims.oid || userinfo.oid,
     strategyName: 'openidStrategy',
+<<<<<<< HEAD
   });
+=======
+  };
+  const result = await findOpenIDUser(lookup);
+>>>>>>> upstream/main
   let user = result.user;
   const error = result.error;
 
@@ -595,7 +622,11 @@ async function processOpenIDAuth(tokenset, existingUsersOnly = false) {
     throw new Error(ErrorTypes.AUTH_FAILED);
   }
 
+<<<<<<< HEAD
   const appConfig = user?.tenantId ? await resolveAppConfigForUser(getAppConfig, user) : baseConfig;
+=======
+  let appConfig = user?.tenantId ? await resolveAppConfigForUser(getAppConfig, user) : baseConfig;
+>>>>>>> upstream/main
 
   if (!isEmailDomainAllowed(email, appConfig?.registration?.allowedDomains)) {
     logger.error(
@@ -676,6 +707,7 @@ async function processOpenIDAuth(tokenset, existingUsersOnly = false) {
     throw new Error('User does not exist');
   }
 
+<<<<<<< HEAD
   if (!user) {
     user = {
       provider: 'openid',
@@ -703,6 +735,30 @@ async function processOpenIDAuth(tokenset, existingUsersOnly = false) {
       user.email = email;
       user.emailVerified = userinfo.email_verified || false;
     }
+=======
+  const profile = {
+    openidId: userinfo.sub,
+    openidIssuer,
+    username,
+    name: fullName,
+    email,
+    emailVerified: userinfo.email_verified || false,
+    idOnTheSource: userinfo.oid,
+  };
+
+  if (!user) {
+    ({ user, appConfig } = await createOpenIDUser({
+      lookup,
+      profile,
+      appConfig,
+      getAppConfig,
+      getBalanceConfig,
+      createUserIfAbsent,
+      findBalanceByUser,
+    }));
+  } else {
+    user = applyOpenIDProfile(user, profile);
+>>>>>>> upstream/main
   }
 
   const adminRole = process.env.OPENID_ADMIN_ROLE;

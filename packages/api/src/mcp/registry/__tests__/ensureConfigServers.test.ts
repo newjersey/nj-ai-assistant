@@ -171,6 +171,30 @@ describe('MCPServersRegistry — ensureConfigServers', () => {
     expect(inspectSpy).toHaveBeenCalledTimes(1);
   });
 
+<<<<<<< HEAD
+=======
+  it('should lazy-init YAML server when admin overrides only the requestHeaders field', async () => {
+    await registry.addServer('yaml_remote', sseConfig, 'CACHE');
+    inspectSpy.mockClear();
+
+    const overrideConfig: t.MCPOptions = {
+      ...sseConfig,
+      requestHeaders: { 'X-Conversation-Id': '{{LIBRECHAT_BODY_CONVERSATIONID}}' },
+    };
+    const result = await registry.ensureConfigServers({
+      yaml_remote: overrideConfig,
+    });
+
+    expect(result).toHaveProperty('yaml_remote');
+    expect(
+      (result.yaml_remote as { requestHeaders?: Record<string, string> }).requestHeaders,
+    ).toEqual({
+      'X-Conversation-Id': '{{LIBRECHAT_BODY_CONVERSATIONID}}',
+    });
+    expect(inspectSpy).toHaveBeenCalledTimes(1);
+  });
+
+>>>>>>> upstream/main
   it('should lazy-init YAML server when admin overrides only the OBO field', async () => {
     await registry.addServer('yaml_remote', sseConfig, 'CACHE');
     inspectSpy.mockClear();

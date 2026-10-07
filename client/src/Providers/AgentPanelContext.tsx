@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import React, { createContext, useContext, useState, useMemo, useEffect, useRef } from 'react';
+=======
+import React, { createContext, useContext, useState, useMemo, useEffect } from 'react';
+>>>>>>> upstream/main
 import { useRecoilValue } from 'recoil';
 import { useLocation } from 'react-router-dom';
 import { EModelEndpoint } from 'librechat-data-provider';
@@ -53,15 +57,25 @@ export function AgentPanelProvider({
       activateCatalog('mcpTools');
     }
   }, [panelVisible]);
+<<<<<<< HEAD
+=======
+  const observeVisibleToolAuthorization = panelVisible && observeToolAuthorization;
+>>>>>>> upstream/main
   const [mcp, setMcp] = useState<MCP | undefined>(undefined);
   const [mcps, setMcps] = useState<MCP[] | undefined>(undefined);
   const [action, setAction] = useState<Action | undefined>(undefined);
   const [activePanel, setActivePanel] = useState<Panel>(Panel.builder);
+<<<<<<< HEAD
   // NJ: Fix focus when returning to agent builder
   const returnFocusRef = useRef<Panel | null>(null);
   const [agent_id, setCurrentAgentId] = useState<string | undefined>(undefined);
   const { availableMCPServers, isLoading, availableMCPServersMap, connectionStatus } =
     useMCPServerManager({ observeToolAuthorization });
+=======
+  const [agent_id, setCurrentAgentId] = useState<string | undefined>(undefined);
+  const { availableMCPServers, isLoading, availableMCPServersMap, connectionStatus } =
+    useMCPServerManager({ observeToolAuthorization: observeVisibleToolAuthorization });
+>>>>>>> upstream/main
   const { data: startupConfig } = useGetStartupConfig();
   const { data: actions } = useGetActionsQuery(EModelEndpoint.agents, {
     enabled: observeToolAuthorization,
@@ -74,9 +88,14 @@ export function AgentPanelProvider({
   const mcpToolsReady = useCatalogReady('mcpTools');
   useMCPRefresh({
     enabled:
+<<<<<<< HEAD
       panelVisible &&
       mcpToolsReady &&
       observeToolAuthorization &&
+=======
+      mcpToolsReady &&
+      observeVisibleToolAuthorization &&
+>>>>>>> upstream/main
       !isLoading &&
       availableMCPServers.length > 0,
     tools: true,
@@ -84,7 +103,11 @@ export function AgentPanelProvider({
   const { data: mcpData, isFetching: mcpToolsFetching } = useMCPToolsQuery({
     enabled:
       mcpToolsReady &&
+<<<<<<< HEAD
       observeToolAuthorization &&
+=======
+      observeVisibleToolAuthorization &&
+>>>>>>> upstream/main
       !isLoading &&
       availableMCPServers != null &&
       availableMCPServers.length > 0,
@@ -205,7 +228,10 @@ export function AgentPanelProvider({
     mcpToolsLoading,
     setActivePanel,
     endpointsConfig,
+<<<<<<< HEAD
     returnFocusRef,
+=======
+>>>>>>> upstream/main
     setCurrentAgentId,
     availableMCPServers,
     availableMCPServersMap,

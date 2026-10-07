@@ -54,7 +54,11 @@ function DynamicTextarea({
       }`}
     >
       <HoverCard openDelay={300}>
+<<<<<<< HEAD
         <HoverCardTrigger className="grid w-full items-center gap-2">
+=======
+        <HoverCardTrigger className="grid h-full w-full content-between items-center gap-2">
+>>>>>>> upstream/main
           <div className="flex w-full justify-between">
             <Label
               htmlFor={`${settingKey}-dynamic-textarea`}
@@ -62,7 +66,11 @@ function DynamicTextarea({
             >
               {labelCode ? (localize(label as TranslationKeys) ?? label) : label || settingKey}{' '}
               {showDefault && (
+<<<<<<< HEAD
                 <small className="opacity-40 high-contrast:opacity-100">
+=======
+                <small className="high-contrast:opacity-100 opacity-40">
+>>>>>>> upstream/main
                   (
                   {typeof defaultValue === 'undefined' || !(defaultValue as string).length
                     ? localize('com_endpoint_default_blank')
@@ -73,7 +81,18 @@ function DynamicTextarea({
             </Label>
           </div>
           <TextareaAutosize
+<<<<<<< HEAD
             id={`${settingKey}-dynamic-textarea`}
+=======
+            focusOutline="hidden"
+            id={`${settingKey}-dynamic-textarea`}
+            /** The field is measured by a shadow copy of itself, and the panel mounts
+             *  before the sidebar has settled on a width, so that measurement can come
+             *  back as one word per line. Capping the rows lets the library clamp its
+             *  own answer instead of leaving a CSS max-height to hide a wrong one. */
+            minRows={3}
+            maxRows={8}
+>>>>>>> upstream/main
             disabled={readonly}
             value={inputValue ?? ''}
             onChange={setInputValue}
@@ -87,7 +106,11 @@ function DynamicTextarea({
                 : placeholder
             }
             className={cn(
+<<<<<<< HEAD
               'flex max-h-[138px] min-h-[100px] w-full resize-none rounded-lg border border-border-light bg-surface-secondary px-3 py-2 text-sm focus:outline-none',
+=======
+              'border-border-light bg-surface-secondary flex max-h-[13.75rem] min-h-[4.75rem] w-full resize-none rounded-lg border px-3 py-2 text-sm',
+>>>>>>> upstream/main
             )}
           />
         </HoverCardTrigger>

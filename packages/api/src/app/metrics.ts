@@ -171,6 +171,11 @@ export type RumProxyResult =
   | 'auth_drop'
   | 'auth_error'
   | 'bad_request'
+<<<<<<< HEAD
+=======
+  | 'rate_limited'
+  | 'unsupported_media_type'
+>>>>>>> upstream/main
   | 'not_configured'
   | 'collector_4xx'
   | 'collector_5xx'

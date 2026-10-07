@@ -1,6 +1,10 @@
 const path = require('path');
 const { v4 } = require('uuid');
+<<<<<<< HEAD
 const { countTokens } = require('@librechat/api');
+=======
+const { countTokens, announceReply, isAnnounceableReply } = require('@librechat/api');
+>>>>>>> upstream/main
 const { escapeRegExp } = require('@librechat/data-schemas');
 const {
   Constants,
@@ -8,7 +12,17 @@ const {
   AnnotationTypes,
   defaultOrderQuery,
 } = require('librechat-data-provider');
+<<<<<<< HEAD
 const { saveMessage, getMessages, spendTokens, saveConvo } = require('~/models');
+=======
+const {
+  saveConvo,
+  getMessages,
+  spendTokens,
+  saveMessage,
+  stampConvoLastResponse,
+} = require('~/models');
+>>>>>>> upstream/main
 const { retrieveAndProcessFile } = require('~/server/services/Files/process');
 
 /**
@@ -76,6 +90,12 @@ async function saveUserMessage(req, params) {
     tokenCount,
   };
 
+<<<<<<< HEAD
+=======
+  // Only confirmed new conversations seed membership; saveConvo applies it on insert.
+  const chatProjectId =
+    req?.resolvedConversation === null ? req.chatProjectContext?.projectId : undefined;
+>>>>>>> upstream/main
   const convo = {
     endpoint: params.endpoint,
     conversationId: params.conversationId,
@@ -83,8 +103,13 @@ async function saveUserMessage(req, params) {
     instructions: params.instructions,
     assistant_id: params.assistant_id,
     model: params.model,
+<<<<<<< HEAD
   };
 
+=======
+    ...(typeof chatProjectId === 'string' && chatProjectId ? { chatProjectId } : {}),
+  };
+>>>>>>> upstream/main
   if (params.files?.length) {
     userMessage.files = params.files.map(({ file_id }) => ({ file_id }));
     convo.file_ids = params.file_ids;
@@ -100,7 +125,14 @@ async function saveUserMessage(req, params) {
   const savedConvo = await saveConvo(
     { ...ctx, expiredAt: message?.expiredAt ?? ctx.expiredAt },
     convo,
+<<<<<<< HEAD
     { context: 'api/server/services/Threads/manage.js #saveUserMessage' },
+=======
+    {
+      context: 'api/server/services/Threads/manage.js #saveUserMessage',
+      ...(message?._id != null ? { appendMessageIds: [message._id] } : {}),
+    },
+>>>>>>> upstream/main
   );
   if (savedConvo != null) {
     req.resolvedConversation = savedConvo;
@@ -126,9 +158,17 @@ async function saveUserMessage(req, params) {
  * @param {string} [params.instructions] - Optional: from preset for `instructions` field.
  * @param {string} [params.spec] - Optional: Model spec identifier.
  * @param {string} [params.iconURL]
+<<<<<<< HEAD
  * Overrides the instructions of the assistant.
  * @param {string} [params.promptPrefix] - Optional: from preset for `additional_instructions` field.
  * @return {Promise<Run>} A promise that resolves to the created run object.
+=======
+ * @param {import('librechat-data-provider').TAttachment[]} [params.attachments]
+ * Overrides the instructions of the assistant.
+ * @param {string} [params.promptPrefix] - Optional: from preset for `additional_instructions` field.
+ * @return {Promise<{message: Object|null, conversation: Object|null}>} The persisted assistant
+ * message and the conversation snapshot settled by the same write.
+>>>>>>> upstream/main
  */
 async function saveAssistantMessage(req, params) {
   // const tokenCount = // TODO: need to count each content part
@@ -149,6 +189,10 @@ async function saveAssistantMessage(req, params) {
     /* For messages, use the assistant_id instead of model */
     model: params.assistant_id,
     content: params.content,
+<<<<<<< HEAD
+=======
+    attachments: params.attachments,
+>>>>>>> upstream/main
     sender: 'Assistant',
     isCreatedByUser: false,
     text: params.text,
@@ -158,6 +202,16 @@ async function saveAssistantMessage(req, params) {
     spec: params.spec,
   });
 
+<<<<<<< HEAD
+=======
+  const announceable = isAnnounceableReply({
+    messageId: message?.messageId,
+    content: params.content,
+    text: params.text,
+    isTemporary: ctx.isTemporary,
+  });
+
+>>>>>>> upstream/main
   const savedConvo = await saveConvo(
     { ...ctx, expiredAt: message?.expiredAt ?? ctx.expiredAt },
     {
@@ -170,14 +224,31 @@ async function saveAssistantMessage(req, params) {
       iconURL: params.iconURL,
       spec: params.spec,
     },
+<<<<<<< HEAD
     { context: 'api/server/services/Threads/manage.js #saveAssistantMessage' },
+=======
+    {
+      context: 'api/server/services/Threads/manage.js #saveAssistantMessage',
+      /** Judged by the same predicate every other persistence path asks, so an assistant row
+       *  that renders nothing cannot raise a dot here that opening the chat can never clear.
+       *  `saveConvo` assigns the timestamp past its own awaited reads, so a catch-up recorded
+       *  while one of them is in flight cannot outrank this reply. */
+      stampReply: announceable,
+      ...(announceable ? { replyMessageId: message.messageId } : {}),
+      ...(message?._id != null ? { appendMessageIds: [message._id] } : {}),
+    },
+>>>>>>> upstream/main
   );
 
   if (savedConvo != null) {
     req.resolvedConversation = savedConvo;
   }
 
+<<<<<<< HEAD
   return message;
+=======
+  return { message, conversation: savedConvo };
+>>>>>>> upstream/main
 }
 
 /**
@@ -243,6 +314,12 @@ async function syncMessages({
     expiredAt: openai.req?.resolvedConversation?.expiredAt,
     interfaceConfig: openai.req?.config?.interfaceConfig,
   };
+<<<<<<< HEAD
+=======
+  /** The assistant writes this synchronization performed. Their results decide whether a reply
+   *  is actually in the history: a write that resolved empty must not raise an indicator. */
+  const assistantRecordPromises = [];
+>>>>>>> upstream/main
 
   /**
    *
@@ -253,7 +330,15 @@ async function syncMessages({
    * @param {dbMessage} params.apiMessage
    */
   const processNewMessage = async ({ dbMessage, apiMessage }) => {
+<<<<<<< HEAD
     recordPromises.push(saveMessage(ctx, { ...dbMessage, user: openai.req.user.id }));
+=======
+    const recorded = saveMessage(ctx, { ...dbMessage, user: openai.req.user.id });
+    recordPromises.push(recorded);
+    if (dbMessage.role === 'assistant') {
+      assistantRecordPromises.push(recorded);
+    }
+>>>>>>> upstream/main
 
     if (!apiMessage.id.includes('msg_')) {
       return;
@@ -358,6 +443,10 @@ async function syncMessages({
   }, []);
 
   await Promise.all(modifyPromises);
+<<<<<<< HEAD
+=======
+  const recordedAssistantReplies = await Promise.all(assistantRecordPromises);
+>>>>>>> upstream/main
   await Promise.all(recordPromises);
 
   const savedConvo = await saveConvo(
@@ -372,6 +461,29 @@ async function syncMessages({
     openai.req.resolvedConversation = savedConvo;
   }
 
+<<<<<<< HEAD
+=======
+  /* Every caller that reaches here recovers assistant output the normal save path never wrote:
+     a cancelled run, or one that errored after the model had already produced content. The
+     `saveConvo` above carries no reply stamp, so without this the recovered reply would never
+     raise its unseen indicator. Only a write that actually persisted counts, and it is
+     best-effort, since those messages are already durable.
+     A run cancelled before any output still persists the synthetic row `checkMessageGaps`
+     built, and the error handlers add their visible content to the returned object rather
+     than to that row: stamping it would raise a dot for a message that renders nothing, and
+     acknowledgement requires the stamped reply to be on screen. */
+  const persistedAssistantReply = recordedAssistantReplies.findLast((message) => message != null);
+  await announceReply(
+    { stampConvoLastResponse },
+    {
+      userId: openai.req.user.id,
+      conversationId,
+      reply: { ...persistedAssistantReply, isTemporary: ctx.isTemporary },
+      context: 'syncMessages',
+    },
+  );
+
+>>>>>>> upstream/main
   return result;
 }
 
@@ -539,6 +651,21 @@ const recordUsage = async ({
 
 const uniqueCitationStart = '^====||===';
 const uniqueCitationEnd = '==|||||^';
+<<<<<<< HEAD
+=======
+const adjacentCitationRegex = new RegExp(
+  `${escapeRegExp(uniqueCitationStart)}(\\d+)${escapeRegExp(
+    uniqueCitationEnd,
+  )}(\\s*)${escapeRegExp(uniqueCitationStart)}(\\d+)${escapeRegExp(uniqueCitationEnd)}`,
+  'g',
+);
+const remainingAdjacentRegex = new RegExp(
+  `(${escapeRegExp(uniqueCitationStart)}(\\d+)${escapeRegExp(uniqueCitationEnd)})\\s*\\1+`,
+  'g',
+);
+const citationStartRegex = new RegExp(escapeRegExp(uniqueCitationStart), 'g');
+const citationEndRegex = new RegExp(escapeRegExp(uniqueCitationEnd), 'g');
+>>>>>>> upstream/main
 
 /**
  * Sorts, processes, and flattens messages to a single string.
@@ -664,12 +791,15 @@ async function processMessages({ openai, client, messages = [] }) {
   await Promise.all(fileRetrievalPromises);
 
   // Handle adjacent identical citations with the unique format
+<<<<<<< HEAD
   const adjacentCitationRegex = new RegExp(
     `${escapeRegExp(uniqueCitationStart)}(\\d+)${escapeRegExp(
       uniqueCitationEnd,
     )}(\\s*)${escapeRegExp(uniqueCitationStart)}(\\d+)${escapeRegExp(uniqueCitationEnd)}`,
     'g',
   );
+=======
+>>>>>>> upstream/main
   text = text.replace(adjacentCitationRegex, (match, num1, space, num2) => {
     return num1 === num2
       ? `${uniqueCitationStart}${num1}${uniqueCitationEnd}`
@@ -677,6 +807,7 @@ async function processMessages({ openai, client, messages = [] }) {
   });
 
   // Remove any remaining adjacent identical citations
+<<<<<<< HEAD
   const remainingAdjacentRegex = new RegExp(
     `(${escapeRegExp(uniqueCitationStart)}(\\d+)${escapeRegExp(uniqueCitationEnd)})\\s*\\1+`,
     'g',
@@ -686,6 +817,13 @@ async function processMessages({ openai, client, messages = [] }) {
   // Replace the unique citation format with the final format
   text = text.replace(new RegExp(escapeRegExp(uniqueCitationStart), 'g'), '^');
   text = text.replace(new RegExp(escapeRegExp(uniqueCitationEnd), 'g'), '^');
+=======
+  text = text.replace(remainingAdjacentRegex, '$1');
+
+  // Replace the unique citation format with the final format
+  text = text.replace(citationStartRegex, '^');
+  text = text.replace(citationEndRegex, '^');
+>>>>>>> upstream/main
 
   if (sources.size) {
     text += '\n\n';

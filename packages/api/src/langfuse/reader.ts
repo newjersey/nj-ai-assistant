@@ -15,12 +15,22 @@ import type {
 } from '@librechat/data-schemas';
 import type { LangfuseScoreDestination } from './destinations';
 import type { TraceQuery, TraceReader } from '~/traces/types';
+<<<<<<< HEAD
 import { exportsInternalTraceUserId } from './identity';
+=======
+import { TOOL_ROUND_NAME, resolveTraceRole } from './roles';
+import { exportsInternalTraceUserId } from './identity';
+import { toTracePrompt, toTraceReply } from './prompt';
+>>>>>>> upstream/main
 import { getScoreDestinations } from './destinations';
 import { TraceReadError } from '~/traces/types';
 import { mergeHeaders } from '~/utils/headers';
 import { redirectPolicyFor } from './utils';
 import { traceIdForMessage } from './trace';
+<<<<<<< HEAD
+=======
+import { toolRoundNames } from './rounds';
+>>>>>>> upstream/main
 
 const OBSERVATIONS_PATH = '/api/public/v2/observations';
 const MAX_PAGE_SIZE = 1000;
@@ -33,6 +43,19 @@ const NAME_MAX_LENGTH = 200;
 const STATUS_MESSAGE_MAX_LENGTH = 1000;
 const LIST_FIELDS = 'core,basic,time,model,usage';
 const DETAIL_FIELDS = `${LIST_FIELDS},io,metadata`;
+<<<<<<< HEAD
+=======
+const ROUND_FIELDS = 'core,io';
+/**
+ * Bounds on naming tool rounds. Langfuse cannot return a round's input without its output, and
+ * a round the SDK found no calls for keeps the whole graph state as its input, so the rounds are
+ * read a few at a time and the read stops at a byte budget: the newest rounds are named and the
+ * rest are left to the chat's messages. These are safety caps on a best-effort addition, as
+ * `MAX_PAGE_SIZE` is, not limits an operator tunes; `showToolNames` is the lever.
+ */
+const ROUND_PAGE_SIZE = 50;
+const ROUND_BYTES_BUDGET = 8 * 1024 * 1024;
+>>>>>>> upstream/main
 const DESTINATION_PREFERENCE: Record<LangfuseScoreDestination['name'], number> = {
   connection: 0,
   tenant: 1,
@@ -66,8 +89,17 @@ const pageSchema = z.object({
   meta: z.object({ cursor: z.string().nullish() }).partial().nullish(),
 });
 
+<<<<<<< HEAD
 type LangfuseObservation = z.infer<typeof observationSchema>;
 type OwnedObservation = { observation: LangfuseObservation; messageId: string };
+=======
+const roundSchema = z.object({ id: z.string().min(1), input: z.unknown() });
+
+type LangfuseObservation = z.infer<typeof observationSchema>;
+/** The response that owns a trace, and whether the trace is its title run rather than the run itself. */
+type TraceOwner = { messageId: string; origin?: 'title' };
+type OwnedObservation = { observation: LangfuseObservation } & TraceOwner;
+>>>>>>> upstream/main
 
 export interface LangfuseTraceReaderDeps {
   getConversationTraceRefs: (input: {
@@ -117,6 +149,38 @@ async function release(response: Response): Promise<void> {
   await response.body?.cancel().catch(() => undefined);
 }
 
+<<<<<<< HEAD
+=======
+type ByteBudget = { remaining: number };
+
+/**
+ * Parses a JSON body while holding no more of it than the budget has left. `Response.json()`
+ * buffers whatever the backend sends, which for a read that returns content is not ours to bound
+ * any other way.
+ */
+async function readBounded(response: Response, budget: ByteBudget): Promise<unknown> {
+  const reader = response.body?.getReader();
+  if (reader == null) {
+    return undefined;
+  }
+  const decoder = new TextDecoder();
+  let text = '';
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) {
+      break;
+    }
+    budget.remaining -= value.byteLength;
+    if (budget.remaining < 0) {
+      await reader.cancel().catch(() => undefined);
+      throw new TraceReadError('upstream_error', 'Langfuse returned more than the read allows');
+    }
+    text += decoder.decode(value, { stream: true });
+  }
+  return JSON.parse(text + decoder.decode());
+}
+
+>>>>>>> upstream/main
 function clamp(value: string, maxLength: number): string {
   return value.length > maxLength ? value.slice(0, maxLength) : value;
 }
@@ -168,7 +232,15 @@ function toCost(observation: LangfuseObservation): number | undefined {
   return cost != null && Number.isFinite(cost) && cost >= 0 ? cost : undefined;
 }
 
+<<<<<<< HEAD
 function toRecord(observation: LangfuseObservation, messageId: string): TTraceRecord {
+=======
+function toRecord(
+  observation: LangfuseObservation,
+  messageId: string,
+  origin?: 'title',
+): TTraceRecord {
+>>>>>>> upstream/main
   const type = observation.type.toUpperCase();
   /** An event is a point in time and is never given an end, so a missing end is not "running". */
   const endTime = observation.endTime ?? (type === 'EVENT' ? observation.startTime : null);
@@ -178,12 +250,21 @@ function toRecord(observation: LangfuseObservation, messageId: string): TTraceRe
   const model = (observation.model ?? observation.providedModelName)?.trim();
   const usage = toUsage(observation.usageDetails);
   const cost = toCost(observation);
+<<<<<<< HEAD
+=======
+  const kind = KIND_BY_TYPE[type] ?? 'span';
+>>>>>>> upstream/main
   return {
     id: observation.id,
     traceId: observation.traceId,
     messageId,
     parentId: observation.parentObservationId || null,
+<<<<<<< HEAD
     kind: KIND_BY_TYPE[type] ?? 'span',
+=======
+    kind,
+    ...resolveTraceRole(kind, name),
+>>>>>>> upstream/main
     name: clamp(name, NAME_MAX_LENGTH),
     startTime: new Date(observation.startTime).toISOString(),
     status,
@@ -197,6 +278,10 @@ function toRecord(observation: LangfuseObservation, messageId: string): TTraceRe
       : {}),
     ...(usage ? { usage } : {}),
     ...(cost != null ? { cost } : {}),
+<<<<<<< HEAD
+=======
+    ...(origin ? { origin } : {}),
+>>>>>>> upstream/main
   };
 }
 
@@ -235,12 +320,21 @@ function traceIdsOf(message: SampledTraceMessage): string[] {
  * unique per user rather than globally, so a record whose trace is not in this
  * map is never returned.
  */
+<<<<<<< HEAD
 function buildTraceOwners(messages: SampledTraceMessage[]): Map<string, string> {
   const owners = new Map<string, string>();
   for (const message of messages) {
     for (const traceId of traceIdsOf(message)) {
       owners.set(traceId, message.messageId);
     }
+=======
+function buildTraceOwners(messages: SampledTraceMessage[]): Map<string, TraceOwner> {
+  const owners = new Map<string, TraceOwner>();
+  for (const message of messages) {
+    const [run, title] = traceIdsOf(message);
+    owners.set(run, { messageId: message.messageId });
+    owners.set(title, { messageId: message.messageId, origin: 'title' });
+>>>>>>> upstream/main
   }
   return owners;
 }
@@ -478,6 +572,11 @@ export function createLangfuseTraceReader({
     params: URLSearchParams,
     query: TraceQuery,
     hasCursor: boolean,
+<<<<<<< HEAD
+=======
+    /** Spends the body's bytes from this budget, refusing the rest of a body that outruns it. */
+    budget?: ByteBudget,
+>>>>>>> upstream/main
   ): Promise<z.infer<typeof pageSchema>> {
     const url = `${destination.baseUrl.replace(/\/+$/, '')}${OBSERVATIONS_PATH}?${params.toString()}`;
     const timeout = AbortSignal.timeout(query.settings.requestTimeoutMs);
@@ -513,8 +612,16 @@ export function createLangfuseTraceReader({
     }
     let body: unknown;
     try {
+<<<<<<< HEAD
       body = await response.json();
     } catch (error) {
+=======
+      body = budget == null ? await response.json() : await readBounded(response, budget);
+    } catch (error) {
+      if (error instanceof TraceReadError) {
+        throw error;
+      }
+>>>>>>> upstream/main
       throw failed(
         error,
         new TraceReadError('upstream_error', 'Langfuse returned an invalid response'),
@@ -527,7 +634,11 @@ export function createLangfuseTraceReader({
     return parsed.data;
   }
 
+<<<<<<< HEAD
   function parseRows(rows: unknown[], owners: Map<string, string>): OwnedObservation[] {
+=======
+  function parseRows(rows: unknown[], owners: Map<string, TraceOwner>): OwnedObservation[] {
+>>>>>>> upstream/main
     const observations: OwnedObservation[] = [];
     let malformed = 0;
     for (const row of rows) {
@@ -536,9 +647,15 @@ export function createLangfuseTraceReader({
         malformed++;
         continue;
       }
+<<<<<<< HEAD
       const messageId = owners.get(parsed.data.traceId);
       if (messageId != null) {
         observations.push({ observation: parsed.data, messageId });
+=======
+      const owner = owners.get(parsed.data.traceId);
+      if (owner != null) {
+        observations.push({ observation: parsed.data, ...owner });
+>>>>>>> upstream/main
       }
     }
     if (malformed > 0) {
@@ -869,6 +986,85 @@ export function createLangfuseTraceReader({
       }
 
       /** Reads a segment from its project until its records or this request's record budget run out. */
+<<<<<<< HEAD
+=======
+      /**
+       * Names the tools of the listed tool rounds from the rounds' own input, in one read scoped to
+       * those rounds. A list read carries no input, and asking for it on every record would return
+       * each model call's whole conversation. The names are an addition to a page already read, so
+       * a failure here leaves the rounds unnamed instead of failing the page.
+       */
+      async function nameToolRounds(
+        destination: LangfuseScoreDestination,
+        traceIds: string[],
+        records: TTraceRecord[],
+      ): Promise<void> {
+        if (!query.settings.showToolNames) {
+          return;
+        }
+        const rounds = new Map<string, TTraceRecord>();
+        let from: string | undefined;
+        let to: string | undefined;
+        for (const record of records) {
+          if (record.role !== 'tools') {
+            continue;
+          }
+          rounds.set(record.id, record);
+          from = from == null || record.startTime < from ? record.startTime : from;
+          to = to == null || record.startTime > to ? record.startTime : to;
+        }
+        if (from == null || to == null) {
+          return;
+        }
+        const filter = JSON.stringify([
+          ...scopeFilter(traceIds),
+          { type: 'string', column: 'name', operator: '=', value: TOOL_ROUND_NAME },
+          { type: 'datetime', column: 'startTime', operator: '>=', value: from },
+          { type: 'datetime', column: 'startTime', operator: '<=', value: to },
+        ]);
+        let unnamed = rounds.size;
+        const budget: ByteBudget = { remaining: ROUND_BYTES_BUDGET };
+        let cursor: string | undefined;
+        const followed = new Set<string>();
+        try {
+          while (unnamed > 0 && budget.remaining > 0) {
+            const params = new URLSearchParams({
+              fields: ROUND_FIELDS,
+              limit: String(ROUND_PAGE_SIZE),
+              filter,
+            });
+            if (cursor) {
+              params.set('cursor', cursor);
+            }
+            const page = await requestPage(destination, params, query, cursor != null, budget);
+            for (const row of page.data) {
+              const parsed = roundSchema.safeParse(row);
+              const round = parsed.success ? rounds.get(parsed.data.id) : undefined;
+              const tools = parsed.success ? toolRoundNames(parsed.data.input) : undefined;
+              if (round != null && round.tools == null) {
+                unnamed--;
+              }
+              if (round != null && tools != null) {
+                round.tools = tools;
+              }
+            }
+            const next = page.meta?.cursor || undefined;
+            if (!next || page.data.length === 0 || followed.has(next)) {
+              break;
+            }
+            followed.add(next);
+            cursor = next;
+          }
+        } catch (error) {
+          if (query.signal?.aborted) {
+            throw error;
+          }
+          const reason = error instanceof TraceReadError ? error.code : 'unknown';
+          logger.debug(`[traces] Tool rounds could not be named: ${reason}`);
+        }
+      }
+
+>>>>>>> upstream/main
       async function readFrom(
         destination: LangfuseScoreDestination,
         traceIds: string[],
@@ -890,12 +1086,21 @@ export function createLangfuseTraceReader({
             params.set('cursor', cursor);
           }
           const page = await requestPage(destination, params, query, cursor != null);
+<<<<<<< HEAD
           for (const { observation, messageId } of parseRows(page.data, owners)) {
             records.push(toRecord(observation, messageId));
+=======
+          for (const { observation, messageId, origin } of parseRows(page.data, owners)) {
+            records.push(toRecord(observation, messageId, origin));
+>>>>>>> upstream/main
           }
           remaining -= page.data.length;
           const next = page.meta?.cursor || undefined;
           if (!next || page.data.length === 0) {
+<<<<<<< HEAD
+=======
+            await nameToolRounds(destination, traceIds, records);
+>>>>>>> upstream/main
             return { records };
           }
           /** A cursor that repeats would hand every later page the same records. */
@@ -904,6 +1109,10 @@ export function createLangfuseTraceReader({
           }
           followed.add(next);
           if (remaining <= 0) {
+<<<<<<< HEAD
+=======
+            await nameToolRounds(destination, traceIds, records);
+>>>>>>> upstream/main
             return { records, next };
           }
           cursor = next;
@@ -1072,8 +1281,13 @@ export function createLangfuseTraceReader({
         }
         return null;
       }
+<<<<<<< HEAD
       const { observation, messageId } = match;
       const record = toRecord(observation, messageId);
+=======
+      const { observation, messageId, origin } = match;
+      const record = toRecord(observation, messageId, origin);
+>>>>>>> upstream/main
       if (!includeContent) {
         return { record, contentAvailable: false };
       }
@@ -1081,9 +1295,20 @@ export function createLangfuseTraceReader({
       const input = toContent(observation.input, maxLength);
       const output = toContent(observation.output, maxLength);
       const metadata = toContent(observation.metadata, maxLength);
+<<<<<<< HEAD
       return {
         record,
         contentAvailable: true,
+=======
+      const isModelCall = record.kind === 'generation';
+      const prompt = isModelCall ? toTracePrompt(observation.input, maxLength) : undefined;
+      const reply = isModelCall ? toTraceReply(observation.output, maxLength) : undefined;
+      return {
+        record,
+        contentAvailable: true,
+        ...(prompt ? { prompt } : {}),
+        ...(reply ? { reply } : {}),
+>>>>>>> upstream/main
         ...(input ? { input } : {}),
         ...(output ? { output } : {}),
         ...(metadata ? { metadata } : {}),

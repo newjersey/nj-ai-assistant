@@ -1,21 +1,38 @@
 import { useMemo, useState } from 'react';
 import { useAtomValue } from 'jotai';
+<<<<<<< HEAD
 import { ChevronDown, CornerDownRight, Radio } from 'lucide-react';
 import { ContentTypes, EModelEndpoint } from 'librechat-data-provider';
+=======
+import { Radio } from 'lucide-react';
+import { ContentTypes } from 'librechat-data-provider';
+>>>>>>> upstream/main
 import { Button, Collapsible, CollapsibleContent, CollapsibleTrigger } from '@librechat/client';
 import type { TMessageContentParts } from 'librechat-data-provider';
 import type { ReactNode } from 'react';
 import type { ChildConversationTurn } from './adapters';
 import type { TranslationKeys } from '~/hooks';
+<<<<<<< HEAD
+=======
+import type { TurnAuthor } from './author';
+import SystemEventHeader, {
+  SystemEventIcon,
+  systemEventHeaderClasses,
+} from '~/components/Chat/Messages/ui/SystemEvent';
+>>>>>>> upstream/main
 import { SubagentActivityContent, SubagentStatus } from './SubagentActivity';
 import ContentParts from '~/components/Chat/Messages/Content/ContentParts';
 import { isAbnormalTerminalStatus, isLiveSubagentStatus } from './status';
 import { messageFooterClasses } from '~/components/Chat/Messages/styles';
 import MessageRow from '~/components/Chat/Messages/ui/MessageRow';
 import { ElapsedTimer } from '~/components/Chat/Messages/Elapsed';
+<<<<<<< HEAD
 import MessageIcon from '~/components/Chat/Messages/MessageIcon';
 import { showThinkingAtom } from '~/store/showThinking';
 import { useAgentsMapContext } from '~/Providers';
+=======
+import { showThinkingAtom } from '~/store/showThinking';
+>>>>>>> upstream/main
 import { useChatSurface } from './surface';
 import { useLocalize } from '~/hooks';
 import { cn } from '~/utils';
@@ -26,12 +43,20 @@ const TRIGGER_LABELS = {
   external_event: 'com_ui_subagent_trigger_external_event',
 } as const satisfies Record<ChildConversationTurn['trigger']['kind'], TranslationKeys>;
 
+<<<<<<< HEAD
 function TriggerIcon({ kind }: { kind: ChildConversationTurn['trigger']['kind'] }) {
   const Icon = kind === 'external_event' ? Radio : CornerDownRight;
   return (
     <span className="flex size-6 items-center justify-center rounded-full bg-surface-tertiary text-text-secondary">
       <Icon size={14} aria-hidden />
     </span>
+=======
+function ExternalEventIcon() {
+  return (
+    <SystemEventIcon>
+      <Radio size={14} />
+    </SystemEventIcon>
+>>>>>>> upstream/main
   );
 }
 
@@ -49,15 +74,21 @@ function ExternalEventTrigger({
   let body: ReactNode;
   if (details == null) {
     body = (
+<<<<<<< HEAD
       <div className="flex items-center gap-1.5 text-xs font-medium text-text-secondary">
         <TriggerIcon kind="external_event" />
         <span>{label}</span>
+=======
+      <div className="text-text-secondary flex items-center gap-2 py-1 text-sm">
+        <SystemEventHeader icon={<ExternalEventIcon />} label={label} />
+>>>>>>> upstream/main
       </div>
     );
   } else {
     body = (
       <Collapsible open={expanded} onOpenChange={setExpanded}>
         <CollapsibleTrigger asChild>
+<<<<<<< HEAD
           <Button
             type="button"
             variant="ghost"
@@ -84,12 +115,36 @@ function ExternalEventTrigger({
             <dd className="break-words text-text-primary">{details.sourceType}</dd>
             <dt>{localize('com_ui_subagent_event_received')}</dt>
             <dd className="break-words text-text-primary">
+=======
+          <Button type="button" variant="ghost" className={systemEventHeaderClasses}>
+            <SystemEventHeader
+              icon={<ExternalEventIcon />}
+              label={label}
+              detail={`${details.eventType} · ${details.sourceType}`}
+              expanded={expanded}
+            />
+            <span className="sr-only">{details.occurredAt}</span>
+          </Button>
+        </CollapsibleTrigger>
+        <CollapsibleContent className="text-text-secondary pt-0.5 pb-1 text-xs">
+          <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1">
+            <dt>{localize('com_ui_subagent_event_type')}</dt>
+            <dd className="text-text-primary break-words">{details.eventType}</dd>
+            <dt>{localize('com_ui_subagent_event_source')}</dt>
+            <dd className="text-text-primary break-words">{details.sourceType}</dd>
+            <dt>{localize('com_ui_subagent_event_received')}</dt>
+            <dd className="text-text-primary break-words">
+>>>>>>> upstream/main
               {new Date(details.occurredAt).toLocaleString()}
             </dd>
             {details.expectedActionToolName != null && (
               <>
                 <dt>{localize('com_ui_subagent_event_expected_action')}</dt>
+<<<<<<< HEAD
                 <dd className="break-words text-text-primary">{details.expectedActionToolName}</dd>
+=======
+                <dd className="text-text-primary break-words">{details.expectedActionToolName}</dd>
+>>>>>>> upstream/main
               </>
             )}
           </dl>
@@ -100,13 +155,21 @@ function ExternalEventTrigger({
   return (
     <MessageRow
       id={`${turn.taskId}:trigger`}
+<<<<<<< HEAD
       icon={<TriggerIcon kind="external_event" />}
+=======
+      icon={<ExternalEventIcon />}
+>>>>>>> upstream/main
       label={label}
       footer={null}
       timestamp={turn.trigger.createdAt ?? details?.occurredAt}
       ariaLabel={label}
       headerPrefix=""
       isCreatedByUser={true}
+<<<<<<< HEAD
+=======
+      systemLabel={localize('com_ui_system_event')}
+>>>>>>> upstream/main
       fullWidth={fullWidth}
     >
       {body}
@@ -114,7 +177,23 @@ function ExternalEventTrigger({
   );
 }
 
+<<<<<<< HEAD
 function TriggerMessage({ turn, fullWidth }: { turn: ChildConversationTurn; fullWidth: boolean }) {
+=======
+/** A parent agent's briefing or follow-up is the user side of this conversation
+ *  with the parent as its author, so it is main chat's user turn under the
+ *  parent's name and face. Only an external event, which no agent wrote, stays
+ *  a system turn. */
+function TriggerMessage({
+  turn,
+  fullWidth,
+  parentAuthor,
+}: {
+  turn: ChildConversationTurn;
+  fullWidth: boolean;
+  parentAuthor: TurnAuthor;
+}) {
+>>>>>>> upstream/main
   const showThinking = useAtomValue(showThinkingAtom);
   const localize = useLocalize();
   const label = localize(TRIGGER_LABELS[turn.trigger.kind]);
@@ -136,13 +215,19 @@ function TriggerMessage({ turn, fullWidth }: { turn: ChildConversationTurn; full
   return (
     <MessageRow
       id={`${turn.taskId}:trigger`}
+<<<<<<< HEAD
       icon={<TriggerIcon kind={turn.trigger.kind} />}
       label={label}
+=======
+      icon={parentAuthor.icon}
+      label={parentAuthor.name}
+>>>>>>> upstream/main
       footer={null}
       timestamp={turn.trigger.createdAt}
       ariaLabel={label}
       headerPrefix=""
       isCreatedByUser={true}
+<<<<<<< HEAD
       fullWidth={fullWidth}
     >
       <div className="mb-1 flex items-center gap-1.5 text-xs font-medium text-text-secondary">
@@ -150,6 +235,12 @@ function TriggerMessage({ turn, fullWidth }: { turn: ChildConversationTurn; full
         <span>{label}</span>
       </div>
       {content.length > 0 && (
+=======
+      showAuthor
+      fullWidth={fullWidth}
+    >
+      {content.length > 0 ? (
+>>>>>>> upstream/main
         <ContentParts
           content={content}
           messageId={`${turn.taskId}:trigger`}
@@ -160,9 +251,17 @@ function TriggerMessage({ turn, fullWidth }: { turn: ChildConversationTurn; full
           isSubmitting={false}
           isLatestMessage={false}
         />
+<<<<<<< HEAD
       )}
       {turn.trigger.summaryTruncated === true && (
         <div className="mt-1 text-xs italic text-text-secondary">
+=======
+      ) : (
+        <div className="text-text-secondary text-sm italic">{label}</div>
+      )}
+      {turn.trigger.summaryTruncated === true && (
+        <div className="text-text-secondary mt-1 text-xs italic">
+>>>>>>> upstream/main
           {localize('com_ui_subagent_trigger_truncated')}
         </div>
       )}
@@ -173,7 +272,11 @@ function TriggerMessage({ turn, fullWidth }: { turn: ChildConversationTurn; full
 function ChildMessage({
   turn,
   state,
+<<<<<<< HEAD
   agentId,
+=======
+  author,
+>>>>>>> upstream/main
   conversationId,
   fullWidth,
   onCancelControl,
@@ -182,7 +285,11 @@ function ChildMessage({
 }: {
   turn: ChildConversationTurn;
   state: 'ready' | 'loading' | 'error';
+<<<<<<< HEAD
   agentId?: string;
+=======
+  author: TurnAuthor;
+>>>>>>> upstream/main
   conversationId?: string | null;
   fullWidth: boolean;
   onCancelControl?: (controlId: string) => void;
@@ -190,9 +297,12 @@ function ChildMessage({
   onLoadDetails?: () => void;
 }) {
   const localize = useLocalize();
+<<<<<<< HEAD
   const agentsMap = useAgentsMapContext();
   const agent = agentId == null ? undefined : agentsMap?.[agentId];
   const label = agent?.name ?? turn.activity.title;
+=======
+>>>>>>> upstream/main
   const detailsLimited = turn.activity.activityTruncated === true;
   let limitedNotice: ReactNode;
   if (detailsLimited && onLoadDetails != null && detailState !== 'unavailable') {
@@ -221,6 +331,7 @@ function ChildMessage({
   const footer = (
     <div className={cn('mt-1 flex justify-start gap-3', messageFooterClasses)}>{footerContent}</div>
   );
+<<<<<<< HEAD
   const iconData = {
     endpoint: EModelEndpoint.agents,
     modelLabel: label,
@@ -236,6 +347,15 @@ function ChildMessage({
       label={label}
       footer={footer}
       ariaLabel={label}
+=======
+  return (
+    <MessageRow
+      id={`${turn.taskId}:assistant`}
+      icon={author.icon}
+      label={author.name}
+      footer={footer}
+      ariaLabel={author.name}
+>>>>>>> upstream/main
       headerPrefix=""
       isCreatedByUser={false}
       fullWidth={fullWidth}
@@ -250,10 +370,17 @@ function ChildMessage({
         onCancelControl={onCancelControl}
       />
       {detailsLimited && detailState !== 'loading' && (
+<<<<<<< HEAD
         <div className="mt-2 text-xs text-text-secondary">{limitedNotice}</div>
       )}
       {detailState === 'loading' && (
         <div className="mt-2 text-xs text-text-secondary" aria-live="polite">
+=======
+        <div className="text-text-secondary mt-2 text-xs">{limitedNotice}</div>
+      )}
+      {detailState === 'loading' && (
+        <div className="text-text-secondary mt-2 text-xs" aria-live="polite">
+>>>>>>> upstream/main
           {localize('com_ui_loading')}
         </div>
       )}
@@ -263,7 +390,12 @@ function ChildMessage({
 
 export default function SubagentConversation({
   turns,
+<<<<<<< HEAD
   agentId,
+=======
+  author,
+  parentAuthor,
+>>>>>>> upstream/main
   conversationId,
   stateByTask,
   controllableTaskId,
@@ -272,7 +404,14 @@ export default function SubagentConversation({
   onLoadTurnDetails,
 }: {
   turns: ChildConversationTurn[];
+<<<<<<< HEAD
   agentId?: string;
+=======
+  /** The child agent: every assistant turn's header. */
+  author: TurnAuthor;
+  /** The agent that briefs the child: every parent-written turn's header. */
+  parentAuthor: TurnAuthor;
+>>>>>>> upstream/main
   conversationId?: string | null;
   stateByTask?: ReadonlyMap<string, 'ready' | 'loading' | 'error'>;
   controllableTaskId?: string;
@@ -290,12 +429,20 @@ export default function SubagentConversation({
           data-subagent-thread-turn={turn.taskId}
         >
           <div className="px-4">
+<<<<<<< HEAD
             <TriggerMessage turn={turn} fullWidth={fullWidth} />
+=======
+            <TriggerMessage turn={turn} fullWidth={fullWidth} parentAuthor={parentAuthor} />
+>>>>>>> upstream/main
           </div>
           <div className="px-4">
             <ChildMessage
               turn={turn}
+<<<<<<< HEAD
               agentId={agentId}
+=======
+              author={author}
+>>>>>>> upstream/main
               conversationId={conversationId}
               fullWidth={fullWidth}
               state={stateByTask?.get(turn.taskId) ?? 'ready'}

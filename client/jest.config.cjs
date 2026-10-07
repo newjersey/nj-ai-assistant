@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 /** v0.8.8-rc3 */
+=======
+/** v0.8.8 */
+>>>>>>> upstream/main
 const { maxWorkers } = require('../config/jest.workers.cjs');
 
 module.exports = {
@@ -7,7 +11,11 @@ module.exports = {
   testEnvironmentOptions: {
     url: 'http://localhost:3080',
   },
+<<<<<<< HEAD
   collectCoverage: true,
+=======
+  collectCoverage: process.env.COVERAGE === 'true',
+>>>>>>> upstream/main
   collectCoverageFrom: [
     'src/**/*.{js,jsx,ts,tsx}',
     '!<rootDir>/node_modules/',
@@ -33,6 +41,10 @@ module.exports = {
       'jest-file-loader',
     '^test/(.*)$': '<rootDir>/test/$1',
     '^~/(.*)$': '<rootDir>/src/$1',
+<<<<<<< HEAD
+=======
+    '^@librechat/client$': '<rootDir>/../packages/client/dist/index.cjs',
+>>>>>>> upstream/main
     '^librechat-data-provider/react-query$':
       '<rootDir>/../node_modules/librechat-data-provider/src/react-query',
   },
@@ -49,7 +61,10 @@ module.exports = {
     '\\.[jt]sx?$': 'babel-jest',
     '\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$':
       'jest-file-loader',
+<<<<<<< HEAD
     '\\.md$': '<rootDir>/src/nj/test/rawTransform.cjs',
+=======
+>>>>>>> upstream/main
   },
   transformIgnorePatterns: [
     '/node_modules/(?!(@ariakit/react-components|@ariakit/react-utils|@ariakit/react-store|@ariakit/components|@ariakit/store|@ariakit/utils|@zattoo/use-double-click|@dicebear|@react-dnd|react-dnd.*|dnd-core|filenamify|filename-reserved-regex|heic-to|lowlight|highlight\\.js|fault|lucide-react|lucide|morphicons|react-markdown|unified|bail|trough|devlop|is-.*|parse-entities|stringify-entities|character-.*|trim-lines|style-to-object|inline-style-parser|html-url-attributes|escape-string-regexp|longest-streak|zwitch|ccount|markdown-table|comma-separated-tokens|space-separated-tokens|web-namespaces|property-information|remark-.*|rehype-.*|recma-.*|hast.*|mdast-.*|unist-.*|vfile.*|micromark.*|estree-util-.*|decode-named-character-reference)/)/',

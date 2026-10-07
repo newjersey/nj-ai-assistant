@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 const { scopedCacheKey } = require('@librechat/data-schemas');
 const {
   Time,
@@ -6,6 +7,10 @@ const {
   parseTextParts,
   findLastSeparatorIndex,
 } = require('librechat-data-provider');
+=======
+const { createSpeechChunkProcessor } = require('@librechat/api');
+const { CacheKeys, SEPARATORS, findLastSeparatorIndex } = require('librechat-data-provider');
+>>>>>>> upstream/main
 const { getLogStores } = require('~/cache');
 const { getMessage } = require('~/models');
 
@@ -51,6 +56,7 @@ function getRandomVoiceId(voiceIds) {
  * @property {string[]} normalizedAlignment.chars
  */
 
+<<<<<<< HEAD
 const MAX_NOT_FOUND_COUNT = 6;
 const MAX_NO_CHANGE_COUNT = 10;
 
@@ -133,6 +139,20 @@ function createChunkProcessor(user, messageId) {
   }
 
   return processChunks;
+=======
+/**
+ * @param {string} user
+ * @param {string} messageId
+ * @returns {() => Promise<{ text: string, isFinished: boolean }[] | string>}
+ */
+function createChunkProcessor(user, messageId) {
+  return createSpeechChunkProcessor({
+    user,
+    messageId,
+    cache: getLogStores(CacheKeys.MESSAGES),
+    getMessage,
+  });
+>>>>>>> upstream/main
 }
 
 /**

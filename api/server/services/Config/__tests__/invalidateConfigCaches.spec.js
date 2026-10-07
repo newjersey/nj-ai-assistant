@@ -21,6 +21,10 @@ jest.mock('@librechat/data-schemas', () => {
 });
 
 jest.mock('~/models', () => ({
+<<<<<<< HEAD
+=======
+  initializeMessageBudget: jest.fn(),
+>>>>>>> upstream/main
   getApplicableConfigs: jest.fn().mockResolvedValue([]),
   getUserPrincipals: jest.fn().mockResolvedValue([]),
 }));
@@ -45,7 +49,18 @@ jest.mock('@librechat/api', () => ({
 
 // ── Tests ──────────────────────────────────────────────────────────────
 
+<<<<<<< HEAD
 const { invalidateConfigCaches } = require('../app');
+=======
+const { getAppConfig, invalidateConfigCaches } = require('../app');
+const { initializeMessageBudget } = require('~/models');
+// Capture module-composition calls before clearMocks resets the spy history.
+const budgetInitializations = [...initializeMessageBudget.mock.calls];
+
+test('Config supplies its actual reader exactly once during composition', () => {
+  expect(budgetInitializations).toEqual([[getAppConfig]]);
+});
+>>>>>>> upstream/main
 
 describe('invalidateConfigCaches', () => {
   beforeEach(() => {

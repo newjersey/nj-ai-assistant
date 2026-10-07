@@ -12,6 +12,11 @@ jest.mock('react-hook-form', () => ({
   useWatch: () => undefined,
 }));
 
+<<<<<<< HEAD
+=======
+const mockOpenAutoFocus: { current?: (event: Event) => void } = {};
+
+>>>>>>> upstream/main
 jest.mock('@librechat/client', () => {
   const React = jest.requireActual('react');
   return {
@@ -40,8 +45,29 @@ jest.mock('@librechat/client', () => {
             ),
           )
         : null,
+<<<<<<< HEAD
     OGDialogContent: ({ children, ...rest }: { children: React.ReactNode }) =>
       React.createElement('div', rest, children),
+=======
+    OGDialogContent: React.forwardRef(
+      (
+        {
+          children,
+          onOpenAutoFocus,
+          focusOutline: _focusOutline,
+          ...rest
+        }: {
+          children: React.ReactNode;
+          onOpenAutoFocus?: (event: Event) => void;
+          focusOutline?: string;
+        },
+        ref: React.Ref<HTMLDivElement>,
+      ) => {
+        mockOpenAutoFocus.current = onOpenAutoFocus;
+        return React.createElement('div', { ...rest, ref }, children);
+      },
+    ),
+>>>>>>> upstream/main
     OGDialogHeader: ({ children, ...rest }: { children: React.ReactNode }) =>
       React.createElement('div', rest, children),
     OGDialogTitle: ({ children, ...rest }: { children: React.ReactNode }) =>
@@ -66,6 +92,17 @@ const skill: AgentItem = {
 };
 
 describe('ItemDialog', () => {
+<<<<<<< HEAD
+=======
+  test('focuses the dialog content on open instead of the first focusable element', () => {
+    render(<ItemDialog item={skill} agentId="a1" onClose={jest.fn()} />);
+    const event = new Event('focusScope.autoFocusOnMount', { cancelable: true });
+    mockOpenAutoFocus.current?.(event);
+    expect(event.defaultPrevented).toBe(true);
+    expect(document.activeElement).toBe(screen.getByTestId('item-dialog'));
+  });
+
+>>>>>>> upstream/main
   test('renders nothing when item is null', () => {
     render(<ItemDialog item={null} agentId="a1" onClose={jest.fn()} />);
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();

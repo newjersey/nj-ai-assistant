@@ -54,6 +54,7 @@ function MultiSelectPop({
             <button
               data-testid="select-dropdown-button"
               className={cn(
+<<<<<<< HEAD
                 'relative flex flex-col rounded-md border border-border-light bg-surface-secondary py-2 pl-3 pr-10 text-left focus:outline-none focus:ring-0 focus:ring-offset-0 sm:text-sm',
                 'pointer-cursor font-normal',
                 'hover:bg-surface-hover radix-state-open:bg-surface-hover',
@@ -65,6 +66,19 @@ function MultiSelectPop({
                 <span
                   className={cn(
                     'flex h-6 items-center gap-1 text-sm text-text-primary',
+=======
+                'border-border-light bg-surface-secondary relative flex flex-col rounded-md border py-2 pr-10 pl-3 text-left focus:ring-0 focus:ring-offset-0 focus:outline-hidden sm:text-sm',
+                'cursor-pointer font-normal',
+                'hover:bg-surface-hover data-[state=open]:bg-surface-hover',
+              )}
+            >
+              {' '}
+              {showLabel && <label className="text-text-secondary block text-xs">{title}</label>}
+              <span className="inline-flex" id={excludeIds[2]}>
+                <span
+                  className={cn(
+                    'text-text-primary flex h-6 items-center gap-1 text-sm',
+>>>>>>> upstream/main
                     !showLabel ? 'text-xs' : '',
                   )}
                 >
@@ -79,9 +93,15 @@ function MultiSelectPop({
                           {v.icon ? (
                             <img src={v.icon} alt={`${v} logo`} className="icon-lg rounded-sm" />
                           ) : (
+<<<<<<< HEAD
                             <Wrench className="icon-lg rounded-sm bg-surface-fixed" />
                           )}
                           <div className="absolute inset-0 rounded-sm ring-1 ring-inset ring-border-light" />
+=======
+                            <Wrench className="icon-lg bg-surface-fixed rounded-sm" />
+                          )}
+                          <div className="ring-border-light absolute inset-0 rounded-sm ring-1 ring-inset" />
+>>>>>>> upstream/main
                         </div>
                       ))}
                     </div>
@@ -96,7 +116,11 @@ function MultiSelectPop({
                   viewBox="0 0 24 24"
                   strokeLinecap="round"
                   strokeLinejoin="round"
+<<<<<<< HEAD
                   className="h-4 w-4 text-text-tertiary"
+=======
+                  className="text-text-tertiary h-4 w-4"
+>>>>>>> upstream/main
                   height="1em"
                   width="1em"
                   xmlns="http://www.w3.org/2000/svg"
@@ -112,7 +136,11 @@ function MultiSelectPop({
               side="bottom"
               align="center"
               className={cn(
+<<<<<<< HEAD
                 'mt-2 max-h-[52vh] min-w-full overflow-hidden overflow-y-auto rounded-lg border border-border-light bg-surface-secondary shadow-lg',
+=======
+                'border-border-light bg-surface-secondary mt-2 max-h-[52vh] min-w-full overflow-hidden overflow-y-auto rounded-lg border shadow-lg',
+>>>>>>> upstream/main
                 hasSearchRender && 'relative',
               )}
             >
@@ -137,7 +165,11 @@ function MultiSelectPop({
                           className="icon-sm mr-1 rounded-sm bg-cover"
                         />
                       ) : (
+<<<<<<< HEAD
                         <Wrench className="icon-sm mr-1 rounded-sm bg-surface-secondary bg-cover" />
+=======
+                        <Wrench className="icon-sm bg-surface-secondary mr-1 rounded-sm bg-cover" />
+>>>>>>> upstream/main
                       )
                     }
                   />

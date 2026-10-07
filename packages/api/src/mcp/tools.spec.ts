@@ -2,7 +2,12 @@ import { logger } from '@librechat/data-schemas';
 import { Constants, normalizeServerName } from 'librechat-data-provider';
 import type { LCAvailableTools, ParsedServerConfig } from './types';
 import type { MCPToolCacheDeps, MCPToolInput } from './tools';
+<<<<<<< HEAD
 import { getMCPAppToolsPublicationGeneration } from './toolsChanged';
+=======
+import { getMCPToolCatalogGeneration } from './toolsChanged';
+import { MCP_APPS_CAPABILITY_PROFILE } from './capabilities';
+>>>>>>> upstream/main
 import { createMCPToolCacheService } from './tools';
 
 const requestScopedConfig: ParsedServerConfig = {
@@ -87,6 +92,49 @@ function createSharedCacheDeps(params: {
 
 describe('createMCPToolCacheService', () => {
   describe('configuration-addressed app catalogs', () => {
+<<<<<<< HEAD
+=======
+    it('keeps standard operator catalogs global and Apps catalogs user-scoped', async () => {
+      const appCache = new Map<string, LCAvailableTools>();
+      const userCache = new Map<string, LCAvailableTools>();
+      const deps = createSharedCacheDeps({ config: cacheableConfig, appCache, userCache });
+      const service = createMCPToolCacheService(deps);
+      const standardTools = {
+        [toolName('standard', 'dynamic')]: makeTool(toolName('standard', 'dynamic')),
+      };
+      const appsTools = {
+        [toolName('apps', 'dynamic')]: makeTool(toolName('apps', 'dynamic')),
+      };
+
+      await service.cacheMCPServerTools({
+        userId: 'u1',
+        serverName: 'dynamic',
+        serverTools: standardTools,
+        publicationRevision: '1',
+      });
+      await service.cacheMCPServerTools({
+        userId: 'u1',
+        serverName: 'dynamic',
+        serverTools: appsTools,
+        publicationGeneration: 'apps-lease',
+        capabilityProfile: MCP_APPS_CAPABILITY_PROFILE,
+      });
+
+      await expect(service.getMCPServerTools('u1', 'dynamic')).resolves.toEqual(standardTools);
+      await expect(
+        service.getMCPServerTools('u1', 'dynamic', undefined, MCP_APPS_CAPABILITY_PROFILE),
+      ).resolves.toEqual(appsTools);
+      expect(appCache).toHaveProperty('size', 1);
+      expect(userCache).toHaveProperty('size', 1);
+      expect(deps.getCachedTools).toHaveBeenLastCalledWith({
+        userId: 'u1',
+        serverName: 'dynamic',
+        configGeneration: getMCPToolCatalogGeneration(cacheableConfig, MCP_APPS_CAPABILITY_PROFILE),
+        allowLegacyMigration: false,
+      });
+    });
+
+>>>>>>> upstream/main
     it('restores the static catalog without discovering app server configs', async () => {
       const staticTools = { builtin: makeTool('builtin') };
       const updateCachedGlobalTools = jest.fn(async (update) => update({}));
@@ -128,7 +176,11 @@ describe('createMCPToolCacheService', () => {
       const setCachedAppServerTools = jest.fn().mockResolvedValue(true);
       const deps = createMockDeps({ setCachedAppServerTools });
       const service = createMCPToolCacheService(deps);
+<<<<<<< HEAD
       const generation = getMCPAppToolsPublicationGeneration(cacheableConfig);
+=======
+      const generation = getMCPToolCatalogGeneration(cacheableConfig);
+>>>>>>> upstream/main
 
       await expect(
         service.replaceAppServerTools({
@@ -278,13 +330,21 @@ describe('createMCPToolCacheService', () => {
       await newService.replaceAppServerTools({
         serverName: 'dynamic',
         serverTools: newTools,
+<<<<<<< HEAD
         publicationGeneration: getMCPAppToolsPublicationGeneration(newConfig),
+=======
+        publicationGeneration: getMCPToolCatalogGeneration(newConfig),
+>>>>>>> upstream/main
         publicationRevision: '1',
       });
       await oldService.replaceAppServerTools({
         serverName: 'dynamic',
         serverTools: oldTools,
+<<<<<<< HEAD
         publicationGeneration: getMCPAppToolsPublicationGeneration(oldConfig),
+=======
+        publicationGeneration: getMCPToolCatalogGeneration(oldConfig),
+>>>>>>> upstream/main
         publicationRevision: '1',
       });
 
@@ -312,7 +372,11 @@ describe('createMCPToolCacheService', () => {
       await oldService.replaceAppServerTools({
         serverName: 'dynamic',
         serverTools: stale,
+<<<<<<< HEAD
         publicationGeneration: getMCPAppToolsPublicationGeneration(oldConfig),
+=======
+        publicationGeneration: getMCPToolCatalogGeneration(oldConfig),
+>>>>>>> upstream/main
         publicationRevision: '1',
       });
       await expect(newService.getMCPServerTools('user', 'dynamic')).resolves.toBeNull();
@@ -320,7 +384,11 @@ describe('createMCPToolCacheService', () => {
       await newService.replaceAppServerTools({
         serverName: 'dynamic',
         serverTools: current,
+<<<<<<< HEAD
         publicationGeneration: getMCPAppToolsPublicationGeneration(newConfig),
+=======
+        publicationGeneration: getMCPToolCatalogGeneration(newConfig),
+>>>>>>> upstream/main
         publicationRevision: '1',
       });
       await expect(newService.getMCPServerTools('user', 'dynamic')).resolves.toEqual(current);
@@ -347,12 +415,20 @@ describe('createMCPToolCacheService', () => {
 
       expect(setCachedAppServerTools).toHaveBeenCalledWith(
         'alpha',
+<<<<<<< HEAD
         getMCPAppToolsPublicationGeneration(alphaConfig),
+=======
+        getMCPToolCatalogGeneration(alphaConfig),
+>>>>>>> upstream/main
         { [alpha]: makeTool(alpha) },
       );
       expect(setCachedAppServerTools).toHaveBeenCalledWith(
         'beta',
+<<<<<<< HEAD
         getMCPAppToolsPublicationGeneration(betaConfig),
+=======
+        getMCPToolCatalogGeneration(betaConfig),
+>>>>>>> upstream/main
         { [beta]: makeTool(beta) },
       );
       expect(deps.setCachedTools).not.toHaveBeenCalled();
@@ -394,7 +470,11 @@ describe('createMCPToolCacheService', () => {
       expect(setCachedToolsIfCurrent).toHaveBeenCalledWith(expect.any(Object), {
         userId: 'u1',
         serverName: 'tenant',
+<<<<<<< HEAD
         configGeneration: getMCPAppToolsPublicationGeneration(tenantConfig),
+=======
+        configGeneration: getMCPToolCatalogGeneration(tenantConfig),
+>>>>>>> upstream/main
         publicationGeneration: 'connection-generation',
       });
     });

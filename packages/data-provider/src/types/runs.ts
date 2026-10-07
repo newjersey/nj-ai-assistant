@@ -38,6 +38,13 @@ export enum StepEvents {
   ON_MESSAGE_DELTA = 'on_message_delta',
   ON_REASONING_DELTA = 'on_reasoning_delta',
   ON_RUN_STEP_DELTA = 'on_run_step_delta',
+<<<<<<< HEAD
+=======
+  /** SDK handoff from generated arguments to host or direct tool execution. */
+  ON_TOOL_CALLS_DISPATCHED = 'on_tool_calls_dispatched',
+  /** Compact first-fragment marker, retained for resumable generations. */
+  ON_TOOL_PREPARATION = 'on_tool_preparation',
+>>>>>>> upstream/main
   ON_RUN_STEP_COMPLETED = 'on_run_step_completed',
   /** Terminal signal for a run step: closed with a status and timestamps. */
   ON_RUN_STEP_CLOSED = 'on_run_step_closed',
@@ -539,6 +546,11 @@ export type SubagentUpdatePhase =
   | 'start'
   | 'run_step'
   | 'run_step_delta'
+<<<<<<< HEAD
+=======
+  | 'tool_preparation'
+  | 'tool_calls_dispatched'
+>>>>>>> upstream/main
   | 'run_step_completed'
   | 'run_step_closed'
   | 'message_delta'
@@ -569,6 +581,11 @@ export interface SubagentUpdateEvent {
   activityEventId?: string;
   /** Host-assigned monotonic sequence within one detached child run. */
   activitySequence?: number;
+<<<<<<< HEAD
+=======
+  /** Host omission marker, counted only when its event is folded. */
+  activityDroppedCount?: number;
+>>>>>>> upstream/main
   /** Parent-side `tool_call_id` for the `subagent` tool invocation that
    *  triggered this run. Surfaces from the SDK (`3.1.67-dev.2`+) so hosts
    *  can correlate child progress to the parent tool call deterministically. */

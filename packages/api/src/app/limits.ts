@@ -16,6 +16,11 @@ export const handleRateLimits = (rateLimits?: TCustomConfig['rateLimits']): void
     conversationsImport: RateLimitPrefix.IMPORT,
     tts: RateLimitPrefix.TTS,
     stt: RateLimitPrefix.STT,
+<<<<<<< HEAD
+=======
+    emailChange: RateLimitPrefix.EMAIL_CHANGE,
+    emailChangeConfirm: RateLimitPrefix.EMAIL_CHANGE_CONFIRM,
+>>>>>>> upstream/main
   };
 
   Object.entries(rateLimitKeys).forEach(([key, prefix]) => {

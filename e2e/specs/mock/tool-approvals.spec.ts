@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { expect, test } from '@playwright/test';
@@ -216,6 +217,32 @@ async function expectCompletedApprovalToolOutput(page: Page, toolCallId: string,
     await expect(toolOutput).toBeVisible({ timeout: 5000 });
   }).toPass({ timeout: 30000 });
 }
+=======
+import { expect, test } from '@playwright/test';
+import type { Route } from '@playwright/test';
+import type { ApprovalResumeResponse } from './approvals.helpers';
+import {
+  APPROVAL_ERROR,
+  APPROVAL_REASON,
+  APPROVAL_EXPIRED,
+  BATCH_APPROVAL_PROMPT_MARKER,
+  REWRITTEN_APPROVAL_PROMPT_MARKER,
+  RESTRICTED_APPROVAL_PROMPT_MARKER,
+  uniqueLabel,
+  approvalCard,
+  approvalCards,
+  isResumeRequest,
+  collapseComposerApproval,
+  clearApprovalInvocations,
+  startApproval,
+  submitAndCapture,
+  createAndSelectApprovalAgent,
+  expectApprovalInvocationCount,
+  expectCompletedApprovalToolOutput,
+} from './approvals.helpers';
+import { NEW_CHAT_PATH, getAccessToken, messagesView, requestJson } from './helpers';
+import { cleanupAgent } from './agents.helpers';
+>>>>>>> upstream/main
 
 test.describe('tool approvals', () => {
   test('approves a paused tool with its original arguments', async ({ page }) => {

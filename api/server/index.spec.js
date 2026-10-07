@@ -102,7 +102,13 @@ describe('Telemetry wiring', () => {
     const ingressIndex = source.indexOf(
       "app.use('/api/agents/chat', agentStartupIngressMiddleware);",
     );
+<<<<<<< HEAD
     const jsonParserIndex = source.indexOf("app.use(express.json({ limit: '3mb' }));");
+=======
+    const jsonParserIndex = source.indexOf(
+      "app.use(excludeRumBodyParser(express.json({ limit: '3mb' })));",
+    );
+>>>>>>> upstream/main
     const recorderIndex = source.indexOf(
       "app.use('/api/agents/chat', agentStartupTelemetryMiddleware);",
     );
@@ -111,6 +117,10 @@ describe('Telemetry wiring', () => {
 
     expect(ingressIndex).toBeGreaterThan(-1);
     expect(recorderIndex).toBeGreaterThan(-1);
+<<<<<<< HEAD
+=======
+    expect(jsonParserIndex).toBeGreaterThan(-1);
+>>>>>>> upstream/main
     expect(ingressIndex).toBeLessThan(jsonParserIndex);
     expect(tracingIndex).toBeLessThan(recorderIndex);
     expect(recorderIndex).toBeLessThan(agentsRouteIndex);
@@ -171,7 +181,13 @@ describe('Startup readiness wiring', () => {
   });
 
   it('configures subagent task routing before the server accepts requests', () => {
+<<<<<<< HEAD
     const routingIndex = source.indexOf('await configureSubagentTaskRouting();');
+=======
+    const routingIndex = source.indexOf(
+      'await configureSubagentTaskRouting(appConfig?.endpoints?.agents?.subagentActivity);',
+    );
+>>>>>>> upstream/main
     const listenIndex = source.indexOf('const server = app.listen');
 
     expect(routingIndex).toBeGreaterThan(-1);
@@ -188,6 +204,20 @@ describe('Startup readiness wiring', () => {
     expect(shutdownRegistrationIndex).toBeLessThan(listenIndex);
   });
 
+<<<<<<< HEAD
+=======
+  it('registers background task draining with the graceful shutdown coordinator', () => {
+    const registrationIndex = source.indexOf('registerBackgroundTaskShutdown({');
+    const listenIndex = source.indexOf('const server = app.listen');
+
+    expect(registrationIndex).toBeGreaterThan(-1);
+    expect(registrationIndex).toBeLessThan(listenIndex);
+    expect(source).toContain(
+      'interruptGraceMs: appConfig?.endpoints?.agents?.backgroundTasks?.shutdownInterruptGraceMs',
+    );
+  });
+
+>>>>>>> upstream/main
   it('configures HTTP timeouts before graceful shutdown handling', () => {
     const listenIndex = source.indexOf('const server = app.listen');
     const timeoutConfigIndex = source.indexOf('configureServerTimeouts(server);');
@@ -323,10 +353,15 @@ describe('Server Configuration', () => {
     expect(response.status).toBe(200);
     expect(response.headers['x-frame-options']).toBe('SAMEORIGIN');
     expect(response.headers['x-content-type-options']).toBe('nosniff');
+<<<<<<< HEAD
     /* NJ: nj-helmet sets a global CSP
     expect(response.headers['content-security-policy']).toBeUndefined();
     expect(response.headers['content-security-policy-report-only']).toBeUndefined();
     */
+=======
+    expect(response.headers['content-security-policy']).toBeUndefined();
+    expect(response.headers['content-security-policy-report-only']).toBeUndefined();
+>>>>>>> upstream/main
   });
 
   it('should not cache index page', async () => {

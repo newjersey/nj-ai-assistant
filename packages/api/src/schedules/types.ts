@@ -4,6 +4,10 @@ import type {
   AgentTriggerDeliveryStatus,
   AgentTriggerDeliveryFailure,
 } from '@librechat/data-schemas';
+<<<<<<< HEAD
+=======
+import type { ScheduledMCPIdentity } from 'librechat-data-provider';
+>>>>>>> upstream/main
 import type { ScheduleMCPOutcome } from 'librechat-data-provider';
 import type { Types } from 'mongoose';
 import type { AgentTriggerEnqueueOptions, AgentTriggerEnvelope } from '../agents/triggers';
@@ -12,6 +16,10 @@ import type { SlotClaimResult } from './capacity';
 export interface ScheduleLimits {
   /** Feature-level switch: when false the engine claims/fires nothing. */
   enabled: boolean;
+<<<<<<< HEAD
+=======
+  mcpConsent?: { enabled: boolean; maxLifetimeHours: number };
+>>>>>>> upstream/main
   maxPerUser: number;
   minIntervalMinutes: number;
   autoDisableAfterFailures: number;
@@ -180,6 +188,13 @@ export interface ScheduleFileRef {
 }
 
 export interface ScheduleEngineDeps {
+<<<<<<< HEAD
+=======
+  /** Retried even when Mongo has no active/unbookkept run left to enumerate. */
+  reconcileRetainedJobs?: () => Promise<void>;
+  /** Host erasure fence for exact-generation receipt acknowledgements. */
+  eraseSettledSchedule?: ScheduleMethods['eraseScheduleIfDrained'];
+>>>>>>> upstream/main
   preflightMCP: ScheduleMCPPreflight;
   methods: ScheduleMethods;
   /** Resolves interface.schedules limits, per-principal when a user is given. */
@@ -279,12 +294,22 @@ export interface ScheduleEngineDeps {
 
 /** The immutable scheduled identity of a generation job, for reconcile/abort fencing. */
 export interface JobIdentity {
+<<<<<<< HEAD
+=======
+  createdAt?: number;
+>>>>>>> upstream/main
   scheduleId: string;
   scheduledFor: string | Date;
 }
 
 /** Job-store state plus the job's scheduled identity (absent on a replacement turn). */
 export interface JobState {
+<<<<<<< HEAD
+=======
+  providerDrained?: boolean;
+  terminalPersistencePending?: boolean;
+  terminalHostActionPending?: boolean;
+>>>>>>> upstream/main
   status: string;
   checkpointNamespace?: string;
   createdAt?: number;
@@ -299,6 +324,10 @@ export interface JobState {
    *  owner left it. See SerializableJobData.scheduleOutcome. */
   scheduleOutcome?: string;
   scheduleOutcomeError?: string;
+<<<<<<< HEAD
+=======
+  scheduleMCPFailure?: ScheduleMCPOutcome;
+>>>>>>> upstream/main
   preserveForScheduleReconcile?: boolean;
 }
 
@@ -329,5 +358,36 @@ export type FireableSchedule = ISchedule;
 export type ScheduleMCPPreflight = (
   agentId: string,
   user: ScheduleUserContext,
+<<<<<<< HEAD
   options: { concurrency: number; signal?: AbortSignal; deadlineMs?: number; scheduleId?: string },
 ) => Promise<ScheduleMCPOutcome[]>;
+=======
+  options: {
+    concurrency: number;
+    signal?: AbortSignal;
+    deadlineMs?: number;
+    scheduleId?: string;
+    stage?: 'activation' | 'invoke' | 'resume';
+    /** Trusted fire host provenance, never a body-provided permission. */
+    manual?: boolean;
+  },
+) => Promise<ScheduleMCPOutcome[]>;
+
+/** Trusted occurrence attribution for a safe MCP authorization failure. */
+export interface ScheduleMCPFailureInput {
+  error: unknown;
+  streamId?: string;
+  jobCreatedAt?: number;
+  userId?: string;
+  serverName: string;
+  identity?: ScheduledMCPIdentity;
+}
+
+/** The trusted host retires this exact MCP request before occurrence settlement. */
+export interface ScheduleMCPSettlementBoundary {
+  identity: ScheduledMCPIdentity;
+  streamId: string;
+  jobCreatedAt: number;
+  quiesce: () => Promise<void>;
+}
+>>>>>>> upstream/main

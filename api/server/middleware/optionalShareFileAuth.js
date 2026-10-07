@@ -1,4 +1,5 @@
 const cookie = require('cookie');
+<<<<<<< HEAD
 const jwt = require('jsonwebtoken');
 const { isEnabled } = require('@librechat/api');
 const { logger, runAsSystem } = require('@librechat/data-schemas');
@@ -86,3 +87,26 @@ const optionalShareFileAuth = async (req, res, next) => {
 };
 
 module.exports = optionalShareFileAuth;
+=======
+const { logger, runAsSystem } = require('@librechat/data-schemas');
+const {
+  createOptionalShareFileAuth,
+  clearCloudFrontCookies,
+  isTwoFactorEnrollmentRequired,
+  isTokenRetired,
+  isEnabled,
+} = require('@librechat/api');
+const { getUserById, findSession } = require('~/models');
+
+module.exports = createOptionalShareFileAuth({
+  parseCookie: cookie.parse,
+  getUserById,
+  findSession,
+  runAsSystem,
+  clearCloudFrontCookies,
+  enrollmentRequired: isTwoFactorEnrollmentRequired,
+  tokenRetired: isTokenRetired,
+  enabled: isEnabled,
+  warn: (...args) => logger.warn(...args),
+});
+>>>>>>> upstream/main

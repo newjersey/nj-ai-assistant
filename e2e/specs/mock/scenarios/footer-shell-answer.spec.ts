@@ -10,10 +10,16 @@ import { deleteConversations, deleteMessagesByConversation, seedConversations } 
  * deployment's own configuration, so two cases have to keep working: a document
  * that carries no answer at all (the Vite dev server serves `client/index.html`
  * itself, and a proxy could strip the script), and a caller whose resolved
+<<<<<<< HEAD
  * configuration disagrees with it — a per-tenant, role or user config override
  * of `interface.privacyPolicy` is resolved only by `/api/config`. In both, the
  * resolved answer is the one that decides, and the bar never covers the
  * composer once it has.
+=======
+ * configuration disagrees with it, since a per-tenant, role or user override of
+ * `customFooter` is resolved only by `/api/config`. In both, the resolved answer
+ * is the one that decides, and the bar never covers the composer once it has.
+>>>>>>> upstream/main
  *
  * The footer is hidden below `sm`, so this runs on the desktop viewport it
  * describes.
@@ -103,21 +109,33 @@ test.describe('footer answer in the shell', () => {
     }
   });
 
+<<<<<<< HEAD
   test('a policy link this caller alone has still clears the composer @scenario:an-override-policy-link-clears-the-composer', async ({
+=======
+  test('a footer this caller alone has still clears the composer @scenario:an-override-custom-footer-clears-the-composer', async ({
+>>>>>>> upstream/main
     page,
   }) => {
     test.setTimeout(60000);
     const conversationId = randomUUID();
     await seedConversations(getE2EUser().email, [
+<<<<<<< HEAD
       { conversationId, title: 'Override policy link', updatedAt: new Date() },
+=======
+      { conversationId, title: 'Override custom footer', updatedAt: new Date() },
+>>>>>>> upstream/main
     ]);
 
     try {
       /** The harness deployment configures no footer, so its document says so:
        *  this caller's resolved configuration is the one that disagrees. */
+<<<<<<< HEAD
       await serveResolvedConfig(page, {
         interface: { privacyPolicy: { externalUrl: 'https://example.com/privacy' } },
       });
+=======
+      await serveResolvedConfig(page, { customFooter: CUSTOM_FOOTER });
+>>>>>>> upstream/main
 
       await page.goto(`/c/${conversationId}`, { timeout: 15000 });
       await expect(page.locator(COMPOSER)).toBeVisible();
@@ -126,10 +144,16 @@ test.describe('footer answer in the shell', () => {
         'the deployment was expected to report no configured footer',
       ).toBe(false);
 
+<<<<<<< HEAD
       const policyLink = page.getByRole('link', { name: /privacy/i });
       await expect(policyLink).toBeVisible({ timeout: 15000 });
       await expect(policyLink).toHaveAttribute('href', 'https://example.com/privacy');
       await expectFooterBelowComposer(page, policyLink);
+=======
+      const footer = page.getByText(CUSTOM_FOOTER);
+      await expect(footer).toBeVisible({ timeout: 15000 });
+      await expectFooterBelowComposer(page, footer);
+>>>>>>> upstream/main
 
       /** The bar arrived after the first paint, so the check that matters is the
        *  composer's action row still taking its own clicks. */

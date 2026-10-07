@@ -1,5 +1,9 @@
 import React from 'react';
 import { render, act } from '@testing-library/react';
+<<<<<<< HEAD
+=======
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+>>>>>>> upstream/main
 import { ThemeContext, highContrastDarkTheme, highContrastLightTheme } from '@librechat/client';
 import type { Monaco } from '@monaco-editor/react';
 import type { IThemeRGB } from '@librechat/client';
@@ -45,6 +49,7 @@ jest.mock('@monaco-editor/react', () => ({
 
 jest.mock('~/Providers/EditorContext', () => {
   const ReactModule = jest.requireActual<typeof import('react')>('react');
+<<<<<<< HEAD
   return {
     useMutationState: () => {
       const [isMutating, setIsMutating] = ReactModule.useState(false);
@@ -53,6 +58,52 @@ jest.mock('~/Providers/EditorContext', () => {
     useCodeState: () => {
       const [currentCode, setCurrentCode] = ReactModule.useState('');
       return { currentCode, setCurrentCode };
+=======
+  const actual = jest.requireActual<typeof import('~/Providers/EditorContext')>(
+    '~/Providers/EditorContext',
+  );
+  return {
+    isSavedText: actual.isSavedText,
+    recordSave: actual.recordSave,
+    resolveServerContent: actual.resolveServerContent,
+    useMutationState: () => ({ isMutating: false }),
+    useCodeState: () => {
+      const [currentCode, setCurrentCode] = ReactModule.useState('');
+      const [rejectedCode, setRejectedState] = ReactModule.useState<Record<string, string>>({});
+      const setRejectedCode = ReactModule.useCallback(
+        (code: string | undefined, artifactId?: string) => {
+          setRejectedState((previous) => {
+            if (artifactId == null) {
+              return code === undefined ? {} : previous;
+            }
+            const next = { ...previous };
+            if (code === undefined) {
+              delete next[artifactId];
+            } else {
+              next[artifactId] = code;
+            }
+            return next;
+          });
+        },
+        [],
+      );
+      const codeSession = ReactModule.useRef(0);
+      const savedContent = ReactModule.useRef({});
+      const endCodeSession = ReactModule.useCallback(() => {
+        codeSession.current += 1;
+      }, []);
+      return {
+        currentCode,
+        setCurrentCode,
+        retainedCode: {},
+        rejectedCode,
+        setRejectedCode,
+        clearCode: () => {},
+        codeSession,
+        endCodeSession,
+        savedContent,
+      };
+>>>>>>> upstream/main
     },
   };
 });
@@ -101,6 +152,7 @@ const renderEditor = (initial: Artifact = artifact, initialAppearance = defaultA
   const monacoRef: React.MutableRefObject<editor.IStandaloneCodeEditor | null> = { current: null };
   let currentArtifact = initial;
   let currentAppearance = initialAppearance;
+<<<<<<< HEAD
   const tree = () => (
     <ThemeContext.Provider
       value={
@@ -112,6 +164,24 @@ const renderEditor = (initial: Artifact = artifact, initialAppearance = defaultA
     >
       <ArtifactCodeEditor artifact={currentArtifact} monacoRef={monacoRef} />
     </ThemeContext.Provider>
+=======
+  const client = new QueryClient({
+    defaultOptions: { mutations: { retry: false }, queries: { retry: false } },
+  });
+  const tree = () => (
+    <QueryClientProvider client={client}>
+      <ThemeContext.Provider
+        value={
+          {
+            resolvedMode: currentAppearance.resolvedMode,
+            highContrast: currentAppearance.highContrast,
+          } as React.ContextType<typeof ThemeContext>
+        }
+      >
+        <ArtifactCodeEditor artifact={currentArtifact} monacoRef={monacoRef} />
+      </ThemeContext.Provider>
+    </QueryClientProvider>
+>>>>>>> upstream/main
   );
   const utils = render(tree());
   const rerenderWith = (next: Artifact) => {

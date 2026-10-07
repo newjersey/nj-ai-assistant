@@ -56,9 +56,29 @@ describe('limiterCache', () => {
     // Verify it returns a RedisStore instance
     expect(testStore).toBeDefined();
     expect(testStore!.constructor.name).toBe('RedisStore');
+<<<<<<< HEAD
     expect(testStore!.prefix).toBe('test-limiter:');
     expect(typeof testStore!.sendCommand).toBe('function');
 
+=======
+    expect(testStore!.prefix).toBe('Cache-Integration-Test::test-limiter:');
+    expect(typeof testStore!.sendCommand).toBe('function');
+
+    // rate-limit-redis sends uppercase dynamic commands. The pinned ioredis
+    // key lookup is case-sensitive, so these raw calls bypass keyPrefix and
+    // RedisStore must carry the deployment prefix itself.
+    const limiterKey = 'rate-limit-user:123';
+    testStore!.init({ windowMs: 60_000 } as Parameters<RedisStore['init']>[0]);
+    await expect(testStore!.increment(limiterKey)).resolves.toMatchObject({ totalHits: 1 });
+    expect(await ioredisClient!.call('GET', `${testStore!.prefix}${limiterKey}`)).toBe('1');
+    expect(await ioredisClient!.call('GET', `test-limiter:${limiterKey}`)).toBeNull();
+    expect(
+      await ioredisClient!.call('GET', `Cache-Integration-Test::${testStore!.prefix}${limiterKey}`),
+    ).toBeNull();
+    await testStore!.resetKey(limiterKey);
+    expect(await ioredisClient!.call('GET', `${testStore!.prefix}${limiterKey}`)).toBeNull();
+
+>>>>>>> upstream/main
     const testKey = 'user:123';
 
     // SET operation

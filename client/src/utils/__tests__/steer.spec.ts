@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { Constants, ContentTypes } from 'librechat-data-provider';
+=======
+import { Constants, ContentTypes, ReasoningEffort } from 'librechat-data-provider';
+>>>>>>> upstream/main
 import type { TMessage, TSteerAppliedEvent } from 'librechat-data-provider';
 import {
   getSteerPart,
@@ -6,10 +10,18 @@ import {
   resolveRunEndTarget,
   findSteerMessageIndex,
   appendAppliedSteerIds,
+<<<<<<< HEAD
+=======
+  isLegacyDeliveryUncertain,
+>>>>>>> upstream/main
   resolveAbortSteerTarget,
   insertQueuedOrigin,
   mergeRestagedQuotes,
   collectDroppedSteerQuotes,
+<<<<<<< HEAD
+=======
+  carriedSteerContext,
+>>>>>>> upstream/main
 } from '../steer';
 
 const buildEvent = (overrides: Partial<TSteerAppliedEvent> = {}): TSteerAppliedEvent => ({
@@ -36,6 +48,25 @@ const assistantMessage = (overrides: Partial<TMessage> = {}): TMessage =>
     ...overrides,
   }) as TMessage;
 
+<<<<<<< HEAD
+=======
+describe('carriedSteerContext', () => {
+  it('preserves request-scoped reasoning through restore and recovery paths', () => {
+    expect(
+      carriedSteerContext({
+        quotes: ['excerpt'],
+        manualSkills: ['writer'],
+        reasoningOverride: { key: 'reasoning_effort', value: ReasoningEffort.high },
+      }),
+    ).toEqual({
+      quotes: ['excerpt'],
+      manualSkills: ['writer'],
+      reasoningOverride: { key: 'reasoning_effort', value: ReasoningEffort.high },
+    });
+  });
+});
+
+>>>>>>> upstream/main
 describe('applySteerPart', () => {
   it('places the part at its absolute index on a new message object', () => {
     const message = assistantMessage();
@@ -211,6 +242,22 @@ describe('appendAppliedSteerIds', () => {
   });
 });
 
+<<<<<<< HEAD
+=======
+describe('isLegacyDeliveryUncertain', () => {
+  it('locks ambiguous v1 and unnegotiated deliveries, but not v2', () => {
+    expect(
+      isLegacyDeliveryUncertain({ deliveryUncertain: true, generationProtocolVersion: 1 }),
+    ).toBe(true);
+    expect(isLegacyDeliveryUncertain({ deliveryUncertain: true })).toBe(true);
+    expect(
+      isLegacyDeliveryUncertain({ deliveryUncertain: true, generationProtocolVersion: 2 }),
+    ).toBe(false);
+    expect(isLegacyDeliveryUncertain({ generationProtocolVersion: 1 })).toBe(false);
+  });
+});
+
+>>>>>>> upstream/main
 describe('insertQueuedOrigin', () => {
   const staleOrigin = {
     item: {

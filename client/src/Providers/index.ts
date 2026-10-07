@@ -10,6 +10,10 @@ export * from './EditorContext';
 export * from './ChatFormContext';
 export * from './BookmarkContext';
 export * from './MessageContext';
+<<<<<<< HEAD
+=======
+export * from './AuthorContext';
+>>>>>>> upstream/main
 export * from './AssistantsContext';
 export * from './AgentsContext';
 export * from './AssistantsMapContext';
@@ -26,5 +30,10 @@ export * from './UploadModalContext';
 export * from './ArtifactsContext';
 export * from './PromptGroupsContext';
 export * from './MessagesViewContext';
+<<<<<<< HEAD
+=======
+export * from './MCPAppsPolicyContext';
+export * from './ComposerRestoreContext';
+>>>>>>> upstream/main
 export * from './MediaContext';
 export { default as BadgeRowProvider } from './BadgeRowContext';

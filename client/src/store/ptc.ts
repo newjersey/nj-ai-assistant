@@ -1,4 +1,5 @@
 import { atomFamily } from 'recoil';
+<<<<<<< HEAD
 import type { PtcToolCallStatus } from 'librechat-data-provider';
 
 /**
@@ -21,6 +22,9 @@ export interface PtcTraceEntry {
   error?: string;
   durationMs?: number;
 }
+=======
+import type { PtcTrace } from '~/common';
+>>>>>>> upstream/main
 
 /**
  * Stable identity for one PTC invocation in its parent message. Providers
@@ -39,6 +43,7 @@ export const ptcTraceKey = (parentMessageId: string, toolCallId: string) =>
  */
 export const PTC_TRACE_MAX_ENTRIES = 100;
 
+<<<<<<< HEAD
 /** One PTC program's trace: the retained tail plus what the cap discarded. */
 export interface PtcTrace {
   entries: PtcTraceEntry[];
@@ -46,6 +51,8 @@ export interface PtcTrace {
   dropped: number;
 }
 
+=======
+>>>>>>> upstream/main
 /** Shared empty value — one reference, so untouched atoms compare equal. */
 export const EMPTY_PTC_TRACE: PtcTrace = { entries: [], dropped: 0 };
 

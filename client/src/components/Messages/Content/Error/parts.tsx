@@ -277,7 +277,11 @@ export function ErrorDetails({ label, children }: { label: string; children: Rea
         onClick={() => setOpen((expanded) => !expanded)}
         aria-expanded={open}
         aria-controls={panelId}
+<<<<<<< HEAD
         className="flex items-center gap-1 rounded-md text-xs font-medium text-text-secondary transition-colors hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-text-primary"
+=======
+        className="text-text-secondary hover:text-text-primary focus-visible:ring-text-primary flex items-center gap-1 rounded-md text-xs font-medium transition-colors focus-visible:ring-2 focus-visible:outline-hidden"
+>>>>>>> upstream/main
       >
         {label}
         <ChevronRight
@@ -290,7 +294,11 @@ export function ErrorDetails({ label, children }: { label: string; children: Rea
       </button>
       <div id={panelId} style={panelStyle} aria-hidden={!open}>
         <div ref={panelRef} className="overflow-hidden">
+<<<<<<< HEAD
           <div className="mt-1 whitespace-pre-wrap break-words text-xs text-text-secondary">
+=======
+          <div className="text-text-secondary mt-1 text-xs break-words whitespace-pre-wrap">
+>>>>>>> upstream/main
             {children}
           </div>
         </div>
@@ -299,6 +307,42 @@ export function ErrorDetails({ label, children }: { label: string; children: Rea
   );
 }
 
+<<<<<<< HEAD
+=======
+/** Past a sentence's worth of text, or across lines, a detail is a body to open rather than read. */
+const INLINE_DETAIL_LENGTH = 240;
+
+/**
+ * A headline plus the failure's own words, the way every provider-produced error reads: what is
+ * known first, the reported text second. A single sentence stays in place, where a reader gets it
+ * without acting; a body of text collapses under `label`.
+ */
+export function ErrorWithDetail({
+  headline,
+  detail,
+  label,
+}: {
+  headline: string;
+  detail?: string;
+  label: string;
+}) {
+  if (detail == null) {
+    return <>{headline}</>;
+  }
+
+  return (
+    <ErrorBody>
+      <div>{headline}</div>
+      {detail.length <= INLINE_DETAIL_LENGTH && !/[\r\n]/.test(detail) ? (
+        <div className="text-text-secondary">{detail}</div>
+      ) : (
+        <ErrorDetails label={label}>{detail}</ErrorDetails>
+      )}
+    </ErrorBody>
+  );
+}
+
+>>>>>>> upstream/main
 export function ErrorActions({ children }: { children: React.ReactNode }) {
   return <div className="flex flex-wrap items-center gap-2">{children}</div>;
 }
@@ -322,10 +366,13 @@ export function ErrorAction({
 
 export const formatNumber = (value: number): string => new Intl.NumberFormat().format(value);
 
+<<<<<<< HEAD
 /** Token credits are a float balance; two decimals, matching the balance settings row. */
 export const formatCredits = (value: number): string =>
   new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 }).format(value);
 
+=======
+>>>>>>> upstream/main
 const isoTimestamp = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/;
 
 /**

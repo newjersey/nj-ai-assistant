@@ -81,8 +81,19 @@ describe('useAskAnswerMode', () => {
       wrapper: JotaiWrapper,
     });
 
+<<<<<<< HEAD
     expect(result.current.liveAsk).toBe(liveAsk);
     expect(result.current.active).toBe(true);
+=======
+    expect(mockUseGetMessages).toHaveBeenCalledWith(
+      'conversation-1',
+      expect.objectContaining({ enabled: true, select: findLiveAskUserQuestion }),
+    );
+    expect(result.current.liveAsk).toBe(liveAsk);
+    expect(result.current.active).toBe(true);
+    expect(result.current.composerAnswers).toBe(true);
+    expect(result.current.composerLocked).toBe(false);
+>>>>>>> upstream/main
     expect(result.current.popoverVisible).toBe(true);
   });
 
@@ -95,6 +106,11 @@ describe('useAskAnswerMode', () => {
 
     expect(result.current.liveAsk).toBeNull();
     expect(result.current.active).toBe(false);
+<<<<<<< HEAD
+=======
+    expect(result.current.composerAnswers).toBe(false);
+    expect(result.current.composerLocked).toBe(false);
+>>>>>>> upstream/main
     expect(result.current.popoverVisible).toBe(false);
   });
 
@@ -107,6 +123,10 @@ describe('useAskAnswerMode', () => {
 
     expect(result.current.active).toBe(true);
     expect(result.current.batchMode).toBe(true);
+<<<<<<< HEAD
+=======
+    expect(result.current.composerLocked).toBe(true);
+>>>>>>> upstream/main
     expect(result.current.options).toEqual([]);
     expect(result.current.draftId).toBeNull();
     /** The bounded form owns the answer, so the composer never speaks for it. */
@@ -149,10 +169,35 @@ describe('useAskAnswerMode', () => {
     const { result } = renderHook(() => useAskAnswerMode('new'), {
       wrapper: JotaiWrapper,
     });
+<<<<<<< HEAD
+=======
+    expect(mockUseGetMessages).toHaveBeenCalledWith(
+      '',
+      expect.objectContaining({ enabled: false, select: findLiveAskUserQuestion }),
+    );
+>>>>>>> upstream/main
     expect(result.current.liveAsk).toBeNull();
     expect(result.current.active).toBe(false);
   });
 
+<<<<<<< HEAD
+=======
+  it('yields typed Enter to the shared composer binding resolver', () => {
+    mockUseGetMessages.mockReturnValue({ data: liveAsk });
+    const { result } = renderHook(() => useAskAnswerMode('conversation-1'));
+
+    const handled = result.current.handleComposerKeyDown({
+      key: 'Enter',
+      keyCode: 13,
+      currentTarget: { value: 'typed answer' },
+      nativeEvent: { isComposing: false },
+    } as never);
+
+    expect(handled).toBe(false);
+    expect(mockSubmitAskAnswer).not.toHaveBeenCalled();
+  });
+
+>>>>>>> upstream/main
   it('forces liveAsk null when there is no conversation id', () => {
     mockUseGetMessages.mockReturnValue({ data: liveAsk });
 
@@ -471,6 +516,10 @@ describe('useAskAnswerMode', () => {
     });
 
     expect(result.current.submitText('answer from A')).toBe(true);
+<<<<<<< HEAD
+=======
+    expect(mockResetComposer).not.toHaveBeenCalled();
+>>>>>>> upstream/main
     act(() => finishAnswer?.());
 
     expect(mockResetComposer).toHaveBeenCalledTimes(1);

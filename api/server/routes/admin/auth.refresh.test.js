@@ -60,8 +60,14 @@ jest.mock('@librechat/api', () => {
   };
 });
 
+<<<<<<< HEAD
 jest.mock('~/server/controllers/auth/LoginController', () => ({
   loginController: jest.fn((req, res) => res.status(200).end()),
+=======
+const mockAdminLoginController = jest.fn((req, res) => res.status(200).end());
+jest.mock('~/server/controllers/auth/LoginController', () => ({
+  loginController: (...args) => mockAdminLoginController(...args),
+>>>>>>> upstream/main
 }));
 
 jest.mock('~/server/middleware/roles/capabilities', () => ({
@@ -634,6 +640,30 @@ describe('admin local login route', () => {
     expect(middleware.requireLocalAuth).not.toHaveBeenCalled();
   });
 
+<<<<<<< HEAD
+=======
+  it('preserves the additive required-setup response contract for admin clients', async () => {
+    mockAdminLoginController.mockImplementationOnce((req, res) =>
+      res.status(200).json({
+        twoFAPending: true,
+        twoFASetupRequired: true,
+        tempToken: 'setup-token',
+      }),
+    );
+
+    const response = await request(app).post('/api/admin/login/local').send({
+      email: 'admin@example.com',
+      password: 'password',
+    });
+
+    expect(response.body).toEqual({
+      twoFAPending: true,
+      twoFASetupRequired: true,
+      tempToken: 'setup-token',
+    });
+  });
+
+>>>>>>> upstream/main
   it('stops before local auth when the email login gate rejects the request', async () => {
     middleware.validateEmailLogin.mockImplementationOnce((req, res) =>
       res.status(403).json({ message: 'Email login is not allowed.' }),

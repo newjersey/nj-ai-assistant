@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { Spinner, useMediaQuery } from '@librechat/client';
+=======
+import { Spinner } from '@librechat/client';
+>>>>>>> upstream/main
 import { PermissionTypes, Permissions } from 'librechat-data-provider';
 import { Navigate, useNavigate, useParams, useLocation, useSearchParams } from 'react-router-dom';
 import SkillFileViewer from '~/components/Skills/display/SkillFileViewer';
@@ -7,6 +11,10 @@ import { useHasAccess, useAuthContext, useLocalize } from '~/hooks';
 import SkillDetail from '~/components/Skills/display/SkillDetail';
 import SkillState from '~/components/Skills/display/SkillState';
 import OpenSidebar from '~/components/Chat/Menus/OpenSidebar';
+<<<<<<< HEAD
+=======
+import useDrawerViewport from '~/hooks/Nav/useDrawerViewport';
+>>>>>>> upstream/main
 import { useGetSkillByIdQuery } from '~/data-provider';
 
 /**
@@ -38,7 +46,11 @@ export default function SkillsView() {
   const rolesLoaded = user?.role != null && roles?.[user.role] != null;
   if (!rolesLoaded) {
     return (
+<<<<<<< HEAD
       <div className="flex h-full w-full items-center justify-center bg-presentation">
+=======
+      <div className="bg-surface-primary-alt flex h-full w-full items-center justify-center">
+>>>>>>> upstream/main
         <Spinner className="text-text-secondary" aria-label={localize('com_ui_loading')} />
       </div>
     );
@@ -59,7 +71,11 @@ export default function SkillsView() {
   // No skill selected — empty state
   if (!skillId) {
     return (
+<<<<<<< HEAD
       <div className="flex h-full w-full flex-col bg-presentation">
+=======
+      <div className="bg-surface-primary-alt flex h-full w-full flex-col">
+>>>>>>> upstream/main
         <MobileSidebarToggle />
         <div className="flex flex-1 flex-col items-center justify-center">
           <SkillState
@@ -76,7 +92,11 @@ export default function SkillsView() {
 
 function CreateView() {
   return (
+<<<<<<< HEAD
     <div className="flex h-full w-full flex-col overflow-y-auto bg-presentation">
+=======
+    <div className="bg-surface-primary-alt flex h-full w-full flex-col overflow-y-auto">
+>>>>>>> upstream/main
       <MobileSidebarToggle />
       <CreateSkillForm />
     </div>
@@ -94,16 +114,31 @@ function DetailView({ skillId }: { skillId: string }) {
   // Show file content when a file is selected from the sidebar tree
   if (activeFile) {
     return (
+<<<<<<< HEAD
       <div className="flex h-full w-full flex-col bg-presentation">
         <MobileSidebarToggle />
         <SkillFileViewer skillId={skillId} relativePath={activeFile} />
+=======
+      <div className="bg-surface-primary-alt flex h-full w-full flex-col">
+        <MobileSidebarToggle />
+        <SkillFileViewer
+          key={`${skillId}:${activeFile}`}
+          skillId={skillId}
+          relativePath={activeFile}
+          skill={skillQuery.data}
+        />
+>>>>>>> upstream/main
       </div>
     );
   }
 
   if (skillQuery.isLoading) {
     return (
+<<<<<<< HEAD
       <div className="flex h-full w-full items-center justify-center bg-presentation">
+=======
+      <div className="bg-surface-primary-alt flex h-full w-full items-center justify-center">
+>>>>>>> upstream/main
         <Spinner className="text-text-secondary" aria-label={localize('com_ui_loading')} />
       </div>
     );
@@ -111,7 +146,11 @@ function DetailView({ skillId }: { skillId: string }) {
 
   if (skillQuery.isError || !skillQuery.data) {
     return (
+<<<<<<< HEAD
       <div className="flex h-full w-full flex-col bg-presentation">
+=======
+      <div className="bg-surface-primary-alt flex h-full w-full flex-col">
+>>>>>>> upstream/main
         <MobileSidebarToggle />
         <SkillState
           variant="error"
@@ -123,7 +162,11 @@ function DetailView({ skillId }: { skillId: string }) {
   }
 
   return (
+<<<<<<< HEAD
     <div className="flex h-full w-full flex-col bg-presentation">
+=======
+    <div className="bg-surface-primary-alt flex h-full w-full flex-col">
+>>>>>>> upstream/main
       <MobileSidebarToggle />
       <SkillDetail
         skill={skillQuery.data}
@@ -137,7 +180,11 @@ function DetailView({ skillId }: { skillId: string }) {
 /** Edit form — reached via the Edit button or `/skills/:id/edit` URL. */
 function EditView({ skillId }: { skillId: string }) {
   return (
+<<<<<<< HEAD
     <div className="flex h-full w-full flex-col overflow-y-auto bg-presentation">
+=======
+    <div className="bg-surface-primary-alt flex h-full w-full flex-col overflow-y-auto">
+>>>>>>> upstream/main
       <MobileSidebarToggle />
       <SkillForm skillId={skillId} />
     </div>
@@ -146,7 +193,11 @@ function EditView({ skillId }: { skillId: string }) {
 
 /** Sidebar reopen affordance for small screens, where the drawer is the only navigation. */
 function MobileSidebarToggle() {
+<<<<<<< HEAD
   const isSmallScreen = useMediaQuery('(max-width: 768px)');
+=======
+  const isSmallScreen = useDrawerViewport();
+>>>>>>> upstream/main
   if (!isSmallScreen) {
     return null;
   }

@@ -34,6 +34,10 @@ jest.mock('@librechat/api', () => ({
 }));
 
 jest.mock('~/models', () => ({
+<<<<<<< HEAD
+=======
+  initializeMessageBudget: jest.fn(),
+>>>>>>> upstream/main
   saveMessage: jest.fn(async (req, message) => message),
   getConvo: jest.fn(async () => null),
   getMessages: jest.fn(async () => []),

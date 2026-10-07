@@ -15,6 +15,10 @@ import { Time, CacheKeys } from 'librechat-data-provider';
 import { RedisStore as ConnectRedis } from 'connect-redis';
 import type { SendCommandFn } from 'rate-limit-redis';
 import { keyvRedisClient, ioredisClient, handleKeyvRedisError } from './redisClients';
+<<<<<<< HEAD
+=======
+import { createClusterSafeSendCommand } from './limiterSendCommand';
+>>>>>>> upstream/main
 import { batchDeleteKeys, scanKeys } from './redisUtils';
 import {
   instrumentIORedisClient,
@@ -36,6 +40,17 @@ import { violationFile } from './keyvFiles';
 const inMemoryCacheMap = new Map<string, Keyv>();
 
 /**
+<<<<<<< HEAD
+=======
+ * Each Redis adapter attaches listeners to the process-wide client. Reuse it for
+ * identical inputs so request-time lookups do not retain a new adapter forever.
+ * TTL remains part of the identity: Redis callers can share keys while using
+ * different default expirations. Custom fallback stores are ignored in Redis mode.
+ */
+const redisCacheMap = new Map<string, Map<number | undefined, Keyv>>();
+
+/**
+>>>>>>> upstream/main
  * Deletes every key under a namespace through the raw client, which is the one
  * write path that bypasses the Keyv error funnel; READONLY rejections are routed
  * to failover recovery before propagating.
@@ -70,6 +85,7 @@ async function clearRedisNamespace(namespace: string): Promise<void> {
  * namespace so that every call-site shares the same underlying `Map`. The first
  * caller's TTL wins for a given namespace.
  *
+<<<<<<< HEAD
  * @param namespace - The cache namespace.
  * @param ttl - Time to live for cache entries.
  * @param fallbackStore - Optional fallback store if Redis is not used.
@@ -80,6 +96,35 @@ export const standardCache = (namespace: string, ttl?: number, fallbackStore?: o
     try {
       const keyvRedis = new KeyvRedis(keyvRedisClient);
       const cache = new Keyv(keyvRedis, { namespace, ttl });
+=======
+ * **Redis mode**: instances are shared for the same namespace and default TTL.
+ * Different TTLs still address the same Redis keys without changing one another's defaults.
+ *
+ * @param namespace - The cache namespace.
+ * @param ttl - Time to live for cache entries.
+ * @param fallbackStore - Optional fallback store if Redis is not used.
+ * @param options.throwOnErrors - Rejects failed Redis operations instead of resolving them as a
+ *   miss or a no-op delete, for callers that must know an eviction did not happen. The first
+ *   caller's value wins for a shared namespace and TTL.
+ * @returns Cache instance.
+ */
+export const standardCache = (
+  namespace: string,
+  ttl?: number,
+  fallbackStore?: object,
+  options: { throwOnErrors?: boolean } = {},
+): Keyv => {
+  if (keyvRedisClient && !cacheConfig.FORCED_IN_MEMORY_CACHE_NAMESPACES?.includes(namespace)) {
+    const byTtl = redisCacheMap.get(namespace);
+    const existing = byTtl?.get(ttl);
+    if (existing) {
+      return existing;
+    }
+    try {
+      const { throwOnErrors = false } = options;
+      const keyvRedis = new KeyvRedis(keyvRedisClient, { throwOnErrors });
+      const cache = new Keyv(keyvRedis, { namespace, ttl, throwOnErrors });
+>>>>>>> upstream/main
       keyvRedis.namespace = cacheConfig.REDIS_KEY_PREFIX;
       keyvRedis.keyPrefixSeparator = cacheConfig.GLOBAL_PREFIX_SEPARATOR;
 
@@ -90,10 +135,21 @@ export const standardCache = (namespace: string, ttl?: number, fallbackStore?: o
 
       // Override clear() to handle namespace-aware deletion
       // The default Keyv clear() doesn't respect namespace due to the workaround above
+<<<<<<< HEAD
       // Workaround for issue #10487 https://github.com/danny-avila/LibreChat/issues/10487
       cache.clear = () => clearRedisNamespace(namespace);
 
       return instrumentRedisCache(cache, namespace);
+=======
+      // Workaround for issue #10487 https://github.com/LibreChat-AI/LibreChat/issues/10487
+      cache.clear = () => clearRedisNamespace(namespace);
+
+      const instrumented = instrumentRedisCache(cache, namespace);
+      const instances = byTtl ?? new Map<number | undefined, Keyv>();
+      instances.set(ttl, instrumented);
+      redisCacheMap.set(namespace, instances);
+      return instrumented;
+>>>>>>> upstream/main
     } catch (err) {
       logger.error(`Failed to create Redis cache for namespace ${namespace}:`, err);
       throw err;
@@ -171,6 +227,7 @@ export const limiterCache = (prefix: string): RedisStore | undefined => {
   if (!cacheConfig.USE_REDIS) {
     return undefined;
   }
+<<<<<<< HEAD
   // Note: The `prefix` is applied by RedisStore internally to its key operations.
   // The global REDIS_KEY_PREFIX is applied by ioredisClient's keyPrefix setting.
   // Combined key format: `{REDIS_KEY_PREFIX}::{prefix}{identifier}`
@@ -178,20 +235,50 @@ export const limiterCache = (prefix: string): RedisStore | undefined => {
 
   try {
     const sendCommand: SendCommandFn = (async (...args: string[]) => {
+=======
+  // rate-limit-redis supplies uppercase command names to `call()`. In the
+  // pinned ioredis version, dynamic-command key metadata is case-sensitive,
+  // so those calls bypass the configured keyPrefix, including EVALSHA keys.
+  // Include the deployment prefix here exactly once.
+  prefix = prefix.endsWith(':') ? prefix : `${prefix}:`;
+  const deploymentPrefix = cacheConfig.REDIS_KEY_PREFIX
+    ? `${cacheConfig.REDIS_KEY_PREFIX}${cacheConfig.GLOBAL_PREFIX_SEPARATOR}`
+    : '';
+  const limiterPrefix = `${deploymentPrefix}${prefix}`;
+
+  try {
+    const executeCommand = (async (...args: string[]) => {
+>>>>>>> upstream/main
       const redisClient = ioredisClient;
       if (redisClient == null) {
         throw new Error('Redis client not available');
       }
+<<<<<<< HEAD
       try {
         return await observeRedisOperation('ioredis', RedisUseCases.RATE_LIMIT, args[0], () =>
           redisClient.call(args[0], ...args.slice(1)),
         );
+=======
+      return await observeRedisOperation('ioredis', RedisUseCases.RATE_LIMIT, args[0], () =>
+        redisClient.call(args[0], ...args.slice(1)),
+      );
+    }) as SendCommandFn;
+    const clusterSafeCommand = createClusterSafeSendCommand(executeCommand);
+    const sendCommand: SendCommandFn = async (...args: string[]) => {
+      try {
+        return await clusterSafeCommand(...args);
+>>>>>>> upstream/main
       } catch (err) {
         logger.error('Redis command execution failed:', err);
         throw err;
       }
+<<<<<<< HEAD
     }) as SendCommandFn;
     return new RedisStore({ sendCommand, prefix });
+=======
+    };
+    return new RedisStore({ sendCommand, prefix: limiterPrefix });
+>>>>>>> upstream/main
   } catch (err) {
     logger.error(`Failed to create Redis rate limiter for prefix ${prefix}:`, err);
     return undefined;

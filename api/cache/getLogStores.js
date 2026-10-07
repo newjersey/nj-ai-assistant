@@ -66,11 +66,25 @@ const namespaces = {
     CacheKeys.OPENID_EXCHANGED_TOKENS,
     Time.TEN_MINUTES,
   ),
+<<<<<<< HEAD
   [CacheKeys.AUTH_USER_DOC]: standardCache(CacheKeys.AUTH_USER_DOC),
+=======
+  [CacheKeys.AUTH_USER_DOC]: standardCache(CacheKeys.AUTH_USER_DOC, undefined, undefined, {
+    throwOnErrors: true,
+  }),
+>>>>>>> upstream/main
   [CacheKeys.ADMIN_OAUTH_EXCHANGE]: standardCache(
     CacheKeys.ADMIN_OAUTH_EXCHANGE,
     Time.THIRTY_SECONDS,
   ),
+<<<<<<< HEAD
+=======
+  [CacheKeys.PASSKEY_CHALLENGE]: standardCache(CacheKeys.PASSKEY_CHALLENGE, Time.FIVE_MINUTES),
+  [CacheKeys.AGENT_LINKED_INSTRUCTIONS]: standardCache(
+    CacheKeys.AGENT_LINKED_INSTRUCTIONS,
+    Time.FIVE_MINUTES,
+  ),
+>>>>>>> upstream/main
 };
 
 /**

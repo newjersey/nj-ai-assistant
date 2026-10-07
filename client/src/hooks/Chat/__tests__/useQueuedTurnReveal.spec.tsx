@@ -5,7 +5,11 @@ import { Provider as JotaiProvider, createStore } from 'jotai';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { TMessage, TAgentQueuedTurnReceipt } from 'librechat-data-provider';
+<<<<<<< HEAD
 import type { QueuedMessage, RunEnd } from '~/store/families';
+=======
+import type { QueuedMessage, RunEnd } from '~/hooks/Chat/queue';
+>>>>>>> upstream/main
 import type { RevealedQueuedTurn } from '~/store/steer';
 import useQueuedTurnReveal, {
   buildRevealedMessage,

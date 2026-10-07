@@ -11,6 +11,11 @@ import {
   Workflow,
   Zap,
   Layers,
+<<<<<<< HEAD
+=======
+  Network,
+  Waypoints,
+>>>>>>> upstream/main
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import type { AgentItem } from './types';
@@ -22,6 +27,7 @@ export interface ItemIcon {
 }
 
 const BUILTIN_ICONS: Record<string, ItemIcon> = {
+<<<<<<< HEAD
   execute_code: {
     Icon: Code,
     colorClass: 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-300',
@@ -49,12 +55,50 @@ const BUILTIN_ICONS: Record<string, ItemIcon> = {
   ask_user_question: {
     Icon: MessageCircleQuestion,
     colorClass: 'bg-teal-500/15 text-teal-600 dark:text-teal-300',
+=======
+  subagents: {
+    Icon: Network,
+    colorClass: 'bg-series-2/15 text-series-2',
+  },
+  handoffs: {
+    Icon: Waypoints,
+    colorClass: 'bg-series-4/15 text-series-4',
+  },
+  execute_code: {
+    Icon: Code,
+    colorClass: 'bg-series-7/15 text-series-7',
+  },
+  web_search: {
+    Icon: Globe,
+    colorClass: 'bg-series-1/15 text-series-1',
+  },
+  artifacts: {
+    Icon: Sparkles,
+    colorClass: 'bg-series-6/15 text-series-6',
+  },
+  context: {
+    Icon: FileText,
+    colorClass: 'bg-series-4/15 text-series-4',
+  },
+  file_search: {
+    Icon: FileSearch,
+    colorClass: 'bg-series-5/15 text-series-5',
+  },
+  memory: {
+    Icon: Brain,
+    colorClass: 'bg-series-8/15 text-series-8',
+  },
+  ask_user_question: {
+    Icon: MessageCircleQuestion,
+    colorClass: 'bg-series-3/15 text-series-3',
+>>>>>>> upstream/main
   },
 };
 
 const KIND_FALLBACK_ICONS: Record<AgentItem['kind'], ItemIcon> = {
   builtin: {
     Icon: Layers,
+<<<<<<< HEAD
     colorClass: 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-300',
   },
   tool: {
@@ -72,6 +116,25 @@ const KIND_FALLBACK_ICONS: Record<AgentItem['kind'], ItemIcon> = {
   action: {
     Icon: Workflow,
     colorClass: 'bg-rose-500/15 text-rose-600 dark:text-rose-300',
+=======
+    colorClass: 'bg-series-7/15 text-series-7',
+  },
+  tool: {
+    Icon: Wrench,
+    colorClass: 'bg-series-1/15 text-series-1',
+  },
+  mcp: {
+    Icon: Server,
+    colorClass: 'bg-series-6/15 text-series-6',
+  },
+  skill: {
+    Icon: Zap,
+    colorClass: 'bg-series-4/15 text-series-4',
+  },
+  action: {
+    Icon: Workflow,
+    colorClass: 'bg-series-2/15 text-series-2',
+>>>>>>> upstream/main
   },
 };
 

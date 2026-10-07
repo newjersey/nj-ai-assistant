@@ -23,7 +23,11 @@ export default function Button({
       data-testid={`${type}-generation-button`}
       aria-keyshortcuts={ariaKey}
       className={cn(
+<<<<<<< HEAD
         'custom-btn btn-neutral relative -z-0 whitespace-nowrap border-0 md:border',
+=======
+        'custom-btn btn-neutral relative -z-0 border-0 whitespace-nowrap md:border',
+>>>>>>> upstream/main
         removeFocusOutlines,
         className,
       )}
@@ -32,7 +36,11 @@ export default function Button({
       <div className="flex w-full items-center justify-center gap-2">
         {children}
         {shortcutDisplay && (
+<<<<<<< HEAD
           <span className="hidden rounded-md border border-border-light px-1.5 py-0.5 text-[10px] leading-none text-text-secondary md:inline-flex">
+=======
+          <span className="border-border-light text-text-secondary hidden rounded-md border px-1.5 py-0.5 text-[10px] leading-none md:inline-flex">
+>>>>>>> upstream/main
             {shortcutDisplay}
           </span>
         )}

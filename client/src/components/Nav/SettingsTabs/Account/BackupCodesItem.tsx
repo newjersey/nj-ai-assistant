@@ -1,8 +1,13 @@
 import React, { useState } from 'react';
 import { RefreshCcw } from 'lucide-react';
 import { useSetRecoilState } from 'recoil';
+<<<<<<< HEAD
 import { motion, AnimatePresence } from 'framer-motion';
 import { REGEXP_ONLY_DIGITS, REGEXP_ONLY_DIGITS_AND_CHARS } from 'input-otp';
+=======
+import { REGEXP_ONLY_DIGITS } from 'input-otp';
+import { motion, AnimatePresence } from 'framer-motion';
+>>>>>>> upstream/main
 import {
   InputOTPSeparator,
   InputOTPGroup,
@@ -24,14 +29,25 @@ import type {
   TBackupCode,
   TUser,
 } from 'librechat-data-provider';
+<<<<<<< HEAD
 import { useRegenerateBackupCodesMutation } from '~/data-provider';
 import { useAuthContext, useLocalize } from '~/hooks';
+=======
+import BackupCodeInput, { isBackupCode } from '~/components/Auth/BackupCodeInput';
+import { useRegenerateBackupCodesMutation } from '~/data-provider';
+import { useAuthContext, useLocalize } from '~/hooks';
+import { useTwoFactorError } from './errors';
+>>>>>>> upstream/main
 import store from '~/store';
 
 const BackupCodesItem: React.FC = () => {
   const localize = useLocalize();
   const { user } = useAuthContext();
   const { showToast } = useToastContext();
+<<<<<<< HEAD
+=======
+  const showError = useTwoFactorError();
+>>>>>>> upstream/main
   const setUser = useSetRecoilState(store.user);
   const [isDialogOpen, setDialogOpen] = useState<boolean>(false);
   const [otpToken, setOtpToken] = useState('');
@@ -69,11 +85,15 @@ const BackupCodesItem: React.FC = () => {
           URL.revokeObjectURL(url);
         }
       },
+<<<<<<< HEAD
       onError: () =>
         showToast({
           message: localize('com_ui_backup_codes_regenerate_error'),
           status: 'error',
         }),
+=======
+      onError: (error) => showError(error, 'com_ui_backup_codes_regenerate_error'),
+>>>>>>> upstream/main
     });
   };
 
@@ -81,7 +101,11 @@ const BackupCodesItem: React.FC = () => {
     fetchBackupCodes(false);
   };
 
+<<<<<<< HEAD
   const otpReady = !needs2FA || otpToken.length === (useBackup ? 8 : 6);
+=======
+  const otpReady = !needs2FA || (useBackup ? isBackupCode(otpToken) : otpToken.length === 6);
+>>>>>>> upstream/main
 
   return (
     <OGDialog open={isDialogOpen} onOpenChange={setDialogOpen}>
@@ -110,8 +134,13 @@ const BackupCodesItem: React.FC = () => {
           >
             {Array.isArray(user?.backupCodes) && user?.backupCodes.length > 0 ? (
               <>
+<<<<<<< HEAD
                 <div className="mb-6 rounded-lg border border-status-warning-border bg-status-warning-subtle p-4">
                   <p className="text-sm text-text-secondary">
+=======
+                <div className="border-status-warning-border bg-status-warning-subtle mb-6 rounded-lg border p-4">
+                  <p className="text-text-secondary text-sm">
+>>>>>>> upstream/main
                     {localize('com_ui_backup_codes_security_info')}
                   </p>
                 </div>
@@ -144,14 +173,22 @@ const BackupCodesItem: React.FC = () => {
                           });
                           document.dispatchEvent(announcement);
                         }}
+<<<<<<< HEAD
                         className={`flex flex-col rounded-xl border p-4 backdrop-blur-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-text-primary ${
+=======
+                        className={`focus-visible:ring-text-primary flex flex-col rounded-xl border p-4 backdrop-blur-xs transition-colors focus-visible:ring-2 focus-visible:outline-hidden ${
+>>>>>>> upstream/main
                           isUsed
                             ? 'border-status-error-border bg-status-error-subtle'
                             : 'border-status-success-border bg-status-success-subtle'
                         } `}
                       >
                         <div className="flex items-center justify-between" aria-hidden="true">
+<<<<<<< HEAD
                           <span className="text-sm font-medium text-text-secondary">
+=======
+                          <span className="text-text-secondary text-sm font-medium">
+>>>>>>> upstream/main
                             {localize('com_ui_backup_code_number', { number: index + 1 })}
                           </span>
                           <TooltipAnchor
@@ -215,6 +252,7 @@ const BackupCodesItem: React.FC = () => {
                   {localize('com_ui_2fa_verification_required')}
                 </Label>
                 <div className="flex justify-center">
+<<<<<<< HEAD
                   <InputOTP
                     value={otpToken}
                     onChange={setOtpToken}
@@ -234,6 +272,18 @@ const BackupCodesItem: React.FC = () => {
                         <InputOTPSlot index={7} />
                       </InputOTPGroup>
                     ) : (
+=======
+                  {useBackup ? (
+                    <BackupCodeInput value={otpToken} onChange={setOtpToken} />
+                  ) : (
+                    <InputOTP
+                      value={otpToken}
+                      onChange={setOtpToken}
+                      maxLength={6}
+                      pattern={REGEXP_ONLY_DIGITS}
+                      className="gap-2"
+                    >
+>>>>>>> upstream/main
                       <>
                         <InputOTPGroup>
                           <InputOTPSlot index={0} />
@@ -247,8 +297,13 @@ const BackupCodesItem: React.FC = () => {
                           <InputOTPSlot index={5} />
                         </InputOTPGroup>
                       </>
+<<<<<<< HEAD
                     )}
                   </InputOTP>
+=======
+                    </InputOTP>
+                  )}
+>>>>>>> upstream/main
                 </div>
                 <Button
                   type="button"
@@ -257,7 +312,11 @@ const BackupCodesItem: React.FC = () => {
                     setUseBackup(!useBackup);
                     setOtpToken('');
                   }}
+<<<<<<< HEAD
                   className="h-auto p-0 text-sm text-text-primary hover:underline"
+=======
+                  className="text-text-primary h-auto p-0 text-sm hover:underline"
+>>>>>>> upstream/main
                 >
                   {useBackup ? localize('com_ui_use_2fa_code') : localize('com_ui_use_backup_code')}
                 </Button>

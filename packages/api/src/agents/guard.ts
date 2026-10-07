@@ -2,6 +2,10 @@ import { Constants } from 'librechat-data-provider';
 import type { ConversationMethods, IConversation } from '@librechat/data-schemas';
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
 import type { SubagentThreadTaskStore } from './subagentThreads';
+<<<<<<< HEAD
+=======
+import { PARTIAL_RESOLVED_CONVERSATION } from './conversationSymbols';
+>>>>>>> upstream/main
 import { isReservedSubagentThreadId } from './subagentThreadIds';
 import { isAgentEventRetentionActive } from './eventRetention';
 
@@ -52,6 +56,7 @@ interface ResolvedConversationRequest extends Request {
   _agentEventBindingTenantId?: string;
 }
 
+<<<<<<< HEAD
 /**
  * Brands the lineage-only conversation `isBoundEventContinuation` synthesizes: it stands in
  * for binding checks but carries none of the stored document's optional fields, so readers
@@ -61,6 +66,8 @@ export const PARTIAL_RESOLVED_CONVERSATION: unique symbol = Symbol.for(
   'librechat.resolvedConversation.partial',
 );
 
+=======
+>>>>>>> upstream/main
 function applyEventBindingContext(
   request: ResolvedConversationRequest,
   conversation: IConversation,

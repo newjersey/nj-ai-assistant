@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import React, { useRef } from 'react';
+=======
+import React from 'react';
+>>>>>>> upstream/main
 import { JSX } from 'react/jsx-runtime';
 import {
   Label,
@@ -9,9 +13,15 @@ import {
   ListboxOptions,
 } from '@headlessui/react';
 import type { Option, OptionWithIcon, DropdownValueSetter } from '~/common';
+<<<<<<< HEAD
 import { useMultiSearch } from './MultiSearch';
 import { CheckMark } from '~/svgs';
 import { cn } from '~/utils';
+=======
+import { cn, disabledFillClasses } from '~/utils';
+import { useMultiSearch } from './MultiSearch';
+import { CheckMark } from '~/svgs';
+>>>>>>> upstream/main
 
 type SelectDropDownProps = {
   id?: string;
@@ -99,8 +109,11 @@ function SelectDropDown({
   const options = hasSearchRender ? filteredValues : values;
   const renderIcon = showOptionIcon && value != null && (value as OptionWithIcon).icon != null;
 
+<<<<<<< HEAD
   const buttonRef = useRef<HTMLButtonElement>(null);
 
+=======
+>>>>>>> upstream/main
   return (
     <div className={cn('flex items-center justify-center gap-2', containerClassName ?? '')}>
       <div className={cn('relative w-full', subContainerClassName ?? '')}>
@@ -108,6 +121,7 @@ function SelectDropDown({
           {({ open }) => (
             <>
               <ListboxButton
+<<<<<<< HEAD
                 ref={buttonRef}
                 data-testid="select-dropdown-button"
                 onKeyDown={(e) => {
@@ -120,12 +134,33 @@ function SelectDropDown({
                 }}
                 className={cn(
                   'relative flex w-full cursor-default flex-col rounded-md border border-border-light bg-surface-secondary py-2 pl-3 pr-10 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-text-primary focus-visible:ring-offset-2 disabled:bg-surface-secondary sm:text-sm',
+=======
+                data-testid="select-dropdown-button"
+                onKeyDown={(event) => {
+                  if (event.key !== 'Enter') {
+                    return;
+                  }
+                  event.preventDefault();
+                  if (!open) {
+                    event.currentTarget.dispatchEvent(
+                      new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }),
+                    );
+                  }
+                }}
+                className={cn(
+                  'border-border-control bg-surface-secondary focus-visible:ring-focus-control disabled:bg-surface-secondary relative flex w-full cursor-default flex-col rounded-md border py-2 pr-10 pl-3 text-left focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden sm:text-sm',
+                  disabledFillClasses,
+>>>>>>> upstream/main
                   className ?? '',
                 )}
               >
                 {showLabel && (
                   <Label
+<<<<<<< HEAD
                     className="block text-xs text-text-secondary"
+=======
+                    className="text-text-secondary block text-xs"
+>>>>>>> upstream/main
                     id="headlessui-listbox-label-:r1:"
                     data-headlessui-state=""
                   >
@@ -135,13 +170,21 @@ function SelectDropDown({
                 <span className="inline-flex w-full truncate">
                   <span
                     className={cn(
+<<<<<<< HEAD
                       'flex h-6 items-center gap-1 truncate text-sm text-text-primary',
+=======
+                      'text-text-primary flex h-6 items-center gap-1 truncate text-sm',
+>>>>>>> upstream/main
                       !showLabel ? 'text-xs' : '',
                       currentValueClass ?? '',
                     )}
                   >
                     {!showLabel && !emptyTitle && (
+<<<<<<< HEAD
                       <span className="text-xs text-text-secondary">{title}:</span>
+=======
+                      <span className="text-text-secondary text-xs">{title}:</span>
+>>>>>>> upstream/main
                     )}
                     {renderIcon && optionIconSide !== 'right' && (
                       <span className="icon-md flex items-center">
@@ -172,7 +215,11 @@ function SelectDropDown({
                     viewBox="0 0 24 24"
                     strokeLinecap="round"
                     strokeLinejoin="round"
+<<<<<<< HEAD
                     className="h-4 w-4 text-text-tertiary"
+=======
+                    className="text-text-tertiary h-4 w-4"
+>>>>>>> upstream/main
                     height="1em"
                     width="1em"
                     xmlns="http://www.w3.org/2000/svg"
@@ -192,7 +239,11 @@ function SelectDropDown({
               >
                 <ListboxOptions
                   className={cn(
+<<<<<<< HEAD
                     'absolute z-10 mt-2 max-h-60 w-full overflow-auto rounded border border-border-light bg-surface-secondary text-xs md:w-[100%]',
+=======
+                    'border-border-light bg-surface-secondary absolute z-10 mt-2 max-h-60 w-full overflow-auto rounded border text-xs md:w-[100%]',
+>>>>>>> upstream/main
                     optionsListClass ?? '',
                   )}
                 >
@@ -201,7 +252,11 @@ function SelectDropDown({
                       key={'listbox-render-option'}
                       value={null}
                       className={cn(
+<<<<<<< HEAD
                         'group relative flex h-[42px] cursor-pointer select-none items-center overflow-hidden pl-3 pr-9 text-text-primary hover:bg-surface-hover',
+=======
+                        'group text-text-primary hover:bg-surface-hover relative flex h-[2.625rem] cursor-pointer items-center overflow-hidden pr-9 pl-3 select-none',
+>>>>>>> upstream/main
                         optionsClass ?? '',
                       )}
                     >
@@ -230,7 +285,11 @@ function SelectDropDown({
                         value={option}
                         className={({ active }) =>
                           cn(
+<<<<<<< HEAD
                             'group relative flex h-[42px] cursor-pointer select-none items-center overflow-hidden pl-3 pr-9 text-text-primary hover:bg-surface-hover',
+=======
+                            'group text-text-primary hover:bg-surface-hover relative flex h-[2.625rem] cursor-pointer items-center overflow-hidden pr-9 pl-3 select-none',
+>>>>>>> upstream/main
                             active ? 'bg-surface-active text-text-primary' : '',
                             optionsClass ?? '',
                           )
@@ -239,7 +298,11 @@ function SelectDropDown({
                         <span className="flex items-center gap-1.5 truncate">
                           <span
                             className={cn(
+<<<<<<< HEAD
                               'flex h-6 items-center gap-1 text-text-primary',
+=======
+                              'text-text-primary flex h-6 items-center gap-1',
+>>>>>>> upstream/main
                               option === value ? 'font-semibold' : '',
                               iconSide === 'left' ? 'ml-4' : '',
                             )}
@@ -256,10 +319,17 @@ function SelectDropDown({
                             )}
                             {currentLabel}
                           </span>
+<<<<<<< HEAD
                           {currentValue === activeValue && (
                             <span
                               className={cn(
                                 'absolute inset-y-0 flex items-center text-text-primary',
+=======
+                          {value != null && currentValue === activeValue && (
+                            <span
+                              className={cn(
+                                'text-text-primary absolute inset-y-0 flex items-center',
+>>>>>>> upstream/main
                                 iconSide === 'left' ? 'left-0 pl-2' : 'right-0 pr-3',
                               )}
                             >

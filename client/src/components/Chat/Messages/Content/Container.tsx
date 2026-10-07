@@ -5,7 +5,11 @@ import Files from './Files';
 
 const Container = ({ children, message }: { children: React.ReactNode; message?: TMessage }) => (
   <div
+<<<<<<< HEAD
     className="text-message flex min-h-[20px] flex-col items-start gap-3 overflow-visible [.text-message+&]:mt-5"
+=======
+    className="text-message flex min-h-[1.25rem] flex-col items-start gap-3 overflow-visible [.text-message+&]:mt-5"
+>>>>>>> upstream/main
     dir="auto"
   >
     {message?.isCreatedByUser === true && (

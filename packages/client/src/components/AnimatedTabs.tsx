@@ -1,7 +1,11 @@
 import { forwardRef, useEffect, useRef } from 'react';
 import * as Ariakit from '@ariakit/react';
 import type { ElementRef } from 'react';
+<<<<<<< HEAD
 import { cn } from '~/utils';
+=======
+import { cn, disabledInkClasses } from '~/utils';
+>>>>>>> upstream/main
 import './AnimatedTabs.css';
 import { JSX } from 'react/jsx-runtime';
 
@@ -21,6 +25,10 @@ export interface AnimatedTabsProps {
   tabListProps?: Ariakit.TabListProps;
   containerClassName?: string;
   defaultSelectedId?: string;
+<<<<<<< HEAD
+=======
+  tone?: 'default' | 'muted';
+>>>>>>> upstream/main
 }
 
 function usePrevious<T>(value: T) {
@@ -59,7 +67,15 @@ const Tab = forwardRef<ElementRef<typeof Ariakit.Tab>, Ariakit.TabProps>(functio
         else if (ref) ref.current = node;
       }}
       {...props}
+<<<<<<< HEAD
       className={`animated-tab aria-selected:text-token-text-primary flex select-none items-center justify-center gap-2 whitespace-nowrap border-none text-sm font-medium outline-none transition-colors aria-disabled:opacity-50 ${props.className || ''}`}
+=======
+      className={cn(
+        'animated-tab aria-selected:text-text-primary flex items-center justify-center gap-2 border-none text-sm font-medium whitespace-nowrap outline-hidden transition-colors select-none aria-disabled:opacity-50',
+        disabledInkClasses,
+        props.className,
+      )}
+>>>>>>> upstream/main
     />
   );
 });
@@ -90,6 +106,10 @@ export function AnimatedTabs({
   containerClassName = '',
   tabListProps = {},
   defaultSelectedId,
+<<<<<<< HEAD
+=======
+  tone = 'default',
+>>>>>>> upstream/main
 }: AnimatedTabsProps): JSX.Element {
   const tabIds = tabs.map((tab, index) => tab.id || `tab-${index}`);
   const firstTabId = defaultSelectedId || tabIds[0];
@@ -130,7 +150,11 @@ export function AnimatedTabs({
               key={tabIds[index]}
               id={tabIds[index]}
               disabled={tab.disabled}
+<<<<<<< HEAD
               className={tabClassName}
+=======
+              className={cn(tone === 'muted' && 'text-text-secondary', tabClassName)}
+>>>>>>> upstream/main
               data-state={tabIds[index] === firstTabId ? 'active' : 'inactive'}
             >
               {/* TypeScript workaround for React i18next children type compatibility */}

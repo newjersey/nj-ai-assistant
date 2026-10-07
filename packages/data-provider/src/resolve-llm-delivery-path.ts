@@ -1,5 +1,9 @@
 import type { TDefaultLLMDeliveryPath, TDefaultLLMDeliveryPathConfig } from './file-config';
 import type { EndpointFileConfig, FileConfig, RegexLike } from './types/files';
+<<<<<<< HEAD
+=======
+import type { CodeEnvReferenceSet } from './codeEnvRef';
+>>>>>>> upstream/main
 import type { TEndpoint } from './config';
 import {
   retrievalMimeTypes,
@@ -17,6 +21,10 @@ import {
 } from './schemas';
 import { normalizeEndpointName } from './utils';
 import { EToolResources } from './types/tools';
+<<<<<<< HEAD
+=======
+import { getCodeEnvRefs } from './codeEnvRef';
+>>>>>>> upstream/main
 
 /**
  * The native provider a custom endpoint declares, when it declares one. A custom endpoint
@@ -224,10 +232,16 @@ export function resolveDefaultLLMDeliveryPath(
     return canRecoverText(mimeType) ? 'text' : 'none';
   }
 
+<<<<<<< HEAD
   /* NJ: Keep ALL Bedrock documents off the provider path (policy — see the commented
      EModelEndpoint.bedrock in documentSupportedProviders, schemas.ts). Upstream's Converse
      document special-case, which would route Bedrock document types to the provider, is
      intentionally disabled:
+=======
+  /** Bedrock's Converse document path natively accepts more than PDF, so on that
+   *  endpoint its document types belong on the provider path rather than being
+   *  extracted, which would drop non-text content and layout. */
+>>>>>>> upstream/main
   if (
     systemDefault !== 'provider' &&
     endpoint === EModelEndpoint.bedrock &&
@@ -235,7 +249,10 @@ export function resolveDefaultLLMDeliveryPath(
   ) {
     return 'provider';
   }
+<<<<<<< HEAD
   */
+=======
+>>>>>>> upstream/main
 
   /* The text fallback is only meaningful where text can be recovered. An archive or a
    * columnar data file reaching it would be decoded as UTF-8 into the prompt, so keep it
@@ -364,11 +381,50 @@ export interface TurnFileConsumers {
   fileSearch: boolean;
 }
 
+<<<<<<< HEAD
 /** Whether a tool this turn runs can read a file of this type. */
 export function hasTurnFileConsumer(mimeType: string, consumers: TurnFileConsumers): boolean {
   return (
     (consumers.executeCode && canToolResourceConsume(EToolResources.execute_code, mimeType)) ||
     (consumers.fileSearch && canToolResourceConsume(EToolResources.file_search, mimeType))
+=======
+/**
+ * Whether the record shows this file reached a tool's own store: vectors for file search, a
+ * sandbox pointer for code execution. Nothing else writes either, so their presence is proof
+ * the file was provisioned and their absence proof it was not. The same evidence deferred
+ * provisioning reads before queueing a file, so a turn cannot withhold content for a tool that
+ * provisioning has yet to serve.
+ */
+export function hasToolResourceProvisioning(file: TurnDeliveryFile, toolResource: string): boolean {
+  if (toolResource === EToolResources.execute_code) {
+    return getCodeEnvRefs(file.metadata).length > 0;
+  }
+  return file.embedded === true || (file.metadata?.embeddedEntities?.length ?? 0) > 0;
+}
+
+/**
+ * Whether a tool this turn runs can read a file of this type.
+ *
+ * Passing the record asks the stricter question a delivery decision needs where a tool serves
+ * only what it already holds. File search reads the vector store, and an upload that named no
+ * destination is filed under no tool at all, so an enabled search tool is a reader only once
+ * the record shows the store holds the file. Run Code needs no copy in advance: its first call
+ * uploads every attachment it can read to the sandbox, so enabling it is enough. Requiring a
+ * copy there would hand the file's text to the prompt on every turn before the first code run,
+ * and a turn that refuses that text never runs code, so the file would never become held.
+ */
+export function hasTurnFileConsumer(
+  mimeType: string,
+  consumers: TurnFileConsumers,
+  file?: TurnDeliveryFile,
+): boolean {
+  const searchHolds = file == null || hasToolResourceProvisioning(file, EToolResources.file_search);
+  return (
+    (consumers.executeCode && canToolResourceConsume(EToolResources.execute_code, mimeType)) ||
+    (consumers.fileSearch &&
+      canToolResourceConsume(EToolResources.file_search, mimeType) &&
+      searchHolds)
+>>>>>>> upstream/main
   );
 }
 
@@ -396,7 +452,21 @@ export interface TurnDeliveryFile {
   text?: string | null;
   /** Stored as an upload-time inference, so any string may be read back. */
   llmDeliveryPath?: string | null;
+<<<<<<< HEAD
   metadata?: { routingMimeType?: string; destinationChosen?: boolean } | null;
+=======
+  /** Whether a vector store holds this file, which is what lets file search serve it.
+   *  Records predating namespace tracking carry only this flag. */
+  embedded?: boolean | null;
+  metadata?:
+    | ({
+        routingMimeType?: string;
+        destinationChosen?: boolean;
+        /** Vector namespaces holding this file, written as each embedding succeeds. */
+        embeddedEntities?: string[];
+      } & CodeEnvReferenceSet)
+    | null;
+>>>>>>> upstream/main
 }
 
 const isLLMDeliveryPath = (value: unknown): value is TDefaultLLMDeliveryPath =>
@@ -412,10 +482,23 @@ export function hasInferredLLMDeliveryPath(file: TurnDeliveryFile): boolean {
  *
  * A record predating routing and a destination the user chose keep what they stored. An
  * inferred route re-resolves against the endpoint handling the turn. A `none` route leaves
+<<<<<<< HEAD
  * the file for a tool; where the endpoint enables `textFallbackWithoutTools` and this turn
  * runs no tool that can read the file, the text extracted at upload is delivered rather than
  * the file reaching nothing. Consumers left undefined are unknown and not judged, as in
  * {@link resolveUploadDestination}.
+=======
+ * the file for a tool; where the endpoint enables `textFallbackWithoutTools` and no tool this
+ * turn runs can read the file, the text extracted at upload is delivered rather than the file
+ * reaching nothing. Consumers left undefined are unknown and not judged, as in
+ * {@link resolveUploadDestination}.
+ *
+ * For file search, reading is asked of the record rather than of the tool set, because the two
+ * disagree for the upload that needs the fallback most: one that named no destination is filed
+ * under no tool, so enabling file search would otherwise withhold the text for a vector store
+ * that never received the file. Run Code is judged by the tool set: see
+ * {@link hasTurnFileConsumer}.
+>>>>>>> upstream/main
  */
 export function resolveTurnLLMDeliveryPath(
   routing: Partial<TurnDeliveryRouting> | undefined,
@@ -435,7 +518,11 @@ export function resolveTurnLLMDeliveryPath(
     endpointConfig?.textFallbackWithoutTools === true &&
     consumers != null &&
     hasFallbackText &&
+<<<<<<< HEAD
     !hasTurnFileConsumer(mimeType, consumers)
+=======
+    !hasTurnFileConsumer(mimeType, consumers, file)
+>>>>>>> upstream/main
   ) {
     return 'text';
   }

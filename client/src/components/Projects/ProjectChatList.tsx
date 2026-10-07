@@ -10,7 +10,12 @@ import {
   type ReactNode,
 } from 'react';
 import throttle from 'lodash/throttle';
+<<<<<<< HEAD
 import { Spinner } from '@librechat/client';
+=======
+import { MessagesSquare } from 'lucide-react';
+import { Button, EmptyState, Spinner, useRemScale } from '@librechat/client';
+>>>>>>> upstream/main
 import { AutoSizer, CellMeasurer, CellMeasurerCache, List } from 'react-virtualized';
 import type { TConversation } from 'librechat-data-provider';
 import type { MeasuredCellParent } from '~/components/Conversations/Conversations';
@@ -27,8 +32,12 @@ type ChatSortField = 'updatedAt' | 'createdAt';
 type FlattenedItem =
   | { type: 'date'; groupName: string }
   | { type: 'convo'; convo: TConversation }
+<<<<<<< HEAD
   | { type: 'loading' }
   | { type: 'empty' };
+=======
+  | { type: 'loading' };
+>>>>>>> upstream/main
 
 interface ProjectChatListProps {
   conversations: TConversation[];
@@ -53,8 +62,13 @@ const MeasuredRow: FC<MeasuredRowProps> = memo(
   ({ cache, rowKey, parent, index, style, children }) => (
     <CellMeasurer cache={cache} columnIndex={0} key={rowKey} parent={parent} rowIndex={index}>
       {({ registerChild }) => (
+<<<<<<< HEAD
         <div ref={registerChild as React.LegacyRef<HTMLDivElement>} style={style}>
           {children}
+=======
+        <div ref={registerChild as React.LegacyRef<HTMLDivElement>} style={style} role="row">
+          <div role="gridcell">{children}</div>
+>>>>>>> upstream/main
         </div>
       )}
     </CellMeasurer>
@@ -66,8 +80,13 @@ MeasuredRow.displayName = 'ProjectWorkspaceMeasuredRow';
 const LoadingRow = memo(() => {
   const localize = useLocalize();
   return (
+<<<<<<< HEAD
     <div className="flex items-center justify-center gap-2 py-4 text-sm text-text-secondary">
       <Spinner className="text-text-primary" />
+=======
+    <div className="text-text-secondary flex items-center justify-center gap-2 py-4 text-sm">
+      <Spinner className="shrink-0" />
+>>>>>>> upstream/main
       <span>{localize('com_ui_loading')}</span>
     </div>
   );
@@ -91,6 +110,7 @@ const ConversationRow = memo(
     return (
       <article
         className={cn(
+<<<<<<< HEAD
           'group/project-chat mb-2 flex items-center rounded-2xl border border-border-light bg-surface-secondary',
           'transition-colors hover:bg-surface-hover',
           isMenuOpen && 'bg-surface-hover',
@@ -99,24 +119,47 @@ const ConversationRow = memo(
         <button
           type="button"
           className="flex min-w-0 flex-1 items-center gap-3 rounded-2xl px-3.5 py-3 text-left outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-text-primary"
+=======
+          'group/project-chat border-border-light bg-surface-secondary mb-2 flex items-center rounded-2xl border',
+          'hover:bg-surface-hover transition-colors',
+          isMenuOpen && 'bg-surface-hover',
+        )}
+      >
+        <Button
+          type="button"
+          variant="card"
+          size="row"
+          className="min-w-0 flex-1"
+>>>>>>> upstream/main
           onClick={() => navigateToConvo(conversation)}
         >
           <span className="flex h-10 w-10 shrink-0 items-center justify-center">
             <ConversationEndpointIcon conversation={conversation} size={40} context="landing" />
           </span>
           <span className="min-w-0 flex-1">
+<<<<<<< HEAD
             <span className="block truncate text-sm font-medium text-text-primary">{title}</span>
             <span className="block truncate text-xs tabular-nums text-text-secondary">
+=======
+            <span className="text-text-primary block truncate text-sm font-medium">{title}</span>
+            <span className="text-text-secondary block truncate text-xs tabular-nums">
+>>>>>>> upstream/main
               {formattedDate}
             </span>
           </span>
           {isGenerating ? (
+<<<<<<< HEAD
             <Spinner
               className="h-4 w-4 shrink-0 text-text-primary"
               aria-label={localize('com_ui_generating')}
             />
           ) : null}
         </button>
+=======
+            <Spinner className="h-4 w-4 shrink-0" aria-label={localize('com_ui_generating')} />
+          ) : null}
+        </Button>
+>>>>>>> upstream/main
         {conversationId ? (
           <div className="pr-2">
             <ProjectChatOptions
@@ -145,7 +188,13 @@ const ProjectChatList = ({
   emptyLabel,
   loadMore,
 }: ProjectChatListProps) => {
+<<<<<<< HEAD
   const { data: activeJobsData } = useActiveJobs();
+=======
+  const localize = useLocalize();
+  const { data: activeJobsData } = useActiveJobs();
+  const remScale = useRemScale();
+>>>>>>> upstream/main
   const activeJobIds = useMemo(
     () => new Set(activeJobsData?.activeJobIds ?? []),
     [activeJobsData?.activeJobIds],
@@ -154,9 +203,12 @@ const ProjectChatList = ({
     if (isLoading) {
       return [{ type: 'loading' as const }];
     }
+<<<<<<< HEAD
     if (!conversations.length) {
       return [{ type: 'empty' as const }];
     }
+=======
+>>>>>>> upstream/main
 
     const items: FlattenedItem[] = [];
     groupConversations(conversations, { field: sortBy }).forEach(([groupName, convos]) => {
@@ -176,7 +228,11 @@ const ProjectChatList = ({
     () =>
       new CellMeasurerCache({
         fixedWidth: true,
+<<<<<<< HEAD
         defaultHeight: 52,
+=======
+        defaultHeight: Math.round(52 * remScale),
+>>>>>>> upstream/main
         keyMapper: (index) => {
           const item = flattenedItemsRef.current[index];
           if (!item) {
@@ -191,7 +247,11 @@ const ProjectChatList = ({
           return `project-workspace-${item.type}`;
         },
       }),
+<<<<<<< HEAD
     [],
+=======
+    [remScale],
+>>>>>>> upstream/main
   );
 
   const listRef = useRef<List | null>(null);
@@ -219,6 +279,7 @@ const ProjectChatList = ({
         );
       }
 
+<<<<<<< HEAD
       if (item.type === 'empty') {
         return (
           <MeasuredRow key={key} {...rowProps}>
@@ -227,6 +288,8 @@ const ProjectChatList = ({
         );
       }
 
+=======
+>>>>>>> upstream/main
       if (item.type === 'date') {
         return (
           <MeasuredRow key={key} {...rowProps}>
@@ -246,7 +309,11 @@ const ProjectChatList = ({
         </MeasuredRow>
       );
     },
+<<<<<<< HEAD
     [activeJobIds, cache, emptyLabel, flattenedItems],
+=======
+    [activeJobIds, cache, flattenedItems],
+>>>>>>> upstream/main
   );
 
   const getRowHeight = useCallback(
@@ -263,11 +330,31 @@ const ProjectChatList = ({
     [flattenedItems.length, hasNextPage, throttledLoadMore],
   );
 
+<<<<<<< HEAD
   return (
     <div className="min-h-[280px] flex-1 overflow-hidden">
       <AutoSizer>
         {({ width, height }) => (
           <List
+=======
+  /** Outside the virtualized list: as a measured row the message sits at the top of a
+   *  full-height viewport, and the panel is the thing that should center it. */
+  if (!isLoading && !conversations.length) {
+    return (
+      <div className="min-h-[280px] flex-1">
+        <EmptyState icon={MessagesSquare} description={emptyLabel} className="h-full" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-[17.5rem] flex-1 overflow-hidden">
+      <AutoSizer>
+        {({ width, height }) => (
+          <List
+            aria-label={localize('com_ui_chats')}
+            containerRole="rowgroup"
+>>>>>>> upstream/main
             ref={listRef}
             width={width}
             height={height}
@@ -277,7 +364,11 @@ const ProjectChatList = ({
             deferredMeasurementCache={cache}
             overscanRowCount={8}
             onRowsRendered={handleRowsRendered}
+<<<<<<< HEAD
             className="outline-none"
+=======
+            className="outline-hidden"
+>>>>>>> upstream/main
             style={{ outline: 'none' }}
           />
         )}

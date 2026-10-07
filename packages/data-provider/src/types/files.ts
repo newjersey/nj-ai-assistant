@@ -62,6 +62,11 @@ export type FileConfig = {
     [key: string]: EndpointFileConfig;
   };
   skills?: {
+<<<<<<< HEAD
+=======
+    /** Maximum concurrent blob deletions during failed archive import cleanup. */
+    importCleanupConcurrency?: number;
+>>>>>>> upstream/main
     fileSizeLimit?: number;
   };
   fileTokenLimit?: number;
@@ -101,6 +106,11 @@ export type FileConfigInput = {
     [key: string]: EndpointFileConfig;
   };
   skills?: {
+<<<<<<< HEAD
+=======
+    /** Maximum concurrent blob deletions during failed archive import cleanup. */
+    importCleanupConcurrency?: number;
+>>>>>>> upstream/main
     fileSizeLimit?: number;
   };
   serverFileSizeLimit?: number;
@@ -167,6 +177,10 @@ export type TFile = {
   width?: number;
   height?: number;
   expiresAt?: string | Date;
+<<<<<<< HEAD
+=======
+  expiredAt?: string | Date | null;
+>>>>>>> upstream/main
   preview?: string;
   text?: string;
   /**
@@ -212,7 +226,10 @@ export type TFile = {
     routingMimeType?: string;
   };
   llmDeliveryPath?: 'provider' | 'text' | 'none';
+<<<<<<< HEAD
   pinned?: boolean;
+=======
+>>>>>>> upstream/main
   createdAt?: string | Date;
   updatedAt?: string | Date;
 };

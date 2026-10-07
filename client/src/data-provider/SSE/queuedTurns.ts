@@ -5,6 +5,10 @@ import type {
   TAgentQueuedTurnReceipt,
   TEnqueueAgentQueuedTurnRequest,
 } from 'librechat-data-provider';
+<<<<<<< HEAD
+=======
+import { useChatTransport } from '~/Providers/ChatTransportContext';
+>>>>>>> upstream/main
 
 export type AgentQueuedTurnReceipt = TAgentQueuedTurnReceipt;
 export type EnqueueAgentQueuedTurnRequest = TEnqueueAgentQueuedTurnRequest;
@@ -133,12 +137,20 @@ export function useAgentQueuedTurns(
   expectsReceipts = false,
 ) {
   const queryClient = useQueryClient();
+<<<<<<< HEAD
+=======
+  const transport = useChatTransport();
+>>>>>>> upstream/main
   const knownIds = [...new Set(clientRequestIds)].sort();
   const knownIdsSignature = knownIds.join('\u0000');
   const previousRequest = useRef({ conversationId, knownIdsSignature });
   const query = useQuery({
     queryKey: agentQueuedTurnsQueryKey(conversationId),
+<<<<<<< HEAD
     queryFn: () => fetchAgentQueuedTurns(conversationId, knownIds),
+=======
+    queryFn: () => transport.listQueued(conversationId, knownIds),
+>>>>>>> upstream/main
     enabled: enabled && conversationId.length > 0,
     staleTime: 1_000,
     /** A stopped indeterminate row can receive exact proof at any time. Its
@@ -191,9 +203,16 @@ export function useAgentQueuedTurns(
 
 export function useEnqueueAgentQueuedTurnMutation() {
   const queryClient = useQueryClient();
+<<<<<<< HEAD
   return useMutation({
     mutationKey: [MutationKeys.enqueueAgentQueuedTurn],
     mutationFn: enqueueAgentQueuedTurn,
+=======
+  const transport = useChatTransport();
+  return useMutation({
+    mutationKey: [MutationKeys.enqueueAgentQueuedTurn],
+    mutationFn: transport.enqueue,
+>>>>>>> upstream/main
     /** A retry can encounter admission middleware while the first request is
      * still committing. Reconcile ambiguous outcomes through the read-only
      * known-id projection instead of issuing a second mutating POST. */
@@ -207,9 +226,16 @@ export function useEnqueueAgentQueuedTurnMutation() {
 
 export function useCancelAgentQueuedTurnMutation() {
   const queryClient = useQueryClient();
+<<<<<<< HEAD
   return useMutation({
     mutationKey: [MutationKeys.cancelAgentQueuedTurn],
     mutationFn: cancelAgentQueuedTurn,
+=======
+  const transport = useChatTransport();
+  return useMutation({
+    mutationKey: [MutationKeys.cancelAgentQueuedTurn],
+    mutationFn: transport.cancelQueued,
+>>>>>>> upstream/main
     onSuccess: (_receipt, input) =>
       queryClient.invalidateQueries({
         queryKey: [QueryKeys.agentQueuedTurns, input.conversationId],

@@ -1,4 +1,14 @@
+<<<<<<< HEAD
 import { logger, BASE_CONFIG_PRINCIPAL_ID } from '@librechat/data-schemas';
+=======
+import {
+  logger,
+  getConfigFieldIssues,
+  applyConfigTombstones,
+  getConfigOverrideIssues,
+  BASE_CONFIG_PRINCIPAL_ID,
+} from '@librechat/data-schemas';
+>>>>>>> upstream/main
 import {
   BASE_PRINCIPAL_CONFIG_SECTIONS,
   BASE_ONLY_CONFIG_SECTIONS,
@@ -11,7 +21,17 @@ import {
   isProcessMCPServerConfig,
   isProcessMCPServerField,
 } from 'librechat-data-provider';
+<<<<<<< HEAD
 import type { AppConfig, ConfigSection, IConfig, SystemCapability } from '@librechat/data-schemas';
+=======
+import type {
+  AppConfig,
+  ConfigSection,
+  IConfig,
+  SystemCapability,
+  ConfigOverrideIssue,
+} from '@librechat/data-schemas';
+>>>>>>> upstream/main
 import type { TCustomConfig } from 'librechat-data-provider';
 import type { Types, ClientSession } from 'mongoose';
 import type { Response } from 'express';
@@ -411,6 +431,18 @@ function redactAppConfigForResponse(appConfig: AppConfig): AppConfig {
   return safeConfig;
 }
 
+<<<<<<< HEAD
+=======
+/** Reports only the paths and stable codes: schema messages can echo the submitted values. */
+function invalidOverrideResponse(res: Response, issues: ConfigOverrideIssue[]): Response {
+  return res.status(400).json({
+    error: 'Invalid config override',
+    code: 'CONFIG_OVERRIDE_INVALID',
+    issues: issues.map(({ path, code }) => ({ path, code })),
+  });
+}
+
+>>>>>>> upstream/main
 function preservePatchedConfigSecretFields(
   fields: Record<string, unknown>,
   existingOverrides?: unknown,
@@ -462,6 +494,18 @@ export function createAdminConfigHandlers(deps: AdminConfigDeps): {
     invalidateConfigCaches,
   } = deps;
 
+<<<<<<< HEAD
+=======
+  /** The deployment's `librechat.yaml` config, which overrides are validated on top of. */
+  async function getBaseYamlConfig(tenantId?: string): Promise<Partial<TCustomConfig>> {
+    if (!getAppConfig) {
+      return {};
+    }
+    const appConfig = await getAppConfig({ tenantId, baseOnly: true });
+    return appConfig?.config ?? {};
+  }
+
+>>>>>>> upstream/main
   /**
    * GET / — List all active config overrides.
    */
@@ -724,10 +768,29 @@ export function createAdminConfigHandlers(deps: AdminConfigDeps): {
       const needsProtectedBaseSections =
         principalId === BASE_CONFIG_PRINCIPAL_ID &&
         (overrideSections.length > 0 || priority != null);
+<<<<<<< HEAD
       const existingConfig =
         needsExistingSecrets || needsProtectedBaseSections
           ? await findConfigByPrincipal(principalType, principalId, { includeInactive: true })
           : null;
+=======
+      const needsExisting = needsExistingSecrets || needsProtectedBaseSections;
+      const [stored, baseYaml] = await Promise.all([
+        overrideSections.length > 0 || needsExisting
+          ? findConfigByPrincipal(principalType, principalId, { includeInactive: true })
+          : null,
+        overrideSections.length > 0 ? getBaseYamlConfig(user.tenantId) : {},
+      ]);
+      /** A full replace keeps the principal's tombstones, so they shape the base it lands on. */
+      const overrideIssues = getConfigOverrideIssues(
+        encryptedOverrides,
+        applyConfigTombstones(baseYaml, stored?.tombstones),
+      );
+      if (overrideIssues.length > 0) {
+        return invalidOverrideResponse(res, overrideIssues);
+      }
+      const existingConfig = needsExisting ? stored : null;
+>>>>>>> upstream/main
       const preservedOverrides = preserveConfigSecrets(
         encryptedOverrides,
         existingConfig?.overrides,
@@ -903,6 +966,7 @@ export function createAdminConfigHandlers(deps: AdminConfigDeps): {
       }
       const requestedPriority = hasBroadManage ? priority : undefined;
 
+<<<<<<< HEAD
       const hasObjectValuedSecretPatch = Object.entries(fields).some(([fieldPath, value]) =>
         isConfigSecretPreservablePatch(fieldPath, value),
       );
@@ -911,6 +975,17 @@ export function createAdminConfigHandlers(deps: AdminConfigDeps): {
           ? await findConfigByPrincipal(principalType, principalId, { includeInactive: true })
           : null;
       const encryptedFields = encryptConfigSecretFields(fields);
+=======
+      const [existing, baseYaml] = await Promise.all([
+        findConfigByPrincipal(principalType, principalId, { includeInactive: true }),
+        getBaseYamlConfig(user.tenantId),
+      ]);
+      const encryptedFields = encryptConfigSecretFields(fields);
+      const fieldIssues = getConfigFieldIssues(encryptedFields, baseYaml, existing);
+      if (fieldIssues.length > 0) {
+        return invalidOverrideResponse(res, fieldIssues);
+      }
+>>>>>>> upstream/main
       const preservedFields = preservePatchedConfigSecretFields(
         encryptedFields,
         existing?.overrides,

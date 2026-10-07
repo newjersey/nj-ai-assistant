@@ -32,6 +32,13 @@ export type ChildActivityItem =
       input?: string | Record<string, unknown>;
       output?: string;
       status: 'running' | 'completed' | 'failed' | 'cancelled';
+<<<<<<< HEAD
+=======
+      toolPreparationStartedAt?: number;
+      toolDispatchedAt?: number;
+      toolPreparationDurationMs?: number;
+      toolExecutionDurationMs?: number;
+>>>>>>> upstream/main
       inputValidationError?: true;
       approval?: Agents.ToolCall['approval'];
       inputTruncated?: boolean;
@@ -78,6 +85,13 @@ type ContentToolCall = {
   name?: string;
   progress?: number;
   runStepStatus?: PartMetadata['runStepStatus'];
+<<<<<<< HEAD
+=======
+  toolPreparationStartedAt?: number;
+  toolDispatchedAt?: number;
+  toolPreparationDurationMs?: number;
+  toolExecutionDurationMs?: number;
+>>>>>>> upstream/main
   inputValidationError?: true;
   approval?: Agents.ToolCall['approval'];
 };
@@ -163,6 +177,19 @@ const contentPartsToActivity = (
         ...(tool.args == null ? {} : { input: tool.args }),
         ...(tool.output == null ? {} : { output: tool.output }),
         status: runStepStatus ?? (completed ? 'completed' : 'running'),
+<<<<<<< HEAD
+=======
+        ...(tool.toolPreparationStartedAt == null
+          ? {}
+          : { toolPreparationStartedAt: tool.toolPreparationStartedAt }),
+        ...(tool.toolDispatchedAt == null ? {} : { toolDispatchedAt: tool.toolDispatchedAt }),
+        ...(tool.toolPreparationDurationMs == null
+          ? {}
+          : { toolPreparationDurationMs: tool.toolPreparationDurationMs }),
+        ...(tool.toolExecutionDurationMs == null
+          ? {}
+          : { toolExecutionDurationMs: tool.toolExecutionDurationMs }),
+>>>>>>> upstream/main
         ...(tool.inputValidationError === true ? { inputValidationError: true } : {}),
         ...(tool.approval == null || approvalVisibility === 'hidden'
           ? {}

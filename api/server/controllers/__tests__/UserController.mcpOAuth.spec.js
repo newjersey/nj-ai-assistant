@@ -26,6 +26,14 @@ jest.mock('librechat-data-provider', () => ({
 
 jest.mock('@librechat/api', () => ({
   ...jest.requireActual('@librechat/api'),
+<<<<<<< HEAD
+=======
+  createEmailChangeService: jest.fn(() => ({
+    requestEmailChange: jest.fn(),
+    confirmEmailChange: jest.fn(),
+  })),
+  createEmailChangeDeps: jest.fn(() => ({})),
+>>>>>>> upstream/main
   MCPOAuthHandler: {
     generateFlowId: jest.fn((userId, serverName, tenantId) => {
       const flowId = `${userId}:${serverName}`;

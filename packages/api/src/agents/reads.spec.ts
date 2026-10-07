@@ -10,6 +10,10 @@ import type { IRole, IUser } from '@librechat/data-schemas';
 import type { Request, Response } from 'express';
 import type { AgentManagementReadDeps } from './reads';
 import { createAgentManagementReadHandlers } from './reads';
+<<<<<<< HEAD
+=======
+import { getAgentListAccess } from './listing';
+>>>>>>> upstream/main
 
 jest.mock('@librechat/data-schemas', () => {
   const actual = jest.requireActual('@librechat/data-schemas');
@@ -70,6 +74,122 @@ function makeDeps(overrides: Partial<AgentManagementReadDeps> = {}): AgentManage
   };
 }
 
+<<<<<<< HEAD
+=======
+describe('Agent list access', () => {
+  it('rejects invalid permission masks before checking the manager bypass', async () => {
+    const deps = makeDeps({ hasCapability: jest.fn().mockResolvedValue(true) });
+
+    await expect(getAgentListAccess(user, 0 as PermissionBits, deps)).rejects.toThrow(
+      'requiredPermissions must be a positive number',
+    );
+    expect(deps.hasCapability).not.toHaveBeenCalled();
+    expect(deps.findAccessibleResources).not.toHaveBeenCalled();
+  });
+
+  it('does not use speculative ACL results for a manager', async () => {
+    const deps = makeDeps({ hasCapability: jest.fn().mockResolvedValue(true) });
+
+    const access = await getAgentListAccess(user, PermissionBits.VIEW, deps);
+
+    expect(deps.hasCapability).toHaveBeenCalledWith(user, SystemCapabilities.MANAGE_AGENTS);
+    expect(deps.findAccessibleResources).toHaveBeenCalledTimes(2);
+    expect(access).toEqual({ accessibleIds: null, editableIds: null });
+  });
+
+  it('uses the ACL for ordinary viewers and marks only editable agents', async () => {
+    const editableId = new Types.ObjectId();
+    const deps = makeDeps({
+      findAccessibleResources: jest
+        .fn()
+        .mockImplementation(({ requiredPermissions }) =>
+          Promise.resolve(
+            requiredPermissions === PermissionBits.EDIT ? [editableId] : [objectId, editableId],
+          ),
+        ),
+    });
+
+    const access = await getAgentListAccess(user, PermissionBits.VIEW, deps);
+
+    expect(access).toEqual({
+      accessibleIds: [objectId.toString(), editableId.toString()],
+      editableIds: [editableId.toString()],
+    });
+    expect(deps.findAccessibleResources).toHaveBeenCalledWith({
+      userId: user.id,
+      role: user.role,
+      idOnTheSource: user.idOnTheSource,
+      resourceType: ResourceType.AGENT,
+      requiredPermissions: PermissionBits.VIEW,
+    });
+    expect(deps.findAccessibleResources).toHaveBeenCalledWith(
+      expect.objectContaining({ requiredPermissions: PermissionBits.EDIT }),
+    );
+  });
+
+  it('falls back to the ACL rather than bypassing on capability-check failure', async () => {
+    const deps = makeDeps({
+      hasCapability: jest.fn().mockRejectedValue(new Error('lookup failed')),
+    });
+
+    const access = await getAgentListAccess(user, PermissionBits.VIEW, deps);
+
+    expect(access).toEqual({
+      accessibleIds: [objectId.toString()],
+      editableIds: [objectId.toString()],
+    });
+    expect(deps.findAccessibleResources).toHaveBeenCalledTimes(2);
+  });
+
+  it('starts ACL queries while capability lookup is still pending', async () => {
+    let resolveCapability!: (value: boolean) => void;
+    const capability = new Promise<boolean>((resolve) => {
+      resolveCapability = resolve;
+    });
+    const deps = makeDeps({ hasCapability: jest.fn().mockReturnValue(capability) });
+
+    const accessPromise = getAgentListAccess(user, PermissionBits.VIEW, deps);
+    expect(deps.findAccessibleResources).toHaveBeenCalledTimes(2);
+    resolveCapability(false);
+    await expect(accessPromise).resolves.toEqual({
+      accessibleIds: [objectId.toString()],
+      editableIds: [objectId.toString()],
+    });
+  });
+
+  it('does not require the speculative ACL reads to succeed for a manager', async () => {
+    const deps = makeDeps({
+      hasCapability: jest.fn().mockResolvedValue(true),
+      findAccessibleResources: jest.fn().mockRejectedValue(new Error('ACL unavailable')),
+    });
+
+    await expect(getAgentListAccess(user, PermissionBits.VIEW, deps)).resolves.toEqual({
+      accessibleIds: null,
+      editableIds: null,
+    });
+  });
+
+  it('propagates ACL lookup errors for a user without management capability', async () => {
+    const deps = makeDeps({
+      findAccessibleResources: jest.fn().mockRejectedValue(new Error('ACL unavailable')),
+    });
+
+    await expect(getAgentListAccess(user, PermissionBits.VIEW, deps)).rejects.toThrow(
+      'ACL unavailable',
+    );
+  });
+
+  it('does not repeat the EDIT lookup for an EDIT-scoped list', async () => {
+    const deps = makeDeps();
+
+    const access = await getAgentListAccess(user, PermissionBits.EDIT, deps);
+
+    expect(access).toEqual({ accessibleIds: [objectId.toString()], editableIds: null });
+    expect(deps.findAccessibleResources).toHaveBeenCalledTimes(1);
+  });
+});
+
+>>>>>>> upstream/main
 describe('Agent Management read handlers', () => {
   it('lists only ACL-discovered records in the authenticated tenant', async () => {
     const deps = makeDeps();

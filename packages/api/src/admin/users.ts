@@ -57,6 +57,14 @@ export interface AdminUsersDeps {
     principalType: PrincipalType;
     principalId: string | Types.ObjectId;
   }) => Promise<void>;
+<<<<<<< HEAD
+=======
+  /**
+   * Credential IDs are globally unique, so passkeys left behind by a deleted user
+   * keep authentication material and can collide with a later registration.
+   */
+  deletePasskeysByUser: (userId: string) => Promise<number>;
+>>>>>>> upstream/main
 }
 
 export function createAdminUsersHandlers(deps: AdminUsersDeps): {
@@ -79,6 +87,10 @@ export function createAdminUsersHandlers(deps: AdminUsersDeps): {
     invalidateCodeEnvironmentConfigCache,
     deleteConfig,
     deleteAclEntries,
+<<<<<<< HEAD
+=======
+    deletePasskeysByUser,
+>>>>>>> upstream/main
   } = deps;
 
   async function listUsersHandler(req: ServerRequest, res: Response) {
@@ -229,6 +241,10 @@ export function createAdminUsersHandlers(deps: AdminUsersDeps): {
         deleteConfig(PrincipalType.USER, id),
         ...(codeEnvironmentCleanupSafe ? [deleteUserCodeEnvironments(objectId)] : []),
         deleteAclEntries({ principalType: PrincipalType.USER, principalId: objectId }),
+<<<<<<< HEAD
+=======
+        deletePasskeysByUser(id),
+>>>>>>> upstream/main
       ]);
       for (const r of cleanupResults) {
         if (r.status === 'rejected') {

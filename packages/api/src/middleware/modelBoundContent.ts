@@ -264,6 +264,11 @@ export interface ModelBoundProviderContentInput {
   readonly onTraversalFailure?: LocatorTraversalReporter;
   readonly filters?: FiltersConfig;
   readonly legacyPii?: MessageFilterPiiConfig;
+<<<<<<< HEAD
+=======
+  /** Exact generated tokens from server-owned canonical user rows, never request metadata. */
+  readonly privateTextTokens?: ReadonlySet<string>;
+>>>>>>> upstream/main
   readonly providerMessages: readonly ModelBoundProviderMessage[];
   readonly storedMessages?: readonly (StoredModelBoundMessage | null | undefined)[];
   readonly resolvedFiles?: readonly (ModelBoundCanonicalFile | null | undefined)[];
@@ -679,7 +684,16 @@ export interface ModelBoundChatModelCallback {
   readonly handleChatModelStart: (
     llm: object | undefined,
     messageBatches: readonly (readonly ModelBoundProviderMessage[])[],
+<<<<<<< HEAD
   ) => void;
+=======
+    runId?: string,
+    parentRunId?: string,
+    extraParams?: Record<string, unknown>,
+    tags?: string[],
+    metadata?: Record<string, unknown>,
+  ) => void | Promise<void>;
+>>>>>>> upstream/main
 }
 
 export interface InitialModelBoundAdmissionCallback {
@@ -725,6 +739,11 @@ export interface ModelBoundContentInput {
   readonly onTraversalFailure?: LocatorTraversalReporter;
   readonly filters?: FiltersConfig;
   readonly legacyPii?: MessageFilterPiiConfig;
+<<<<<<< HEAD
+=======
+  /** Exact generated tokens from server-owned canonical user rows, never request metadata. */
+  readonly privateTextTokens?: ReadonlySet<string>;
+>>>>>>> upstream/main
   /** Fresh API input: every role is caller-submitted. */
   readonly submittedMessages?: readonly ModelBoundMessage[];
   /** Persisted chat history: user rows plus structured tool fragments are re-inspected. */
@@ -3146,6 +3165,10 @@ function assertIndexedModelBoundProviderContent(
     onTraversalFailure: input.onTraversalFailure,
     filters: input.filters,
     legacyPii: input.legacyPii,
+<<<<<<< HEAD
+=======
+    privateTextTokens: input.privateTextTokens,
+>>>>>>> upstream/main
     storedMessages: projection.storedMessages,
     resolvedFiles: projection.resolvedFiles,
     deferredTraversalErrors: projection.deferredTraversalErrors,
@@ -3233,7 +3256,18 @@ function snapshotBoundedSourceFileIds(
 /** Creates a run-stable callback shared by root, summary, and subagent model clients. */
 export function createModelBoundChatModelCallback(
   input: Omit<ModelBoundProviderContentInput, 'providerMessages'>,
+<<<<<<< HEAD
   options: { readonly onContentRejected?: (error: unknown) => void } = {},
+=======
+  options: {
+    readonly onContentRejected?: (error: unknown) => void;
+    readonly onContentAllowed?: (context: {
+      runId?: string;
+      parentRunId?: string;
+      metadata?: Record<string, unknown>;
+    }) => void | Promise<void>;
+  } = {},
+>>>>>>> upstream/main
 ): ModelBoundChatModelCallback {
   const storedMessageSnapshot = snapshotBoundedProviderArray(input.storedMessages);
   const resolvedFileSnapshot = snapshotBoundedProviderArray(input.resolvedFiles);
@@ -3242,6 +3276,10 @@ export function createModelBoundChatModelCallback(
     onTraversalFailure: input.onTraversalFailure,
     filters: input.filters,
     legacyPii: input.legacyPii,
+<<<<<<< HEAD
+=======
+    privateTextTokens: input.privateTextTokens,
+>>>>>>> upstream/main
     storedMessages: storedMessageSnapshot.values,
     resolvedFiles: resolvedFileSnapshot.values,
     fileIdsBySourceMessageId: sourceFileIdSnapshot.values,
@@ -3260,6 +3298,14 @@ export function createModelBoundChatModelCallback(
     handleChatModelStart: (
       _llm: object | undefined,
       messageBatches: readonly (readonly ModelBoundProviderMessage[])[],
+<<<<<<< HEAD
+=======
+      runId?: string,
+      parentRunId?: string,
+      _extraParams?: Record<string, unknown>,
+      _tags?: string[],
+      metadata?: Record<string, unknown>,
+>>>>>>> upstream/main
     ) => {
       let messageBatchCount = 0;
       let messageBatchesOverflowed = false;
@@ -3317,6 +3363,10 @@ export function createModelBoundChatModelCallback(
         options.onContentRejected?.(error);
         throw new FatalModelBoundPolicyError(error);
       }
+<<<<<<< HEAD
+=======
+      return options.onContentAllowed?.({ runId, parentRunId, metadata });
+>>>>>>> upstream/main
     },
   });
   return callback;
@@ -3492,6 +3542,7 @@ function inspectModelBoundContent(
   const inspectionSession = inspector?.createSession();
   const shouldContinueAfterFinding = inspectionSession?.hasAuditRules === true;
   let finding: ReturnType<NonNullable<typeof inspectionSession>['inspect']> = null;
+<<<<<<< HEAD
   const inspectFragments = (fragments: Iterable<TextContentFragment>): void => {
     if (finding == null || shouldContinueAfterFinding) {
       const nextFinding = inspectionSession?.inspect(fragments) ?? null;
@@ -3502,6 +3553,31 @@ function inspectModelBoundContent(
     if (finding == null || shouldContinueAfterFinding) {
       const nextFinding = inspectionSession?.inspectFragment(fragment) ?? null;
       finding ??= nextFinding;
+=======
+  const inspectFragment = (fragment: TextContentFragment): void => {
+    if (finding != null && !shouldContinueAfterFinding) {
+      return;
+    }
+    const inspectableText =
+      input.privateTextTokens?.size &&
+      (fragment.source === 'message' || fragment.source === 'assembled_context')
+        ? fragment.text.replace(
+            /\[(?:EMAIL|PHONE|NAME|CREDENTIAL|CUSTOM)_\d+_[a-f0-9]{32}\]/g,
+            (token) => (input.privateTextTokens!.has(token) ? '' : token),
+          )
+        : fragment.text;
+    const inspected =
+      inspectableText === fragment.text ? fragment : { ...fragment, text: inspectableText };
+    const nextFinding = inspectionSession?.inspectFragment(inspected) ?? null;
+    finding ??= nextFinding;
+  };
+  const inspectFragments = (fragments: Iterable<TextContentFragment>): void => {
+    for (const fragment of fragments) {
+      inspectFragment(fragment);
+      if (finding != null && !shouldContinueAfterFinding) {
+        return;
+      }
+>>>>>>> upstream/main
     }
   };
   const traversalErrors: ContentTraversalLimitError[] = [

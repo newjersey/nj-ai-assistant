@@ -5,6 +5,13 @@ const {
   assertConversationImportContentAllowed,
   reportLocatorTraversalFailure,
   executeConversationImportWrites,
+<<<<<<< HEAD
+=======
+  resolveImportRetentionFields,
+  resolveImportTagCounts,
+  getNativeCopyInspectionTokens,
+  saveNativeCopyMessages,
+>>>>>>> upstream/main
 } = require('@librechat/api');
 const {
   getTenantId,
@@ -12,12 +19,16 @@ const {
   createFallbackRetentionDate,
   createChatExpirationDate,
 } = require('@librechat/data-schemas');
+<<<<<<< HEAD
 const {
   EModelEndpoint,
   Constants,
   RetentionMode,
   openAISettings,
 } = require('librechat-data-provider');
+=======
+const { EModelEndpoint, Constants, openAISettings } = require('librechat-data-provider');
+>>>>>>> upstream/main
 const {
   bulkIncrementTagCounts,
   bulkSaveConvos,
@@ -81,6 +92,7 @@ class ImportBatchBuilder {
     this.conversations = [];
     this.messages = [];
     this.retentionFields = undefined;
+<<<<<<< HEAD
   }
 
   getRetentionFields() {
@@ -101,6 +113,19 @@ class ImportBatchBuilder {
     } catch (error) {
       logger.error('[ImportBatchBuilder] Error creating import expiration date:', error);
       this.retentionFields = { isTemporary: false, expiredAt: createFallbackRetentionDate() };
+=======
+    /** Set by a fork or duplicate so the copy keeps its source's temporary classification. */
+    this.sourceIsTemporary = undefined;
+  }
+
+  getRetentionFields() {
+    if (this.retentionFields === undefined) {
+      this.retentionFields = resolveImportRetentionFields(
+        this.interfaceConfig,
+        { createChatExpirationDate, createFallbackRetentionDate, logger },
+        { sourceIsTemporary: this.sourceIsTemporary },
+      );
+>>>>>>> upstream/main
     }
     return this.retentionFields;
   }
@@ -174,9 +199,25 @@ class ImportBatchBuilder {
       endpoint: this.endpoint,
       model: originalConvo.model ?? fallbackModel,
       ...this.getRetentionFields(),
+<<<<<<< HEAD
     };
     convo._id && delete convo._id;
     delete convo.subagentThread;
+=======
+      ...(originalConvo.tags != null && {
+        tags: resolveImportTagCounts(this.getRetentionFields(), originalConvo.tags),
+      }),
+    };
+    convo._id && delete convo._id;
+    delete convo.subagentThread;
+    /* A fork or duplicate starts its own unread history; carrying the source
+       conversation's catch-up state over would light a dot on a never-read copy. */
+    delete convo.lastResponseAt;
+    delete convo.lastResponseMessageId;
+    delete convo.lastResponseIsManual;
+    delete convo.isMarkedUnread;
+    delete convo.lastSeenAt;
+>>>>>>> upstream/main
     this.conversations.push(convo);
 
     return { conversation: convo, messages: this.messages };
@@ -205,6 +246,10 @@ class ImportBatchBuilder {
       {
         user: { id: this.requestUserId },
         getFiles,
+<<<<<<< HEAD
+=======
+        privateTextTokens: getNativeCopyInspectionTokens(this.messages),
+>>>>>>> upstream/main
         ...(this.legacyPii == null ? {} : { legacyPii: this.legacyPii }),
       },
     );
@@ -215,12 +260,23 @@ class ImportBatchBuilder {
       conversationIds,
       ...(tenantId == null ? {} : { tenantId }),
     };
+<<<<<<< HEAD
     const tags = this.conversations.flatMap((convo) => convo.tags);
+=======
+    const tags = resolveImportTagCounts(
+      this.getRetentionFields(),
+      this.conversations.flatMap((convo) => convo.tags),
+    );
+>>>>>>> upstream/main
 
     try {
       await executeConversationImportWrites({
         saveConversations: () => bulkSaveConvos(this.conversations),
+<<<<<<< HEAD
         saveMessages: () => bulkSaveMessages(this.messages, true),
+=======
+        saveMessages: () => saveNativeCopyMessages(bulkSaveMessages, this.messages),
+>>>>>>> upstream/main
         updateTagCounts: () => bulkIncrementTagCounts(this.requestUserId, tags),
         deleteMessages: () => deleteImportedMessages(cleanupScope),
         deleteConversations: () => deleteImportedConversations(cleanupScope),

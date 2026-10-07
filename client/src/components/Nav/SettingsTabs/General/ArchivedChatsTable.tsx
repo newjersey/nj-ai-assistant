@@ -171,20 +171,32 @@ export default function ArchivedChatsTable() {
               to={`/c/${conversationId ?? ''}`}
               target="_blank"
               rel="noopener noreferrer"
+<<<<<<< HEAD
               className="group flex items-center gap-1.5 truncate rounded-sm font-medium text-text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-text-primary"
+=======
+              className="group text-text-primary focus-visible:ring-text-primary flex items-center gap-1.5 truncate rounded-sm font-medium underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:outline-hidden"
+>>>>>>> upstream/main
               aria-label={localize('com_ui_open_archived_chat_new_tab_title', {
                 title: title ?? localize('com_ui_untitled'),
               })}
             >
               <span className="truncate">{title}</span>
               <ExternalLink
+<<<<<<< HEAD
                 className="size-3.5 flex-shrink-0 text-text-tertiary transition-colors group-hover:text-text-secondary"
+=======
+                className="text-text-tertiary group-hover:text-text-secondary size-3.5 shrink-0 transition-colors"
+>>>>>>> upstream/main
                 aria-hidden="true"
               />
             </Link>
           );
           return (
+<<<<<<< HEAD
             <div className="flex items-center gap-2.5">
+=======
+            <div className="flex w-0 min-w-full items-center gap-2.5">
+>>>>>>> upstream/main
               <MinimalIcon
                 endpoint={row.original.endpoint}
                 size={28}
@@ -236,7 +248,10 @@ export default function ArchivedChatsTable() {
                   </Button>
                 }
               />
+<<<<<<< HEAD
               {/* NJ: We don't allow deleting conversations
+=======
+>>>>>>> upstream/main
               <TooltipAnchor
                 description={localize('com_ui_delete_conversation_tooltip')}
                 render={
@@ -253,7 +268,10 @@ export default function ArchivedChatsTable() {
                   </Button>
                 }
               />
+<<<<<<< HEAD
                */}
+=======
+>>>>>>> upstream/main
             </div>
           );
         },
@@ -273,7 +291,11 @@ export default function ArchivedChatsTable() {
         columns={columns}
         data={allConversations}
         getRowId={getRowId}
+<<<<<<< HEAD
         className="scrollbar-gutter-stable max-h-[60vh] min-h-80"
+=======
+        className="max-h-[60vh] min-h-80 scrollbar-gutter-stable"
+>>>>>>> upstream/main
         onFilterChange={handleFilterChange}
         filterValue={queryParams.search}
         fetchNextPage={handleFetchNextPage}

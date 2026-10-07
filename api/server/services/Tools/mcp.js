@@ -9,6 +9,12 @@ const {
   getMissingRuntimeBodyPlaceholderFields,
   isMCPInitializationError,
   prepareMCPAuthorizationMutation,
+<<<<<<< HEAD
+=======
+  resolveMCPClientCapabilityProfile,
+  recordScheduledMCPToolAuthFailure,
+  getScheduledMCPBearerIdentity,
+>>>>>>> upstream/main
 } = require('@librechat/api');
 const { CacheKeys, Constants } = require('librechat-data-provider');
 const { getMCPManager, getMCPServersRegistry, getFlowStateManager } = require('~/config');
@@ -50,6 +56,10 @@ const MCP_REINITIALIZE_FAILURE_REASONS = {
  * @param {import('@librechat/api').AuthIdentityContext} [params.oboIdentityContext] - Non-template-visible OBO identity context built from the real request user.
  * @param {AbortSignal} [params.signal] - Cancels queued and in-flight catalog reads when the request ends.
  * @param {import('@librechat/api').MCPServerCatalogRecoveryPolicy} [params.recoveryPolicy]
+<<<<<<< HEAD
+=======
+ * @param {import('librechat-data-provider').TMCPAppsPolicy} [params.mcpApps]
+>>>>>>> upstream/main
  */
 async function loadMCPServerCatalogs({
   user,
@@ -59,7 +69,13 @@ async function loadMCPServerCatalogs({
   oboIdentityContext,
   signal,
   recoveryPolicy,
+<<<<<<< HEAD
 }) {
+=======
+  mcpApps,
+}) {
+  const capabilityProfile = resolveMCPClientCapabilityProfile(mcpApps);
+>>>>>>> upstream/main
   const flowManager = getFlowStateManager(getLogStores(CacheKeys.FLOWS));
   const tokenMethods = { findToken, updateToken, createToken, deleteTokens };
   const mcpManager = getMCPManager();
@@ -74,7 +90,16 @@ async function loadMCPServerCatalogs({
       attemptTimeoutMs: recoveryPolicy?.authorizationFenceTimeoutMs,
     });
   return loadCatalogs(
+<<<<<<< HEAD
     { user, servers, signal, recoveryPolicy },
+=======
+    {
+      user,
+      servers: servers.map((server) => ({ ...server, capabilityProfile })),
+      signal,
+      recoveryPolicy,
+    },
+>>>>>>> upstream/main
     {
       loadUserMCPAuthMap: (userId, serverNames) =>
         getUserMCPAuthMap({
@@ -127,6 +152,11 @@ async function loadMCPServerCatalogs({
  * @param {import('@librechat/api').RequestScopedMCPConnectionStore} [params.requestScopedConnections]
  * @param {Record<string, Record<string, string>>} [params.userMCPAuthMap]
  * @param {import('@librechat/api').MCPServerCatalogRecoveryPolicy} [params.recoveryPolicy]
+<<<<<<< HEAD
+=======
+ * @param {string | null} [params.streamId] - Owning generation's stream ID, if resumable.
+ * @param {number} [params.jobCreatedAt] - Owning generation epoch.
+>>>>>>> upstream/main
  */
 async function reinitMCPServer({
   user,
@@ -147,7 +177,15 @@ async function reinitMCPServer({
   oboIdentityContext,
   oauthEnd,
   recoveryPolicy,
+<<<<<<< HEAD
 }) {
+=======
+  mcpApps,
+  streamId,
+  jobCreatedAt,
+}) {
+  const capabilityProfile = resolveMCPClientCapabilityProfile(mcpApps);
+>>>>>>> upstream/main
   /** @type {MCPConnection | null} */
   let connection = null;
   let serverConfig = providedConfig;
@@ -281,6 +319,10 @@ async function reinitMCPServer({
         upstreamTokenProvider,
         upstreamTokenProviderResolver,
         oboIdentityContext,
+<<<<<<< HEAD
+=======
+        capabilityProfile,
+>>>>>>> upstream/main
       });
 
       logger.info('[MCP Reinitialize] Successfully established connection');
@@ -323,6 +365,10 @@ async function reinitMCPServer({
             upstreamTokenProvider,
             upstreamTokenProviderResolver,
             oboIdentityContext,
+<<<<<<< HEAD
+=======
+            capabilityProfile,
+>>>>>>> upstream/main
           });
 
           if (discoveryResult.tools && discoveryResult.tools.length > 0) {
@@ -397,6 +443,10 @@ async function reinitMCPServer({
         serverConfig,
         ...(publicationGeneration && { publicationGeneration }),
         ...(publicationRevision && { publicationRevision }),
+<<<<<<< HEAD
+=======
+        capabilityProfile,
+>>>>>>> upstream/main
       });
       if (availableTools == null) {
         tools = null;
@@ -452,6 +502,20 @@ async function reinitMCPServer({
     return result;
   } catch (error) {
     if (isMCPInitializationError(error, signal)) {
+<<<<<<< HEAD
+=======
+      await recordScheduledMCPToolAuthFailure(
+        {
+          error,
+          streamId,
+          jobCreatedAt,
+          userId: user?.id,
+          serverName,
+          identity: getScheduledMCPBearerIdentity(requestScopedConnections),
+        },
+        () => require('~/server/services/Schedules').recordMCPToolAuthFailure,
+      );
+>>>>>>> upstream/main
       throw error;
     }
     logger.error('[MCP Reinitialize] Error loading MCP tools; servers may still be initializing');

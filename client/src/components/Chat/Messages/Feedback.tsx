@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
+=======
+import React, { memo, useState, useCallback, useMemo, useEffect } from 'react';
+>>>>>>> upstream/main
 import * as Ariakit from '@ariakit/react';
 import { TFeedback, TFeedbackTag, getTagsForRating } from 'librechat-data-provider';
 import {
@@ -61,14 +65,23 @@ function FeedbackOptionButton({
     <Button
       variant="ghost"
       className={cn(
+<<<<<<< HEAD
         'h-auto w-full justify-start gap-3 rounded-xl p-2 text-text-secondary transition-colors duration-200 hover:bg-surface-hover hover:text-text-primary',
         active && 'bg-surface-hover font-semibold text-text-primary',
+=======
+        'text-text-secondary hover:bg-surface-hover hover:text-text-primary h-auto w-full justify-start gap-3 rounded-xl p-2 transition-colors duration-200',
+        active && 'bg-surface-hover text-text-primary font-semibold',
+>>>>>>> upstream/main
       )}
       onClick={onClick}
       aria-label={label}
       aria-pressed={active}
     >
+<<<<<<< HEAD
       <Icon size="19" bold={active} aria-hidden="true" />
+=======
+      <Icon size="1.1875rem" bold={active} aria-hidden="true" />
+>>>>>>> upstream/main
       <span>{label}</span>
     </Button>
   );
@@ -158,7 +171,11 @@ function FeedbackButtons({
             aria-pressed={feedback?.rating === 'thumbsUp'}
             aria-haspopup="menu"
           >
+<<<<<<< HEAD
             <ThumbUpIcon size="19" bold={feedback?.rating === 'thumbsUp'} />
+=======
+            <ThumbUpIcon size="1.1875rem" bold={feedback?.rating === 'thumbsUp'} />
+>>>>>>> upstream/main
           </Button>
         }
       />
@@ -167,7 +184,11 @@ function FeedbackButtons({
         gutter={8}
         portal
         unmountOnHide
+<<<<<<< HEAD
         className="popover-animate flex w-auto flex-col gap-1.5 overflow-hidden rounded-2xl border border-border-medium bg-surface-secondary p-1.5 shadow-lg"
+=======
+        className="popover-animate border-border-medium bg-surface-secondary rounded-theme-popover flex w-auto flex-col gap-1.5 overflow-hidden border p-1.5 shadow-lg"
+>>>>>>> upstream/main
       >
         <div className="flex flex-col items-stretch justify-center">
           {positiveTags.map((tag) => (
@@ -193,7 +214,11 @@ function FeedbackButtons({
             aria-pressed={feedback?.rating === 'thumbsDown'}
             aria-haspopup="menu"
           >
+<<<<<<< HEAD
             <ThumbDownIcon size="19" bold={feedback?.rating === 'thumbsDown'} />
+=======
+            <ThumbDownIcon size="1.1875rem" bold={feedback?.rating === 'thumbsDown'} />
+>>>>>>> upstream/main
           </Button>
         }
       />
@@ -202,7 +227,11 @@ function FeedbackButtons({
         gutter={8}
         portal
         unmountOnHide
+<<<<<<< HEAD
         className="popover-animate flex w-auto flex-col gap-1.5 overflow-hidden rounded-2xl border border-border-medium bg-surface-secondary p-1.5 shadow-lg"
+=======
+        className="popover-animate border-border-medium bg-surface-secondary rounded-theme-popover flex w-auto flex-col gap-1.5 overflow-hidden border p-1.5 shadow-lg"
+>>>>>>> upstream/main
       >
         <div className="flex flex-col items-stretch justify-center">
           {negativeTags.map((tag) => (
@@ -222,11 +251,15 @@ function FeedbackButtons({
 const buttonClasses = (isActive: boolean, isLast: boolean) =>
   hoverButtonClasses({ isActive, isLast });
 
+<<<<<<< HEAD
 export default function Feedback({
   isLast = false,
   handleFeedback,
   feedback: initialFeedback,
 }: FeedbackProps) {
+=======
+function Feedback({ isLast = false, handleFeedback, feedback: initialFeedback }: FeedbackProps) {
+>>>>>>> upstream/main
   const localize = useLocalize();
   const [openDialog, setOpenDialog] = useState(false);
   const [feedback, setFeedback] = useState<TFeedback | undefined>(initialFeedback);
@@ -297,7 +330,11 @@ export default function Feedback({
             aria-label={label}
             aria-pressed="true"
           >
+<<<<<<< HEAD
             <Icon size="19" bold />
+=======
+            <Icon size="1.1875rem" bold />
+>>>>>>> upstream/main
           </Button>
         }
       />
@@ -318,11 +355,19 @@ export default function Feedback({
       )}
       <OGDialog open={openDialog} onOpenChange={setOpenDialog}>
         <OGDialogContent className="w-11/12 max-w-lg">
+<<<<<<< HEAD
           <OGDialogTitle className="text-token-text-primary text-lg font-semibold leading-6">
             {localize('com_ui_feedback_more_information')}
           </OGDialogTitle>
           <Textarea
             className="h-auto w-full rounded-xl border-border-light p-2"
+=======
+          <OGDialogTitle className="text-lg leading-6 font-semibold">
+            {localize('com_ui_feedback_more_information')}
+          </OGDialogTitle>
+          <Textarea
+            className="border-border-light h-auto w-full rounded-xl p-2"
+>>>>>>> upstream/main
             value={feedback?.text || ''}
             onChange={handleTextChange}
             rows={4}
@@ -342,3 +387,9 @@ export default function Feedback({
     </>
   );
 }
+<<<<<<< HEAD
+=======
+
+/** Memoized: a send re-renders every row's toolbar, and nothing here depends on it. */
+export default memo(Feedback);
+>>>>>>> upstream/main

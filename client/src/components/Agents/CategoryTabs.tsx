@@ -19,6 +19,7 @@ interface CategoryTabsProps {
   onChange: (value: string) => void;
 }
 
+<<<<<<< HEAD
 /**
  * CategoryTabs - Component for displaying category tabs with counts
  *
@@ -27,6 +28,9 @@ interface CategoryTabsProps {
  * Uses database-driven category labels with no hardcoded values.
  * Features multi-row wrapping for better responsive behavior.
  */
+=======
+/** Keyboard-accessible category filters with immediate selection feedback. */
+>>>>>>> upstream/main
 const CategoryTabs: React.FC<CategoryTabsProps> = ({
   categories,
   activeTab,
@@ -53,6 +57,7 @@ const CategoryTabs: React.FC<CategoryTabsProps> = ({
   };
 
   const loadingSkeleton = (
+<<<<<<< HEAD
     <div className="w-full pb-2">
       <div className="flex flex-wrap justify-center gap-1.5 px-4">
         {[...Array(6)].map((_, i) => (
@@ -60,6 +65,12 @@ const CategoryTabs: React.FC<CategoryTabsProps> = ({
             key={i}
             className="h-[36px] min-w-[80px] animate-pulse rounded-lg bg-surface-tertiary"
           />
+=======
+    <div className="w-full">
+      <div className="flex flex-wrap justify-start gap-1.5">
+        {[...Array(6)].map((_, i) => (
+          <div key={i} className="bg-surface-tertiary h-8 min-w-[5rem] rounded-full" />
+>>>>>>> upstream/main
         ))}
       </div>
     </div>
@@ -117,12 +128,17 @@ const CategoryTabs: React.FC<CategoryTabsProps> = ({
   // Early return if no categories available
   if (!isLoading && (!categories || categories.length === 0)) {
     return (
+<<<<<<< HEAD
       <div className="text-center text-text-secondary">{localize('com_ui_no_categories')}</div>
+=======
+      <div className="text-text-secondary text-center">{localize('com_ui_no_categories')}</div>
+>>>>>>> upstream/main
     );
   }
 
   // Main tabs content
   const tabsContent = (
+<<<<<<< HEAD
     <div className="w-full pb-2">
       <div
         className={cn(
@@ -130,6 +146,14 @@ const CategoryTabs: React.FC<CategoryTabsProps> = ({
           isSmallScreen
             ? 'scrollbar-hide flex gap-2 overflow-x-auto scroll-smooth'
             : 'flex flex-wrap justify-center gap-1.5',
+=======
+    <div className="w-full">
+      <div
+        className={cn(
+          isSmallScreen
+            ? 'hide-scrollbar flex gap-1.5 overflow-x-auto'
+            : 'flex flex-wrap justify-start gap-1.5',
+>>>>>>> upstream/main
         )}
         role="tablist"
         aria-label={localize('com_agents_category_tabs_label')}
@@ -151,6 +175,7 @@ const CategoryTabs: React.FC<CategoryTabsProps> = ({
             onClick={() => onChange(category.value)}
             onKeyDown={(e) => handleKeyDown(e, category.value)}
             className={cn(
+<<<<<<< HEAD
               'relative cursor-pointer select-none whitespace-nowrap px-3 py-2 transition-all duration-200',
               isSmallScreen ? 'min-w-fit flex-shrink-0' : '',
               activeTab === category.value
@@ -160,6 +185,17 @@ const CategoryTabs: React.FC<CategoryTabsProps> = ({
             role="tab"
             aria-selected={activeTab === category.value}
             aria-controls={`tabpanel-${category.value}`}
+=======
+              'focus-visible:ring-text-primary inline-flex h-8 cursor-pointer items-center justify-center rounded-full border px-2.5 text-xs font-medium whitespace-nowrap select-none focus-visible:ring-2 focus-visible:outline-hidden focus-visible:ring-inset',
+              isSmallScreen ? 'min-w-fit shrink-0' : '',
+              activeTab === category.value
+                ? 'border-border-chrome-heavy bg-surface-active-alt text-text-primary'
+                : 'border-border-chrome bg-surface-secondary text-text-secondary hover:bg-surface-hover hover:text-text-primary',
+            )}
+            role="tab"
+            aria-selected={activeTab === category.value}
+            aria-controls={`category-panel-${category.value}`}
+>>>>>>> upstream/main
             tabIndex={activeTab === category.value ? 0 : -1}
             aria-label={localize('com_agents_category_tab_label', {
               category: getCategoryDisplayName(category),
@@ -168,6 +204,7 @@ const CategoryTabs: React.FC<CategoryTabsProps> = ({
             })}
           >
             {getCategoryDisplayName(category)}
+<<<<<<< HEAD
             {/* Underline for active tab */}
             {activeTab === category.value && (
               <div
@@ -175,6 +212,8 @@ const CategoryTabs: React.FC<CategoryTabsProps> = ({
                 aria-hidden="true"
               />
             )}
+=======
+>>>>>>> upstream/main
           </button>
         ))}
       </div>

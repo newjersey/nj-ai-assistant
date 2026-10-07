@@ -1,8 +1,13 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
+<<<<<<< HEAD
 import { getAgentAvatarUrl, renderAgentAvatar, getContactDisplayName } from '../agents';
 import type t from 'librechat-data-provider';
+=======
+import type t from 'librechat-data-provider';
+import { getAgentAvatarUrl, renderAgentAvatar, getContactDisplayName } from '../agents';
+>>>>>>> upstream/main
 
 // Mock the Feather icon from lucide-react
 jest.mock('lucide-react', () => ({
@@ -119,6 +124,7 @@ describe('Agent Utilities', () => {
       const container = screen.getByAltText('Test Agent avatar').parentElement;
       expect(container).toHaveClass('custom-class');
     });
+<<<<<<< HEAD
 
     it('should handle showBorder option', () => {
       const agent = {
@@ -133,6 +139,8 @@ describe('Agent Utilities', () => {
       rerender(<div>{renderAgentAvatar(agent, { showBorder: false })}</div>);
       expect(screen.getByAltText('Test Agent avatar')).not.toHaveClass('border-1');
     });
+=======
+>>>>>>> upstream/main
   });
 
   describe('getContactDisplayName', () => {

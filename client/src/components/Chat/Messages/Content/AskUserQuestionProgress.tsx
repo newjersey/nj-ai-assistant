@@ -4,6 +4,10 @@ import parseJsonField, { parseJsonFieldOccurrences } from './Parts/parseJsonFiel
 import { collectLiveAskToolCallIds } from '~/utils/approval';
 import { useGetMessagesByConvoId } from '~/data-provider';
 import { ChatContext } from '~/Providers/ChatContext';
+<<<<<<< HEAD
+=======
+import { useToolPreparation } from './preparation';
+>>>>>>> upstream/main
 import { useLocalize } from '~/hooks';
 
 /**
@@ -28,6 +32,10 @@ export default function AskUserQuestionProgress({
   toolCallId?: string;
 }) {
   const localize = useLocalize();
+<<<<<<< HEAD
+=======
+  const preparationText = useToolPreparation();
+>>>>>>> upstream/main
   const conversationId = useContext(ChatContext)?.conversation?.conversationId;
   const enabled = conversationId != null && conversationId !== 'new';
   const { data: livePauses } = useGetMessagesByConvoId(enabled ? conversationId : '', {
@@ -68,6 +76,7 @@ export default function AskUserQuestionProgress({
   }
 
   return (
+<<<<<<< HEAD
     <div className="my-2 flex w-full flex-col gap-1.5 rounded-lg border border-border-light bg-surface-secondary p-3">
       <div
         className="flex items-center gap-2 text-xs font-medium text-text-secondary"
@@ -80,6 +89,20 @@ export default function AskUserQuestionProgress({
         <p className="text-sm font-medium text-text-primary [overflow-wrap:anywhere]">{question}</p>
       ) : (
         <div className="h-4 w-2/5 animate-pulse rounded bg-surface-tertiary" aria-hidden="true" />
+=======
+    <div className="border-border-light bg-surface-secondary my-2 flex w-full flex-col gap-1.5 rounded-lg border p-3">
+      <div
+        className="text-text-secondary flex items-center gap-2 text-xs font-medium"
+        role="status"
+      >
+        <MessageCircleQuestion className="h-4 w-4 animate-pulse" aria-hidden="true" />
+        <span className="shimmer">{preparationText ?? localize('com_ui_asking')}</span>
+      </div>
+      {question.length > 0 ? (
+        <p className="text-text-primary text-sm font-medium [overflow-wrap:anywhere]">{question}</p>
+      ) : (
+        <div className="bg-surface-tertiary h-4 w-2/5 animate-pulse rounded" aria-hidden="true" />
+>>>>>>> upstream/main
       )}
     </div>
   );

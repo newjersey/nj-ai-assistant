@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { useMemo } from 'react';
+=======
+import { useMemo, useContext, createContext } from 'react';
+>>>>>>> upstream/main
 import { X, PlusCircle } from 'lucide-react';
 import { EModelEndpoint } from 'librechat-data-provider';
 import { Button, ControlCombobox } from '@librechat/client';
@@ -9,6 +13,11 @@ import MessageIcon from '~/components/Share/MessageIcon';
 import { useAgentsMapContext } from '~/Providers';
 import { useLocalize } from '~/hooks';
 
+<<<<<<< HEAD
+=======
+export const AgentPickerPortalContext = createContext<HTMLElement | null>(null);
+
+>>>>>>> upstream/main
 const AGENT_MESSAGE = { endpoint: EModelEndpoint.agents, isCreatedByUser: false } as TMessage;
 
 /** Renders an agent's avatar/icon as used in combobox options and select triggers. */
@@ -19,7 +28,11 @@ export const agentIcon = (agent?: Agent | false): ReactNode => (
 /** Fixed-size circular agent avatar for list rows. */
 export function AgentGlyph({ agent }: { agent?: Agent }) {
   return (
+<<<<<<< HEAD
     <div className="flex h-6 w-6 flex-shrink-0 items-center justify-center overflow-hidden rounded-full">
+=======
+    <div className="flex h-6 w-6 shrink-0 items-center justify-center overflow-hidden rounded-full">
+>>>>>>> upstream/main
       {agentIcon(agent)}
     </div>
   );
@@ -74,16 +87,28 @@ interface AddAgentSelectProps {
 /** Dashed "+ Add agent" combobox shared by every orchestration pattern. */
 export function AddAgentSelect({ options, onSelect, placeholder, ariaLabel }: AddAgentSelectProps) {
   const localize = useLocalize();
+<<<<<<< HEAD
   return (
     <ControlCombobox
       isCollapsed={false}
+=======
+  const portalElement = useContext(AgentPickerPortalContext) ?? undefined;
+  return (
+    <ControlCombobox
+      isCollapsed={false}
+      portalElement={portalElement}
+>>>>>>> upstream/main
       ariaLabel={ariaLabel}
       selectedValue=""
       setValue={onSelect}
       selectPlaceholder={placeholder}
       searchPlaceholder={localize('com_ui_agent_var', { 0: localize('com_ui_search') })}
       items={options}
+<<<<<<< HEAD
       className="h-9 w-full border-dashed border-border-heavy text-center text-text-secondary hover:text-text-primary"
+=======
+      className="border-border-light text-text-secondary hover:text-text-primary h-9 w-full border-dashed text-center"
+>>>>>>> upstream/main
       containerClassName="px-0"
       SelectIcon={<PlusCircle size={16} className="text-text-secondary" />}
     />
@@ -109,9 +134,17 @@ export function AgentSelectInline({
   ariaLabel,
 }: AgentSelectInlineProps) {
   const localize = useLocalize();
+<<<<<<< HEAD
   return (
     <ControlCombobox
       isCollapsed={false}
+=======
+  const portalElement = useContext(AgentPickerPortalContext) ?? undefined;
+  return (
+    <ControlCombobox
+      isCollapsed={false}
+      portalElement={portalElement}
+>>>>>>> upstream/main
       ariaLabel={ariaLabel}
       selectedValue={selectedValue}
       setValue={onChange}
@@ -120,7 +153,11 @@ export function AgentSelectInline({
       items={options}
       displayValue={displayValue}
       SelectIcon={icon}
+<<<<<<< HEAD
       className="h-9 flex-1 border-border-light"
+=======
+      className="border-border-light h-9 flex-1"
+>>>>>>> upstream/main
       containerClassName="px-0"
     />
   );
@@ -137,7 +174,11 @@ export function RemoveButton({ onClick, label }: RemoveButtonProps) {
     <Button
       variant="ghost"
       size="icon"
+<<<<<<< HEAD
       className="size-auto flex-shrink-0 p-1 text-text-secondary hover:bg-surface-secondary hover:text-text-primary"
+=======
+      className="text-text-secondary hover:bg-surface-secondary hover:text-text-primary size-auto shrink-0 p-1"
+>>>>>>> upstream/main
       onClick={onClick}
       aria-label={label}
     >
@@ -172,9 +213,15 @@ interface StaticAgentRowProps {
 /** Borderless display row for a selected agent (avatar, name, remove). */
 export function StaticAgentRow({ agent, name, onRemove, removeLabel }: StaticAgentRowProps) {
   return (
+<<<<<<< HEAD
     <div className="flex items-center gap-2 rounded-lg px-1 py-1 transition hover:bg-surface-secondary">
       <AgentGlyph agent={agent} />
       <span className="min-w-0 flex-1 truncate text-sm text-text-primary">{name}</span>
+=======
+    <div className="hover:bg-surface-secondary flex items-center gap-2 rounded-lg px-1 py-1 transition">
+      <AgentGlyph agent={agent} />
+      <span className="text-text-primary min-w-0 flex-1 truncate text-sm">{name}</span>
+>>>>>>> upstream/main
       <RemoveButton onClick={onRemove} label={removeLabel} />
     </div>
   );
@@ -190,8 +237,13 @@ interface ListMetaProps {
 export function ListMeta({ label, count, max }: ListMetaProps) {
   return (
     <div className="flex items-center justify-between gap-2">
+<<<<<<< HEAD
       <span className="text-xs font-medium text-text-secondary">{label}</span>
       <span className="whitespace-nowrap text-[10px] font-medium tabular-nums text-text-tertiary">
+=======
+      <span className="text-text-secondary text-xs font-medium">{label}</span>
+      <span className="text-text-tertiary text-[10px] font-medium whitespace-nowrap tabular-nums">
+>>>>>>> upstream/main
         {count} / {max}
       </span>
     </div>

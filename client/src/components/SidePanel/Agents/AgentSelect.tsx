@@ -2,29 +2,63 @@ import { memo, useCallback, useEffect, useRef } from 'react';
 import { EarthIcon } from 'lucide-react';
 import { ControlCombobox } from '@librechat/client';
 import { useFormContext, Controller } from 'react-hook-form';
+<<<<<<< HEAD
 import { AgentCapabilities, defaultAgentFormValues } from 'librechat-data-provider';
+=======
+import {
+  AgentCapabilities,
+  normalizeAgentSelectorLimit,
+  defaultAgentFormValues,
+} from 'librechat-data-provider';
+>>>>>>> upstream/main
 import type { Agent, AgentCreateParams, StatefulCodeEnvironment } from 'librechat-data-provider';
 import type { UseMutationResult, QueryObserverResult } from '@tanstack/react-query';
 import type { TAgentCapabilities, AgentForm } from '~/common';
 import { cn, createProviderOption, processAgentOption, getDefaultAgentFormValues } from '~/utils';
+<<<<<<< HEAD
 import { useLocalize, useAgentDefaultPermissionLevel } from '~/hooks';
 import { mergeDirtyToolsWithServerActions } from './agentTools';
 import { useListAgentsQuery } from '~/data-provider';
 
 const keys = new Set(Object.keys(defaultAgentFormValues));
 
+=======
+import { useListAgentsQuery, useGetStartupConfig } from '~/data-provider';
+import { useLocalize, useAgentDefaultPermissionLevel } from '~/hooks';
+import { mergeDirtyToolsWithServerActions } from './agentTools';
+
+const keys = new Set(Object.keys(defaultAgentFormValues));
+
+/** Dropdown cap: 480px tall; the unsearched list cap comes from
+ * `interface.agentSelectorLimit` (default 10), and the search field covers
+ * agents past the cut. */
+const SELECTOR_MAX_HEIGHT = 480;
+
+>>>>>>> upstream/main
 function AgentSelect({
   agentQuery,
   selectedAgentId = null,
   setCurrentAgentId,
   createMutation,
   defaultStatefulCodeEnvironment,
+<<<<<<< HEAD
+=======
+  instructionsPromptReady = true,
+>>>>>>> upstream/main
 }: {
   selectedAgentId: string | null;
   agentQuery: QueryObserverResult<Agent>;
   setCurrentAgentId: React.Dispatch<React.SetStateAction<string | undefined>>;
   createMutation: UseMutationResult<Agent, Error, AgentCreateParams>;
   defaultStatefulCodeEnvironment: StatefulCodeEnvironment;
+<<<<<<< HEAD
+=======
+  /** Whether `agentQuery.data` is the expanded agent (the only source of
+   * `instructionsPrompt`) rather than the basic projection, which never carries it.
+   * `false` keeps the form's existing instructions-source/-prompt values instead of
+   * reading a linked agent as unlinked while the expanded query is still loading. */
+  instructionsPromptReady?: boolean;
+>>>>>>> upstream/main
 }) {
   const localize = useLocalize();
   const lastSelectedAgent = useRef<string | null>(null);
@@ -40,6 +74,11 @@ function AgentSelect({
   const dirtyFieldsRef = useRef(dirtyFields);
   dirtyFieldsRef.current = dirtyFields;
   const permissionLevel = useAgentDefaultPermissionLevel();
+<<<<<<< HEAD
+=======
+  const { data: startupConfig } = useGetStartupConfig();
+  const selectorLimit = normalizeAgentSelectorLimit(startupConfig?.interface?.agentSelectorLimit);
+>>>>>>> upstream/main
 
   const { data: agents = null } = useListAgentsQuery(
     { requiredPermission: permissionLevel },
@@ -87,6 +126,22 @@ function AgentSelect({
         agentTools.push(tool);
       });
 
+<<<<<<< HEAD
+=======
+      /** The basic projection never carries `instructionsPrompt`, so deriving from it
+       * here would read a linked agent as unlinked until the expanded query resolves.
+       * Keep whatever the form already has until then. */
+      let resolvedInstructionsPrompt: AgentForm['instructionsPrompt'];
+      let resolvedInstructionsSource: AgentForm['instructionsSource'];
+      if (instructionsPromptReady) {
+        resolvedInstructionsPrompt = fullAgent.instructionsPrompt ?? null;
+        resolvedInstructionsSource = resolvedInstructionsPrompt != null ? 'prompt' : 'inline';
+      } else {
+        resolvedInstructionsPrompt = getValues('instructionsPrompt');
+        resolvedInstructionsSource = getValues('instructionsSource');
+      }
+
+>>>>>>> upstream/main
       const formValues: Partial<AgentForm & TAgentCapabilities> = {
         ...capabilities,
         agent: update,
@@ -96,13 +151,27 @@ function AgentSelect({
         category: fullAgent.category || 'general',
         // Make sure support_contact is properly loaded
         support_contact: fullAgent.support_contact,
+<<<<<<< HEAD
+=======
+        conversation_starters: fullAgent.conversation_starters ?? [],
+        conversation_starter_draft: '',
+>>>>>>> upstream/main
         avatar_file: null,
         avatar_preview: fullAgent.avatar?.filepath ?? '',
         avatar_action: null,
         stateful_code_environment: fullAgent.stateful_code_environment ?? 'user',
         code_environment_id: fullAgent.code_environment_id,
+<<<<<<< HEAD
         code_workspace_id: fullAgent.code_workspace_id,
         git_identity: fullAgent.git_identity,
+=======
+        code_environment_ids: fullAgent.code_environment_ids ?? [],
+        repositoryInstructions: fullAgent.repositoryInstructions,
+        code_workspace_id: fullAgent.code_workspace_id,
+        git_identity: fullAgent.git_identity,
+        instructionsSource: resolvedInstructionsSource,
+        instructionsPrompt: resolvedInstructionsPrompt,
+>>>>>>> upstream/main
       };
 
       Object.entries(fullAgent).forEach(([name, value]) => {
@@ -197,7 +266,11 @@ function AgentSelect({
         setValue('tools', mergedDirtyTools, { shouldDirty: true });
       }
     },
+<<<<<<< HEAD
     [getValues, reset, setValue],
+=======
+    [getValues, reset, setValue, instructionsPromptReady],
+>>>>>>> upstream/main
   );
 
   const onSelect = useCallback(
@@ -273,6 +346,11 @@ function AgentSelect({
           selectPlaceholder={field?.value?.value ?? createAgent}
           iconSide="right"
           searchPlaceholder={localize('com_agents_search_name')}
+<<<<<<< HEAD
+=======
+          popoverMaxHeight={SELECTOR_MAX_HEIGHT}
+          unsearchedLimit={selectorLimit}
+>>>>>>> upstream/main
           SelectIcon={field?.value?.icon}
           setValue={onSelect}
           items={
@@ -288,7 +366,11 @@ function AgentSelect({
             ]
           }
           className={cn(
+<<<<<<< HEAD
             'z-50 flex h-9 w-full flex-none items-center justify-center truncate rounded-md bg-white font-bold',
+=======
+            'z-50 flex h-9 w-full flex-none items-center justify-center truncate rounded-md bg-transparent font-bold',
+>>>>>>> upstream/main
           )}
           ariaLabel={localize('com_ui_agent')}
           isCollapsed={false}
@@ -306,7 +388,12 @@ const MemoizedAgentSelect = memo(
     prevProps.agentQuery.data === nextProps.agentQuery.data &&
     prevProps.agentQuery.isSuccess === nextProps.agentQuery.isSuccess &&
     prevProps.createMutation.data?.id === nextProps.createMutation.data?.id &&
+<<<<<<< HEAD
     prevProps.createMutation.isLoading === nextProps.createMutation.isLoading,
+=======
+    prevProps.createMutation.isLoading === nextProps.createMutation.isLoading &&
+    prevProps.instructionsPromptReady === nextProps.instructionsPromptReady,
+>>>>>>> upstream/main
 );
 MemoizedAgentSelect.displayName = 'AgentSelect';
 

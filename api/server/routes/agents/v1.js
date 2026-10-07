@@ -126,7 +126,11 @@ router.post(
   checkAgentCreate,
   configMiddleware,
   canAccessAgentResource({
+<<<<<<< HEAD
     requiredPermission: PermissionBits.VIEW, // NJ: Allow duplicating agents users can view, so they can customize them
+=======
+    requiredPermission: PermissionBits.EDIT,
+>>>>>>> upstream/main
     resourceIdParam: 'id',
   }),
   configMiddleware,

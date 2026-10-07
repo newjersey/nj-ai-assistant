@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 const jwt = require('jsonwebtoken');
 const { createHash } = require('crypto');
 const rateLimit = require('express-rate-limit');
@@ -99,3 +100,17 @@ const twoFactorTempLimiter = (req, res, next) => {
 };
 
 module.exports = twoFactorTempLimiter;
+=======
+const { createTwoFactorLimiters, limiterCache, removePorts } = require('@librechat/api');
+const { logViolation } = require('~/cache');
+
+const { twoFactorTempLimiter, twoFactorSetupLimiter } = createTwoFactorLimiters({
+  env: process.env,
+  limiterCache,
+  removePorts,
+  logViolation,
+});
+
+module.exports = twoFactorTempLimiter;
+module.exports.twoFactorSetupLimiter = twoFactorSetupLimiter;
+>>>>>>> upstream/main

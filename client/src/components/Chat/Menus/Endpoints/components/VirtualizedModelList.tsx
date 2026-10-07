@@ -1,6 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react';
+<<<<<<< HEAD
 import { List } from 'react-virtualized';
 import * as Ariakit from '@ariakit/react';
+=======
+import * as Ariakit from '@ariakit/react';
+import { useRemScale } from '@librechat/client';
+import { AutoSizer, List } from 'react-virtualized';
+>>>>>>> upstream/main
 import type { ListRowProps } from 'react-virtualized';
 import type { Endpoint } from '~/common';
 import { EndpointModelItem } from './EndpointModelItem';
@@ -17,9 +23,16 @@ interface VirtualizedModelListProps {
   isFavorite: (modelId: string) => boolean;
   onToggleFavorite: (modelId: string) => void;
   endpointIndex?: number;
+<<<<<<< HEAD
   /** Count of options rendered ahead of this list in the same listbox (marketplace entry,
    *  model specs), so `aria-posinset` is relative to the whole listbox and not just this list. */
   precedingOptionCount: number;
+=======
+  /** Count of options rendered ahead of this list in the same listbox. */
+  precedingOptionCount: number;
+  /** Total selectable options in the surrounding listbox, when known. */
+  listboxSetSize?: number;
+>>>>>>> upstream/main
 }
 
 /**
@@ -44,10 +57,18 @@ export default function VirtualizedModelList({
   onToggleFavorite,
   endpointIndex,
   precedingOptionCount,
+<<<<<<< HEAD
+=======
+  listboxSetSize,
+>>>>>>> upstream/main
 }: VirtualizedModelListProps) {
   const listRef = useRef<List>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const combobox = Ariakit.useComboboxContext();
+<<<<<<< HEAD
+=======
+  const remScale = useRemScale();
+>>>>>>> upstream/main
   const indexSuffix = endpointIndex != null ? `-${endpointIndex}` : '';
   const rowCount = modelIds.length;
 
@@ -71,12 +92,17 @@ export default function VirtualizedModelList({
     };
     const handleBoundaryNavigation = (event: KeyboardEvent) => {
       const delta = deltaFor(event.key);
+<<<<<<< HEAD
       if (delta === 0) {
+=======
+      if (delta === 0 || !containerRef.current) {
+>>>>>>> upstream/main
         return;
       }
       const activeId = combobox.getState().activeId;
       const activeRow = activeId ? document.getElementById(activeId) : null;
       const wrapper = activeRow?.closest<HTMLElement>('[data-row-index]');
+<<<<<<< HEAD
       if (!wrapper || !containerRef.current?.contains(wrapper)) {
         return;
       }
@@ -91,6 +117,38 @@ export default function VirtualizedModelList({
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           const id = rowAt(next)?.id;
+=======
+      let next: number | null = null;
+
+      if (wrapper && containerRef.current.contains(wrapper)) {
+        const currentIndex = Number(wrapper.dataset.rowIndex);
+        const candidate = currentIndex + delta;
+        /** Let Ariakit own both the in-window case and the ends of the list. */
+        if (candidate < 0 || candidate >= rowCount || rowAt(candidate)) {
+          return;
+        }
+        next = candidate;
+      } else {
+        const activePosition = Number(activeRow?.getAttribute('aria-posinset'));
+        const entersFromBefore = delta === 1 && activePosition === precedingOptionCount;
+        const entersFromAfter =
+          delta === -1 && activePosition === precedingOptionCount + rowCount + 1;
+        if (entersFromBefore) {
+          next = 0;
+        } else if (entersFromAfter) {
+          next = rowCount - 1;
+        } else {
+          return;
+        }
+      }
+
+      event.preventDefault();
+      event.stopPropagation();
+      listRef.current?.scrollToRow(next!);
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          const id = rowAt(next!)?.id;
+>>>>>>> upstream/main
           if (id) {
             combobox.move(id);
           }
@@ -99,11 +157,20 @@ export default function VirtualizedModelList({
     };
     document.addEventListener('keydown', handleBoundaryNavigation, true);
     return () => document.removeEventListener('keydown', handleBoundaryNavigation, true);
+<<<<<<< HEAD
   }, [combobox, rowCount, rowAt]);
 
   const height = useMemo(
     () => Math.min(MAX_LIST_HEIGHT, Math.max(ROW_HEIGHT, rowCount * ROW_HEIGHT)),
     [rowCount],
+=======
+  }, [combobox, precedingOptionCount, rowCount, rowAt]);
+
+  const rowHeight = ROW_HEIGHT * remScale;
+  const height = useMemo(
+    () => Math.min(MAX_LIST_HEIGHT * remScale, Math.max(rowHeight, rowCount * rowHeight)),
+    [rowCount, rowHeight, remScale],
+>>>>>>> upstream/main
   );
 
   const rowRenderer = useCallback(
@@ -118,15 +185,26 @@ export default function VirtualizedModelList({
             isFavorite={isFavorite(modelId)}
             onToggleFavorite={onToggleFavorite}
             posInSet={precedingOptionCount + index + 1}
+<<<<<<< HEAD
             setSize={precedingOptionCount + rowCount}
+=======
+            setSize={listboxSetSize ?? precedingOptionCount + rowCount}
+>>>>>>> upstream/main
           />
         </div>
       );
     },
     [
+<<<<<<< HEAD
       endpoint,
       globalByName,
       isFavorite,
+=======
+      globalByName,
+      endpoint,
+      isFavorite,
+      listboxSetSize,
+>>>>>>> upstream/main
       modelIds,
       onToggleFavorite,
       precedingOptionCount,
@@ -135,6 +213,7 @@ export default function VirtualizedModelList({
   );
 
   return (
+<<<<<<< HEAD
     <div ref={containerRef} data-endpoint-models={`${endpoint.value}${indexSuffix}`}>
       <List
         ref={listRef}
@@ -158,6 +237,38 @@ export default function VirtualizedModelList({
         containerRole="presentation"
         tabIndex={-1}
       />
+=======
+    <div
+      ref={containerRef}
+      data-endpoint-models={`${endpoint.value}${indexSuffix}`}
+      className="w-full"
+    >
+      <AutoSizer disableHeight>
+        {({ width }) => (
+          <List
+            ref={listRef}
+            width={width}
+            height={height}
+            rowCount={rowCount}
+            rowHeight={rowHeight}
+            overscanRowCount={OVERSCAN}
+            rowRenderer={rowRenderer}
+            className="outline-hidden!"
+            /**
+             * `List` spreads its props onto the underlying `Grid`, whose defaults are
+             * `role="grid"`, `containerRole="row"` and `tabIndex={0}`. Left alone, that puts a
+             * focusable grid between Ariakit's listbox and its options: tabbing out of the
+             * search field lands on the wrapper instead of a row, where the combobox no longer
+             * owns the keystroke, and the grid/row semantics fight the surrounding listbox.
+             * Neutralise both so focus and ARIA stay with the combobox items.
+             */
+            role="presentation"
+            containerRole="presentation"
+            tabIndex={-1}
+          />
+        )}
+      </AutoSizer>
+>>>>>>> upstream/main
     </div>
   );
 }

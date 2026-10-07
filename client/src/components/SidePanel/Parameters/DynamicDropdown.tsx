@@ -71,7 +71,11 @@ function DynamicDropdown({
       )}
     >
       <HoverCard openDelay={300}>
+<<<<<<< HEAD
         <HoverCardTrigger className="grid w-full items-center gap-2">
+=======
+        <HoverCardTrigger className="grid h-full w-full content-between items-center gap-2">
+>>>>>>> upstream/main
           {showLabel === true && (
             <div className="flex w-full justify-between">
               <Label
@@ -80,7 +84,11 @@ function DynamicDropdown({
               >
                 {labelCode ? (localize(label as TranslationKeys) ?? label) : label || settingKey}
                 {showDefault && (
+<<<<<<< HEAD
                   <small className="opacity-40 high-contrast:opacity-100">
+=======
+                  <small className="high-contrast:opacity-100 opacity-40">
+>>>>>>> upstream/main
                     ({localize('com_endpoint_default')}: {defaultValue})
                   </small>
                 )}

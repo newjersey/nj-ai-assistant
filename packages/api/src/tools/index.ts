@@ -6,3 +6,7 @@ export * from './toolkits';
 export * from './definitions';
 export * from './classification';
 export * from './rolePermissions';
+<<<<<<< HEAD
+=======
+export * from './compare';
+>>>>>>> upstream/main

@@ -8,6 +8,10 @@ import {
   inlineFlowchartConfig,
   sanitizeMermaidSvg,
 } from '~/utils/mermaid';
+<<<<<<< HEAD
+=======
+import { importWithRecovery } from '~/lib/assets/lazy';
+>>>>>>> upstream/main
 
 // Constants
 const MD5_LENGTH_THRESHOLD = 10_000;
@@ -22,7 +26,11 @@ const loadMermaid = () => {
   }
 
   if (!mermaidPromise) {
+<<<<<<< HEAD
     mermaidPromise = import('mermaid').then((mod) => mod.default);
+=======
+    mermaidPromise = importWithRecovery(() => import('mermaid')).then((mod) => mod.default);
+>>>>>>> upstream/main
   }
 
   return mermaidPromise;

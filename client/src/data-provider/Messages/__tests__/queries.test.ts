@@ -372,7 +372,11 @@ describe('useGetMessagesByConvoId', () => {
       expect(result.current.data).toEqual(serverMessages);
     });
     expect(mockGetMessagesByConvoId).toHaveBeenCalledTimes(1);
+<<<<<<< HEAD
     expect(mockGetMessagesByConvoId).toHaveBeenCalledWith(conversationId);
+=======
+    expect(mockGetMessagesByConvoId).toHaveBeenCalledWith(conversationId, { toolPreviews: true });
+>>>>>>> upstream/main
 
     unmount();
   });
@@ -397,7 +401,11 @@ describe('useGetMessagesByConvoId', () => {
     });
 
     await waitFor(() => {
+<<<<<<< HEAD
       expect(mockGetMessagesByConvoId).toHaveBeenCalledWith(conversationId);
+=======
+      expect(mockGetMessagesByConvoId).toHaveBeenCalledWith(conversationId, { toolPreviews: true });
+>>>>>>> upstream/main
     });
 
     act(() => {
@@ -443,7 +451,11 @@ describe('useGetMessagesByConvoId', () => {
     const refetchPromise = result.current.refetch();
 
     await waitFor(() => {
+<<<<<<< HEAD
       expect(mockGetMessagesByConvoId).toHaveBeenCalledWith(conversationId);
+=======
+      expect(mockGetMessagesByConvoId).toHaveBeenCalledWith(conversationId, { toolPreviews: true });
+>>>>>>> upstream/main
     });
 
     act(() => {
@@ -520,7 +532,11 @@ describe('useGetMessagesByConvoId', () => {
     const refetchPromise = result.current.refetch();
 
     await waitFor(() => {
+<<<<<<< HEAD
       expect(mockGetMessagesByConvoId).toHaveBeenCalledWith(conversationId);
+=======
+      expect(mockGetMessagesByConvoId).toHaveBeenCalledWith(conversationId, { toolPreviews: true });
+>>>>>>> upstream/main
     });
 
     act(() => {
@@ -579,7 +595,13 @@ describe('useGetMessagesByConvoId', () => {
     await waitFor(() => {
       expect(result.current.data).toBe(currentMessages);
     });
+<<<<<<< HEAD
     expect(dataService.getMessagesByConvoId).toHaveBeenCalledWith(conversationId);
+=======
+    expect(dataService.getMessagesByConvoId).toHaveBeenCalledWith(conversationId, {
+      toolPreviews: true,
+    });
+>>>>>>> upstream/main
     expect(queryClient.getQueryData([QueryKeys.messages, conversationId])).toBe(currentMessages);
 
     unmount();
@@ -623,7 +645,13 @@ describe('useGetMessagesByConvoId', () => {
     await waitFor(() => {
       expect(result.current.data).toBe(currentMessages);
     });
+<<<<<<< HEAD
     expect(dataService.getMessagesByConvoId).toHaveBeenCalledWith(conversationId);
+=======
+    expect(dataService.getMessagesByConvoId).toHaveBeenCalledWith(conversationId, {
+      toolPreviews: true,
+    });
+>>>>>>> upstream/main
     expect(queryClient.getQueryData([QueryKeys.messages, conversationId])).toBe(currentMessages);
     expect(logger.warn).toHaveBeenCalledWith(
       'messages',

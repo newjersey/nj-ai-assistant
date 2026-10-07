@@ -2,7 +2,13 @@ import { createHash } from 'crypto';
 import { logger } from '@librechat/data-schemas';
 import { MCPOptionsSchema } from 'librechat-data-provider';
 import type { Tool } from '@modelcontextprotocol/sdk/types.js';
+<<<<<<< HEAD
 import type { MCPOptions, ParsedServerConfig } from './types';
+=======
+import type { MCPClientCapabilityProfile } from './capabilities';
+import type { MCPOptions, ParsedServerConfig } from './types';
+import { STANDARD_MCP_CAPABILITY_PROFILE } from './capabilities';
+>>>>>>> upstream/main
 import { processMCPEnv } from '../utils/env';
 
 const RETRY_BASE_DELAY_MS = 250;
@@ -36,19 +42,49 @@ export function getMCPAppToolsPublicationGeneration(config: ParsedServerConfig):
    * a rolling deployment. Address the catalog by the effective runtime config so an old replica's
    * live connection cannot publish into the new replica's slice. DB-sourced configs deliberately
    * remain literal because processMCPEnv derives that rule from dbId. */
+<<<<<<< HEAD
   const runtimeConfig = processMCPEnv({ options: config });
+=======
+  /** Keep both header maps: a request override can hide a catalog-only change. */
+  let runtimeConfig = processMCPEnv({ options: config });
+  if ('requestHeaders' in config && config.requestHeaders != null) {
+    const requestConfig = processMCPEnv({
+      options: { ...config, apiKey: undefined, headers: config.requestHeaders },
+    });
+    if ('headers' in requestConfig && 'requestHeaders' in runtimeConfig) {
+      runtimeConfig = { ...runtimeConfig, requestHeaders: requestConfig.headers };
+    }
+  }
+>>>>>>> upstream/main
   const parsedConfig = MCPOptionsSchema.parse(runtimeConfig) as StableConfigValue;
   return createHash('sha256')
     .update(JSON.stringify(sortConfigValue(parsedConfig)))
     .digest('hex');
 }
 
+<<<<<<< HEAD
+=======
+/** Addresses catalogs by both configuration and the capabilities that produced them. */
+export function getMCPToolCatalogGeneration(
+  config: ParsedServerConfig,
+  capabilityProfile: MCPClientCapabilityProfile = STANDARD_MCP_CAPABILITY_PROFILE,
+): string {
+  return createHash('sha256')
+    .update(JSON.stringify([getMCPAppToolsPublicationGeneration(config), capabilityProfile]))
+    .digest('hex');
+}
+
+>>>>>>> upstream/main
 /** A complete tool-list snapshot and the cache scope it belongs to. */
 export interface MCPToolsChangedEvent {
   serverName: string;
   tools: Tool[];
   serverConfig: MCPOptions;
   userId?: string;
+<<<<<<< HEAD
+=======
+  capabilityProfile?: MCPClientCapabilityProfile;
+>>>>>>> upstream/main
   /** Connection-bound token used to fence stale cross-replica cache publications. */
   publicationGeneration?: string;
   /** Monotonic ticket assigned before an app-level tools/list request begins. */
@@ -70,6 +106,12 @@ let handler: MCPToolsChangedHandler | null = null;
 const pendingChanges = new Map<string, PendingToolsChange>();
 
 type MCPToolsChangedScope = Pick<MCPToolsChangedEvent, 'serverName' | 'userId'>;
+<<<<<<< HEAD
+=======
+type MCPToolsChangedPublicationScope = MCPToolsChangedScope & {
+  capabilityProfile?: MCPClientCapabilityProfile;
+};
+>>>>>>> upstream/main
 
 export type MCPToolsChangedGenerationHandler = (
   scope: MCPToolsChangedScope,
@@ -90,8 +132,17 @@ export type MCPToolsChangedRevisionHandler = (scope: {
 
 let revisionHandler: MCPToolsChangedRevisionHandler | null = null;
 
+<<<<<<< HEAD
 function getChangeKey(event: MCPToolsChangedScope): string {
   return JSON.stringify([event.userId ?? null, event.serverName]);
+=======
+function getChangeKey(event: MCPToolsChangedPublicationScope): string {
+  return JSON.stringify([
+    event.userId ?? null,
+    event.serverName,
+    event.capabilityProfile ?? STANDARD_MCP_CAPABILITY_PROFILE,
+  ]);
+>>>>>>> upstream/main
 }
 
 function clearRetryTimer(change: PendingToolsChange): void {
@@ -209,13 +260,21 @@ export async function reserveMCPToolsChangedRevision(scope: {
   serverName: string;
   serverConfig: ParsedServerConfig;
   userId?: string;
+<<<<<<< HEAD
+=======
+  capabilityProfile?: MCPClientCapabilityProfile;
+>>>>>>> upstream/main
 }): Promise<string | undefined> {
   if (scope.userId || !revisionHandler) {
     return undefined;
   }
   return revisionHandler({
     serverName: scope.serverName,
+<<<<<<< HEAD
     configGeneration: getMCPAppToolsPublicationGeneration(scope.serverConfig),
+=======
+    configGeneration: getMCPToolCatalogGeneration(scope.serverConfig, scope.capabilityProfile),
+>>>>>>> upstream/main
   });
 }
 
@@ -252,7 +311,11 @@ export async function notifyMCPToolsChanged(event: MCPToolsChangedEvent): Promis
 }
 
 /** Cancels queued retries and drains an in-flight publication before cache invalidation. */
+<<<<<<< HEAD
 export async function cancelMCPToolsChanged(scope: MCPToolsChangedScope): Promise<void> {
+=======
+export async function cancelMCPToolsChanged(scope: MCPToolsChangedPublicationScope): Promise<void> {
+>>>>>>> upstream/main
   const key = getChangeKey(scope);
   const change = pendingChanges.get(key);
   if (!change) {

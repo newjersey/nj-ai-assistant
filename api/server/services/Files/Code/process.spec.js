@@ -65,8 +65,16 @@ const passthroughWithTimeout = async (promise) => promise;
 jest.mock('@librechat/api', () => {
   return {
     processCodeOutput: jest.requireActual('@librechat/api').processCodeOutput,
+<<<<<<< HEAD
     prepareCodeOutputBufferForInspection:
       jest.requireActual('@librechat/api').prepareCodeOutputBufferForInspection,
+=======
+    createSandboxTextReader: jest.requireActual('@librechat/api').createSandboxTextReader,
+    prepareCodeOutputBufferForInspection:
+      jest.requireActual('@librechat/api').prepareCodeOutputBufferForInspection,
+    getCodeFileContextLine: jest.requireActual('@librechat/api').getCodeFileContextLine,
+    appendCodeFileContextLine: jest.requireActual('@librechat/api').appendCodeFileContextLine,
+>>>>>>> upstream/main
     resolveDownloadPath: (file) => file.storageKey || file.filepath,
     logAxiosError: jest.fn(),
     /* Behaviourally identical to the real predicate in
@@ -2031,6 +2039,31 @@ describe('Code Process', () => {
   });
 
   describe('readWorkspaceFile', () => {
+<<<<<<< HEAD
+=======
+    it('forwards the configured rate-limit budget to the workspace transport', async () => {
+      const req = {
+        ...mockReq,
+        config: { ...mockReq.config, endpoints: { agents: { codeApiMaxRetryWaitMs: 0 } } },
+      };
+      mockExecuteWorkspaceTool.mockResolvedValueOnce({ operation: 'read_file' });
+
+      await readWorkspaceFile({
+        file_path: 'src/app.ts',
+        workspace_id: 'primary',
+        start_line: 1,
+        max_lines: 10,
+        codeApiBaseUrl: 'https://attached-code.example.com/v1',
+        executionProfile: 'stateful',
+        req,
+      });
+
+      expect(mockExecuteWorkspaceTool).toHaveBeenCalledWith(
+        expect.objectContaining({ codeApiMaxRetryWaitMs: 0 }),
+      );
+    });
+
+>>>>>>> upstream/main
     it('forwards authenticated reads to the selected attached worker', async () => {
       const controller = new AbortController();
       const result = {
@@ -2050,6 +2083,10 @@ describe('Code Process', () => {
         readWorkspaceFile({
           file_path: 'src/app.ts',
           workspace_id: 'primary',
+<<<<<<< HEAD
+=======
+          workspace_instance_id: 'a'.repeat(64),
+>>>>>>> upstream/main
           start_line: 1,
           max_lines: 200,
           codeApiBaseUrl: 'https://attached-code.example.com/v1',
@@ -2057,6 +2094,7 @@ describe('Code Process', () => {
           bridgeWorkerId: 'worker-user-1',
           req: mockReq,
           signal: controller.signal,
+<<<<<<< HEAD
         }),
       ).resolves.toBe(result);
 
@@ -2068,10 +2106,58 @@ describe('Code Process', () => {
           'X-CodeAPI-Expected-Profile': 'stateful',
           'X-LibreChat-Code-Worker-ID': 'worker-user-1',
         },
+=======
+          maxQueueWaitMs: 0,
+          maxRequestTimeoutMs: 125_000,
+          maxRunTimeoutMs: 180_000,
+          admission: {
+            queueWaitMs: 60_000,
+            initialDelayMs: 1_000,
+            maxDelayMs: 30_000,
+            multiplier: 2,
+            jitterRatio: 0.2,
+          },
+          deadlineAtMs: 160_000,
+        }),
+      ).resolves.toBe(result);
+
+      expect(getCodeApiAuthHeaders).not.toHaveBeenCalled();
+      const { authHeaders } = mockExecuteWorkspaceTool.mock.calls[0][0];
+      await expect(authHeaders()).resolves.toEqual({
+        Authorization: 'Bearer workspace-token',
+        'X-CodeAPI-Expected-Profile': 'stateful',
+        'X-LibreChat-Code-Worker-ID': 'worker-user-1',
+      });
+      getCodeApiAuthHeaders.mockResolvedValueOnce({ Authorization: 'Bearer refreshed-token' });
+      await expect(authHeaders()).resolves.toMatchObject({
+        Authorization: 'Bearer refreshed-token',
+        'X-LibreChat-Code-Worker-ID': 'worker-user-1',
+      });
+      expect(getCodeApiAuthHeaders).toHaveBeenNthCalledWith(2, mockReq, 'worker-user-1');
+      expect(mockExecuteWorkspaceTool).toHaveBeenCalledWith({
+        baseURL: 'https://attached-code.example.com/v1',
+        authHeaders: expect.any(Function),
+        maxQueueWaitMs: 0,
+        codeApiMaxRetryWaitMs: undefined,
+        maxRequestTimeoutMs: 125_000,
+        maxRunTimeoutMs: 180_000,
+        admission: {
+          queueWaitMs: 60_000,
+          initialDelayMs: 1_000,
+          maxDelayMs: 30_000,
+          multiplier: 2,
+          jitterRatio: 0.2,
+        },
+        deadlineAtMs: 160_000,
+>>>>>>> upstream/main
         request: {
           protocolVersion: 1,
           operation: 'read_file',
           workspaceId: 'primary',
+<<<<<<< HEAD
+=======
+          workspaceInstanceId: 'a'.repeat(64),
+>>>>>>> upstream/main
           path: 'src/app.ts',
           startLine: 1,
           maxLines: 200,
@@ -2105,6 +2191,7 @@ describe('Code Process', () => {
           bridgeWorkerId: 'worker-user-1',
           req: mockReq,
           signal: controller.signal,
+<<<<<<< HEAD
         }),
       ).resolves.toBe(result);
 
@@ -2115,6 +2202,32 @@ describe('Code Process', () => {
           'X-CodeAPI-Expected-Profile': 'stateful',
           'X-LibreChat-Code-Worker-ID': 'worker-user-1',
         },
+=======
+          maxQueueWaitMs: 0,
+        }),
+      ).resolves.toBe(result);
+
+      expect(getCodeApiAuthHeaders).not.toHaveBeenCalled();
+      const { authHeaders } = mockExecuteWorkspaceTool.mock.calls[0][0];
+      await expect(authHeaders()).resolves.toEqual({
+        Authorization: 'Bearer workspace-token',
+        'X-CodeAPI-Expected-Profile': 'stateful',
+        'X-LibreChat-Code-Worker-ID': 'worker-user-1',
+      });
+      getCodeApiAuthHeaders.mockResolvedValueOnce({ Authorization: 'Bearer refreshed-token' });
+      await expect(authHeaders()).resolves.toMatchObject({
+        Authorization: 'Bearer refreshed-token',
+        'X-LibreChat-Code-Worker-ID': 'worker-user-1',
+      });
+      expect(getCodeApiAuthHeaders).toHaveBeenNthCalledWith(2, mockReq, 'worker-user-1');
+      expect(mockExecuteWorkspaceTool).toHaveBeenCalledWith({
+        baseURL: 'https://attached-code.example.com/v1',
+        authHeaders: expect.any(Function),
+        maxQueueWaitMs: 0,
+        codeApiMaxRetryWaitMs: undefined,
+        maxRequestTimeoutMs: undefined,
+        deadlineAtMs: undefined,
+>>>>>>> upstream/main
         request: {
           protocolVersion: 1,
           operation: 'search_text',
@@ -2144,6 +2257,10 @@ describe('Code Process', () => {
       await expect(
         listWorkspaceFiles({
           workspace_id: 'primary',
+<<<<<<< HEAD
+=======
+          linked_worktrees: true,
+>>>>>>> upstream/main
           path: 'src',
           after_path: 'src/app.ts',
           max_results: 20,
@@ -2152,6 +2269,7 @@ describe('Code Process', () => {
           bridgeWorkerId: 'worker-user-1',
           req: mockReq,
           signal: controller.signal,
+<<<<<<< HEAD
         }),
       ).resolves.toBe(result);
 
@@ -2162,6 +2280,33 @@ describe('Code Process', () => {
           'X-CodeAPI-Expected-Profile': 'stateful',
           'X-LibreChat-Code-Worker-ID': 'worker-user-1',
         },
+=======
+          maxQueueWaitMs: 0,
+        }),
+      ).resolves.toBe(result);
+
+      expect(getCodeApiAuthHeaders).not.toHaveBeenCalled();
+      const { authHeaders } = mockExecuteWorkspaceTool.mock.calls[0][0];
+      await expect(authHeaders()).resolves.toEqual({
+        Authorization: 'Bearer workspace-token',
+        'X-CodeAPI-Expected-Profile': 'stateful',
+        'X-LibreChat-Code-Worker-ID': 'worker-user-1',
+      });
+      getCodeApiAuthHeaders.mockResolvedValueOnce({ Authorization: 'Bearer refreshed-token' });
+      await expect(authHeaders()).resolves.toMatchObject({
+        Authorization: 'Bearer refreshed-token',
+        'X-LibreChat-Code-Worker-ID': 'worker-user-1',
+      });
+      expect(getCodeApiAuthHeaders).toHaveBeenNthCalledWith(2, mockReq, 'worker-user-1');
+      expect(mockExecuteWorkspaceTool).toHaveBeenCalledWith({
+        baseURL: 'https://attached-code.example.com/v1',
+        linkedWorktrees: true,
+        authHeaders: expect.any(Function),
+        maxQueueWaitMs: 0,
+        codeApiMaxRetryWaitMs: undefined,
+        maxRequestTimeoutMs: undefined,
+        deadlineAtMs: undefined,
+>>>>>>> upstream/main
         request: {
           protocolVersion: 1,
           operation: 'list_files',
@@ -2195,11 +2340,16 @@ describe('Code Process', () => {
           content: 'ready',
           overwrite: false,
           workspace_id: 'primary',
+<<<<<<< HEAD
+=======
+          workspace_instance_id: 'b'.repeat(64),
+>>>>>>> upstream/main
           codeApiBaseUrl: 'https://attached-code.example.com/v1',
           executionProfile: 'stateful',
           bridgeWorkerId: 'worker-user-1',
           req: mockReq,
           signal: controller.signal,
+<<<<<<< HEAD
         }),
       ).resolves.toBe(result);
 
@@ -2210,10 +2360,40 @@ describe('Code Process', () => {
           'X-CodeAPI-Expected-Profile': 'stateful',
           'X-LibreChat-Code-Worker-ID': 'worker-user-1',
         },
+=======
+          maxQueueWaitMs: 0,
+        }),
+      ).resolves.toBe(result);
+
+      expect(getCodeApiAuthHeaders).not.toHaveBeenCalled();
+      const { authHeaders } = mockExecuteWorkspaceTool.mock.calls[0][0];
+      await expect(authHeaders()).resolves.toEqual({
+        Authorization: 'Bearer workspace-token',
+        'X-CodeAPI-Expected-Profile': 'stateful',
+        'X-LibreChat-Code-Worker-ID': 'worker-user-1',
+      });
+      getCodeApiAuthHeaders.mockResolvedValueOnce({ Authorization: 'Bearer refreshed-token' });
+      await expect(authHeaders()).resolves.toMatchObject({
+        Authorization: 'Bearer refreshed-token',
+        'X-LibreChat-Code-Worker-ID': 'worker-user-1',
+      });
+      expect(getCodeApiAuthHeaders).toHaveBeenNthCalledWith(2, mockReq, 'worker-user-1');
+      expect(mockExecuteWorkspaceTool).toHaveBeenCalledWith({
+        baseURL: 'https://attached-code.example.com/v1',
+        authHeaders: expect.any(Function),
+        maxQueueWaitMs: 0,
+        codeApiMaxRetryWaitMs: undefined,
+        maxRequestTimeoutMs: undefined,
+        deadlineAtMs: undefined,
+>>>>>>> upstream/main
         request: {
           protocolVersion: 1,
           operation: 'write_file',
           workspaceId: 'primary',
+<<<<<<< HEAD
+=======
+          workspaceInstanceId: 'b'.repeat(64),
+>>>>>>> upstream/main
           path: 'src/new.ts',
           content: 'ready',
           overwrite: false,
@@ -2247,11 +2427,21 @@ describe('Code Process', () => {
           bridgeWorkerId: 'worker-user-1',
           req: mockReq,
           expected_base_sha256: 'a'.repeat(64),
+<<<<<<< HEAD
+=======
+          maxRequestTimeoutMs: 125_000,
+          deadlineAtMs: 160_000,
+>>>>>>> upstream/main
         }),
       ).resolves.toBe(result);
 
       expect(mockExecuteWorkspaceTool).toHaveBeenCalledWith(
         expect.objectContaining({
+<<<<<<< HEAD
+=======
+          maxRequestTimeoutMs: 125_000,
+          deadlineAtMs: 160_000,
+>>>>>>> upstream/main
           request: {
             protocolVersion: 1,
             operation: 'edit_file',
@@ -2267,6 +2457,35 @@ describe('Code Process', () => {
       );
     });
 
+<<<<<<< HEAD
+=======
+    it('forwards negotiated matching and replaceAll on edits and previews', async () => {
+      const edits = [{ oldText: 'false', newText: 'true', replaceAll: true }];
+      mockExecuteWorkspaceTool.mockResolvedValue({});
+      const shared = {
+        file_path: 'src/app.ts',
+        edits,
+        matching: 'tolerant',
+        workspace_id: 'primary',
+        codeApiBaseUrl: 'https://attached-code.example.com/v1',
+        executionProfile: 'stateful',
+        bridgeWorkerId: 'worker-user-1',
+        req: mockReq,
+      };
+
+      await editWorkspaceFile(shared);
+      await previewWorkspaceEdit(shared);
+
+      for (const operation of ['edit_file', 'preview_edit']) {
+        expect(mockExecuteWorkspaceTool).toHaveBeenCalledWith(
+          expect.objectContaining({
+            request: expect.objectContaining({ operation, edits, matching: 'tolerant' }),
+          }),
+        );
+      }
+    });
+
+>>>>>>> upstream/main
     it('forwards a non-mutating attached-workspace edit preview', async () => {
       const result = {
         protocolVersion: 1,
@@ -2289,11 +2508,21 @@ describe('Code Process', () => {
           codeApiBaseUrl: 'https://attached-code.example.com/v1',
           executionProfile: 'stateful',
           req: mockReq,
+<<<<<<< HEAD
+=======
+          maxRequestTimeoutMs: 125_000,
+          deadlineAtMs: 160_000,
+>>>>>>> upstream/main
         }),
       ).resolves.toBe(result);
 
       expect(mockExecuteWorkspaceTool).toHaveBeenCalledWith(
         expect.objectContaining({
+<<<<<<< HEAD
+=======
+          maxRequestTimeoutMs: 125_000,
+          deadlineAtMs: 160_000,
+>>>>>>> upstream/main
           request: {
             protocolVersion: 1,
             operation: 'preview_edit',
@@ -2475,6 +2704,196 @@ describe('Code Process', () => {
       });
     });
 
+<<<<<<< HEAD
+=======
+    describe('complete text for ranged reads', () => {
+      beforeEach(() => {
+        const actual = jest.requireActual('@librechat/api');
+        require('@librechat/api').readWindowedSandboxImage.mockImplementation(
+          actual.readWindowedSandboxImage,
+        );
+        mockParseSandboxImageChunk.mockImplementation(actual.parseSandboxImageChunk);
+      });
+      afterEach(() => {
+        require('@librechat/api').readWindowedSandboxImage.mockImplementation(({ readChunk }) =>
+          readChunk({ code: 'read-one-window' }),
+        );
+        mockParseSandboxImageChunk.mockImplementation((response) => response);
+        mockAxios.mockReset();
+      });
+
+      const fullText = Array.from(
+        { length: 900 },
+        (_, i) => `${String(i + 1).padStart(4, '0')}: ${'x'.repeat(93)}`,
+      ).join('\n');
+
+      function cappedExecResponse(code, content = fullText, cap = 65_536) {
+        let stdout;
+        if (code.startsWith('cat ')) stdout = content;
+        else {
+          const payload = /payload = ("[^"\n]+")/.exec(code);
+          if (!payload) throw new Error('Expected the production bounded reader script');
+          const { offset, chunk, limit } = JSON.parse(
+            Buffer.from(JSON.parse(payload[1]), 'base64').toString('utf8'),
+          );
+          const bytes = Buffer.from(content);
+          const window = bytes.subarray(offset, offset + chunk);
+          stdout =
+            JSON.stringify(
+              bytes.length > limit
+                ? { too_large: true, bytes: bytes.length }
+                : { total: bytes.length, n: window.length, b64: window.toString('base64') },
+            ) + '\n';
+        }
+        const overflow = stdout.length > cap;
+        return {
+          data: {
+            stdout: stdout.slice(0, cap),
+            stderr: overflow ? 'Output limit exceeded' : '',
+            status: overflow ? 'OL' : 'success',
+          },
+        };
+      }
+
+      it('retrieves the complete 900-line text before the handler selects line 850', async () => {
+        const actual = jest.requireActual('@librechat/api');
+        const { readWindowedSandboxImage } = require('@librechat/api');
+        readWindowedSandboxImage.mockImplementationOnce(actual.readWindowedSandboxImage);
+        mockParseSandboxImageChunk.mockImplementation(actual.parseSandboxImageChunk);
+        mockAxios.mockImplementation(async ({ data }) => cappedExecResponse(data.code));
+        const result = await readSandboxFile({
+          file_path: '/mnt/data/catalogue.txt',
+          maxBytes: 262_144,
+        });
+        expect(result.content).toBe(fullText);
+        expect(result.complete).toBe(true);
+        expect(mockAxios.mock.calls.length).toBeGreaterThan(1);
+        const handler = actual.createToolExecuteHandler({
+          loadTools: async () => ({ loadedTools: [], configurable: { codeEnvAvailable: true } }),
+          readSandboxFile: async () => result,
+        });
+        const [page] = await new Promise((resolve, reject) =>
+          handler.handle('on_tool_execute', {
+            toolCalls: [
+              {
+                id: 'capped-range',
+                name: 'read_file',
+                args: { path: '/mnt/data/catalogue.txt', start_line: 850, max_lines: 1 },
+              },
+            ],
+            resolve,
+            reject,
+          }),
+        );
+        expect(page.status).toBe('success');
+        expect(page.content).toContain('850 | 0850: ');
+        expect(page.content).toContain('start_line 851');
+      });
+      it('still filters protected text beyond the stdout prefix before serving a clean range', async () => {
+        const actual = jest.requireActual('@librechat/api');
+        const content = fullText + '\nPROTECTED-TAIL';
+        mockAxios.mockImplementation(async ({ data }) => cappedExecResponse(data.code, content));
+        const handler = actual.createToolExecuteHandler({
+          loadTools: async () => ({
+            loadedTools: [],
+            configurable: {
+              codeEnvAvailable: true,
+              req: {
+                config: {
+                  filters: {
+                    files: {
+                      pii: {
+                        fields: ['content'],
+                        starterPatterns: [],
+                        customPatterns: [
+                          { id: 'protected', label: 'protected', regex: 'PROTECTED-TAIL' },
+                        ],
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          }),
+          readSandboxFile,
+        });
+        const [page] = await new Promise((resolve, reject) =>
+          handler.handle('on_tool_execute', {
+            toolCalls: [
+              {
+                id: 'filtered-full-read',
+                name: 'read_file',
+                args: { path: '/mnt/data/catalogue.txt', max_lines: 1 },
+              },
+            ],
+            resolve,
+            reject,
+          }),
+        );
+        expect(page.status).toBe('error');
+        expect(page.errorMessage).toContain('content_filter_block');
+        expect(page.content).toBe('');
+      });
+
+      it('narrows a smaller runner cap without accepting its incomplete stdout', async () => {
+        mockAxios.mockImplementation(async ({ data }) =>
+          cappedExecResponse(data.code, fullText, 16_384),
+        );
+        const result = await readSandboxFile({
+          file_path: '/mnt/data/catalogue.txt',
+          codeApiBaseUrl: 'https://small-text.example.com',
+          maxBytes: 262_144,
+        });
+        expect(result).toEqual({ content: fullText, complete: true });
+        expect(mockAxios.mock.calls.length).toBeGreaterThan(2);
+      });
+
+      it('refuses oversized files without transferring a prefix', async () => {
+        mockAxios.mockImplementation(async ({ data }) =>
+          cappedExecResponse(data.code, 'x'.repeat(262_145)),
+        );
+        const result = await readSandboxFile({
+          file_path: '/mnt/data/catalogue.txt',
+          maxBytes: 262_144,
+        });
+        expect(result).toEqual({ tooLarge: true, reason: 'size', bytes: 262_145 });
+        expect(mockAxios).toHaveBeenCalledTimes(1);
+      });
+
+      it('forwards the execution identity and cancellation signal on every chunk', async () => {
+        mockAxios.mockImplementation(async ({ data }) => cappedExecResponse(data.code));
+        const controller = new AbortController();
+        const files = [{ id: 'file-a', name: 'catalogue.txt', session_id: 'session-a' }];
+        const params = {
+          file_path: '/mnt/data/catalogue.txt',
+          maxBytes: 262_144,
+          session_id: 'session-a',
+          runtime_session_hint: 'runtime-a',
+          codeApiBaseUrl: 'https://stateful-code.example.com',
+          executionProfile: 'stateful',
+          bridgeWorkerId: 'worker-a',
+          files,
+          req: mockReq,
+          signal: controller.signal,
+        };
+        const result = await readSandboxFile(params);
+        expect(result.complete).toBe(true);
+        for (const [call] of mockAxios.mock.calls) {
+          expect(call).toMatchObject({
+            url: 'https://stateful-code.example.com/exec',
+            signal: controller.signal,
+            data: { session_id: 'session-a', runtime_session_hint: 'runtime-a', files },
+            headers: {
+              'X-CodeAPI-Expected-Profile': 'stateful',
+              'X-LibreChat-Code-Worker-ID': 'worker-a',
+            },
+          });
+        }
+        expect(getCodeApiAuthHeaders).toHaveBeenCalledWith(mockReq, 'worker-a');
+      });
+    });
+
+>>>>>>> upstream/main
     describe('response handling', () => {
       it('returns { content: stdout } on success', async () => {
         mockAxios.mockResolvedValueOnce({
@@ -2859,6 +3278,10 @@ describe('Code Process', () => {
           tool_resources: { execute_code: { file_ids: [dbFile.file_id], files: [] } },
           agentId: 'agent-id',
           signal: controller.signal,
+<<<<<<< HEAD
+=======
+          maxQueueWaitMs: 0,
+>>>>>>> upstream/main
         }),
       ).rejects.toMatchObject({ name: 'AbortError' });
       expect(handleFileUpload).toHaveBeenCalledTimes(1);
@@ -3453,6 +3876,27 @@ describe('Code Process', () => {
       expect(result.files?.[0]?.name).toBe('photo.webp');
     });
 
+<<<<<<< HEAD
+=======
+    it('tells the model an attached workspace cannot open primed files', async () => {
+      setupSessionInfoOk();
+      getFiles.mockResolvedValue([makeFile({ status: 'ready' })]);
+
+      const result = await primeFiles({
+        req: { user: { id: 'user-123', role: 'USER' } },
+        tool_resources: { execute_code: { file_ids: ['fid-ready'], files: [] } },
+        agentId: 'agent-id',
+        codeFileLocation: 'programmatic',
+      });
+
+      expect(result.toolContext).toContain('not in the attached workspace');
+      expect(result.toolContext).toContain('$LIBRECHAT_CODE_DATA_DIR/data-ready.xlsx');
+      expect(result.toolContext).not.toContain('/mnt/data');
+      expect(result.toolContext).not.toContain('tool environment:');
+      expect(result.files).toHaveLength(1);
+    });
+
+>>>>>>> upstream/main
     it('annotates a pending file with "(preview not yet generated)"', async () => {
       setupSessionInfoOk();
       getFiles.mockResolvedValue([makeFile({ status: 'pending' })]);

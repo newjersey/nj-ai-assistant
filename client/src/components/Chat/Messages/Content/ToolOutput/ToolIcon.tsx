@@ -1,16 +1,29 @@
 import { Constants, isActionTool, splitToolCallName } from 'librechat-data-provider';
 import {
   Terminal,
+<<<<<<< HEAD
+=======
+  Users,
+>>>>>>> upstream/main
   Globe,
   ImageIcon,
   ArrowRightLeft,
   FileSearch,
   FileText,
+<<<<<<< HEAD
+=======
+  FilePlus2,
+  FilePenLine,
+>>>>>>> upstream/main
   MessageCircleQuestion,
   ScrollText,
   Brain,
   Zap,
   Wrench,
+<<<<<<< HEAD
+=======
+  ListChecks,
+>>>>>>> upstream/main
 } from 'lucide-react';
 import LangIcon from '~/components/Messages/Content/LangIcon';
 import CustomIcon from '~/components/ui/CustomIcon';
@@ -25,11 +38,22 @@ export type ToolIconType =
   | 'execute_code'
   | 'web_search'
   | 'image_gen'
+<<<<<<< HEAD
+=======
+  | 'subagent'
+>>>>>>> upstream/main
   | 'agent_handoff'
   | 'file_search'
   | 'skill'
   | 'read_file'
+<<<<<<< HEAD
   | 'bash_tool'
+=======
+  | 'create_file'
+  | 'edit_file'
+  | 'bash_tool'
+  | 'background_tasks'
+>>>>>>> upstream/main
   | 'ask_user_question'
   | 'memory'
   | 'action'
@@ -41,10 +65,21 @@ const ICON_MAP: Record<ToolIconType, React.ComponentType<{ className?: string }>
   web_search: Globe,
   image_gen: ImageIcon,
   agent_handoff: ArrowRightLeft,
+<<<<<<< HEAD
   file_search: FileSearch,
   skill: ScrollText,
   read_file: FileText,
   bash_tool: BashIcon,
+=======
+  subagent: Users,
+  file_search: FileSearch,
+  skill: ScrollText,
+  read_file: FileText,
+  create_file: FilePlus2,
+  edit_file: FilePenLine,
+  bash_tool: BashIcon,
+  background_tasks: ListChecks,
+>>>>>>> upstream/main
   ask_user_question: MessageCircleQuestion,
   memory: Brain,
   action: Zap,
@@ -58,6 +93,12 @@ export function getToolIconType(name: string): ToolIconType {
   if (name.includes(Constants.mcp_delimiter)) {
     return 'mcp';
   }
+<<<<<<< HEAD
+=======
+  if (name === Constants.CHECK_BACKGROUND_TASK) {
+    return 'background_tasks';
+  }
+>>>>>>> upstream/main
   if (name === 'execute_code' || name === Constants.PROGRAMMATIC_TOOL_CALLING) {
     return 'execute_code';
   }
@@ -79,9 +120,21 @@ export function getToolIconType(name: string): ToolIconType {
   if (name === 'read_file') {
     return 'read_file';
   }
+<<<<<<< HEAD
   if (name === 'bash_tool' || name === Constants.BASH_PROGRAMMATIC_TOOL_CALLING) {
     return 'bash_tool';
   }
+=======
+  if (name === 'create_file' || name === 'edit_file') {
+    return name;
+  }
+  if (name === 'bash_tool' || name === Constants.BASH_PROGRAMMATIC_TOOL_CALLING) {
+    return 'bash_tool';
+  }
+  if (name === Constants.SUBAGENT) {
+    return 'subagent';
+  }
+>>>>>>> upstream/main
   if (name === 'ask_user_question') {
     return 'ask_user_question';
   }
@@ -120,7 +173,11 @@ export default function ToolIcon({ type, iconUrl, isAnimating = false, className
         src={iconUrl}
         alt=""
         className={cn(
+<<<<<<< HEAD
           'size-4 shrink-0 rounded-full object-cover text-text-secondary',
+=======
+          'text-text-secondary size-4 shrink-0 rounded-full object-cover',
+>>>>>>> upstream/main
           isAnimating && 'animate-pulse',
           className,
         )}
@@ -132,7 +189,11 @@ export default function ToolIcon({ type, iconUrl, isAnimating = false, className
   return (
     <IconComponent
       className={cn(
+<<<<<<< HEAD
         'size-4 shrink-0 text-text-secondary',
+=======
+        'text-text-secondary size-4 shrink-0',
+>>>>>>> upstream/main
         isAnimating && 'animate-pulse',
         className,
       )}

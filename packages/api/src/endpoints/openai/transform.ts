@@ -4,7 +4,11 @@ import type { ClientOptions } from '@librechat/agents';
 import type * as t from '~/types';
 import { knownOpenAIParams } from './llm';
 
+<<<<<<< HEAD
 const anthropicExcludeParams = new Set(['anthropicApiUrl']);
+=======
+const anthropicExcludeParams = new Set(['anthropicApiUrl', 'outputConfig']);
+>>>>>>> upstream/main
 const googleExcludeParams = new Set([
   'safetySettings',
   'location',

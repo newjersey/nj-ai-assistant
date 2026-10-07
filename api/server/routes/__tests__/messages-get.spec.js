@@ -51,14 +51,32 @@ jest.mock('@librechat/api', () => {
   };
 
   return {
+<<<<<<< HEAD
     /** The real helper, without loading the rest of the package this suite mocks around. */
     withoutTraceRefs: jest.requireActual('../../../../packages/api/src/langfuse/trace.ts')
       .withoutTraceRefs,
+=======
+    prepareToolCallPreviews: jest.fn(() => (messages) => Promise.resolve(messages)),
+    createToolCallPartHandler: jest.fn(() => (_req, res) => res.status(404).end()),
+    rejectToolCallPreviewWrites: (_req, _res, next) => next(),
+    withMessageToolCallPreviews: (_req, message) => message,
+    /** The real helper, without loading the rest of the package this suite mocks around. */
+    withoutTraceRefs: jest.requireActual('../../../../packages/api/src/langfuse/trace.ts')
+      .withoutTraceRefs,
+    createPrivateTextView: jest.fn(() => (_req, _res, next) => next()),
+    stripPrivateMessageFields: jest.requireActual(
+      '../../../../packages/api/src/protection/private/view',
+    ).stripPrivateMessageFields,
+>>>>>>> upstream/main
     createContentFilter: jest.fn(() => (req, res, next) => next()),
     inspectContent,
     extractChatContent,
     extractFeedbackContent: jest.fn(() => []),
     extractStoredMessageContent,
+<<<<<<< HEAD
+=======
+    applyForcedRetention: jest.fn(),
+>>>>>>> upstream/main
     contentFilterBlockResponse,
     getContentTraversalFragments,
     isContentTraversalLimitError,
@@ -121,6 +139,11 @@ jest.mock('@librechat/api', () => {
   };
 });
 
+<<<<<<< HEAD
+=======
+jest.mock('~/server/services/Config', () => ({ getAppConfig: jest.fn() }));
+
+>>>>>>> upstream/main
 jest.mock('~/server/services/Endpoints/agents/subagentThreadStore', () => ({}));
 
 jest.mock('@librechat/data-schemas', () => ({
@@ -640,6 +663,11 @@ describe('message route conversation ownership filters', () => {
           messageId: 'hit-1',
           conversationId: 'convo-1',
           text: 'needle in a haystack',
+<<<<<<< HEAD
+=======
+          privateText: 'v1:encrypted-original',
+          privacyRevision: 'public-revision',
+>>>>>>> upstream/main
           contextMeta: {
             calibrationRatio: 1.2,
             encoding: 'claude',
@@ -661,6 +689,11 @@ describe('message route conversation ownership filters', () => {
     expect(response.body.messages).toHaveLength(1);
     expect(response.body.messages[0]).toMatchObject({ messageId: 'hit-1', title: 'Found' });
     expect(response.body.messages[0]).not.toHaveProperty('contextMeta');
+<<<<<<< HEAD
+=======
+    expect(response.body.messages[0]).not.toHaveProperty('privateText');
+    expect(response.body.messages[0].privacyRevision).toBe('public-revision');
+>>>>>>> upstream/main
   });
 
   it('returns indistinguishable not-found responses for child and missing query reads', async () => {

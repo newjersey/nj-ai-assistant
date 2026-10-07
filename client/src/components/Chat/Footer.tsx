@@ -4,17 +4,30 @@ import ReactMarkdown from 'react-markdown';
 import { Constants, hasConfiguredFooter } from 'librechat-data-provider';
 import type { TStartupConfig } from 'librechat-data-provider';
 import { useGetStartupConfig } from '~/data-provider';
+<<<<<<< HEAD
+=======
+import { policyUrls } from '~/utils/policies';
+>>>>>>> upstream/main
 import { useLocalize } from '~/hooks';
 
 type FooterProps = {
   className?: string;
   startupConfig?: FooterStartupConfig | null;
+<<<<<<< HEAD
   /** A started conversation keeps only what the deployment configured. The
    *  generic model disclaimer belongs to the welcome screen, where it is first
    *  read, but a custom footer, a privacy policy and terms of service are the
    *  operator's own content: scoping the disclaimer out must not take their
    *  configuration off the screen that used to carry it. With nothing
    *  configured, this renders nothing at all. */
+=======
+  /** A started conversation keeps only the footer the deployment wrote. The
+   *  generic model disclaimer belongs to the welcome screen, where it is first
+   *  read, and the policy links belong where they are agreed to: registration
+   *  states the consent with both links, and the welcome screen the
+   *  conversation starts from carries them under the composer. With no custom
+   *  footer configured, this renders nothing at all. */
+>>>>>>> upstream/main
   configuredOnly?: boolean;
 };
 
@@ -42,10 +55,17 @@ const shellHasConfiguredFooter =
  * over. Both decisions read this one answer so they cannot disagree.
  *
  * Until `/api/config` answers, that answer is the shell's, which is the
+<<<<<<< HEAD
  * deployment's own configuration (`librechat.yaml` plus `CUSTOM_FOOTER`). A DB
  * config override that adds or removes a policy link for the caller's tenant,
  * role or user is resolved only by `/api/config`, so on such a deployment the
  * resolved answer — the one that wins here — can differ from the shell's.
+=======
+ * deployment's own `CUSTOM_FOOTER`. A DB config override that sets or clears
+ * the footer for the caller's tenant, role or user is resolved only by
+ * `/api/config`, so on such a deployment the resolved answer (the one that
+ * wins here) can differ from the shell's.
+>>>>>>> upstream/main
  */
 export function useConfiguredFooter(): boolean {
   const { data: config, isSuccess } = useGetStartupConfig();
@@ -59,23 +79,41 @@ function Footer({ className, startupConfig, configuredOnly = false }: FooterProp
   const config = shouldFetchConfig ? fetchedConfig : startupConfig;
   const localize = useLocalize();
 
+<<<<<<< HEAD
   const privacyPolicy = config?.interface?.privacyPolicy;
   const termsOfService = config?.interface?.termsOfService;
 
   const privacyPolicyRender = privacyPolicy?.externalUrl != null && (
     <a className="text-text-muted underline" href={privacyPolicy.externalUrl} rel="noreferrer">
+=======
+  /** The same reading the consent and the auth footer use: a blank url is not
+   *  a published policy. */
+  const { privacyPolicyUrl, termsOfServiceUrl } = policyUrls(configuredOnly ? undefined : config);
+
+  const privacyPolicyRender = privacyPolicyUrl != null && (
+    <a className="text-text-muted underline" href={privacyPolicyUrl} rel="noreferrer">
+>>>>>>> upstream/main
       {localize('com_ui_privacy_policy')}
     </a>
   );
 
+<<<<<<< HEAD
   const termsOfServiceRender = termsOfService?.externalUrl != null && (
     <a className="text-text-muted underline" href={termsOfService.externalUrl} rel="noreferrer">
+=======
+  const termsOfServiceRender = termsOfServiceUrl != null && (
+    <a className="text-text-muted underline" href={termsOfServiceUrl} rel="noreferrer">
+>>>>>>> upstream/main
       {localize('com_ui_terms_of_service')}
     </a>
   );
 
   const configuredFooter = typeof config?.customFooter === 'string' ? config.customFooter : null;
+<<<<<<< HEAD
   /** The generic disclaimer is the part a conversation drops; operator content is not. */
+=======
+  /** The generic disclaimer is the part a conversation drops; the operator's own footer is not. */
+>>>>>>> upstream/main
   const genericFooter = configuredOnly
     ? ''
     : '[LibreChat ' +
@@ -144,7 +182,11 @@ function Footer({ className, startupConfig, configuredOnly = false }: FooterProp
              rather than the brighter `text-secondary`: the underline carries the
              affordance, and a link that outshines its own sentence puts the
              emphasis back where this change takes it from. */
+<<<<<<< HEAD
           'absolute bottom-0 left-0 right-0 hidden items-center justify-center gap-2 px-2 py-2 text-center text-xs text-text-muted sm:flex md:px-[60px]'
+=======
+          'text-text-muted absolute right-0 bottom-0 left-0 hidden items-center justify-center gap-2 px-2 py-2 text-center text-xs sm:flex md:px-15'
+>>>>>>> upstream/main
         }
       >
         {footerElements.map((contentRender, index) => {
@@ -155,7 +197,11 @@ function Footer({ className, startupConfig, configuredOnly = false }: FooterProp
               {!isLastElement && (
                 <div
                   key={`separator-${index}`}
+<<<<<<< HEAD
                   className="h-2 border-r-[1px] border-border-medium"
+=======
+                  className="border-border-medium h-2 border-r-[1px]"
+>>>>>>> upstream/main
                 />
               )}
             </React.Fragment>

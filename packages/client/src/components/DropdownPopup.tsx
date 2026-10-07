@@ -1,8 +1,16 @@
+<<<<<<< HEAD
 import React from 'react';
 import * as Ariakit from '@ariakit/react';
 import type * as t from '~/common';
 import { usePopoverZIndex } from './OriginalDialog';
 import { cn } from '~/utils';
+=======
+import React, { useEffect } from 'react';
+import * as Ariakit from '@ariakit/react';
+import type * as t from '~/common';
+import { usePopoverZIndex } from './OriginalDialog';
+import { cn, disabledInkClasses } from '~/utils';
+>>>>>>> upstream/main
 import './Dropdown.css';
 
 interface DropdownProps {
@@ -15,6 +23,11 @@ interface DropdownProps {
   iconClassName?: string;
   itemClassName?: string;
   sameWidth?: boolean;
+<<<<<<< HEAD
+=======
+  /** Preferred CSS minimum width, capped to the space available to the menu. */
+  minWidth?: string;
+>>>>>>> upstream/main
   anchor?: { x: string; y: string };
   gutter?: number;
   modal?: boolean;
@@ -26,7 +39,12 @@ interface DropdownProps {
   mountByState?: boolean;
   unmountOnHide?: boolean;
   finalFocus?: React.RefObject<HTMLElement>;
+<<<<<<< HEAD
   placement?: 'top-start' | 'bottom-start'; // NJ: customized dropwdown so it displays above the chat.
+=======
+  autoFocusOnShow?: Ariakit.MenuProps['autoFocusOnShow'];
+  getAnchorRect?: Ariakit.MenuProps['getAnchorRect'];
+>>>>>>> upstream/main
 }
 
 type MenuProps = Omit<
@@ -41,6 +59,7 @@ const DropdownPopup: React.FC<DropdownProps> = ({
   setIsOpen,
   focusLoop,
   mountByState,
+<<<<<<< HEAD
   placement,
   ...props
 }) => {
@@ -50,18 +69,37 @@ const DropdownPopup: React.FC<DropdownProps> = ({
     focusLoop,
     placement: placement ?? 'bottom-start',
   });
+=======
+  autoFocusOnShow,
+  ...props
+}) => {
+  const menu = Ariakit.useMenuStore({ open: isOpen, setOpen: setIsOpen, focusLoop });
+  useEffect(() => {
+    if (isOpen && autoFocusOnShow === true) {
+      menu.setAutoFocusOnShow(true);
+    }
+  }, [isOpen, autoFocusOnShow, menu]);
+>>>>>>> upstream/main
   if (mountByState) {
     return (
       <Ariakit.MenuProvider store={menu}>
         {trigger}
+<<<<<<< HEAD
         {isOpen && <Menu {...props} />}
+=======
+        {isOpen && <Menu {...props} autoFocusOnShow={autoFocusOnShow} />}
+>>>>>>> upstream/main
       </Ariakit.MenuProvider>
     );
   }
   return (
     <Ariakit.MenuProvider store={menu}>
       {trigger}
+<<<<<<< HEAD
       <Menu {...props} />
+=======
+      <Menu {...props} autoFocusOnShow={autoFocusOnShow} />
+>>>>>>> upstream/main
     </Ariakit.MenuProvider>
   );
 };
@@ -76,6 +114,10 @@ const Menu: React.FC<MenuProps> = ({
   modal,
   portal,
   sameWidth,
+<<<<<<< HEAD
+=======
+  minWidth,
+>>>>>>> upstream/main
   gutter = 8,
   finalFocus,
   unmountOnHide,
@@ -96,12 +138,28 @@ const Menu: React.FC<MenuProps> = ({
       finalFocus={finalFocus}
       unmountOnHide={unmountOnHide}
       preserveTabOrder={preserveTabOrder}
+<<<<<<< HEAD
       /* Portaled menus land beside modal OGDialog layers, which set
          `pointer-events: none` on body and re-enable it only on their own
          content. Without this the menu inherits `none` and its items become
          hit-transparent (danny-avila/LibreChat#14487). */
       style={{ zIndex, pointerEvents: 'auto', ...style }}
       className={cn('popover-ui', className)}
+=======
+      style={{
+        zIndex,
+        minWidth:
+          minWidth == null
+            ? undefined
+            : `min(${minWidth}, calc(100vw - 1rem), var(--popover-available-width, 100vw))`,
+        ...style,
+      }}
+      /* Portaled menus land beside modal OGDialog layers, which set
+         `pointer-events: none` on body and re-enable it only on their own
+         content. Without `pointer-events-auto` the menu inherits `none` and its
+         items become hit-transparent (danny-avila/LibreChat#14487). */
+      className={cn('popover-ui pointer-events-auto', className)}
+>>>>>>> upstream/main
       {...props}
     >
       {items
@@ -109,7 +167,11 @@ const Menu: React.FC<MenuProps> = ({
         .map((item, index) => {
           const { subItems } = item;
           if (item.separate === true) {
+<<<<<<< HEAD
             return <Ariakit.MenuSeparator key={index} className="my-1 h-px border-border-medium" />;
+=======
+            return <Ariakit.MenuSeparator key={index} className="border-border-medium my-1 h-px" />;
+>>>>>>> upstream/main
           }
           if (subItems && subItems.length > 0) {
             return (
@@ -119,7 +181,12 @@ const Menu: React.FC<MenuProps> = ({
               >
                 <Ariakit.MenuButton
                   className={cn(
+<<<<<<< HEAD
                     'group flex w-full cursor-pointer items-center justify-between gap-2 rounded-lg px-3 py-3.5 text-sm text-text-primary outline-none hover:bg-surface-hover focus:bg-surface-hover md:px-2.5 md:py-2',
+=======
+                    'group text-text-primary hover:bg-surface-hover focus:bg-surface-hover flex w-full cursor-pointer items-center justify-between gap-2 rounded-lg px-3 py-3.5 text-sm outline-hidden md:px-2.5 md:py-2',
+                    disabledInkClasses,
+>>>>>>> upstream/main
                     itemClassName,
                   )}
                   disabled={item.disabled}
@@ -130,7 +197,14 @@ const Menu: React.FC<MenuProps> = ({
                 >
                   <span className="flex items-center gap-2">
                     {item.icon != null && (
+<<<<<<< HEAD
                       <span className={cn('mr-2 size-4', iconClassName)} aria-hidden="true">
+=======
+                      <span
+                        className={cn('size-theme-icon mr-2 [&>svg]:size-full', iconClassName)}
+                        aria-hidden="true"
+                      >
+>>>>>>> upstream/main
                         {item.icon}
                       </span>
                     )}
@@ -154,7 +228,12 @@ const Menu: React.FC<MenuProps> = ({
               key={`${keyPrefix ?? ''}${index}-${item.id ?? ''}`}
               id={item.id}
               className={cn(
+<<<<<<< HEAD
                 'group flex w-full cursor-pointer items-center gap-2 rounded-lg px-3 py-3.5 text-sm text-text-primary outline-none hover:bg-surface-hover focus:bg-surface-hover md:px-2.5 md:py-2',
+=======
+                'group text-text-primary hover:bg-surface-hover focus:bg-surface-hover flex w-full cursor-pointer items-center gap-2 rounded-lg px-3 py-3.5 text-sm outline-hidden md:px-2.5 md:py-2',
+                disabledInkClasses,
+>>>>>>> upstream/main
                 itemClassName,
                 item.className,
               )}
@@ -179,13 +258,24 @@ const Menu: React.FC<MenuProps> = ({
               }}
             >
               {item.icon != null && (
+<<<<<<< HEAD
                 <span className={cn('mr-2 size-4', iconClassName)} aria-hidden="true">
+=======
+                <span
+                  className={cn('size-theme-icon mr-2 [&>svg]:size-full', iconClassName)}
+                  aria-hidden="true"
+                >
+>>>>>>> upstream/main
                   {item.icon}
                 </span>
               )}
               {item.label}
               {item.kbd != null && (
+<<<<<<< HEAD
                 <kbd className="ml-auto hidden font-sans text-xs text-text-tertiary group-hover:inline group-focus:inline">
+=======
+                <kbd className="text-text-tertiary ml-auto hidden font-sans text-xs group-hover:inline group-focus:inline">
+>>>>>>> upstream/main
                   ⌘{item.kbd}
                 </kbd>
               )}

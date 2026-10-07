@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+import { bindToolApproval, bindToolApprovalIdentity, getToolApprovalIdentity } from './approval';
+>>>>>>> upstream/main
 /**
  * @fileoverview Tool definitions loader for event-driven mode.
  * Loads tool definitions without creating tool instances for efficient initialization.
@@ -5,7 +9,11 @@
  * @module packages/api/src/tools/definitions
  */
 
+<<<<<<< HEAD
 import { Providers } from '@librechat/agents';
+=======
+import { Providers, GitHubCompareToolName } from '@librechat/agents';
+>>>>>>> upstream/main
 import {
   Constants,
   isActionTool,
@@ -43,6 +51,11 @@ export interface LoadToolDefinitionsParams {
   agentId: string;
   /** Agent's tool list (tool names/identifiers) */
   tools: string[];
+<<<<<<< HEAD
+=======
+  /** Explicit deployment opt-in for read-only GitHub comparisons. */
+  githubCompareEnabled?: boolean;
+>>>>>>> upstream/main
   /** Agent-specific tool options */
   toolOptions?: AgentToolOptions;
   /** Whether deferred tools feature is enabled */
@@ -184,6 +197,12 @@ export async function loadToolDefinitions(
   let resolvedMCPToolCount = 0;
 
   for (const toolName of tools) {
+<<<<<<< HEAD
+=======
+    if (toolName === GitHubCompareToolName && params.githubCompareEnabled !== true) {
+      continue;
+    }
+>>>>>>> upstream/main
     if (isActionTool(toolName)) {
       actionToolNames.push(toolName);
       continue;
@@ -311,6 +330,7 @@ export async function loadToolDefinitions(
     if (isMCPAllPlaceholder(toolName)) {
       for (const [actualToolName, toolDef] of Object.entries(serverTools)) {
         if (toolDef?.function) {
+<<<<<<< HEAD
           mcpToolDefs.push({
             name: actualToolName,
             description: toolDef.function.description || undefined,
@@ -318,6 +338,30 @@ export async function loadToolDefinitions(
             serverName,
             serverToolName: toolDef.serverToolName,
           });
+=======
+          mcpToolDefs.push(
+            bindToolApprovalIdentity(
+              {
+                name: actualToolName,
+                description: toolDef.function.description || undefined,
+                parameters: buildMcpParameters(toolDef.function.parameters),
+                serverName,
+                serverToolName: toolDef.serverToolName,
+              },
+              toolDef.serverToolName ??
+                actualToolName.slice(
+                  0,
+                  -`${Constants.mcp_delimiter}${normalizeServerName(serverName)}`.length,
+                ),
+              normalizeJsonSchema(
+                resolveJsonSchemaRefs(
+                  toolDef.function.parameters ?? { type: 'object', properties: {} },
+                ),
+              ),
+              toolDef.function.description || undefined,
+            ),
+          );
+>>>>>>> upstream/main
           resolvedMCPToolCount++;
         }
       }
@@ -326,6 +370,7 @@ export async function loadToolDefinitions(
 
     const toolMatch = findToolMatch(serverTools);
     if (toolMatch?.def.function) {
+<<<<<<< HEAD
       mcpToolDefs.push({
         name: toolName,
         description: toolMatch.def.function.description || undefined,
@@ -334,6 +379,31 @@ export async function loadToolDefinitions(
         serverToolName: toolMatch.def.serverToolName,
         currentToolName: toolMatch.currentToolName,
       });
+=======
+      mcpToolDefs.push(
+        bindToolApprovalIdentity(
+          {
+            name: toolName,
+            description: toolMatch.def.function.description || undefined,
+            parameters: buildMcpParameters(toolMatch.def.function.parameters),
+            serverName,
+            serverToolName: toolMatch.def.serverToolName,
+            currentToolName: toolMatch.currentToolName,
+          },
+          toolMatch.def.serverToolName ??
+            toolName.slice(
+              0,
+              -`${Constants.mcp_delimiter}${normalizeServerName(serverName)}`.length,
+            ),
+          normalizeJsonSchema(
+            resolveJsonSchemaRefs(
+              toolMatch.def.function.parameters ?? { type: 'object', properties: {} },
+            ),
+          ),
+          toolMatch.def.function.description || undefined,
+        ),
+      );
+>>>>>>> upstream/main
       resolvedMCPToolCount++;
     }
   }
@@ -353,6 +423,7 @@ export async function loadToolDefinitions(
     });
   }
 
+<<<<<<< HEAD
   const loadedTools = mcpToolDefs.map((def) => ({
     name: def.name,
     description: def.description,
@@ -362,6 +433,24 @@ export async function loadToolDefinitions(
     mcpServerToolName: def.serverToolName,
     mcpCurrentToolName: def.currentToolName,
   })) as unknown as GenericTool[];
+=======
+  const loadedTools = mcpToolDefs.map((def) =>
+    bindToolApproval(
+      {
+        name: def.name,
+        description: def.description,
+        mcp: true as const,
+        mcpJsonSchema: def.parameters,
+        mcpRawServerName: def.serverName,
+        mcpServerToolName: def.serverToolName,
+        mcpCurrentToolName: def.currentToolName,
+      },
+      undefined,
+      undefined,
+      getToolApprovalIdentity(def),
+    ),
+  ) as unknown as GenericTool[];
+>>>>>>> upstream/main
 
   const classificationResult = await buildToolClassification({
     userId,

@@ -22,6 +22,11 @@ import type {
   IdempotencyClaimValue,
   IdempotencyClaimResult,
   ParkedSteerClaim,
+<<<<<<< HEAD
+=======
+  ScheduleCleanupScope,
+  ScheduleProviderOwner,
+>>>>>>> upstream/main
 } from '~/stream/interfaces/IJobStore';
 import type { EarlyBufferOverflowState } from '../../types/earlyBufferRecovery';
 import type { RecoveredSteerPayload } from '~/stream/SteerRecovery';
@@ -43,7 +48,13 @@ import {
   recoveredSteerPayloadMatches,
   RecoveredSteerPayloadMismatchError,
 } from '~/stream/SteerRecovery';
+<<<<<<< HEAD
 import { createCheckpointNamespace } from '~/stream/checkpoints';
+=======
+import { retainedScheduleReceipt } from '~/stream/internal/scheduleReceipts';
+import { createCheckpointNamespace } from '~/stream/checkpoints';
+import { retainScheduleMCPFailure } from '../scheduleFailure';
+>>>>>>> upstream/main
 import { toPendingSteer } from '~/stream/SteeringLifecycle';
 
 /** Recovery window for parked steers (mirrors Redis's completed-job TTL). */
@@ -145,11 +156,23 @@ interface ContentState {
  * - No chunk persistence needed - same instance handles generation and reconnects
  */
 export class InMemoryJobStore implements IJobStoreV2 {
+<<<<<<< HEAD
+=======
+  readonly durableScheduleReceipts = false;
+>>>>>>> upstream/main
   readonly detachedAgentEventActionStoreMode = 'process_local' as const;
 
   private jobs = new Map<string, SerializableJobData>();
   private contentState = new Map<string, ContentState>();
   private cleanupInterval: NodeJS.Timeout | null = null;
+<<<<<<< HEAD
+=======
+  private staleGenerationHandler?: (streamId: string, createdAt: number) => void;
+
+  setStaleGenerationHandler(handler?: (streamId: string, createdAt: number) => void): void {
+    this.staleGenerationHandler = handler;
+  }
+>>>>>>> upstream/main
 
   /** Maps userId -> Set of streamIds (conversationIds) for active jobs */
   private userJobMap = new Map<string, Set<string>>();
@@ -320,7 +343,13 @@ export class InMemoryJobStore implements IJobStoreV2 {
           existingJob.userId !== userId ||
           (existingJob.tenantId != null && existingJob.tenantId !== tenantId))
       ) {
+<<<<<<< HEAD
         throw new Error('Generation job owner mismatch');
+=======
+        throw recoveredSteerId != null
+          ? new RecoveredSteerPayloadMismatchError('owner_mismatch')
+          : new Error('Generation job owner mismatch');
+>>>>>>> upstream/main
       }
 
       const parked = this.parkedSteers.get(streamId);
@@ -351,7 +380,13 @@ export class InMemoryJobStore implements IJobStoreV2 {
         throw new Error('Generation recovery state is corrupt');
       }
       if (parsed.userId !== userId || (parsed.tenantId != null && parsed.tenantId !== tenantId)) {
+<<<<<<< HEAD
         throw new Error('Generation job owner mismatch');
+=======
+        throw recoveredSteerId != null
+          ? new RecoveredSteerPayloadMismatchError('owner_mismatch')
+          : new Error('Generation job owner mismatch');
+>>>>>>> upstream/main
       }
     };
 
@@ -360,6 +395,10 @@ export class InMemoryJobStore implements IJobStoreV2 {
       const currentCreatedAt = current?.createdAt ?? this.getRetainedGenerationEpoch(streamId);
       if (
         current?.terminalHostActionPending === true ||
+<<<<<<< HEAD
+=======
+        current?.preserveForScheduleReconcile === true ||
+>>>>>>> upstream/main
         (rejectActivePredecessor === true &&
           (current?.status === 'running' ||
             current?.status === 'requires_action' ||
@@ -398,15 +437,26 @@ export class InMemoryJobStore implements IJobStoreV2 {
     const assertRecoveryCompatible = (): void => {
       if (recoveredSteerId == null) {
         if (recoveredSteerPayload != null) {
+<<<<<<< HEAD
           throw new RecoveredSteerPayloadMismatchError();
+=======
+          throw new RecoveredSteerPayloadMismatchError('invalid_payload');
+>>>>>>> upstream/main
         }
         return;
       }
       if (!isRecoveredSteerPayload(recoveredSteerPayload)) {
+<<<<<<< HEAD
         throw new RecoveredSteerPayloadMismatchError();
       }
       if (initialMetadata.generationProtocolVersion === 1) {
         throw new RecoveredSteerPayloadMismatchError();
+=======
+        throw new RecoveredSteerPayloadMismatchError('invalid_payload');
+      }
+      if (initialMetadata.generationProtocolVersion === 1) {
+        throw new RecoveredSteerPayloadMismatchError('protocol_mismatch');
+>>>>>>> upstream/main
       }
 
       let candidate: ReturnType<typeof toPendingSteer> | undefined;
@@ -437,11 +487,21 @@ export class InMemoryJobStore implements IJobStoreV2 {
         candidate = item == null ? undefined : toPendingSteer(item);
       }
 
+<<<<<<< HEAD
       if (
         sourceProtocol !== 2 ||
         candidate == null ||
         !recoveredSteerPayloadMatches(candidate, recoveredSteerPayload)
       ) {
+=======
+      if (candidate == null) {
+        throw new RecoveredSteerPayloadMismatchError('source_missing');
+      }
+      if (sourceProtocol !== 2) {
+        throw new RecoveredSteerPayloadMismatchError('protocol_mismatch');
+      }
+      if (!recoveredSteerPayloadMatches(candidate, recoveredSteerPayload)) {
+>>>>>>> upstream/main
         throw new RecoveredSteerPayloadMismatchError();
       }
     };
@@ -718,7 +778,34 @@ export class InMemoryJobStore implements IJobStoreV2 {
     }
     // Plain field writer. Membership-aware status transitions
     // (running ⇄ requires_action) go solely through transitionStatus.
+<<<<<<< HEAD
     Object.assign(job, updates);
+=======
+    const patch = retainScheduleMCPFailure(job, updates);
+    Object.assign(job, patch, retainedScheduleReceipt(job, updates));
+  }
+
+  async recoverScheduleProviderOwnerLoss(owner: ScheduleProviderOwner): Promise<boolean> {
+    const job = this.jobs.get(owner.streamId);
+    if (
+      !job ||
+      job.createdAt !== owner.createdAt ||
+      job.providerExecutionId !== owner.providerExecutionId ||
+      job.scheduleId !== owner.scheduleId ||
+      job.scheduledFor !== owner.scheduledFor ||
+      job.userId !== owner.userId ||
+      (job.tenantId ?? null) !== owner.tenantId ||
+      (job.lastActiveAt ?? job.createdAt) !== owner.lastActiveAt ||
+      job.status !== 'error' ||
+      job.error !== 'Scheduled generation owner became unavailable' ||
+      job.preserveForScheduleReconcile !== true ||
+      job.providerDrained !== false
+    )
+      return false;
+    job.providerDrained = true;
+    job.error = 'Scheduled provider owner termination confirmed';
+    return true;
+>>>>>>> upstream/main
   }
 
   async markProviderExecutionDrained(
@@ -794,12 +881,20 @@ export class InMemoryJobStore implements IJobStoreV2 {
       this.parkQueuedSteers(streamId, job, Date.now());
     }
     job.status = args.to;
+<<<<<<< HEAD
     if (args.patch) {
       Object.assign(job, args.patch);
     }
     for (const field of args.clear ?? []) {
       delete job[field];
     }
+=======
+    const patch = retainScheduleMCPFailure(job, args.patch ?? {});
+    const receipt = retainedScheduleReceipt(job, args.patch ?? {}, args.clear ?? []);
+    Object.assign(job, patch);
+    for (const field of args.clear ?? []) delete job[field];
+    Object.assign(job, receipt);
+>>>>>>> upstream/main
     const receiptEntries = this.steerReceipts.get(streamId)?.values() ?? [];
     if (args.to === 'requires_action' && args.patch?.pendingAction?.expiresAt == null) {
       // Unlike Redis, this store has no paused-job backstop eviction. Preserve
@@ -1095,6 +1190,11 @@ export class InMemoryJobStore implements IJobStoreV2 {
         continue;
       }
       if (
+<<<<<<< HEAD
+=======
+        !job.scheduleId &&
+        job.preserveForScheduleReconcile !== true &&
+>>>>>>> upstream/main
         job.providerDrained === false &&
         job.completedAt != null &&
         now - job.completedAt >= PROVIDER_DRAIN_TIMEOUT_MS
@@ -1115,6 +1215,42 @@ export class InMemoryJobStore implements IJobStoreV2 {
     return pending;
   }
 
+<<<<<<< HEAD
+=======
+  async hasScheduleCleanupObligation(scope: ScheduleCleanupScope): Promise<boolean> {
+    for (const job of this.jobs.values()) {
+      if (
+        !job.scheduleId ||
+        (scope.scheduleId && job.scheduleId !== scope.scheduleId) ||
+        (scope.userId && job.userId !== scope.userId)
+      )
+        continue;
+      if (
+        job.providerDrained === false ||
+        job.terminalPersistencePending === true ||
+        job.terminalHostActionPending === true
+      )
+        return true;
+    }
+    return false;
+  }
+
+  async getScheduleReconcileJobs(limit: number): Promise<SerializableJobData[]> {
+    const held: SerializableJobData[] = [];
+    let remaining = this.jobs.size;
+    for (const [stream, job] of this.jobs) {
+      if (remaining-- <= 0) break;
+      if (job.preserveForScheduleReconcile !== true) continue;
+      held.push(job);
+      // Rotate retry attempts so a failed first batch cannot starve later obligations.
+      this.jobs.delete(stream);
+      this.jobs.set(stream, job);
+      if (held.length >= limit) break;
+    }
+    return held;
+  }
+
+>>>>>>> upstream/main
   async clearTerminalHostAction(streamId: string, expectedCreatedAt?: number): Promise<void> {
     const job = this.jobs.get(streamId);
     // Identity-fenced: a replacement generation at this streamId (a newer createdAt) must
@@ -1129,6 +1265,10 @@ export class InMemoryJobStore implements IJobStoreV2 {
     const now = Date.now();
     const toDelete: Array<{ streamId: string; createdAt: number }> = [];
     let staleRunning = 0;
+<<<<<<< HEAD
+=======
+    let retainedRecovered = 0;
+>>>>>>> upstream/main
 
     // Expired parked steers are otherwise only purged by a claim.
     for (const [streamId, parked] of this.parkedSteers) {
@@ -1261,7 +1401,19 @@ export class InMemoryJobStore implements IJobStoreV2 {
             continue;
           }
           this.parkQueuedSteers(streamId, job, now);
+<<<<<<< HEAD
           toDelete.push({ streamId, createdAt: job.createdAt });
+=======
+          if (job.preserveForScheduleReconcile === true) {
+            job.status = 'error';
+            job.completedAt = now;
+            job.error = 'Scheduled generation owner became unavailable';
+            job.steersClosed = true;
+            // Cancel the exact local owner before readers can observe retirement.
+            this.staleGenerationHandler?.(streamId, job.createdAt);
+            retainedRecovered++;
+          } else toDelete.push({ streamId, createdAt: job.createdAt });
+>>>>>>> upstream/main
           staleRunning++;
         }
       }
@@ -1295,7 +1447,11 @@ export class InMemoryJobStore implements IJobStoreV2 {
       logger.debug(`[InMemoryJobStore] Cleaned up ${toDelete.length} expired jobs`);
     }
 
+<<<<<<< HEAD
     return toDelete.length;
+=======
+    return toDelete.length + retainedRecovered;
+>>>>>>> upstream/main
   }
 
   private async evictOldest(): Promise<void> {
@@ -1337,6 +1493,10 @@ export class InMemoryJobStore implements IJobStoreV2 {
   }
 
   async destroy(): Promise<void> {
+<<<<<<< HEAD
+=======
+    this.staleGenerationHandler = undefined;
+>>>>>>> upstream/main
     if (this.cleanupInterval) {
       clearInterval(this.cleanupInterval);
       this.cleanupInterval = null;

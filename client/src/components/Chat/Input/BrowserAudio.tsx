@@ -1,7 +1,11 @@
 import { useEffect } from 'react';
 import { useSetRecoilState } from 'recoil';
 import { useParams } from 'react-router-dom';
+<<<<<<< HEAD
 import { parseTextParts } from 'librechat-data-provider';
+=======
+import { getSpeechText } from 'librechat-data-provider';
+>>>>>>> upstream/main
 import useTextToSpeechBrowser from '~/hooks/Input/useTextToSpeechBrowser';
 import useAutoplayTrigger from '~/hooks/Audio/useAutoplayTrigger';
 import { logger } from '~/utils';
@@ -36,10 +40,14 @@ export default function BrowserAudio({ index = 0 }) {
       return;
     }
 
+<<<<<<< HEAD
     const text =
       Array.isArray(latestMessage.content) && latestMessage.content.length > 0
         ? parseTextParts(latestMessage.content)
         : (latestMessage.text ?? '');
+=======
+    const text = getSpeechText(latestMessage);
+>>>>>>> upstream/main
 
     if (!text) {
       return;

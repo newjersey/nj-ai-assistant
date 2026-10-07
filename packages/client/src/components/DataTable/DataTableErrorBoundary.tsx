@@ -73,6 +73,7 @@ class DataTableErrorBoundaryInner extends Component<
             aria-labelledby="datatable-error-title"
             aria-describedby="datatable-error-desc"
             tabIndex={-1}
+<<<<<<< HEAD
             className="relative w-full max-w-md overflow-hidden rounded-lg border border-border-light bg-surface-primary-alt p-6 shadow-sm outline-none before:absolute before:left-0 before:top-0 before:h-full before:w-1 before:bg-surface-destructive/80 focus:ring-2 focus:ring-text-primary focus:ring-offset-2"
           >
             <div className="flex items-center gap-2">
@@ -82,13 +83,28 @@ class DataTableErrorBoundaryInner extends Component<
               </h3>
             </div>
             <p id="datatable-error-desc" className="mt-2 text-sm text-text-secondary">
+=======
+            className="border-border-light bg-surface-primary-alt before:bg-surface-destructive/80 focus:ring-focus-control relative w-full max-w-md overflow-hidden rounded-lg border p-6 shadow-xs outline-hidden before:absolute before:top-0 before:left-0 before:h-full before:w-1 focus:ring-2 focus:ring-offset-2"
+          >
+            <div className="flex items-center gap-2">
+              <RefreshCw className="text-surface-destructive h-4 w-4" />
+              <h3 id="datatable-error-title" className="text-text-primary text-sm font-medium">
+                {this.props.localize('com_ui_table_error')}
+              </h3>
+            </div>
+            <p id="datatable-error-desc" className="text-text-secondary mt-2 text-sm">
+>>>>>>> upstream/main
               {this.props.localize('com_ui_table_error_description')}
             </p>
             <div className="mt-4 flex justify-center">
               <Button
                 variant="outline"
                 onClick={this.handleReset}
+<<<<<<< HEAD
                 className="flex items-center gap-2 px-3 py-1.5 text-sm hover:bg-surface-hover dark:hover:bg-surface-active"
+=======
+                className="hover:bg-surface-hover dark:hover:bg-surface-active flex items-center gap-2 px-3 py-1.5 text-sm"
+>>>>>>> upstream/main
                 aria-label="Retry loading table"
               >
                 <RefreshCw className="h-3 w-3" />
@@ -98,11 +114,19 @@ class DataTableErrorBoundaryInner extends Component<
           </div>
 
           {import.meta.env.MODE === 'development' && this.state.error && (
+<<<<<<< HEAD
             <details className="mt-4 max-w-md rounded-md bg-surface-secondary p-3 text-xs">
               <summary className="cursor-pointer font-medium text-text-primary">
                 {this.props.localize('com_ui_error_details')}
               </summary>
               <pre className="mt-2 whitespace-pre-wrap text-text-secondary">
+=======
+            <details className="bg-surface-secondary mt-4 max-w-md rounded-md p-3 text-xs">
+              <summary className="text-text-primary cursor-pointer font-medium">
+                {this.props.localize('com_ui_error_details')}
+              </summary>
+              <pre className="text-text-secondary mt-2 whitespace-pre-wrap">
+>>>>>>> upstream/main
                 {this.state.error.message}
               </pre>
             </details>

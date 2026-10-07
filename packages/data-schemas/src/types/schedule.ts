@@ -3,6 +3,10 @@ import type {
   ScheduleDisabledReason,
   TScheduleCadence,
 } from 'librechat-data-provider';
+<<<<<<< HEAD
+=======
+import type { ScheduledMCPEnrollment } from 'librechat-data-provider';
+>>>>>>> upstream/main
 import type { ScheduleMCPOutcome } from 'librechat-data-provider';
 import type { Document, Types } from 'mongoose';
 
@@ -22,6 +26,10 @@ export interface ISchedule {
   chatProjectId?: string;
   file_ids?: string[];
   tools?: string[];
+<<<<<<< HEAD
+=======
+  mcpConsent?: ScheduledMCPEnrollment;
+>>>>>>> upstream/main
   cron?: string;
   enabled: boolean;
   disabledReason?: ScheduleDisabledReason;

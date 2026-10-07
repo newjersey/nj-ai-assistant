@@ -18,16 +18,33 @@ import {
   setTokenHeader,
   isSystemRoleName,
   buildLoginRedirectUrl,
+<<<<<<< HEAD
+=======
+  clearTwoFactorSetupToken,
+  persistTwoFactorSetupToken,
+  TWO_FACTOR_FEDERATED_LOGIN_BLOCKED_CODE,
+>>>>>>> upstream/main
 } from 'librechat-data-provider';
 import type * as t from 'librechat-data-provider';
 import type { ReactNode } from 'react';
 import {
+<<<<<<< HEAD
   SESSION_KEY,
   isSafeRedirect,
   getPostLoginRedirect,
   clearComposerDraftStorage,
   clearRetainedFileDeletions,
   openFileDeletionRetention,
+=======
+  isSafeRedirect,
+  getPostLoginRedirect,
+  clearPostLoginRedirect,
+  persistRedirectToSession,
+  clearComposerDraftStorage,
+  clearRetainedFileDeletions,
+  openFileDeletionRetention,
+  isRequiredTwoFactorSetupRoute,
+>>>>>>> upstream/main
 } from '~/utils';
 import {
   useGetRole,
@@ -38,6 +55,10 @@ import {
 } from '~/data-provider';
 import { resetChatFilterSessionAtom } from '~/components/Conversations/chatFilters';
 import { TAuthConfig, TUserContext, TAuthContext, TResError } from '~/common';
+<<<<<<< HEAD
+=======
+import { resetFacetsAtom } from '~/components/Conversations/facets';
+>>>>>>> upstream/main
 import useTimeout from './useTimeout';
 import store from '~/store';
 
@@ -55,9 +76,25 @@ if (import.meta.hot) {
  * path the other was wired into. */
 const endSessionClientState = (): void => {
   getDefaultStore().set(resetChatFilterSessionAtom);
+<<<<<<< HEAD
   clearRetainedFileDeletions();
   clearComposerDraftStorage();
 };
+=======
+  getDefaultStore().set(resetFacetsAtom);
+  clearRetainedFileDeletions();
+  clearComposerDraftStorage();
+};
+/**
+ * Only recognized codes override the HTTP status used by the login error translation.
+ */
+const getLoginErrorText = (error: TResError): string | undefined => {
+  const code = error?.response?.data?.code;
+  return code === ErrorTypes.AUTH_CROSS_ORIGIN || code === TWO_FACTOR_FEDERATED_LOGIN_BLOCKED_CODE
+    ? code
+    : error?.message;
+};
+>>>>>>> upstream/main
 
 const AuthContextProvider = ({
   authConfig,
@@ -101,6 +138,15 @@ const AuthContextProvider = ({
         setIsAuthReady(true);
         if (isAuthenticated) {
           setQueriesEnabled(true);
+<<<<<<< HEAD
+=======
+          /**
+           * Any accepted full-auth response supersedes a staged enrollment, whichever path minted
+           * it. The setup endpoints trust the stored bearer independently of the session, so a
+           * token left behind here would let this user finish the previous one's enrollment.
+           */
+          clearTwoFactorSetupToken();
+>>>>>>> upstream/main
           /** The clear on the way out latches retention shut so a DELETE that settles afterwards
            * cannot write the departing account's payload back in. This is the only place that
            * knows a new session exists to reopen it for. */
@@ -114,6 +160,7 @@ const AuthContextProvider = ({
           endSessionClientState();
         }
 
+<<<<<<< HEAD
         const searchParams = new URLSearchParams(window.location.search);
         const postLoginRedirect = getPostLoginRedirect(searchParams);
 
@@ -124,6 +171,14 @@ const AuthContextProvider = ({
           logoutRedirect ??
           postLoginRedirect ??
           (redirect && isSafeRedirect(redirect) ? redirect : null);
+=======
+        const logoutRedirect = logoutRedirectRef.current;
+        logoutRedirectRef.current = undefined;
+
+        /** Callers resolve the post-login destination, so it is consumed exactly once per sign-in. */
+        const finalRedirect =
+          logoutRedirect ?? (redirect && isSafeRedirect(redirect) ? redirect : null);
+>>>>>>> upstream/main
 
         if (finalRedirect == null) {
           return;
@@ -133,16 +188,44 @@ const AuthContextProvider = ({
       }, 50),
     [navigate, setUser, setQueriesEnabled],
   );
+<<<<<<< HEAD
   const doSetError = useTimeout({ callback: (error) => setError(error as string | undefined) });
 
   const loginUser = useLoginUserMutation({
     onSuccess: (data: t.TLoginResponse) => {
       const { user, token, twoFAPending, tempToken } = data;
+=======
+  const setErrorAfterTimeout = useCallback(
+    (error: string | number | boolean | null) => setError(error as string | undefined),
+    [],
+  );
+  const doSetError = useTimeout({ callback: setErrorAfterTimeout });
+
+  const { mutate: loginMutate } = useLoginUserMutation({
+    onSuccess: (data: t.TLoginResponse) => {
+      const { user, token, twoFAPending, twoFASetupRequired, tempToken } = data;
+      /**
+       * A sign-in supersedes whatever enrollment the tab was holding. An abandoned setup token
+       * outlives the screen that staged it, so leaving it here would let the next visitor to the
+       * setup route finish the previous user's enrollment and take the tab as them.
+       */
+      clearTwoFactorSetupToken();
+      if (twoFASetupRequired) {
+        const redirectTo = new URLSearchParams(window.location.search).get('redirect_to');
+        if (redirectTo) {
+          persistRedirectToSession(redirectTo);
+        }
+        persistTwoFactorSetupToken(tempToken ?? '');
+        navigate('/login/2fa/setup', { replace: true });
+        return;
+      }
+>>>>>>> upstream/main
       if (twoFAPending) {
         navigate(`/login/2fa?tempToken=${tempToken}`, { replace: true });
         return;
       }
       setError(undefined);
+<<<<<<< HEAD
       setUserContext({ token, isAuthenticated: true, user, redirect: '/c/new' });
     },
     onError: (error: TResError | unknown) => {
@@ -151,6 +234,17 @@ const AuthContextProvider = ({
       doSetError(code === ErrorTypes.AUTH_CROSS_ORIGIN ? code : resError.message);
       // Preserve a valid redirect_to across login failures so the deep link survives retries.
       // Cannot use buildLoginRedirectUrl() here — it reads the current pathname (already /login)
+=======
+      const redirect =
+        getPostLoginRedirect(new URLSearchParams(window.location.search)) ?? '/c/new';
+      setUserContext({ token, isAuthenticated: true, user, redirect });
+    },
+    onError: (error: TResError | unknown) => {
+      clearTwoFactorSetupToken();
+      doSetError(getLoginErrorText(error as TResError));
+      // Preserve a valid redirect_to across login failures so the deep link survives retries.
+      // Cannot use buildLoginRedirectUrl() here: it reads the current pathname (already /login)
+>>>>>>> upstream/main
       // and would return plain /login, dropping the redirect_to destination.
       const redirectTo = new URLSearchParams(window.location.search).get('redirect_to');
       const loginPath =
@@ -160,7 +254,11 @@ const AuthContextProvider = ({
       navigate(loginPath, { replace: true });
     },
   });
+<<<<<<< HEAD
   const logoutUser = useLogoutUserMutation({
+=======
+  const { mutate: logoutMutate } = useLogoutUserMutation({
+>>>>>>> upstream/main
     onSuccess: (data) => {
       if (data.redirect) {
         /** data.redirect is the IdP's end_session_endpoint URL: an absolute URL generated
@@ -196,6 +294,7 @@ const AuthContextProvider = ({
 
   const logout = useCallback(
     (redirect?: string) => {
+<<<<<<< HEAD
       if (redirect) {
         logoutRedirectRef.current = redirect;
       }
@@ -209,6 +308,59 @@ const AuthContextProvider = ({
   const login = (data: t.TLoginUser) => {
     loginUser.mutate(data);
   };
+=======
+      clearPostLoginRedirect();
+      clearTwoFactorSetupToken();
+      if (redirect) {
+        logoutRedirectRef.current = redirect;
+      }
+      logoutMutate(undefined);
+    },
+    [logoutMutate],
+  );
+
+  const completeAuthentication = useCallback(
+    (authenticatedToken: string, authenticatedUser: t.TUser) => {
+      const redirect =
+        getPostLoginRedirect(new URLSearchParams(window.location.search)) ?? '/c/new';
+      /** The enrollment credential has done its job; do not leave it live in the tab. */
+      clearTwoFactorSetupToken();
+      setUser(authenticatedUser);
+      setToken(authenticatedToken);
+      setTokenHeader(authenticatedToken);
+      setIsAuthenticated(true);
+      setIsAuthReady(true);
+      setQueriesEnabled(true);
+      openFileDeletionRetention();
+      navigate(redirect, { replace: true });
+    },
+    [navigate, setQueriesEnabled, setUser],
+  );
+
+  /**
+   * The enrollment hand-off normally replaces the document, which discards the session it is
+   * redirecting away from. Where session storage is blocked it has to keep the document instead,
+   * so this provider stays mounted and that session survives: the user query stays enabled and
+   * navigates to the login page the moment it fails, taking the user off the very screen the
+   * server is demanding they complete. Land on the state a replaced document would have left, and
+   * leave the setup token alone, since the in-memory mirror is then its only copy.
+   */
+  const clearAuthenticationForRedirect = useCallback(() => {
+    endSessionClientState();
+    setUser(undefined);
+    setToken(undefined);
+    setIsAuthenticated(false);
+  }, [setUser]);
+
+  const userQuery = useGetUserQuery({ enabled: !!(token ?? '') });
+
+  const login = useCallback(
+    (data: t.TLoginUser) => {
+      loginMutate(data);
+    },
+    [loginMutate],
+  );
+>>>>>>> upstream/main
 
   const silentRefresh = useCallback(() => {
     if (authConfig?.test === true) {
@@ -222,10 +374,36 @@ const AuthContextProvider = ({
         if (isExternalRedirectRef.current) {
           return;
         }
+<<<<<<< HEAD
         const { user, token = '' } = data ?? {};
         if (token) {
           const storedRedirect = sessionStorage.getItem(SESSION_KEY);
           sessionStorage.removeItem(SESSION_KEY);
+=======
+        const { user, token = '', twoFASetupRequired, tempToken } = data ?? {};
+        if (twoFASetupRequired && tempToken) {
+          persistTwoFactorSetupToken(tempToken);
+          /**
+           * Already on the setup route, reached by an enforcement redirect that parked the
+           * destination in the query. Replacing the route again would drop that query, and the
+           * route itself is not a safe redirect to bank, so enrollment would end at `/c/new`.
+           */
+          if (isRequiredTwoFactorSetupRoute()) {
+            return;
+          }
+          const baseUrl = apiBaseUrl();
+          const rawPath = window.location.pathname;
+          const strippedPath =
+            baseUrl && (rawPath === baseUrl || rawPath.startsWith(baseUrl + '/'))
+              ? rawPath.slice(baseUrl.length) || '/'
+              : rawPath;
+          const currentUrl = `${strippedPath}${window.location.search}${window.location.hash}`;
+          persistRedirectToSession(currentUrl);
+          navigate('/login/2fa/setup', { replace: true });
+          return;
+        }
+        if (token) {
+>>>>>>> upstream/main
           const baseUrl = apiBaseUrl();
           const rawPath = window.location.pathname;
           const strippedPath =
@@ -235,7 +413,11 @@ const AuthContextProvider = ({
           const currentUrl = `${strippedPath}${window.location.search}`;
           const fallbackRedirect = isSafeRedirect(currentUrl) ? currentUrl : '/c/new';
           const redirect =
+<<<<<<< HEAD
             storedRedirect && isSafeRedirect(storedRedirect) ? storedRedirect : fallbackRedirect;
+=======
+            getPostLoginRedirect(new URLSearchParams(window.location.search)) ?? fallbackRedirect;
+>>>>>>> upstream/main
           setUserContext({ user, token, isAuthenticated: true, redirect });
           return;
         }
@@ -245,6 +427,12 @@ const AuthContextProvider = ({
         if (authConfig?.test === true) {
           return;
         }
+<<<<<<< HEAD
+=======
+        if (isRequiredTwoFactorSetupRoute()) {
+          return;
+        }
+>>>>>>> upstream/main
         if (authConfig?.optional !== true) {
           navigate(buildLoginRedirectUrl());
         }
@@ -259,6 +447,12 @@ const AuthContextProvider = ({
         if (authConfig?.test === true) {
           return;
         }
+<<<<<<< HEAD
+=======
+        if (isRequiredTwoFactorSetupRoute()) {
+          return;
+        }
+>>>>>>> upstream/main
         if (authConfig?.optional !== true) {
           navigate(buildLoginRedirectUrl());
         }
@@ -301,6 +495,10 @@ const AuthContextProvider = ({
     navigate,
     silentRefresh,
     setUserContext,
+<<<<<<< HEAD
+=======
+    doSetError,
+>>>>>>> upstream/main
   ]);
 
   useEffect(() => {
@@ -320,6 +518,24 @@ const AuthContextProvider = ({
     };
   }, [setUserContext, user]);
 
+<<<<<<< HEAD
+=======
+  useEffect(() => {
+    const handleAuthRedirect = (event: CustomEvent<{ inDocument?: boolean }>) => {
+      if (event.detail?.inDocument !== true) {
+        return;
+      }
+      clearAuthenticationForRedirect();
+    };
+
+    window.addEventListener('authRedirectStarted', handleAuthRedirect as EventListener);
+
+    return () => {
+      window.removeEventListener('authRedirectStarted', handleAuthRedirect as EventListener);
+    };
+  }, [clearAuthenticationForRedirect]);
+
+>>>>>>> upstream/main
   const memoedValue = useMemo(
     () => ({
       user,
@@ -327,6 +543,10 @@ const AuthContextProvider = ({
       error,
       login,
       logout,
+<<<<<<< HEAD
+=======
+      completeAuthentication,
+>>>>>>> upstream/main
       setError,
       roles: {
         [SystemRoles.USER]: userRole,
@@ -337,9 +557,12 @@ const AuthContextProvider = ({
       isAuthReady,
     }),
 
+<<<<<<< HEAD
     /** `login` is a plain function rebuilt every render, so depending on it would rebuild this
      * context value every render and re-render every consumer of auth state. */
     // eslint-disable-next-line react-hooks/exhaustive-deps
+=======
+>>>>>>> upstream/main
     [
       user,
       error,
@@ -351,6 +574,12 @@ const AuthContextProvider = ({
       isCustomRole,
       userRoleName,
       customRole,
+<<<<<<< HEAD
+=======
+      login,
+      logout,
+      completeAuthentication,
+>>>>>>> upstream/main
     ],
   );
 

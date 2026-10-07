@@ -55,6 +55,13 @@ function resetCheckpointRows(rows = []) {
   checkpointRows.splice(0, checkpointRows.length, ...rows);
   deletionTargets.clear();
 }
+<<<<<<< HEAD
+=======
+const markConvoSeenHandler = jest.fn();
+const markConvoUnreadHandler = jest.fn();
+const renameConversationHandler = jest.fn((_req, res) => res.status(204).end());
+const renameHandlerInputs = [];
+>>>>>>> upstream/main
 
 module.exports = {
   archiveAllHandler,
@@ -67,10 +74,26 @@ module.exports = {
   messageUserLimiter,
   checkpointRows,
   resetCheckpointRows,
+<<<<<<< HEAD
+=======
+  markConvoSeenHandler,
+  markConvoUnreadHandler,
+  renameConversationHandler,
+  renameHandlerInputs,
+>>>>>>> upstream/main
 
   agents: () => ({ sleep: jest.fn() }),
 
   api: (overrides = {}) => ({
+<<<<<<< HEAD
+=======
+    withToolCallPreviews: (_req, result) => result,
+    createGeneratedTitleHandler: jest.fn(() => jest.fn()),
+    createRenameConversationHandler: jest.fn((deps) => {
+      renameHandlerInputs.push(deps);
+      return renameConversationHandler;
+    }),
+>>>>>>> upstream/main
     /** Mirrors the real helper so query-flag parsing (`isArchived`, `pinned`) is exercised. */
     isEnabled: jest.fn((value) => {
       if (typeof value === 'boolean') {
@@ -105,6 +128,15 @@ module.exports = {
       const raw = Array.isArray(value) ? value[0] : value;
       return raw === 'asc' || raw === 'desc' ? raw : fallback;
     }),
+<<<<<<< HEAD
+=======
+    /** The real resolver and parser, so the route tests see the same 400s and configured
+     *  limits a request would. */
+    resolveConversationListFilters: jest.fn(
+      jest.requireActual('../../../../packages/api/src/conversations/filters.ts')
+        .resolveConversationListFilters,
+    ),
+>>>>>>> upstream/main
     resolveImportMaxFileSize: jest.fn(() => 262144000),
     createAxiosInstance: jest.fn(() => ({
       get: jest.fn(),
@@ -123,6 +155,21 @@ module.exports = {
     }),
     createSubagentThreadViewHandler: jest.fn(() => (_req, res) => res.status(200).json({})),
     createSubagentControlHandler: jest.fn(() => (_req, res) => res.status(200).json({})),
+<<<<<<< HEAD
+=======
+    createBackgroundTaskIndexHandler: jest.fn(
+      () => (_req, res) => res.status(200).json({ tasks: [] }),
+    ),
+    createBackgroundTaskPolicyMiddleware: jest.fn(() => (_req, _res, next) => next()),
+    createGitHubPullRequestSource: jest.fn(() => ({ find: jest.fn() })),
+    createPullRequestLookup: jest.fn(() => jest.fn()),
+    createConversationPullRequestHandler: jest.fn(
+      () => (_req, res) => res.status(200).json({ pullRequest: null }),
+    ),
+    createBackgroundTaskCancelHandler: jest.fn(
+      () => (_req, res) => res.status(200).json({ results: [] }),
+    ),
+>>>>>>> upstream/main
     isValidSubagentControlRequest: jest.fn((body) => {
       if (body == null || typeof body !== 'object') return false;
       const commonKeys = ['taskId', 'invocationId', 'action'];
@@ -166,6 +213,26 @@ module.exports = {
       subagentActivityHandlerInputs.push({ deps, stream });
       return (_req, res) => res.status(200).end();
     }),
+<<<<<<< HEAD
+=======
+    /* Wiring only. The handlers' own validation and error mapping are covered against the
+       real implementations in `packages/api/src/conversations/read.spec.ts`; mirroring them
+       here would leave the route suite asserting against a copy. */
+    createMarkConvoSeenHandler: jest.fn(({ markConvoSeen }) => {
+      markConvoSeenHandler.mockImplementation(async (req, res) => {
+        const result = await markConvoSeen(req.user.id, req.body?.arg?.conversationId);
+        return res.status(200).json(result);
+      });
+      return markConvoSeenHandler;
+    }),
+    createMarkConvoUnreadHandler: jest.fn(({ markConvoUnread }) => {
+      markConvoUnreadHandler.mockImplementation(async (req, res) => {
+        const result = await markConvoUnread(req.user.id, req.body?.arg?.conversationId);
+        return res.status(200).json(result);
+      });
+      return markConvoUnreadHandler;
+    }),
+>>>>>>> upstream/main
     deleteConvoSharedLinksWithCleanup: jest.fn(),
     deleteAllSharedLinksWithCleanup: jest.fn(),
     deleteAgentCheckpoints,
@@ -191,6 +258,11 @@ module.exports = {
   }),
 
   dataProvider: (overrides = {}) => ({
+<<<<<<< HEAD
+=======
+    conversationListConfigSchema:
+      jest.requireActual('librechat-data-provider').conversationListConfigSchema,
+>>>>>>> upstream/main
     CacheKeys: { GEN_TITLE: 'GEN_TITLE' },
     EModelEndpoint: {
       azureAssistants: 'azureAssistants',
@@ -209,6 +281,12 @@ module.exports = {
 
   toolCallModel: () => ({ deleteToolCalls: jest.fn() }),
 
+<<<<<<< HEAD
+=======
+  /** The list route reads its filter limits from the base config. */
+  appConfig: () => ({ getAppConfig: jest.fn().mockResolvedValue({}) }),
+
+>>>>>>> upstream/main
   sharedModels: () => ({
     getConvosByCursor: jest.fn(),
     getConvo: jest.fn(),
@@ -217,6 +295,11 @@ module.exports = {
     archiveAllConvos: jest.fn(),
     saveConvo: jest.fn(),
     setConvoPinned: jest.fn(),
+<<<<<<< HEAD
+=======
+    markConvoSeen: jest.fn(),
+    markConvoUnread: jest.fn(),
+>>>>>>> upstream/main
     deleteAllSharedLinks: jest.fn(),
     deleteConvoSharedLink: jest.fn(),
     deleteToolCalls: jest.fn(),

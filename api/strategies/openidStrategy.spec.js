@@ -2,7 +2,11 @@ const undici = require('undici');
 const fetch = require('node-fetch');
 const jwtDecode = require('jsonwebtoken/decode');
 const { ErrorTypes, FileSources } = require('librechat-data-provider');
+<<<<<<< HEAD
 const { findUser, createUser, updateUser, findRolesByNames } = require('~/models');
+=======
+const { findUser, updateUser, findRolesByNames, createUserIfAbsent } = require('~/models');
+>>>>>>> upstream/main
 const {
   getOpenIdProxyDispatcher,
   resolveAppConfigForUser,
@@ -97,9 +101,16 @@ jest.mock('@librechat/api', () => {
 });
 jest.mock('~/models', () => ({
   findUser: jest.fn(),
+<<<<<<< HEAD
   createUser: jest.fn(),
   updateUser: jest.fn(),
   findRolesByNames: jest.fn(),
+=======
+  createUserIfAbsent: jest.fn(),
+  updateUser: jest.fn(),
+  findRolesByNames: jest.fn(),
+  findBalanceByUser: jest.fn(),
+>>>>>>> upstream/main
 }));
 jest.mock('@librechat/data-schemas', () => ({
   ...jest.requireActual('@librechat/api'),
@@ -264,11 +275,19 @@ describe('setupOpenId', () => {
       permissions: ['admin'],
     });
 
+<<<<<<< HEAD
     // By default, assume that no user is found, so createUser will be called
     findUser.mockResolvedValue(null);
     createUser.mockImplementation(async (userData) => {
       // simulate created user with an _id property
       return { _id: 'newUserId', ...userData };
+=======
+    // By default, assume that no user is found, so createUserIfAbsent will be called
+    findUser.mockResolvedValue(null);
+    createUserIfAbsent.mockImplementation(async (userData) => {
+      // simulate created user with an _id property
+      return { ok: true, value: { _id: 'newUserId', ...userData } };
+>>>>>>> upstream/main
     });
     updateUser.mockImplementation(async (id, userData) => {
       return { _id: id, ...userData };
@@ -420,7 +439,11 @@ describe('setupOpenId', () => {
     expect(getOpenIdIssuer.mock.calls[0][1]).toEqual(
       expect.objectContaining({ issuer: 'https://fake-issuer.com' }),
     );
+<<<<<<< HEAD
     expect(createUser).toHaveBeenCalledWith(
+=======
+    expect(createUserIfAbsent).toHaveBeenCalledWith(
+>>>>>>> upstream/main
       expect.objectContaining({
         provider: 'openid',
         openidId: userinfo.sub,
@@ -430,8 +453,11 @@ describe('setupOpenId', () => {
         name: `${userinfo.given_name} ${userinfo.family_name}`,
       }),
       { enabled: false },
+<<<<<<< HEAD
       true,
       true,
+=======
+>>>>>>> upstream/main
     );
   });
 
@@ -447,11 +473,17 @@ describe('setupOpenId', () => {
 
     // Assert
     expect(user.username).toBe(expectUsername);
+<<<<<<< HEAD
     expect(createUser).toHaveBeenCalledWith(
       expect.objectContaining({ username: expectUsername }),
       { enabled: false },
       true,
       true,
+=======
+    expect(createUserIfAbsent).toHaveBeenCalledWith(
+      expect.objectContaining({ username: expectUsername }),
+      { enabled: false },
+>>>>>>> upstream/main
     );
   });
 
@@ -467,11 +499,17 @@ describe('setupOpenId', () => {
 
     // Assert
     expect(user.username).toBe(expectUsername);
+<<<<<<< HEAD
     expect(createUser).toHaveBeenCalledWith(
       expect.objectContaining({ username: expectUsername }),
       { enabled: false },
       true,
       true,
+=======
+    expect(createUserIfAbsent).toHaveBeenCalledWith(
+      expect.objectContaining({ username: expectUsername }),
+      { enabled: false },
+>>>>>>> upstream/main
     );
   });
 
@@ -485,11 +523,17 @@ describe('setupOpenId', () => {
 
     // Assert – username should equal the sub (converted as-is)
     expect(user.username).toBe(userinfo.sub);
+<<<<<<< HEAD
     expect(createUser).toHaveBeenCalledWith(
       expect.objectContaining({ username: userinfo.sub }),
       { enabled: false },
       true,
       true,
+=======
+    expect(createUserIfAbsent).toHaveBeenCalledWith(
+      expect.objectContaining({ username: userinfo.sub }),
+      { enabled: false },
+>>>>>>> upstream/main
     );
   });
 
@@ -575,7 +619,11 @@ describe('setupOpenId', () => {
     // Assert – verify that the strategy rejects login
     expect(result.user).toBe(false);
     expect(result.details.message).toBe(ErrorTypes.AUTH_FAILED);
+<<<<<<< HEAD
     expect(createUser).not.toHaveBeenCalled();
+=======
+    expect(createUserIfAbsent).not.toHaveBeenCalled();
+>>>>>>> upstream/main
     expect(updateUser).not.toHaveBeenCalled();
   });
 
@@ -602,10 +650,116 @@ describe('setupOpenId', () => {
 
     expect(result.user).toBe(false);
     expect(result.details.message).toBe(ErrorTypes.AUTH_FAILED);
+<<<<<<< HEAD
     expect(createUser).not.toHaveBeenCalled();
     expect(updateUser).not.toHaveBeenCalled();
   });
 
+=======
+    expect(createUserIfAbsent).not.toHaveBeenCalled();
+    expect(updateUser).not.toHaveBeenCalled();
+  });
+
+  describe('concurrent first login', () => {
+    const raceCreateWith = (existingUser) => {
+      let created = false;
+      const matches = (query) =>
+        Object.entries(query).every(([field, value]) => existingUser[field] === value);
+      findUser.mockImplementation(async (query) =>
+        created && matches(query) ? existingUser : null,
+      );
+      createUserIfAbsent.mockImplementation(async () => {
+        created = true;
+        return { ok: false, error: { code: 'user_exists' } };
+      });
+    };
+
+    it('continues as the user the other request created', async () => {
+      raceCreateWith({
+        _id: 'winnerUserId',
+        provider: 'openid',
+        openidId: tokenset.claims().sub,
+        openidIssuer: 'https://fake-issuer.com',
+        email: tokenset.claims().email,
+        username: 'testusername',
+        name: 'First Last',
+      });
+
+      const { user } = await validate(tokenset);
+
+      expect(createUserIfAbsent).toHaveBeenCalledTimes(1);
+      expect(updateUser).toHaveBeenCalledWith(
+        'winnerUserId',
+        expect.objectContaining({ openidId: tokenset.claims().sub }),
+      );
+      expect(user).toEqual(
+        expect.objectContaining({ _id: 'winnerUserId', email: tokenset.claims().email }),
+      );
+    });
+
+    it("writes this callback's claims over the ones the other request stored", async () => {
+      raceCreateWith({
+        _id: 'winnerUserId',
+        provider: 'openid',
+        openidId: tokenset.claims().sub,
+        openidIssuer: 'https://fake-issuer.com',
+        email: 'old@example.com',
+        emailVerified: false,
+        username: 'old-username',
+        name: 'Old Name',
+      });
+
+      await validate(tokenset);
+
+      expect(updateUser).toHaveBeenCalledWith(
+        'winnerUserId',
+        expect.objectContaining({
+          email: tokenset.claims().email,
+          emailVerified: true,
+          username: tokenset.claims().preferred_username,
+          name: `${tokenset.claims().given_name} ${tokenset.claims().family_name}`,
+        }),
+      );
+    });
+
+    it('fails the login while the account it found has no start balance yet', async () => {
+      const { findBalanceByUser } = require('~/models');
+      const { getBalanceConfig } = require('@librechat/api');
+      getBalanceConfig.mockReturnValue({ enabled: true, startBalance: 500 });
+      findBalanceByUser.mockResolvedValue(null);
+      raceCreateWith({
+        _id: 'winnerUserId',
+        provider: 'openid',
+        openidId: tokenset.claims().sub,
+        openidIssuer: 'https://fake-issuer.com',
+        email: tokenset.claims().email,
+      });
+
+      const result = await validate(tokenset);
+
+      expect(findBalanceByUser).toHaveBeenCalledWith('winnerUserId');
+      expect(result.user).toBe(false);
+      expect(result.details.message).toBe(ErrorTypes.AUTH_FAILED);
+      expect(updateUser).not.toHaveBeenCalled();
+      getBalanceConfig.mockReturnValue({ enabled: false });
+    });
+
+    it('fails the login when another provider took the email in the meantime', async () => {
+      raceCreateWith({
+        _id: 'localUserId',
+        provider: 'local',
+        email: tokenset.claims().email,
+      });
+
+      const result = await validate(tokenset);
+
+      expect(result.user).toBe(false);
+      expect(result.details.message).toBe(ErrorTypes.AUTH_FAILED);
+      expect(updateUser).not.toHaveBeenCalled();
+    });
+  });
+
+>>>>>>> upstream/main
   it('should enforce the required role and reject login if missing', async () => {
     // Arrange – simulate a token without the required role.
     jwtDecode.mockReturnValue({
@@ -650,7 +804,11 @@ describe('setupOpenId', () => {
 
     // Assert – login succeeds when required role is present after splitting
     expect(user).toBeTruthy();
+<<<<<<< HEAD
     expect(createUser).toHaveBeenCalled();
+=======
+    expect(createUserIfAbsent).toHaveBeenCalled();
+>>>>>>> upstream/main
   });
 
   it('should allow login when roles claim is a comma-separated string containing the required role', async () => {
@@ -664,7 +822,11 @@ describe('setupOpenId', () => {
 
     // Assert – login succeeds when required role is present after splitting
     expect(user).toBeTruthy();
+<<<<<<< HEAD
     expect(createUser).toHaveBeenCalled();
+=======
+    expect(createUserIfAbsent).toHaveBeenCalled();
+>>>>>>> upstream/main
   });
 
   it('should allow login when roles claim is a mixed comma-and-space-separated string containing the required role', async () => {
@@ -678,7 +840,11 @@ describe('setupOpenId', () => {
 
     // Assert – login succeeds when required role is present after splitting
     expect(user).toBeTruthy();
+<<<<<<< HEAD
     expect(createUser).toHaveBeenCalled();
+=======
+    expect(createUserIfAbsent).toHaveBeenCalled();
+>>>>>>> upstream/main
   });
 
   it('should reject login when roles claim is a space-separated string that does not contain the required role', async () => {
@@ -710,7 +876,11 @@ describe('setupOpenId', () => {
     expect(user).toBeTruthy();
     expect(user.email).toBe(tokenset.claims().email);
     expect(user.username).toBe(tokenset.claims().preferred_username);
+<<<<<<< HEAD
     expect(createUser).toHaveBeenCalled();
+=======
+    expect(createUserIfAbsent).toHaveBeenCalled();
+>>>>>>> upstream/main
   });
 
   it('should allow login when required role is found in userinfo claims', async () => {
@@ -2422,11 +2592,17 @@ describe('setupOpenId', () => {
       const { user } = await validate({ ...tokenset, claims: () => userinfo });
 
       expect(user.email).toBe('user@corp.example.com');
+<<<<<<< HEAD
       expect(createUser).toHaveBeenCalledWith(
         expect.objectContaining({ email: 'user@corp.example.com' }),
         expect.anything(),
         true,
         true,
+=======
+      expect(createUserIfAbsent).toHaveBeenCalledWith(
+        expect.objectContaining({ email: 'user@corp.example.com' }),
+        expect.anything(),
+>>>>>>> upstream/main
       );
     });
 
