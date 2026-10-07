@@ -1,12 +1,22 @@
 import { useState, memo, useRef } from 'react';
+<<<<<<< HEAD
 import { useSetRecoilState } from 'recoil';
 import * as Menu from '@ariakit/react/menu';
 import icons from '@uswds/uswds/img/sprite.svg';
+=======
+import { useSetAtom } from 'jotai';
+import { useSetRecoilState } from 'recoil';
+import * as Menu from '@ariakit/react/menu';
+>>>>>>> upstream/main
 import { GearIcon, DropdownMenuSeparator, Avatar } from '@librechat/client';
 import {
   Archive,
   ChevronRight,
   CircleHelp,
+<<<<<<< HEAD
+=======
+  Files,
+>>>>>>> upstream/main
   Keyboard,
   LifeBuoy,
   LogOut,
@@ -14,11 +24,20 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { ArchivedChatsModal } from '~/components/Nav/SettingsTabs/General/ArchivedChatsModal';
+<<<<<<< HEAD
 import { NewJerseySelectItems } from '~/nj/components/NewJerseySelectItems';
 import { useGetStartupConfig, useGetUserBalance } from '~/data-provider';
 import { useAuthContext } from '~/hooks/AuthContext';
 import { useLocalize } from '~/hooks';
 import Settings from './Settings';
+=======
+import { filesDialogTriggerAtom, showFilesDialogAtom } from '~/store/filesDialog';
+import { useGetStartupConfig } from '~/data-provider';
+import { useAuthContext } from '~/hooks/AuthContext';
+import { settingsOpenAtom } from './Settings';
+import { openInNewTab } from '~/utils';
+import { useLocalize } from '~/hooks';
+>>>>>>> upstream/main
 import store from '~/store';
 
 function HelpSubmenu({
@@ -48,16 +67,28 @@ function HelpSubmenu({
       >
         <CircleHelp className="icon-md" aria-hidden="true" />
         <span className="flex-1 text-left">{localize('com_nav_help')}</span>
+<<<<<<< HEAD
         <ChevronRight className="h-4 w-4 text-text-secondary" aria-hidden="true" />
+=======
+        <ChevronRight className="text-text-secondary h-4 w-4" aria-hidden="true" />
+>>>>>>> upstream/main
       </Menu.MenuItem>
       <Menu.Menu
         portal
         gutter={12}
+<<<<<<< HEAD
         className="account-settings-popover popover-ui popover-from-left z-[126] w-[244px] rounded-lg"
       >
         {hasHelpFaq && (
           <Menu.MenuItem
             onClick={() => window.open(helpAndFaqURL, '_blank', 'noopener,noreferrer')}
+=======
+        className="account-settings-popover popover-ui popover-from-left z-[126] w-[min(15.25rem,90vw)] rounded-lg"
+      >
+        {hasHelpFaq && (
+          <Menu.MenuItem
+            onClick={() => openInNewTab(helpAndFaqURL)}
+>>>>>>> upstream/main
             className="select-item text-sm"
           >
             <LifeBuoy className="icon-md" aria-hidden="true" />
@@ -71,7 +102,11 @@ function HelpSubmenu({
         {showLegalDivider && (hasTos || hasPrivacy) && <DropdownMenuSeparator />}
         {hasTos && (
           <Menu.MenuItem
+<<<<<<< HEAD
             onClick={() => window.open(termsOfServiceURL, '_blank', 'noopener,noreferrer')}
+=======
+            onClick={() => openInNewTab(termsOfServiceURL)}
+>>>>>>> upstream/main
             className="select-item text-sm"
           >
             <Scale className="icon-md" aria-hidden="true" />
@@ -80,7 +115,11 @@ function HelpSubmenu({
         )}
         {hasPrivacy && (
           <Menu.MenuItem
+<<<<<<< HEAD
             onClick={() => window.open(privacyPolicyURL, '_blank', 'noopener,noreferrer')}
+=======
+            onClick={() => openInNewTab(privacyPolicyURL)}
+>>>>>>> upstream/main
             className="select-item text-sm"
           >
             <ShieldCheck className="icon-md" aria-hidden="true" />
@@ -94,12 +133,20 @@ function HelpSubmenu({
 
 function AccountSettings({ collapsed = false }: { collapsed?: boolean }) {
   const localize = useLocalize();
+<<<<<<< HEAD
   const { user, isAuthenticated, logout } = useAuthContext();
   const { data: startupConfig } = useGetStartupConfig();
   const balanceQuery = useGetUserBalance({
     enabled: !!isAuthenticated && startupConfig?.balance?.enabled,
   });
   const [showSettings, setShowSettings] = useState(false);
+=======
+  const { user, logout } = useAuthContext();
+  const { data: startupConfig } = useGetStartupConfig();
+  const setShowSettings = useSetAtom(settingsOpenAtom);
+  const setShowFiles = useSetAtom(showFilesDialogAtom);
+  const setFilesDialogTrigger = useSetAtom(filesDialogTriggerAtom);
+>>>>>>> upstream/main
   const setShowShortcutsDialog = useSetRecoilState(store.showShortcutsDialog);
   const [showArchived, setShowArchived] = useState(false);
   const accountSettingsButtonRef = useRef<HTMLButtonElement>(null);
@@ -112,6 +159,7 @@ function AccountSettings({ collapsed = false }: { collapsed?: boolean }) {
         data-testid="nav-user"
         className={
           collapsed
+<<<<<<< HEAD
             ? 'flex h-9 w-9 items-center justify-center rounded-lg transition-colors hover:bg-surface-active-alt aria-[expanded=true]:bg-surface-active-alt'
             : 'mt-text-sm flex h-auto w-full items-center gap-2 rounded-xl p-2 text-sm transition-all duration-200 ease-in-out hover:bg-surface-active-alt aria-[expanded=true]:bg-surface-active-alt'
         }
@@ -119,13 +167,24 @@ function AccountSettings({ collapsed = false }: { collapsed?: boolean }) {
         <div
           className={collapsed ? 'size-7 flex-shrink-0' : '-ml-0.9 -mt-0.8 h-8 w-8 flex-shrink-0'}
         >
+=======
+            ? 'hover:bg-surface-nav-hover aria-[expanded=true]:bg-surface-nav-selected flex h-9 w-9 items-center justify-center rounded-lg transition-colors'
+            : 'hover:bg-surface-nav-hover aria-[expanded=true]:bg-surface-nav-selected flex h-auto w-full items-center gap-2 rounded-xl p-2 text-sm transition-all duration-200 ease-in-out'
+        }
+      >
+        <div className={collapsed ? 'size-7 shrink-0' : 'h-8 w-8 shrink-0'}>
+>>>>>>> upstream/main
           <div className="relative flex">
             <Avatar user={user} size={collapsed ? 28 : 32} />
           </div>
         </div>
         {!collapsed && (
           <div
+<<<<<<< HEAD
             className="mt-2 grow overflow-hidden text-ellipsis whitespace-nowrap text-left text-text-primary"
+=======
+            className="text-text-primary mt-2 grow overflow-hidden text-left text-ellipsis whitespace-nowrap"
+>>>>>>> upstream/main
             style={{ marginTop: '0', marginLeft: '0' }}
           >
             {user?.name ?? user?.username ?? localize('com_nav_user')}
@@ -134,12 +193,17 @@ function AccountSettings({ collapsed = false }: { collapsed?: boolean }) {
       </Menu.MenuButton>
       <Menu.Menu
         portal
+<<<<<<< HEAD
         className="account-settings-popover popover-ui z-[125] w-[305px] rounded-lg md:w-[244px]"
+=======
+        className="account-settings-popover popover-ui z-[125] w-[min(19.0625rem,90vw)] rounded-lg md:w-[min(15.25rem,90vw)]"
+>>>>>>> upstream/main
         style={{
           transformOrigin: collapsed ? 'left bottom' : 'bottom',
           translate: collapsed ? '4px 0' : '0 -4px',
         }}
       >
+<<<<<<< HEAD
         <div className="text-token-text-secondary ml-3 mr-2 py-2 text-sm" role="note">
           {user?.email ?? localize('com_nav_user')}
         </div>
@@ -153,6 +217,12 @@ function AccountSettings({ collapsed = false }: { collapsed?: boolean }) {
             <DropdownMenuSeparator />
           </>
         )}
+=======
+        <div className="text-text-secondary mr-2 ml-3 py-2 text-sm" role="note">
+          {user?.email ?? localize('com_nav_user')}
+        </div>
+        <DropdownMenuSeparator />
+>>>>>>> upstream/main
         <HelpSubmenu
           helpAndFaqURL={startupConfig?.helpAndFaqURL}
           termsOfServiceURL={startupConfig?.interface?.termsOfService?.externalUrl}
@@ -163,6 +233,24 @@ function AccountSettings({ collapsed = false }: { collapsed?: boolean }) {
           <Archive className="icon-md" aria-hidden="true" />
           {localize('com_nav_archived_chats')}
         </Menu.MenuItem>
+<<<<<<< HEAD
+=======
+
+        <Menu.MenuItem
+          onClick={() => {
+            /** The menu is gone by the time the dialog captures focus, so the
+             *  account button has to be named here or focus returns to the
+             *  document body when the dialog closes. */
+            setFilesDialogTrigger(accountSettingsButtonRef);
+            setShowFiles(true);
+          }}
+          className="select-item text-sm"
+          data-testid="nav-files"
+        >
+          <Files className="icon-md" aria-hidden="true" />
+          {localize('com_nav_my_files')}
+        </Menu.MenuItem>
+>>>>>>> upstream/main
         <Menu.MenuItem
           onClick={() => setShowSettings(true)}
           className="select-item text-sm"
@@ -172,6 +260,7 @@ function AccountSettings({ collapsed = false }: { collapsed?: boolean }) {
           {localize('com_nav_settings')}
         </Menu.MenuItem>
         <DropdownMenuSeparator />
+<<<<<<< HEAD
         */}
         <NewJerseySelectItems />
         <Menu.MenuItem onClick={() => logout()} className="select-item text-sm">
@@ -186,6 +275,10 @@ function AccountSettings({ collapsed = false }: { collapsed?: boolean }) {
           {/* NJ: Use USWDS icon (to match the other icons in the menu)
           <LogOut className="icon-md" aria-hidden="true" />
            */}
+=======
+        <Menu.MenuItem onClick={() => logout()} className="select-item text-sm">
+          <LogOut className="icon-md" aria-hidden="true" />
+>>>>>>> upstream/main
           {localize('com_nav_log_out')}
         </Menu.MenuItem>
       </Menu.Menu>
@@ -196,7 +289,10 @@ function AccountSettings({ collapsed = false }: { collapsed?: boolean }) {
           triggerRef={accountSettingsButtonRef}
         />
       )}
+<<<<<<< HEAD
       {showSettings && <Settings open={showSettings} onOpenChange={setShowSettings} />}
+=======
+>>>>>>> upstream/main
     </Menu.MenuProvider>
   );
 }

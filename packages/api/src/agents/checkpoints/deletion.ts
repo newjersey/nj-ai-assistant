@@ -225,9 +225,15 @@ export async function openCheckpointDeletion(
 /** Replay captured identities after topology deletion; never sweep new generations. */
 export function createCheckpointDeletionReclaimer(
   getOwnerJobs: (userId: string, tenantId?: string) => Promise<string[]>,
+<<<<<<< HEAD
 ): (limit: number) => Promise<number> {
   let after: string | undefined;
   return async (limit) => {
+=======
+): (limit: number, activity?: { found: boolean }) => Promise<number> {
+  let after: string | undefined;
+  return async (limit, activity) => {
+>>>>>>> upstream/main
     if (!Number.isSafeInteger(limit) || limit <= 0) throw new Error('Invalid reclamation limit');
     const db = mongoose.connection.db;
     if (!db || mongoose.connection.readyState !== 1)
@@ -238,6 +244,10 @@ export function createCheckpointDeletionReclaimer(
       .sort({ _id: 1 })
       .limit(limit)
       .toArray();
+<<<<<<< HEAD
+=======
+    if (activity != null && targets.length > 0) activity.found = true;
+>>>>>>> upstream/main
     after = targets.length === limit ? targets[targets.length - 1]._id : undefined;
     const jobsByOwner = new Map<string, Promise<string[]>>();
 

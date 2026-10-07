@@ -3,10 +3,20 @@ const path = require('path');
 const axios = require('axios');
 const {
   deleteRagFile,
+<<<<<<< HEAD
+=======
+  moveLocalFile,
+  stripCacheBust,
+  writeLocalFile,
+>>>>>>> upstream/main
   assertRemoteFileURL,
   getRemoteFileFetchMaxBytes,
   getRemoteFileFetchTimeoutMs,
   assertRemoteFileContentLength,
+<<<<<<< HEAD
+=======
+  saveLocalBuffer: saveBufferToLocalPath,
+>>>>>>> upstream/main
 } = require('@librechat/api');
 const { logger } = require('@librechat/data-schemas');
 const { EModelEndpoint } = require('librechat-data-provider');
@@ -25,6 +35,7 @@ const paths = require('~/config/paths');
  */
 async function saveLocalFile(file, outputPath, outputFilename) {
   try {
+<<<<<<< HEAD
     if (!fs.existsSync(outputPath)) {
       fs.mkdirSync(outputPath, { recursive: true });
     }
@@ -36,6 +47,10 @@ async function saveLocalFile(file, outputPath, outputFilename) {
     fs.unlinkSync(file.path);
 
     return outputFilePath;
+=======
+    const fileExtension = path.extname(file.originalname);
+    return await moveLocalFile(file.path, outputPath, outputFilename + fileExtension);
+>>>>>>> upstream/main
   } catch (error) {
     logger.error('[saveFile] Error while saving the file:', error);
     throw error;
@@ -71,6 +86,7 @@ const saveLocalImage = async (req, file, filename) => {
  */
 async function saveLocalBuffer({ userId, buffer, fileName, basePath = 'images' }) {
   try {
+<<<<<<< HEAD
     const { publicPath, uploads } = paths;
 
     /**
@@ -95,6 +111,9 @@ async function saveLocalBuffer({ userId, buffer, fileName, basePath = 'images' }
     const filePath = path.posix.join('/', basePath, userId, fileName);
 
     return filePath;
+=======
+    return await saveBufferToLocalPath({ paths, userId, buffer, fileName, basePath });
+>>>>>>> upstream/main
   } catch (error) {
     logger.error('[saveLocalBuffer] Error while saving the buffer:', error);
     throw error;
@@ -141,11 +160,14 @@ async function saveFileFromURL({ userId, URL, fileName, basePath = 'images' }) {
     // Construct the outputPath based on the basePath and userId
     const outputPath = path.join(paths.publicPath, basePath, userId.toString());
 
+<<<<<<< HEAD
     // Check if the output directory exists, if not, create it
     if (!fs.existsSync(outputPath)) {
       fs.mkdirSync(outputPath, { recursive: true });
     }
 
+=======
+>>>>>>> upstream/main
     // Replace or append the correct extension
     const extRegExp = new RegExp(path.extname(fileName) + '$');
     fileName = fileName.replace(extRegExp, `.${extension}`);
@@ -153,9 +175,13 @@ async function saveFileFromURL({ userId, URL, fileName, basePath = 'images' }) {
       fileName += `.${extension}`;
     }
 
+<<<<<<< HEAD
     // Save the file to the output path
     const outputFilePath = path.join(outputPath, fileName);
     fs.writeFileSync(outputFilePath, buffer);
+=======
+    await writeLocalFile(outputPath, fileName, buffer);
+>>>>>>> upstream/main
 
     return {
       bytes,
@@ -207,11 +233,28 @@ const isValidPath = (req, base, subfolder, filepath) => {
 /**
  * @param {string} filepath
  */
+<<<<<<< HEAD
+=======
+/**
+ * A file whose bytes are still on disk must not be reported as deleted: callers use the resolved
+ * promise to decide that a record may lose its metadata and its agent references. Storage that was
+ * already gone is the one benign case, and `processDeleteRequest` treats it as deleted by design.
+ */
+>>>>>>> upstream/main
 const unlinkFile = async (filepath) => {
   try {
     await fs.promises.unlink(filepath);
   } catch (error) {
+<<<<<<< HEAD
     logger.error('Error deleting file:', error);
+=======
+    if (error?.code === 'ENOENT') {
+      logger.warn('Local file was already missing during delete:', error);
+      return;
+    }
+    logger.error('Error deleting file:', error);
+    throw error;
+>>>>>>> upstream/main
   }
 };
 
@@ -231,8 +274,13 @@ const deleteLocalFile = async (req, file) => {
   const appConfig = req.config;
   const { publicPath, uploads } = appConfig.paths;
 
+<<<<<<< HEAD
   /** Filepath stripped of query parameters (e.g., ?manual=true) */
   const cleanFilepath = file.filepath.split('?')[0];
+=======
+  /** Filepath stripped of query parameters (e.g., ?manual=true, ?v=<timestamp>) */
+  const cleanFilepath = stripCacheBust(file.filepath);
+>>>>>>> upstream/main
 
   await deleteRagFile({ userId: req.user.id, file });
 
@@ -293,6 +341,7 @@ async function uploadLocalFile({ req, file, file_id }) {
   const { uploads } = appConfig.paths;
   const userPath = path.join(uploads, req.user.id);
 
+<<<<<<< HEAD
   if (!fs.existsSync(userPath)) {
     fs.mkdirSync(userPath, { recursive: true });
   }
@@ -301,6 +350,10 @@ async function uploadLocalFile({ req, file, file_id }) {
   const newPath = path.join(userPath, fileName);
 
   await fs.promises.writeFile(newPath, inputBuffer);
+=======
+  const fileName = `${file_id}__${path.basename(inputFilePath)}`;
+  const newPath = await writeLocalFile(userPath, fileName, inputBuffer);
+>>>>>>> upstream/main
   const filepath = path.posix.join('/', 'uploads', req.user.id, path.basename(newPath));
 
   let height, width;
@@ -321,12 +374,23 @@ async function uploadLocalFile({ req, file, file_id }) {
  * Retrieves a readable stream for a file from local storage.
  *
  * @param {ServerRequest} req - The request object from Express
+<<<<<<< HEAD
  * @param {string} filepath - The filepath.
  * @returns {ReadableStream} A readable stream of the file.
  */
 async function getLocalFileStream(req, filepath) {
   try {
     const appConfig = req.config;
+=======
+ * @param {string} requestedFilepath - The filepath, which may carry a cache-busting query string.
+ * @returns {ReadableStream} A readable stream of the file.
+ */
+async function getLocalFileStream(req, requestedFilepath) {
+  try {
+    const appConfig = req.config;
+    /** Reused code outputs persist a `?v=<timestamp>` suffix that no file on disk carries */
+    const filepath = stripCacheBust(requestedFilepath);
+>>>>>>> upstream/main
     if (filepath.includes('/uploads/')) {
       const basePath = filepath.split('/uploads/')[1];
 

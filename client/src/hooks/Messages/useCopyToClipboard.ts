@@ -11,6 +11,10 @@ import {
   STANDALONE_PATTERN,
   INVALID_CITATION_REGEX,
 } from '~/utils/citations';
+<<<<<<< HEAD
+=======
+import { parseWakeupMessage } from '~/components/Chat/Messages/Content/Parts/wakeup';
+>>>>>>> upstream/main
 import { markdownToHtml } from '~/utils/richtext';
 import store from '~/store';
 
@@ -221,6 +225,28 @@ type MessageClipboardSource = ClipboardSource &
     variant?: MarkdownVariant;
   };
 
+<<<<<<< HEAD
+=======
+/** Mirror the rendered task results, never the hidden host prompt, when
+ *  copying a wake-up. User-submitted lookalikes retain their original content. */
+export function getMessageClipboardSource(message?: TMessage | null): MessageClipboardSource {
+  const display = parseWakeupMessage(message ?? undefined);
+  if (display != null) {
+    return {
+      text: display.tasks.map((task) => task.result).join('\n\n'),
+      isCreatedByUser: false,
+      variant: 'lite',
+    };
+  }
+  return {
+    text: message?.text,
+    content: message?.content,
+    isCreatedByUser: message?.isCreatedByUser,
+    error: message?.error,
+  };
+}
+
+>>>>>>> upstream/main
 /**
  * Copies a message honoring the user's rich text preference. Kept apart from
  * `useCopyToClipboard` so the plain copies (share links, API keys, callback

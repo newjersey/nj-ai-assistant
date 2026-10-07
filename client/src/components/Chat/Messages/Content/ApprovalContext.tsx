@@ -98,6 +98,11 @@ const ApprovalContext = createContext<ApprovalContextValue | null>(null);
 
 export interface ToolApprovalDecisionDraft {
   active: Agents.ToolApprovalDecisionType | null;
+<<<<<<< HEAD
+=======
+  /** With `active === 'approve'`: also approve this tool for the rest of the conversation. */
+  allowAlways?: boolean;
+>>>>>>> upstream/main
   editText: string;
   responseText: string;
   reason: string;

@@ -5,6 +5,10 @@ import CustomMinimalIcon from '../../svgs/CustomMinimalIcon';
 import AzureMinimalIcon from '../../svgs/AzureMinimalIcon';
 import AnthropicIcon from '../../svgs/AnthropicIcon';
 import MoonshotIcon from '../../svgs/MoonshotIcon';
+<<<<<<< HEAD
+=======
+import BedrockIcon from '../../svgs/BedrockIcon';
+>>>>>>> upstream/main
 import GeminiIcon from '../../svgs/GeminiIcon';
 import GPTIcon from '../../svgs/GPTIcon';
 import XAIcon from '../../svgs/XAIcon';
@@ -83,8 +87,12 @@ export const providerIcons: Record<ProviderId, ProviderIconDef> = {
     brandColor: 'var(--provider-azure, linear-gradient(0.375turn, #61bde2, #4389d0))',
   },
   [ProviderId.bedrock]: {
+<<<<<<< HEAD
     // NJ: Override BedrockIcon, just show Anthropic for now
     art: component(AnthropicIcon),
+=======
+    art: component(BedrockIcon),
+>>>>>>> upstream/main
     label: 'AWS Bedrock',
     mono: true,
     brandColor: 'var(--provider-bedrock, #268672)',

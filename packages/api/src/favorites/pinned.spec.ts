@@ -11,6 +11,10 @@ import {
 import { createPinnedOrderHandlers } from './pinned';
 
 jest.mock('@librechat/data-schemas', () => ({
+<<<<<<< HEAD
+=======
+  ...jest.requireActual('@librechat/data-schemas'),
+>>>>>>> upstream/main
   logger: { error: jest.fn(), warn: jest.fn(), info: jest.fn(), debug: jest.fn() },
 }));
 

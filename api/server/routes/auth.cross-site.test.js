@@ -36,6 +36,22 @@ jest.mock('~/server/controllers/TwoFactorController', () => ({
 
 jest.mock('~/server/controllers/auth/TwoFactorAuthController', () => ({
   verify2FAWithTempToken: (...args) => mockVerify2FAWithTempToken(...args),
+<<<<<<< HEAD
+=======
+  confirm2FASetupWithTempToken: jest.fn((req, res) => res.status(204).end()),
+  acknowledge2FASetup: jest.fn((req, res) => res.status(204).end()),
+  finalize2FASetup: jest.fn((req, res) => res.status(204).end()),
+}));
+
+jest.mock('~/server/controllers/auth/PasskeyController', () => ({
+  listPasskeys: jest.fn((req, res) => res.status(204).end()),
+  updatePasskey: jest.fn((req, res) => res.status(204).end()),
+  removePasskey: jest.fn((req, res) => res.status(204).end()),
+  authenticatePasskey: jest.fn((req, res, next) => next()),
+  loginPasskeyOptions: jest.fn((req, res) => res.status(204).end()),
+  registerPasskeyOptions: jest.fn((req, res) => res.status(204).end()),
+  registerPasskeyVerify: jest.fn((req, res) => res.status(204).end()),
+>>>>>>> upstream/main
 }));
 
 jest.mock('~/server/controllers/auth/LogoutController', () => ({
@@ -61,10 +77,23 @@ jest.mock('~/server/middleware', () => {
     logHeaders: pass,
     requireSameOrigin: jest.requireActual('~/server/middleware/requireSameOrigin'),
     loginLimiter: (...args) => mockLoginLimiter(...args),
+<<<<<<< HEAD
     setTwoFactorTempUser: (...args) => mockSetTwoFactorTempUser(...args),
     twoFactorTempLimiter: pass,
     checkBan: pass,
     validateEmailLogin: pass,
+=======
+    passkeyLimiter: pass,
+    passkeyStepUpLimiter: pass,
+    setTwoFactorTempUser: (...args) => mockSetTwoFactorTempUser(...args),
+    setTwoFactorAcknowledgementTempUser: pass,
+    setTwoFactorFinalizationTempUser: pass,
+    twoFactorTempLimiter: pass,
+    twoFactorSetupLimiter: pass,
+    blockRetiredSetupToken: pass,
+    checkBan: pass,
+    validateEmailLogin: jest.requireActual('~/server/middleware/validateEmailLogin'),
+>>>>>>> upstream/main
     requireLocalAuth: (...args) => mockRequireLocalAuth(...args),
     requireLdapAuth: (...args) => mockRequireLocalAuth(...args),
     registerLimiter: pass,
@@ -126,6 +155,25 @@ describe('local login endpoints reject cross-site submissions', () => {
     expect(mockLoginController).not.toHaveBeenCalled();
   });
 
+<<<<<<< HEAD
+=======
+  it('rejects a cross-site passkey assertion before verifying it', async () => {
+    const { authenticatePasskey } = require('~/server/controllers/auth/PasskeyController');
+
+    await request(app)
+      .post('/api/auth/passkey/login/verify')
+      .set('Host', 'chat.example.com')
+      .set('Sec-Fetch-Site', 'cross-site')
+      .set('Origin', OTHER_ORIGIN)
+      .type('form')
+      .send({ sessionId: 'attacker-session', 'credential[id]': 'attacker-credential' })
+      .expect(403);
+
+    expect(authenticatePasskey).not.toHaveBeenCalled();
+    expect(mockLoginController).not.toHaveBeenCalled();
+  });
+
+>>>>>>> upstream/main
   it('rejects a cross-site temp-token 2FA submission before verifying it', async () => {
     await request(app)
       .post('/api/auth/2fa/verify-temp')
@@ -185,4 +233,43 @@ describe('local login endpoints reject cross-site submissions', () => {
 
     expect(mockLoginController).toHaveBeenCalledTimes(1);
   });
+<<<<<<< HEAD
+=======
+
+  describe('with email login disabled', () => {
+    beforeEach(() => {
+      process.env.ALLOW_EMAIL_LOGIN = 'false';
+    });
+
+    afterEach(() => {
+      delete process.env.ALLOW_EMAIL_LOGIN;
+    });
+
+    it('still rejects the password login', async () => {
+      await request(app)
+        .post('/api/auth/login')
+        .send({ email: 'user@example.com', password: 'password' })
+        .expect(403);
+
+      expect(mockLoginController).not.toHaveBeenCalled();
+    });
+
+    it('keeps passkey sign-in reachable', async () => {
+      const {
+        authenticatePasskey,
+        loginPasskeyOptions,
+      } = require('~/server/controllers/auth/PasskeyController');
+
+      await request(app).post('/api/auth/passkey/login/options').expect(204);
+      await request(app)
+        .post('/api/auth/passkey/login/verify')
+        .send({ sessionId: 'session', credential: { id: 'credential' } })
+        .expect(204);
+
+      expect(loginPasskeyOptions).toHaveBeenCalledTimes(1);
+      expect(authenticatePasskey).toHaveBeenCalledTimes(1);
+      expect(mockLoginController).toHaveBeenCalledTimes(1);
+    });
+  });
+>>>>>>> upstream/main
 });

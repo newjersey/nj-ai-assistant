@@ -1,5 +1,9 @@
 import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
+<<<<<<< HEAD
+=======
+import { openPanel } from './panels';
+>>>>>>> upstream/main
 
 /**
  * The panels share one empty card: a bordered box with a circular icon, a title
@@ -21,9 +25,12 @@ test.describe('empty panel cards', () => {
   test('the empty prompts panel is drawn like the other panels @scenario:empty-prompts-panel-matches-other-panels', async ({
     page,
   }) => {
+<<<<<<< HEAD
     const width = page.viewportSize()?.width ?? 0;
     test.skip(width < 768, 'the side panels open as a drawer below md');
 
+=======
+>>>>>>> upstream/main
     await page.goto('/c/new', { timeout: 10000 });
 
     const prompts = await openPanelCard(page, 'Prompts', 'No prompts yet');
@@ -35,7 +42,11 @@ test.describe('empty panel cards', () => {
 
 /** Open a side panel from the rail and measure the empty card it renders. */
 async function openPanelCard(page: Page, panel: string, title: string): Promise<CardStyle> {
+<<<<<<< HEAD
   await page.getByRole('button', { name: panel }).first().click();
+=======
+  await openPanel(page, panel.toLowerCase(), panel);
+>>>>>>> upstream/main
   await expect(page.getByText(title, { exact: true }).first()).toBeVisible({ timeout: 20000 });
 
   return page.evaluate((heading) => {

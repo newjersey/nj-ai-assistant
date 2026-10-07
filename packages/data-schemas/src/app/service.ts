@@ -1,7 +1,14 @@
 import {
   AgentCapabilities,
   EModelEndpoint,
+<<<<<<< HEAD
   filtersConfigSchema,
+=======
+  chatProjectsConfigSchema,
+  filtersConfigSchema,
+  conversationListConfigSchema,
+  toolCallPreviewsConfigSchema,
+>>>>>>> upstream/main
   hasActiveFiltersConfig,
   getConfigDefaults,
   langfuseConfigSchema,
@@ -91,6 +98,34 @@ export function loadLangfuseConfig(config: DeepPartial<TCustomConfig>): AppConfi
   return parsed.data;
 }
 
+<<<<<<< HEAD
+=======
+/** Resolves the list filter limits, schema defaults included; an invalid block keeps the
+ *  defaults rather than lifting a bound the operator meant to set. */
+export function loadConversationListConfig(
+  config: DeepPartial<TCustomConfig>,
+): NonNullable<AppConfig['conversationList']> {
+  const parsed = conversationListConfigSchema.safeParse(config.conversationList ?? {});
+  if (parsed.success) {
+    return parsed.data;
+  }
+  logger.warn('[AppService] Invalid conversationList config', parsed.error.flatten());
+  return conversationListConfigSchema.parse({});
+}
+
+/** Resolves the tool-call preview bounds; an invalid block keeps the defaults. */
+export function loadToolCallPreviewsConfig(
+  config: DeepPartial<TCustomConfig>,
+): NonNullable<AppConfig['toolCallPreviews']> {
+  const parsed = toolCallPreviewsConfigSchema.safeParse(config.toolCallPreviews ?? {});
+  if (parsed.success) {
+    return parsed.data;
+  }
+  logger.warn('[AppService] Invalid toolCallPreviews config', parsed.error.flatten());
+  return toolCallPreviewsConfigSchema.parse({});
+}
+
+>>>>>>> upstream/main
 export function loadFiltersConfig(config: DeepPartial<TCustomConfig>): AppConfig['filters'] {
   const raw = config.filters;
   if (raw === undefined) {
@@ -141,10 +176,14 @@ export const AppService = async (params?: {
   const skillSync = loadSkillSyncConfig(config);
   const filteredTools = config.filteredTools;
   const includedTools = config.includedTools;
+<<<<<<< HEAD
   // NJ: We want to be able to use `local` for local dev, thus an optional env var
   const fileStrategy = (process.env.FILE_STRATEGY ??
     config.fileStrategy ??
     configDefaults.fileStrategy) as
+=======
+  const fileStrategy = (config.fileStrategy ?? configDefaults.fileStrategy) as
+>>>>>>> upstream/main
     | FileSources.local
     | FileSources.s3
     | FileSources.firebase
@@ -164,9 +203,18 @@ export const AppService = async (params?: {
 
   const mcpServersConfig = config.mcpServers || null;
   const mcpSettings = config.mcpSettings || null;
+<<<<<<< HEAD
   const actions = config.actions;
   const registration = config.registration ?? configDefaults.registration;
   const interfaceConfig = await loadDefaultInterface({ config, configDefaults });
+=======
+  const mcpAppSandbox = config.mcpAppSandbox ?? configDefaults.mcpAppSandbox;
+  const actions = config.actions;
+  const registration = config.registration ?? configDefaults.registration;
+  const emailChange = config.emailChange;
+  const interfaceConfig = await loadDefaultInterface({ config, configDefaults });
+  const projects = chatProjectsConfigSchema.parse(config.projects ?? {});
+>>>>>>> upstream/main
   const turnstileConfig = loadTurnstileConfig(config, configDefaults);
   const speech = config.speech;
   const filters = loadFiltersConfig(config);
@@ -183,9 +231,20 @@ export const AppService = async (params?: {
     balance,
     skillSync,
     webSearch,
+<<<<<<< HEAD
     mcpSettings,
     fileStrategy,
     registration,
+=======
+    githubCompare: config.githubCompare,
+    mcpSettings,
+    mcpAppSandbox,
+    fileStrategy,
+    projects,
+    registration,
+    emailChange,
+    passkeys: config.passkeys,
+>>>>>>> upstream/main
     transactions,
     filteredTools,
     includedTools,
@@ -201,6 +260,11 @@ export const AppService = async (params?: {
     fileStrategies: config.fileStrategies,
     cloudfront: config.cloudfront as AppConfig['cloudfront'],
     secureImageLinks: config.secureImageLinks !== false,
+<<<<<<< HEAD
+=======
+    conversationList: loadConversationListConfig(config),
+    toolCallPreviews: loadToolCallPreviewsConfig(config),
+>>>>>>> upstream/main
   };
 
   const agentsDefaults = agentsConfigSetup(config);

@@ -20,13 +20,18 @@ export default function SkillFilePreview({ skillId, nodeId, fileName }: SkillFil
 
   if (isLoading) {
     return (
+<<<<<<< HEAD
       <div className="flex h-full items-center justify-center bg-surface-primary">
+=======
+      <div className="bg-surface-primary flex h-full items-center justify-center">
+>>>>>>> upstream/main
         <Spinner className="text-text-tertiary" />
       </div>
     );
   }
 
   return (
+<<<<<<< HEAD
     <div className="flex h-full flex-col bg-surface-primary">
       <div className="flex items-center gap-2 border-b border-border-light px-4 py-2">
         <div className="flex min-w-0 flex-1 items-center gap-2">
@@ -38,6 +43,19 @@ export default function SkillFilePreview({ skillId, nodeId, fileName }: SkillFil
           <span className="truncate text-sm font-medium text-text-primary">{fileName}</span>
           {ext && (
             <span className="rounded bg-surface-tertiary px-1.5 py-0.5 text-[11px] font-medium uppercase tracking-wide text-text-tertiary">
+=======
+    <div className="bg-surface-primary flex h-full flex-col">
+      <div className="border-border-light flex items-center gap-2 border-b px-4 py-2">
+        <div className="flex min-w-0 flex-1 items-center gap-2">
+          {isImage ? (
+            <FileImage className="text-series-5 size-4 shrink-0" aria-hidden="true" />
+          ) : (
+            <File className="text-text-tertiary size-4 shrink-0" aria-hidden="true" />
+          )}
+          <span className="text-text-primary truncate text-sm font-medium">{fileName}</span>
+          {ext && (
+            <span className="bg-surface-tertiary text-text-tertiary rounded px-1.5 py-0.5 text-[11px] font-medium tracking-wide uppercase">
+>>>>>>> upstream/main
               {ext}
             </span>
           )}
@@ -76,12 +94,21 @@ export default function SkillFilePreview({ skillId, nodeId, fileName }: SkillFil
           />
         ) : (
           <div className="flex flex-col items-center gap-3 text-center">
+<<<<<<< HEAD
             <div className="flex size-14 items-center justify-center rounded-2xl bg-surface-tertiary">
               <File className="size-7 text-text-tertiary" aria-hidden="true" />
             </div>
             <div>
               <p className="text-sm font-medium text-text-primary">{fileName}</p>
               <p className="mt-0.5 text-xs text-text-tertiary">
+=======
+            <div className="bg-surface-tertiary flex size-14 items-center justify-center rounded-2xl">
+              <File className="text-text-tertiary size-7" aria-hidden="true" />
+            </div>
+            <div>
+              <p className="text-text-primary text-sm font-medium">{fileName}</p>
+              <p className="text-text-tertiary mt-0.5 text-xs">
+>>>>>>> upstream/main
                 {data?.mimeType ?? localize('com_ui_unknown_file_type')}
               </p>
             </div>

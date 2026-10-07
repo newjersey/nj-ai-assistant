@@ -7,6 +7,10 @@ import {
   messagesView,
   requestJson,
   sendMessageAndWaitForCompletion,
+<<<<<<< HEAD
+=======
+  uploadViaLegacyOption,
+>>>>>>> upstream/main
 } from './helpers';
 
 /**
@@ -74,6 +78,7 @@ async function selectAgent(page: Page, agentName: string) {
   await expect(modelTrigger(page)).toContainText(agentName);
 }
 
+<<<<<<< HEAD
 /** Attaches a CSV through the real attach menu → Code Environment target,
  *  which uploads it to the live Code API before the message is ever sent. */
 async function attachCodeFile(page: Page) {
@@ -96,6 +101,16 @@ async function attachCodeFile(page: Page) {
       buffer: Buffer.from(FILE_CONTENT),
     }),
   ]);
+=======
+/** Attaches a CSV through the palette's Code Environment destination row,
+ *  which uploads it to the live Code API before the message is ever sent. */
+async function attachCodeFile(page: Page) {
+  const upload = await uploadViaLegacyOption(page, 'Upload to Code Environment', {
+    name: FILE_NAME,
+    mimeType: 'text/csv',
+    content: FILE_CONTENT,
+  });
+>>>>>>> upstream/main
   expect(upload.ok(), `code file upload returned ${upload.status()}`).toBeTruthy();
   await expect(page.getByText(FILE_NAME).first()).toBeVisible();
 }

@@ -34,7 +34,11 @@ export default function SiblingSwitch({
     'hover-button h-auto rounded-lg p-1.5 text-text-secondary-alt',
     'hover:text-text-primary hover:bg-surface-hover',
     'group-hover:visible group-focus-visible:visible group-has-[:focus-visible:not(:is(input,textarea,[contenteditable]))]:visible group-[.final-completion]:visible',
+<<<<<<< HEAD
     'focus-visible:ring-2 focus-visible:ring-text-primary focus-visible:outline-none',
+=======
+    'focus-visible:ring-2 focus-visible:ring-text-primary',
+>>>>>>> upstream/main
   );
 
   return siblingCount > 1 ? (
@@ -56,7 +60,11 @@ export default function SiblingSwitch({
         <ChevronLeft size="19" aria-hidden="true" />
       </Button>
       <span
+<<<<<<< HEAD
         className="flex-shrink-0 flex-grow tabular-nums"
+=======
+        className="shrink-0 grow tabular-nums"
+>>>>>>> upstream/main
         aria-live="polite"
         aria-atomic="true"
         role="status"

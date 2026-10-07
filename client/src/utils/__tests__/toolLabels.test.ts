@@ -74,6 +74,21 @@ describe('getToolDisplayLabel', () => {
     );
   });
 
+<<<<<<< HEAD
+=======
+  it('uses the background task label for the native poll tool, not an MCP tool with that name', () => {
+    expect(getToolDisplayLabel(Constants.CHECK_BACKGROUND_TASK, identityLocalize)).toBe(
+      'com_ui_background_tasks',
+    );
+    expect(
+      getToolDisplayLabel(
+        `${Constants.CHECK_BACKGROUND_TASK}${Constants.mcp_delimiter}remote`,
+        identityLocalize,
+      ),
+    ).toBe('remote');
+  });
+
+>>>>>>> upstream/main
   it.each(['set_memory', 'delete_memory'])('returns a friendly memory label for %s', (toolName) => {
     expect(getToolDisplayLabel(toolName, identityLocalize)).toBe(TOOL_FRIENDLY_NAME_KEYS[toolName]);
   });

@@ -1,5 +1,6 @@
 import { memo, useRef, useMemo, useEffect, useState, useCallback } from 'react';
 import { useWatch } from 'react-hook-form';
+<<<<<<< HEAD
 import { useRecoilState, useRecoilValue, useRecoilCallback } from 'recoil';
 import { Constants, isAssistantsEndpoint, isAgentsEndpoint } from 'librechat-data-provider';
 import { composerSurfaceClasses, composerSurfaceShadow, TextareaAutosize } from '@librechat/client';
@@ -8,6 +9,39 @@ import type { SetterOrUpdater } from 'recoil';
 import type { ExtendedFile, FileSetter, ConvoGenerator } from '~/common';
 import type { QueuedMessageContext } from '~/hooks/Chat/useSteering';
 import {
+=======
+import { useNavigate } from 'react-router-dom';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import {
+  composerSurfaceClasses,
+  composerSurfaceShadow,
+  TextareaAutosize,
+  useRemScale,
+} from '@librechat/client';
+import {
+  Constants,
+  Permissions,
+  PermissionTypes,
+  isAgentsEndpoint,
+  isAssistantsEndpoint,
+} from 'librechat-data-provider';
+import type { TChatProject, TMessage, TConversation } from 'librechat-data-provider';
+import type { SetterOrUpdater } from 'recoil';
+import type { ExtendedFile, FileSetter, ConvoGenerator, TAskFunction } from '~/common';
+import type { QueuedMessageContext } from '~/hooks/Chat/useSteering';
+import {
+  cn,
+  getModelSpec,
+  hasIncompleteFiles,
+  removeFocusRings,
+  getComposerDraftId,
+  getPendingDraftId,
+  clearAllDrafts,
+  getFilesDraftCached,
+  isPastedTextFileMarked,
+} from '~/utils';
+import {
+>>>>>>> upstream/main
   useTextarea,
   useAutoSave,
   useLocalize,
@@ -19,6 +53,7 @@ import {
   useCodeWorkspace,
 } from '~/hooks';
 import {
+<<<<<<< HEAD
   cn,
   getModelSpec,
   hasIncompleteFiles,
@@ -28,15 +63,23 @@ import {
   isPastedTextFileMarked,
 } from '~/utils';
 import {
+=======
+>>>>>>> upstream/main
   useChatContext,
   useChatFormContext,
   useAddedChatContext,
   useAssistantsMapContext,
+<<<<<<< HEAD
+=======
+  useComposerRestoreHost,
+  BadgeRowProvider,
+>>>>>>> upstream/main
 } from '~/Providers';
 import {
   PendingToolApprovalButton,
   PendingToolApprovalPanel,
 } from '~/components/Chat/approval/Review';
+<<<<<<< HEAD
 import PendingManualSkillsChips from './PendingManualSkillsChips';
 import usePastedTextEdit from '~/hooks/Files/usePastedTextEdit';
 import useAskAnswerMode from '~/hooks/Input/useAskAnswerMode';
@@ -55,10 +98,30 @@ import useSteering from '~/hooks/Chat/useSteering';
 import CodeApprovalMenu from './CodeApprovalMenu';
 import FileFormChat from './Files/FileFormChat';
 import InFlightSteers from './InFlightSteers';
+=======
+import useComposerRestore from '~/hooks/Input/useComposerRestore';
+import { useChatSettings } from '~/Providers/ChatSettingsContext';
+import usePastedTextEdit from '~/hooks/Files/usePastedTextEdit';
+import useAskAnswerMode from '~/hooks/Input/useAskAnswerMode';
+import AskUserQuestionPopover from './AskUserQuestionPopover';
+import useComposerItems from '~/hooks/Input/useComposerItems';
+import useAttachTarget from '~/hooks/Input/useAttachTarget';
+import Hints, { composerHintId } from './Composer/Hints';
+import PastedTextDialog from './Files/PastedTextDialog';
+import DuringRunSendButton from './DuringRunSendButton';
+import ProjectLandingChip from '../ProjectLandingChip';
+import useHasAccess from '~/hooks/Roles/useHasAccess';
+import useDictation from '~/hooks/Input/useDictation';
+import { useGetStartupConfig } from '~/data-provider';
+import CodeWorkspaceMenu from './CodeWorkspaceMenu';
+import useSteering from '~/hooks/Chat/useSteering';
+import CodeApprovalMenu from './CodeApprovalMenu';
+>>>>>>> upstream/main
 import TextareaHeader from './TextareaHeader';
 import PromptsCommand from './PromptsCommand';
 import { submitFromComposer } from './submit';
 import SkillsCommand from './SkillsCommand';
+<<<<<<< HEAD
 import AudioRecorder from './AudioRecorder';
 import AutoPlayAudio from './AutoPlayAudio';
 import CollapseChat from './CollapseChat';
@@ -68,6 +131,19 @@ import StopButton from './StopButton';
 import SendButton from './SendButton';
 import EditBadges from './EditBadges';
 import BadgeRow from './BadgeRow';
+=======
+import AutoPlayAudio from './AutoPlayAudio';
+import Waveform from './Composer/Waveform';
+import { mainTextareaId } from '~/common';
+import CollapseChat from './CollapseChat';
+import QuoteButton from './QuoteButton';
+import ToolDialogs from './ToolDialogs';
+import StopButton from './StopButton';
+import SendButton from './SendButton';
+import Queue from './Composer/Queue';
+import Tray from './Composer/Tray';
+import Bar from './Composer/Bar';
+>>>>>>> upstream/main
 import Mention from './Mention';
 import store from '~/store';
 
@@ -95,9 +171,25 @@ interface ChatFormProps {
   index: number;
   placeholder?: string;
   project?: TChatProject;
+<<<<<<< HEAD
   /** Owned by ChatView: which layout the composer sits in — the welcome screen
    *  floats or bottoms it out, a conversation ends the page with it. */
   isLandingPage: boolean;
+=======
+  /** The host is reconciling the requested route with its conversation record. */
+  routePending: boolean;
+  /** Owned by ChatView: which layout the composer sits in — the welcome screen
+   *  floats or bottoms it out, a conversation ends the page with it. */
+  isLandingPage: boolean;
+  /** Owned by the host: the persisted preference for whether Enter sends the
+   *  message (vs. queues a newline). The composer only consumes it. */
+  enterToSend: boolean;
+  /** Owned by the host: the Auto Send Text preference dictation consumes. */
+  autoSendText: number;
+  /** Owned by the host: whether the shell has loaded the speech settings yet;
+   *  dictation stays off until it has. */
+  speechSettingsInitialized: boolean;
+>>>>>>> upstream/main
   /** Owned by the host: the app-level preference for where the welcome-screen
    *  composer sits. The chat feature only consumes it. */
   centerFormOnLanding: boolean;
@@ -135,12 +227,25 @@ const focusOwningTargetSelector = [
   '[role="dialog"]',
   '[role="alertdialog"]',
 ].join(', ');
+<<<<<<< HEAD
+=======
+/** Matches the composer's one-line height; scaled so it tracks its rem padding. */
+const INITIAL_TEXTAREA_HEIGHT = 44;
+>>>>>>> upstream/main
 
 const ChatForm = memo(function ChatForm({
   index,
   placeholder,
   project,
+<<<<<<< HEAD
   isLandingPage,
+=======
+  routePending,
+  isLandingPage,
+  enterToSend,
+  autoSendText,
+  speechSettingsInitialized,
+>>>>>>> upstream/main
   footerBelow,
   centerFormOnLanding,
   files,
@@ -155,24 +260,44 @@ const ChatForm = memo(function ChatForm({
 }: ChatFormProps) {
   const submitButtonRef = useRef<HTMLButtonElement>(null);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
+<<<<<<< HEAD
   useFocusChatEffect(textAreaRef);
   const localize = useLocalize();
+=======
+  /** The palette anchors to the whole composer, not to its own button, so it
+   *  spans the composer width and sits flush above it. */
+  const composerBoxRef = useRef<HTMLDivElement>(null);
+  useFocusChatEffect(textAreaRef);
+  const localize = useLocalize();
+  const remScale = useRemScale();
+>>>>>>> upstream/main
 
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [, setIsScrollable] = useState(false);
   const [visualRowCount, setVisualRowCount] = useState(1);
   const [isTextAreaFocused, setIsTextAreaFocused] = useState(false);
+<<<<<<< HEAD
   const [backupBadges, setBackupBadges] = useState<Pick<BadgeItem, 'id'>[]>([]);
+=======
+  /** Last measured row count, so an unchanged measurement never schedules a
+   *  render at all rather than relying on a state-equality bailout. */
+  const measuredRowCountRef = useRef(1);
+>>>>>>> upstream/main
 
   const SpeechToText = useRecoilValue(store.speechToText);
   const TextToSpeech = useRecoilValue(store.textToSpeech);
   const chatDirection = useRecoilValue(store.chatDirection);
   const automaticPlayback = useRecoilValue(store.automaticPlayback);
   const maximizeChatSpace = useRecoilValue(store.maximizeChatSpace);
+<<<<<<< HEAD
   const isTemporary = useRecoilValue(store.isTemporary);
 
   const [badges, setBadges] = useRecoilState(store.chatBadges);
   const [isEditingBadges, setIsEditingBadges] = useRecoilState(store.isEditingBadges);
+=======
+  const { isTemporary } = useChatSettings();
+
+>>>>>>> upstream/main
   const [showStopButton, setShowStopButton] = useRecoilState(store.showStopButtonByIndex(index));
   const plusPopoverAtom = useMemo(() => store.showPlusPopoverFamily(index), [index]);
   const mentionPopoverAtom = useMemo(() => store.showMentionPopoverFamily(index), [index]);
@@ -195,15 +320,37 @@ const ChatForm = memo(function ChatForm({
     () => getModelSpec({ specName: conversation?.spec, startupConfig }),
     [conversation?.spec, startupConfig],
   );
+<<<<<<< HEAD
   const hideBadgeRow = modelSpec?.hideBadgeRow === true;
   const filesLoading = useMemo(() => hasIncompleteFiles(files), [files]);
+=======
+  const filesLoading = useMemo(() => hasIncompleteFiles(files), [files]);
+  /** Agents and assistants carry their own tool configuration, so the composer's
+   *  ephemeral tool controls only apply elsewhere, and a spec can suppress them
+   *  outright. Same gate the old `showEphemeralBadges` prop applied. */
+  const showTools = useMemo(
+    () =>
+      !!endpoint &&
+      modelSpec?.hideBadgeRow !== true &&
+      !isAgentsEndpoint(endpoint) &&
+      !isAssistantsEndpoint(endpoint),
+    [endpoint, modelSpec?.hideBadgeRow],
+  );
+>>>>>>> upstream/main
   const conversationId = useMemo(
     () => conversation?.conversationId ?? Constants.NEW_CONVO,
     [conversation?.conversationId],
   );
+<<<<<<< HEAD
   /**
    * The quote feature merges excerpts server-side in `BaseClient.sendMessage`,
    * which the Assistants endpoints bypass — so hide the UI there rather than
+=======
+  const isNewConversation = conversationId === '' || conversationId === Constants.NEW_CONVO;
+  /**
+   * The quote feature merges excerpts server-side in `BaseClient.sendMessage`,
+   * which the Assistants endpoints bypass, so hide the UI there rather than
+>>>>>>> upstream/main
    * letting users queue quotes the assistant never receives.
    */
   const quotesEnabled = useMemo(() => !isAssistantsEndpoint(endpoint), [endpoint]);
@@ -277,10 +424,17 @@ const ChatForm = memo(function ChatForm({
     : (answerMode.otherLabel ?? localize('com_ui_something_else'));
   /** The composer is not a plain chat composer: it either IS this pause's
    *  answer box, or is locked behind the batch card that owns the answer. A
+<<<<<<< HEAD
    *  collapsed batch is neither — it hands the composer back to the thread. */
   const composerReserved = answerMode.composerAnswers || answerMode.composerLocked;
 
   const consumeDraft = useAutoSave({
+=======
+   *  collapsed batch is neither, it hands the composer back to the thread. */
+  const composerReserved = answerMode.composerAnswers || answerMode.composerLocked;
+
+  const { consumeDraft, preserveText, settleText } = useAutoSave({
+>>>>>>> upstream/main
     index,
     files,
     setFiles,
@@ -293,6 +447,20 @@ const ChatForm = memo(function ChatForm({
     draftId: answerMode.draftId,
   });
 
+<<<<<<< HEAD
+=======
+  const {
+    isPreparing: isPreparingFromUrl,
+    settingsError: urlSettingsError,
+    clearSettingsError,
+  } = useQueryParams({
+    textAreaRef,
+    routePending,
+    onBeforePrompt: preserveText,
+    onPromptSettled: settleText,
+  });
+
+>>>>>>> upstream/main
   const pastedTextEdit = usePastedTextEdit({ index, files, setFiles, textAreaRef });
 
   /** Provenance, not the filename, decides which chips are pastes: a user can deliberately
@@ -313,9 +481,16 @@ const ChatForm = memo(function ChatForm({
   );
   /** The chip's actions hide while a replacement upload or inline move is in flight, so the
    * same original cannot be acted on twice. */
+<<<<<<< HEAD
   const isPasteActionPending = useCallback(
     (file: ExtendedFile) => pastedTextEdit.isActionPending(file.file_id),
     [pastedTextEdit],
+=======
+  const { isActionPending } = pastedTextEdit;
+  const isPasteActionPending = useCallback(
+    (file: ExtendedFile) => isActionPending(file.file_id),
+    [isActionPending],
+>>>>>>> upstream/main
   );
 
   const { submitMessage, submitPrompt } = useSubmitMessage();
@@ -331,6 +506,10 @@ const ChatForm = memo(function ChatForm({
         overrideFiles,
         overrideQuotes: context?.quotes ?? [],
         overrideManualSkills: context?.manualSkills ?? [],
+<<<<<<< HEAD
+=======
+        overrideReasoning: context?.reasoningOverride ?? null,
+>>>>>>> upstream/main
         overrideClientRequestId: context?.clientRequestId,
         overrideRecoverySteerId: context?.recoverySteerId,
         overrideExpectedPredecessorCreatedAt: context?.expectedPredecessorCreatedAt,
@@ -338,6 +517,7 @@ const ChatForm = memo(function ChatForm({
       }),
     [submitMessage],
   );
+<<<<<<< HEAD
   /** Chip "Edit message" restore: quote chips + skill picks merge back into
    *  their compose-time atoms (the chips above the textarea re-render them). */
   const restoreComposerContext = useRecoilCallback(
@@ -388,12 +568,50 @@ const ChatForm = memo(function ChatForm({
     conversation,
     isSubmitting,
     answerModeActive: composerReserved,
+=======
+  const navigate = useNavigate();
+  /** A queued message becomes the first message of a fresh chat through the same
+   *  `prompt` + `submit` query contract that deep links already use. */
+  const startQueuedInNewChat = useCallback(
+    (text: string) => navigate(`/c/new?${new URLSearchParams({ prompt: text, submit: 'true' })}`),
+    [navigate],
+  );
+  const { restoreReclaimedSteer, canRestoreToComposer } = useComposerRestore({
+    index,
+    conversationId,
+    methods,
+    files,
+    setFiles,
+    textAreaRef,
+    answerModeActive: composerReserved,
+  });
+  /* Surfaces outside the composer (a steer cancelled from the thread) re-home
+     their words through the same guarded restore the queue rail gets as a
+     prop. Published while this composer is mounted; a recovery that resolves
+     after it has gone finds nothing and falls back to the queue. */
+  const { publish: publishComposerRestore, publishRewake } = useComposerRestoreHost();
+  useEffect(() => {
+    publishComposerRestore(restoreReclaimedSteer);
+    return () => publishComposerRestore(null);
+  }, [publishComposerRestore, restoreReclaimedSteer]);
+  const steering = useSteering({
+    consumeDraft,
+    addedConversation: addedConvo,
+    index,
+    conversationId,
+    conversation,
+    codeEnvironmentMode: codeWorkspace.mode,
+    isSubmitting,
+    answerModeActive: composerReserved,
+    composerDisabled: isPreparingFromUrl,
+>>>>>>> upstream/main
     files,
     setFiles,
     filesLoading,
     sendNow,
     stopGenerating,
   });
+<<<<<<< HEAD
 
   /** Read at call time, not captured: a reclaim resolves into the callback from
    *  the render it was clicked in, so the closure's `conversationId` is the OLD
@@ -475,15 +693,34 @@ const ChatForm = memo(function ChatForm({
   /** ⌘/Ctrl+Enter = the non-default during-run action, ⌥/Alt+Enter =
    *  interrupt & send (discards the answer), ⌘/Ctrl+Shift+Enter = interrupt &
    *  steer (keeps it) — all counterparts of Enter's `submitDuringRun`. */
+=======
+  /* A steer retried from the thread can land in the queue after the run it
+     belonged to has ended and spent its one-shot drain signal; the thread
+     reaches the drain through the same host as the restore above. */
+  const { rewakeDrain: steeringRewakeDrain } = steering;
+  useEffect(() => {
+    publishRewake(steeringRewakeDrain);
+    return () => publishRewake(null);
+  }, [publishRewake, steeringRewakeDrain]);
+
+  /** Ctrl/Cmd+Enter selects the alternate; both interrupt chords use the same mode. */
+>>>>>>> upstream/main
   const handleDuringRunModifier = useCallback(
     (kind: 'other' | 'interrupt' | 'preempt') => {
       const text = methods.getValues('text');
       let consumed = false;
       if (kind === 'interrupt') {
+<<<<<<< HEAD
         consumed = steering.interruptAndSend(text);
       } else if (kind === 'preempt') {
         consumed = steering.interruptSteer(text);
       } else if (steering.effectiveAction === 'steer') {
+=======
+        consumed = steering.interruptSteer(text);
+      } else if (kind === 'preempt') {
+        consumed = steering.interruptSteer(text);
+      } else if (steering.effectiveAction !== 'queue') {
+>>>>>>> upstream/main
         consumed = steering.queueFromComposer(text);
       } else {
         consumed = steering.steerFromComposer(text);
@@ -509,10 +746,15 @@ const ChatForm = memo(function ChatForm({
     textAreaRef,
     submitButtonRef,
     setIsScrollable,
+<<<<<<< HEAD
+=======
+    /* Only picks the missing-key placeholder; preparation and answer holds live on the textarea. */
+>>>>>>> upstream/main
     disabled: disableInputs,
     // The composer IS the free-form answer box while a question pause is live.
     placeholder: composerReserved ? answerPlaceholder : placeholder,
     // Enter stays live during a run when it can steer/queue instead of send.
+<<<<<<< HEAD
     allowSubmitWhileGenerating: steering.duringRunActive,
     onDuringRunModifier: steering.duringRunActive ? handleDuringRunModifier : undefined,
     answerModeActive: answerMode.composerAnswers,
@@ -520,6 +762,14 @@ const ChatForm = memo(function ChatForm({
 
   useQueryParams({ textAreaRef });
 
+=======
+    allowSubmitWhileGenerating: steering.duringRunActive || answerMode.composerAnswers,
+    onDuringRunModifier: steering.duringRunActive ? handleDuringRunModifier : undefined,
+    answerModeActive: answerMode.composerAnswers,
+    enterToSend,
+  });
+
+>>>>>>> upstream/main
   /** Attachments stand in for text only on the normal send path. Answer mode
    *  hands the composer text straight to the paused run, which answers with
    *  values and cannot consume files, so an empty draft must stay unsubmittable
@@ -537,6 +787,7 @@ const ChatForm = memo(function ChatForm({
 
   const textValue = useWatch({ control: methods.control, name: 'text' });
 
+<<<<<<< HEAD
   useEffect(() => {
     if (textAreaRef.current) {
       const style = window.getComputedStyle(textAreaRef.current);
@@ -587,15 +838,212 @@ const ChatForm = memo(function ChatForm({
     }
     return null;
   })();
+=======
+  /** The composer commits once per keystroke for the row count and the send
+   *  button; a second commit for a row count that did not move (or that no
+   *  layout engine can measure, where `lineHeight` is not a number) doubles the
+   *  cost of the app's busiest surface for nothing. */
+  useEffect(() => {
+    const textarea = textAreaRef.current;
+    if (!textarea) {
+      return;
+    }
+    const lineHeight = parseFloat(window.getComputedStyle(textarea).lineHeight);
+    if (!(lineHeight > 0)) {
+      return;
+    }
+    const nextRowCount = Math.floor(textarea.scrollHeight / lineHeight);
+    if (nextRowCount === measuredRowCountRef.current) {
+      return;
+    }
+    measuredRowCountRef.current = nextRowCount;
+    setVisualRowCount(nextRowCount);
+  }, [textValue, remScale]);
+
+  const isMoreThanThreeRows = visualRowCount > 3;
+
+  const composerItems = useComposerItems(conversationId, quotesEnabled);
+  const attachTarget = useAttachTarget(conversation, disableInputs);
+  const hasPromptsAccess = useHasAccess({
+    permissionType: PermissionTypes.PROMPTS,
+    permission: Permissions.USE,
+  });
+  const slashCommandEnabled = useRecoilValue(store.slashCommand);
+  const atCommandEnabled = useRecoilValue(store.atCommand);
+  const idleActions = useMemo(
+    () => ({
+      prompts: hasPromptsAccess && slashCommandEnabled,
+      mentions: atCommandEnabled,
+      attach: attachTarget.canAttach,
+    }),
+    [hasPromptsAccess, slashCommandEnabled, atCommandEnabled, attachTarget.canAttach],
+  );
+  const { submitText: submitAnswerText } = answerMode;
+  const dictationAnswerModeActive = answerMode.composerAnswers;
+  const speechDisabled =
+    !speechSettingsInitialized ||
+    disableInputs ||
+    isNotAppendable ||
+    answerMode.composerLocked ||
+    isPreparingFromUrl;
+  /** The same gate `onSubmit` applies: while a question pause is live the
+   * composer IS the answer box, so a dictated turn has to answer it rather
+   * than start a turn the paused run would drop. */
+  const dictationAsk = useCallback<TAskFunction>(
+    (props) => {
+      if (dictationAnswerModeActive && submitAnswerText(props.text)) {
+        return;
+      }
+      return submitMessage({ text: props.text });
+    },
+    [dictationAnswerModeActive, submitAnswerText, submitMessage],
+  );
+  const dictation = useDictation({
+    ask: dictationAsk,
+    duringRunSubmit: steering.duringRunActive ? steering.submitDuringRun : undefined,
+    methods,
+    /* Answer mode leaves the run submitting while handing the composer over,
+       which is exactly when speech must still reach it: the send button is
+       enabled on the same terms. */
+    isSubmitting: (isSubmitting && !dictationAnswerModeActive) || answerMode.composerLocked,
+    filesLoading,
+    /* A dictated question answer is cleared by answer mode only after the
+       resume succeeds. A transient failure must leave the transcript intact. */
+    deferComposerReset: dictationAnswerModeActive,
+    disabled: speechDisabled,
+    autoSendText,
+    speechToText: SpeechToText,
+    index,
+  });
+  /** The waveform stands in for the placeholder until words arrive, and is
+   *  then the only thing drawn on that line. */
+  const listening = dictation.active && (textValue?.trim() ?? '') === '';
+  const uploadingCount = useMemo(() => {
+    let count = 0;
+    for (const file of files.values()) {
+      if (file.progress < 1) {
+        count++;
+      }
+    }
+    return count;
+  }, [files]);
+
+  /* The abort is generation-scoped and inert until the start POST installs the
+     epoch; assistants abort through their own path and need no epoch. */
+  const canStop = steering.canControlGeneration || isAssistantsEndpoint(endpoint);
+
+  /** One button slot while a run is generating: with composer text the send
+   *  button takes over (Enter steers/queues; hover reveals all actions);
+   *  clearing the text restores Stop. */
+  /* Memoized for `memo(Bar)`: an inline element is a new identity every render,
+     and this component re-renders on every keystroke. */
+  const duringRunSlot = useMemo(() => {
+    const sendOwnsSlot = steering.duringRunActive && (textValue?.trim() ?? '') !== '';
+    /* Stays mounted (hidden) behind the during-run send button: the stop
+       shortcut resolves against the focused form, so a half-typed steer would
+       otherwise leave it reaching into another pane or doing nothing. */
+    const stopButton = showStopButton ? (
+      <StopButton
+        stop={handleStopGenerating}
+        setShowStopButton={setShowStopButton}
+        canStop={canStop}
+        hidden={sendOwnsSlot && !isPreparingFromUrl}
+      />
+    ) : null;
+    if (sendOwnsSlot) {
+      return (
+        <>
+          <DuringRunSendButton
+            ref={submitButtonRef}
+            control={methods.control}
+            steering={steering}
+            isNewConversation={isNewConversation}
+            getText={() => methods.getValues('text')}
+            onConsumed={consumeComposer}
+            disabled={filesLoading || isPreparingFromUrl}
+            enterToSend={enterToSend}
+          />
+          {stopButton}
+        </>
+      );
+    }
+    return stopButton;
+  }, [
+    consumeComposer,
+    isNewConversation,
+    isPreparingFromUrl,
+    steering,
+    textValue,
+    methods,
+    submitButtonRef,
+    filesLoading,
+    showStopButton,
+    setShowStopButton,
+    handleStopGenerating,
+    canStop,
+    enterToSend,
+  ]);
+
+  /* Memoized for `memo(Bar)`: an inline element is a new identity every render,
+     and this component re-renders on every keystroke. */
+  /* Gated on the slot having something to show rather than on `showStopButton`:
+     that flag only flips once the start POST installs the generation epoch, and
+     until then Enter already queues while this slot still offered the ordinary
+     send button, disabled. The slot decides for itself between the during-run
+     control, Stop, and nothing, so an empty one falls through to send. */
+  const actionSlot = useMemo(
+    () =>
+      isSubmitting && !answerMode.composerAnswers && duringRunSlot != null
+        ? duringRunSlot
+        : endpoint && (
+            <SendButton
+              ref={submitButtonRef}
+              control={methods.control}
+              fileCount={submittableFileCount}
+              disabled={
+                filesLoading ||
+                isPreparingFromUrl ||
+                disableInputs ||
+                !codeWorkspace.canSubmit ||
+                isNotAppendable ||
+                answerMode.composerLocked ||
+                (isSubmitting && !answerMode.composerAnswers)
+              }
+            />
+          ),
+    [
+      codeWorkspace.canSubmit,
+      isPreparingFromUrl,
+      endpoint,
+      duringRunSlot,
+      filesLoading,
+      disableInputs,
+      isNotAppendable,
+      isSubmitting,
+      answerMode.composerAnswers,
+      answerMode.composerLocked,
+      submittableFileCount,
+      methods.control,
+    ],
+  );
+>>>>>>> upstream/main
 
   const baseClasses = useMemo(
     () =>
       cn(
+<<<<<<< HEAD
         'md:py-3.5 m-0 w-full resize-none py-[13px] placeholder-black/60 bg-transparent dark:placeholder-white/60 [&:has(textarea:focus)]:shadow-[0_2px_6px_rgba(0,0,0,.05)]',
         isCollapsed ? 'max-h-[52px]' : 'max-h-[45vh] md:max-h-[55vh]',
         isMoreThanThreeRows ? 'pl-5' : 'px-5',
       ),
     [isCollapsed, isMoreThanThreeRows],
+=======
+        'md:py-3.5 m-0 w-full resize-none py-3.25 placeholder:text-text-tertiary bg-transparent [&:has(textarea:focus)]:shadow-[0_2px_6px_rgba(0,0,0,.05)]',
+        isCollapsed ? 'max-h-[3.25rem]' : 'max-h-[45vh] md:max-h-[55vh]',
+        'px-5',
+      ),
+    [isCollapsed],
+>>>>>>> upstream/main
   );
 
   /* From `sm` up the band leaves room under itself for the disclaimer, which only
@@ -604,17 +1052,27 @@ const ChatForm = memo(function ChatForm({
      conversation has nothing beneath it, so it keeps only enough to clear the
      surface's own shadow. Below `sm` the composer runs to the viewport floor in
      every state. */
+<<<<<<< HEAD
   // NJ: Keep our own clearance ('mb-3') wherever the centred landing composer isn't floating
   const landingClearance =
     centerFormOnLanding && !isSubmitting ? 'transition-all duration-200 sm:mb-28' : 'mb-3';
   let bottomClearance = 'mb-3';
+=======
+  const landingClearance =
+    centerFormOnLanding && !isSubmitting ? 'transition-all duration-200 sm:mb-28' : 'sm:mb-10';
+  let bottomClearance = 'sm:mb-4';
+>>>>>>> upstream/main
   if (isLandingPage) {
     bottomClearance = landingClearance;
   } else if (footerBelow) {
     /* A conversation that carries a configured footer keeps the band that bar
        needs, exactly as the welcome screen does. */
+<<<<<<< HEAD
     // NJ: Our empty CUSTOM_FOOTER reads as configured, so keep our own clearance
     bottomClearance = 'mb-3';
+=======
+    bottomClearance = 'sm:mb-10';
+>>>>>>> upstream/main
   }
 
   /** Answer mode, then during-run steering or queueing (a run in flight, or a
@@ -626,18 +1084,38 @@ const ChatForm = memo(function ChatForm({
         {
           answerMode,
           steering,
+<<<<<<< HEAD
           submitMessage,
+=======
+          submitMessage: (message) => {
+            const result = submitMessage(message);
+            if (result !== false) {
+              clearAllDrafts(getPendingDraftId(index));
+            }
+            return result;
+          },
+>>>>>>> upstream/main
           reset: () => methods.reset(),
         },
         data,
       ),
+<<<<<<< HEAD
     [answerMode, steering, submitMessage, methods],
+=======
+    [answerMode, steering, submitMessage, methods, index],
+>>>>>>> upstream/main
   );
 
   return (
     <form
       onSubmit={methods.handleSubmit((data) => {
+<<<<<<< HEAD
         submitComposerText(data);
+=======
+        if (!isPreparingFromUrl && submitComposerText(data) !== false) {
+          clearSettingsError();
+        }
+>>>>>>> upstream/main
       })}
       className={cn(
         /* `margin-bottom` is animated as well as `max-width`: it is what carries
@@ -652,6 +1130,7 @@ const ChatForm = memo(function ChatForm({
         bottomClearance,
       )}
     >
+<<<<<<< HEAD
       <div className="relative flex h-full min-w-0 flex-1 items-stretch md:flex-col">
         {/* Primary composer owns the selection popup so split-view doesn't double it. */}
         {index === 0 && quotesEnabled && <QuoteButton conversationId={conversationId} />}
@@ -674,12 +1153,43 @@ const ChatForm = memo(function ChatForm({
               className={cn(
                 'mx-4 -mb-3 flex min-w-0 flex-wrap items-center gap-1 rounded-t-2xl',
                 'border border-border-light bg-surface-secondary px-2 pb-4 pt-1',
+=======
+      {/* `min-w-0`: a flex item's automatic minimum size is its content's
+          min-content width, and one long unbroken word in a queued message
+          propagates all the way up here: the composer stretched past the
+          thread and its chips ran off the side. Zeroing it lets the width come
+          from the form, so the chips inside truncate instead. */}
+      <div className="relative flex h-full min-w-0 flex-1 items-stretch md:flex-col">
+        {/* Primary composer owns the selection popup so split-view doesn't double it. */}
+        {index === 0 && quotesEnabled && <QuoteButton conversationId={conversationId} />}
+        <div className="relative flex w-full flex-col">
+          {steering.enabled && (
+            <Queue
+              steering={steering}
+              conversationId={conversationId}
+              onRestoreToComposer={restoreReclaimedSteer}
+              canRestoreToComposer={canRestoreToComposer}
+              onStartNewChat={startQueuedInNewChat}
+            />
+          )}
+          {(project || codeWorkspace.visible) && (
+            <div
+              data-testid="composer-context-rail"
+              className={cn(
+                'mx-4 -mb-3 flex min-w-0 flex-wrap items-center gap-1.5 rounded-t-2xl',
+                'border-border-light bg-surface-secondary border px-2 pt-2 pb-5',
+>>>>>>> upstream/main
                 isRTL && 'flex-row-reverse',
               )}
             >
               {project ? <ProjectLandingChip project={project} /> : null}
+<<<<<<< HEAD
               {codeWorkspace.required && (!codeWorkspace.locked || !codeWorkspace.canSubmit) ? (
                 <div className="min-w-0 px-1 pt-1">
+=======
+              {codeWorkspace.visible ? (
+                <div className="min-w-0">
+>>>>>>> upstream/main
                   <CodeWorkspaceMenu
                     setConversation={setConversation}
                     workspace={codeWorkspace}
@@ -719,14 +1229,25 @@ const ChatForm = memo(function ChatForm({
               agentId={conversation?.agent_id}
             />
             <div
+<<<<<<< HEAD
+=======
+              ref={composerBoxRef}
+>>>>>>> upstream/main
               data-testid="composer-surface"
               onClick={handleContainerClick}
               className={cn(
                 /* The surface runs to the viewport floor below `sm`, where it is
+<<<<<<< HEAD
                    squared off at the bottom (`rounded-t-3xl`) and no disclaimer
                    follows it — so the action row is the last thing in it, with no
                    band of padding under the buttons. */
                 'relative flex w-full flex-grow flex-col overflow-hidden rounded-t-3xl sm:rounded-3xl',
+=======
+                   squared off at the bottom (`rounded-t-theme-surface-lg`) and no disclaimer
+                   follows it — so the action row is the last thing in it, with no
+                   band of padding under the buttons. */
+                'rounded-t-theme-surface-lg sm:rounded-theme-surface-lg relative flex w-full grow flex-col overflow-hidden',
+>>>>>>> upstream/main
                 composerSurfaceClasses(),
                 isTextAreaFocused ? composerSurfaceShadow.focused : composerSurfaceShadow.blurred,
                 /* Temporary-chat accent is a ChatForm-only override, not part of
@@ -735,6 +1256,7 @@ const ChatForm = memo(function ChatForm({
                    follows the theme instead of the raw `violet-800/60` edge that
                    composited to 1.48:1 on the high contrast dark canvas.
                    Held at half alpha in the standard palettes, where series-6 is
+<<<<<<< HEAD
                    a saturated #7e23cd / #ab68fe and a full-strength edge reads as
                    a warning rather than a quiet mode hint. The contrast modes take
                    it opaque, because that is the only way it clears the 3:1
@@ -764,10 +1286,31 @@ const ChatForm = memo(function ChatForm({
               />
               <FileFormChat
                 index={index}
+=======
+                   a saturated purple in both modes and a full-strength edge reads as
+                   a warning rather than a quiet mode hint. The contrast modes take
+                   it opaque, because that is the only way it clears the 3:1
+                   non-text floor there. */
+                /** The tint layers over the opaque chat surface instead of replacing it, so the
+                 *  context rail tucked under the composer never shows through. */
+                isTemporary &&
+                  'border-series-6/50 from-series-6/10 to-series-6/10 high-contrast:border-series-6 bg-linear-to-b',
+              )}
+            >
+              <TextareaHeader addedConvo={addedConvo} setAddedConvo={setAddedConvo} />
+              <Tray
+                items={composerItems}
+                focusComposer={focusTextArea}
+>>>>>>> upstream/main
                 conversation={conversation}
                 files={files}
                 setFiles={setFiles}
                 setFilesLoading={setFilesLoading}
+<<<<<<< HEAD
+=======
+                isRTL={isRTL}
+                index={index}
+>>>>>>> upstream/main
                 isPastedTextFile={isPastedTextFile}
                 isPasteActionPending={isPasteActionPending}
                 onEditPastedText={pastedTextEdit.openEditor}
@@ -781,7 +1324,17 @@ const ChatForm = memo(function ChatForm({
               {endpoint && (
                 <div className={cn('flex', isRTL ? 'flex-row-reverse' : 'flex-row')}>
                   <div
+<<<<<<< HEAD
                     className="relative flex-1"
+=======
+                    className={cn(
+                      'relative flex-1',
+                      listening &&
+                        '[&_textarea]:caret-transparent [&_textarea]:placeholder:text-transparent',
+                      /* Locked behind a question: the placeholder is a notice, not text. */
+                      answerMode.composerLocked && '[&_textarea]:select-none',
+                    )}
+>>>>>>> upstream/main
                     style={
                       isCollapsed
                         ? {
@@ -800,7 +1353,16 @@ const ChatForm = memo(function ChatForm({
                           textAreaRef as React.MutableRefObject<HTMLTextAreaElement | null>
                         ).current = e;
                       }}
+<<<<<<< HEAD
                       disabled={disableInputs || isNotAppendable || answerMode.composerLocked}
+=======
+                      disabled={
+                        disableInputs ||
+                        isNotAppendable ||
+                        answerMode.composerLocked ||
+                        isPreparingFromUrl
+                      }
+>>>>>>> upstream/main
                       onPaste={handlePaste}
                       onKeyDown={(e) => {
                         // Answer mode consumes option-navigation keys from the
@@ -820,15 +1382,27 @@ const ChatForm = memo(function ChatForm({
                       onFocus={handleTextareaFocus}
                       onBlur={handleTextareaBlur}
                       aria-label={localize('com_ui_message_input')}
+<<<<<<< HEAD
                       onClick={handleFocusOrClick}
                       style={{ height: 44, overflowY: 'auto' }}
                       className={cn(
                         'lc-field', // NJ: Enforce focus-ring removal on the prompt textarea
+=======
+                      aria-describedby={cn(
+                        composerHintId(index),
+                        (codeWorkspace.state === 'choose' || codeWorkspace.state === 'missing') &&
+                          `code-workspace-hint-${index}`,
+                      )}
+                      onClick={handleFocusOrClick}
+                      style={{ height: INITIAL_TEXTAREA_HEIGHT * remScale, overflowY: 'auto' }}
+                      className={cn(
+>>>>>>> upstream/main
                         baseClasses,
                         removeFocusRings,
                         'scrollbar-hover transition-[max-height] duration-200 disabled:cursor-not-allowed',
                       )}
                     />
+<<<<<<< HEAD
                   </div>
                   <div className="flex flex-col items-start justify-start pr-2.5 pt-1.5">
                     <CollapseChat
@@ -925,6 +1499,119 @@ const ChatForm = memo(function ChatForm({
               {TextToSpeech && automaticPlayback && <AutoPlayAudio index={index} />}
             </div>
           </div>
+=======
+                    {listening && (
+                      /* Stands in for the placeholder: same inset, same line, so
+                         it reads as the input listening rather than as a widget
+                         bolted on. Once words arrive the transcript takes over. */
+                      <Waveform
+                        active={dictation.active}
+                        className={cn('pointer-events-none absolute inset-x-5 inset-y-2')}
+                      />
+                    )}
+                    {/* Sits over the fade scrim in the corner of the input
+                        rather than in its own column beside it, so a long draft
+                        does not push an orphaned control off to the side. */}
+                    <div className="absolute right-2 bottom-1 z-10">
+                      <CollapseChat
+                        isCollapsed={isCollapsed}
+                        isScrollable={isMoreThanThreeRows}
+                        setIsCollapsed={setIsCollapsed}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+              {(isPreparingFromUrl || urlSettingsError) && (
+                <p role="status" className="text-text-secondary px-5 pb-2 text-sm">
+                  {localize(urlSettingsError ? 'com_ui_url_settings_failed' : 'com_ui_sending')}
+                </p>
+              )}
+              {(codeWorkspace.state === 'choose' || codeWorkspace.state === 'missing') && (
+                <p
+                  id={`code-workspace-hint-${index}`}
+                  role="status"
+                  className="text-text-secondary px-5 pb-2 text-sm"
+                >
+                  {localize('com_error_code_workspace_required')}
+                </p>
+              )}
+              {/* The composer is what keeps MCP connection and authorization state
+                  current wherever its ephemeral tools apply; the Agent Builder's
+                  tool library reads the same cache, so without this a server it
+                  lists reads as unknown and offers to connect instead of toggling. */}
+              <BadgeRowProvider
+                conversationId={conversationId}
+                specName={conversation?.spec}
+                isSubmitting={isSubmitting}
+                observeToolAuthorization={showTools}
+              >
+                <Bar
+                  index={index}
+                  isRTL={isRTL}
+                  disabled={disableInputs}
+                  agentId={conversation?.agent_id}
+                  /* The RAW endpoint, not the effective type above: the attach
+                     destinations resolve the provider from its name, so a
+                     custom endpoint reduced to `custom` loses the uploads its
+                     provider actually takes (OpenRouter's video and audio).
+                     `endpointType` beside it carries the resolved type. */
+                  endpoint={conversation?.endpoint}
+                  endpointType={attachTarget.endpointType}
+                  endpointFileConfig={attachTarget.endpointFileConfig}
+                  useResponsesApi={attachTarget.useResponsesApi}
+                  conversationId={conversationId}
+                  conversation={conversation}
+                  files={files}
+                  setFiles={setFiles}
+                  setFilesLoading={setFilesLoading}
+                  canAttach={attachTarget.canAttach}
+                  anchorRef={composerBoxRef}
+                  showTools={showTools}
+                  isSubmitting={isSubmitting}
+                  showSpeech={SpeechToText}
+                  speechDisabled={speechDisabled}
+                  dictation={dictation}
+                  approvalSlot={
+                    <div className={cn('flex items-center gap-1.5', isRTL && 'flex-row-reverse')}>
+                      <CodeApprovalMenu
+                        conversation={conversation}
+                        addedConversation={addedConvo}
+                        codeEnvironmentMode={codeWorkspace.mode}
+                        setConversation={setConversation}
+                        disabled={disableInputs}
+                      />
+                      {index === 0 && conversationId != null && (
+                        <PendingToolApprovalButton conversationId={conversationId} />
+                      )}
+                    </div>
+                  }
+                  actionSlot={actionSlot}
+                  hasAddedConversation={addedConvo != null}
+                />
+                <ToolDialogs />
+              </BadgeRowProvider>
+              {TextToSpeech && automaticPlayback && <AutoPlayAudio index={index} />}
+            </div>
+          </div>
+          {/* Sibling of the composer row, not a child: inside that flex-row it
+              would lay out as a narrow column beside the box. */}
+          <Hints
+            index={index}
+            enterToSend={enterToSend}
+            hasText={(textValue?.trim() ?? '') !== ''}
+            isSubmitting={isSubmitting}
+            duringRunActive={steering.duringRunActive}
+            canControlGeneration={steering.canControlGeneration}
+            duringRunAction={steering.effectiveAction}
+            /* A staged reasoning choice forces the message to queue, and the
+               send-now chord then queues too; do not advertise it. */
+            canSteer={steering.canSteer && steering.pendingReasoningOverride == null}
+            answerModeActive={answerMode.active}
+            uploadingCount={uploadingCount}
+            idleActions={idleActions}
+          />
+>>>>>>> upstream/main
         </div>
       </div>
     </form>
@@ -935,19 +1622,43 @@ ChatForm.displayName = 'ChatForm';
 /**
  * Wrapper that subscribes to ChatContext and passes stable individual values
  * to the memo'd ChatForm. This prevents ChatForm from re-rendering on every
+<<<<<<< HEAD
  * streaming chunk — it only re-renders when the specific values it uses change.
+=======
+ * streaming chunk: it only re-renders when the specific values it uses change.
+>>>>>>> upstream/main
  */
 function ChatFormWrapper({
   index = 0,
   placeholder,
   project,
+<<<<<<< HEAD
   isLandingPage,
+=======
+  routePending = false,
+  isLandingPage,
+  /** Defaults to the atom's own default (`atomWithLocalStorage('enterToSend',
+   *  true)`) so call sites that predate this prop, mainly tests, keep their
+   *  prior behavior without passing it explicitly. */
+  enterToSend = true,
+  /** Same reason, from `atomWithLocalStorage('autoSendText', -1)`. */
+  autoSendText = -1,
+  /** Same reason, from the `speechSettingsInitialized` atom's `false`. */
+  speechSettingsInitialized = false,
+>>>>>>> upstream/main
   footerBelow,
   centerFormOnLanding,
 }: {
   index?: number;
   placeholder?: string;
   project?: TChatProject;
+<<<<<<< HEAD
+=======
+  routePending?: boolean;
+  enterToSend?: boolean;
+  autoSendText?: number;
+  speechSettingsInitialized?: boolean;
+>>>>>>> upstream/main
   isLandingPage: boolean;
   footerBelow: boolean;
   centerFormOnLanding: boolean;
@@ -985,6 +1696,19 @@ function ChatFormWrapper({
       conversation?.codeApprovalMode,
       conversation?.codeEnvironmentMode,
       conversation?.codeWorkspaces,
+<<<<<<< HEAD
+=======
+      /** The composer's reasoning control reads its configured value off this
+       *  object. Leaving these out held the old level on screen after a
+       *  Parameters-panel edit, while the next send already used the new one. */
+      conversation?.reasoning_effort,
+      conversation?.effort,
+      conversation?.thinkingLevel,
+      conversation?.thinkingBudget,
+      /** The attach picker resolves the upload route from it, and a Responses
+       *  routing policy can send web-search turns to a different route. */
+      conversation?.web_search,
+>>>>>>> upstream/main
       hasMessages,
     ],
   );
@@ -1014,8 +1738,17 @@ function ChatFormWrapper({
   return (
     <ChatForm
       index={index}
+<<<<<<< HEAD
       placeholder={placeholder}
       project={project}
+=======
+      enterToSend={enterToSend}
+      autoSendText={autoSendText}
+      speechSettingsInitialized={speechSettingsInitialized}
+      placeholder={placeholder}
+      project={project}
+      routePending={routePending}
+>>>>>>> upstream/main
       isLandingPage={isLandingPage}
       footerBelow={footerBelow}
       centerFormOnLanding={centerFormOnLanding}

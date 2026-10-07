@@ -10,6 +10,10 @@ import { AttachmentGroup } from './Attachment';
 import parseJsonField from './parseJsonField';
 import { useToolCallIntent } from './intent';
 import { TOOL_ROW_CLASSES } from '../rows';
+<<<<<<< HEAD
+=======
+import BareStatus from './BareStatus';
+>>>>>>> upstream/main
 import { useLocalize } from '~/hooks';
 import { cn } from '~/utils';
 
@@ -94,6 +98,7 @@ export default function ReadFileCall({
   const fileName = filePath.split('/').pop() || filePath;
   const lang = useMemo(() => langFromPath(filePath), [filePath]);
 
+<<<<<<< HEAD
   const { showCode, toggleCode, expandStyle, expandRef, phase, hasOutput } = useToolCallState({
     initialProgress,
     isSubmitting,
@@ -131,17 +136,71 @@ export default function ReadFileCall({
           isExpanded={showCode}
         />
       </div>
+=======
+  const { showCode, toggleCode, expandStyle, expandRef, phase, hasOutput, bare, rowRef } =
+    useToolCallState({
+      initialProgress,
+      isSubmitting,
+      output,
+      hasInput: !!filePath,
+      panelReady: output.length > 0,
+      keepRow: intent != null,
+      onExpand,
+      runStepStatus,
+    });
+
+  const highlighted = useLazyHighlight(showCode && hasOutput ? output : undefined, lang);
+
+  const finishedText =
+    phase === 'cancelled'
+      ? localize('com_ui_cancelled')
+      : (intent ?? localize('com_ui_read_file', { 0: fileName }));
+
+  return (
+    <>
+      <BareStatus active={bare} text={finishedText} />
+      {!bare && (
+        <div className={TOOL_ROW_CLASSES} ref={rowRef}>
+          <ProgressText
+            phase={phase}
+            onClick={toggleCode}
+            inProgressText={intent ?? localize('com_ui_reading_file', { 0: fileName })}
+            finishedText={finishedText}
+            durationMs={runStepDurationMs}
+            icon={
+              <FileText
+                className={cn(
+                  'text-text-secondary size-4 shrink-0',
+                  phase === 'running' && 'animate-pulse',
+                )}
+                aria-hidden="true"
+              />
+            }
+            hasInput={!!filePath || hasOutput}
+            isExpanded={showCode}
+          />
+        </div>
+      )}
+>>>>>>> upstream/main
       <div style={expandStyle}>
         <div className="overflow-hidden" ref={expandRef}>
           {hasOutput && (
             <div
               className={cn(
                 toolPanelSpacingClassName,
+<<<<<<< HEAD
                 'overflow-hidden rounded-lg border border-border-light bg-surface-secondary',
               )}
             >
               <CodeWindowHeader language={fileName} code={output} />
               <pre className="max-h-[300px] overflow-auto bg-surface-chat p-4 font-mono text-xs dark:bg-surface-primary-alt">
+=======
+                'border-border-light bg-surface-secondary overflow-hidden rounded-lg border',
+              )}
+            >
+              <CodeWindowHeader language={fileName} code={output} />
+              <pre className="bg-surface-code-body max-h-[18.75rem] overflow-auto p-4 font-mono text-xs">
+>>>>>>> upstream/main
                 <code className={`hljs language-${lang} !whitespace-pre`}>
                   {highlighted ?? output}
                 </code>

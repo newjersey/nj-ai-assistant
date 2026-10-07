@@ -3,6 +3,19 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { Chip } from './Chip';
 
 describe('Chip', () => {
+<<<<<<< HEAD
+=======
+  it('renders a theme-aware surface tone for non-status context', () => {
+    render(<Chip tone="surface">Context</Chip>);
+
+    expect(screen.getByText('Context').parentElement).toHaveClass(
+      'border-border-chrome',
+      'bg-surface-secondary',
+      'text-text-secondary',
+    );
+  });
+
+>>>>>>> upstream/main
   it('renders semantic tone classes', () => {
     render(<Chip tone="info">Search result</Chip>);
 
@@ -40,7 +53,12 @@ describe('Chip', () => {
     expect(screen.getByText('Themeable').parentElement).toHaveClass(
       'h-theme-control',
       'rounded-theme-control',
+<<<<<<< HEAD
       'gap-theme-compact',
+=======
+      'gap-theme-control-gap',
+      'px-theme-control-x',
+>>>>>>> upstream/main
     );
     expect(screen.getByRole('button', { name: 'Remove theme' })).toHaveClass(
       'rounded-theme-control-round',

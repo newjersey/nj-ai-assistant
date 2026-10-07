@@ -19,6 +19,10 @@ import {
   clearUsageFolded,
   calibrationFamily,
   pendingUsageFamily,
+<<<<<<< HEAD
+=======
+  activeUsageResponseIdFamily,
+>>>>>>> upstream/main
   branchTotalsFamily,
   subagentUsageFamily,
   pendingSubagentUsageFamily,
@@ -42,6 +46,10 @@ const FLUSH_INTERVAL_MS = 250;
 
 interface UsageSubmissionLike {
   userMessage?: Pick<TMessage, 'messageId' | 'conversationId'> | null;
+<<<<<<< HEAD
+=======
+  initialResponse?: Pick<TMessage, 'messageId' | 'parentMessageId'> | null;
+>>>>>>> upstream/main
   conversation?: Partial<Pick<TConversation, 'conversationId' | 'endpoint' | 'model'>> | null;
 }
 
@@ -52,6 +60,11 @@ interface FinalDataLike {
 }
 
 export interface UsageHandlers {
+<<<<<<< HEAD
+=======
+  /** Bind an optimistic, created, or resumed response without inventing usage. */
+  bindResponse: (submission: UsageSubmissionLike) => string | null;
+>>>>>>> upstream/main
   contextHandler: (data: TContextUsageEvent, submission: UsageSubmissionLike) => void;
   usageHandler: (data: TTokenUsageEvent, submission: UsageSubmissionLike) => void;
   tapStream: (data: { delta?: { content?: unknown } }, submission: UsageSubmissionLike) => void;
@@ -122,10 +135,73 @@ export default function useUsageHandler(): UsageHandlers {
   return useMemo<UsageHandlers>(() => {
     const jotai = getDefaultStore();
 
+<<<<<<< HEAD
+=======
+    let liveConversationKey: string | null = null;
+    /** Some terminal callbacks retain the original unsaved submission after
+     * CREATED has already moved its state. Never move an empty `new` bucket
+     * back over the live conversation in those callbacks. */
+    const resolveUsageKey = (submission: UsageSubmissionLike) => {
+      const key = getConvoKey(submission);
+      return key === Constants.NEW_CONVO && liveConversationKey != null ? liveConversationKey : key;
+    };
+    const moveConversation = (from: string, to: string) => {
+      if (from === to) {
+        return;
+      }
+      migrateIndex(from, to);
+      migrateUsageFolded(from, to);
+      jotai.set(contextSnapshotFamily(to), jotai.get(contextSnapshotFamily(from)));
+      jotai.set(snapshotsByAnchorFamily(to), jotai.get(snapshotsByAnchorFamily(from)));
+      jotai.set(pendingUsageFamily(to), jotai.get(pendingUsageFamily(from)));
+      jotai.set(activeUsageResponseIdFamily(to), jotai.get(activeUsageResponseIdFamily(from)));
+      jotai.set(liveTokensFamily(to), jotai.get(liveTokensFamily(from)));
+      jotai.set(branchTotalsFamily(to), jotai.get(branchTotalsFamily(from)));
+      jotai.set(totalUsageFamily(to), sumTotalUsage(to));
+      jotai.set(calibrationFamily(to), jotai.get(calibrationFamily(from)));
+      jotai.set(subagentUsageFamily(to), jotai.get(subagentUsageFamily(from)));
+      jotai.set(pendingSubagentUsageFamily(to), jotai.get(pendingSubagentUsageFamily(from)));
+      // Atom-family eviction alone does not notify a still-mounted /c/new view.
+      jotai.set(activeUsageResponseIdFamily(from), null);
+      jotai.set(pendingUsageFamily(from), EMPTY_USAGE_TOTALS);
+      jotai.set(liveTokensFamily(from), 0);
+      removeUsageAtoms(from);
+      liveConversationKey = to;
+    };
+
+    /** The transport owns response-id normalization. Use the same response it
+     * renders, including durable IDs assigned by legacy text and resume events. */
+    const bindResponse: UsageHandlers['bindResponse'] = (submission) => {
+      const convoKey = getConvoKey(submission);
+      if (liveConversationKey === Constants.NEW_CONVO && convoKey !== liveConversationKey) {
+        moveConversation(liveConversationKey, convoKey);
+      }
+      liveConversationKey = convoKey;
+      const responseId = submission.initialResponse?.messageId ?? null;
+      const ownerAtom = activeUsageResponseIdFamily(convoKey);
+      const previousId = jotai.get(ownerAtom);
+      jotai.set(ownerAtom, responseId);
+      /** A server ID remap doesn't invalidate this turn's pending usage or its
+       * live context. Only move a snapshot owned by the previous response. */
+      const snapshotAtom = contextSnapshotFamily(convoKey);
+      const snapshot = jotai.get(snapshotAtom);
+      if (
+        previousId != null &&
+        responseId != null &&
+        previousId !== responseId &&
+        snapshot?.responseMessageId === previousId
+      ) {
+        jotai.set(snapshotAtom, { ...snapshot, responseMessageId: responseId });
+      }
+      return responseId;
+    };
+
+>>>>>>> upstream/main
     const setLive = (convoKey: string, value: number) => {
       jotai.set(liveTokensFamily(convoKey), value);
     };
 
+<<<<<<< HEAD
     /** Flush the in-flight pending usage into a response's index entry, then
      *  reset pending. Only flushes when events were actually folded this session
      *  (eventCount > 0), so a finalize that carries persisted `metadata.usage`
@@ -136,6 +212,24 @@ export default function useUsageHandler(): UsageHandlers {
       const pending = jotai.get(pendingAtom);
       const keep = responseId != null && pending.eventCount > 0;
       if (keep) {
+=======
+    /** Settle observed usage and clear live state. Pending supplies a response
+     * rollup only when the server supplied none (legacy FINAL or local stop).
+     * Session-only subagent usage still settles once, independently of which
+     * source supplied the whole-turn rollup. */
+    const flushPendingInto = (
+      convoKey: string,
+      responseId: string | null,
+      hasPersistedUsage = false,
+    ) => {
+      const pendingAtom = pendingUsageFamily(convoKey);
+      const pending = jotai.get(pendingAtom);
+      const keep = responseId != null && pending.eventCount > 0;
+      /** FINAL's persisted rollup covers the whole run; this subscriber may
+       * have observed only the last calls. Pending is a legacy/stop fallback,
+       * never a replacement for the response just upserted from the server. */
+      if (keep && !hasPersistedUsage) {
+>>>>>>> upstream/main
         setEntryUsage(convoKey, responseId, {
           input: pending.input,
           output: pending.output,
@@ -156,14 +250,27 @@ export default function useUsageHandler(): UsageHandlers {
       }
       jotai.set(pendingSubAtom, EMPTY_USAGE);
       jotai.set(pendingAtom, EMPTY_USAGE_TOTALS);
+<<<<<<< HEAD
     };
 
     const contextHandler: UsageHandlers['contextHandler'] = (data, submission) => {
       const convoKey = getConvoKey(submission);
+=======
+      jotai.set(activeUsageResponseIdFamily(convoKey), null);
+    };
+
+    const contextHandler: UsageHandlers['contextHandler'] = (data, submission) => {
+      const responseMessageId = bindResponse(submission);
+      const convoKey = resolveUsageKey(submission);
+>>>>>>> upstream/main
       jotai.set(contextSnapshotFamily(convoKey), {
         ...data,
         completedOutputTokens: data.resumedOutputTokens ?? data.completedOutputTokens,
         anchorMessageId: submission.userMessage?.messageId ?? null,
+<<<<<<< HEAD
+=======
+        responseMessageId,
+>>>>>>> upstream/main
       });
       if (data.calibrationRatio != null && data.calibrationRatio > 0) {
         jotai.set(calibrationFamily(convoKey), data.calibrationRatio);
@@ -191,7 +298,12 @@ export default function useUsageHandler(): UsageHandlers {
      *  `finalizeUsage` flushes the accumulated pending into the per-message index
      *  and resets it, so branch/total stay index-derived (no double count). */
     const foldUsage = (data: TTokenUsageEvent, submission: UsageSubmissionLike): boolean => {
+<<<<<<< HEAD
       const convoKey = getConvoKey(submission);
+=======
+      bindResponse(submission);
+      const convoKey = resolveUsageKey(submission);
+>>>>>>> upstream/main
       /** runId+seq is unique per model call; fall back to the payload when a
        *  source predates the sequence tag */
       const usageKey =
@@ -248,7 +360,11 @@ export default function useUsageHandler(): UsageHandlers {
      *  search). Resume is handled server-side (the job-store snapshot is reconciled
      *  when the call's usage is persisted), so no backfill reconcile is needed. */
     const reconcileLiveSnapshot = (data: TTokenUsageEvent, submission: UsageSubmissionLike) => {
+<<<<<<< HEAD
       const convoKey = getConvoKey(submission);
+=======
+      const convoKey = resolveUsageKey(submission);
+>>>>>>> upstream/main
       const snapshotAtom = contextSnapshotFamily(convoKey);
       const snapshot = jotai.get(snapshotAtom);
       if (snapshot == null) {
@@ -284,10 +400,18 @@ export default function useUsageHandler(): UsageHandlers {
        *  snapshot gauge keeps the full response for under-reporting providers */
       confirmedRef.current += normalizeUsageUnits(data).output;
       streamCharsRef.current = 0;
+<<<<<<< HEAD
       setLive(getConvoKey(submission), confirmedRef.current);
     };
 
     const tapStream: UsageHandlers['tapStream'] = (data, submission) => {
+=======
+      setLive(resolveUsageKey(submission), confirmedRef.current);
+    };
+
+    const tapStream: UsageHandlers['tapStream'] = (data, submission) => {
+      bindResponse(submission);
+>>>>>>> upstream/main
       const chars = countDeltaChars(data?.delta?.content);
       if (chars <= 0) {
         return;
@@ -298,12 +422,20 @@ export default function useUsageHandler(): UsageHandlers {
         return;
       }
       lastFlushRef.current = now;
+<<<<<<< HEAD
       const convoKey = getConvoKey(submission);
+=======
+      const convoKey = resolveUsageKey(submission);
+>>>>>>> upstream/main
       const ratio = jotai.get(calibrationFamily(convoKey));
       setLive(convoKey, confirmedRef.current + estimateTokens(streamCharsRef.current, ratio));
     };
 
     const tapContent: UsageHandlers['tapContent'] = (text, submission) => {
+<<<<<<< HEAD
+=======
+      bindResponse(submission);
+>>>>>>> upstream/main
       const value = extractContentText(text);
       if (value.length === 0) {
         return;
@@ -315,7 +447,11 @@ export default function useUsageHandler(): UsageHandlers {
         return;
       }
       lastFlushRef.current = now;
+<<<<<<< HEAD
       const convoKey = getConvoKey(submission);
+=======
+      const convoKey = resolveUsageKey(submission);
+>>>>>>> upstream/main
       const ratio = jotai.get(calibrationFamily(convoKey));
       setLive(convoKey, confirmedRef.current + estimateTokens(streamCharsRef.current, ratio));
     };
@@ -323,7 +459,11 @@ export default function useUsageHandler(): UsageHandlers {
     const resetLive: UsageHandlers['resetLive'] = (submission) => {
       streamCharsRef.current = 0;
       confirmedRef.current = 0;
+<<<<<<< HEAD
       const convoKey = getConvoKey(submission);
+=======
+      const convoKey = resolveUsageKey(submission);
+>>>>>>> upstream/main
       setLive(convoKey, 0);
       /** Terminal path with no salvageable response (stream error / intentional
        *  close): discard the in-flight pending usage — and the subagent share
@@ -334,12 +474,67 @@ export default function useUsageHandler(): UsageHandlers {
        *  them as already folded and the response's usage stays missing until a
        *  full reload. */
       jotai.set(pendingUsageFamily(convoKey), EMPTY_USAGE_TOTALS);
+<<<<<<< HEAD
+=======
+      jotai.set(activeUsageResponseIdFamily(convoKey), null);
+>>>>>>> upstream/main
       jotai.set(pendingSubagentUsageFamily(convoKey), EMPTY_USAGE);
       clearUsageFolded(convoKey);
     };
 
+<<<<<<< HEAD
     const attributePending: UsageHandlers['attributePending'] = (responseId, submission) => {
       const convoKey = getConvoKey(submission);
+=======
+    /** Both local stop and FINAL retain the same branch-owned context. Capture
+     * output from refs before resetting live state, including throttled text.
+     * Never promote a snapshot from a different response sharing the user. */
+    const retainSnapshot = (
+      convoKey: string,
+      responseId: string | null,
+      userMsgId: string | null,
+      output: number,
+      retainedToolTokens?: number,
+    ) => {
+      if (responseId == null) {
+        return;
+      }
+      const snapshotAtom = contextSnapshotFamily(convoKey);
+      const snapshot = jotai.get(snapshotAtom);
+      if (
+        snapshot == null ||
+        (snapshot.responseMessageId != null
+          ? snapshot.responseMessageId !== responseId
+          : snapshot.anchorMessageId !== userMsgId)
+      ) {
+        return;
+      }
+      const retained: ContextSnapshot = {
+        ...snapshot,
+        anchorMessageId: responseId,
+        responseMessageId: responseId,
+        ...(output > 0 && { completedOutputTokens: output }),
+        ...(retainedToolTokens != null &&
+          Number.isFinite(retainedToolTokens) &&
+          retainedToolTokens > 0 && { retainedToolTokens }),
+      };
+      jotai.set(snapshotAtom, retained);
+      const historyAtom = snapshotsByAnchorFamily(convoKey);
+      const next = new Map(jotai.get(historyAtom));
+      next.set(responseId, retained);
+      jotai.set(historyAtom, next);
+    };
+
+    const attributePending: UsageHandlers['attributePending'] = (responseId, submission) => {
+      const convoKey = resolveUsageKey(submission);
+      retainSnapshot(
+        convoKey,
+        responseId,
+        submission.userMessage?.messageId ?? null,
+        confirmedRef.current +
+          estimateTokens(streamCharsRef.current, jotai.get(calibrationFamily(convoKey))),
+      );
+>>>>>>> upstream/main
       /** Flush the billed-but-uncommitted usage onto the stopped partial reply
        *  (when its id is known and events were folded), then reset pending and
        *  the live estimate. Index-derived branch/total then reflect it. */
@@ -354,6 +549,10 @@ export default function useUsageHandler(): UsageHandlers {
     };
 
     const backfillUsage: UsageHandlers['backfillUsage'] = (entries, submission) => {
+<<<<<<< HEAD
+=======
+      bindResponse(submission);
+>>>>>>> upstream/main
       /** Fold the resumed run's persisted events idempotently — never reset
        *  the conversation totals, or a reconnect mid-stream would drop the
        *  usage of prompts already completed earlier in the session */
@@ -363,7 +562,12 @@ export default function useUsageHandler(): UsageHandlers {
     };
 
     const seedLive: UsageHandlers['seedLive'] = (chars, submission) => {
+<<<<<<< HEAD
       const convoKey = getConvoKey(submission);
+=======
+      bindResponse(submission);
+      const convoKey = resolveUsageKey(submission);
+>>>>>>> upstream/main
       /** A completed resumed call already carries exact output in its snapshot.
        * Trailing text is the same output, not a new streaming delta. */
       if (chars <= 0 || jotai.get(contextSnapshotFamily(convoKey))?.completedOutputTokens != null) {
@@ -375,7 +579,11 @@ export default function useUsageHandler(): UsageHandlers {
     };
 
     const finalizeUsage: UsageHandlers['finalizeUsage'] = (data, submission) => {
+<<<<<<< HEAD
       const fromKey = getConvoKey(submission);
+=======
+      const fromKey = resolveUsageKey(submission);
+>>>>>>> upstream/main
       const realId = data.conversation?.conversationId ?? fromKey;
       /** From the refs, not the atom — the throttle may not have flushed */
       const liveAtFinalize =
@@ -384,6 +592,7 @@ export default function useUsageHandler(): UsageHandlers {
 
       upsertEntries(fromKey, [data.requestMessage, data.responseMessage]);
 
+<<<<<<< HEAD
       if (realId !== fromKey) {
         migrateIndex(fromKey, realId);
         migrateUsageFolded(fromKey, realId);
@@ -398,6 +607,9 @@ export default function useUsageHandler(): UsageHandlers {
         );
         removeUsageAtoms(fromKey);
       }
+=======
+      moveConversation(fromKey, realId);
+>>>>>>> upstream/main
 
       const responseMeta = data.responseMessage?.contextMeta;
       if (responseMeta?.calibrationRatio != null && responseMeta.calibrationRatio > 0) {
@@ -411,7 +623,11 @@ export default function useUsageHandler(): UsageHandlers {
        *  reset pending. Branch/total are summed from the index, so this single
        *  add is counted exactly once; the persisted `metadata.usage` reproduces
        *  it on reload. */
+<<<<<<< HEAD
       flushPendingInto(realId, responseId);
+=======
+      flushPendingInto(realId, responseId, data.responseMessage?.metadata?.usage != null);
+>>>>>>> upstream/main
 
       const tailId = responseId ?? data.requestMessage?.messageId ?? null;
       if (tailId) {
@@ -419,6 +635,7 @@ export default function useUsageHandler(): UsageHandlers {
       }
       jotai.set(totalUsageFamily(realId), sumTotalUsage(realId));
 
+<<<<<<< HEAD
       const snapshotAtom = contextSnapshotFamily(realId);
       const snapshot = jotai.get(snapshotAtom);
       /** Re-anchor the snapshot from the user message — shared by both branches
@@ -451,6 +668,16 @@ export default function useUsageHandler(): UsageHandlers {
           jotai.set(historyAtom, next);
         }
       }
+=======
+      retainSnapshot(
+        realId,
+        responseId,
+        userMsgId,
+        liveAtFinalize,
+        (data.responseMessage?.metadata?.contextUsage as TContextUsageEvent | undefined)
+          ?.retainedToolTokens,
+      );
+>>>>>>> upstream/main
 
       streamCharsRef.current = 0;
       confirmedRef.current = 0;
@@ -458,6 +685,10 @@ export default function useUsageHandler(): UsageHandlers {
     };
 
     return {
+<<<<<<< HEAD
+=======
+      bindResponse,
+>>>>>>> upstream/main
       contextHandler,
       usageHandler,
       tapStream,

@@ -31,6 +31,10 @@ import { useChatFormContext, useUploadModalContext } from '~/Providers';
 import useComposerBindings from '~/hooks/Input/useComposerBindings';
 import useFileUploadRouter from '~/hooks/Files/useFileUploadRouter';
 import { useAgentsMapContext } from '~/Providers/AgentsMapContext';
+<<<<<<< HEAD
+=======
+import { useChatSettings } from '~/Providers/ChatSettingsContext';
+>>>>>>> upstream/main
 import useGetSender from '~/hooks/Conversations/useGetSender';
 import useUploadOptions from '~/hooks/Files/useUploadOptions';
 import { useInteractionHealthCheck } from '~/data-provider';
@@ -51,6 +55,10 @@ export default function useTextarea({
   allowSubmitWhileGenerating = false,
   onDuringRunModifier,
   answerModeActive = false,
+<<<<<<< HEAD
+=======
+  enterToSend,
+>>>>>>> upstream/main
 }: {
   textAreaRef: React.RefObject<HTMLTextAreaElement>;
   submitButtonRef: React.RefObject<HTMLButtonElement>;
@@ -64,6 +72,11 @@ export default function useTextarea({
   onDuringRunModifier?: (kind: 'other' | 'interrupt' | 'preempt') => void;
   /** Keeps pasted text inline while the composer is answering a paused question. */
   answerModeActive?: boolean;
+<<<<<<< HEAD
+=======
+  /** Host-owned: whether Enter sends. The hint advertises the same value. */
+  enterToSend: boolean;
+>>>>>>> upstream/main
 }) {
   const localize = useLocalize();
   const getSender = useGetSender();
@@ -82,8 +95,12 @@ export default function useTextarea({
   const { openModal } = useUploadModalContext();
   const assistantMap = useAssistantsMapContext();
   const checkHealth = useInteractionHealthCheck();
+<<<<<<< HEAD
   const enterToSend = useRecoilValue(store.enterToSend);
   const saveDrafts = useRecoilValue(store.saveDrafts);
+=======
+  const { saveDrafts } = useChatSettings();
+>>>>>>> upstream/main
   const pasteLongTextAsFile = useRecoilValue(store.pasteLongTextAsFile);
   const { shortcutsEnabled, submitOverride, yieldedChords } = useComposerBindings();
 
@@ -154,12 +171,28 @@ export default function useTextarea({
    *  navigation that resolves its record before moving the route. */
   useEffect(() => {
     const text = pendingComposerText ?? '';
+<<<<<<< HEAD
     if (text === '' || !insertComposerText(text)) {
+=======
+    if (text === '') {
+      return;
+    }
+    /* A reclaimed steer must not overwrite a draft the user typed while the
+     * cancel request was in flight. Keep both messages distinct when the
+     * composer already owns text; an empty composer receives the exact steer. */
+    const currentText = textAreaRef.current?.value ?? '';
+    const handoffText = currentText.length > 0 ? `\n${text}` : text;
+    if (!insertComposerText(handoffText)) {
+>>>>>>> upstream/main
       return;
     }
 
     setPendingComposerText(undefined);
+<<<<<<< HEAD
   }, [insertComposerText, pendingComposerText, setPendingComposerText]);
+=======
+  }, [insertComposerText, pendingComposerText, setPendingComposerText, textAreaRef]);
+>>>>>>> upstream/main
 
   useEffect(() => {
     const currentValue = textAreaRef.current?.value ?? '';
@@ -196,11 +229,14 @@ export default function useTextarea({
           ? getEntityName({ name: entityName, isAgent, localize })
           : getSender(conversation as TEndpointOption);
 
+<<<<<<< HEAD
       // NJ: Custom prompt placeholder, if not an agent
       if (!isAgent) {
         return 'What would you like to accomplish today?';
       }
 
+=======
+>>>>>>> upstream/main
       return `${localize('com_endpoint_message_new', {
         0: sender ? sender : localize('com_endpoint_ai'),
       })}`;
@@ -476,7 +512,11 @@ export default function useTextarea({
       if (saveDrafts && isFilesDraftOwnedByThisTab(getFilesDraft(draftId))) {
         addPastedTextDraftFile({ id: draftId, fileId: pendingFileId });
         try {
+<<<<<<< HEAD
           setDraft({ id: draftId, value: composerValue, persistExact: true });
+=======
+          setDraft({ id: draftId, value: composerValue });
+>>>>>>> upstream/main
           setPendingTextAttachmentDraft({
             id: draftId,
             fileId: pendingFileId,

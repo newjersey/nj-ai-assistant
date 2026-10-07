@@ -89,6 +89,10 @@ describe('cleanupMCPServerOAuth', () => {
 
   it('retries when callback persistence crosses the credential snapshot', async () => {
     const deleteTokens = jest.fn();
+<<<<<<< HEAD
+=======
+    const flowManager = createFlowManager();
+>>>>>>> upstream/main
     let clientRead = 0;
     const findToken = jest.fn(async ({ type }: { type?: string }) => {
       const generation =
@@ -130,10 +134,17 @@ describe('cleanupMCPServerOAuth', () => {
       pluginKey: 'mcp_test-server',
       serverConfigOverride: { type: 'streamable-http', url: 'https://example.com/mcp' },
       dependencies: {
+<<<<<<< HEAD
         flowManager: createFlowManager() as never,
         oauthHandler: {
           generateFlowId: jest.fn(() => 'user-1:test-server'),
           generateTokenFlowId: jest.fn(() => 'user-1:test-server'),
+=======
+        flowManager: flowManager as never,
+        oauthHandler: {
+          generateFlowId: jest.fn(() => 'user-1:test-server'),
+          generateTokenFlowId: jest.fn(() => 'tokens-v2:user-1:test-server'),
+>>>>>>> upstream/main
           deleteFlowAndStateMapping: jest.fn(),
           revokeOAuthToken: jest.fn(),
         },
@@ -150,6 +161,14 @@ describe('cleanupMCPServerOAuth', () => {
       },
     });
 
+<<<<<<< HEAD
+=======
+    expect(flowManager.deleteFlow).toHaveBeenCalledWith(
+      'tokens-v2:user-1:test-server',
+      'mcp_get_tokens',
+    );
+    expect(flowManager.deleteFlow).toHaveBeenCalledWith('user-1:test-server', 'mcp_get_tokens');
+>>>>>>> upstream/main
     expect(findToken).toHaveBeenCalledTimes(8);
     expect(deleteTokens).toHaveBeenCalledTimes(3);
     for (const [filter] of deleteTokens.mock.calls) {

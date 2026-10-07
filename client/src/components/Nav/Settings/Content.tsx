@@ -29,18 +29,30 @@ export default function Content({ activeTab, query, ctx }: ContentProps) {
     return (
       <div aria-label={localize('com_ui_settings_results_aria')} aria-live="polite">
         {results.length === 0 ? (
+<<<<<<< HEAD
           <p className="p-2 text-sm text-text-secondary">
             {localize('com_ui_settings_no_results')}
           </p>
         ) : (
           <div className="divide-y divide-border-light overflow-hidden rounded-xl border border-border-light text-sm text-text-primary">
+=======
+          <p className="text-text-secondary p-2 text-sm">
+            {localize('com_ui_settings_no_results')}
+          </p>
+        ) : (
+          <div className="text-text-primary overflow-hidden rounded-xl text-sm">
+>>>>>>> upstream/main
             {results.map(({ entry, label }) => {
               const Cmp = entry.Component;
               const tabMeta = TABS.find((t) => t.id === entry.tab)!;
               const sectionMeta = tabMeta.sections.find((s) => s.id === entry.section);
               return (
                 <div key={entry.id} className="px-4 py-3">
+<<<<<<< HEAD
                   <div className="mb-1.5 text-xs text-text-tertiary">
+=======
+                  <div className="text-text-tertiary mb-1.5 text-xs">
+>>>>>>> upstream/main
                     {localize(tabMeta.labelKey)} ›{' '}
                     {sectionMeta ? localize(sectionMeta.labelKey) : label}
                   </div>

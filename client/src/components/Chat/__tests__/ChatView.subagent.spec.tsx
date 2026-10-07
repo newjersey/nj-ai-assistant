@@ -49,11 +49,19 @@ jest.mock('~/Providers', () => {
     ChatContext: Context,
     AddedChatContext: Context,
     ChatFormProvider: Passthrough,
+<<<<<<< HEAD
+=======
+    ComposerRestoreProvider: Passthrough,
+>>>>>>> upstream/main
     useFileMapContext: () => new Map(),
   };
 });
 
 jest.mock('~/data-provider', () => ({
+<<<<<<< HEAD
+=======
+  useProjectQuery: () => ({ data: undefined }),
+>>>>>>> upstream/main
   useGetMessagesByConvoId: () => ({
     data: [{ messageId: 'message-1' }],
     isLoading: false,
@@ -68,6 +76,12 @@ jest.mock('../Presentation', () => ({ children }: { children: React.ReactNode })
 ));
 jest.mock('../Input/ChatForm', () => () => <div data-testid="chat-form" />);
 jest.mock('../Landing', () => () => <div data-testid="landing" />);
+<<<<<<< HEAD
+=======
+jest.mock('../Trace', () => ({
+  TraceSurface: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
+>>>>>>> upstream/main
 jest.mock('../Footer', () => ({
   __esModule: true,
   default: () => <div data-testid="footer" />,
@@ -110,6 +124,7 @@ describe('ChatView child-thread execution identity', () => {
     expect(screen.getByRole('note')).toHaveTextContent('com_ui_subagent_thread_read_only');
     expect(screen.getByTestId('header')).toHaveAttribute('data-read-only', 'true');
   });
+<<<<<<< HEAD
 
   it('keeps a saved-agent child view-only after it settles', () => {
     mockConversation = {
@@ -126,4 +141,6 @@ describe('ChatView child-thread execution identity', () => {
     expect(screen.getByRole('note')).toHaveTextContent('com_ui_subagent_thread_read_only');
     expect(screen.getByTestId('header')).toHaveAttribute('data-read-only', 'true');
   });
+=======
+>>>>>>> upstream/main
 });

@@ -4,6 +4,14 @@ export interface IChatProject {
   _id?: Types.ObjectId;
   name: string;
   description?: string;
+<<<<<<< HEAD
+=======
+  instructions?: string;
+  contextRevision?: number;
+  file_ids?: string[];
+  hasInstructions?: boolean;
+  fileCount?: number;
+>>>>>>> upstream/main
   user: string;
   conversationCount: number;
   lastConversationAt?: Date | null;

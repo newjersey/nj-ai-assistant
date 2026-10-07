@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { hoverButtonClasses, messageFooterClasses, revealOnRowHoverClasses } from '../styles';
+=======
+import { hoverButtonClasses, revealOnRowHoverClasses } from '../styles';
+>>>>>>> upstream/main
 
 const FADE = '[@media(hover:hover)]:opacity-0';
 
@@ -92,6 +96,7 @@ describe('hoverButtonClasses', () => {
     expect(hoverButtonClasses({ className: 'ml-0' })).toContain('ml-0');
   });
 });
+<<<<<<< HEAD
 
 describe('messageFooterClasses', () => {
   /** A hover button is a 19px icon with p-1.5 either side, so the row it forms is
@@ -100,3 +105,5 @@ describe('messageFooterClasses', () => {
     expect(messageFooterClasses).toContain('min-h-[31px]');
   });
 });
+=======
+>>>>>>> upstream/main

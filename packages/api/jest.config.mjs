@@ -5,6 +5,10 @@ const esModules = [
   '@langchain/langgraph-checkpoint',
   '@langchain/langgraph-sdk',
   '@mistralai/mistralai',
+<<<<<<< HEAD
+=======
+  '@modelcontextprotocol/ext-apps',
+>>>>>>> upstream/main
   'domelementtype',
   'domhandler',
   'dom-serializer',

@@ -3,8 +3,14 @@ import type * as t from '~/mcp/types';
 import {
   setMCPToolsChangedHandler,
   setMCPToolsChangedRevisionHandler,
+<<<<<<< HEAD
   getMCPAppToolsPublicationGeneration,
 } from '~/mcp/toolsChanged';
+=======
+  getMCPToolCatalogGeneration,
+} from '~/mcp/toolsChanged';
+import { STANDARD_MCP_CAPABILITY_PROFILE } from '~/mcp/capabilities';
+>>>>>>> upstream/main
 import { ConnectionsRepository } from '~/mcp/ConnectionsRepository';
 import { MCPConnectionFactory } from '~/mcp/MCPConnectionFactory';
 import { MCPConnection } from '~/mcp/connection';
@@ -37,10 +43,18 @@ const mockRegistryInstance = {
   shouldEnableSSRFProtection: mockShouldEnableSSRFProtection,
   getAllowedDomains: mockGetAllowedDomains,
   getAllowedAddresses: mockGetAllowedAddresses,
+<<<<<<< HEAD
+=======
+  getMCPAppsPolicy: jest.fn().mockReturnValue({ enabled: true, legacyHtmlEnabled: true }),
+>>>>>>> upstream/main
   resolveAllowlists: jest.fn(async () => ({
     allowedDomains: mockGetAllowedDomains(),
     allowedAddresses: mockGetAllowedAddresses(),
     useSSRFProtection: mockShouldEnableSSRFProtection(),
+<<<<<<< HEAD
+=======
+    mcpApps: { enabled: true, legacyHtmlEnabled: true },
+>>>>>>> upstream/main
   })),
 };
 
@@ -143,6 +157,10 @@ describe('ConnectionsRepository', () => {
           allowedDomains: null,
           allowedAddresses: null,
           dbSourced: false,
+<<<<<<< HEAD
+=======
+          capabilityProfile: STANDARD_MCP_CAPABILITY_PROFILE,
+>>>>>>> upstream/main
         },
         undefined,
       );
@@ -151,6 +169,84 @@ describe('ConnectionsRepository', () => {
       expect(mockConnection.refreshToolList).not.toHaveBeenCalled();
     });
 
+<<<<<<< HEAD
+=======
+    it('creates an operator connection only for the expected current config', async () => {
+      const expectedConfig = mockServerConfigs.server1;
+
+      await expect(repository.get('server1', { expectedConfig })).resolves.toBe(mockConnection);
+
+      expect(MCPConnectionFactory.create).toHaveBeenCalledWith(
+        expect.objectContaining({ serverConfig: expectedConfig }),
+        undefined,
+      );
+    });
+
+    it('rejects a stale expected config without evicting the current pooled connection', async () => {
+      repository['connections'].set('server1', mockConnection);
+      const staleConfig = { ...mockServerConfigs.server1, url: 'http://localhost:3999' };
+
+      await expect(repository.get('server1', { expectedConfig: staleConfig })).rejects.toThrow(
+        'changed during connection checkout',
+      );
+
+      expect(repository.getPooledConnection('server1')).toBe(mockConnection);
+      expect(mockConnection.dispose).not.toHaveBeenCalled();
+    });
+
+    it('disposes a new connection when the current config changes before publication', async () => {
+      let releaseCreation!: () => void;
+      let markCreationStarted!: () => void;
+      const creationHeld = new Promise<void>((resolve) => {
+        releaseCreation = resolve;
+      });
+      const creationStarted = new Promise<void>((resolve) => {
+        markCreationStarted = resolve;
+      });
+      (MCPConnectionFactory.create as jest.Mock).mockImplementationOnce(async () => {
+        markCreationStarted();
+        await creationHeld;
+        return mockConnection;
+      });
+
+      const load = repository.get('server1', { expectedConfig: mockServerConfigs.server1 });
+      await creationStarted;
+      mockServerConfigs.server1 = { ...mockServerConfigs.server1, url: 'http://localhost:3999' };
+      releaseCreation();
+
+      await expect(load).rejects.toThrow('changed during connection checkout');
+      expect(mockConnection.dispose).toHaveBeenCalledTimes(1);
+      expect(repository.getPooledConnection('server1')).toBeUndefined();
+    });
+
+    it('refuses an app connection for a server declaring chat-only headers', async () => {
+      mockServerConfigs.server1 = {
+        ...mockServerConfigs.server1,
+        requestHeaders: { 'X-Workspace': 'workspace-1' },
+      } as t.ParsedServerConfig;
+
+      const result = await repository.get('server1');
+
+      /** A shared session would carry these into its own `initialize` and
+       *  `tools/list`, which every later catalog read reuses. */
+      expect(result).toBeNull();
+      expect(MCPConnectionFactory.create).not.toHaveBeenCalled();
+    });
+
+    it('still creates a user-owned connection for a server declaring chat-only headers', async () => {
+      mockServerConfigs.server1 = {
+        ...mockServerConfigs.server1,
+        requestHeaders: { 'X-Workspace': 'workspace-1' },
+      } as t.ParsedServerConfig;
+      const userRepository = new ConnectionsRepository('user-1');
+
+      const result = await userRepository.get('server1');
+
+      expect(result).toBe(mockConnection);
+      expect(MCPConnectionFactory.create).toHaveBeenCalledTimes(1);
+    });
+
+>>>>>>> upstream/main
     it('serializes concurrent creation so only one connection is retained', async () => {
       const [first, second] = await Promise.all([
         repository.get('server1'),
@@ -182,7 +278,11 @@ describe('ConnectionsRepository', () => {
         expect.objectContaining({
           serverName: 'server1',
           tools: [],
+<<<<<<< HEAD
           publicationGeneration: getMCPAppToolsPublicationGeneration(mockServerConfigs.server1),
+=======
+          publicationGeneration: getMCPToolCatalogGeneration(mockServerConfigs.server1),
+>>>>>>> upstream/main
         }),
       );
       expect(loaded).toBe(false);
@@ -340,6 +440,10 @@ describe('ConnectionsRepository', () => {
           allowedDomains: null,
           allowedAddresses: null,
           dbSourced: false,
+<<<<<<< HEAD
+=======
+          capabilityProfile: STANDARD_MCP_CAPABILITY_PROFILE,
+>>>>>>> upstream/main
         },
         undefined,
       );
@@ -383,6 +487,10 @@ describe('ConnectionsRepository', () => {
           allowedDomains: null,
           allowedAddresses: null,
           dbSourced: false,
+<<<<<<< HEAD
+=======
+          capabilityProfile: STANDARD_MCP_CAPABILITY_PROFILE,
+>>>>>>> upstream/main
         },
         undefined,
       );

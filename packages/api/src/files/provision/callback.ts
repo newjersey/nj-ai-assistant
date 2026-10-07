@@ -1,5 +1,6 @@
 import { Constants } from '@librechat/agents';
 import { logger } from '@librechat/data-schemas';
+<<<<<<< HEAD
 import {
   EToolResources,
   getCodeEnvRefForProfile,
@@ -18,6 +19,16 @@ import {
 } from '~/files/code/destinations';
 import { createCodeApiRateLimitBudget, isCodeApiRateLimitError } from '~/utils';
 import { getCodeEnvUploadFilename } from '../code/form';
+=======
+import { EToolResources } from 'librechat-data-provider';
+import type { CodeEnvFile, SubagentExecutionContext } from '@librechat/agents';
+import type { TFile } from 'librechat-data-provider';
+import type { CodeEnvRefUpdate, ProvisionService } from './service';
+import type { ProvisionToolContext } from '../code/queued';
+import type { ServerRequest } from '~/types';
+import { createCodeApiRateLimitBudget, isCodeApiRateLimitError } from '~/utils';
+import { planCodeFileUploads } from '../code/queued';
+>>>>>>> upstream/main
 import { isCodeFileToolName } from '~/agents/tools';
 
 /** Deferred database write produced by a successful provisioning call. */
@@ -46,6 +57,7 @@ async function persistWithRetry(
   return false;
 }
 
+<<<<<<< HEAD
 /** The slice of a per-agent tool context this callback reads and updates. */
 export interface ProvisionToolContext {
   provisionState?: ProvisionState;
@@ -55,11 +67,22 @@ export interface ProvisionToolContext {
   /** Successful refs retained while another file in the same batch awaits retry. */
   pendingProvisionedCodeFiles?: CodeEnvFile[];
 }
+=======
+export type { ProvisionToolContext } from '../code/queued';
+>>>>>>> upstream/main
 
 export interface ProvisionCallbackDeps {
   req: ServerRequest;
   agentToolContexts: Map<string, ProvisionToolContext>;
   resolvePrimaryAgentId?: () => string | undefined;
+<<<<<<< HEAD
+=======
+  /** A child routed per call keeps its own context, keyed by its execution. */
+  resolveExecutionContext?: (
+    agentId: string | undefined,
+    executionContext: SubagentExecutionContext | undefined,
+  ) => ProvisionToolContext | undefined;
+>>>>>>> upstream/main
   provisionToCodeEnv: ProvisionService['provisionToCodeEnv'];
   provisionToVectorDB: ProvisionService['provisionToVectorDB'];
   updateFile: (update: FileUpdate) => Promise<unknown>;
@@ -108,6 +131,10 @@ export function createProvisionFilesCallback({
   req,
   agentToolContexts,
   resolvePrimaryAgentId,
+<<<<<<< HEAD
+=======
+  resolveExecutionContext,
+>>>>>>> upstream/main
   provisionToCodeEnv,
   provisionToVectorDB,
   updateFile,
@@ -117,6 +144,10 @@ export function createProvisionFilesCallback({
   toolNames: string[],
   agentId?: string,
   signal?: AbortSignal,
+<<<<<<< HEAD
+=======
+  executionContext?: SubagentExecutionContext,
+>>>>>>> upstream/main
 ) => Promise<CodeEnvFile[]> {
   /* Agents in a handoff or parallel graph are initialized independently over the same
    * request attachments, so each holds its own ProvisionState for the same file. Keyed
@@ -150,6 +181,10 @@ export function createProvisionFilesCallback({
     toolNames: string[],
     agentId?: string,
     signal?: AbortSignal,
+<<<<<<< HEAD
+=======
+    executionContext?: SubagentExecutionContext,
+>>>>>>> upstream/main
   ): Promise<CodeEnvFile[]> {
     signal?.throwIfAborted();
     /* agentId is optional on this callback and a batch for the primary agent may omit
@@ -159,11 +194,23 @@ export function createProvisionFilesCallback({
      * while reading state from a fallback context would upload them as user-scoped,
      * then reconstruct them as agent-scoped on the next turn, and the entity id used to
      * query those vectors would no longer match the one they were stored under. */
+<<<<<<< HEAD
     const { ctx, resolvedAgentId } = resolveProvisionContext({
       agentId,
       agentToolContexts,
       primaryAgentId: resolvePrimaryAgentId?.(),
     });
+=======
+    const placedCtx = resolveExecutionContext?.(agentId, executionContext);
+    const { ctx, resolvedAgentId } =
+      placedCtx != null
+        ? { ctx: placedCtx, resolvedAgentId: agentId }
+        : resolveProvisionContext({
+            agentId,
+            agentToolContexts,
+            primaryAgentId: resolvePrimaryAgentId?.(),
+          });
+>>>>>>> upstream/main
     if (!ctx?.provisionState) {
       return [];
     }
@@ -259,6 +306,7 @@ export function createProvisionFilesCallback({
       ? [...(ctx.pendingProvisionedCodeFiles ?? [])]
       : [];
     if (needsCode && provisionState.codeEnvFiles.length > 0) {
+<<<<<<< HEAD
       const queuedFileIds = new Set(provisionState.codeEnvFiles.map((file) => file.file_id));
       const liveFiles =
         (ctx.tool_resources as Record<string, { files?: TFile[] } | undefined>)[
@@ -346,6 +394,26 @@ export function createProvisionFilesCallback({
             ),
             file.file_id,
           );
+=======
+      const uploads = planCodeFileUploads({
+        context: ctx,
+        contexts: agentToolContexts.values(),
+        agentId: resolvedAgentId,
+        userId: req.user?.id,
+        useAdvertisedNames: true,
+      });
+      provisionState.codeEnvDestinations ??= new Map();
+      for (const { file, destination } of uploads) {
+        provisionState.codeEnvDestinations.set(file.file_id, destination);
+      }
+      const queuedCodeFiles = uploads.map(({ file }) => file);
+      /** Every file in this tool-load batch shares one wait allowance. */
+      const codeApiRateLimitBudget = createCodeApiRateLimitBudget(
+        req.config?.endpoints?.agents?.codeApiMaxRetryWaitMs,
+      );
+      const results = await Promise.allSettled(
+        uploads.map(async ({ file, destination: sandboxFilename }) => {
+>>>>>>> upstream/main
           const provisioned = await shareProvisioning(
             shareKey(`code:${codeRouteKey}`, file, sandboxFilename),
             async () => {

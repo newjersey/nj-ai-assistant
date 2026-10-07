@@ -1,7 +1,11 @@
 import React from 'react';
 import { RecoilRoot } from 'recoil';
 import { render } from '@testing-library/react';
+<<<<<<< HEAD
 import type { PtcTraceEntry } from '~/store/ptc';
+=======
+import type { PtcTraceEntry } from '~/common';
+>>>>>>> upstream/main
 import { ptcTraceByToolCallId, ptcTraceKey } from '~/store/ptc';
 import { MessageContext } from '~/Providers/MessageContext';
 import ExecuteCode from '../ExecuteCode';

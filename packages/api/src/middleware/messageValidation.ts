@@ -71,12 +71,33 @@ export type MessageValidationDeps = {
   logger: MessageValidationLogger;
 };
 
+<<<<<<< HEAD
+=======
+export type MessageRequestValidationOptions = {
+  /**
+   * The route reads one stored message of the conversation (a tool-call part) rather than
+   * addressing a message for mutation, so a conversation that is still only an active job
+   * before its first save stays readable to the job's owner, as the conversation read is.
+   */
+  activeJobMessageRead?: boolean;
+};
+
+>>>>>>> upstream/main
 export type MessageRequestMiddleware = {
   canReadActiveJobConversation: (
     req: MessageValidationRequest,
     conversationId?: string,
+<<<<<<< HEAD
   ) => Promise<boolean>;
   createMessageRequestValidation: (req: MessageValidationRequest) => MessageRequestValidation;
+=======
+    options?: MessageRequestValidationOptions,
+  ) => Promise<boolean>;
+  createMessageRequestValidation: (
+    req: MessageValidationRequest,
+    options?: MessageRequestValidationOptions,
+  ) => MessageRequestValidation;
+>>>>>>> upstream/main
   prepareMessageRequestValidation: (
     req: MessageValidationRequest,
     res: Response,
@@ -105,8 +126,17 @@ export function createMessageRequestMiddleware(
   async function canReadActiveJobConversation(
     req: MessageValidationRequest,
     conversationId?: string,
+<<<<<<< HEAD
   ): Promise<boolean> {
     if (!isPublicReadMethod(req.method) || req.params?.messageId) {
+=======
+    options?: MessageRequestValidationOptions,
+  ): Promise<boolean> {
+    if (!isPublicReadMethod(req.method)) {
+      return false;
+    }
+    if (req.params?.messageId && options?.activeJobMessageRead !== true) {
+>>>>>>> upstream/main
       return false;
     }
 
@@ -143,11 +173,19 @@ export function createMessageRequestMiddleware(
   async function validateConversationAccess(
     req: MessageValidationRequest,
     conversationId?: string,
+<<<<<<< HEAD
+=======
+    options?: MessageRequestValidationOptions,
+>>>>>>> upstream/main
   ): Promise<MessageValidationResult> {
     const conversation = await deps.getConvo(req.user.id, conversationId);
 
     if (!conversation) {
+<<<<<<< HEAD
       if (await canReadActiveJobConversation(req, conversationId)) {
+=======
+      if (await canReadActiveJobConversation(req, conversationId, options)) {
+>>>>>>> upstream/main
         return { ok: true };
       }
 
@@ -172,7 +210,14 @@ export function createMessageRequestMiddleware(
     return { ok: true };
   }
 
+<<<<<<< HEAD
   function createMessageRequestValidation(req: MessageValidationRequest): MessageRequestValidation {
+=======
+  function createMessageRequestValidation(
+    req: MessageValidationRequest,
+    options?: MessageRequestValidationOptions,
+  ): MessageRequestValidation {
+>>>>>>> upstream/main
     const body = req.body ?? {};
     const paramConversationId = req.params?.conversationId;
     const bodyConversationId = body.conversationId;
@@ -207,7 +252,11 @@ export function createMessageRequestMiddleware(
     return {
       conversationId,
       shouldFetchMessages: true,
+<<<<<<< HEAD
       promise: validateConversationAccess(req, conversationId),
+=======
+      promise: validateConversationAccess(req, conversationId, options),
+>>>>>>> upstream/main
     };
   }
 

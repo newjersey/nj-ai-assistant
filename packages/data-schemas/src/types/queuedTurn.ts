@@ -1,3 +1,8 @@
+<<<<<<< HEAD
+=======
+import type { TReasoningOverride } from 'librechat-data-provider';
+import type { CodeApprovalMode } from 'librechat-data-provider';
+>>>>>>> upstream/main
 import type { Document, Types } from 'mongoose';
 
 export type AgentQueuedTurnStatus =
@@ -72,6 +77,12 @@ export interface IAgentQueuedTurn {
   files?: AgentQueuedTurnFileRef[];
   quotes?: string[];
   manualSkills?: string[];
+<<<<<<< HEAD
+=======
+  /** Per-turn selection, absent on legacy queue rows. Not a permission grant. */
+  codeApprovalMode?: CodeApprovalMode;
+  reasoningOverride?: TReasoningOverride;
+>>>>>>> upstream/main
   expectedPredecessorCreatedAt?: number;
   attempts: number;
   availableAt: Date;
@@ -148,6 +159,11 @@ export type AgentQueuedTurnActiveRecord = Pick<
   | 'files'
   | 'quotes'
   | 'manualSkills'
+<<<<<<< HEAD
+=======
+  | 'codeApprovalMode'
+  | 'reasoningOverride'
+>>>>>>> upstream/main
   | 'expectedPredecessorCreatedAt'
   | 'attempts'
   | 'availableAt'

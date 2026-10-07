@@ -48,7 +48,11 @@ export const revealOnRowHoverClasses =
  * completes. The value is the height of a hover button, `p-1.5` either side of a
  * 19px icon.
  */
+<<<<<<< HEAD
 export const messageFooterClasses = 'min-h-[31px] text-xs';
+=======
+export const messageFooterClasses = 'min-h-[1.9375rem] text-xs';
+>>>>>>> upstream/main
 
 type HoverButtonStyleOptions = {
   isActive?: boolean;
@@ -80,7 +84,11 @@ export const hoverButtonClasses = ({
     'group-hover:visible group-focus-visible:visible group-has-[:focus-visible:not(:is(input,textarea,[contenteditable]))]:visible group-[.final-completion]:visible',
     !isLast && revealOnRowHoverClasses,
     'group-has-[.hover-button-active]:visible group-has-[.hover-button-active]:opacity-100',
+<<<<<<< HEAD
     'focus-visible:ring-2 focus-visible:ring-text-primary focus-visible:outline-none',
+=======
+    'focus-visible:ring-2 focus-visible:ring-text-primary focus-visible:outline-hidden',
+>>>>>>> upstream/main
     isActive && 'hover-button-active active text-text-primary bg-surface-hover',
     className,
   );

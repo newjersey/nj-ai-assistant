@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { useState, useRef, useMemo, useEffect } from 'react';
+=======
+import { useState, useRef, useMemo, useEffect, useId } from 'react';
+>>>>>>> upstream/main
 import { Plus } from 'lucide-react';
 import { useRecoilValue } from 'recoil';
 import { useLocation } from 'react-router-dom';
@@ -11,8 +15,13 @@ import {
   useAuthContext,
   activateCatalog,
 } from '~/hooks';
+<<<<<<< HEAD
 import MCPConfigDialog from '~/components/MCP/MCPConfigDialog';
 import { PanelFooter, PanelContent } from '~/components/ui';
+=======
+import { PanelFooter, PanelContent, PanelHeader } from '~/components/ui';
+import MCPConfigDialog from '~/components/MCP/MCPConfigDialog';
+>>>>>>> upstream/main
 import MCPServerCardSkeleton from './MCPServerCardSkeleton';
 import { useMCPRefresh } from '~/hooks/MCP/useMCPRefresh';
 import MCPAdminSettings from './MCPAdminSettings';
@@ -22,6 +31,10 @@ import store from '~/store';
 
 export default function MCPBuilderPanel() {
   const localize = useLocalize();
+<<<<<<< HEAD
+=======
+  const headingId = useId();
+>>>>>>> upstream/main
   const location = useLocation();
   /** The panel stays mounted while the sidebar is hidden (collapsed, mobile
    * drawer, or the insights route collapsing it), so only a visible panel
@@ -63,6 +76,7 @@ export default function MCPBuilderPanel() {
   return (
     <div
       role="region"
+<<<<<<< HEAD
       aria-label={localize('com_ui_mcp_servers')}
       className="flex h-full w-full flex-col overflow-hidden pt-2"
     >
@@ -77,6 +91,17 @@ export default function MCPBuilderPanel() {
             containerClassName="flex-1"
           />
           {hasCreateAccess && (
+=======
+      aria-labelledby={headingId}
+      className="flex h-full w-full flex-col overflow-hidden pt-2"
+    >
+      {/* Sticky header: title, create, search */}
+      <PanelHeader
+        title={localize('com_ui_mcp_servers')}
+        titleId={headingId}
+        action={
+          hasCreateAccess && (
+>>>>>>> upstream/main
             <MCPServerDialog
               open={showDialog}
               onOpenChange={setShowDialog}
@@ -89,9 +114,15 @@ export default function MCPBuilderPanel() {
                   render={
                     <Button
                       ref={addButtonRef}
+<<<<<<< HEAD
                       variant="outline"
                       size="icon"
                       className="size-9 shrink-0 bg-transparent"
+=======
+                      variant="ghost"
+                      size="icon"
+                      className="size-8 shrink-0"
+>>>>>>> upstream/main
                       onClick={() => setShowDialog(true)}
                       aria-label={localize('com_ui_add_mcp')}
                     >
@@ -101,9 +132,23 @@ export default function MCPBuilderPanel() {
                 />
               </OGDialogTrigger>
             </MCPServerDialog>
+<<<<<<< HEAD
           )}
         </div>
       </div>
+=======
+          )
+        }
+        search={
+          <FilterInput
+            inputId="mcp-filter"
+            label={localize('com_ui_filter_mcp_servers')}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        }
+      />
+>>>>>>> upstream/main
 
       {/* Only the list scrolls */}
       <PanelContent

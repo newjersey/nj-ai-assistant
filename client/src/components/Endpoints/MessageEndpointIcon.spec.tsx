@@ -3,8 +3,12 @@ import { EModelEndpoint, ProviderId } from 'librechat-data-provider';
 import type { TEndpointsConfig } from 'librechat-data-provider';
 import MessageEndpointIcon from './MessageEndpointIcon';
 
+<<<<<<< HEAD
 // NJ: Most of this is broken because we override with our own icon
 describe.skip('MessageEndpointIcon', () => {
+=======
+describe('MessageEndpointIcon', () => {
+>>>>>>> upstream/main
   it('uses the semantic foreground when an endpoint icon has no background', () => {
     const { container } = render(
       <MessageEndpointIcon

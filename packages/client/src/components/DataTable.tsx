@@ -16,6 +16,10 @@ import {
 import type { Table as TTable } from '@tanstack/react-table';
 import { Table, TableRow, TableBody, TableCell, TableHead, TableHeader } from './Table';
 import { useMediaQuery, useLocalize, TranslationKeys } from '~/hooks';
+<<<<<<< HEAD
+=======
+import { useTableRowHeight } from './DataTable/DataTable.hooks';
+>>>>>>> upstream/main
 import AnimatedSearchInput from './AnimatedSearchInput';
 import { TrashIcon, Spinner } from '~/svgs';
 import { Skeleton } from './Skeleton';
@@ -45,7 +49,11 @@ const SelectionCheckbox = memo(
       role="button"
       tabIndex={0}
       onKeyDown={(e) => e.stopPropagation()}
+<<<<<<< HEAD
       className="flex h-full w-[30px] items-center justify-center"
+=======
+      className="flex h-full w-[1.875rem] items-center justify-center"
+>>>>>>> upstream/main
       onClick={(e) => e.stopPropagation()}
     >
       <Checkbox checked={checked} onCheckedChange={onChange} aria-label={ariaLabel} />
@@ -81,12 +89,21 @@ const TableRowComponent = <TData, TValue>({
   onSelectionChange,
   index,
   isSearching,
+<<<<<<< HEAD
+=======
+  measureRef,
+>>>>>>> upstream/main
 }: {
   row: Row<TData>;
   isSmallScreen: boolean;
   onSelectionChange?: (rowId: string, selected: boolean) => void;
   index: number;
   isSearching: boolean;
+<<<<<<< HEAD
+=======
+  /** Lets the virtualizer measure the row it rendered, whatever cells it carries. */
+  measureRef?: (node: HTMLTableRowElement | null) => void;
+>>>>>>> upstream/main
 }) => {
   const handleSelection = useCallback(
     (value: boolean) => {
@@ -98,8 +115,15 @@ const TableRowComponent = <TData, TValue>({
 
   return (
     <TableRow
+<<<<<<< HEAD
       data-state={row.getIsSelected() ? 'selected' : undefined}
       className="motion-safe:animate-fadeIn border-b border-border-light transition-all duration-300 ease-out hover:bg-surface-secondary"
+=======
+      ref={measureRef}
+      data-index={index}
+      data-state={row.getIsSelected() ? 'selected' : undefined}
+      className="motion-safe:animate-fadeIn border-border-light hover:bg-surface-secondary border-b transition-all duration-300 ease-out"
+>>>>>>> upstream/main
       style={{
         animationDelay: `${index * 20}ms`,
         transform: `translateY(${isSearching ? '4px' : '0'})`,
@@ -109,7 +133,11 @@ const TableRowComponent = <TData, TValue>({
       {row.getVisibleCells().map((cell) => {
         if (cell.column.id === 'select') {
           return (
+<<<<<<< HEAD
             <TableCell key={cell.id} className="px-2 py-1 transition-all duration-300">
+=======
+            <TableCell key={cell.id} size="dense" className="px-2 transition-all duration-300">
+>>>>>>> upstream/main
               <SelectionCheckbox
                 checked={row.getIsSelected()}
                 onChange={handleSelection}
@@ -121,9 +149,18 @@ const TableRowComponent = <TData, TValue>({
 
         if (cell.column.id === 'title') {
           return (
+<<<<<<< HEAD
             <TableHead
               key={cell.id}
               className="w-0 max-w-0 px-2 py-1 align-middle text-xs transition-all duration-300 sm:px-4 sm:py-2 sm:text-sm"
+=======
+            /* A row's title, not a column name: it keeps the secondary text rather than the
+               column-header role the cell would otherwise take. */
+            <TableHead
+              key={cell.id}
+              size="row"
+              className="text-text-secondary w-0 max-w-0 px-2 align-middle text-xs transition-all duration-300 sm:px-4 sm:text-sm"
+>>>>>>> upstream/main
               style={getColumnStyle(
                 cell.column.columnDef as TableColumn<TData, TValue>,
                 isSmallScreen,
@@ -140,7 +177,12 @@ const TableRowComponent = <TData, TValue>({
         return (
           <TableCell
             key={cell.id}
+<<<<<<< HEAD
             className="w-0 max-w-0 overflow-visible px-2 py-1 align-middle text-xs transition-all duration-300 sm:px-4 sm:py-2 sm:text-sm"
+=======
+            size="compact"
+            className="w-0 max-w-0 overflow-visible px-2 align-middle text-xs transition-all duration-300 sm:px-4 sm:text-sm"
+>>>>>>> upstream/main
             style={getColumnStyle(
               cell.column.columnDef as TableColumn<TData, TValue>,
               isSmallScreen,
@@ -191,14 +233,22 @@ const DeleteButton = memo(
         variant="outline"
         onClick={onDelete}
         disabled={disabled}
+<<<<<<< HEAD
         className={cn('min-w-[40px] transition-all duration-200', isSmallScreen && 'px-2 py-1')}
+=======
+        className={cn('min-w-[2.5rem] transition-all duration-200', isSmallScreen && 'px-2 py-1')}
+>>>>>>> upstream/main
         aria-label={ariaLabel}
       >
         {isDeleting ? (
           <Spinner className="size-4" />
         ) : (
           <>
+<<<<<<< HEAD
             <TrashIcon className="size-3.5 text-text-destructive sm:size-4" />
+=======
+            <TrashIcon className="text-text-destructive size-3.5 sm:size-4" />
+>>>>>>> upstream/main
             {!isSmallScreen && <span className="ml-2">Delete</span>}
           </>
         )}
@@ -244,7 +294,11 @@ export default function DataTable<TData, TValue>({
     const selectColumn = {
       id: 'select',
       header: ({ table }: { table: TTable<TData> }) => (
+<<<<<<< HEAD
         <div className="flex h-full w-[30px] items-center justify-center">
+=======
+        <div className="flex h-full w-[1.875rem] items-center justify-center">
+>>>>>>> upstream/main
           <Checkbox
             checked={table.getIsAllPageRowsSelected()}
             onCheckedChange={(value) => table.toggleAllPageRowsSelected(Boolean(value))}
@@ -259,7 +313,11 @@ export default function DataTable<TData, TValue>({
           ariaLabel="Select row"
         />
       ),
+<<<<<<< HEAD
       meta: { size: '50px' },
+=======
+      meta: { size: '3.125rem' },
+>>>>>>> upstream/main
     };
     return [selectColumn, ...columns];
   }, [columns, enableRowSelection, showCheckboxes]);
@@ -286,6 +344,7 @@ export default function DataTable<TData, TValue>({
 
   const { rows } = table.getRowModel();
 
+<<<<<<< HEAD
   const rowVirtualizer = useVirtualizer({
     count: rows.length,
     getScrollElement: () => tableContainerRef.current,
@@ -293,6 +352,32 @@ export default function DataTable<TData, TValue>({
     overscan: 10,
   });
 
+=======
+  /** The first guess for a row that has not rendered yet, from the columns it will carry: a
+   *  title cell's height when there is one, a compact row otherwise. Both follow the theme's cell
+   *  space and row rule, and rendered rows are measured. */
+  const hasTitleColumn = useMemo(
+    () =>
+      columns.some(
+        (column) =>
+          column.id === 'title' || ('accessorKey' in column && column.accessorKey === 'title'),
+      ),
+    [columns],
+  );
+  const rowHeight = useTableRowHeight(hasTitleColumn ? 'titled' : 'compact');
+  const rowVirtualizer = useVirtualizer({
+    count: rows.length,
+    getScrollElement: () => tableContainerRef.current,
+    estimateSize: useCallback(() => rowHeight, [rowHeight]),
+    overscan: 10,
+  });
+
+  /** The virtualizer caches row sizes, so a theme that changes the row height drops them. */
+  useEffect(() => {
+    rowVirtualizer.measure();
+  }, [rowHeight, rowVirtualizer]);
+
+>>>>>>> upstream/main
   const virtualRows = rowVirtualizer.getVirtualItems();
   const totalSize = rowVirtualizer.getTotalSize();
   const paddingTop = virtualRows.length > 0 ? virtualRows[0].start : 0;
@@ -378,13 +463,21 @@ export default function DataTable<TData, TValue>({
     const firstDataColumnIndex = tableColumns[0]?.id === 'select' ? 1 : 0;
 
     return (
+<<<<<<< HEAD
       <TableRow key={index} className="motion-safe:animate-fadeIn border-b border-border-light">
+=======
+      <TableRow key={index} className="motion-safe:animate-fadeIn border-border-light border-b">
+>>>>>>> upstream/main
         {tableColumns.map((column, columnIndex) => {
           const style = getColumnStyle(column as TableColumn<TData, TValue>, isSmallScreen);
           const isFirstDataColumn = columnIndex === firstDataColumnIndex;
 
           return (
+<<<<<<< HEAD
             <TableCell key={column.id} className="px-2 py-1 sm:px-4 sm:py-2" style={style}>
+=======
+            <TableCell key={column.id} size="compact" className="px-2 sm:px-4" style={style}>
+>>>>>>> upstream/main
               <Skeleton
                 className="h-6"
                 style={isFirstDataColumn ? { width: `${randomWidth}px` } : { width: '100%' }}
@@ -429,7 +522,11 @@ export default function DataTable<TData, TValue>({
       <div
         ref={tableContainerRef}
         className={cn(
+<<<<<<< HEAD
           'relative min-h-0 max-w-full flex-1 overflow-x-auto overflow-y-auto rounded-md border border-border-light',
+=======
+          'border-border-light relative min-h-0 max-w-full flex-1 overflow-x-auto overflow-y-auto rounded-md border',
+>>>>>>> upstream/main
           'transition-all duration-300 ease-out',
           isSearching && 'bg-surface-secondary/50',
           className,
@@ -437,6 +534,7 @@ export default function DataTable<TData, TValue>({
       >
         <Table
           unwrapped
+<<<<<<< HEAD
           className="w-full min-w-[300px] table-fixed border-separate border-spacing-0"
         >
           <TableHeader className="sticky top-0 z-50 bg-surface-secondary">
@@ -446,6 +544,17 @@ export default function DataTable<TData, TValue>({
                   <TableHead
                     key={header.id}
                     className="whitespace-nowrap bg-surface-secondary px-2 py-2 text-left text-sm font-medium text-text-secondary sm:px-4"
+=======
+          className="w-full min-w-[18.75rem] table-fixed border-separate border-spacing-0"
+        >
+          <TableHeader className="bg-surface-secondary sticky top-0 z-50">
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id} className="border-border-light border-b">
+                {headerGroup.headers.map((header) => (
+                  <TableHead
+                    key={header.id}
+                    className="bg-surface-secondary text-table-header-text px-2 text-left text-sm font-medium whitespace-nowrap sm:px-4"
+>>>>>>> upstream/main
                     style={getColumnStyle(
                       header.column.columnDef as TableColumn<TData, TValue>,
                       isSmallScreen,
@@ -484,6 +593,10 @@ export default function DataTable<TData, TValue>({
                   isSmallScreen={isSmallScreen}
                   index={virtualRow.index}
                   isSearching={isSearching}
+<<<<<<< HEAD
+=======
+                  measureRef={rowVirtualizer.measureElement}
+>>>>>>> upstream/main
                 />
               );
             })}

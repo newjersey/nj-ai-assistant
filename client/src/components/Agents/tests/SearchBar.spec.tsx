@@ -18,12 +18,19 @@ describe('SearchBar', () => {
     mockOnSearch.mockClear();
   });
 
+<<<<<<< HEAD
   it('renders with correct placeholder', () => {
     render(<SearchBar value="" onSearch={mockOnSearch} />);
 
     const input = screen.getByRole('textbox');
     expect(input).toBeInTheDocument();
     expect(input).toHaveAttribute('placeholder', 'com_agents_search_placeholder');
+=======
+  it('focuses the input through its standard floating label', async () => {
+    render(<SearchBar value="" onSearch={mockOnSearch} />);
+    await user.click(screen.getByText('com_agents_search_aria'));
+    expect(screen.getByRole('textbox', { name: 'com_agents_search_aria' })).toHaveFocus();
+>>>>>>> upstream/main
   });
 
   it('displays the provided value', () => {
@@ -90,6 +97,7 @@ describe('SearchBar', () => {
     expect(input).toHaveAttribute('aria-label', 'com_agents_search_aria');
   });
 
+<<<<<<< HEAD
   it('applies custom className', () => {
     render(<SearchBar value="" onSearch={mockOnSearch} className="custom-class" />);
 
@@ -97,6 +105,8 @@ describe('SearchBar', () => {
     expect(container).toHaveClass('custom-class');
   });
 
+=======
+>>>>>>> upstream/main
   it('prevents form submission on clear button click', async () => {
     const handleSubmit = jest.fn();
 
@@ -133,7 +143,11 @@ describe('SearchBar', () => {
     input.focus();
     await user.click(clearButton);
 
+<<<<<<< HEAD
     // Input should still be in the document and ready for new input
     expect(input).toBeInTheDocument();
+=======
+    expect(input).toHaveFocus();
+>>>>>>> upstream/main
   });
 });

@@ -11,6 +11,7 @@ import {
   useSetRecoilState,
   useRecoilCallback,
 } from 'recoil';
+<<<<<<< HEAD
 import type {
   EModelEndpoint,
   TConversation,
@@ -20,6 +21,12 @@ import type {
 } from 'librechat-data-provider';
 import type { GenerationProtocolVersion } from '~/data-provider/SSE/protocol';
 import type { TOptionSettings, ExtendedFile } from '~/common';
+=======
+import type { EModelEndpoint, TConversation, TSubmission, TPreset } from 'librechat-data-provider';
+import type { GenerationProtocolVersion } from '~/data-provider/SSE/protocol';
+import type { TOptionSettings, ExtendedFile } from '~/common';
+import type { PendingSteer } from '~/hooks/Chat/queue';
+>>>>>>> upstream/main
 import {
   clearModelForNonEphemeralAgent,
   createChatSearchParams,
@@ -347,6 +354,7 @@ const pendingComposerTextByConvoId = atomFamily<string | undefined, string>({
 });
 
 /**
+<<<<<<< HEAD
  * A steer message submitted mid-run. Server truth: `sending` covers the POST
  * in flight, `pending` means the server queued it (awaiting its injection
  * boundary — the next tool batch, or the next safe token boundary when
@@ -392,6 +400,8 @@ export type PendingSteer = {
 };
 
 /**
+=======
+>>>>>>> upstream/main
  * Per-conversation steers awaiting injection. Reconciled against the server:
  * `on_steer_applied` removes its chip; `sync`/`resumeState.pendingSteers`
  * replaces the list on reconnect; run-end reports convert leftovers into
@@ -402,6 +412,7 @@ const pendingSteersByConvoId = atomFamily<PendingSteer[], string>({
   default: [],
 });
 
+<<<<<<< HEAD
 /** A message composed during a run, queued to send after it finishes.
  *  Attachments ride the queued item (already uploaded at attach time) and are
  *  passed to `ask` as `overrideFiles` on drain — steering itself is text-only,
@@ -594,6 +605,8 @@ const drainAfterAbortByIndex = atomFamily<DrainAfterAbort | false, string | numb
   default: false,
 });
 
+=======
+>>>>>>> upstream/main
 /**
  * Server steer ids whose `on_steer_applied` event already landed. The 202 ACK
  * and the SSE ride different connections, so the applied event can arrive
@@ -607,6 +620,7 @@ const appliedSteerIdsByConvoId = atomFamily<string[], string>({
   default: [],
 });
 
+<<<<<<< HEAD
 /**
  * Steer ids whose applied event landed in THIS session, pending their one-shot
  * receipt draw-in. `SteerPart` consumes its id on mount so the animation plays
@@ -629,6 +643,8 @@ const liveAppliedSteerFamily = selectorFamily<boolean, string>({
       steerId.length > 0 && get(liveAppliedSteerIds).includes(steerId),
 });
 
+=======
+>>>>>>> upstream/main
 /** Optimistic ids the server has proven accepted via ACK or SYNC. Separate
  * from `appliedSteerIdsByConvoId`: accepted-but-still-queued steers must not
  * be suppressed by terminal conversion, but a late POST error must not
@@ -820,6 +836,7 @@ export default {
   pendingManualSkillsByConvoId,
   pendingQuotesByConvoId,
   pendingSteersByConvoId,
+<<<<<<< HEAD
   queuedMessagesByConvoId,
   settledQueuedTurnReceiptsByConvoId,
   pendingQueuedTurnEnqueueIdsByConvoId,
@@ -829,6 +846,9 @@ export default {
   appliedSteerIdsByConvoId,
   liveAppliedSteerIds,
   liveAppliedSteerFamily,
+=======
+  appliedSteerIdsByConvoId,
+>>>>>>> upstream/main
   acceptedSteerClientIdsByConvoId,
   activeGenerationCreatedAtByConvoId,
   activeGenerationProtocolVersionByConvoId,

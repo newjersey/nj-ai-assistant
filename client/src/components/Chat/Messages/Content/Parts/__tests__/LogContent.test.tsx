@@ -3,6 +3,10 @@ import { RecoilRoot } from 'recoil';
 import { render, screen } from '@testing-library/react';
 import type { TAttachment } from 'librechat-data-provider';
 import type { MutableSnapshot } from 'recoil';
+<<<<<<< HEAD
+=======
+import { MessageContext } from '~/Providers/MessageContext';
+>>>>>>> upstream/main
 import LogContent from '../LogContent';
 import store from '~/store';
 
@@ -75,7 +79,19 @@ const renderWith = (ui: React.ReactElement, opts: { streaming?: boolean } = {}) 
   const initializeState = (snapshot: MutableSnapshot) => {
     snapshot.set(store.isSubmittingFamily(0), streaming);
   };
+<<<<<<< HEAD
   return render(<RecoilRoot initializeState={initializeState}>{ui}</RecoilRoot>);
+=======
+  return render(
+    <RecoilRoot initializeState={initializeState}>
+      <MessageContext.Provider
+        value={{ messageId: 'test-response', isExpanded: true, isSubmitting: streaming }}
+      >
+        {ui}
+      </MessageContext.Provider>
+    </RecoilRoot>,
+  );
+>>>>>>> upstream/main
 };
 
 describe('LogContent attachment routing', () => {

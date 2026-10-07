@@ -1,4 +1,8 @@
 import { Schema } from 'mongoose';
+<<<<<<< HEAD
+=======
+import { CODE_APPROVAL_MODES } from 'librechat-data-provider';
+>>>>>>> upstream/main
 import type { IAgentQueuedTurnDocument } from '~/types/queuedTurn';
 
 const fileRefSchema = new Schema(
@@ -23,6 +27,21 @@ const failureSchema = new Schema(
   { _id: false },
 );
 
+<<<<<<< HEAD
+=======
+const reasoningOverrideSchema = new Schema(
+  {
+    key: {
+      type: String,
+      enum: ['reasoning_effort', 'effort', 'thinkingLevel', 'thinkingBudget'],
+      required: true,
+    },
+    value: { type: Schema.Types.Mixed, required: true },
+  },
+  { _id: false },
+);
+
+>>>>>>> upstream/main
 const terminalReceiptSchema = new Schema(
   {
     outcome: {
@@ -73,6 +92,11 @@ const queuedTurnSchema: Schema<IAgentQueuedTurnDocument> = new Schema(
     files: { type: [fileRefSchema], default: undefined },
     quotes: { type: [String], default: undefined },
     manualSkills: { type: [String], default: undefined },
+<<<<<<< HEAD
+=======
+    codeApprovalMode: { type: String, enum: [...CODE_APPROVAL_MODES] },
+    reasoningOverride: { type: reasoningOverrideSchema },
+>>>>>>> upstream/main
     expectedPredecessorCreatedAt: { type: Number, min: 0 },
     attempts: { type: Number, required: true, default: 0, min: 0 },
     availableAt: { type: Date, required: true },

@@ -1,3 +1,8 @@
+<<<<<<< HEAD
+=======
+import type { TMessage } from 'librechat-data-provider';
+
+>>>>>>> upstream/main
 export type WakeupTaskStatus = 'completed' | 'error' | 'cancelled';
 
 export type WakeupTask = {
@@ -72,7 +77,10 @@ const backgroundWakeupTask = (payload: unknown): WakeupTask | null => {
   const status = wakeupStatus(payload.status);
   if (
     status == null ||
+<<<<<<< HEAD
     status === 'cancelled' ||
+=======
+>>>>>>> upstream/main
     typeof payload.background_task_id !== 'string' ||
     typeof payload.tool_call_id !== 'string' ||
     typeof payload.tool !== 'string' ||
@@ -124,3 +132,15 @@ export function parseWakeupText(text?: string | null): WakeupDisplay | null {
   }
   return { kind: 'background_tool', tasks: tasks as WakeupTask[] };
 }
+<<<<<<< HEAD
+=======
+
+/** User-submitted lookalikes are ordinary prompts. Older host wake-ups may omit
+ *  provenance, so retain their existing strict header/payload compatibility. */
+export function parseWakeupMessage(
+  message: Pick<TMessage, 'text' | 'isCreatedByUser' | 'isUserSubmitted'> | undefined,
+): WakeupDisplay | null {
+  if (message?.isCreatedByUser !== true || message.isUserSubmitted === true) return null;
+  return parseWakeupText(message.text);
+}
+>>>>>>> upstream/main

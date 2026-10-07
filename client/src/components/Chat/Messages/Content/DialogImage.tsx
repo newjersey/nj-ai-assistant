@@ -2,9 +2,18 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { PanelLeftOpen, PanelLeftClose } from 'lucide';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { X, ArrowDownToLine, RotateCcw } from 'lucide-react';
+<<<<<<< HEAD
 import { Button, MorphIcon, TooltipAnchor } from '@librechat/client';
 import { useLocalize } from '~/hooks';
 
+=======
+import { Button, MorphIcon, TooltipAnchor, useMediaQuery, useRemScale } from '@librechat/client';
+import { useLocalize } from '~/hooks';
+
+/** The lightbox is z-250 and not an OGDialog, so its tooltips would keep the default 150 and sit behind it. */
+const TOOLTIP_Z_INDEX = 300;
+
+>>>>>>> upstream/main
 const imageSizeCache = new Map<string, string>();
 
 const getQualityStyles = (quality: string): string => {
@@ -24,6 +33,11 @@ export default function DialogImage({
   downloadImage,
   args,
   triggerRef,
+<<<<<<< HEAD
+=======
+  showDetails = true,
+  title,
+>>>>>>> upstream/main
 }: {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
@@ -36,6 +50,13 @@ export default function DialogImage({
     [key: string]: unknown;
   };
   triggerRef?: React.RefObject<HTMLButtonElement>;
+<<<<<<< HEAD
+=======
+  /** Off for an uploaded file, which has no generation details to show. */
+  showDetails?: boolean;
+  /** Names the dialog and the image for assistive tech, e.g. the file name. */
+  title?: string;
+>>>>>>> upstream/main
 }) {
   const localize = useLocalize();
   const [isPromptOpen, setIsPromptOpen] = useState(false);
@@ -239,6 +260,7 @@ export default function DialogImage({
     ? localize('com_ui_hide_image_details')
     : localize('com_ui_show_image_details');
 
+<<<<<<< HEAD
   // Calculate image max dimensions accounting for side panel (w-80 = 320px)
   const getImageMaxWidth = () => {
     if (isPromptOpen) {
@@ -249,16 +271,36 @@ export default function DialogImage({
     }
     return '90vw';
   };
+=======
+  /* The details panel is 20rem wide, so the viewport it has to fit beside has to be
+     measured in the same units: a fixed 640px breakpoint puts the panel beside the
+     image at scales where 20rem leaves almost nothing for the image and pushes the
+     action controls offscreen. Below it the panel overlays instead, as on mobile. */
+  const remScale = useRemScale();
+  const detailsFitBesideImage = useMediaQuery(`(min-width: ${640 * remScale}px)`);
+  const detailsBeside = isPromptOpen && detailsFitBesideImage;
+
+  // Reserve the side panel's width (w-80 = 20rem) only when it sits beside the image
+  const getImageMaxWidth = () => (detailsBeside ? 'calc(90vw - 20rem)' : '90vw');
+>>>>>>> upstream/main
 
   return (
     <DialogPrimitive.Root open={isOpen} onOpenChange={onOpenChange}>
       <DialogPrimitive.Portal>
         <DialogPrimitive.Overlay
+<<<<<<< HEAD
           className="fixed inset-0 z-[100] bg-black/90"
           onClick={handleBackgroundClick}
         />
         <DialogPrimitive.Content
           className="fixed inset-0 z-[100] flex items-center justify-center outline-none"
+=======
+          className="bg-surface-media-overlay/90 fixed inset-0 z-[250]"
+          onClick={handleBackgroundClick}
+        />
+        <DialogPrimitive.Content
+          className="fixed inset-0 z-[250] flex items-center justify-center outline-hidden"
+>>>>>>> upstream/main
           onOpenAutoFocus={(e) => {
             e.preventDefault();
             closeButtonRef.current?.focus();
@@ -270,16 +312,31 @@ export default function DialogImage({
           onPointerDownOutside={(e) => e.preventDefault()}
           onClick={handleBackgroundClick}
         >
+<<<<<<< HEAD
           {/* Close button - top left */}
           <div className="absolute left-4 top-4 z-20">
             <TooltipAnchor
+=======
+          {title != null && (
+            <DialogPrimitive.Title className="sr-only">{title}</DialogPrimitive.Title>
+          )}
+          {/* Close button - top left */}
+          <div className="absolute top-4 left-4 z-20">
+            <TooltipAnchor
+              zIndex={TOOLTIP_Z_INDEX}
+>>>>>>> upstream/main
               description={localize('com_ui_close')}
               render={
                 <Button
                   ref={closeButtonRef}
                   onClick={() => onOpenChange(false)}
+<<<<<<< HEAD
                   variant="ghost"
                   className="h-10 w-10 p-0 text-white hover:bg-white/10"
+=======
+                  variant="media"
+                  className="h-10 w-10 p-0"
+>>>>>>> upstream/main
                   aria-label={localize('com_ui_close')}
                 >
                   <X className="size-6" aria-hidden="true" />
@@ -288,18 +345,33 @@ export default function DialogImage({
             />
           </div>
 
+<<<<<<< HEAD
           {/* Action buttons - top right (336px = 320px panel + 16px gap) */}
           <div
             className={`absolute top-4 z-20 flex items-center gap-2 transition-[right] duration-300 ${isPromptOpen ? 'right-[336px]' : 'right-4'}`}
           >
             {zoom > 1 && (
               <TooltipAnchor
+=======
+          {/* Action buttons - top right (21rem = 20rem panel + 1rem gap) */}
+          <div
+            className={`absolute top-4 z-20 flex items-center gap-2 transition-[right] duration-300 ${detailsBeside ? 'right-[21rem]' : 'right-4'}`}
+          >
+            {zoom > 1 && (
+              <TooltipAnchor
+                zIndex={TOOLTIP_Z_INDEX}
+>>>>>>> upstream/main
                 description={localize('com_ui_reset_zoom')}
                 render={
                   <Button
                     onClick={resetZoom}
+<<<<<<< HEAD
                     variant="ghost"
                     className="h-10 w-10 p-0 text-white hover:bg-white/10"
+=======
+                    variant="media"
+                    className="h-10 w-10 p-0"
+>>>>>>> upstream/main
                     aria-label={localize('com_ui_reset_zoom')}
                   >
                     <RotateCcw className="size-5" aria-hidden="true" />
@@ -308,18 +380,28 @@ export default function DialogImage({
               />
             )}
             <TooltipAnchor
+<<<<<<< HEAD
+=======
+              zIndex={TOOLTIP_Z_INDEX}
+>>>>>>> upstream/main
               description={localize('com_ui_download')}
               render={
                 <Button
                   onClick={() => downloadImage()}
+<<<<<<< HEAD
                   variant="ghost"
                   className="h-10 w-10 p-0 text-white hover:bg-white/10"
+=======
+                  variant="media"
+                  className="h-10 w-10 p-0"
+>>>>>>> upstream/main
                   aria-label={localize('com_ui_download')}
                 >
                   <ArrowDownToLine className="size-5" aria-hidden="true" />
                 </Button>
               }
             />
+<<<<<<< HEAD
             <TooltipAnchor
               description={imageDetailsLabel}
               render={
@@ -336,11 +418,36 @@ export default function DialogImage({
                 </Button>
               }
             />
+=======
+            {showDetails && (
+              <TooltipAnchor
+                zIndex={TOOLTIP_Z_INDEX}
+                description={imageDetailsLabel}
+                render={
+                  <Button
+                    onClick={() => setIsPromptOpen(!isPromptOpen)}
+                    variant="media"
+                    className="h-10 w-10 p-0"
+                    aria-label={imageDetailsLabel}
+                  >
+                    <MorphIcon
+                      icon={isPromptOpen ? PanelLeftOpen : PanelLeftClose}
+                      className="size-5"
+                    />
+                  </Button>
+                }
+              />
+            )}
+>>>>>>> upstream/main
           </div>
 
           {/* Image container - centered */}
           <div
+<<<<<<< HEAD
             className={`transition-[margin] duration-300 ${isPromptOpen ? 'mr-80' : ''}`}
+=======
+            className={`transition-[margin] duration-300 ${detailsBeside ? 'mr-80' : ''}`}
+>>>>>>> upstream/main
             onClick={(e) => e.stopPropagation()}
           >
             <div
@@ -364,7 +471,11 @@ export default function DialogImage({
                 <img
                   ref={imageRef}
                   src={src}
+<<<<<<< HEAD
                   alt="Image"
+=======
+                  alt={title ?? 'Image'}
+>>>>>>> upstream/main
                   decoding="async"
                   className="block max-h-[85vh] object-contain"
                   style={{
@@ -377,6 +488,7 @@ export default function DialogImage({
           </div>
 
           {/* Side Panel */}
+<<<<<<< HEAD
           <div
             data-side-panel
             className={`fixed right-0 top-0 z-30 h-full w-80 transform border-l border-white/10 bg-surface-primary shadow-2xl transition-transform duration-300 ${
@@ -441,12 +553,87 @@ export default function DialogImage({
                       <span className="text-sm font-medium text-text-primary">
                         {imageSize || 'Loading...'}
                       </span>
+=======
+          {showDetails && (
+            <div
+              data-side-panel
+              className={`bg-surface-primary border-text-on-media/10 fixed top-0 right-0 z-30 h-full w-80 max-w-full transform border-l shadow-2xl transition-transform duration-300 ${
+                isPromptOpen ? 'translate-x-0' : 'translate-x-full'
+              }`}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="h-full overflow-y-auto p-6">
+                <div className="mb-4 flex items-center justify-between">
+                  <h3 className="text-text-primary text-lg font-semibold">
+                    {localize('com_ui_image_details')}
+                  </h3>
+                  <Button
+                    onClick={() => setIsPromptOpen(false)}
+                    variant="ghost"
+                    className={detailsBeside ? 'hidden' : 'h-10 w-10 p-0'}
+                    aria-label={localize('com_ui_hide_image_details')}
+                  >
+                    <X className="size-5" aria-hidden="true" />
+                  </Button>
+                </div>
+                <div className="bg-border-medium mb-4 h-px"></div>
+
+                <div className="space-y-6">
+                  {/* Prompt Section */}
+                  <div>
+                    <h4 className="text-text-primary mb-2 text-sm font-medium">
+                      {localize('com_ui_prompt')}
+                    </h4>
+                    <div className="bg-surface-tertiary rounded-md p-3">
+                      <p className="text-text-primary text-sm leading-relaxed">
+                        {args?.prompt || 'No prompt available'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Generation Settings */}
+                  <div>
+                    <h4 className="text-text-primary mb-3 text-sm font-medium">
+                      {localize('com_ui_generation_settings')}
+                    </h4>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-text-primary text-sm">
+                          {localize('com_ui_size')}:
+                        </span>
+                        <span className="text-text-primary text-sm font-medium">
+                          {args?.size || 'Unknown'}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-text-primary text-sm">
+                          {localize('com_ui_quality')}:
+                        </span>
+                        <span
+                          className={`rounded px-2 py-1 text-xs font-medium capitalize ${getQualityStyles(args?.quality || '')}`}
+                        >
+                          {args?.quality || 'Standard'}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-text-primary text-sm">
+                          {localize('com_ui_file_size')}:
+                        </span>
+                        <span className="text-text-primary text-sm font-medium">
+                          {imageSize || 'Loading...'}
+                        </span>
+                      </div>
+>>>>>>> upstream/main
                     </div>
                   </div>
                 </div>
               </div>
             </div>
+<<<<<<< HEAD
           </div>
+=======
+          )}
+>>>>>>> upstream/main
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>
     </DialogPrimitive.Root>

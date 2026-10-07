@@ -29,6 +29,11 @@ function hexToRgb(value: string): Rgb {
   ];
 }
 
+<<<<<<< HEAD
+=======
+/** WCAG 1.4.3 contrast, the floor the file-type tiles hold their glyph to. */
+const WCAG_AA_NORMAL = 4.5;
+>>>>>>> upstream/main
 /** WCAG 1.4.6 enhanced contrast, the reason these modes exist. */
 const WCAG_AAA_NORMAL = 7;
 /** WCAG 1.4.11 non-text contrast, for borders, rings, marks and fills. */
@@ -73,7 +78,11 @@ const textTokens: Array<keyof IThemeRGB> = [
 
 /** Code blocks share the mode's own high-contrast canvas rather than a bundled
  * fallback that would reintroduce a grey surface. */
+<<<<<<< HEAD
 const codeSurfaces: Array<keyof IThemeRGB> = ['rgb-surface-code'];
+=======
+const codeSurfaces: Array<keyof IThemeRGB> = ['rgb-surface-code', 'rgb-surface-code-body'];
+>>>>>>> upstream/main
 
 const syntaxTokens: Array<keyof IThemeRGB> = [
   'rgb-syntax-text',
@@ -117,6 +126,10 @@ const accentTokens: Array<keyof IThemeRGB> = [
   'rgb-link',
   'rgb-link-hover',
   'rgb-link-visited',
+<<<<<<< HEAD
+=======
+  'rgb-link-prose',
+>>>>>>> upstream/main
   'rgb-brand-purple',
 ];
 
@@ -273,6 +286,25 @@ describe.each([
     expect(below(theme, WCAG_AAA_NORMAL, solidFills, ['rgb-surface-primary'])).toEqual([]);
   });
 
+<<<<<<< HEAD
+=======
+  /** File-type tiles carry a glyph in `file-ink`; the legacy hues let the spreadsheet tile fall
+   *  to 2.95:1 under a white glyph, so each mode steps every hue to the far side of its ink. */
+  it('keeps every file-type tile at WCAG AA against its glyph and the page', () => {
+    const tiles: Array<keyof IThemeRGB> = [
+      'rgb-file-document',
+      'rgb-file-sheet',
+      'rgb-file-code',
+      'rgb-file-artifact',
+      'rgb-file-audio',
+      'rgb-file-video',
+      'rgb-file-generic',
+    ];
+    expect(below(theme, WCAG_AA_NORMAL, ['rgb-file-ink'], tiles)).toEqual([]);
+    expect(below(theme, WCAG_AA_NORMAL, tiles, ['rgb-surface-primary'])).toEqual([]);
+  });
+
+>>>>>>> upstream/main
   it('paints its status labels in the ink of the opposing canvas', () => {
     expect(theme['rgb-text-on-status']).toBe(
       theme === highContrastDarkTheme ? '0 0 0' : '255 255 255',
@@ -288,7 +320,11 @@ describe.each([
         theme,
         WCAG_NON_TEXT,
         ['rgb-switch-unchecked'],
+<<<<<<< HEAD
         ['rgb-surface-primary', 'rgb-surface-inverted'],
+=======
+        ['rgb-surface-primary', 'rgb-switch-thumb', 'rgb-surface-inverted'],
+>>>>>>> upstream/main
       ),
     ).toEqual([]);
   });

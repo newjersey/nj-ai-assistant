@@ -5,6 +5,10 @@ import { fixupConfigRules, fixupPluginRules } from '@eslint/compat';
 import reactHooks from 'eslint-plugin-react-hooks';
 import tsParser from '@typescript-eslint/parser';
 import importPlugin from 'eslint-plugin-import';
+<<<<<<< HEAD
+=======
+import { plugin as shadcn } from '@shadcn/lint';
+>>>>>>> upstream/main
 import prettier from 'eslint-plugin-prettier';
 import { FlatCompat } from '@eslint/eslintrc';
 import jsxA11Y from 'eslint-plugin-jsx-a11y';
@@ -56,7 +60,10 @@ export default [
       'packages/data-provider/dist/**/*',
       'packages/data-provider/test_bundle/**/*',
       'packages/data-schemas/dist/**/*',
+<<<<<<< HEAD
       'packages/data-schemas/misc/**/*',
+=======
+>>>>>>> upstream/main
       'data-node/**/*',
       'meili_data/**/*',
       '**/node_modules/**/*',
@@ -188,6 +195,147 @@ export default [
       'jsx-a11y/img-redundant-alt': 'off',
     },
   },
+<<<<<<< HEAD
+=======
+  // @shadcn/lint: design-system enforcement for the two client surfaces. The linter treats
+  // `@librechat/client` — plus the app-local `~/components/ui` re-exports — as the design
+  // system, reads each primitive's cva variants, and reports a className that overrides what
+  // the primitive owns, naming the variants and sizes to use instead. The tree's existing
+  // violations are recorded in eslint-suppressions.json, so these rules gate new and edited
+  // code without a tree-wide migration; see CLAUDE.md, "Theming and styling".
+  //
+  // The client's entry points and helpers are `.jsx`/`.js` — App.jsx among them — so the globs
+  // name those extensions too: the rules have to see them.
+  {
+    files: ['client/src/**/*.{ts,tsx,js,jsx}', 'packages/client/src/**/*.{ts,tsx,js,jsx}'],
+    plugins: { shadcn },
+    settings: {
+      shadcn: {
+        ui: '@librechat/client',
+        componentImports: ['^~/components/ui(/|$)'],
+        note: 'See CLAUDE.md, "Theming and styling".',
+      },
+    },
+    rules: {
+      'shadcn/no-restyle': [
+        'error',
+        {
+          // `icon-*` is a sizing utility from client/src/style.css (height, width, stroke-width),
+          // so it belongs with layout rather than with a primitive's own appearance.
+          allow: ['layout', 'icon-*'],
+          // A contract replaces `allow` rather than extending it, so each one restates the
+          // baseline. These record policy, not debt: the categories below are the caller's to
+          // set, which is why they are not in eslint-suppressions.json.
+          contracts: [
+            // A text primitive renders the caller's text, so the caller owns its size, weight
+            // and leading. Color is still the theme's: it stays reported here.
+            {
+              pattern: '^(Label|Description|DialogTitle|DialogDescription|SeriesLabel)$',
+              allow: ['layout', 'icon-*', 'typography'],
+            },
+            // A skeleton stands in for the caller's content, so it takes that content's
+            // silhouette and footprint.
+            { pattern: '^Skeleton$', allow: ['layout', 'icon-*', 'shape', 'spacing'] },
+          ],
+        },
+      ],
+      'shadcn/no-raw-colors': 'error',
+      'shadcn/no-arbitrary-values': ['error', { allow: ['layout'] }],
+      'shadcn/no-inline-styles': [
+        'error',
+        {
+          // Geometry that carries a measured or animated number — a virtual row's height, a
+          // floating panel's offset, a drag transform — has no class form. Everything else
+          // (color, display, transition, spacing) does, and stays reported.
+          allow: [
+            'width',
+            'height',
+            'minWidth',
+            'minHeight',
+            'maxWidth',
+            'maxHeight',
+            'top',
+            'right',
+            'bottom',
+            'left',
+            'transform',
+            'transformOrigin',
+            'zIndex',
+          ],
+        },
+      ],
+      'shadcn/require-static-classes': 'error',
+      // Now answerable: the rule asks the installed Tailwind whether a class generates CSS, and
+      // the app is on v4. Classes declared in a stylesheet Tailwind reads are recognized on their
+      // own; these are the ones it cannot see, plain selectors in files loaded separately
+      // (style.css families, the library's component CSS) and classes a third party puts in the
+      // DOM. Everything outside this list that generates no CSS is reported: the `prose` variants
+      // that quietly render nothing today, and the `token-`-prefixed names, which were painting
+      // through plain rules in `client/src/style.css` that this change removes in favour of the
+      // tokens themselves rather than adding six more names here.
+      'shadcn/no-unknown-classes': [
+        'error',
+        {
+          allow: [
+            // client/src/style.css and the library's component CSS
+            'icon-*',
+            'hover-button',
+            'toast-root',
+            'alert-root',
+            'tooltip',
+            'spinner',
+            'popover-ui',
+            'select-item',
+            'assistant-item',
+            'animated-tab',
+            'animated-tab-list',
+            'animated-tab-panel',
+            'animated-panels',
+            'animate-popover',
+            'animate-popover-bottom',
+            'animate-pulse-slow',
+            'animate-gradient-x',
+            'animate-fadeIn',
+            'slow-pulse',
+            'hide-scrollbar',
+            'scrollbar-gutter-spacer',
+            'active',
+            // put in the DOM by a dependency, not by Tailwind
+            'lucide',
+            'lucide-*',
+            'language-*',
+            'i-heroicons-*',
+            'form-check-label',
+            // Markers a selector reads rather than Tailwind styling: each one is queried by a
+            // stylesheet, a component, or an e2e spec, so it carries no CSS of its own.
+            'popover',
+            'user-turn',
+            'agent-turn',
+            'final-completion',
+            'sibling-content-group',
+            'scroll-animation',
+            'hover-button-active',
+            'open',
+          ],
+        },
+      ],
+    },
+  },
+  {
+    // A primitive owns its own internals, so the rules that police callers are off inside the
+    // component library. `no-raw-colors` and `no-inline-styles` stay on: the primitives are
+    // where theme tokens matter most. `client/src/components/ui` is deliberately not here:
+    // `componentImports` marks it as a place primitives are imported from, but what it holds
+    // are app composites — a dialog, a collapse, a date-range picker — and their overrides of a
+    // shared primitive are exactly what `no-restyle` exists to report.
+    files: ['packages/client/src/**/*.{ts,tsx,js,jsx}'],
+    rules: {
+      'shadcn/no-restyle': 'off',
+      'shadcn/no-arbitrary-values': 'off',
+      'shadcn/require-static-classes': 'off',
+    },
+  },
+>>>>>>> upstream/main
   {
     files: ['**/.eslintrc.js', '**/jest.config.js', 'client/vite.config.ts'],
     languageOptions: {
@@ -208,6 +356,17 @@ export default [
       '**/*.spec.tsx',
       '**/setupTests.js',
     ],
+<<<<<<< HEAD
+=======
+    settings: {
+      jest: {
+        globalAliases: {
+          describe: ['describeIfFerretDB', 'describeLive'],
+          it: ['itIfFerretDB'],
+        },
+      },
+    },
+>>>>>>> upstream/main
     languageOptions: {
       globals: {
         ...globals.jest,
@@ -216,6 +375,10 @@ export default [
     },
     rules: {
       // TEST
+<<<<<<< HEAD
+=======
+      'jest/no-standalone-expect': ['error', { additionalTestBlockFunctions: ['itIfFerretDB'] }],
+>>>>>>> upstream/main
       'react/display-name': 'off',
       'react/prop-types': 'off',
       'jest/no-commented-out-tests': 'off',
@@ -223,6 +386,16 @@ export default [
       'jest/no-conditional-expect': 'off',
       'jest/no-disabled-tests': 'off',
       '@typescript-eslint/no-unused-vars': 'off',
+<<<<<<< HEAD
+=======
+      // A spec's fixture markup is an assertion, not a design surface.
+      'shadcn/no-restyle': 'off',
+      'shadcn/no-raw-colors': 'off',
+      'shadcn/no-arbitrary-values': 'off',
+      'shadcn/no-inline-styles': 'off',
+      'shadcn/require-static-classes': 'off',
+      'shadcn/no-unknown-classes': 'off',
+>>>>>>> upstream/main
     },
   },
   ...compat
@@ -236,8 +409,14 @@ export default [
     })),
   {
     files: ['**/*.ts', '**/*.tsx'],
+<<<<<<< HEAD
     // e2e specs keep only the non-type-checked recommended rules from the block above.
     ignores: ['packages/**/*', 'client/vite.config.ts', 'e2e/**/*'],
+=======
+    // Package, E2E, and root integration tests are not part of the client
+    // TypeScript project. They still get the recommended rules above.
+    ignores: ['packages/**/*', 'client/vite.config.ts', 'e2e/**/*', 'src/tests/**/*'],
+>>>>>>> upstream/main
     plugins: {
       '@typescript-eslint': typescriptEslintEslintPlugin,
       jest: fixupPluginRules(jest),
@@ -350,6 +529,16 @@ export default [
       parser: tsParser,
       ecmaVersion: 'latest',
       sourceType: 'module',
+<<<<<<< HEAD
+=======
+      parserOptions: {
+        project: [
+          './packages/data-schemas/tsconfig.json',
+          './packages/data-schemas/misc/ferretdb/tsconfig.json',
+          './packages/data-schemas/misc/documentdb/tsconfig.json',
+        ],
+      },
+>>>>>>> upstream/main
     },
     rules: {
       '@typescript-eslint/no-unused-vars': [

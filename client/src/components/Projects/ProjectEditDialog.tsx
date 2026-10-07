@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { useEffect, useId, useRef, useState, type FormEvent } from 'react';
 import {
   MAX_CHAT_PROJECT_NAME_LENGTH,
@@ -16,12 +17,21 @@ import {
 import type { TChatProject } from 'librechat-data-provider';
 import { useUpdateProjectMutation } from '~/data-provider';
 import { NotificationSeverity } from '~/common';
+=======
+import { useRef } from 'react';
+import { OGDialog, OGDialogTitle, OGDialogHeader, OGDialogContent } from '@librechat/client';
+import type { TChatProject } from 'librechat-data-provider';
+import type { ComponentProps } from 'react';
+import { useUpdateProjectMutation } from '~/data-provider';
+import ProjectEditor from './ProjectEditor';
+>>>>>>> upstream/main
 import { useLocalize } from '~/hooks';
 
 type ProjectEditDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   project: TChatProject;
+<<<<<<< HEAD
 };
 
 export default function ProjectEditDialog({ open, onOpenChange, project }: ProjectEditDialogProps) {
@@ -133,6 +143,61 @@ export default function ProjectEditDialog({ open, onOpenChange, project }: Proje
           </Button>
         }
       />
+=======
+  triggerRef?: ComponentProps<typeof OGDialog>['triggerRef'];
+};
+
+export default function ProjectEditDialog({
+  open,
+  onOpenChange,
+  project,
+  triggerRef,
+}: ProjectEditDialogProps) {
+  const localize = useLocalize();
+  /** Owned here, so a save in flight settles with its toast; the dialog stays open meanwhile. */
+  const updateProject = useUpdateProjectMutation();
+  const savingRef = useRef(false);
+  /** Read at event time: the submit marks the ref before the loading state renders. */
+  const isBusy = () => savingRef.current || updateProject.isLoading;
+  return (
+    <OGDialog
+      open={open}
+      onOpenChange={(next) => {
+        if (next || !isBusy()) {
+          onOpenChange(next);
+        }
+      }}
+      triggerRef={triggerRef}
+    >
+      <OGDialogContent
+        className="w-11/12 max-w-md"
+        showCloseButton={false}
+        onEscapeKeyDown={(event) => {
+          if (isBusy()) {
+            event.preventDefault();
+          }
+        }}
+        onInteractOutside={(event) => {
+          if (isBusy()) {
+            event.preventDefault();
+          }
+        }}
+      >
+        <OGDialogHeader>
+          <OGDialogTitle>{localize('com_ui_edit_project')}</OGDialogTitle>
+        </OGDialogHeader>
+        {/* Mounted per opening so the form starts from the saved project. */}
+        {open ? (
+          <ProjectEditor
+            project={project}
+            layout="dialog"
+            updateProject={updateProject}
+            savingRef={savingRef}
+            onDone={() => onOpenChange(false)}
+          />
+        ) : null}
+      </OGDialogContent>
+>>>>>>> upstream/main
     </OGDialog>
   );
 }

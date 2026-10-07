@@ -9,6 +9,14 @@ jest.mock('@librechat/agents', () => ({
 }));
 
 jest.mock('@librechat/api', () => ({
+<<<<<<< HEAD
+=======
+  prepareToolCallPreviews: jest.fn(() => (messages) => Promise.resolve(messages)),
+  createToolCallPartHandler: jest.fn(() => (_req, res) => res.status(404).end()),
+  rejectToolCallPreviewWrites: (_req, _res, next) => next(),
+  withMessageToolCallPreviews: (_req, message) => message,
+  createPrivateTextView: jest.fn(() => (_req, _res, next) => next()),
+>>>>>>> upstream/main
   createContentFilter: jest.fn(() => (req, res, next) => next()),
   inspectContent: jest.fn(() => null),
   extractFeedbackContent: jest.fn(() => []),
@@ -23,6 +31,11 @@ jest.mock('@librechat/api', () => ({
   requireFeedbackEnabled: (req, res, next) => next(),
 }));
 
+<<<<<<< HEAD
+=======
+jest.mock('~/server/services/Config', () => ({ getAppConfig: jest.fn() }));
+
+>>>>>>> upstream/main
 jest.mock('~/server/services/Endpoints/agents/subagentThreadStore', () => ({}));
 
 jest.mock('@librechat/data-schemas', () => ({

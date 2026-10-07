@@ -71,7 +71,16 @@ describe('ToolCallLimitNotice', () => {
     expect(ask).toHaveBeenCalledTimes(1);
     expect(ask).toHaveBeenCalledWith(
       { text: TRANSLATIONS.com_ui_tool_call_limit_continue_prompt },
+<<<<<<< HEAD
       { overrideFiles: [], overrideManualSkills: [], overrideQuotes: [] },
+=======
+      {
+        overrideFiles: [],
+        overrideManualSkills: [],
+        overrideQuotes: [],
+        overrideReasoning: null,
+      },
+>>>>>>> upstream/main
     );
   });
 
@@ -85,7 +94,16 @@ describe('ToolCallLimitNotice', () => {
 
     expect(ask).toHaveBeenCalledWith(
       { text: TRANSLATIONS.com_ui_tool_call_limit_answer_prompt },
+<<<<<<< HEAD
       { overrideFiles: [], overrideManualSkills: [], overrideQuotes: [] },
+=======
+      {
+        overrideFiles: [],
+        overrideManualSkills: [],
+        overrideQuotes: [],
+        overrideReasoning: null,
+      },
+>>>>>>> upstream/main
     );
   });
 

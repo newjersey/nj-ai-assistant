@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 const crypto = require('crypto');
+=======
+>>>>>>> upstream/main
 const { getStrategyFunctions } = require('~/server/services/Files/strategies');
 const { batchUploadCodeEnvFiles } = require('~/server/services/Files/Code/crud');
 const {
@@ -17,11 +20,19 @@ const {
 const {
   checkAccess,
   isMemoryEnabled,
+<<<<<<< HEAD
   getStorageMetadata,
+=======
+>>>>>>> upstream/main
   resolveRequestTenantId,
   enrichWithSkillConfigurable,
   mergeDeploymentSkillIds,
   createDeploymentSkillMethods,
+<<<<<<< HEAD
+=======
+  createSkillFileSaver,
+  createSkillManagementFileSaver,
+>>>>>>> upstream/main
   isDeploymentSkillFileSource,
   getDeploymentSkillDownloadStream,
 } = require('@librechat/api');
@@ -77,6 +88,7 @@ function resolveSkillStorage(req, { isImage = false } = {}) {
   return { saveBuffer: strategy.saveBuffer, source };
 }
 
+<<<<<<< HEAD
 function basename(relativePath) {
   const slash = relativePath.lastIndexOf('/');
   return slash === -1 ? relativePath : relativePath.slice(slash + 1);
@@ -142,6 +154,19 @@ async function saveSkillFileContent({ req, skillId, relativePath, content, mimeT
   }
 
   return { bytes: result.bytes, relativePath: result.relativePath };
+=======
+const skillFileSaveDeps = {
+  getSkillFileByPath: db.getSkillFileByPath,
+  upsertSkillFile: db.upsertSkillFile,
+  resolveStorage: resolveSkillStorage,
+  getStrategyFunctions,
+};
+const saveSkillFileContent = createSkillFileSaver(skillFileSaveDeps);
+const saveSkillManagementFileContent = createSkillManagementFileSaver(skillFileSaveDeps);
+
+function getSkillManagementFileSaver() {
+  return saveSkillManagementFileContent;
+>>>>>>> upstream/main
 }
 
 function canCreateSkill({ req }) {
@@ -425,6 +450,10 @@ function getSkillToolDeps() {
 
 module.exports = {
   getSkillToolDeps,
+<<<<<<< HEAD
+=======
+  getSkillManagementFileSaver,
+>>>>>>> upstream/main
   canAuthorSkillFiles,
   isAgentSkillAuthoringEnabledForRun,
   getSkillDbMethods,

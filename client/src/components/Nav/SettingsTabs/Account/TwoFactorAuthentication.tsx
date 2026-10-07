@@ -3,6 +3,14 @@ import { useSetRecoilState } from 'recoil';
 import { SmartphoneIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
+<<<<<<< HEAD
+=======
+  isTwoFactorPolicyProvider,
+  type TUser,
+  type TVerify2FARequest,
+} from 'librechat-data-provider';
+import {
+>>>>>>> upstream/main
   OGDialog,
   useToastContext,
   OGDialogContent,
@@ -10,17 +18,28 @@ import {
   OGDialogTitle,
   Progress,
 } from '@librechat/client';
+<<<<<<< HEAD
 import type { TUser, TVerify2FARequest } from 'librechat-data-provider';
+=======
+>>>>>>> upstream/main
 import type { Variants } from 'framer-motion';
 import {
   useConfirmTwoFactorMutation,
   useDisableTwoFactorMutation,
   useEnableTwoFactorMutation,
+<<<<<<< HEAD
+=======
+  useGetStartupConfig,
+>>>>>>> upstream/main
   useVerifyTwoFactorMutation,
 } from '~/data-provider';
 import { SetupPhase, QRPhase, VerifyPhase, BackupPhase, DisablePhase } from './TwoFactorPhases';
 import { DisableTwoFactorToggle } from './DisableTwoFactorToggle';
 import { useAuthContext, useLocalize } from '~/hooks';
+<<<<<<< HEAD
+=======
+import { useTwoFactorError } from './errors';
+>>>>>>> upstream/main
 import store from '~/store';
 
 export type Phase = 'setup' | 'qr' | 'verify' | 'backup' | 'disable';
@@ -34,8 +53,15 @@ const phaseVariants: Variants = {
 const TwoFactorAuthentication: React.FC = () => {
   const localize = useLocalize();
   const { user } = useAuthContext();
+<<<<<<< HEAD
   const setUser = useSetRecoilState(store.user);
   const { showToast } = useToastContext();
+=======
+  const { data: startupConfig } = useGetStartupConfig();
+  const setUser = useSetRecoilState(store.user);
+  const { showToast } = useToastContext();
+  const showError = useTwoFactorError();
+>>>>>>> upstream/main
   const buttonRef = useRef<HTMLButtonElement>(null);
 
   const [secret, setSecret] = useState<string>('');
@@ -52,6 +78,7 @@ const TwoFactorAuthentication: React.FC = () => {
   const { mutate: verify2FAMutate, isLoading: isVerifying } = useVerifyTwoFactorMutation();
   const { mutate: disable2FAMutate, isLoading: isDisabling } = useDisableTwoFactorMutation();
 
+<<<<<<< HEAD
   const steps = ['Setup', 'Scan QR', 'Verify', 'Backup'];
   const phasesLabel: Record<Phase, string> = {
     setup: 'Setup',
@@ -62,12 +89,35 @@ const TwoFactorAuthentication: React.FC = () => {
   };
 
   const currentStep = steps.indexOf(phasesLabel[phase]);
+=======
+  const steps = [
+    localize('com_ui_2fa_setup'),
+    localize('com_ui_2fa_scan_qr'),
+    localize('com_ui_verify'),
+    localize('com_ui_backup_codes'),
+  ];
+  const phaseIndex: Record<Phase, number> = {
+    setup: 0,
+    qr: 1,
+    verify: 2,
+    backup: 3,
+    disable: -1,
+  };
+  const currentStep = phaseIndex[phase];
+  const isTwoFactorRequired =
+    startupConfig?.twoFactorAuthenticationRequired === true &&
+    isTwoFactorPolicyProvider(user?.provider);
+>>>>>>> upstream/main
 
   const resetState = useCallback(() => {
     if (user?.twoFactorEnabled && otpauthUrl) {
       disable2FAMutate(undefined, {
+<<<<<<< HEAD
         onError: () =>
           showToast({ message: localize('com_ui_2fa_disable_error'), status: 'error' }),
+=======
+        onError: (error) => showError(error, 'com_ui_2fa_disable_error'),
+>>>>>>> upstream/main
       });
     }
 
@@ -78,7 +128,11 @@ const TwoFactorAuthentication: React.FC = () => {
     setDisableToken('');
     setPhase(user?.twoFactorEnabled ? 'disable' : 'setup');
     setDownloaded(false);
+<<<<<<< HEAD
   }, [user, otpauthUrl, disable2FAMutate, localize, showToast]);
+=======
+  }, [user, otpauthUrl, disable2FAMutate, showError]);
+>>>>>>> upstream/main
 
   const handleGenerateQRCode = useCallback(() => {
     enable2FAMutate(undefined, {
@@ -88,9 +142,15 @@ const TwoFactorAuthentication: React.FC = () => {
         setBackupCodes(backupCodes);
         setPhase('qr');
       },
+<<<<<<< HEAD
       onError: () => showToast({ message: localize('com_ui_2fa_generate_error'), status: 'error' }),
     });
   }, [enable2FAMutate, localize, showToast]);
+=======
+      onError: (error) => showError(error, 'com_ui_2fa_generate_error'),
+    });
+  }, [enable2FAMutate, showError]);
+>>>>>>> upstream/main
 
   const handleVerify = useCallback(() => {
     if (!verificationToken) {
@@ -106,6 +166,7 @@ const TwoFactorAuthentication: React.FC = () => {
             { token: verificationToken },
             {
               onSuccess: () => setPhase('backup'),
+<<<<<<< HEAD
               onError: () =>
                 showToast({ message: localize('com_ui_2fa_invalid'), status: 'error' }),
             },
@@ -115,6 +176,16 @@ const TwoFactorAuthentication: React.FC = () => {
       },
     );
   }, [verificationToken, verify2FAMutate, confirm2FAMutate, localize, showToast]);
+=======
+              onError: (error) => showError(error, 'com_ui_2fa_invalid'),
+            },
+          );
+        },
+        onError: (error) => showError(error, 'com_ui_2fa_invalid'),
+      },
+    );
+  }, [verificationToken, verify2FAMutate, confirm2FAMutate, localize, showToast, showError]);
+>>>>>>> upstream/main
 
   const handleDownload = useCallback(() => {
     if (!backupCodes.length) {
@@ -184,10 +255,17 @@ const TwoFactorAuthentication: React.FC = () => {
           setPhase('setup');
           setOtpauthUrl('');
         },
+<<<<<<< HEAD
         onError: () => showToast({ message: localize('com_ui_2fa_invalid'), status: 'error' }),
       });
     },
     [disable2FAMutate, showToast, localize, setUser],
+=======
+        onError: (error) => showError(error, 'com_ui_2fa_invalid'),
+      });
+    },
+    [disable2FAMutate, showToast, localize, setUser, showError],
+>>>>>>> upstream/main
   );
 
   return (
@@ -203,6 +281,10 @@ const TwoFactorAuthentication: React.FC = () => {
     >
       <DisableTwoFactorToggle
         enabled={!!user?.twoFactorEnabled}
+<<<<<<< HEAD
+=======
+        required={isTwoFactorRequired}
+>>>>>>> upstream/main
         onChange={() => setDialogOpen(true)}
         disabled={isVerifying || isDisabling || isGenerating}
         buttonRef={buttonRef}
@@ -221,11 +303,16 @@ const TwoFactorAuthentication: React.FC = () => {
           >
             <OGDialogHeader>
               <OGDialogTitle className="mb-2 flex items-center gap-3 text-2xl font-bold">
+<<<<<<< HEAD
                 <SmartphoneIcon className="h-6 w-6 text-text-primary" aria-hidden="true" />
+=======
+                <SmartphoneIcon className="text-text-primary h-6 w-6" aria-hidden="true" />
+>>>>>>> upstream/main
                 {user?.twoFactorEnabled
                   ? localize('com_ui_2fa_disable')
                   : localize('com_ui_2fa_setup')}
               </OGDialogTitle>
+<<<<<<< HEAD
               {user?.twoFactorEnabled && phase !== 'disable' && (
                 <div className="mt-4 space-y-3">
                   <Progress
@@ -243,6 +330,20 @@ const TwoFactorAuthentication: React.FC = () => {
                               : 'rgb(var(--text-tertiary))',
                         }}
                         className="font-medium"
+=======
+              {phase !== 'disable' && (
+                <div className="mt-4 space-y-3">
+                  <Progress
+                    value={(currentStep / (steps.length - 1)) * 100}
+                    className="h-2 rounded-full"
+                  />
+                  <div className="text-text-primary flex justify-between text-sm">
+                    {steps.map((step, index) => (
+                      <motion.span
+                        key={step}
+                        animate={{ opacity: currentStep >= index ? 1 : 0.7 }}
+                        className="text-text-primary font-medium"
+>>>>>>> upstream/main
                       >
                         {step}
                       </motion.span>

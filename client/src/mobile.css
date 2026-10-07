@@ -1,3 +1,11 @@
+<<<<<<< HEAD
+=======
+/* `@apply` needs the theme in scope, and this file is a separate entry point imported by
+ * main.jsx rather than an `@import` of style.css. `@reference` loads that theme without
+ * emitting its CSS a second time. */
+@reference './style.css';
+
+>>>>>>> upstream/main
 .hover-button.active {
   display: block;
   visibility: visible;
@@ -22,7 +30,11 @@
 
 @media (max-width: 767px) {
   .nav {
+<<<<<<< HEAD
     width: calc(100% - 10px)  ;
+=======
+    width: calc(100% - 10px);
+>>>>>>> upstream/main
     transition: all 0.15s;
   }
 
@@ -49,6 +61,7 @@
 }
 
 @keyframes tuning {
+<<<<<<< HEAD
   0% { transform: rotate(30deg); }
   25% { transform: rotate(110deg); }
   50% { transform: rotate(-40deg); }
@@ -73,6 +86,43 @@
   }
 }
 
+=======
+  0% {
+    transform: rotate(30deg);
+  }
+  25% {
+    transform: rotate(110deg);
+  }
+  50% {
+    transform: rotate(-40deg);
+  }
+  75% {
+    transform: rotate(80deg);
+  }
+  100% {
+    transform: rotate(30deg);
+  }
+}
+
+.rotate {
+  animation: tuning 2.1s 1;
+}
+
+.azure-bg-color {
+  background: linear-gradient(0.375turn, #61bde2, #4389d0);
+}
+
+@keyframes slowPulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+>>>>>>> upstream/main
 .slow-pulse {
   animation: slowPulse 2.5s ease-in-out infinite;
 }
@@ -121,6 +171,15 @@
 /* Content elements */
 .sp-preview-iframe {
   @apply h-full w-full grow;
+<<<<<<< HEAD
+=======
+  /* An unstyled artifact document inks in the browser's black over a transparent frame, which is
+   * unreadable on a dark theme. Canvas gives the frame an opaque page in the scheme the system
+   * prefers, and the document's own color-scheme decides whether it adapts to it or the browser
+   * paints it a light backdrop. */
+  color-scheme: light dark;
+  background-color: Canvas;
+>>>>>>> upstream/main
 }
 
 .sp-cm {
@@ -128,6 +187,7 @@
 }
 
 @keyframes shake {
+<<<<<<< HEAD
   0%, 100% { transform: translateX(0); }
   10%, 30%, 50%, 70%, 90% { transform: translateX(-3px); }
   20%, 40%, 60%, 80% { transform: translateX(3px); }
@@ -135,18 +195,64 @@
 
 .shake {
   animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+=======
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-3px);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(3px);
+  }
+}
+
+.shake {
+  animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+>>>>>>> upstream/main
 }
 
 .cm-content:focus {
   outline: none !important;
 }
 
+<<<<<<< HEAD
 p.whitespace-pre-wrap a, li a {
+=======
+/* `p.whitespace-pre-wrap a` (0,1,2) outranked a utility under v3 too, so it stays unlayered and
+ * keeps doing so. `li a` is two element selectors: a class beat it under v3, and unlayered under
+ * v4's layers it would beat every utility instead — `no-underline` on a link inside a list stopped
+ * working. Layered, it loses to a utility again and still styles an unclassed list link. */
+p.whitespace-pre-wrap a {
+>>>>>>> upstream/main
   color: #0066cc;
   text-decoration: underline;
   font-weight: bold;
 }
 
+<<<<<<< HEAD
 .dark p.whitespace-pre-wrap a, .dark li a {
   color: #52a0ff;
 }
+=======
+@layer base {
+  li a {
+    color: #0066cc;
+    text-decoration: underline;
+    font-weight: bold;
+  }
+}
+
+.dark p.whitespace-pre-wrap a,
+.dark li a {
+  color: #52a0ff;
+}
+>>>>>>> upstream/main

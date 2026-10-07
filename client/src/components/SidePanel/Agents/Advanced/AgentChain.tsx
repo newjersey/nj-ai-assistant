@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React, { useState, useMemo, useEffect } from 'react';
 import { Link2, ListOrdered } from 'lucide-react';
 import type { ControllerRenderProps } from 'react-hook-form';
@@ -11,6 +12,14 @@ import {
   useSelectableAgents,
 } from './AgentList';
 import OrchestrationPattern from './OrchestrationPattern';
+=======
+import { ListOrdered } from 'lucide-react';
+import { Button } from '@librechat/client';
+import type { ControllerRenderProps } from 'react-hook-form';
+import type { AgentForm } from '~/common';
+import OrchestrationPattern from './OrchestrationPattern';
+import { useSelectableAgents } from './AgentList';
+>>>>>>> upstream/main
 import { useLocalize } from '~/hooks';
 import { CountPill } from './ui';
 
@@ -19,6 +28,7 @@ interface AgentChainProps {
   currentAgentId: string;
 }
 
+<<<<<<< HEAD
 /** TODO: make configurable */
 const MAX_AGENTS = 10;
 
@@ -52,11 +62,22 @@ const AgentChain: React.FC<AgentChainProps> = ({ field, currentAgentId }) => {
 
   const currentAgent = currentAgentId ? getAgent(currentAgentId) : undefined;
   const currentName = currentAgent?.name?.trim();
+=======
+export default function AgentChain({ field, currentAgentId }: AgentChainProps) {
+  const localize = useLocalize();
+  const agentIds = field.value ?? [];
+  const { getAgent } = useSelectableAgents({ currentAgentId });
+
+  if (agentIds.length === 0) {
+    return null;
+  }
+>>>>>>> upstream/main
 
   return (
     <OrchestrationPattern
       icon={<ListOrdered className="h-4 w-4" strokeWidth={1.75} aria-hidden="true" />}
       title={localize('com_ui_agent_chain')}
+<<<<<<< HEAD
       subtitle={localize('com_ui_agent_chain_subtitle')}
       info={<p className="text-sm text-text-secondary">{localize('com_ui_agent_chain_info')}</p>}
       trailing={
@@ -123,3 +144,23 @@ const AgentChain: React.FC<AgentChainProps> = ({ field, currentAgentId }) => {
 };
 
 export default AgentChain;
+=======
+      subtitle={localize('com_ui_agent_chain_deprecated')}
+      info={<p className="text-text-secondary text-sm">{localize('com_ui_agent_chain_info')}</p>}
+      trailing={<CountPill>{agentIds.length}</CountPill>}
+    >
+      <ol className="flex flex-col gap-1" aria-label={localize('com_ui_agent_chain')}>
+        {agentIds.map((agentId, index) => (
+          <li key={`${agentId}-${index}`} className="text-text-secondary text-sm">
+            {index + 1}. {getAgent(agentId)?.name ?? agentId}
+          </li>
+        ))}
+      </ol>
+      <p className="text-text-secondary text-sm">{localize('com_ui_agent_chain_migrate')}</p>
+      <Button type="button" variant="outline" onClick={() => field.onChange([])}>
+        {localize('com_ui_agent_chain_remove')}
+      </Button>
+    </OrchestrationPattern>
+  );
+}
+>>>>>>> upstream/main

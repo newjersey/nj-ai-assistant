@@ -1,9 +1,14 @@
+<<<<<<< HEAD
 import { useMemo, useState, useEffect, useCallback } from 'react';
 import { useRecoilValue } from 'recoil';
+=======
+import { useMemo, useState, useCallback } from 'react';
+>>>>>>> upstream/main
 import { Tools } from 'librechat-data-provider';
 import { TooltipAnchor } from '@librechat/client';
 import { FileText, FileSpreadsheet, FileCode, FileImage, File } from 'lucide-react';
 import type { TAttachment, TFile, PartMetadata } from 'librechat-data-provider';
+<<<<<<< HEAD
 import { useLocalize, useProgress, useExpandCollapse } from '~/hooks';
 import { ToolIcon, OutputRenderer, isError } from './ToolOutput';
 import { resolveToolCallPhase } from '~/utils/toolCallPhase';
@@ -14,6 +19,18 @@ import { useToolCallIntent } from './Parts/intent';
 import { useGetFiles } from '~/data-provider';
 import ProgressText from './ProgressText';
 import store from '~/store';
+=======
+import { toolPanelSpacingClassName, useToolExpansion } from './disclosure';
+import { useLocalize, useProgress, useExpandCollapse } from '~/hooks';
+import { ToolIcon, OutputRenderer, isError } from './ToolOutput';
+import { resolveToolCallPhase } from '~/utils/toolCallPhase';
+import FilePreviewDialog from './FilePreviewDialog';
+import { sortPagesByRelevance, cn } from '~/utils';
+import { useToolCallIntent } from './Parts/intent';
+import { useToolPreparation } from './preparation';
+import { useGetFiles } from '~/data-provider';
+import ProgressText from './ProgressText';
+>>>>>>> upstream/main
 
 interface FileSource {
   fileId: string;
@@ -295,18 +312,30 @@ function FileHeader({
 
   return (
     <div className="flex items-center gap-2 px-3 py-2">
+<<<<<<< HEAD
       <IconComponent className="size-3.5 shrink-0 text-text-secondary" aria-hidden="true" />
+=======
+      <IconComponent className="text-text-secondary size-3.5 shrink-0" aria-hidden="true" />
+>>>>>>> upstream/main
       {onOpenPreview ? (
         <button
           type="button"
           onClick={onOpenPreview}
+<<<<<<< HEAD
           className="min-w-0 truncate text-left text-xs font-medium text-text-primary underline decoration-border-medium underline-offset-2 transition-colors hover:text-text-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-heavy focus-visible:ring-offset-1"
+=======
+          className="text-text-primary decoration-border-medium hover:text-text-secondary focus-visible:ring-focus-subtle min-w-0 truncate text-left text-xs font-medium underline underline-offset-2 transition-colors focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-hidden"
+>>>>>>> upstream/main
           aria-label={`${localize('com_ui_preview')}: ${fileName}`}
         >
           {fileName}
         </button>
       ) : (
+<<<<<<< HEAD
         <span className="min-w-0 truncate text-xs font-medium text-text-primary">{fileName}</span>
+=======
+        <span className="text-text-primary min-w-0 truncate text-xs font-medium">{fileName}</span>
+>>>>>>> upstream/main
       )}
       {relevance > 0 && (
         <TooltipAnchor
@@ -315,7 +344,11 @@ function FileHeader({
           className="flex cursor-help items-center"
         >
           <span
+<<<<<<< HEAD
             className="shrink-0 cursor-help rounded bg-surface-tertiary px-1.5 py-0.5 text-[11px] tabular-nums leading-none text-text-secondary"
+=======
+            className="bg-surface-tertiary text-text-secondary shrink-0 cursor-help rounded px-1.5 py-0.5 text-[11px] leading-none tabular-nums"
+>>>>>>> upstream/main
             aria-label={`${localize('com_ui_relevance')}: ${Math.round(relevance * 100)}%`}
           >
             {Math.round(relevance * 100)}%
@@ -324,7 +357,11 @@ function FileHeader({
       )}
       <span className="flex-1" />
       {sortedPages && sortedPages.length > 0 && (
+<<<<<<< HEAD
         <span className="shrink-0 text-[11px] text-text-secondary">
+=======
+        <span className="text-text-secondary shrink-0 text-[11px]">
+>>>>>>> upstream/main
           {localize('com_file_pages', { pages: sortedPages.join(', ') })}
         </span>
       )}
@@ -365,6 +402,10 @@ export default function RetrievalCall({
    *  describe_intent); persists as the settled label. The sr-only live
    *  region below deliberately keeps its stable generic value. */
   const intent = useToolCallIntent(args);
+<<<<<<< HEAD
+=======
+  const preparationText = useToolPreparation();
+>>>>>>> upstream/main
 
   /**
    * One resolution, read by the label, the live region and the icon alike.
@@ -380,7 +421,10 @@ export default function RetrievalCall({
     hasError: typeof output === 'string' && isError(output),
   });
   const hasOutput = !!output && !isError(output);
+<<<<<<< HEAD
   const autoExpand = useRecoilValue(store.autoExpandTools);
+=======
+>>>>>>> upstream/main
 
   const fileSources = useMemo(() => extractFileSources(attachments), [attachments]);
   const parsedResults = useMemo(
@@ -402,7 +446,12 @@ export default function RetrievalCall({
 
   const hasResults = displayResults.length > 0;
   const hasExpandableContent = phase !== 'failed' && hasResults;
+<<<<<<< HEAD
   const [showOutput, setShowOutput] = useState(() => autoExpand && hasExpandableContent);
+=======
+  const [expanded, setExpanded] = useToolExpansion(hasExpandableContent);
+  const showOutput = hasExpandableContent && expanded;
+>>>>>>> upstream/main
   const { style: expandStyle, ref: expandRef } = useExpandCollapse(showOutput);
 
   const [previewIndex, setPreviewIndex] = useState<number | null>(null);
@@ -438,6 +487,7 @@ export default function RetrievalCall({
     };
   }, [displayResults, previewIndex]);
 
+<<<<<<< HEAD
   useEffect(() => {
     if (!hasExpandableContent) {
       setShowOutput(false);
@@ -457,13 +507,25 @@ export default function RetrievalCall({
       return next;
     });
   }, [onExpand]);
+=======
+  const handleToggleOutput = useCallback(() => {
+    setExpanded(!showOutput);
+    if (!showOutput) {
+      onExpand?.();
+    }
+  }, [onExpand, setExpanded, showOutput]);
+>>>>>>> upstream/main
 
   return (
     <div>
       <span className="sr-only" aria-live="polite" aria-atomic="true">
         {(() => {
           if (phase === 'running') {
+<<<<<<< HEAD
             return localize('com_ui_searching_files');
+=======
+            return preparationText ?? localize('com_ui_searching_files');
+>>>>>>> upstream/main
           }
           if (phase === 'cancelled') {
             return localize('com_ui_cancelled');
@@ -504,7 +566,11 @@ export default function RetrievalCall({
                   <div
                     key={`${item.fileId ?? item.fileName}-${i}`}
                     className={cn(
+<<<<<<< HEAD
                       'overflow-hidden rounded-lg border border-border-light bg-surface-secondary',
+=======
+                      'border-border-light bg-surface-secondary overflow-hidden rounded-lg border',
+>>>>>>> upstream/main
                     )}
                   >
                     <FileHeader
@@ -516,7 +582,11 @@ export default function RetrievalCall({
                       onOpenPreview={item.fileId ? () => openPreview(i) : undefined}
                     />
                     {item.content && (
+<<<<<<< HEAD
                       <div className="border-t border-border-light px-3 py-3">
+=======
+                      <div className="border-border-inset border-t px-3 py-3">
+>>>>>>> upstream/main
                         <OutputRenderer text={item.content} />
                       </div>
                     )}

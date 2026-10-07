@@ -1,7 +1,12 @@
 import { useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
+<<<<<<< HEAD
 import { QueryKeys } from 'librechat-data-provider';
 import { useQueryClient } from '@tanstack/react-query';
+=======
+import { useQueryClient } from '@tanstack/react-query';
+import { QueryKeys, getSpeechText } from 'librechat-data-provider';
+>>>>>>> upstream/main
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import type { TMessage } from 'librechat-data-provider';
 import {
@@ -66,7 +71,13 @@ export default function StreamAudio({ index = 0 }) {
           setGlobalAudioURL(null);
         }
 
+<<<<<<< HEAD
         let cacheKey = latestMessage?.text ?? '';
+=======
+        /** Keyed by the spoken text, as manual playback is, so audio cached from an
+         *  unfiltered message (reasoning included) is never replayed. */
+        let cacheKey = latestMessage ? getSpeechText(latestMessage) : '';
+>>>>>>> upstream/main
         const cache = await caches.open('tts-responses');
         const cachedResponse = await cache.match(cacheKey);
 
@@ -139,7 +150,11 @@ export default function StreamAudio({ index = 0 }) {
             const targetMessage = latestMessages.find(
               (msg) => msg.messageId === latestMessage?.messageId,
             );
+<<<<<<< HEAD
             cacheKey = targetMessage?.text ?? '';
+=======
+            cacheKey = targetMessage ? getSpeechText(targetMessage) : '';
+>>>>>>> upstream/main
             if (!cacheKey) {
               logger.warn('Cache key not found, skipping audio cache');
             } else {

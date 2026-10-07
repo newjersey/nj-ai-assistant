@@ -10,6 +10,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { QueryKeys, FileSources, EModelEndpoint } from 'librechat-data-provider';
 import { render, screen, within, waitFor, fireEvent } from '@testing-library/react';
 import type { TFile, TFileUpload, TConversation } from 'librechat-data-provider';
+<<<<<<< HEAD
 import type { ChatFormValues } from '~/common';
 import ChatForm, { toRestoredComposerFile } from '../ChatForm';
 import { ChatContext, ChatFormProvider } from '~/Providers';
@@ -17,6 +18,36 @@ import { AuthContextProvider } from '~/hooks/AuthContext';
 import store from '~/store';
 
 const mockUpload = jest.fn();
+=======
+import type { ChatFormValues, TAskFunction } from '~/common';
+import type { TranslationKeys } from '~/hooks/useLocalize';
+import { getDraft, getPendingDraftId, setDraft } from '~/utils';
+import ChatForm, { toRestoredComposerFile } from '../ChatForm';
+import { ChatContext, ChatFormProvider } from '~/Providers';
+import { AuthContextProvider } from '~/hooks/AuthContext';
+import * as FileContainer from '../Files/FileContainer';
+import store from '~/store';
+
+const mockUpload = jest.fn();
+const mockAsk = jest.fn();
+
+// Production keeps `t` stable between language changes; the global test double does not.
+jest.mock('react-i18next', () => {
+  const actual = jest.requireActual<typeof import('react-i18next')>('react-i18next');
+  const t = (key: TranslationKeys, options?: import('i18next').TOptions) =>
+    jest.requireActual<typeof import('~/locales/i18n')>('~/locales/i18n').default.t(key, options);
+  return {
+    ...actual,
+    useTranslation: () => ({
+      t,
+      i18n: {
+        ...jest.requireActual<typeof import('~/locales/i18n')>('~/locales/i18n').default,
+        changeLanguage: jest.fn(),
+      },
+    }),
+  };
+});
+>>>>>>> upstream/main
 
 jest.mock('librechat-data-provider', () => {
   const actual = jest.requireActual('librechat-data-provider');
@@ -68,7 +99,13 @@ let commits = 0;
 
 function Harness() {
   const [files, setFiles] = useRecoilState(store.filesByIndex(0));
+<<<<<<< HEAD
   const [isSubmitting] = useRecoilState(store.isSubmittingFamily(0));
+=======
+  const [isSubmitting, setIsSubmitting] = useRecoilState(store.isSubmittingFamily(0));
+  /* ChatView owns this read and passes it in; the harness stands in for it. */
+  const [speechSettingsInitialized] = useRecoilState(store.speechSettingsInitialized);
+>>>>>>> upstream/main
   const [, setFilesLoading] = useState(false);
   const methods = useForm<ChatFormValues>({ defaultValues: { text: '' } });
 
@@ -89,7 +126,17 @@ function Harness() {
         stopGenerating: () => undefined,
         getMessages: () => undefined,
         setMessages: () => undefined,
+<<<<<<< HEAD
         ask: () => undefined,
+=======
+        ask: (...args: Parameters<TAskFunction>) => {
+          const result = mockAsk(...args);
+          if (result !== false) {
+            setIsSubmitting(true);
+          }
+          return result;
+        },
+>>>>>>> upstream/main
         regenerate: () => undefined,
         setSiblingIdx: () => undefined,
         showPopover: false,
@@ -103,7 +150,11 @@ function Harness() {
         handleRegenerate: () => undefined,
         handleContinue: () => undefined,
       }) as unknown as React.ContextType<typeof ChatContext>,
+<<<<<<< HEAD
     [files, setFiles, isSubmitting],
+=======
+    [files, setFiles, isSubmitting, setIsSubmitting],
+>>>>>>> upstream/main
   );
 
   return (
@@ -113,6 +164,10 @@ function Harness() {
           <ChatForm
             index={0}
             isLandingPage={false}
+<<<<<<< HEAD
+=======
+            speechSettingsInitialized={speechSettingsInitialized}
+>>>>>>> upstream/main
             footerBelow={false}
             centerFormOnLanding={false}
           />
@@ -125,7 +180,12 @@ function Harness() {
 function renderComposer({
   submitting = false,
   quotes = [],
+<<<<<<< HEAD
 }: { submitting?: boolean; quotes?: string[] } = {}) {
+=======
+  speechSettingsInitialized = false,
+}: { submitting?: boolean; quotes?: string[]; speechSettingsInitialized?: boolean } = {}) {
+>>>>>>> upstream/main
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
   });
@@ -143,13 +203,23 @@ function renderComposer({
       <RecoilRoot
         initializeState={({ set }) => {
           set(store.isSubmittingFamily(0), submitting);
+<<<<<<< HEAD
+=======
+          set(store.speechSettingsInitialized, speechSettingsInitialized);
+>>>>>>> upstream/main
           set(store.pendingQuotesByConvoId(conversation.conversationId ?? ''), quotes);
         }}
       >
         <Router>
           <AuthContextProvider authConfig={{ loginRedirect: '', test: true }}>
             <DndProvider backend={HTML5Backend}>
+<<<<<<< HEAD
               <Harness />
+=======
+              <main>
+                <Harness />
+              </main>
+>>>>>>> upstream/main
             </DndProvider>
           </AuthContextProvider>
         </Router>
@@ -172,6 +242,10 @@ describe('ChatForm attachments', () => {
     global.URL.revokeObjectURL = jest.fn();
     (global as unknown as { Image: unknown }).Image = StubImage;
     mockUpload.mockReset();
+<<<<<<< HEAD
+=======
+    mockAsk.mockReset();
+>>>>>>> upstream/main
     /** The server echoes the id the client sent back as `temp_file_id`. */
     mockUpload.mockImplementation((body: FormData) =>
       Promise.resolve({ ...uploadResponse, temp_file_id: body.get('file_id') as string }),
@@ -195,6 +269,21 @@ describe('ChatForm attachments', () => {
     });
   });
 
+<<<<<<< HEAD
+=======
+  test('keeps the mic disabled until speech settings hydrate', async () => {
+    const pending = renderComposer({ speechSettingsInitialized: false });
+    const micName = 'Use microphone';
+
+    expect(await screen.findByRole('button', { name: micName })).toBeDisabled();
+
+    pending.unmount();
+    renderComposer({ speechSettingsInitialized: true });
+
+    expect(await screen.findByRole('button', { name: micName })).toBeEnabled();
+  }, 20000);
+
+>>>>>>> upstream/main
   test('re-enables send once an attachment finishes uploading', async () => {
     const { container } = renderComposer();
 
@@ -212,7 +301,11 @@ describe('ChatForm attachments', () => {
   test('does not steal focus when clicking the nested attachment icon', async () => {
     renderComposer();
     const textarea = await screen.findByTestId('text-input');
+<<<<<<< HEAD
     const trigger = screen.getByRole('button', { name: 'Attach File Options' });
+=======
+    const trigger = screen.getByTestId('composer-palette-button');
+>>>>>>> upstream/main
     expect(trigger).toBeEnabled();
     const icon = trigger.querySelector('svg');
     expect(icon).not.toBeNull();
@@ -221,23 +314,75 @@ describe('ChatForm attachments', () => {
     await userEvent.click(icon as SVGElement);
 
     expect(focus).not.toHaveBeenCalled();
+<<<<<<< HEAD
     expect(await screen.findByRole('menu', { name: 'Attach File Options' })).toBeInTheDocument();
+=======
+    expect(await screen.findByRole('dialog', { name: 'Attach and tools' })).toBeInTheDocument();
+>>>>>>> upstream/main
   }, 20000);
 
   test('closes an open menu when the textarea is clicked', async () => {
     renderComposer();
     const textarea = await screen.findByTestId('text-input');
+<<<<<<< HEAD
     await userEvent.click(screen.getByRole('button', { name: 'Attach File Options' }));
     expect(await screen.findByRole('menu', { name: 'Attach File Options' })).toBeInTheDocument();
+=======
+    await userEvent.click(screen.getByTestId('composer-palette-button'));
+    expect(await screen.findByRole('dialog', { name: 'Attach and tools' })).toBeInTheDocument();
+>>>>>>> upstream/main
 
     await userEvent.click(textarea);
 
     await waitFor(() =>
+<<<<<<< HEAD
       expect(screen.queryByRole('menu', { name: 'Attach File Options' })).not.toBeInTheDocument(),
+=======
+      expect(screen.queryByRole('dialog', { name: 'Attach and tools' })).not.toBeInTheDocument(),
+>>>>>>> upstream/main
     );
     expect(textarea).toHaveFocus();
   }, 20000);
 
+<<<<<<< HEAD
+=======
+  test('does not restore an older fragment of the sent message while the run starts', async () => {
+    renderComposer();
+    const textarea = await screen.findByTestId('text-input');
+    const message = 'i would like to learn how to use it for a demo or is it too early days';
+    await userEvent.type(textarea, message);
+    setDraft({ id: getPendingDraftId(), value: 'i would like to learn how to use it for a dem' });
+
+    await userEvent.click(sendButton());
+
+    await waitFor(() =>
+      expect(mockAsk).toHaveBeenCalledWith(
+        expect.objectContaining({ text: message }),
+        expect.anything(),
+      ),
+    );
+    expect(textarea).toHaveValue('');
+    expect(getDraft(getPendingDraftId())).toBe('');
+
+    await userEvent.type(textarea, 'a different follow-up');
+    await waitFor(() => expect(getDraft(getPendingDraftId())).toBe('a different follow-up'));
+  }, 20000);
+
+  test('keeps the draft intact when the normal send is refused', async () => {
+    mockAsk.mockReturnValue(false);
+    renderComposer();
+    const textarea = await screen.findByTestId('text-input');
+    await userEvent.type(textarea, 'not sent');
+    setDraft({ id: getPendingDraftId(), value: 'earlier follow-up' });
+
+    await userEvent.click(sendButton());
+
+    await waitFor(() => expect(mockAsk).toHaveBeenCalled());
+    expect(textarea).toHaveValue('not sent');
+    expect(getDraft(getPendingDraftId())).toBe('earlier follow-up');
+  }, 20000);
+
+>>>>>>> upstream/main
   test('still returns focus to the textarea after a plain control click', async () => {
     renderComposer();
     const textarea = await screen.findByTestId('text-input');
@@ -279,6 +424,7 @@ describe('ChatForm attachments', () => {
     expect(textarea).toHaveFocus();
   }, 20000);
 
+<<<<<<< HEAD
   test('returns focus to the textarea when removing a quote collapses the popup', async () => {
     renderComposer({ quotes: ['alpha', 'beta'] });
     const textarea = await screen.findByTestId('text-input');
@@ -308,10 +454,52 @@ describe('ChatForm attachments', () => {
 
     await waitFor(() => expect(within(popup).getAllByRole('button')).toHaveLength(2));
     expect(within(popup).getAllByRole('button', { name: 'Remove quote' })[0]).toHaveFocus();
+=======
+  test('returns focus to the textarea when the last quote is removed', async () => {
+    renderComposer({ quotes: ['alpha'] });
+    const textarea = await screen.findByTestId('text-input');
+
+    await userEvent.click(screen.getByRole('button', { name: 'Remove quote' }));
+
+    await waitFor(() => expect(screen.queryAllByTestId('composer-chip-quote')).toHaveLength(0));
+    expect(textarea).toHaveFocus();
+  }, 20000);
+
+  test('moves focus to the remaining quote when one of two is removed', async () => {
+    renderComposer({ quotes: ['alpha', 'beta'] });
+    await screen.findByTestId('text-input');
+    const firstChip = () => screen.getAllByTestId('composer-chip-quote')[0];
+
+    await userEvent.click(within(firstChip()).getByRole('button', { name: 'Remove quote' }));
+
+    await waitFor(() => expect(screen.getAllByTestId('composer-chip-quote')).toHaveLength(1));
+    expect(screen.getByText('beta')).toBeInTheDocument();
+    expect(
+      within(screen.getByTestId('composer-chip-quote')).getByRole('button', {
+        name: 'Remove quote',
+      }),
+    ).toHaveFocus();
+  }, 20000);
+
+  test('keeps focus inside the popup when removing a quote leaves several', async () => {
+    renderComposer({ quotes: ['alpha', 'beta', 'gamma'] });
+    await screen.findByTestId('text-input');
+    const firstChip = () => screen.getAllByTestId('composer-chip-quote')[0];
+
+    await userEvent.click(within(firstChip()).getByRole('button', { name: 'Remove quote' }));
+
+    await waitFor(() => expect(screen.getAllByTestId('composer-chip-quote')).toHaveLength(2));
+    expect(
+      within(screen.getAllByTestId('composer-chip-quote')[0]).getByRole('button', {
+        name: 'Remove quote',
+      }),
+    ).toHaveFocus();
+>>>>>>> upstream/main
   }, 20000);
 
   test('does not raise the keyboard when a quote removal collapses the popup on touch', async () => {
     const matchMedia = window.matchMedia;
+<<<<<<< HEAD
     window.matchMedia = jest
       .fn()
       .mockReturnValue({ matches: true }) as unknown as typeof matchMedia;
@@ -327,6 +515,21 @@ describe('ChatForm attachments', () => {
       await userEvent.click(within(popup).getAllByRole('button', { name: 'Remove quote' })[0]);
 
       await waitFor(() => expect(screen.queryByTestId('quote-selections-popup')).toBeNull());
+=======
+    window.matchMedia = jest.fn().mockReturnValue({
+      matches: true,
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+    }) as unknown as typeof matchMedia;
+    try {
+      renderComposer({ quotes: ['alpha', 'beta'] });
+      const textarea = await screen.findByTestId('text-input');
+      const firstChip = () => screen.getAllByTestId('composer-chip-quote')[0];
+
+      await userEvent.click(within(firstChip()).getByRole('button', { name: 'Remove quote' }));
+
+      await waitFor(() => expect(screen.getAllByTestId('composer-chip-quote')).toHaveLength(1));
+>>>>>>> upstream/main
       expect(textarea).not.toHaveFocus();
     } finally {
       window.matchMedia = matchMedia;
@@ -376,6 +579,34 @@ describe('ChatForm attachments', () => {
     expect(textarea).toHaveValue('hi');
   }, 20000);
 
+<<<<<<< HEAD
+=======
+  test('does not redraw an attached document on each keystroke', async () => {
+    mockUpload.mockImplementation((body: FormData) =>
+      Promise.resolve({
+        ...uploadResponse,
+        filename: 'report.pdf',
+        type: 'application/pdf',
+        temp_file_id: body.get('file_id') as string,
+      }),
+    );
+    const { container } = renderComposer();
+    await attach(container, new File(['document'], 'report.pdf', { type: 'application/pdf' }));
+    expect(await screen.findByRole('button', { name: 'report.pdf' })).toBeVisible();
+    const textarea = screen.getByTestId('text-input');
+    await userEvent.click(textarea);
+    const preview = jest.spyOn(FileContainer, 'default');
+
+    await userEvent.type(textarea, 'read this document');
+
+    // Allow the upload cache to reconcile once, not once per keystroke.
+    expect(preview.mock.calls.length).toBeLessThanOrEqual(1);
+    await userEvent.click(sendButton());
+    expect(mockAsk).toHaveBeenCalledWith({ text: 'read this document' }, expect.any(Object));
+    expect(textarea).toHaveValue('');
+  });
+
+>>>>>>> upstream/main
   /**
    * The composer is the app's busiest surface: every keystroke already re-renders
    * it for the row count and the send button's enabled state, so anything that

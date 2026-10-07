@@ -1,5 +1,10 @@
+<<<<<<< HEAD
 import { RetentionMode } from 'librechat-data-provider';
 import { createFallbackRetentionDate } from '@librechat/data-schemas';
+=======
+import { createFallbackRetentionDate } from '@librechat/data-schemas';
+import { isAllDataRetention, isForcedTemporaryRetention } from 'librechat-data-provider';
+>>>>>>> upstream/main
 import type { AppConfig } from '@librechat/data-schemas';
 
 type InterfaceConfig = AppConfig['interfaceConfig'];
@@ -113,15 +118,25 @@ async function computeRetentionExpiry(
   dependencies: RetentionDependencies,
 ): Promise<RetentionExpiry> {
   const interfaceConfig = req?.config?.interfaceConfig;
+<<<<<<< HEAD
   const isRetentionAll = interfaceConfig?.retentionMode === RetentionMode.ALL;
   const conversationId = req?.body?.conversationId;
   const userId = req?.user?.id;
+=======
+  const isForcedTemporary = isForcedTemporaryRetention(interfaceConfig?.retentionMode);
+  const isRetentionAll = isAllDataRetention(interfaceConfig?.retentionMode);
+  const conversationId = req?.body?.conversationId;
+  const userId = req?.user?.id;
+  /** A source message's stored deadline wins in every mode, so a file attached late in a
+   *  chat never outlives the message and conversation that reference it. */
+>>>>>>> upstream/main
   if (req?.fileRetentionSource != null) {
     const source = req.fileRetentionSource;
     const expiredAt = getConversationExpirationDate(source);
     if (expiredAt != null) {
       return { expiredAt };
     }
+<<<<<<< HEAD
     return isRetentionAll || source.isTemporary === true
       ? createRetentionExpiry(req, dependencies, source.isTemporary === true)
       : {};
@@ -129,6 +144,19 @@ async function computeRetentionExpiry(
   if (
     isRetentionAll &&
     (interfaceConfig.generalChatRetention === undefined ||
+=======
+    const isTemporary = isForcedTemporary || source.isTemporary === true;
+    return isRetentionAll || isTemporary
+      ? createRetentionExpiry(req, dependencies, isTemporary)
+      : {};
+  }
+  if (isForcedTemporary) {
+    return createRetentionExpiry(req, dependencies, true);
+  }
+  if (
+    isRetentionAll &&
+    (interfaceConfig?.generalChatRetention === undefined ||
+>>>>>>> upstream/main
       (req?.body?.isTemporary != null && !(conversationId && userId)))
   ) {
     return createRetentionExpiry(req, dependencies);
@@ -211,7 +239,11 @@ const shouldRetainPersistentAgentFile = ({
   const interfaceConfig = req?.config?.interfaceConfig;
   return (
     isPersistentAgentResourceUpload({ messageAttachment, toolResource }) &&
+<<<<<<< HEAD
     (interfaceConfig?.retentionMode !== RetentionMode.ALL ||
+=======
+    (!isAllDataRetention(interfaceConfig?.retentionMode) ||
+>>>>>>> upstream/main
       interfaceConfig?.retainAgentFiles === true)
   );
 };
@@ -250,7 +282,11 @@ export async function getSharedLinkExpiration(
     return undefined;
   }
 
+<<<<<<< HEAD
   const isRetentionAll = req?.config?.interfaceConfig?.retentionMode === RetentionMode.ALL;
+=======
+  const isRetentionAll = isAllDataRetention(req?.config?.interfaceConfig?.retentionMode);
+>>>>>>> upstream/main
   const convo = await dependencies.getConvo(userId, conversationId);
   if (!convo) {
     return undefined;

@@ -32,6 +32,10 @@ import {
   takeRetainedFileDeletions,
 } from '~/utils';
 import { useGetFiles, useDeleteFilesMutation } from '~/data-provider';
+<<<<<<< HEAD
+=======
+import { useChatSettings } from '~/Providers/ChatSettingsContext';
+>>>>>>> upstream/main
 import useNewConvo from '~/hooks/useNewConvo';
 import store from '~/store';
 
@@ -119,7 +123,11 @@ export default function useNewChat({
   const { newConversation } = useNewConvo(index);
   const conversationId = useRecoilValue(store.conversationIdByIndex(index));
   const files = useRecoilValue(store.filesByIndex(index));
+<<<<<<< HEAD
   const saveDrafts = useRecoilValue(store.saveDrafts);
+=======
+  const { saveDrafts } = useChatSettings();
+>>>>>>> upstream/main
   const { data: fileList } = useGetFiles<TFile[]>();
   const { mutateAsync } = useDeleteFilesMutation();
   /** The cleanup pass runs on a timer nobody asked for, so it reports nothing: a storage failure

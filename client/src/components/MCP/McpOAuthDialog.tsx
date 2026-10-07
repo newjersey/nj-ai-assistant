@@ -11,7 +11,11 @@ import {
 } from '@librechat/client';
 import CopyButton from '~/components/Messages/Content/CopyButton';
 import { useLocalize, useCopyToClipboard } from '~/hooks';
+<<<<<<< HEAD
 import { cn } from '~/utils';
+=======
+import { cn, openInNewTab } from '~/utils';
+>>>>>>> upstream/main
 
 interface McpOAuthDialogProps {
   open: boolean;
@@ -48,11 +52,19 @@ export default function McpOAuthDialog({
 
   return (
     <OGDialog open={open} onOpenChange={onOpenChange}>
+<<<<<<< HEAD
       <OGDialogContent className="w-11/12 max-w-md overflow-hidden rounded-2xl">
         <div className="flex items-center gap-2">
           {iconUrl && !iconError && (
             <span
               className="flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-md bg-white"
+=======
+      <OGDialogContent className="w-11/12 max-w-md overflow-x-hidden overflow-y-auto rounded-2xl">
+        <div className="flex items-center gap-2">
+          {iconUrl && !iconError && (
+            <span
+              className="bg-surface-fixed flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-md"
+>>>>>>> upstream/main
               aria-hidden="true"
             >
               <img
@@ -64,6 +76,7 @@ export default function McpOAuthDialog({
               />
             </span>
           )}
+<<<<<<< HEAD
           <OGDialogTitle className="text-base font-semibold leading-6 text-text-primary">
             {localize('com_nav_mcp_connect_server', { 0: serverName })}
           </OGDialogTitle>
@@ -73,6 +86,17 @@ export default function McpOAuthDialog({
         </OGDialogDescription>
 
         <div className="flex flex-col gap-3 p-1">
+=======
+          <OGDialogTitle className="text-base leading-6 font-semibold">
+            {localize('com_nav_mcp_connect_server', { 0: serverName })}
+          </OGDialogTitle>
+        </div>
+        <OGDialogDescription className="text-text-secondary text-sm">
+          {localize('com_ui_mcp_oauth_description')}
+        </OGDialogDescription>
+
+        <div className="flex min-w-0 flex-col gap-3 p-1">
+>>>>>>> upstream/main
           {/* Auto-height reveal via grid-template-rows 0fr -> 1fr so the QR slides
            * open smoothly without a hardcoded height, matching MCPToolItem. */}
           <div
@@ -88,15 +112,29 @@ export default function McpOAuthDialog({
                   showQR ? 'opacity-100' : 'opacity-0',
                 )}
               >
+<<<<<<< HEAD
                 <div className="rounded-2xl bg-white p-4 shadow-lg">
                   <QRCodeSVG
                     value={oauthUrl}
                     size={180}
+=======
+                <div className="bg-surface-qr max-w-full min-w-0 rounded-2xl p-4 shadow-lg">
+                  {/* size is only the no-CSS fallback; the rem width is what renders,
+                      so the code follows the dialog instead of staying at 180px. */}
+                  <QRCodeSVG
+                    value={oauthUrl}
+                    size={180}
+                    className="h-auto w-[11.25rem] max-w-full"
+>>>>>>> upstream/main
                     marginSize={2}
                     title={localize('com_ui_mcp_oauth_qr_code_description')}
                   />
                 </div>
+<<<<<<< HEAD
                 <span className="text-xs text-text-secondary">
+=======
+                <span className="text-text-secondary text-xs">
+>>>>>>> upstream/main
                   {localize('com_ui_mcp_oauth_scan_qr')}
                 </span>
               </div>
@@ -111,7 +149,11 @@ export default function McpOAuthDialog({
               value={oauthUrl}
               aria-label={localize('com_ui_copy_link')}
               onFocus={(event) => event.currentTarget.select()}
+<<<<<<< HEAD
               className="pr-10 text-text-secondary"
+=======
+              className="text-text-secondary pr-10"
+>>>>>>> upstream/main
               data-testid="mcp-oauth-url"
             />
             <CopyButton
@@ -123,11 +165,19 @@ export default function McpOAuthDialog({
                   copyUrl(setIsCopying);
                 }
               }}
+<<<<<<< HEAD
               className="absolute right-1 top-1/2 -translate-y-1/2"
             />
           </div>
 
           <div className="flex items-center gap-2">
+=======
+              className="absolute top-1/2 right-1 -translate-y-1/2"
+            />
+          </div>
+
+          <div className="flex min-w-0 flex-wrap items-center gap-2">
+>>>>>>> upstream/main
             <Button
               type="button"
               variant="outline"
@@ -142,11 +192,19 @@ export default function McpOAuthDialog({
             <Button
               type="button"
               variant="submit"
+<<<<<<< HEAD
               className="flex-1"
               onClick={() => window.open(oauthUrl, '_blank', 'noopener,noreferrer')}
             >
               {localize('com_ui_continue_oauth')}
               <ExternalLink className="size-4" aria-hidden="true" />
+=======
+              className="h-auto min-h-10 min-w-0 flex-1 basis-40 whitespace-normal"
+              onClick={() => openInNewTab(oauthUrl)}
+            >
+              {localize('com_ui_continue_oauth')}
+              <ExternalLink className="size-4 shrink-0" aria-hidden="true" />
+>>>>>>> upstream/main
             </Button>
           </div>
         </div>

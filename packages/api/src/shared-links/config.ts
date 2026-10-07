@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+import { deploymentThemeSchema } from 'librechat-data-provider';
+>>>>>>> upstream/main
 import { tenantStorage, SYSTEM_TENANT_ID } from '@librechat/data-schemas';
 import type { TSharedLinkStartupConfig } from 'librechat-data-provider';
 import type { Request, Response, NextFunction } from 'express';
@@ -14,27 +18,52 @@ interface SharedLinkConfigRequest extends Request {
 
 interface SharedLinkConfigMiddlewareDeps {
   getAppConfig: (options?: GetAppConfigOptions) => Promise<AppConfig>;
+<<<<<<< HEAD
+=======
+  /** Reject instead of substituting the base config when the tenant's overrides fail to load. */
+  failClosed?: boolean;
+>>>>>>> upstream/main
 }
 
 /** Resolve shared-link policy independently of the authenticated viewer. */
 export async function resolveSharedLinkConfig(
   getAppConfig: SharedLinkConfigMiddlewareDeps['getAppConfig'],
   tenantId?: string,
+<<<<<<< HEAD
 ): Promise<AppConfig> {
   if (tenantId && tenantId !== SYSTEM_TENANT_ID) {
     return tenantStorage.run({ tenantId }, () => getAppConfig({ tenantId }));
+=======
+  failClosed?: boolean,
+): Promise<AppConfig> {
+  if (tenantId && tenantId !== SYSTEM_TENANT_ID) {
+    return tenantStorage.run({ tenantId }, () =>
+      getAppConfig({ tenantId, ...(failClosed && { failClosed }) }),
+    );
+>>>>>>> upstream/main
   }
   return getAppConfig({ baseOnly: true });
 }
 
+<<<<<<< HEAD
 export function createSharedLinkConfigMiddleware({ getAppConfig }: SharedLinkConfigMiddlewareDeps) {
+=======
+export function createSharedLinkConfigMiddleware({
+  getAppConfig,
+  failClosed,
+}: SharedLinkConfigMiddlewareDeps) {
+>>>>>>> upstream/main
   return async function sharedLinkConfigMiddleware(
     req: SharedLinkConfigRequest,
     _res: Response,
     next: NextFunction,
   ): Promise<void> {
     try {
+<<<<<<< HEAD
       req.config = await resolveSharedLinkConfig(getAppConfig, req.shareTenantId);
+=======
+      req.config = await resolveSharedLinkConfig(getAppConfig, req.shareTenantId, failClosed);
+>>>>>>> upstream/main
       next();
     } catch (error) {
       next(error);
@@ -94,11 +123,33 @@ export function buildSharedLinkStartupPayload(
     payload.customFooter = env.CUSTOM_FOOTER;
   }
 
+<<<<<<< HEAD
   const { privacyPolicy, termsOfService } = appConfig?.interfaceConfig ?? {};
   if (privacyPolicy || termsOfService) {
     payload.interface = {
       ...(privacyPolicy ? { privacyPolicy } : {}),
       ...(termsOfService ? { termsOfService } : {}),
+=======
+  const { privacyPolicy, termsOfService, codeHighlightThrottleMs, artifactUndocking } =
+    appConfig?.interfaceConfig ?? {};
+  const parsedTheme = deploymentThemeSchema.safeParse(appConfig?.interfaceConfig?.theme);
+  const theme = parsedTheme.success ? parsedTheme.data : undefined;
+  /* A shared conversation shows the same artifacts pane, so it needs the same
+   * answer about opening that pane in its own window. */
+  if (
+    privacyPolicy ||
+    termsOfService ||
+    codeHighlightThrottleMs != null ||
+    theme ||
+    artifactUndocking === false
+  ) {
+    payload.interface = {
+      ...(codeHighlightThrottleMs != null ? { codeHighlightThrottleMs } : {}),
+      ...(privacyPolicy ? { privacyPolicy } : {}),
+      ...(termsOfService ? { termsOfService } : {}),
+      ...(theme ? { theme } : {}),
+      ...(artifactUndocking === false ? { artifactUndocking } : {}),
+>>>>>>> upstream/main
     };
   }
 

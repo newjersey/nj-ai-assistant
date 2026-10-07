@@ -16,7 +16,11 @@ let reconcileInFlight: Promise<void> | undefined;
 
 function agentReferenceFilter(environmentId: string, tenantId?: string) {
   return {
+<<<<<<< HEAD
     code_environment_id: environmentId,
+=======
+    $or: [{ code_environment_id: environmentId }, { code_environment_ids: environmentId }],
+>>>>>>> upstream/main
     ...(tenantId == null ? { tenantId: { $exists: false } } : { tenantId }),
   };
 }

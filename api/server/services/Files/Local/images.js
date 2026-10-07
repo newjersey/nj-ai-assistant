@@ -1,6 +1,10 @@
 const fs = require('fs');
 const path = require('path');
 const sharp = require('sharp');
+<<<<<<< HEAD
+=======
+const { stripCacheBust } = require('@librechat/api');
+>>>>>>> upstream/main
 const { resizeImageBuffer } = require('../images/resize');
 const { updateUser, updateFile } = require('~/models');
 
@@ -97,7 +101,11 @@ async function prepareImagesLocal(req, file) {
   if (!fs.existsSync(userPath)) {
     fs.mkdirSync(userPath, { recursive: true });
   }
+<<<<<<< HEAD
   const filepath = path.join(publicPath, file.filepath);
+=======
+  const filepath = path.join(publicPath, stripCacheBust(file.filepath));
+>>>>>>> upstream/main
 
   const promises = [];
   promises.push(updateFile({ file_id: file.file_id }));

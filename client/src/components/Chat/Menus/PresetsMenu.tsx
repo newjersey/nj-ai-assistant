@@ -62,7 +62,13 @@ const PresetsMenu: FC = () => {
 
   return (
     <Root>
+<<<<<<< HEAD
       <Trigger asChild>
+=======
+      {/* The open state belongs to the trigger, which stamps `data-state` on the
+       *  button it renders through, so its fill is set here rather than on the button. */}
+      <Trigger asChild className="data-[state=open]:bg-surface-active-alt">
+>>>>>>> upstream/main
         <TooltipAnchor
           ref={presetsMenuTriggerRef}
           description={localize('com_endpoint_examples')}
@@ -74,7 +80,11 @@ const PresetsMenu: FC = () => {
               id="presets-button"
               data-testid="presets-button"
               aria-label={localize('com_endpoint_examples')}
+<<<<<<< HEAD
               className="h-9 w-9 shrink-0 rounded-theme-control bg-presentation duration-0 hover:bg-surface-hover radix-state-open:bg-surface-active-alt"
+=======
+              className="rounded-theme-control bg-presentation hover:bg-surface-hover h-9 w-9 shrink-0 duration-0"
+>>>>>>> upstream/main
             >
               <BookCopy className="icon-md" aria-hidden="true" />
             </Button>
@@ -88,7 +98,11 @@ const PresetsMenu: FC = () => {
           sideOffset={8}
           collisionPadding={16}
           aria-label={localize('com_endpoint_examples')}
+<<<<<<< HEAD
           className="z-50 max-h-[495px] overflow-x-hidden rounded-theme-surface border border-border-light bg-presentation text-text-primary shadow-lg md:min-w-[400px]"
+=======
+          className="rounded-theme-surface border-border-menu bg-surface-menu text-text-primary z-50 max-h-[min(30.9375rem,80vh)] overflow-x-hidden border shadow-lg md:min-w-[min(25rem,90vw)]"
+>>>>>>> upstream/main
         >
           <PresetItems
             presets={presetsQuery.data}

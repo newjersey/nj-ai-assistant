@@ -1,6 +1,11 @@
 import { logger, tenantStorage } from '@librechat/data-schemas';
 import { Constants, EModelEndpoint } from 'librechat-data-provider';
+<<<<<<< HEAD
 import type { TFile } from 'librechat-data-provider';
+=======
+import type { CodeApprovalMode, TFile, TReasoningOverride } from 'librechat-data-provider';
+import type { ScheduledMCPIdentity } from 'librechat-data-provider';
+>>>>>>> upstream/main
 import type {
   AgentContinueTriggerEnvelope,
   AgentFireTriggerEnvelope,
@@ -50,6 +55,10 @@ export interface AgentContinuationAdmissionSource {
 export type AgentTriggerContinuePreparation =
   | {
       status: 'ready';
+<<<<<<< HEAD
+=======
+      scheduleMCPIdentity?: ScheduledMCPIdentity;
+>>>>>>> upstream/main
       input: string;
       parentMessageId: string;
       expectedPredecessorCreatedAt?: number;
@@ -58,6 +67,13 @@ export type AgentTriggerContinuePreparation =
       files?: Partial<TFile>[];
       quotes?: string[];
       manualSkills?: string[];
+<<<<<<< HEAD
+=======
+      /** Parent-selected coding preference for a completion turn. Admission
+       * revalidates it against live policy; event payloads cannot supply it. */
+      codeApprovalMode?: CodeApprovalMode;
+      reasoningOverride?: TReasoningOverride;
+>>>>>>> upstream/main
       /** Trusted source identity committed by execution enrollment before the
        * provider-start fence opens. */
       admissionSource?: AgentContinuationAdmissionSource;
@@ -66,6 +82,11 @@ export type AgentTriggerContinuePreparation =
       releaseOnDefiniteFailure?: (error?: AgentTriggerExecutionError) => MaybePromise<void>;
       /** Commits the source handoff after generation admission. Failure is
        * outcome-ambiguous: the same delivery retries with the same request id. */
+<<<<<<< HEAD
+=======
+      /** Durable possible-handoff marker written immediately before transport. */
+      beginDispatch?: () => MaybePromise<void>;
+>>>>>>> upstream/main
       settleOnAdmission?: (result: AgentTriggerContinueResult) => MaybePromise<void>;
     }
   | { status: 'settled' };
@@ -168,7 +189,17 @@ export interface AgentTriggerExecutionHostDeps {
 export interface AgentTriggerExecutionHost {
   dispatch: (
     envelope: unknown,
+<<<<<<< HEAD
     options?: { signal?: AbortSignal; attempt?: number; maxAttempts?: number },
+=======
+    options?: {
+      signal?: AbortSignal;
+      attempt?: number;
+      maxAttempts?: number;
+      deliveryClaimToken?: string;
+      requiredWorkerCapability?: string;
+    },
+>>>>>>> upstream/main
   ) => Promise<AgentTriggerExecutionResult>;
 }
 
@@ -632,6 +663,10 @@ async function startRun(
     const url = mode === 'fire' ? fireUrl(baseUrl) : continueUrl(baseUrl);
     const fetcher: AgentTriggerFetch = deps.fetch ?? globalThis.fetch;
     let response: Response;
+<<<<<<< HEAD
+=======
+    await readyPreparation?.beginDispatch?.();
+>>>>>>> upstream/main
     try {
       response = await fetcher(url, {
         method: 'POST',
@@ -668,9 +703,21 @@ async function startRun(
           ...(readyPreparation?.quotes != null && {
             quotes: readyPreparation.quotes,
           }),
+<<<<<<< HEAD
           ...(readyPreparation?.manualSkills != null && {
             manualSkills: readyPreparation.manualSkills,
           }),
+=======
+          ...(readyPreparation?.codeApprovalMode != null && {
+            codeApprovalMode: readyPreparation.codeApprovalMode,
+          }),
+          ...(readyPreparation?.manualSkills != null && {
+            manualSkills: readyPreparation.manualSkills,
+          }),
+          ...(readyPreparation?.reasoningOverride != null && {
+            reasoningOverride: readyPreparation.reasoningOverride,
+          }),
+>>>>>>> upstream/main
           isContinued: false,
           isRegenerate: false,
           clientRequestId: context.idempotencyKey,
@@ -698,6 +745,22 @@ async function startRun(
                 ...(detachedCompletion == null ? {} : { internalCompletion: detachedCompletion }),
               },
             }),
+<<<<<<< HEAD
+=======
+          ...(envelope.mode === 'continue' &&
+            envelope.event.source.type === 'internal' &&
+            ['subagent-completion', 'background-tool-completion'].includes(
+              envelope.event.source.id,
+            ) && {
+              agentCompletion: {
+                version: 1,
+                sourceId: envelope.event.source.id,
+                ...(readyPreparation?.scheduleMCPIdentity && {
+                  scheduleMCPIdentity: readyPreparation.scheduleMCPIdentity,
+                }),
+              },
+            }),
+>>>>>>> upstream/main
           ...(envelope.mode === 'fire' && {
             agentTrigger: {
               version: envelope.version,

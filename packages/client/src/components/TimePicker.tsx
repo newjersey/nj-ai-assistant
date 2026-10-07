@@ -97,14 +97,22 @@ export function TimeColumn({
 
   return (
     <div className="flex min-w-0 flex-1 flex-col">
+<<<<<<< HEAD
       <span className="px-1 pb-1 text-xs font-medium text-text-secondary">{label}</span>
+=======
+      <span className="text-text-secondary px-1 pb-1 text-xs font-medium">{label}</span>
+>>>>>>> upstream/main
       <div
         ref={listRef}
         role="radiogroup"
         aria-label={label}
         // `relative` so the selected row's `offsetTop` is measured against this
         // column and not whatever positioned ancestor the popover happens to have.
+<<<<<<< HEAD
         className="relative max-h-52 overflow-y-auto rounded-lg border border-border-light p-1"
+=======
+        className="border-border-light relative max-h-52 overflow-y-auto rounded-lg border p-1"
+>>>>>>> upstream/main
       >
         {values.map((value, index) => {
           const isSelected = value === selected;
@@ -121,7 +129,11 @@ export function TimeColumn({
               className={cn(
                 'w-full rounded-md px-2 py-1 text-center text-sm tabular-nums transition-colors',
                 isSelected
+<<<<<<< HEAD
                   ? 'bg-surface-active font-medium text-text-primary'
+=======
+                  ? 'bg-surface-active text-text-primary font-medium'
+>>>>>>> upstream/main
                   : 'text-text-secondary hover:bg-surface-hover',
               )}
             >
@@ -172,15 +184,24 @@ function PickerShell({
           aria-labelledby={labelledBy == null ? valueId : `${labelledBy} ${valueId}`}
           className={cn(
             fieldControl,
+<<<<<<< HEAD
             'items-center justify-between gap-2 text-text-primary',
             'hover:bg-surface-hover radix-state-open:bg-surface-hover',
+=======
+            'items-center justify-between gap-2',
+            'hover:bg-surface-hover data-[state=open]:bg-surface-hover',
+>>>>>>> upstream/main
             className,
           )}
         >
           <span id={valueId} className="tabular-nums">
             {display}
           </span>
+<<<<<<< HEAD
           <Clock className="size-4 shrink-0 text-text-secondary" aria-hidden="true" />
+=======
+          <Clock className="text-text-secondary size-4 shrink-0" aria-hidden="true" />
+>>>>>>> upstream/main
         </button>
       </Trigger>
       {/* Deliberately NOT portaled. A Radix dialog sets `pointer-events: none` on
@@ -193,11 +214,19 @@ function PickerShell({
         align="start"
         sideOffset={6}
         className={cn(
+<<<<<<< HEAD
           'z-[999] rounded-xl border border-border-light bg-surface-secondary p-2 shadow-lg outline-none',
           // Same enter/exit motion as the shared Radix primitives (Combobox,
           // Select, DropdownMenu): fade + zoom from the trigger edge, with Radix's
           // own transform origin so the zoom grows out of wherever it was placed.
           'origin-[--radix-popover-content-transform-origin]',
+=======
+          'border-border-light bg-surface-secondary z-[999] max-w-[min(calc(100vw-1rem),var(--radix-popover-content-available-width))] rounded-xl border p-2 shadow-lg outline-hidden',
+          // Same enter/exit motion as the shared Radix primitives (Combobox,
+          // Select, DropdownMenu): fade + zoom from the trigger edge, with Radix's
+          // own transform origin so the zoom grows out of wherever it was placed.
+          'origin-(--radix-popover-content-transform-origin)',
+>>>>>>> upstream/main
           'data-[state=open]:animate-in data-[state=closed]:animate-out',
           'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
           'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',

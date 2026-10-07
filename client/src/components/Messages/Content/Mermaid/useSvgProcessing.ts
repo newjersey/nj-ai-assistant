@@ -1,9 +1,20 @@
 import { useEffect, useMemo, useState, useRef } from 'react';
+<<<<<<< HEAD
 import { processMermaidSvg } from '~/utils/diagram/export';
 import { useDebouncedMermaid } from '~/hooks';
 
 const MIN_CONTAINER_HEIGHT = 200;
 const MAX_CONTAINER_HEIGHT = 500;
+=======
+import { useRemScale } from '@librechat/client';
+import { processMermaidSvg } from '~/utils/diagram/export';
+import { useDebouncedMermaid } from '~/hooks';
+
+/** Canvas bounds and the p-4 allowance, in baseline pixels. */
+const MIN_CONTAINER_HEIGHT = 200;
+const MAX_CONTAINER_HEIGHT = 500;
+const CONTAINER_PADDING = 32;
+>>>>>>> upstream/main
 
 interface UseSvgProcessingOptions {
   content: string;
@@ -25,6 +36,12 @@ export default function useSvgProcessing({
     null,
   );
   const [containerWidth, setContainerWidth] = useState(700);
+<<<<<<< HEAD
+=======
+  /** containerWidth is measured in physical pixels and the surrounding preview is sized
+   *  in rem, so the bounds this height is clamped to have to be read into the same units. */
+  const remScale = useRemScale();
+>>>>>>> upstream/main
   const lastValidSvgRef = useRef<string | null>(null);
   const lastProcessedSvgRef = useRef<string | null>(null);
 
@@ -91,6 +108,7 @@ export default function useSvgProcessing({
   }, [blobUrl]);
 
   const { initialScale, calculatedHeight } = useMemo(() => {
+<<<<<<< HEAD
     if (!svgDimensions) {
       return { initialScale: 1, calculatedHeight: MAX_CONTAINER_HEIGHT };
     }
@@ -105,6 +123,23 @@ export default function useSvgProcessing({
     );
     return { initialScale: scale, calculatedHeight: height };
   }, [svgDimensions, containerWidth]);
+=======
+    const maxHeight = MAX_CONTAINER_HEIGHT * remScale;
+    if (!svgDimensions) {
+      return { initialScale: 1, calculatedHeight: maxHeight };
+    }
+    const padding = CONTAINER_PADDING * remScale;
+    const availableWidth = containerWidth - padding;
+    const scaleX = availableWidth / svgDimensions.width;
+    const scaleY = maxHeight / svgDimensions.height;
+    const scale = Math.min(scaleX, scaleY, 1);
+    const height = Math.max(
+      MIN_CONTAINER_HEIGHT * remScale,
+      Math.min(maxHeight, svgDimensions.height * scale + padding),
+    );
+    return { initialScale: scale, calculatedHeight: height };
+  }, [svgDimensions, containerWidth, remScale]);
+>>>>>>> upstream/main
 
   return {
     blobUrl,

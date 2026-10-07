@@ -229,6 +229,7 @@ export default function useAskAnswerMode(conversationId?: string | null) {
   }, [liveAsk?.actionId, setSelected, setChecked]);
 
   /** Popover ⇄ chat-card handoffs run inside a view transition: both
+<<<<<<< HEAD
    *  surfaces carry the same `view-transition-name`, so the browser morphs
    *  one into the other instead of swapping. Both are user-event driven,
    *  which morphTransition's synchronous flush requires.
@@ -247,6 +248,13 @@ export default function useAskAnswerMode(conversationId?: string | null) {
     },
     [batchMode],
   );
+=======
+   *  surfaces carry the same `view-transition-name`, single questions and
+   *  batches alike, so the browser morphs one into the other instead of
+   *  swapping. Both are user-event driven, which morphTransition's
+   *  synchronous flush requires. */
+  const runHandoff = morphTransition;
+>>>>>>> upstream/main
 
   const collapse = useCallback(() => {
     if (liveAsk) {
@@ -550,6 +558,7 @@ export default function useAskAnswerMode(conversationId?: string | null) {
       }
       const composerText = e.currentTarget.value;
       if (composerText.trim().length > 0) {
+<<<<<<< HEAD
         // The composer IS the free-form answer box: Enter submits the typed
         // text (before useTextarea's submitting-lock can swallow it). Not for
         // a batch, which answers in its card — its Enter belongs to the normal
@@ -559,6 +568,11 @@ export default function useAskAnswerMode(conversationId?: string | null) {
           e.preventDefault();
           return submitText(composerText);
         }
+=======
+        /* Typed answers follow the shared composer binding resolver. ChatForm
+           keeps that path live during a single-question pause, so Enter-to-send,
+           its inverse modifier, and a customized submit chord stay consistent. */
+>>>>>>> upstream/main
         return false;
       }
       /**
@@ -611,12 +625,18 @@ export default function useAskAnswerMode(conversationId?: string | null) {
       active,
       options,
       selected,
+<<<<<<< HEAD
       batchMode,
+=======
+>>>>>>> upstream/main
       multiSelect,
       popoverVisible,
       canSubmit,
       submit,
+<<<<<<< HEAD
       submitText,
+=======
+>>>>>>> upstream/main
       toggleChecked,
       collapse,
       setSelected,

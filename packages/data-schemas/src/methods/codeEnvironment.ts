@@ -1,6 +1,10 @@
 import { Types } from 'mongoose';
 import { createHash } from 'crypto';
+<<<<<<< HEAD
 import { ResourceType } from 'librechat-data-provider';
+=======
+import { ResourceType, MAX_AGENT_CODE_ENVIRONMENT_CHOICES } from 'librechat-data-provider';
+>>>>>>> upstream/main
 import type { CodeEnvironmentUserSettings } from 'librechat-data-provider';
 import type { Model } from 'mongoose';
 import type { CodeEnvironmentDocument } from '~/types';
@@ -49,7 +53,11 @@ function ownerSlotId(ownerId: Types.ObjectId, slot: number): Types.ObjectId {
 
 function agentReferenceFilter(environmentId: string, tenantId?: string) {
   return {
+<<<<<<< HEAD
     code_environment_id: environmentId,
+=======
+    $or: [{ code_environment_id: environmentId }, { code_environment_ids: environmentId }],
+>>>>>>> upstream/main
     ...(tenantId == null ? { tenantId: { $exists: false } } : { tenantId }),
   };
 }
@@ -142,6 +150,34 @@ async function renewCodeEnvironmentReference(
   }
 }
 
+<<<<<<< HEAD
+=======
+/** Hold every machine reference until the write settles. Nesting the existing
+ * guards renews already-acquired leases and releases them if a later acquisition fails. */
+export async function withCodeEnvironmentReferences<T>(
+  mongoose: typeof import('mongoose'),
+  environmentIds: string[],
+  operation: () => Promise<T>,
+  onReferenceLoss?: (result: T, environmentId: string) => Promise<void>,
+): Promise<T> {
+  if (environmentIds.length > MAX_AGENT_CODE_ENVIRONMENT_CHOICES + 1) {
+    throw new Error('Agent code environment references exceed the storage safety ceiling');
+  }
+  const ids = [...new Set(environmentIds.filter(Boolean))];
+  const run = (index: number): Promise<T> =>
+    index === ids.length
+      ? operation()
+      : withCodeEnvironmentReference(
+          mongoose,
+          ids[index],
+          () => run(index + 1),
+          undefined,
+          (result) => onReferenceLoss?.(result, ids[index]) ?? Promise.resolve(),
+        );
+  return await run(0);
+}
+
+>>>>>>> upstream/main
 export async function withCodeEnvironmentReference<T>(
   mongoose: typeof import('mongoose'),
   environmentId: string | undefined,

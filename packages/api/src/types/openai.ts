@@ -14,6 +14,13 @@ export type OpenAIModelOptions = Partial<OpenAIParameters>;
  */
 export interface OpenAIConfigOptions {
   modelOptions?: OpenAIModelOptions;
+<<<<<<< HEAD
+=======
+  transportTimeouts?: {
+    bodyTimeout: number;
+    headersTimeout: number;
+  };
+>>>>>>> upstream/main
   directEndpoint?: boolean;
   reverseProxyUrl?: string | null;
   baseURLIsUserProvided?: boolean;

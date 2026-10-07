@@ -73,7 +73,11 @@ describe('CategoryTabs', () => {
     expect(screen.queryByText('No categories available')).not.toBeInTheDocument();
   });
 
+<<<<<<< HEAD
   it('highlights the active tab', () => {
+=======
+  it('marks the active tab as selected', () => {
+>>>>>>> upstream/main
     render(
       <CategoryTabs
         categories={mockCategories}
@@ -84,11 +88,15 @@ describe('CategoryTabs', () => {
     );
 
     const generalTab = screen.getByText('General').closest('button');
+<<<<<<< HEAD
     expect(generalTab).toHaveClass('bg-surface-hover');
 
     // Should have active underline
     const underline = generalTab?.querySelector('.absolute.bottom-0');
     expect(underline).toBeInTheDocument();
+=======
+    expect(generalTab).toHaveAttribute('aria-selected', 'true');
+>>>>>>> upstream/main
   });
 
   it('calls onChange when a tab is clicked', async () => {
@@ -139,6 +147,7 @@ describe('CategoryTabs', () => {
     expect(mockOnChange).toHaveBeenCalledWith('all');
   });
 
+<<<<<<< HEAD
   it('shows inactive state for non-selected tabs', () => {
     render(
       <CategoryTabs
@@ -159,6 +168,9 @@ describe('CategoryTabs', () => {
   });
 
   it('renders with proper accessibility', () => {
+=======
+  it('marks the selected tab and leaves other tabs unselected', () => {
+>>>>>>> upstream/main
     render(
       <CategoryTabs
         categories={mockCategories}
@@ -169,10 +181,32 @@ describe('CategoryTabs', () => {
     );
 
     const tabs = screen.getAllByRole('tab');
+<<<<<<< HEAD
     expect(tabs.length).toBe(5);
     // Verify all tabs are properly clickable buttons
     tabs.forEach((tab) => {
       expect(tab.tagName).toBe('BUTTON');
+=======
+    expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
+    expect(tabs[2]).toHaveAttribute('aria-selected', 'false');
+  });
+
+  it('renders accessible tabs connected to category panels', () => {
+    render(
+      <CategoryTabs
+        categories={mockCategories}
+        activeTab="promoted"
+        isLoading={false}
+        onChange={mockOnChange}
+      />,
+    );
+
+    const tabs = screen.getAllByRole('tab');
+    expect(tabs).toHaveLength(5);
+    tabs.forEach((tab) => {
+      expect(tab.tagName).toBe('BUTTON');
+      expect(tab.getAttribute('aria-controls')).toMatch(/^category-panel-/);
+>>>>>>> upstream/main
     });
   });
 

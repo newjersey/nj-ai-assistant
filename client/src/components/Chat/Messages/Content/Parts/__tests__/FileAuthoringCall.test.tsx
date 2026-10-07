@@ -29,12 +29,25 @@ jest.mock('~/components/Chat/Messages/Content/ProgressText', () => ({
     phase,
     inProgressText,
     finishedText,
+<<<<<<< HEAD
+=======
+    icon,
+>>>>>>> upstream/main
   }: {
     phase: 'running' | 'completed' | 'cancelled' | 'failed';
     inProgressText: string;
     finishedText: string;
+<<<<<<< HEAD
   }) => (
     <div data-testid="progress-text">{phase === 'running' ? inProgressText : finishedText}</div>
+=======
+    icon: React.ReactNode;
+  }) => (
+    <div data-testid="progress-text">
+      {icon}
+      {phase === 'running' ? inProgressText : finishedText}
+    </div>
+>>>>>>> upstream/main
   ),
 }));
 
@@ -132,6 +145,10 @@ describe('FileAuthoringCall', () => {
     );
 
     expect(screen.getByTestId('progress-text')).toHaveTextContent('Updated SKILL.md');
+<<<<<<< HEAD
+=======
+    expect(document.querySelector('.lucide-file-pen-line')).not.toBeNull();
+>>>>>>> upstream/main
   });
 
   it('prefers the output diff over the args preview after edit_file completes', () => {

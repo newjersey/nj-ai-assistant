@@ -1,6 +1,15 @@
 import { useMemo } from 'react';
 import { useRecoilValue } from 'recoil';
+<<<<<<< HEAD
 import { AgentCapabilities, PermissionTypes, Permissions } from 'librechat-data-provider';
+=======
+import {
+  AgentCapabilities,
+  Permissions,
+  PermissionTypes,
+  isTwoFactorPolicyProvider,
+} from 'librechat-data-provider';
+>>>>>>> upstream/main
 import type { SettingsContextValue } from './types';
 import useProviderKeys from '../SettingsTabs/ProviderKeys/useProviderKeys';
 import { useHasAccess, useAuthContext, useGetAgentsConfig } from '~/hooks';
@@ -31,9 +40,29 @@ export function useSettingsContext(): SettingsContextValue {
   const langfuseConnectionAccess = startupConfig?.langfuseConnectionAccess === true;
   const adminPanelURL = startupConfig?.adminPanelURL ?? '';
   const isLocalProvider = user?.provider === 'local';
+<<<<<<< HEAD
   const twoFactorEnabled = user?.twoFactorEnabled === true;
   const allowAccountDeletion = startupConfig?.allowAccountDeletion !== false;
   const aboutEnabled = startupConfig?.interface?.buildInfo !== false;
+=======
+  const emailEnabled = startupConfig?.emailEnabled === true;
+  const allowEmailChange = startupConfig?.allowEmailChange === true;
+  const passkeyLoginEnabled = startupConfig?.passkeyLoginEnabled === true;
+  const twoFactorPolicyProvider = user != null && isTwoFactorPolicyProvider(user.provider);
+  const twoFactorEnabled = user?.twoFactorEnabled === true;
+  const allowAccountDeletion = startupConfig?.allowAccountDeletion !== false;
+  const aboutEnabled = startupConfig?.interface?.buildInfo !== false;
+  /* Offered only once the deployment has answered, matching the capability hook the alerts
+     read: before then a toggle could store a preference, or raise the browser's permission
+     prompt, for a capability the operator turns off. */
+  const replyConfigLoaded = startupConfig != null;
+  const replyNotificationsConfig = startupConfig?.interface?.replyNotifications;
+  const replyTabBadgeAllowed = replyConfigLoaded && replyNotificationsConfig?.tabBadge !== false;
+  const replyNotificationsAllowed =
+    replyConfigLoaded && replyNotificationsConfig?.desktop !== false;
+  const replyNotificationSoundAllowed =
+    replyConfigLoaded && replyNotificationsConfig?.sound !== false;
+>>>>>>> upstream/main
   const hasRemoteAgentsBool = hasRemoteAgents === true;
   const hasMultiConvoBool = hasMultiConvo === true;
   const hasPromptsBool = hasPrompts === true;
@@ -53,12 +82,25 @@ export function useSettingsContext(): SettingsContextValue {
       hasMultiConvo: hasMultiConvoBool,
       hasPrompts: hasPromptsBool,
       isLocalProvider,
+<<<<<<< HEAD
+=======
+      emailEnabled,
+      allowEmailChange,
+      passkeyLoginEnabled,
+      isTwoFactorPolicyProvider: twoFactorPolicyProvider,
+>>>>>>> upstream/main
       twoFactorEnabled,
       allowAccountDeletion,
       aboutEnabled,
       engineTTS,
       langfuseConnectionAccess,
       adminPanelURL,
+<<<<<<< HEAD
+=======
+      replyTabBadgeAllowed,
+      replyNotificationsAllowed,
+      replyNotificationSoundAllowed,
+>>>>>>> upstream/main
     }),
     [
       balanceEnabled,
@@ -70,12 +112,25 @@ export function useSettingsContext(): SettingsContextValue {
       hasMultiConvoBool,
       hasPromptsBool,
       isLocalProvider,
+<<<<<<< HEAD
+=======
+      emailEnabled,
+      allowEmailChange,
+      passkeyLoginEnabled,
+      twoFactorPolicyProvider,
+>>>>>>> upstream/main
       twoFactorEnabled,
       allowAccountDeletion,
       aboutEnabled,
       engineTTS,
       langfuseConnectionAccess,
       adminPanelURL,
+<<<<<<< HEAD
+=======
+      replyTabBadgeAllowed,
+      replyNotificationsAllowed,
+      replyNotificationSoundAllowed,
+>>>>>>> upstream/main
     ],
   );
 }

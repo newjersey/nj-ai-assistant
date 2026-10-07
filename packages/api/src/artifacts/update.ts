@@ -76,8 +76,21 @@ const getCodeFence = (line: string): CodeFence | null => {
 };
 
 const isClosingCodeFence = (line: string, openingFence: CodeFence): boolean => {
+<<<<<<< HEAD
   const closePattern = new RegExp(`^\\${openingFence.marker}{${openingFence.length},}\\s*$`);
   return closePattern.test(line.trim());
+=======
+  const trimmed = line.trim();
+  if (trimmed.length < openingFence.length) {
+    return false;
+  }
+  for (const char of trimmed) {
+    if (char !== openingFence.marker) {
+      return false;
+    }
+  }
+  return true;
+>>>>>>> upstream/main
 };
 
 const findArtifactClose = (text: string, start: number): ArtifactCloseRange | null => {

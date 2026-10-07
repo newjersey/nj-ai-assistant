@@ -2,6 +2,10 @@ import crypto from 'crypto';
 import { Keyv } from 'keyv';
 import { logger } from '@librechat/data-schemas';
 import type { IUser } from '@librechat/data-schemas';
+<<<<<<< HEAD
+=======
+import { consumeCacheEntry } from '../cache/consume';
+>>>>>>> upstream/main
 
 /** Default admin panel URL for local development */
 const DEFAULT_ADMIN_PANEL_URL = 'http://localhost:3000';
@@ -138,7 +142,11 @@ export async function generateAdminExchangeCode(
 
 /**
  * Exchanges an authorization code for tokens and user data.
+<<<<<<< HEAD
  * The code is deleted immediately after retrieval (one-time use).
+=======
+ * The code is atomically removed before validation (one-time use).
+>>>>>>> upstream/main
  * @param cache - The Keyv cache instance for retrieving exchange data
  * @param code - The authorization code to exchange
  * @param requestOrigin - The origin of the requesting client for origin binding
@@ -151,10 +159,14 @@ export async function exchangeAdminCode(
   requestOrigin?: string,
   codeVerifier?: string,
 ): Promise<AdminExchangeResponse | null> {
+<<<<<<< HEAD
   const data = (await cache.get(code)) as AdminExchangeData | undefined;
 
   /** Delete before validation — ensures one-time use even if subsequent checks throw */
   await cache.delete(code);
+=======
+  const data = await consumeCacheEntry<AdminExchangeData>(cache, code);
+>>>>>>> upstream/main
 
   if (!data) {
     logger.warn('[adminExchange] Invalid or expired authorization code');
@@ -310,6 +322,7 @@ export function isAdminPanelRedirect(
   domainClient: string,
 ): boolean {
   try {
+<<<<<<< HEAD
     const adminUrl = new URL(adminPanelUrl);
     const adminHasPath = adminUrl.pathname !== '/';
 
@@ -323,6 +336,34 @@ export function isAdminPanelRedirect(
     const clientOrigin = new URL(domainClient).origin;
     return redirectOrigin === adminUrl.origin && redirectOrigin !== clientOrigin;
   } catch {
+=======
+    const redirectURL = new URL(redirectUri);
+    const adminURL = new URL(adminPanelUrl);
+    const clientURL = new URL(domainClient);
+
+    const redirectOrigin = redirectURL.origin;
+    const adminOrigin = adminURL.origin;
+    const clientOrigin = clientURL.origin;
+
+    if (redirectOrigin !== adminOrigin) {
+      return false;
+    }
+
+    if (adminOrigin !== clientOrigin) {
+      return true;
+    }
+
+    const adminPath = normalizePath(adminURL.pathname);
+    const redirectPath = normalizePath(redirectURL.pathname);
+
+    if (adminPath === '/') {
+      return false;
+    }
+
+    return redirectPath === adminPath || redirectPath.startsWith(`${adminPath}/`);
+  } catch {
+    /** If URL parsing fails, fall back to simple string comparison */
+>>>>>>> upstream/main
     return redirectUri.startsWith(adminPanelUrl) && !redirectUri.startsWith(domainClient);
   }
 }

@@ -1,7 +1,10 @@
+<<<<<<< HEAD
 /* eslint-disable i18next/no-literal-string */
 /* ^ We're not worried about i18n for this app ^ */
 
 import { useCallback, useRef, useEffect } from 'react';
+=======
+>>>>>>> upstream/main
 import { Globe } from 'lucide-react';
 import { Button, Spinner } from '@librechat/client';
 import { useWatch, useFormContext } from 'react-hook-form';
@@ -12,6 +15,7 @@ import {
   PermissionBits,
   PermissionTypes,
 } from 'librechat-data-provider';
+<<<<<<< HEAD
 import {
   useLocalize,
   useAuthContext,
@@ -22,6 +26,10 @@ import {
 import { AgentForm, AgentPanelProps, isEphemeralAgent } from '~/common';
 import NewJerseyPanelButton from '~/nj/components/NewJerseyPanelButton';
 import { useAgentPanelContext } from '~/Providers/AgentPanelContext';
+=======
+import type { AgentForm, AgentPanelProps } from '~/common';
+import { useLocalize, useAuthContext, useHasAccess, useResourcePermissions } from '~/hooks';
+>>>>>>> upstream/main
 import { GenericGrantAccessDialog } from '~/components/Sharing';
 import { useUpdateAgentMutation } from '~/data-provider';
 import AdvancedButton from './Advanced/AdvancedButton';
@@ -68,6 +76,7 @@ export default function AgentFooter({
   const { hasPermission: hasRemoteAgentPermission, isLoading: remotePermissionsLoading } =
     useResourcePermissions(ResourceType.REMOTE_AGENT, agent?._id || '');
 
+<<<<<<< HEAD
   // NJ: Used to set focus to correct button after returning from its subpanel
   // (E.g., click "version history", then go back, refocuses the "version history" button again)
   const { returnFocusRef } = useAgentPanelContext();
@@ -94,6 +103,8 @@ export default function AgentFooter({
     }
   }, [agent_id, onSelectAgent]);
 
+=======
+>>>>>>> upstream/main
   const canShareThisAgent = hasPermission(PermissionBits.SHARE);
   const canEditThisAgent = hasPermission(PermissionBits.EDIT);
   const canDeleteThisAgent = hasPermission(PermissionBits.DELETE);
@@ -114,6 +125,7 @@ export default function AgentFooter({
 
   const showButtons = activePanel === Panel.builder;
 
+<<<<<<< HEAD
   /**
    * NJ: There are enough customizations that we simply return our own component lib
    *
@@ -200,6 +212,8 @@ export default function AgentFooter({
     </div>
   );
 
+=======
+>>>>>>> upstream/main
   return (
     <div className="mb-1 flex w-full flex-col gap-2">
       {showButtons && (

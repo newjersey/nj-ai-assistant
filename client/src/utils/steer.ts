@@ -5,10 +5,26 @@ import type {
   TSteerAppliedEvent,
   TMessageContentParts,
 } from 'librechat-data-provider';
+<<<<<<< HEAD
 import type { QueuedMessage, QueuedMessageOrigin } from '~/store/families';
 
 type SteerPart = Extract<TMessageContentParts, { type: ContentTypes.STEER }>;
 
+=======
+import type { QueuedMessage, QueuedMessageOrigin } from '~/hooks/Chat/queue';
+import type { PendingSteer } from '~/hooks/Chat/queue';
+
+type SteerPart = Extract<TMessageContentParts, { type: ContentTypes.STEER }>;
+
+/** Protocol v1 cannot correlate an ambiguous failed POST with server state.
+ * Retrying or rerouting it could duplicate words the server already accepted. */
+export function isLegacyDeliveryUncertain(
+  steer: Pick<PendingSteer, 'deliveryUncertain' | 'generationProtocolVersion'>,
+): boolean {
+  return steer.deliveryUncertain === true && steer.generationProtocolVersion !== 2;
+}
+
+>>>>>>> upstream/main
 /** Returns the steer content part when `part` is one, else undefined. */
 export function getSteerPart(part: TMessageContentParts | undefined): SteerPart | undefined {
   return part?.type === ContentTypes.STEER ? (part as SteerPart) : undefined;
@@ -229,7 +245,15 @@ export function appendAppliedSteerIds(prev: string[], steerIds: string[]): strin
   return [...prev, ...fresh].slice(-APPLIED_STEER_IDS_CAP);
 }
 
+<<<<<<< HEAD
 export type SteerCarriedContext = { quotes?: string[]; manualSkills?: string[] };
+=======
+export type SteerCarriedContext = {
+  quotes?: string[];
+  manualSkills?: string[];
+  reasoningOverride?: TMessage['reasoningOverride'];
+};
+>>>>>>> upstream/main
 
 /** Quotes ride the steer POST (the server merges them into the injected
  *  turn) but chips, reseeds, and queued conversions still carry them locally
@@ -239,9 +263,17 @@ export type SteerCarriedContext = { quotes?: string[]; manualSkills?: string[] }
 export function carriedSteerContext(source?: SteerCarriedContext): SteerCarriedContext {
   const quotes = source?.quotes;
   const manualSkills = source?.manualSkills;
+<<<<<<< HEAD
   return {
     ...(quotes && quotes.length > 0 && { quotes }),
     ...(manualSkills && manualSkills.length > 0 && { manualSkills }),
+=======
+  const reasoningOverride = source?.reasoningOverride;
+  return {
+    ...(quotes && quotes.length > 0 && { quotes }),
+    ...(manualSkills && manualSkills.length > 0 && { manualSkills }),
+    ...(reasoningOverride != null && { reasoningOverride }),
+>>>>>>> upstream/main
   };
 }
 

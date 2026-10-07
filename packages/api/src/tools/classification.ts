@@ -1,3 +1,15 @@
+<<<<<<< HEAD
+=======
+import {
+  bindToolApproval,
+  getToolApprovalBinding,
+  getToolApprovalName,
+  getToolApprovalIdentity,
+  bindToolApprovalIdentity,
+} from './approval';
+import { getToolApprovalAuthKind } from './approval';
+import { getToolReviewAuthority } from './approval';
+>>>>>>> upstream/main
 /**
  * @fileoverview Utility functions for building tool registries from agent tool_options.
  * Tool classification (deferred_tools, allowed_callers) is configured via the agent UI.
@@ -12,7 +24,10 @@ import {
   createToolSearch,
   ToolSearchToolDefinition,
   BashProgrammaticToolCallingDefinition,
+<<<<<<< HEAD
   createBashProgrammaticToolCallingTool,
+=======
+>>>>>>> upstream/main
 } from '@librechat/agents';
 import type {
   LCToolRegistry,
@@ -21,10 +36,18 @@ import type {
   GenericTool,
   LCTool,
 } from '@librechat/agents';
+<<<<<<< HEAD
 import type { AgentToolOptions } from 'librechat-data-provider';
 import type { CodeEnvironmentConfig, CodeExecutionContext } from '~/agents/execution';
 import type { CodeCapabilityConfigLoader } from '~/code/capabilities';
 import { supportsProgrammaticCodeExecution } from '~/code/capabilities';
+=======
+import type { AgentGitIdentity, AgentToolOptions } from 'librechat-data-provider';
+import type { CodeEnvironmentConfig, CodeExecutionContext } from '~/agents/execution';
+import type { CodeCapabilityConfigLoader } from '~/code/capabilities';
+import { supportsProgrammaticCodeExecution } from '~/code/capabilities';
+import { createContextProgrammaticBashTool } from '~/code/command';
+>>>>>>> upstream/main
 import { sanitizeGeminiSchema } from '~/mcp/zod';
 
 export type { LCTool, LCToolRegistry, AllowedCaller, JsonSchemaType };
@@ -158,6 +181,17 @@ export function buildToolRegistryFromAgentOptions(
       toolDef.serverName = tool.serverName;
     }
 
+<<<<<<< HEAD
+=======
+    bindToolApproval(
+      toolDef,
+      getToolApprovalBinding(tool),
+      getToolApprovalName(tool),
+      getToolApprovalIdentity(tool),
+      getToolReviewAuthority(tool),
+      getToolApprovalAuthKind(tool),
+    );
+>>>>>>> upstream/main
     registry.set(name, toolDef);
   }
 
@@ -192,6 +226,17 @@ export function extractMCPToolDefinition(tool: MCPToolInstance): ToolDefinition 
     def.description = tool.description;
   }
 
+<<<<<<< HEAD
+=======
+  bindToolApproval(
+    def,
+    getToolApprovalBinding(tool),
+    getToolApprovalName(tool),
+    getToolApprovalIdentity(tool),
+    getToolReviewAuthority(tool),
+    getToolApprovalAuthKind(tool),
+  );
+>>>>>>> upstream/main
   if (tool.mcpJsonSchema) {
     def.parameters = tool.mcpJsonSchema;
   }
@@ -205,8 +250,27 @@ export function extractMCPToolDefinition(tool: MCPToolInstance): ToolDefinition 
     def.serverToolName = tool.mcpServerToolName;
   }
 
+<<<<<<< HEAD
   if (tool.mcpCurrentToolName) {
     def.currentToolName = tool.mcpCurrentToolName;
+=======
+  if (getToolApprovalIdentity(def) == null && serverName) {
+    const suffix = `${Constants.mcp_delimiter}${normalizeServerName(serverName)}`;
+    const upstreamName =
+      tool.mcpServerToolName ??
+      (tool.name.endsWith(suffix) ? tool.name.slice(0, -suffix.length) : undefined);
+    if (upstreamName != null)
+      bindToolApprovalIdentity(def, upstreamName, def.parameters, def.description);
+  }
+
+  if (tool.mcpCurrentToolName && serverName) {
+    def.currentToolName = tool.mcpCurrentToolName;
+    bindToolApproval(
+      def,
+      getToolApprovalBinding(def),
+      `${tool.mcpCurrentToolName}${Constants.mcp_delimiter}${normalizeServerName(serverName)}`,
+    );
+>>>>>>> upstream/main
   }
 
   return def;
@@ -247,6 +311,7 @@ function buildToolRegistry(
   /** No agent options - build basic definitions for event-driven mode */
   const registry: LCToolRegistry = new Map<string, LCTool>();
   for (const toolDef of mcpToolDefs) {
+<<<<<<< HEAD
     registry.set(toolDef.name, {
       name: toolDef.name,
       description: toolDef.description,
@@ -254,6 +319,25 @@ function buildToolRegistry(
       serverName: toolDef.serverName,
       toolType: 'mcp',
     });
+=======
+    registry.set(
+      toolDef.name,
+      bindToolApproval(
+        {
+          name: toolDef.name,
+          description: toolDef.description,
+          parameters: toolDef.parameters,
+          serverName: toolDef.serverName,
+          toolType: 'mcp',
+        },
+        getToolApprovalBinding(toolDef),
+        getToolApprovalName(toolDef),
+        getToolApprovalIdentity(toolDef),
+        getToolReviewAuthority(toolDef),
+        getToolApprovalAuthKind(toolDef),
+      ),
+    );
+>>>>>>> upstream/main
   }
   return registry;
 }
@@ -268,13 +352,21 @@ export interface BuildToolClassificationParams {
   agentId?: string;
   /** Per-tool configuration from the agent */
   agentToolOptions?: AgentToolOptions;
+<<<<<<< HEAD
+=======
+  gitIdentity?: AgentGitIdentity | null;
+>>>>>>> upstream/main
   /** Whether the deferred_tools capability is enabled (from agent config) */
   deferredToolsEnabled?: boolean;
   /** Whether the programmatic_tools capability is enabled (from agent config) */
   programmaticToolsEnabled?: boolean;
   /** Whether code execution is enabled and requested by this agent */
   codeExecutionEnabled?: boolean;
+<<<<<<< HEAD
   /** When true, skip creating tool instances (for event-driven mode) */
+=======
+  /** When true, return definitions without executable tools (event-driven mode). */
+>>>>>>> upstream/main
   definitionsOnly?: boolean;
   /** Agent provider — Gemini/Vertex rejects union types, so injected tool schemas get sanitized */
   provider?: Providers | string;
@@ -389,7 +481,12 @@ export async function buildToolClassification(
     programmaticToolsEnabled &&
     codeExecutionEnabled &&
     agentHasProgrammaticTools(toolRegistry) &&
+<<<<<<< HEAD
     codeExecutionContext?.environmentType !== 'attached' &&
+=======
+    (codeExecutionContext?.environmentType !== 'attached' ||
+      codeExecutionContext.codeWorkspace != null) &&
+>>>>>>> upstream/main
     (await supportsProgrammaticCodeExecution(codeExecutionContext, codeEnvironments, getAppConfig));
   const hasDeferredTools = deferredToolsEnabled && agentHasDeferredTools(toolRegistry);
 
@@ -459,6 +556,7 @@ export async function buildToolClassification(
     return { toolRegistry, toolDefinitions, additionalTools, hasDeferredTools, mcpToolAliases };
   }
 
+<<<<<<< HEAD
   /** In definitions-only mode, add PTC definition without creating the tool instance */
   if (definitionsOnly) {
     toolDefinitions.push({
@@ -490,12 +588,26 @@ export async function buildToolClassification(
     } as Parameters<typeof createBashProgrammaticToolCallingTool>[0] &
       typeof profileParams & { authHeaders?: BuildToolClassificationParams['authHeaders'] });
     additionalTools.push(ptcTool);
+=======
+  try {
+    const ptcTool = createContextProgrammaticBashTool(
+      authHeaders,
+      codeExecutionContext,
+      params.gitIdentity,
+    );
+    if (!definitionsOnly) additionalTools.push(ptcTool);
+>>>>>>> upstream/main
 
     /** Add PTC definition for event-driven mode */
     toolDefinitions.push({
       name: BashProgrammaticToolCallingDefinition.name,
+<<<<<<< HEAD
       description: BashProgrammaticToolCallingDefinition.description,
       parameters: BashProgrammaticToolCallingDefinition.schema as unknown as LCTool['parameters'],
+=======
+      description: ptcTool.description,
+      parameters: ptcTool.schema as LCTool['parameters'],
+>>>>>>> upstream/main
     });
     toolRegistry.set(BashProgrammaticToolCallingDefinition.name, {
       name: BashProgrammaticToolCallingDefinition.name,

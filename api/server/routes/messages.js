@@ -27,8 +27,21 @@ const {
   mergeUserSubmittedMessageFieldPaths,
   isContentFilterError,
   withoutTraceRefs,
+<<<<<<< HEAD
 } = require('@librechat/api');
 const subagentThreadTaskStore = require('~/server/services/Endpoints/agents/subagentThreadStore');
+=======
+  createPrivateTextView,
+  stripPrivateMessageFields,
+  applyForcedRetention,
+  prepareToolCallPreviews,
+  createToolCallPartHandler,
+  rejectToolCallPreviewWrites,
+  withMessageToolCallPreviews,
+} = require('@librechat/api');
+const subagentThreadTaskStore = require('~/server/services/Endpoints/agents/subagentThreadStore');
+const { getAppConfig } = require('~/server/services/Config');
+>>>>>>> upstream/main
 const { findAllArtifacts, replaceArtifactContent } = require('~/server/services/Artifacts/update');
 const {
   requireJwtAuth,
@@ -36,10 +49,19 @@ const {
   configMiddleware,
   sendValidationResponse,
   canReadActiveJobConversation,
+<<<<<<< HEAD
+=======
+  createMessageRequestValidation,
+>>>>>>> upstream/main
   prepareMessageRequestValidation,
 } = require('~/server/middleware');
 const db = require('~/models');
 
+<<<<<<< HEAD
+=======
+const retentionStore = { stampForcedRetention: db.stampForcedRetention };
+
+>>>>>>> upstream/main
 const router = express.Router();
 const filterStoredMessageContent = createContentFilter({
   messageCount: 1,
@@ -55,14 +77,37 @@ const filterFeedbackContent = createContentFilter({
   getFilters: (req) => req.config?.filters,
   extract: (req) => extractFeedbackContent(req.body),
 });
+<<<<<<< HEAD
 const messageMutationMiddleware = [validateMessageReq, configMiddleware];
 const storedMessageMutationMiddleware = [
   validateMessageReq,
+=======
+const toolCallPreviewDeps = { getAppConfig };
+const readToolCallPart = createToolCallPartHandler({
+  getMessages: db.getMessages,
+  validate: (req) => createMessageRequestValidation(req, { activeJobMessageRead: true }),
+  sendValidationResponse: (res, result) => sendValidationResponse(res, result),
+});
+const messageMutationMiddleware = [validateMessageReq, configMiddleware];
+const storedMessageMutationMiddleware = [
+  validateMessageReq,
+  rejectToolCallPreviewWrites,
+>>>>>>> upstream/main
   configMiddleware,
   filterStoredMessageContent,
 ];
 
 router.use(requireJwtAuth);
+<<<<<<< HEAD
+=======
+router.post(
+  '/:conversationId/owner-text',
+  createPrivateTextView({
+    read: db.getPrivateMessageTexts,
+    getKey: () => process.env.CREDS_KEY ?? '',
+  }),
+);
+>>>>>>> upstream/main
 
 async function rejectSubagentThreadWrite(req, res, conversationId) {
   const blocked = await isSubagentThreadWriteBlocked(
@@ -111,6 +156,10 @@ router.get('/', async (req, res) => {
     const sortOrder = sortDirection === 'asc' ? 1 : -1;
 
     let scopedMessageRead;
+<<<<<<< HEAD
+=======
+    const previewToolCalls = prepareToolCallPreviews(req, toolCallPreviewDeps);
+>>>>>>> upstream/main
     if (typeof conversationId === 'string') {
       const ownershipRead = db.getConvoOwnership(user, conversationId);
       /** Client-facing reads never expose server-private fields such as `contextMeta`. */
@@ -143,13 +192,27 @@ router.get('/', async (req, res) => {
         throw messageResult.error;
       }
       const messages = messageResult.value;
+<<<<<<< HEAD
       response = { messages: messages?.length ? [messages[0]] : [], nextCursor: null };
+=======
+      response = {
+        messages: await previewToolCalls(messages?.length ? [messages[0]] : []),
+        nextCursor: null,
+      };
+>>>>>>> upstream/main
     } else if (conversationId) {
       const messageResult = await scopedMessageRead;
       if (!messageResult.ok) {
         throw messageResult.error;
       }
+<<<<<<< HEAD
       response = messageResult.value;
+=======
+      response = {
+        ...messageResult.value,
+        messages: await previewToolCalls(messageResult.value.messages),
+      };
+>>>>>>> upstream/main
     } else if (search) {
       const searchResults = await db.searchMessages(
         search,
@@ -191,9 +254,14 @@ router.get('/', async (req, res) => {
       for (const message of cleanedMessages) {
         const convo = result.convoMap[message.conversationId];
         const dbMessage = dbMessageMap[message.messageId];
+<<<<<<< HEAD
         /** Search hydrates every schema field; server-private state never leaves. */
         const publicHit = { ...message };
         delete publicHit.contextMeta;
+=======
+        /** Search may hydrate server-private fields; only a public projection leaves. */
+        const publicHit = stripPrivateMessageFields(message);
+>>>>>>> upstream/main
 
         activeMessages.push({
           ...publicHit,
@@ -235,9 +303,13 @@ router.get('/', async (req, res) => {
  * @returns {TMessage}
  */
 function toClientMessage(message) {
+<<<<<<< HEAD
   const clientMessage = { ...message };
   delete clientMessage.contextMeta;
   return clientMessage;
+=======
+  return stripPrivateMessageFields(message);
+>>>>>>> upstream/main
 }
 
 router.post('/branch', configMiddleware, async (req, res) => {
@@ -374,7 +446,21 @@ router.post('/branch', configMiddleware, async (req, res) => {
       return res.status(500).json({ error: 'Failed to save branch message' });
     }
 
+<<<<<<< HEAD
     res.status(201).json(toClientMessage(savedMessage));
+=======
+    await applyForcedRetention(retentionStore, {
+      ctx: {
+        userId,
+        isTemporary: sourceMessage.isTemporary,
+        expiredAt: savedMessage.expiredAt ?? sourceMessage.expiredAt,
+        interfaceConfig: req?.config?.interfaceConfig,
+      },
+      conversationId: sourceMessage.conversationId,
+    });
+
+    res.status(201).json(withMessageToolCallPreviews(req, toClientMessage(savedMessage)));
+>>>>>>> upstream/main
   } catch (error) {
     if (isContentFilterError(error)) {
       return res.status(error.statusCode).json(error.body);
@@ -450,6 +536,7 @@ router.post('/artifact/:messageId', configMiddleware, async (req, res) => {
         : { text: updatedText };
     assertStoredMessageMutationAllowed(req.config?.filters, filteredArtifact);
 
+<<<<<<< HEAD
     const savedMessage = await db.saveMessage(
       {
         userId: req?.user?.id,
@@ -457,6 +544,17 @@ router.post('/artifact/:messageId', configMiddleware, async (req, res) => {
         expiredAt: message.expiredAt,
         interfaceConfig: req?.config?.interfaceConfig,
       },
+=======
+    const reqCtx = {
+      userId: req?.user?.id,
+      isTemporary: message.isTemporary,
+      expiredAt: message.expiredAt,
+      interfaceConfig: req?.config?.interfaceConfig,
+    };
+    const context = 'POST /api/messages/artifact/:messageId';
+    const savedMessage = await db.saveMessage(
+      reqCtx,
+>>>>>>> upstream/main
       {
         messageId,
         conversationId: message.conversationId,
@@ -470,6 +568,7 @@ router.post('/artifact/:messageId', configMiddleware, async (req, res) => {
         ),
         user: req.user.id,
       },
+<<<<<<< HEAD
       { context: 'POST /api/messages/artifact/:messageId' },
     );
 
@@ -478,6 +577,22 @@ router.post('/artifact/:messageId', configMiddleware, async (req, res) => {
       content: savedMessage.content,
       text: savedMessage.text,
     });
+=======
+      { context },
+    );
+    await applyForcedRetention(retentionStore, {
+      ctx: reqCtx,
+      conversationId: message.conversationId,
+    });
+
+    res.status(200).json(
+      withMessageToolCallPreviews(req, {
+        conversationId: savedMessage.conversationId,
+        content: savedMessage.content,
+        text: savedMessage.text,
+      }),
+    );
+>>>>>>> upstream/main
   } catch (error) {
     if (isContentFilterError(error)) {
       return res.status(error.statusCode).json(error.body);
@@ -491,6 +606,10 @@ router.get('/:conversationId', prepareMessageRequestValidation, async (req, res)
   try {
     const { conversationId } = req.params;
     const validation = req.messageRequestValidation;
+<<<<<<< HEAD
+=======
+    const previewToolCalls = prepareToolCallPreviews(req, toolCallPreviewDeps);
+>>>>>>> upstream/main
     // This intentionally starts a user-scoped read before validation resolves;
     // the response remains gated on validation success below.
     const messagesPromise = validation.shouldFetchMessages
@@ -511,7 +630,11 @@ router.get('/:conversationId', prepareMessageRequestValidation, async (req, res)
     }
 
     const messages = messagesResult?.messages ?? [];
+<<<<<<< HEAD
     res.status(200).json(messages);
+=======
+    res.status(200).json(await previewToolCalls(messages));
+>>>>>>> upstream/main
   } catch (error) {
     logger.error('Error fetching messages:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -579,6 +702,11 @@ router.get('/:conversationId/:messageId', validateMessageReq, async (req, res) =
   }
 });
 
+<<<<<<< HEAD
+=======
+router.get('/:conversationId/:messageId/parts/:partIndex', readToolCallPart);
+
+>>>>>>> upstream/main
 router.put('/:conversationId/:messageId', messageMutationMiddleware, async (req, res) => {
   try {
     const { conversationId, messageId } = req.params;
@@ -599,6 +727,10 @@ router.put('/:conversationId/:messageId', messageMutationMiddleware, async (req,
     if (index !== undefined && (typeof index !== 'number' || index < 0)) {
       return res.status(400).json({ error: 'Invalid index' });
     }
+<<<<<<< HEAD
+=======
+    const reqCtx = { userId: req?.user?.id, interfaceConfig: req?.config?.interfaceConfig };
+>>>>>>> upstream/main
 
     if (index === undefined) {
       assertStoredMessageMutationAllowed(req.config?.filters, { text });
@@ -623,6 +755,14 @@ router.put('/:conversationId/:messageId', messageMutationMiddleware, async (req,
         tokenCount,
         userSubmittedPaths: mergeUserSubmittedPaths(message.userSubmittedPaths, '/text'),
       });
+<<<<<<< HEAD
+=======
+      await applyForcedRetention(retentionStore, {
+        ctx: reqCtx,
+        conversationId,
+        messageId,
+      });
+>>>>>>> upstream/main
       return res.status(200).json(result);
     }
 
@@ -680,6 +820,14 @@ router.put('/:conversationId/:messageId', messageMutationMiddleware, async (req,
         `/content/${index}/${currentPartType}`,
       ),
     });
+<<<<<<< HEAD
+=======
+    await applyForcedRetention(retentionStore, {
+      ctx: reqCtx,
+      conversationId,
+      messageId,
+    });
+>>>>>>> upstream/main
     return res.status(200).json(result);
   } catch (error) {
     if (isContentFilterError(error)) {
@@ -738,6 +886,15 @@ router.put(
         }).catch((err) => logger.error('[langfuse] feedback score failed:', err));
       }
 
+<<<<<<< HEAD
+=======
+      await applyForcedRetention(retentionStore, {
+        ctx: { userId: req?.user?.id, interfaceConfig: req?.config?.interfaceConfig },
+        conversationId: updatedMessage.conversationId,
+        messageId,
+      });
+
+>>>>>>> upstream/main
       res.json({
         messageId,
         conversationId,

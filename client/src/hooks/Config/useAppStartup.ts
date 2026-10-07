@@ -10,20 +10,34 @@ import {
   resolveModelSpecEndpoint,
 } from 'librechat-data-provider';
 import type { TStartupConfig, TUser } from 'librechat-data-provider';
+<<<<<<< HEAD
 import { useMCPToolsQuery, useMCPServersQuery } from '~/data-provider';
 import { cleanupTimestampedStorage } from '~/utils/timestamps';
 import useSpeechSettingsInit from './useSpeechSettingsInit';
 import { useHasAccess, useCatalogReady } from '~/hooks';
+=======
+import { cleanupTimestampedStorage } from '~/utils/timestamps';
+import useSpeechSettingsInit from './useSpeechSettingsInit';
+import { useHasAccess, useCatalogReady } from '~/hooks';
+import { useMCPServersQuery } from '~/data-provider';
+import { setDocumentTitle } from '~/utils';
+>>>>>>> upstream/main
 import store from '~/store';
 
 export default function useAppStartup({
   startupConfig,
   user,
+<<<<<<< HEAD
   mcpWarmupAllowed,
 }: {
   startupConfig?: TStartupConfig;
   user?: TUser;
   mcpWarmupAllowed: boolean;
+=======
+}: {
+  startupConfig?: TStartupConfig;
+  user?: TUser;
+>>>>>>> upstream/main
 }) {
   const [defaultPreset, setDefaultPreset] = useRecoilState(store.defaultPreset);
   const canUseMcp = useHasAccess({
@@ -32,6 +46,7 @@ export default function useAppStartup({
   });
 
   useSpeechSettingsInit(!!user);
+<<<<<<< HEAD
   /** MCP catalogs are background-warmed: the queries stay off the startup
    * path until warmup releases them (or an MCP UI activates them). */
   const mcpServersReady = useCatalogReady('mcpServers');
@@ -50,6 +65,12 @@ export default function useAppStartup({
       mcpWarmupAllowed &&
       !!user,
   });
+=======
+  /** Server metadata may warm after first paint because it powers lightweight
+   * navigation affordances. Tool discovery stays owned by visible MCP consumers. */
+  const mcpServersReady = useCatalogReady('mcpServers');
+  useMCPServersQuery({ enabled: canUseMcp && mcpServersReady });
+>>>>>>> upstream/main
 
   /** Clean up old localStorage entries on startup */
   useEffect(() => {
@@ -62,7 +83,11 @@ export default function useAppStartup({
     if (!appTitle) {
       return;
     }
+<<<<<<< HEAD
     document.title = appTitle;
+=======
+    setDocumentTitle(appTitle, true);
+>>>>>>> upstream/main
     localStorage.setItem(LocalStorageKeys.APP_TITLE, appTitle);
   }, [startupConfig]);
 

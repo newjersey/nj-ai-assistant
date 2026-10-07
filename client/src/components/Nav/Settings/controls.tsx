@@ -13,6 +13,10 @@ export function toggleControl(opts: {
   localizationKey: TranslationKeys;
   switchId: string;
   hoverCardText?: TranslationKeys;
+<<<<<<< HEAD
+=======
+  onCheckedChange?: (value: boolean) => void;
+>>>>>>> upstream/main
 }): ComponentType {
   const Control = () => (
     <ToggleSwitch
@@ -20,6 +24,10 @@ export function toggleControl(opts: {
       localizationKey={opts.localizationKey}
       switchId={opts.switchId}
       hoverCardText={opts.hoverCardText}
+<<<<<<< HEAD
+=======
+      onCheckedChange={opts.onCheckedChange}
+>>>>>>> upstream/main
     />
   );
   Control.displayName = `Toggle(${opts.switchId})`;

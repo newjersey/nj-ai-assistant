@@ -1,6 +1,9 @@
+<<<<<<< HEAD
 /* eslint-disable i18next/no-literal-string */
 /* ^ We're not worried about i18n for this app ^ */
 
+=======
+>>>>>>> upstream/main
 import React, { useState } from 'react';
 import { PermissionTypes, Permissions } from 'librechat-data-provider';
 import {
@@ -112,6 +115,7 @@ export default function MemoryCreateDialog({
       <OGDialogTemplate
         title={localize('com_ui_create_memory')}
         showCloseButton={false}
+<<<<<<< HEAD
         className="w-11/12 md:max-w-lg"
         main={
           <div className="space-y-4">
@@ -121,6 +125,14 @@ export default function MemoryCreateDialog({
                 {localize('com_ui_key')}
                 */}
                 Label
+=======
+        className="w-11/12 md:max-w-2xl"
+        main={
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="memory-key" className="text-text-primary text-sm font-medium">
+                {localize('com_ui_key')}
+>>>>>>> upstream/main
               </Label>
               <Input
                 id="memory-key"
@@ -128,8 +140,12 @@ export default function MemoryCreateDialog({
                 onChange={(e) => setKey(e.target.value)}
                 onBlur={() => setTouched((prev) => ({ ...prev, key: true }))}
                 onKeyDown={handleKeyPress}
+<<<<<<< HEAD
                 // placeholder={localize('com_ui_enter_key')} // NJ: Rename Key -> Label
                 placeholder="Enter label"
+=======
+                placeholder={localize('com_ui_enter_key')}
+>>>>>>> upstream/main
                 className="w-full"
                 aria-invalid={showKeyError && keyError != null}
                 aria-describedby="memory-key-message"
@@ -142,11 +158,16 @@ export default function MemoryCreateDialog({
               />
             </div>
             <div className="space-y-2">
+<<<<<<< HEAD
               <Label htmlFor="memory-value" className="text-sm font-medium text-text-primary">
                 {/* NJ: Rename "Value" -> "Details"
                 {localize('com_ui_value')}
                 */}
                 Details
+=======
+              <Label htmlFor="memory-value" className="text-text-primary text-sm font-medium">
+                {localize('com_ui_value')}
+>>>>>>> upstream/main
               </Label>
               <Textarea
                 id="memory-value"
@@ -154,10 +175,16 @@ export default function MemoryCreateDialog({
                 onChange={(e) => setValue(e.target.value)}
                 onBlur={() => setTouched((prev) => ({ ...prev, value: true }))}
                 onKeyDown={handleKeyPress}
+<<<<<<< HEAD
                 // placeholder={localize('com_ui_enter_value')} // NJ: Rename Value -> Details
                 placeholder="Enter details"
                 className="min-h-[100px] w-full resize-none rounded-lg border border-border-light bg-transparent px-3 py-2 text-sm text-text-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-border-heavy"
                 rows={4}
+=======
+                placeholder={localize('com_ui_enter_value')}
+                className="border-border-light text-text-primary focus-visible:ring-border-heavy max-h-[45vh] min-h-[11.25rem] w-full resize-y rounded-lg border bg-transparent px-3 py-2 text-sm focus-visible:ring-1"
+                rows={8}
+>>>>>>> upstream/main
                 aria-invalid={showValueError && valueError != null}
                 aria-describedby="memory-value-message"
               />

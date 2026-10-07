@@ -1,11 +1,19 @@
 import { createAgentQueuedTurnModel, createAgentQueuedTurnSequenceModel } from './queuedTurn';
 import { createAgentTriggerLaneSequenceModel } from './triggerLaneSequence';
 import { createScheduleModel, createScheduleRunModel } from './schedule';
+<<<<<<< HEAD
+=======
+import { getTenantIndexMigrationHint } from '~/migrations/tenantIndexes';
+>>>>>>> upstream/main
 import { createSkillSyncCredentialModel } from './skillSyncCredential';
 import { createOpenIDRefreshFlightModel } from './openidRefreshFlight';
 import { createAgentTriggerUserPurgeModel } from './triggerUserPurge';
 import { createRefreshTokenBridgeModel } from './refreshTokenBridge';
 import { createAgentTriggerDeliveryModel } from './triggerDelivery';
+<<<<<<< HEAD
+=======
+import { createToolApprovalGrantModel } from './toolApprovalGrant';
+>>>>>>> upstream/main
 import { createSkillSyncStatusModel } from './skillSyncStatus';
 import { createConversationTagModel } from './conversationTag';
 import { createCodeEnvironmentModel } from './codeEnvironment';
@@ -27,6 +35,10 @@ import { createToolCallModel } from './toolCall';
 import { createAclEntryModel } from './aclEntry';
 import { createAuditLogModel } from './auditLog';
 import { createSessionModel } from './session';
+<<<<<<< HEAD
+=======
+import { createPasskeyModel } from './passkey';
+>>>>>>> upstream/main
 import { createBalanceModel } from './balance';
 import { createMessageModel } from './message';
 import { createActionModel } from './action';
@@ -50,8 +62,15 @@ import logger from '~/config/winston';
  */
 export function createModels(mongoose: typeof import('mongoose')): {
   User: ReturnType<typeof createUserModel>;
+<<<<<<< HEAD
   Token: ReturnType<typeof createTokenModel>;
   Session: ReturnType<typeof createSessionModel>;
+=======
+  ToolApprovalGrant: ReturnType<typeof createToolApprovalGrantModel>;
+  Token: ReturnType<typeof createTokenModel>;
+  Session: ReturnType<typeof createSessionModel>;
+  Passkey: ReturnType<typeof createPasskeyModel>;
+>>>>>>> upstream/main
   Balance: ReturnType<typeof createBalanceModel>;
   Conversation: ReturnType<typeof createConversationModel>;
   ChatProject: ReturnType<typeof createChatProjectModel>;
@@ -99,8 +118,15 @@ export function createModels(mongoose: typeof import('mongoose')): {
 } {
   const models = {
     User: createUserModel(mongoose),
+<<<<<<< HEAD
     Token: createTokenModel(mongoose),
     Session: createSessionModel(mongoose),
+=======
+    ToolApprovalGrant: createToolApprovalGrantModel(mongoose),
+    Token: createTokenModel(mongoose),
+    Session: createSessionModel(mongoose),
+    Passkey: createPasskeyModel(mongoose),
+>>>>>>> upstream/main
     Balance: createBalanceModel(mongoose),
     Conversation: createConversationModel(mongoose),
     ChatProject: createChatProjectModel(mongoose),
@@ -156,6 +182,14 @@ export function createModels(mongoose: typeof import('mongoose')): {
       model.on('index', (error?: Error) => {
         if (error) {
           logger.error(`Index build failed for "${model.modelName}": ${error.message}`);
+<<<<<<< HEAD
+=======
+          // eslint-disable-next-line no-restricted-syntax -- Collection name metadata only, no raw driver operations.
+          const hint = getTenantIndexMigrationHint(model.collection.collectionName, error);
+          if (hint) {
+            logger.warn(hint);
+          }
+>>>>>>> upstream/main
         }
       });
     }

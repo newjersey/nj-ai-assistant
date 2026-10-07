@@ -39,7 +39,42 @@ const persistedAgent = {
 };
 
 describe('Agent Management contract', () => {
+<<<<<<< HEAD
   describe('inputs', () => {
+=======
+  it('preserves repository instruction mode through API updates and response projection', () => {
+    for (const mode of ['prefer', 'defer', 'off'] as const) {
+      expect(agentManagementUpdateSchema.parse({ repositoryInstructions: mode })).toEqual({
+        repositoryInstructions: mode,
+      });
+      expect(
+        projectAgentManagementResponse({ ...persistedAgent, repositoryInstructions: mode })
+          .repositoryInstructions,
+      ).toBe(mode);
+    }
+    expect(
+      agentManagementUpdateSchema.safeParse({ repositoryInstructions: 'allow-all' }).success,
+    ).toBe(false);
+  });
+  describe('inputs', () => {
+    it('round-trips the explicit machine allowlist through management create, update and response', () => {
+      const code_environment_ids = ['machine-a', 'machine-b'];
+      expect(
+        agentManagementCreateSchema.parse({
+          provider: 'openAI',
+          model: 'gpt-5',
+          code_environment_ids,
+        }),
+      ).toMatchObject({ code_environment_ids });
+      expect(agentManagementUpdateSchema.parse({ code_environment_ids: [] })).toEqual({
+        code_environment_ids: [],
+      });
+      expect(
+        projectAgentManagementResponse({ ...persistedAgent, code_environment_ids })
+          .code_environment_ids,
+      ).toEqual(code_environment_ids);
+    });
+>>>>>>> upstream/main
     it('keeps create and update fields aligned with the browser Agent validators', () => {
       expect(
         agentManagementCreateSchema.parse({
@@ -82,6 +117,28 @@ describe('Agent Management contract', () => {
       },
     );
 
+<<<<<<< HEAD
+=======
+    it.each([agentManagementCreateSchema, agentManagementUpdateSchema])(
+      'rejects instructionsPrompt — the Builder-only prompt-group link is not a Management API field',
+      (schema) => {
+        const base =
+          schema === agentManagementCreateSchema ? { provider: 'openAI', model: 'gpt-5' } : {};
+        expect(
+          schema.safeParse({
+            ...base,
+            instructionsPrompt: {
+              source: 'native',
+              groupId: '64da00000000000000000001',
+              selection: { type: 'production' },
+            },
+          }).success,
+        ).toBe(false);
+        expect(schema.safeParse({ ...base, instructionsPrompt: null }).success).toBe(false);
+      },
+    );
+
+>>>>>>> upstream/main
     it('rejects a null model before Agent creation reaches persistence', () => {
       expect(
         agentManagementCreateSchema.safeParse({ provider: 'openAI', model: null }).success,
@@ -206,6 +263,32 @@ describe('Agent Management contract', () => {
       expect(response).not.toHaveProperty('is_promoted');
     });
 
+<<<<<<< HEAD
+=======
+    it('never returns instructionsPrompt — the Builder-only prompt-group link is not a Management API field', () => {
+      // The projection source type has no `instructionsPrompt` field (see the note above
+      // `agentManagementCreateSchema`); the cast simulates a stored document that still
+      // carries the Builder's own link, to prove the allowlist drops it regardless.
+      const response = projectAgentManagementResponse({
+        ...persistedAgent,
+        instructionsPrompt: {
+          source: 'native',
+          groupId: '64da00000000000000000001',
+          selection: { type: 'production' },
+        },
+      } as Record<string, unknown> as typeof persistedAgent);
+
+      expect(response).not.toHaveProperty('instructionsPrompt');
+      expect(agentManagementResponseSchema.parse(response)).toEqual(response);
+      expect(
+        agentManagementResponseSchema.safeParse({
+          ...response,
+          instructionsPrompt: { source: 'native', restricted: true },
+        }).success,
+      ).toBe(false);
+    });
+
+>>>>>>> upstream/main
     it('omits legacy string avatars that are not part of the management contract', () => {
       const response = projectAgentManagementResponse({
         ...persistedAgent,

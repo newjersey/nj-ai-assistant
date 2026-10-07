@@ -19,7 +19,11 @@ export default function ImageVision() {
             {...field}
             checked={field.value}
             onCheckedChange={field.onChange}
+<<<<<<< HEAD
             className="relative float-left mr-2 inline-flex h-4 w-4 cursor-pointer"
+=======
+            className="relative float-left mr-2 inline-flex cursor-pointer"
+>>>>>>> upstream/main
             value={field.value?.toString()}
             aria-labelledby="image-vision-label"
           />

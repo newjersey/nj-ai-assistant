@@ -3,12 +3,17 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+<<<<<<< HEAD
+=======
+  useLayoutEffect,
+>>>>>>> upstream/main
   useMemo,
   useRef,
   useState,
 } from 'react';
 import { JSX } from 'react/jsx-runtime';
 import type { IThemeRGB, ThemeDefinition, ThemeMode } from '../types';
+<<<<<<< HEAD
 import {
   fromLegacyTheme,
   highContrastTheme,
@@ -19,6 +24,27 @@ import applyTheme, { applyResolvedTheme, themeOwnedProperties } from '../utils/a
 import { defaultTheme } from '../themes/default';
 import { darkTheme } from '../themes/dark';
 import '../highContrast.css';
+=======
+import applyTheme, {
+  applyResolvedTheme,
+  clearAppliedTheme,
+  themeOwnedProperties,
+  THEME_BOOT_ATTRIBUTE,
+  THEME_DISABLED_ATTRIBUTE,
+  THEME_FIELD_FOCUS_ATTRIBUTE,
+} from '../utils/applyTheme';
+import {
+  fromLegacyTheme,
+  highContrastTheme,
+  collectThemeWarnings,
+  resolveTheme,
+  validateThemeDefinition,
+} from '../registry';
+import { defaultTheme } from '../themes/default';
+import { darkTheme } from '../themes/dark';
+import '../highContrast.css';
+import '../preflight.css';
+>>>>>>> upstream/main
 
 const THEME_KEY = 'color-theme';
 const THEME_COLORS_KEY = 'theme-colors';
@@ -45,6 +71,11 @@ type ThemeDOMSnapshot = {
   properties: Map<string, { value: string; priority: string }>;
   colorScheme: { value: string; priority: string };
   dataTheme: string | null;
+<<<<<<< HEAD
+=======
+  disabledStyle: string | null;
+  fieldFocusStyle: string | null;
+>>>>>>> upstream/main
 };
 
 type ThemeClassSnapshot = {
@@ -58,6 +89,30 @@ type ThemePropSnapshot = Pick<
   'initialTheme' | 'themeDefinition' | 'themeName' | 'themeRGB'
 >;
 
+<<<<<<< HEAD
+=======
+type ThemeState = {
+  definition?: ThemeDefinition;
+  legacyColors?: IThemeRGB;
+  name?: string;
+};
+
+type StorageWrite = readonly [key: string, value?: string];
+
+type ThemeTransition = {
+  state: ThemeState;
+  writes: StorageWrite[];
+};
+
+/** A controlled prop change resolved during render; its storage writes wait for the commit. */
+type ControlledThemeSync = {
+  props: ThemePropSnapshot;
+  controlled: boolean;
+  writes: StorageWrite[];
+  appearance?: AppearanceMode;
+};
+
+>>>>>>> upstream/main
 type ThemeContextType = {
   theme: AppearanceMode;
   setTheme: (theme: string) => void;
@@ -113,7 +168,10 @@ const matchesMedia = (query: string): boolean =>
     : false;
 
 export const isDark = (theme: string): boolean => {
+<<<<<<< HEAD
   return false; // NJ: We're forcing light theme at all times
+=======
+>>>>>>> upstream/main
   if (theme === 'system') {
     return matchesMedia('(prefers-color-scheme: dark)');
   }
@@ -265,6 +323,122 @@ const getStoredThemeState = (): InitialThemeState => {
 
 const getInitialThemeName = (): string | undefined => readStorage(THEME_NAME_KEY) ?? undefined;
 
+<<<<<<< HEAD
+=======
+/**
+ * Layout effects run before the browser paints the commit that scheduled them,
+ * which is what keeps a theme change from showing a frame of the previous one.
+ * The server has no paint and warns on layout effects, so it takes the passive form.
+ */
+const useBeforePaintEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect;
+
+const defineTheme = (definition?: ThemeDefinition): ThemeTransition => ({
+  state: { definition, legacyColors: undefined, name: definition?.name },
+  writes: [
+    [THEME_DEFINITION_KEY, definition ? JSON.stringify(definition) : undefined],
+    [THEME_COLORS_KEY],
+    [THEME_SOURCE_KEY, definition ? 'definition' : undefined],
+    [THEME_NAME_KEY, definition?.name],
+  ],
+});
+
+const applyLegacyColors = (current: ThemeState, colors?: IThemeRGB): ThemeTransition => {
+  const definition = colors
+    ? fromLegacyTheme(colors, current.definition?.name ?? current.name)
+    : undefined;
+  const legacyColors = definition?.modes.light?.colors;
+  return {
+    state: { definition, legacyColors, name: definition?.name },
+    writes: [
+      [THEME_DEFINITION_KEY, definition ? JSON.stringify(definition) : undefined],
+      [THEME_NAME_KEY, definition?.name],
+      [THEME_COLORS_KEY, legacyColors ? JSON.stringify(legacyColors) : undefined],
+      [THEME_SOURCE_KEY, definition ? 'legacy' : undefined],
+    ],
+  };
+};
+
+const renameTheme = (current: ThemeState, name?: string): ThemeTransition => {
+  const nextName = name?.trim() || (current.definition ? 'custom' : undefined);
+  if (!nextName || !current.definition) {
+    return { state: { ...current, name: nextName }, writes: [[THEME_NAME_KEY, nextName]] };
+  }
+
+  const definition = { ...current.definition, name: nextName };
+  return {
+    state: { ...current, definition, name: nextName },
+    writes: [
+      [THEME_NAME_KEY, nextName],
+      [THEME_DEFINITION_KEY, JSON.stringify(definition)],
+      [THEME_SOURCE_KEY, current.legacyColors ? 'legacy' : 'definition'],
+    ],
+  };
+};
+
+const sameThemeProps = (a: ThemePropSnapshot, b: ThemePropSnapshot): boolean =>
+  a.initialTheme === b.initialTheme &&
+  a.themeDefinition === b.themeDefinition &&
+  a.themeName === b.themeName &&
+  a.themeRGB === b.themeRGB;
+
+/**
+ * Folds a change of the controlled props into the theme state, in the order the
+ * props take precedence: a valid definition, then legacy colors, then clearing a
+ * theme the props installed, then the name. Pure, so it can run during render.
+ */
+const syncControlledTheme = (
+  previous: ThemePropSnapshot,
+  next: ThemePropSnapshot,
+  current: ThemeState,
+  controlled: boolean,
+): ThemeTransition & Omit<ControlledThemeSync, 'props' | 'writes'> => {
+  const definitionChanged = next.themeDefinition !== previous.themeDefinition;
+  const legacyColorsChanged = next.themeRGB !== previous.themeRGB;
+  const switchedToLegacyColors =
+    definitionChanged && !next.themeDefinition && next.themeRGB !== undefined;
+  let state = current;
+  let writes: StorageWrite[] = [];
+  let nextControlled = controlled;
+  let clearedControlledDefinition = false;
+  const apply = (transition: ThemeTransition) => {
+    state = transition.state;
+    writes = [...writes, ...transition.writes];
+  };
+
+  if (definitionChanged || legacyColorsChanged) {
+    if (next.themeDefinition) {
+      if (isValidThemeDefinition(next.themeDefinition)) {
+        apply(defineTheme(next.themeDefinition));
+        nextControlled = true;
+      }
+    } else if (next.themeRGB) {
+      apply(applyLegacyColors(state, next.themeRGB));
+      nextControlled = true;
+    } else if (controlled) {
+      apply(defineTheme(undefined));
+      nextControlled = false;
+      clearedControlledDefinition = true;
+    }
+  }
+
+  if (
+    !next.themeDefinition &&
+    (next.themeName !== previous.themeName || switchedToLegacyColors || clearedControlledDefinition)
+  ) {
+    apply(renameTheme(state, next.themeName));
+  }
+
+  const appearance =
+    next.initialTheme !== previous.initialTheme &&
+    next.initialTheme &&
+    isAppearanceMode(next.initialTheme)
+      ? next.initialTheme
+      : undefined;
+
+  return { state, writes, controlled: nextControlled, appearance };
+};
+
+>>>>>>> upstream/main
 const captureThemeDOM = (root: HTMLElement): ThemeDOMSnapshot => ({
   properties: new Map(
     themeOwnedProperties.map((property) => [
@@ -280,6 +454,11 @@ const captureThemeDOM = (root: HTMLElement): ThemeDOMSnapshot => ({
     priority: root.style.getPropertyPriority('color-scheme'),
   },
   dataTheme: root.getAttribute('data-theme'),
+<<<<<<< HEAD
+=======
+  disabledStyle: root.getAttribute(THEME_DISABLED_ATTRIBUTE),
+  fieldFocusStyle: root.getAttribute(THEME_FIELD_FOCUS_ATTRIBUTE),
+>>>>>>> upstream/main
 });
 
 const restoreThemeDOM = (snapshot: ThemeDOMSnapshot, root: HTMLElement): void => {
@@ -306,6 +485,19 @@ const restoreThemeDOM = (snapshot: ThemeDOMSnapshot, root: HTMLElement): void =>
   } else {
     root.setAttribute('data-theme', snapshot.dataTheme);
   }
+<<<<<<< HEAD
+=======
+  if (snapshot.disabledStyle === null) {
+    root.removeAttribute(THEME_DISABLED_ATTRIBUTE);
+  } else {
+    root.setAttribute(THEME_DISABLED_ATTRIBUTE, snapshot.disabledStyle);
+  }
+  if (snapshot.fieldFocusStyle === null) {
+    root.removeAttribute(THEME_FIELD_FOCUS_ATTRIBUTE);
+  } else {
+    root.setAttribute(THEME_FIELD_FOCUS_ATTRIBUTE, snapshot.fieldFocusStyle);
+  }
+>>>>>>> upstream/main
 };
 
 export function ThemeProvider({
@@ -370,11 +562,16 @@ export function ThemeProvider({
   const themeNameRef = useRef(themeName);
   themeNameRef.current = themeName;
   const persistedInitialProps = useRef(false);
+<<<<<<< HEAD
   const previousThemeProps = useRef<ThemePropSnapshot>({
+=======
+  const themeProps: ThemePropSnapshot = {
+>>>>>>> upstream/main
     initialTheme,
     themeDefinition: propThemeDefinition,
     themeName: propThemeName,
     themeRGB: propThemeRGB,
+<<<<<<< HEAD
   });
   const controlledThemeActive = useRef(
     Boolean(
@@ -383,6 +580,45 @@ export function ThemeProvider({
     ),
   );
   const synchronizedThemeProps = useRef(false);
+=======
+  };
+  const [controlledSync, setControlledSync] = useState<ControlledThemeSync>(() => ({
+    props: themeProps,
+    controlled: Boolean(
+      (propThemeDefinition && isValidThemeDefinition(propThemeDefinition)) ||
+        (!propThemeDefinition && propThemeRGB),
+    ),
+    writes: [],
+  }));
+  const persistedControlledSync = useRef(controlledSync);
+
+  /**
+   * A controlled theme change is folded into state during the render that
+   * delivers it (React re-renders before committing), so the layout effect that
+   * applies the theme sees it in the same commit and nothing paints in between.
+   */
+  if (!sameThemeProps(controlledSync.props, themeProps)) {
+    const sync = syncControlledTheme(
+      controlledSync.props,
+      themeProps,
+      { definition: themeDefinition, legacyColors: legacyThemeRGB, name: themeName },
+      controlledSync.controlled,
+    );
+    setControlledSync({
+      props: themeProps,
+      controlled: sync.controlled,
+      writes: sync.writes,
+      appearance: sync.appearance,
+    });
+    setThemeDefinitionState(sync.state.definition);
+    setLegacyThemeRGB(sync.state.legacyColors);
+    setThemeNameState(sync.state.name);
+    if (sync.appearance) {
+      setThemeState(sync.appearance);
+    }
+  }
+
+>>>>>>> upstream/main
   const themeDOMSnapshot = useRef<ThemeDOMSnapshot | undefined>(undefined);
   const themeClassSnapshot = useRef<ThemeClassSnapshot | undefined>(undefined);
 
@@ -473,12 +709,38 @@ export function ThemeProvider({
     writeStorage(THEME_KEY, newTheme);
   }, []);
 
+<<<<<<< HEAD
+=======
+  const commitThemeTransition = useCallback(
+    ({ state, writes }: ThemeTransition) => {
+      themeDefinitionRef.current = state.definition;
+      setThemeDefinitionState(state.definition);
+      legacyThemeRGBRef.current = state.legacyColors;
+      setLegacyThemeRGB(state.legacyColors);
+      themeNameRef.current = state.name;
+      setThemeNameState(state.name);
+      writes.forEach(([key, value]) => writeThemeStorage(key, value));
+    },
+    [writeThemeStorage],
+  );
+
+  const currentThemeState = useCallback(
+    (): ThemeState => ({
+      definition: themeDefinitionRef.current,
+      legacyColors: legacyThemeRGBRef.current,
+      name: themeNameRef.current,
+    }),
+    [],
+  );
+
+>>>>>>> upstream/main
   const setThemeDefinition = useCallback(
     (definition?: ThemeDefinition) => {
       const errors = definition ? validateThemeDefinition(definition) : [];
       if (errors.length > 0) {
         throw new TypeError(errors.join('\n'));
       }
+<<<<<<< HEAD
       themeDefinitionRef.current = definition;
       setThemeDefinitionState(definition);
       legacyThemeRGBRef.current = undefined;
@@ -591,6 +853,43 @@ export function ThemeProvider({
     setThemeName,
     setThemeRGB,
   ]);
+=======
+      commitThemeTransition(defineTheme(definition));
+    },
+    [commitThemeTransition],
+  );
+
+  const setThemeRGB = useCallback(
+    (colors?: IThemeRGB) => commitThemeTransition(applyLegacyColors(currentThemeState(), colors)),
+    [commitThemeTransition, currentThemeState],
+  );
+
+  const setThemeName = useCallback(
+    (name?: string) => commitThemeTransition(renameTheme(currentThemeState(), name)),
+    [commitThemeTransition, currentThemeState],
+  );
+
+  /** Storage is not paint, so a controlled change persists after its commit, under the
+   *  gating of the render that made it; each sync is written once. */
+  useEffect(() => {
+    if (persistedControlledSync.current === controlledSync) {
+      return;
+    }
+    persistedControlledSync.current = controlledSync;
+    controlledSync.writes.forEach(([key, value]) => writeThemeStorage(key, value));
+    if (controlledSync.appearance) {
+      writeStorage(THEME_KEY, controlledSync.appearance);
+    }
+  }, [controlledSync, writeThemeStorage]);
+
+  /** Stored, controlled and deployment definitions all arrive here, so each is reported once. */
+  useEffect(() => {
+    const warnings = themeDefinition ? collectThemeWarnings(themeDefinition) : [];
+    if (warnings.length > 0) {
+      console.warn(`[ThemeProvider] ${warnings.join('; ')}`);
+    }
+  }, [themeDefinition]);
+>>>>>>> upstream/main
 
   const applyThemeMode = useCallback(
     (currentTheme: AppearanceMode) => {
@@ -602,6 +901,15 @@ export function ThemeProvider({
       setResolvedMode(mode);
       setHighContrast(highContrast);
 
+<<<<<<< HEAD
+=======
+      /** The boot script's pre-paint copy is not the host's own state: drop it before the
+       *  snapshot below, in the same pre-paint pass that applies the provider's theme. */
+      if (root.hasAttribute(THEME_BOOT_ATTRIBUTE)) {
+        clearAppliedTheme(root);
+      }
+
+>>>>>>> upstream/main
       if (!themeClassSnapshot.current) {
         themeClassSnapshot.current = {
           dark: root.classList.contains('dark'),
@@ -644,7 +952,11 @@ export function ThemeProvider({
     [legacyThemeRGB, prepareThemeDOM, restoreAppliedTheme, themeDefinition],
   );
 
+<<<<<<< HEAD
   useEffect(() => {
+=======
+  useBeforePaintEffect(() => {
+>>>>>>> upstream/main
     applyThemeMode(theme);
   }, [applyThemeMode, theme]);
 

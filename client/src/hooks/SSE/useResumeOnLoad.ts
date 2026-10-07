@@ -1,5 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+<<<<<<< HEAD
 import { useStore } from 'jotai';
+=======
+import { useStore, useAtom } from 'jotai';
+>>>>>>> upstream/main
 import { useQueryClient } from '@tanstack/react-query';
 import { useSetRecoilState, useRecoilValue, useRecoilCallback } from 'recoil';
 import {
@@ -7,6 +11,10 @@ import {
   QueryKeys,
   tMessageSchema,
   isAssistantsEndpoint,
+<<<<<<< HEAD
+=======
+  isForcedTemporaryRetention,
+>>>>>>> upstream/main
 } from 'librechat-data-provider';
 import type { TMessage, TConversation, TSubmission, Agents } from 'librechat-data-provider';
 import type { GenerationProtocolVersion } from '~/data-provider/SSE/protocol';
@@ -21,11 +29,19 @@ import {
   carriedSteerContext,
   getBranchSiblingIndexesForTarget,
   hydrateFileDeliveryMetadata,
+<<<<<<< HEAD
+=======
+  isCompactionAnchorProjection,
+>>>>>>> upstream/main
 } from '~/utils';
 import {
   useStreamStatus,
   useActiveJobs,
   useAgentQueuedTurns,
+<<<<<<< HEAD
+=======
+  useGetStartupConfig,
+>>>>>>> upstream/main
   streamStatusQueryKey,
   isQueuedTurnSuccessorOwed,
   extendActiveJobsGrace,
@@ -40,6 +56,10 @@ import { pendingApprovalActionFamily } from '~/components/Chat/approval/state';
 import { agentQueuedTurnsQueryKey } from '~/data-provider/SSE/queuedTurns';
 import useSteerConvert from '~/hooks/Chat/useSteerConvert';
 import { revealedQueuedTurnFamily } from '~/store/steer';
+<<<<<<< HEAD
+=======
+import { resumeRequestsAtom } from '~/hooks/Chat/resume';
+>>>>>>> upstream/main
 import { useFileMapContext } from '~/Providers';
 import store from '~/store';
 
@@ -85,13 +105,34 @@ function resumeStateMatchesSubmission(
   return !!responseMessageId && resumeState.responseMessageId === responseMessageId;
 }
 
+<<<<<<< HEAD
+=======
+/**
+ * The row that names the branch a resumed run belongs to when its own response
+ * is not in the loaded history yet. A compaction's user-message slot is the leaf
+ * it summarizes up to and carries no parent (`projectCompactionAnchor`), so
+ * there the anchor itself names the branch — without this the pane restores no
+ * sibling selection and a compaction started on an older branch comes back on
+ * whichever branch the default lands on.
+ */
+function getResumeBranchFallbackMessageId(
+  resumeState: Agents.ResumeState,
+): string | null | undefined {
+  return resumeState.userMessage?.parentMessageId ?? resumeState.userMessage?.messageId;
+}
+
+>>>>>>> upstream/main
 function getResumeBranchTargetMessageId(
   resumeState: Agents.ResumeState,
   messages: TMessage[],
 ): string | null | undefined {
   const responseMessageId = resumeState.responseMessageId;
   if (!responseMessageId) {
+<<<<<<< HEAD
     return resumeState.userMessage?.parentMessageId;
+=======
+    return getResumeBranchFallbackMessageId(resumeState);
+>>>>>>> upstream/main
   }
 
   const unpaddedResponseMessageId = responseMessageId.replace(/_+$/, '');
@@ -117,7 +158,11 @@ function getResumeBranchTargetMessageId(
     return unpaddedResponseMessageId;
   }
 
+<<<<<<< HEAD
   return resumeState.userMessage?.parentMessageId;
+=======
+  return getResumeBranchFallbackMessageId(resumeState);
+>>>>>>> upstream/main
 }
 
 function preferDefinedString(value?: string | null, fallback?: string): string | undefined {
@@ -135,15 +180,38 @@ function buildSubmissionFromResumeState(
   conversationId: string,
   generationCreatedAt?: number,
   generationProtocolVersion: GenerationProtocolVersion = 1,
+<<<<<<< HEAD
+=======
+  isTemporary = false,
+>>>>>>> upstream/main
 ): TSubmission {
   const userMessageData = resumeState.userMessage;
   const responseMessageId =
     resumeState.responseMessageId ?? `${userMessageData?.messageId ?? 'resume'}_`;
 
+<<<<<<< HEAD
   // Try to find existing user message in the messages array (from database)
   const existingUserMessage = messages.find(
     (m) => m.isCreatedByUser && m.messageId === userMessageData?.messageId,
   );
+=======
+  /**
+   * The run's user-message slot as the loaded history already holds it. Message
+   * ids are unique per row, so a match is that row whoever wrote it: a
+   * compaction submits no user turn and puts the LEAF it summarizes up to in
+   * this slot (`useCompactConversation` client-side, `projectCompactionAnchor`
+   * server-side), which is usually the assistant answer. Adopting the row keeps
+   * the anchor's own identity — synthesizing an empty, parentless USER row over
+   * it rewrites that answer into a phantom root and folds the thread.
+   */
+  const existingSlotMessage = messages.find((m) => m.messageId === userMessageData?.messageId);
+  /** An anchored run — a compaction — created no user turn: the slot names a row
+   *  the transcript already holds. Judged from the projection's shape, never from
+   *  the anchor's author, which is a user message as often as an answer. Either
+   *  way the run is regenerate-shaped for every consumer: no user turn of its
+   *  own, the response parented onto an existing message. */
+  const isAnchoredRun = isCompactionAnchorProjection(userMessageData);
+>>>>>>> upstream/main
 
   // A trailing underscore distinguishes an in-flight regeneration from the persisted
   // response it replaces. Only the exact response id proves generation ownership.
@@ -158,7 +226,11 @@ function buildSubmissionFromResumeState(
       : undefined;
   const responseMetadataMessage = existingResponseMessage ?? persistedRegenerationResponse;
   const isRegenerateResume =
+<<<<<<< HEAD
     resumeState.isRegenerate === true || persistedRegenerationResponse != null;
+=======
+    resumeState.isRegenerate === true || persistedRegenerationResponse != null || isAnchoredRun;
+>>>>>>> upstream/main
   let regenerateMessages: TMessage[] | undefined;
   if (isRegenerateResume) {
     regenerateMessages =
@@ -167,9 +239,15 @@ function buildSubmissionFromResumeState(
         : messages.filter((message) => message.messageId !== responseMessageId);
   }
 
+<<<<<<< HEAD
   // Create or use existing user message
   const userMessage: TMessage =
     existingUserMessage ??
+=======
+  // Create or use the row the slot already names
+  const userMessage: TMessage =
+    existingSlotMessage ??
+>>>>>>> upstream/main
     (userMessageData
       ? (tMessageSchema.parse({
           messageId: userMessageData.messageId,
@@ -230,8 +308,14 @@ function buildSubmissionFromResumeState(
     initialResponse,
     conversation,
     isRegenerate: isRegenerateResume,
+<<<<<<< HEAD
     ...(regenerateMessages && { regenerateMessages }),
     isTemporary: false,
+=======
+    ...(isAnchoredRun && { compact: true }),
+    ...(regenerateMessages && { regenerateMessages }),
+    isTemporary,
+>>>>>>> upstream/main
     endpointOption: {},
     // Signal to useResumableSSE to subscribe to existing stream instead of starting new
     resumeStreamId: streamId,
@@ -276,6 +360,11 @@ export default function useResumeOnLoad(
   const endpointType = currentConversation?.endpointType;
   const actualEndpoint = endpointType ?? endpoint;
   const resumableEnabled = !isAssistantsEndpoint(actualEndpoint);
+<<<<<<< HEAD
+=======
+  const { data: startupConfig, isFetched: startupConfigSettled } = useGetStartupConfig();
+  const isRetentionForced = isForcedTemporaryRetention(startupConfig?.interface?.retentionMode);
+>>>>>>> upstream/main
   // Track conversations we've already processed (either resumed or skipped)
   const processedConvoRef = useRef<string | null>(null);
   /**
@@ -801,6 +890,10 @@ export default function useResumeOnLoad(
   const shouldCheck =
     resumableEnabled &&
     messagesLoaded && // Wait for messages to load before checking
+<<<<<<< HEAD
+=======
+    startupConfigSettled && // The forced retention mode decides the rebuilt submission's temporary state
+>>>>>>> upstream/main
     !hasActiveSubmissionForThisConvo && // Allow if no submission or a confirmed stale submission
     !!conversationId &&
     conversationId !== Constants.NEW_CONVO &&
@@ -838,6 +931,13 @@ export default function useResumeOnLoad(
       return;
     }
 
+<<<<<<< HEAD
+=======
+    if (!startupConfigSettled) {
+      return;
+    }
+
+>>>>>>> upstream/main
     // Don't resume if we already have an active submission FOR THIS CONVERSATION
     // A stale submission with undefined/different conversationId should not block us
     if (hasActiveSubmissionForThisConvo) {
@@ -1028,6 +1128,10 @@ export default function useResumeOnLoad(
         conversationId,
         streamStatus.createdAt,
         generationProtocolVersion,
+<<<<<<< HEAD
+=======
+        streamStatus.isTemporary === true || isRetentionForced,
+>>>>>>> upstream/main
       );
       setSubmission(submission);
     } else {
@@ -1045,7 +1149,11 @@ export default function useResumeOnLoad(
         } as TMessage,
         conversation: { conversationId, title: 'Resumed Chat' } as TConversation,
         isRegenerate: false,
+<<<<<<< HEAD
         isTemporary: false,
+=======
+        isTemporary: streamStatus.isTemporary === true || isRetentionForced,
+>>>>>>> upstream/main
         endpointOption: {},
         // Signal to useResumableSSE to subscribe to existing stream instead of starting new
         resumeStreamId: streamStatus.streamId,
@@ -1084,6 +1192,11 @@ export default function useResumeOnLoad(
     setActiveGenerationCreatedAt,
     jotaiStore,
     externalRunArm,
+<<<<<<< HEAD
+=======
+    isRetentionForced,
+    startupConfigSettled,
+>>>>>>> upstream/main
   ]);
 
   // Reset processedConvoRef when conversation changes to allow re-checking
@@ -1189,4 +1302,54 @@ export default function useResumeOnLoad(
     setSubmission,
     queryClient,
   ]);
+<<<<<<< HEAD
+=======
+
+  /**
+   * An explicit `resumeStream` request takes the announcement's path: the
+   * status read decides whether anything is running, and the effect above
+   * builds the resume submission that `useResumableSSE` attaches through the
+   * host transport. The request is consumed either way: one made while this
+   * pane is already attached is answered by that attachment.
+   */
+  const [resumeRequests, setResumeRequests] = useAtom(resumeRequestsAtom);
+  const resumeRequested = !!conversationId && resumeRequests.has(conversationId);
+  /** The route can name a conversation before this pane has loaded it; until then the endpoint
+   *  that decides resumability is the previous conversation's, so the request waits. */
+  const routeConversationLoaded = currentConversation?.conversationId === conversationId;
+  useEffect(() => {
+    if (!resumeRequested || !conversationId || !routeConversationLoaded) {
+      return;
+    }
+    setResumeRequests((pending) => {
+      const next = new Set(pending);
+      next.delete(conversationId);
+      return next;
+    });
+    if (!resumableEnabled || conversationId === Constants.NEW_CONVO) {
+      return;
+    }
+    if (hasLiveSubmissionForThisConvo) {
+      return;
+    }
+    /** A finished submission still installed reads as attached to the check above. */
+    if (hasActiveSubmissionForThisConvo) {
+      setSubmission(null);
+    }
+    queryClient.invalidateQueries({ queryKey: streamStatusQueryKey(conversationId) });
+    queryClient.invalidateQueries({ queryKey: [QueryKeys.messages, conversationId] });
+    processedConvoRef.current = null;
+    setExternalRunArm((arm) => arm + 1);
+  }, [
+    conversationId,
+    resumeRequested,
+    routeConversationLoaded,
+    setResumeRequests,
+    resumableEnabled,
+    hasActiveSubmissionForThisConvo,
+    hasLiveSubmissionForThisConvo,
+    setSubmission,
+    queryClient,
+  ]);
+>>>>>>> upstream/main
 }

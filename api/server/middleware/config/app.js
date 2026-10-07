@@ -1,5 +1,9 @@
 const { logger } = require('@librechat/data-schemas');
+<<<<<<< HEAD
 const { getAppConfigOptionsFromUser } = require('@librechat/api');
+=======
+const { getAppConfigOptionsFromUser, resolveStrictAppConfig } = require('@librechat/api');
+>>>>>>> upstream/main
 const { getAppConfig } = require('~/server/services/Config');
 
 const configMiddleware = async (req, res, next) => {
@@ -24,4 +28,24 @@ const configMiddleware = async (req, res, next) => {
   }
 };
 
+<<<<<<< HEAD
 module.exports = configMiddleware;
+=======
+/** The same resolution, without the fallback; `resolveStrictAppConfig` owns that choice. */
+const strictConfigMiddleware = async (req, res, next) => {
+  try {
+    req.config = await resolveStrictAppConfig(getAppConfig, req.user);
+    next();
+  } catch (error) {
+    logger.error('Strict config middleware error:', {
+      error: error.message,
+      userRole: req.user?.role,
+      path: req.path,
+    });
+    next(error);
+  }
+};
+
+module.exports = configMiddleware;
+module.exports.strictConfigMiddleware = strictConfigMiddleware;
+>>>>>>> upstream/main

@@ -67,7 +67,11 @@ describe('standardCache - CONFIG_STORE vs TOOL_CACHE namespace isolation', () =>
 
     const toolCache = standardCache(CacheKeys.TOOL_CACHE);
     expect(MockKeyvRedis).toHaveBeenCalledTimes(1);
+<<<<<<< HEAD
     expect(MockKeyvRedis).toHaveBeenCalledWith(mockKeyvRedisClient);
+=======
+    expect(MockKeyvRedis).toHaveBeenCalledWith(mockKeyvRedisClient, { throwOnErrors: false });
+>>>>>>> upstream/main
     expect(toolCache).toBeDefined();
   });
 

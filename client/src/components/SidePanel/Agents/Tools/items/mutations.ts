@@ -3,6 +3,12 @@ import type { AgentItem } from './types';
 
 export type TogglePatch =
   | { type: 'builtin'; field: AgentCapabilities; value: boolean | string }
+<<<<<<< HEAD
+=======
+  | { type: 'subagents'; enabled: boolean }
+  | { type: 'handoffs-remove' }
+  | { type: 'configure' }
+>>>>>>> upstream/main
   | { type: 'tool-add'; id: string }
   | { type: 'tool-remove'; id: string }
   | { type: 'skill-add'; id: string }
@@ -13,6 +19,15 @@ export type TogglePatch =
   | { type: 'action-remove'; actionId: string };
 
 function builtinTogglePatch(id: string, selected: boolean): TogglePatch {
+<<<<<<< HEAD
+=======
+  if (id === 'subagents') {
+    return { type: 'subagents', enabled: !selected };
+  }
+  if (id === 'handoffs') {
+    return selected ? { type: 'handoffs-remove' } : { type: 'configure' };
+  }
+>>>>>>> upstream/main
   if (id === 'ask_user_question') {
     // Native tool presented as a builtin — it has no capability field; the
     // toggle edits agent.tools exactly like a plugin.

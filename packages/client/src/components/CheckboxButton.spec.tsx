@@ -10,9 +10,15 @@ describe('CheckboxButton', () => {
       'h-theme-control',
       'w-theme-control',
       'rounded-theme-control-round',
+<<<<<<< HEAD
       'gap-theme-compact',
       'p-theme-compact',
       'md:px-theme-normal',
+=======
+      'gap-theme-control-gap',
+      'p-theme-compact',
+      'md:px-theme-control-x',
+>>>>>>> upstream/main
     );
   });
 });

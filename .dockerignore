@@ -15,7 +15,10 @@ docs
 
 # Ignore all hidden files
 .*
+<<<<<<< HEAD
 
 # NJ: Need env files to render the librechat yaml file
 !.env.nj-dev
 !.env.nj-prod
+=======
+>>>>>>> upstream/main

@@ -34,9 +34,24 @@ const messageInput = (page: Page) => page.getByRole('textbox', { name: 'Message 
 const duringRunSendButton = (page: Page) => page.getByTestId('during-run-send-button');
 const queuedRows = (page: Page) => page.getByTestId('queued-message-row');
 const messageTurns = (page: Page) => messagesView(page).locator('.message-render');
+<<<<<<< HEAD
 /** In-flight steers are anchored above the composer, not in the thread. */
 const inFlightSteers = (page: Page) => page.getByTestId('in-flight-steer');
 const appliedSteerParts = (page: Page) => messagesView(page).getByTestId('steer-part');
+=======
+/** In-flight steers render at the tail of the streaming reply. */
+const inFlightSteers = (page: Page) => page.getByTestId('pending-steers').getByRole('listitem');
+/** Applied (persisted) steer parts only: pending steers render their own
+ *  SteerPart inside the reply now, so exclude anything under `pending-steers`. */
+const appliedSteerParts = (page: Page) =>
+  messagesView(page).locator('[data-testid="steer-part"]:not([data-testid="pending-steers"] *)');
+/** Both states use SteerPart in canary, so a fast server handoff cannot invalidate layout checks. */
+const codeSteer = (page: Page) =>
+  inFlightSteers(page)
+    .filter({ hasText: 'const payload' })
+    .or(appliedSteerParts(page).filter({ hasText: 'const payload' }))
+    .first();
+>>>>>>> upstream/main
 
 type PersistedMessage = {
   messageId: string;
@@ -58,6 +73,7 @@ function isSteerRequest(response: Response) {
   );
 }
 
+<<<<<<< HEAD
 /** Select the MCP server from the composer's ephemeral MCP dropdown. */
 async function selectEphemeralMCP(page: Page) {
   await page.getByRole('button', { name: 'MCP Servers', exact: true }).click();
@@ -67,6 +83,19 @@ async function selectEphemeralMCP(page: Page) {
   await expect(serverItem).toHaveAttribute('aria-checked', 'true');
   await page.keyboard.press('Escape');
   await expect(page.getByRole('button', { name: new RegExp(MCP_SERVER_TITLE) })).toBeVisible();
+=======
+/** Select the MCP server from the composer palette. */
+async function selectEphemeralMCP(page: Page) {
+  await page.getByRole('button', { name: 'Attach and tools' }).click();
+  const serverItem = page
+    .getByRole('dialog', { name: 'Attach and tools' })
+    .getByRole('button', { name: new RegExp(`^${MCP_SERVER_TITLE}\\b`) });
+  await expect(serverItem).toBeVisible();
+  await serverItem.click();
+  await expect(serverItem).toHaveAttribute('aria-pressed', 'true');
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('listitem', { name: MCP_SERVER_TITLE, exact: true })).toBeVisible();
+>>>>>>> upstream/main
 }
 
 /** Establish a real conversation with a fast first turn so during-run actions
@@ -88,6 +117,18 @@ async function typeDuringRun(page: Page, text: string) {
 }
 
 test.describe('mid-run steering and queuing', () => {
+<<<<<<< HEAD
+=======
+  /* The composer ships with Enter queueing during a run; these tests exercise
+     the steer route, so pin the during-run default to steering. Cmd/Ctrl+Enter
+     then carries the queue path, which the queue tests below rely on. */
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem('duringRunDefaultAction', JSON.stringify('steer'));
+    });
+  });
+
+>>>>>>> upstream/main
   /**
    * The applied-steer contract (requires @librechat/agents ≥ 3.2.63, where
    * top-level `PostToolBatch` hook inputs carry no subagent-scope `agentId`):
@@ -156,6 +197,111 @@ test.describe('mid-run steering and queuing', () => {
     await expect(queuedRows(page)).toHaveCount(0);
   });
 
+<<<<<<< HEAD
+=======
+  test('keeps fenced-code steers inside the thread at desktop and mobile widths', async ({
+    page,
+  }) => {
+    test.setTimeout(150000);
+    const label = uniqueLabel('steer-code-layout');
+    const steerText = `Please use this example:\n\n\`\`\`js\n${`const payload = '${'x'.repeat(300)}';\n`.repeat(12)}\`\`\``;
+
+    await page.goto(NEW_CHAT_PATH, { timeout: 10000 });
+    await selectMockEndpoint(page, PROVIDER_C);
+    await selectEphemeralMCP(page);
+    await establishConversation(page, `steer-code-setup-${label}`);
+
+    const run = await sendMessage(page, `E2E_STEER_TOOL_REPLY:${label}`);
+    expect(run.ok()).toBeTruthy();
+    await typeDuringRun(page, steerText);
+    const [steerResponse] = await Promise.all([
+      page.waitForResponse(isSteerRequest, { timeout: 15000 }),
+      messageInput(page).press('Enter'),
+    ]);
+    expect(steerResponse.status()).toBe(202);
+
+    const row = codeSteer(page);
+    await expect(row.locator('.markdown pre > div')).toHaveCount(1);
+    for (const width of [1200, 390]) {
+      await page.setViewportSize({ width, height: 850 });
+      await expect(row.locator('.markdown pre code')).toBeVisible();
+      const bounds = await row.evaluate((element) => {
+        const stack = element.getBoundingClientRect();
+        const bubble = element.querySelector('.rounded-theme-surface')?.getBoundingClientRect();
+        const codeBlock = element.querySelector('.markdown pre > div')?.getBoundingClientRect();
+        const code = element.querySelector('.markdown pre code');
+        const codeScroller = code?.parentElement;
+        if (!stack || !bubble || !codeBlock || !code || !codeScroller) {
+          throw new Error('Pending steer code block is missing');
+        }
+        return {
+          stackLeft: stack.left,
+          stackRight: stack.right,
+          bubbleLeft: bubble.left,
+          bubbleRight: bubble.right,
+          codeLeft: codeBlock.left,
+          codeRight: codeBlock.right,
+          codeStartLeft: code.getBoundingClientRect().left,
+          codeScrollWidth: codeScroller.scrollWidth,
+          codeClientWidth: codeScroller.clientWidth,
+        };
+      });
+      expect(bounds.bubbleLeft).toBeGreaterThanOrEqual(bounds.stackLeft);
+      expect(bounds.bubbleRight).toBeLessThanOrEqual(bounds.stackRight);
+      expect(bounds.codeLeft).toBeGreaterThanOrEqual(bounds.bubbleLeft);
+      expect(bounds.codeRight).toBeLessThanOrEqual(bounds.bubbleRight);
+      expect(bounds.codeStartLeft).toBeGreaterThanOrEqual(bounds.codeLeft);
+      expect(bounds.codeScrollWidth).toBeGreaterThan(bounds.codeClientWidth);
+      const language = row.locator('.markdown pre').getByText('js', { exact: true });
+      await language.scrollIntoViewIfNeeded();
+      await expect(language).toBeInViewport();
+    }
+    // Canary collapses long user messages only when that preference is enabled.
+    await expect(row.getByRole('button', { name: 'Show more' })).toHaveCount(0);
+  });
+
+  test('keeps the beginning of a short code steer visible without expanding', async ({ page }) => {
+    test.setTimeout(150000);
+    const label = uniqueLabel('steer-code-short');
+    const steerText = `\`\`\`js\nconst payload = '${'x'.repeat(300)}';\n\`\`\``;
+
+    await page.goto(NEW_CHAT_PATH, { timeout: 10000 });
+    await selectMockEndpoint(page, PROVIDER_C);
+    await selectEphemeralMCP(page);
+    await establishConversation(page, `steer-code-setup-${label}`);
+
+    const run = await sendMessage(page, `E2E_STEER_TOOL_REPLY:${label}`);
+    expect(run.ok()).toBeTruthy();
+    await typeDuringRun(page, steerText);
+    const [steerResponse] = await Promise.all([
+      page.waitForResponse(isSteerRequest, { timeout: 15000 }),
+      messageInput(page).press('Enter'),
+    ]);
+    expect(steerResponse.status()).toBe(202);
+
+    const row = codeSteer(page);
+    await expect(row.locator('.markdown pre code')).toContainText('const payload');
+    for (const width of [1200, 390]) {
+      await page.setViewportSize({ width, height: 850 });
+      await expect(row.locator('.markdown pre code')).toBeVisible();
+      const bounds = await row.evaluate((element) => {
+        const stack = element.getBoundingClientRect();
+        const code = element.querySelector('.markdown pre code')?.getBoundingClientRect();
+        if (!stack || !code) {
+          throw new Error('Pending steer code is missing');
+        }
+        return { stackLeft: stack.left, stackRight: stack.right, codeStartLeft: code.left };
+      });
+      expect(bounds.codeStartLeft).toBeGreaterThanOrEqual(bounds.stackLeft);
+      expect(bounds.codeStartLeft).toBeLessThan(bounds.stackRight);
+      const language = row.locator('.markdown pre').getByText('js', { exact: true });
+      await language.scrollIntoViewIfNeeded();
+      await expect(language).toBeInViewport();
+      await expect(row.getByRole('button', { name: 'Show more' })).toHaveCount(0);
+    }
+  });
+
+>>>>>>> upstream/main
   /**
    * Two steers submitted in quick succession must BOTH inject at the next
    * tool-batch boundary: the drain is an atomic take-all, the hook returns one
@@ -493,7 +639,11 @@ test.describe('mid-run steering and queuing', () => {
     await expect(row).toBeVisible({ timeout: 15000 });
     await expect(row.getByRole('button', { name: 'Remove message', exact: true })).toBeVisible();
 
+<<<<<<< HEAD
     await row.getByRole('button', { name: 'More options', exact: true }).click();
+=======
+    await row.getByRole('button', { name: 'More options' }).click();
+>>>>>>> upstream/main
     const edit = page.getByRole('menuitem', { name: 'Edit message', exact: true });
     await expect(edit).toBeVisible();
     await edit.click();
@@ -557,7 +707,11 @@ test.describe('mid-run steering and queuing', () => {
     await expect(followupReply.locator('.agent-turn')).toBeVisible();
   });
 
+<<<<<<< HEAD
   test('interrupt & send (Alt+Enter) stops the run and auto-sends the text as the next turn', async ({
+=======
+  test('Interrupt (Alt+Enter) keeps completed text and continues the same response', async ({
+>>>>>>> upstream/main
     page,
   }) => {
     test.setTimeout(120000);
@@ -577,6 +731,7 @@ test.describe('mid-run steering and queuing', () => {
     await typeDuringRun(page, interruptText);
     await messageInput(page).press('Alt+Enter');
 
+<<<<<<< HEAD
     // The abort settles and the text auto-sends as the next user turn.
     await expect(messageTurns(page)).toHaveCount(6, { timeout: 60000 });
     const interruptTurn = messageTurns(page).nth(4);
@@ -587,13 +742,26 @@ test.describe('mid-run steering and queuing', () => {
     const freshReply = messageTurns(page).nth(5);
     await expect(freshReply).toContainText(MOCK_REPLY_TEXT, { timeout: 30000 });
     await expect(freshReply.locator('.agent-turn')).toBeVisible();
+=======
+    await expect(appliedSteerParts(page).filter({ hasText: interruptText })).toHaveCount(1);
+    await expect(messageTurns(page)).toHaveCount(4);
+    await expect(messagesView(page).getByText('chunk-010')).toBeVisible();
+    await expect(messagesView(page).getByText(`[steers-seen=1] ${interruptText}`)).toBeVisible();
+    await expect(
+      messagesView(page).getByText(`${SLOW_REPLY_CONTINUATION_TEXT} ${label}`),
+    ).toBeVisible();
+>>>>>>> upstream/main
 
     // The interrupted response was stopped mid-stream: its final chunk never
     // arrived (an uninterrupted slow run always ends with it).
     await expect(messagesView(page).getByText(SLOW_REPLY_LAST_CHUNK)).toHaveCount(0);
   });
 
+<<<<<<< HEAD
   test('interrupt & send drains after a created response with no persistable content', async ({
+=======
+  test('Interrupt restarts a silent attempt and preserves the response parent', async ({
+>>>>>>> upstream/main
     page,
   }) => {
     test.setTimeout(120000);
@@ -632,6 +800,7 @@ test.describe('mid-run steering and queuing', () => {
       .toBe(true);
 
     await typeDuringRun(page, interruptText);
+<<<<<<< HEAD
     const [abortResponse] = await Promise.all([
       page.waitForResponse(
         (response) =>
@@ -653,6 +822,32 @@ test.describe('mid-run steering and queuing', () => {
     /** The empty assistant is a durable parent, not merely the optimistic
      * row that the created handler rendered. Without that row an underscore
      * preliminary id can reject this same queued submission. */
+=======
+    const [steerResponse] = await Promise.all([
+      page.waitForResponse(isSteerRequest),
+      messageInput(page).press('Alt+Enter'),
+    ]);
+    expect(steerResponse.status()).toBe(202);
+    await expect(messagesView(page).getByText(`E2E empty reply continued ${label}`)).toBeVisible();
+    await expect(messagesView(page).getByText(`[steers-seen=1] ${interruptText}`)).toBeVisible();
+    await expect(appliedSteerParts(page).filter({ hasText: interruptText })).toHaveCount(1);
+    await expect(messageTurns(page)).toHaveCount(4);
+
+    await expect
+      .poll(async () => {
+        const records = await requestJson<PersistedMessage[]>(page, {
+          path: messagesPath,
+          token: accessToken,
+        });
+        return records.some(
+          (message) =>
+            message.isCreatedByUser === false &&
+            message.unfinished !== true &&
+            JSON.stringify(message.content).includes(interruptText),
+        );
+      })
+      .toBe(true);
+>>>>>>> upstream/main
     const persisted = await requestJson<PersistedMessage[]>(page, {
       path: messagesPath,
       token: accessToken,
@@ -661,6 +856,7 @@ test.describe('mid-run steering and queuing', () => {
       (message) => message.isCreatedByUser === true && message.text === emptyRunPrompt,
     );
     expect(interruptedUser).toBeTruthy();
+<<<<<<< HEAD
     expect(
       persisted.find(
         (message) =>
@@ -687,6 +883,165 @@ test.describe('mid-run steering and queuing', () => {
    * above), and interrupt & send discards the half-written answer entirely.
    * This path does neither: same absence of a boundary, opposite outcome.
    */
+=======
+    const continued = persisted.find(
+      (message) =>
+        message.isCreatedByUser === false && message.parentMessageId === interruptedUser?.messageId,
+    );
+    expect(continued).toBeTruthy();
+    expect(continued?.unfinished).not.toBe(true);
+    expect(JSON.stringify(continued?.content)).toContain(interruptText);
+    await expect(queuedRows(page)).toHaveCount(0);
+  });
+
+  test('Stop before the first token saves the follow-up from the new composer', async ({
+    page,
+  }) => {
+    const label = uniqueLabel('stop-before-token');
+    await page.goto(NEW_CHAT_PATH, { timeout: 10000 });
+    await selectMockEndpoint(page, MOCK_ENDPOINTS[0]);
+
+    let releaseStatus = () => {};
+    const statusGate = new Promise<void>((resolve) => {
+      releaseStatus = resolve;
+    });
+    await page.route('**/api/agents/chat/status/**', async (route) => {
+      const response = await route.fetch();
+      await statusGate;
+      await route.fulfill({ response });
+    });
+
+    await sendMessage(page, `E2E_PRE_TOKEN_REPLY:${label}`);
+    const [abortResponse] = await Promise.all([
+      page.waitForResponse(
+        (response) =>
+          response.request().method() === 'POST' &&
+          new URL(response.url()).pathname === '/api/agents/chat/abort',
+      ),
+      page.getByTestId('stop-generation-button').click(),
+    ]);
+    try {
+      expect(abortResponse.ok()).toBeTruthy();
+      await expect(page.getByText('Generating a reply…', { exact: true })).toBeVisible();
+    } finally {
+      releaseStatus();
+    }
+    await expect(page.getByText('Generating a reply…', { exact: true })).toHaveCount(0);
+    const stoppedTurns = await messageTurns(page).count();
+    expect([0, 2]).toContain(stoppedTurns);
+    await expect(page).toHaveURL(stoppedTurns === 0 ? /\/c\/new$/ : /\/c\/[0-9a-fA-F-]{36}$/);
+
+    const followUp = replyPrompt(`after-${label}`);
+    const followUpStart = await sendMessage(page, followUp);
+    const { streamId: conversationId } = (await followUpStart.json()) as { streamId: string };
+    await expect(messagesView(page).getByText(replyText(`after-${label}`))).toBeVisible();
+    const persisted = await requestJson<PersistedMessage[]>(page, {
+      path: `/api/messages/${encodeURIComponent(conversationId)}`,
+      token: await getAccessToken(page),
+    });
+    expect(persisted.some((message) => message.isCreatedByUser && message.text === followUp)).toBe(
+      true,
+    );
+    await page.reload();
+    await expect(messageTurns(page)).toHaveCount(stoppedTurns + 2);
+    await expect(messagesView(page).getByText(replyText(`after-${label}`))).toBeVisible();
+  });
+
+  for (const startingPoint of ['new', 'existing'] as const) {
+    test(`Stop preserves an empty response parent in a ${startingPoint} chat`, async ({ page }) => {
+      test.setTimeout(120000);
+      const label = uniqueLabel('stop-empty');
+      const emptyRunPrompt = `E2E_EMPTY_SLOW_REPLY:${label}`;
+      const interruptText = `Interrupt empty follow-up ${label}`;
+
+      await page.goto(NEW_CHAT_PATH, { timeout: 10000 });
+      await selectMockEndpoint(page, MOCK_ENDPOINTS[0]);
+      if (startingPoint === 'existing') {
+        await establishConversation(page, `interrupt-empty-setup-${label}`);
+      }
+
+      const run = await sendMessage(page, emptyRunPrompt);
+      expect(run.ok()).toBeTruthy();
+      const { streamId: conversationId } = (await run.json()) as { streamId: string };
+      const accessToken = await getAccessToken(page);
+      const messagesPath = `/api/messages/${encodeURIComponent(conversationId)}`;
+
+      /** BaseClient starts its user-row write only after `onStart` emitted
+       * `created`. Waiting for that row proves the server is in the exact
+       * created-but-still-whitespace state, without relying on a sleep. */
+      await expect
+        .poll(
+          async () => {
+            const persisted = await requestJson<PersistedMessage[]>(page, {
+              path: messagesPath,
+              token: accessToken,
+            });
+            return persisted.some(
+              (message) => message.isCreatedByUser === true && message.text === emptyRunPrompt,
+            );
+          },
+          { timeout: 30000 },
+        )
+        .toBe(true);
+
+      let releaseStatus = () => {};
+      const statusGate = new Promise<void>((resolve) => {
+        releaseStatus = resolve;
+      });
+      await page.route('**/api/agents/chat/status/**', async (route) => {
+        const response = await route.fetch();
+        await statusGate;
+        await route.fulfill({ response });
+      });
+
+      const [abortResponse] = await Promise.all([
+        page.waitForResponse(
+          (response) =>
+            response.request().method() === 'POST' &&
+            new URL(response.url()).pathname === '/api/agents/chat/abort',
+        ),
+        page.getByTestId('stop-generation-button').click(),
+      ]);
+      try {
+        expect(abortResponse.ok()).toBeTruthy();
+        await expect(page.getByText('Generating a reply…', { exact: true })).toBeVisible();
+      } finally {
+        releaseStatus();
+      }
+      await expect(page.getByText('Generating a reply…', { exact: true })).toHaveCount(0);
+      await sendMessage(page, interruptText);
+      const expectedTurns = startingPoint === 'existing' ? 6 : 4;
+      await expect(messageTurns(page)).toHaveCount(expectedTurns);
+      await expect(messageTurns(page).last()).toContainText(MOCK_REPLY_TEXT);
+
+      const persisted = await requestJson<PersistedMessage[]>(page, {
+        path: messagesPath,
+        token: accessToken,
+      });
+      const interruptedUser = persisted.find(
+        (message) => message.isCreatedByUser === true && message.text === emptyRunPrompt,
+      );
+      expect(interruptedUser).toBeTruthy();
+      expect(
+        persisted.find(
+          (message) =>
+            message.isCreatedByUser === false &&
+            message.parentMessageId === interruptedUser?.messageId,
+        ),
+      ).toMatchObject({ content: [], unfinished: true });
+      const followUp = persisted.find(
+        (message) => message.isCreatedByUser === true && message.text === interruptText,
+      );
+      expect(followUp).toBeTruthy();
+      await page.reload();
+      await expect(messageTurns(page)).toHaveCount(expectedTurns);
+      await expect(messageTurns(page).last()).toContainText(MOCK_REPLY_TEXT);
+      await expect(queuedRows(page)).toHaveCount(0);
+    });
+  }
+
+  /** The other interrupt chord uses the same no-tool-boundary continuation. */
+>>>>>>> upstream/main
   test('interrupt & steer (Cmd/Ctrl+Shift+Enter) seals mid-stream and injects with no tool boundary', async ({
     page,
   }) => {

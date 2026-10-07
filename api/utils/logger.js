@@ -10,7 +10,11 @@ if (useFileLogging) {
 }
 
 const logger = winston.createLogger({
+<<<<<<< HEAD
   level: process.env.LOG_LEVEL || 'info',
+=======
+  level: 'info',
+>>>>>>> upstream/main
   format: winston.format.combine(winston.format.timestamp(), winston.format.json()),
   transports,
 });

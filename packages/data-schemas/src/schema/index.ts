@@ -21,6 +21,10 @@ export { default as promptGroupSchema } from './promptGroup';
 export { default as openidRefreshFlightSchema } from './openidRefreshFlight';
 export { default as refreshTokenBridgeSchema } from './refreshTokenBridge';
 export { default as roleSchema } from './role';
+<<<<<<< HEAD
+=======
+export { default as passkeySchema } from './passkey';
+>>>>>>> upstream/main
 export { default as sessionSchema } from './session';
 export { default as shareSchema } from './share';
 export { default as skillSyncCredentialSchema } from './skillSyncCredential';

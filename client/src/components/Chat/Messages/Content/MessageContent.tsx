@@ -1,7 +1,12 @@
 import { memo, Suspense, useMemo } from 'react';
 import { useRecoilValue } from 'recoil';
+<<<<<<< HEAD
 import { Constants } from 'librechat-data-provider';
 import { Alert, DelayedRender } from '@librechat/client';
+=======
+import { Alert, DelayedRender } from '@librechat/client';
+import { Constants, parseThinkingContent } from 'librechat-data-provider';
+>>>>>>> upstream/main
 import type { TMessage } from 'librechat-data-provider';
 import type { TMessageContentProps, TDisplayProps } from '~/common';
 import useSmoothStreaming from '~/hooks/Messages/useSmoothStreaming';
@@ -23,6 +28,7 @@ const ERROR_CONNECTION_TEXT = 'Error connecting to server, try refreshing the pa
 const DELAYED_ERROR_TIMEOUT = 5500;
 const UNFINISHED_DELAY = 250;
 
+<<<<<<< HEAD
 const parseThinkingContent = (text: string) => {
   const thinkingMatch = text.match(/:::thinking([\s\S]*?):::/);
   return {
@@ -31,6 +37,8 @@ const parseThinkingContent = (text: string) => {
   };
 };
 
+=======
+>>>>>>> upstream/main
 const LoadingFallback = () => (
   <div className="mb-[0.625rem]">
     <EmptyText underHeaderIcon />
@@ -48,7 +56,11 @@ const ErrorBox = ({
     role="alert"
     aria-live="assertive"
     className={cn(
+<<<<<<< HEAD
       'rounded-xl border border-status-error-border bg-status-error-subtle p-3 text-sm text-text-secondary',
+=======
+      'border-status-error-border bg-status-error-subtle text-text-secondary rounded-xl border p-3 text-sm',
+>>>>>>> upstream/main
       className,
     )}
   >
@@ -69,7 +81,12 @@ const ConnectionError = ({ message }: { message?: TMessage }) => {
           <Alert
             variant="error"
             icon={false}
+<<<<<<< HEAD
             className="mt-2 text-text-secondary shadow-sm transition-all"
+=======
+            elevation="raised"
+            className="text-text-secondary mt-2 transition-all"
+>>>>>>> upstream/main
           >
             {localize('com_ui_error_connection')}
           </Alert>
@@ -97,7 +114,11 @@ export const ErrorMessage = ({
   );
 };
 
+<<<<<<< HEAD
 const DisplayMessage = ({ text, isCreatedByUser, message, showCursor }: TDisplayProps) => {
+=======
+export const DisplayMessage = ({ text, isCreatedByUser, message, showCursor }: TDisplayProps) => {
+>>>>>>> upstream/main
   const { isSubmitting = false, isLatestMessage = false } = useMessageContext();
   const enableUserMsgMarkdown = useRecoilValue(store.enableUserMsgMarkdown);
   const collapseLongUserMessages = useRecoilValue(store.collapseLongUserMessages);

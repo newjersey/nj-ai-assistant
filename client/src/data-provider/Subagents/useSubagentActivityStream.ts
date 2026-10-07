@@ -1,5 +1,11 @@
+<<<<<<< HEAD
 import { useEffect, useRef } from 'react';
 import { SSE } from 'sse.js';
+=======
+import { useEffect, useMemo, useRef } from 'react';
+import { SSE } from 'sse.js';
+import { selectAtom } from 'jotai/utils';
+>>>>>>> upstream/main
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useQueryClient } from '@tanstack/react-query';
 import { QueryKeys, StepEvents, apiBaseUrl } from 'librechat-data-provider';
@@ -8,6 +14,10 @@ import type { ActiveSubagentPanel } from '~/components/Chat/Subagents/state';
 import {
   closeParentSubagentProgress,
   reduceSubagentProgress,
+<<<<<<< HEAD
+=======
+  reduceSubagentReplay,
+>>>>>>> upstream/main
   registerSubagentProgressKey,
   subagentParentStreamOpenByToolCallId,
   subagentProgressByToolCallId,
@@ -20,6 +30,10 @@ type ActivityEnvelope = {
   data?: unknown;
   final?: unknown;
   subagentActivity?: unknown;
+<<<<<<< HEAD
+=======
+  droppedCount?: unknown;
+>>>>>>> upstream/main
 };
 
 const INITIAL_RECONNECT_MS = 500;
@@ -39,7 +53,11 @@ const isSubagentUpdate = (value: unknown): value is SubagentUpdateEvent => {
   );
 };
 
+<<<<<<< HEAD
 /** Live-only enhancement for the selected durable child; the durable query remains canonical. */
+=======
+/** Replay-then-live enhancement for the selected durable child; the durable query remains canonical. */
+>>>>>>> upstream/main
 export default function useSubagentActivityStream(
   selection: ActiveSubagentPanel,
   enabled = true,
@@ -51,6 +69,17 @@ export default function useSubagentActivityStream(
     selection.event?.progressKey ?? selection.toolCallId,
     selection.partIndex,
   );
+<<<<<<< HEAD
+=======
+  const replayFrom = useAtomValue(
+    useMemo(
+      () =>
+        selectAtom(subagentProgressByToolCallId(key), (progress) => progress?.activityReplayFrom),
+      [key],
+    ),
+  );
+  const reconnectRef = useRef<(() => void) | undefined>();
+>>>>>>> upstream/main
   const setProgress = useSetAtom(subagentProgressByToolCallId(key));
   const parentStreamOpen = useAtomValue(subagentParentStreamOpenByToolCallId(key));
   const setParentStreamOpen = useSetAtom(subagentParentStreamOpenByToolCallId(key));
@@ -67,6 +96,13 @@ export default function useSubagentActivityStream(
   }, [parentStreamOpen, setProgress]);
 
   useEffect(() => {
+<<<<<<< HEAD
+=======
+    if (replayFrom != null && !parentStreamOpen) reconnectRef.current?.();
+  }, [replayFrom, parentStreamOpen]);
+
+  useEffect(() => {
+>>>>>>> upstream/main
     if (!selection.isSubmitting) return;
     registerSubagentProgressKey(key);
     parentStreamOpenRef.current = true;
@@ -121,6 +157,31 @@ export default function useSubagentActivityStream(
           void queryClient.invalidateQueries(queryKey);
           return;
         }
+<<<<<<< HEAD
+=======
+        if (envelope.event === 'subagent_activity_replay' && Array.isArray(envelope.data)) {
+          const replay = envelope.data as ActivityEnvelope[];
+          const events = replay.flatMap((entry) =>
+            entry.event === StepEvents.ON_SUBAGENT_UPDATE && isSubagentUpdate(entry.data)
+              ? [
+                  {
+                    ...entry.data,
+                    activityDroppedCount:
+                      Number.isSafeInteger(entry.droppedCount) && (entry.droppedCount as number) > 0
+                        ? (entry.droppedCount as number)
+                        : undefined,
+                  },
+                ]
+              : [],
+          );
+          registerSubagentProgressKey(key);
+          setProgress((previous) =>
+            reduceSubagentReplay(previous, events, parentStreamOpenRef.current),
+          );
+          retryAttempt = 0;
+          return;
+        }
+>>>>>>> upstream/main
         const event = envelope.data;
         if (envelope.event !== StepEvents.ON_SUBAGENT_UPDATE || !isSubagentUpdate(event)) {
           return;
@@ -135,6 +196,7 @@ export default function useSubagentActivityStream(
         retryAttempt = 0;
         registerSubagentProgressKey(key);
         setProgress((previous) =>
+<<<<<<< HEAD
           reduceSubagentProgress(previous, [event], 'detached', parentStreamOpenRef.current),
         );
       });
@@ -149,6 +211,41 @@ export default function useSubagentActivityStream(
 
     connect();
     return () => {
+=======
+          reduceSubagentProgress(
+            previous,
+            [
+              {
+                ...event,
+                activityDroppedCount:
+                  Number.isSafeInteger(envelope.droppedCount) &&
+                  (envelope.droppedCount as number) > 0
+                    ? (envelope.droppedCount as number)
+                    : undefined,
+              },
+            ],
+            'detached',
+            parentStreamOpenRef.current || previous?.activityReplayFrom != null,
+          ),
+        );
+      });
+      next.addEventListener('error', () => {
+        if (stream === next) reconnect();
+      });
+    };
+
+    const reconnect = () => {
+      if (disposed || terminal || retryTimer != null) return;
+      closeCurrent();
+      const delay = Math.min(INITIAL_RECONNECT_MS * 2 ** retryAttempt, MAX_RECONNECT_MS);
+      retryAttempt += 1;
+      retryTimer = setTimeout(connect, delay);
+    };
+    reconnectRef.current = reconnect;
+    connect();
+    return () => {
+      if (reconnectRef.current === reconnect) reconnectRef.current = undefined;
+>>>>>>> upstream/main
       disposed = true;
       if (retryTimer != null) clearTimeout(retryTimer);
       closeCurrent();

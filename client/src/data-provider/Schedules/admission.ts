@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+import { fetchConvoSnapshot } from '~/utils/convos';
+>>>>>>> upstream/main
 /* Scheduled chats */
 import { QueryKeys, dataService } from 'librechat-data-provider';
 import type { TUser, TConversation } from 'librechat-data-provider';
@@ -111,7 +115,13 @@ async function admit(queryClient: QueryClient, conversationId: string): Promise<
     }
     let conversation: TConversation;
     try {
+<<<<<<< HEAD
       conversation = await dataService.getConversationById(conversationId);
+=======
+      conversation = await fetchConvoSnapshot(queryClient, conversationId, () =>
+        dataService.getConversationById(conversationId),
+      );
+>>>>>>> upstream/main
     } catch (error) {
       if (isTerminalProbeFailure(error)) {
         return false;
@@ -138,7 +148,11 @@ async function admit(queryClient: QueryClient, conversationId: string): Promise<
       [QueryKeys.conversation, conversationId],
       (current) => current ?? conversation,
     );
+<<<<<<< HEAD
     upsertConvoInAllQueries(queryClient, conversation);
+=======
+    upsertConvoInAllQueries(queryClient, conversation, true, 'snapshot');
+>>>>>>> upstream/main
     /** The same bookkeeping the foreground path does when a chat lands in a
      *  project: the project's count and recent-activity ordering live on the
      *  project rows, which the conversation caches above do not touch. */

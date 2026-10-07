@@ -56,7 +56,11 @@ export default function NavToggle({
         className,
         '-translate-y-1/2 transition-transform',
         navVisible ? 'rotate-0' : 'rotate-180',
+<<<<<<< HEAD
         navVisible && translateX ? 'translate-x-[260px]' : 'translate-x-0',
+=======
+        navVisible && translateX ? 'translate-x-[16.25rem]' : 'translate-x-0',
+>>>>>>> upstream/main
       )}
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
@@ -76,13 +80,21 @@ export default function NavToggle({
       >
         <span className="" data-state="closed">
           <div
+<<<<<<< HEAD
             className="flex h-[72px] w-8 items-center justify-center"
+=======
+            className="flex h-[4.5rem] w-8 items-center justify-center"
+>>>>>>> upstream/main
             style={{ ...transition, opacity: isHovering ? 1 : 0.25 }}
           >
             <div className="flex h-6 w-6 flex-col items-center">
               {/* Top bar */}
               <div
+<<<<<<< HEAD
                 className="h-3 w-1 rounded-full bg-surface-inverted"
+=======
+                className="bg-surface-inverted h-3 w-1 rounded-full"
+>>>>>>> upstream/main
                 style={{
                   ...transition,
                   transform: `translateY(0.15rem) rotate(${topBarRotation}) translateZ(0px)`,
@@ -90,7 +102,11 @@ export default function NavToggle({
               />
               {/* Bottom bar */}
               <div
+<<<<<<< HEAD
                 className="h-3 w-1 rounded-full bg-surface-inverted"
+=======
+                className="bg-surface-inverted h-3 w-1 rounded-full"
+>>>>>>> upstream/main
                 style={{
                   ...transition,
                   transform: `translateY(-0.15rem) rotate(${bottomBarRotation}) translateZ(0px)`,

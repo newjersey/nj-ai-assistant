@@ -87,7 +87,11 @@ export default function VariablesDropdown({
               </div>
               <div className="min-w-0 flex-1">
                 <span className={`text-sm font-medium ${labelClass}`}>{localize(labelKey)}</span>
+<<<<<<< HEAD
                 <p className="mt-0.5 text-xs text-text-secondary">{localize(descKey)}</p>
+=======
+                <p className="text-text-secondary mt-0.5 text-xs">{localize(descKey)}</p>
+>>>>>>> upstream/main
               </div>
             </div>
           ),
@@ -122,12 +126,20 @@ export default function VariablesDropdown({
             aria-label={localize('com_ui_add_special_variables')}
             className={`group flex h-8 items-center gap-1.5 rounded-lg bg-transparent px-2 text-sm ${buttonClass}`}
           >
+<<<<<<< HEAD
             <Sparkles className="size-3.5 text-text-secondary" aria-hidden="true" />
+=======
+            <Sparkles className="text-text-secondary size-3.5" aria-hidden="true" />
+>>>>>>> upstream/main
             <span className="hidden text-xs font-medium sm:inline">
               {localize('com_ui_special_variables')}
             </span>
             {usedCount > 0 && (
+<<<<<<< HEAD
               <span className="flex size-4 items-center justify-center rounded-full bg-surface-tertiary text-[10px] font-medium text-text-secondary">
+=======
+              <span className="bg-surface-tertiary text-text-secondary flex size-4 items-center justify-center rounded-full text-[10px] font-medium">
+>>>>>>> upstream/main
                 {usedCount}
               </span>
             )}
@@ -139,7 +151,11 @@ export default function VariablesDropdown({
         }
         items={items}
         menuId={menuId}
+<<<<<<< HEAD
         className="z-50 w-64"
+=======
+        className="z-50 w-[min(16rem,90vw)]"
+>>>>>>> upstream/main
         itemClassName="px-2 py-1"
       />
     </div>

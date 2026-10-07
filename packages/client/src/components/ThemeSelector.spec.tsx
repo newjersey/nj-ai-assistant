@@ -145,8 +145,12 @@ describe('ThemeSelector contrast toggle', () => {
     const toggle = screen.getByRole('button', { name: 'com_ui_toggle_high_contrast' });
     expect(toggle).toHaveAttribute('aria-pressed', 'false');
     fireEvent.click(toggle);
+<<<<<<< HEAD
     // NJ: We don't support dark mode; the rendered scheme resolves to light
     expect(setTheme).toHaveBeenCalledWith('high-contrast-light');
+=======
+    expect(setTheme).toHaveBeenCalledWith('high-contrast-dark');
+>>>>>>> upstream/main
   });
 
   it('turns an explicit contrast mode back off', () => {

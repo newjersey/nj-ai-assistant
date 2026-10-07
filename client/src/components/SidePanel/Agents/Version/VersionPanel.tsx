@@ -1,11 +1,20 @@
+<<<<<<< HEAD
 import { useCallback, useEffect, useMemo, useRef } from 'react';
+=======
+import { useCallback, useMemo } from 'react';
+>>>>>>> upstream/main
 import { ChevronLeft } from 'lucide-react';
 import { Button, useToastContext } from '@librechat/client';
 import type { AgentWithVersions, VersionContext, VersionRecord } from './types';
 import {
   useGetAgentVersionsQuery,
+<<<<<<< HEAD
   useGetExpandedAgentByIdQuery,
   useRevertAgentVersionMutation,
+=======
+  useRevertAgentVersionMutation,
+  useGetExpandedAgentByIdQuery,
+>>>>>>> upstream/main
 } from '~/data-provider';
 import { isActiveVersion } from './isActiveVersion';
 import { useAgentPanelContext } from '~/Providers';
@@ -54,6 +63,10 @@ export default function VersionPanel() {
       name: agentWithVersions.name,
       description: agentWithVersions.description,
       instructions: agentWithVersions.instructions,
+<<<<<<< HEAD
+=======
+      instructionsPrompt: agentWithVersions.instructionsPrompt,
+>>>>>>> upstream/main
       artifacts: agentWithVersions.artifacts,
       capabilities: agentWithVersions.capabilities,
       tools: agentWithVersions.tools,
@@ -114,12 +127,15 @@ export default function VersionPanel() {
     [versions, versionIds, currentAgent, selectedAgentId, activeVersion],
   );
 
+<<<<<<< HEAD
   const panelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     panelRef.current?.focus();
   }, []);
 
+=======
+>>>>>>> upstream/main
   const handleRestore = useCallback(
     (displayIndex: number) => {
       const versionWithId = versionIds.find((v) => v.id === displayIndex);
@@ -146,6 +162,7 @@ export default function VersionPanel() {
       : null;
 
   return (
+<<<<<<< HEAD
     <div className="scrollbar-gutter-stable h-full min-h-[40vh] overflow-auto pb-12 text-sm">
       <header className="grid grid-cols-[auto_1fr_auto] items-center gap-2 px-2 pb-2 pt-1">
         <Button
@@ -154,20 +171,46 @@ export default function VersionPanel() {
           onClick={() => setActivePanel(Panel.builder)}
           aria-label={localize('com_ui_back_to_builder')}
           className="flex-shrink-0 text-text-secondary hover:text-text-primary"
+=======
+    <div className="h-full min-h-[40vh] scrollbar-gutter-stable overflow-auto pb-12 text-sm">
+      <header className="grid grid-cols-[auto_1fr_auto] items-center gap-2 px-2 pt-1 pb-2">
+        <Button
+          variant="subtle"
+          size="icon"
+          shape="theme"
+          onClick={() => setActivePanel(Panel.builder)}
+          aria-label={localize('com_ui_back_to_builder')}
+          className="text-text-secondary hover:text-text-primary shrink-0"
+>>>>>>> upstream/main
         >
           <ChevronLeft className="h-5 w-5" strokeWidth={1.75} aria-hidden="true" />
         </Button>
         <div className="flex flex-col items-center">
+<<<<<<< HEAD
           <h2 className="text-base font-semibold text-text-primary">
             {localize('com_ui_agent_version_history')}
           </h2>
           {countLabel && (
             <p className="text-xs text-text-secondary" aria-live="polite">
+=======
+          <h2 className="text-text-primary text-base font-semibold">
+            {localize('com_ui_agent_version_history')}
+          </h2>
+          {countLabel && (
+            <p className="text-text-secondary text-xs" aria-live="polite">
+>>>>>>> upstream/main
               {countLabel}
             </p>
           )}
         </div>
+<<<<<<< HEAD
         <span aria-hidden="true" className="h-10 w-10" />
+=======
+        <span
+          aria-hidden="true"
+          className="size-theme-button min-h-theme-target min-w-theme-target"
+        />
+>>>>>>> upstream/main
       </header>
       <div className="flex flex-col px-2 pt-2">
         <VersionContent

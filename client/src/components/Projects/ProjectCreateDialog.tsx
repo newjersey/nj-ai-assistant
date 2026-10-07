@@ -22,7 +22,11 @@ import {
   useToastContext,
 } from '@librechat/client';
 import type { TChatProject } from 'librechat-data-provider';
+<<<<<<< HEAD
 import { useCreateProjectMutation } from '~/data-provider';
+=======
+import { useCreateProjectMutation, useGetStartupConfig } from '~/data-provider';
+>>>>>>> upstream/main
 import { useLocalize } from '~/hooks';
 
 type ProjectCreateDialogProps = {
@@ -46,6 +50,12 @@ export default function ProjectCreateDialog({
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const createProject = useCreateProjectMutation();
+<<<<<<< HEAD
+=======
+  const { data: startupConfig } = useGetStartupConfig();
+  const descriptionLimit =
+    startupConfig?.projects?.maxDescriptionLength ?? MAX_CHAT_PROJECT_DESCRIPTION_LENGTH;
+>>>>>>> upstream/main
   const { showToast } = useToastContext();
 
   useEffect(() => {
@@ -102,7 +112,11 @@ export default function ProjectCreateDialog({
         main={
           <form id={formId} onSubmit={handleCreate} className="flex flex-col gap-4">
             <div className="space-y-2">
+<<<<<<< HEAD
               <Label htmlFor={`${formId}-name`} className="text-sm font-medium text-text-primary">
+=======
+              <Label htmlFor={`${formId}-name`} className="text-text-primary text-sm font-medium">
+>>>>>>> upstream/main
                 {localize('com_ui_project_name')}
               </Label>
               <Input
@@ -118,10 +132,17 @@ export default function ProjectCreateDialog({
             <div className="space-y-2">
               <Label
                 htmlFor={`${formId}-description`}
+<<<<<<< HEAD
                 className="text-sm font-medium text-text-primary"
               >
                 {localize('com_ui_description')}{' '}
                 <span className="font-normal text-text-secondary">
+=======
+                className="text-text-primary text-sm font-medium"
+              >
+                {localize('com_ui_description')}{' '}
+                <span className="text-text-secondary font-normal">
+>>>>>>> upstream/main
                   {localize('com_ui_optional')}
                 </span>
               </Label>
@@ -130,7 +151,11 @@ export default function ProjectCreateDialog({
                 value={description}
                 onChange={(event) => setDescription(event.target.value)}
                 rows={3}
+<<<<<<< HEAD
                 maxLength={MAX_CHAT_PROJECT_DESCRIPTION_LENGTH}
+=======
+                maxLength={descriptionLimit}
+>>>>>>> upstream/main
                 className="min-h-[4.5rem] bg-transparent"
               />
             </div>

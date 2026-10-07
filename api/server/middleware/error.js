@@ -1,8 +1,18 @@
 const crypto = require('crypto');
 const { logger } = require('@librechat/data-schemas');
 const { parseConvo } = require('librechat-data-provider');
+<<<<<<< HEAD
 const { sendEvent, handleError, sanitizeMessageForTransmit } = require('@librechat/api');
 const { saveMessage, getMessages, getConvo } = require('~/models');
+=======
+const {
+  sendEvent,
+  handleError,
+  announceErrorTurn,
+  sanitizeMessageForTransmit,
+} = require('@librechat/api');
+const { saveMessage, getMessages, getConvo, stampConvoLastResponse } = require('~/models');
+>>>>>>> upstream/main
 
 /**
  * Processes an error with provided options, saves the error message and sends a corresponding SSE response
@@ -47,10 +57,18 @@ const sendError = async (req, res, options, callback) => {
   }
 
   if (shouldSaveMessage) {
+<<<<<<< HEAD
     await saveMessage(
       {
         userId: req?.user?.id,
         isTemporary: req?.resolvedConversation?.isTemporary ?? req?.body?.isTemporary,
+=======
+    const isTemporary = req?.resolvedConversation?.isTemporary ?? req?.body?.isTemporary;
+    const savedError = await saveMessage(
+      {
+        userId: req?.user?.id,
+        isTemporary,
+>>>>>>> upstream/main
         expiredAt: req?.resolvedConversation?.expiredAt,
         interfaceConfig: req?.config?.interfaceConfig,
       },
@@ -59,6 +77,22 @@ const sendError = async (req, res, options, callback) => {
         context: 'api/server/utils/streamResponse.js - sendError',
       },
     );
+<<<<<<< HEAD
+=======
+    const conversation = await announceErrorTurn(
+      { stampConvoLastResponse },
+      {
+        userId: req?.user?.id ?? user,
+        conversationId,
+        messageId: savedError?.messageId,
+        isTemporary: isTemporary === true,
+        context: 'sendError',
+      },
+    );
+    if (conversation) {
+      errorMessage.conversation = conversation;
+    }
+>>>>>>> upstream/main
   }
 
   if (!errorMessage.error) {

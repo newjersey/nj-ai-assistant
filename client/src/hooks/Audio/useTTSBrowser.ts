@@ -61,7 +61,13 @@ const useTTSBrowser = (props?: TUseTextToSpeech) => {
       if (isMouseDownRef.current) {
         const messageContent = content ?? '';
         const parsedMessage =
+<<<<<<< HEAD
           typeof messageContent === 'string' ? messageContent : parseTextParts(messageContent);
+=======
+          typeof messageContent === 'string'
+            ? messageContent
+            : parseTextParts(messageContent, true);
+>>>>>>> upstream/main
         generateSpeech(parsedMessage);
       }
     }, 1000);
@@ -81,7 +87,11 @@ const useTTSBrowser = (props?: TUseTextToSpeech) => {
     } else {
       const messageContent = content ?? '';
       const parsedMessage =
+<<<<<<< HEAD
         typeof messageContent === 'string' ? messageContent : parseTextParts(messageContent);
+=======
+        typeof messageContent === 'string' ? messageContent : parseTextParts(messageContent, true);
+>>>>>>> upstream/main
       generateSpeech(parsedMessage);
     }
   };

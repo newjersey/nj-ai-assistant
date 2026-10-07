@@ -99,7 +99,11 @@ export interface PromptRecordInput {
   readonly description?: string;
   readonly oneliner?: string;
   readonly category?: string;
+<<<<<<< HEAD
   readonly command?: string;
+=======
+  readonly command?: string | null;
+>>>>>>> upstream/main
 }
 
 interface PromptRecordContentInput extends Omit<PromptRecordInput, 'prompt'> {

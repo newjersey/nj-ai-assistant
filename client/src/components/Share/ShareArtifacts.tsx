@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { lazy, Suspense, useState, useMemo } from 'react';
 import { useRecoilValue } from 'recoil';
 import {
@@ -14,6 +15,28 @@ import { getLatestText } from '~/utils';
 import store from '~/store';
 
 const Artifacts = lazy(() => import('~/components/Artifacts/Artifacts'));
+=======
+import { Suspense, useState, useMemo } from 'react';
+import { useAtomValue } from 'jotai';
+import { useRecoilValue } from 'recoil';
+import { ResizablePanel, ResizableHandleAlt, ResizablePanelGroup } from '@librechat/client';
+import type { TMessage } from 'librechat-data-provider';
+import type { ArtifactsContextValue } from '~/Providers';
+import useArtifactsRegistryLifetime from '~/hooks/Artifacts/useArtifactsRegistryLifetime';
+import UndockedArtifacts from '~/components/Artifacts/UndockedArtifacts';
+import { artifactsUndocked } from '~/components/Artifacts/state';
+import { ArtifactsProvider, EditorProvider } from '~/Providers';
+import { ARTIFACTS_SHEET_MAX_WIDTH } from '~/utils/breakpoints';
+import { useGetSharedStartupConfig } from '~/data-provider';
+import useScaledMaxWidth from '~/hooks/useScaledMaxWidth';
+import { isCodeOnlyArtifact } from '~/utils/artifacts';
+import { lazyWithRecovery } from '~/lib/assets/lazy';
+import { useShareContext } from '~/Providers';
+import { getLatestText } from '~/utils';
+import store from '~/store';
+
+const Artifacts = lazyWithRecovery(() => import('~/components/Artifacts/Artifacts'));
+>>>>>>> upstream/main
 
 const DEFAULT_ARTIFACT_PANEL_SIZE = 40;
 const SHARE_ARTIFACT_PANEL_STORAGE_KEY = 'share:artifacts-panel-size';
@@ -43,7 +66,11 @@ const getInitialArtifactPanelSize = () => {
 
 interface ShareArtifactsContainerProps {
   messages: TMessage[];
+<<<<<<< HEAD
   conversationId: string;
+=======
+  conversationId: string | null | undefined;
+>>>>>>> upstream/main
   mainContent: React.ReactNode;
 }
 
@@ -58,8 +85,31 @@ export function ShareArtifactsContainer({
   const artifacts = useRecoilValue(store.artifactsState);
   const artifactsVisibility = useRecoilValue(store.artifactsVisibility);
   const currentArtifactId = useRecoilValue(store.currentArtifactId);
+<<<<<<< HEAD
   const isSmallScreen = useMediaQuery('(max-width: 1023px)');
   const [artifactPanelSize, setArtifactPanelSize] = useState(getInitialArtifactPanelSize);
+=======
+  const isSmallScreen = useScaledMaxWidth(ARTIFACTS_SHEET_MAX_WIDTH);
+  const isUndocked = useAtomValue(artifactsUndocked);
+  const [artifactPanelSize, setArtifactPanelSize] = useState(getInitialArtifactPanelSize);
+  /* This is the shared conversation's identity, not the chat tab's Recoil
+   * slot. It may be absent while shared data loads; the lifetime hook keeps
+   * the last real identity through that loading transition. */
+  useArtifactsRegistryLifetime(conversationId);
+
+  const { shareId } = useShareContext();
+  const { data: sharedStartupConfig, isSuccess: hasSharedConfig } = useGetSharedStartupConfig(
+    shareId,
+    {
+      enabled: typeof shareId === 'string' && shareId !== '',
+    },
+  );
+  /* An absent field reads as enabled, which is the default and today's pane,
+   * but only once the config has answered: offering the control while the
+   * request is still in flight would let a viewer undock a pane the
+   * deployment forbids, and the answer would then strand it. */
+  const canUndock = hasSharedConfig && sharedStartupConfig?.interface?.artifactUndocking !== false;
+>>>>>>> upstream/main
 
   const artifactsContextValue = useMemo<ArtifactsContextValue | null>(() => {
     const latestMessage =
@@ -76,8 +126,14 @@ export function ShareArtifactsContainer({
       latestMessageId: latestMessage.messageId ?? null,
       latestMessageText,
       conversationId: conversationId ?? null,
+<<<<<<< HEAD
     };
   }, [messages, conversationId]);
+=======
+      canUndock,
+    };
+  }, [messages, conversationId, canUndock]);
+>>>>>>> upstream/main
 
   const hasSelectedArtifact = currentArtifactId != null && artifacts?.[currentArtifactId] != null;
   const hasAutoOpenableArtifact = Object.values(artifacts ?? {}).some(
@@ -102,6 +158,7 @@ export function ShareArtifactsContainer({
     }
   };
 
+<<<<<<< HEAD
   if (!shouldRenderArtifacts || !artifactsContextValue) {
     return <>{mainContent}</>;
   }
@@ -138,6 +195,50 @@ export function ShareArtifactsContainer({
         <ShareArtifactsPanel contextValue={artifactsContextValue} />
       </ResizablePanel>
     </ResizablePanelGroup>
+=======
+  const paneContext = shouldRenderArtifacts ? artifactsContextValue : null;
+  const pane = paneContext != null ? <ShareArtifactsPanel contextValue={paneContext} /> : null;
+  const overlay = paneContext != null ? <ShareArtifactsOverlay contextValue={paneContext} /> : null;
+  const showDockedPanel = pane != null && !isUndocked && !isSmallScreen;
+
+  /* The transcript keeps one place in the tree through every state: React
+   * cannot preserve it across a change of ancestry, so opening the pane,
+   * undocking it or docking it again would each remount the conversation and
+   * throw away the reader's scroll position. Only the pane's host changes —
+   * a second resizable panel, a mobile overlay, or its own window — and the
+   * provider that owns the editor buffer stays mounted above all of them. */
+  return (
+    <EditorProvider>
+      <ResizablePanelGroup
+        orientation="horizontal"
+        className="h-full w-full"
+        onLayoutChanged={handleLayoutChanged}
+      >
+        <ResizablePanel
+          defaultSize={`${showDockedPanel ? 100 - normalizedArtifactSize : 100}`}
+          minSize="35"
+          id="share-content"
+        >
+          {mainContent}
+        </ResizablePanel>
+        {showDockedPanel && (
+          <ResizableHandleAlt withHandle className="bg-border-medium text-text-primary" />
+        )}
+        {showDockedPanel && (
+          <ResizablePanel
+            defaultSize={`${normalizedArtifactSize}`}
+            minSize="20"
+            maxSize="60"
+            id="share-artifacts"
+          >
+            {pane}
+          </ResizablePanel>
+        )}
+      </ResizablePanelGroup>
+      {pane != null && isUndocked && <UndockedArtifacts>{pane}</UndockedArtifacts>}
+      {pane != null && !isUndocked && isSmallScreen && overlay}
+    </EditorProvider>
+>>>>>>> upstream/main
   );
 }
 
@@ -151,6 +252,7 @@ interface ShareArtifactsPanelProps {
 function ShareArtifactsPanel({ contextValue }: ShareArtifactsPanelProps) {
   return (
     <ArtifactsProvider value={contextValue}>
+<<<<<<< HEAD
       <EditorProvider>
         <div className="flex h-full w-full border-l border-border-light bg-surface-primary shadow-2xl">
           <Suspense fallback={null}>
@@ -158,6 +260,13 @@ function ShareArtifactsPanel({ contextValue }: ShareArtifactsPanelProps) {
           </Suspense>
         </div>
       </EditorProvider>
+=======
+      <div className="border-border-light bg-surface-primary flex h-full w-full border-l shadow-2xl">
+        <Suspense fallback={null}>
+          <Artifacts />
+        </Suspense>
+      </div>
+>>>>>>> upstream/main
     </ArtifactsProvider>
   );
 }
@@ -168,7 +277,11 @@ function ShareArtifactsPanel({ contextValue }: ShareArtifactsPanelProps) {
 function ShareArtifactsOverlay({ contextValue }: ShareArtifactsPanelProps) {
   return (
     <div
+<<<<<<< HEAD
       className="fixed inset-y-0 right-0 z-40 flex w-full max-w-full sm:max-w-[420px]"
+=======
+      className="fixed inset-y-0 right-0 z-40 flex w-full max-w-full sm:max-w-[26.25rem]"
+>>>>>>> upstream/main
       role="complementary"
       aria-label="Artifacts panel"
     >

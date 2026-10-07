@@ -16,6 +16,10 @@ const methods = require('~/models');
  *
  * @param {object} [options]
  * @param {import('@librechat/api').HostUpstreamTokenProviderResolver} [options.resolveUpstreamTokenProvider]
+<<<<<<< HEAD
+=======
+ * @param {import('@librechat/api').ScheduledMCPBearerHost} [options.scheduledBearerHost]
+>>>>>>> upstream/main
  */
 function createMCPPreflight(options = {}) {
   return createScheduleMCPPreflight({
@@ -31,6 +35,11 @@ function createMCPPreflight(options = {}) {
       getMCPServersRegistry().getAllServerConfigs(userId, config, role),
     findPluginAuthsByKeys: methods.findPluginAuthsByKeys,
     resolveUpstreamTokenProvider: options.resolveUpstreamTokenProvider,
+<<<<<<< HEAD
+=======
+    scheduledBearerHost: options.scheduledBearerHost,
+    execution: require('./consent').execution,
+>>>>>>> upstream/main
     connect: (connectionOptions) =>
       getMCPManager().getConnection({
         ...connectionOptions,

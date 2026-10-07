@@ -13,6 +13,10 @@ import {
 } from 'librechat-data-provider';
 import type { CodeEnvRef, CodeEnvRefMap, TFile } from 'librechat-data-provider';
 import type { Readable } from 'node:stream';
+<<<<<<< HEAD
+=======
+import type { CodeExecutionContext } from '~/agents/execution';
+>>>>>>> upstream/main
 import type { CodeEnvIdentity } from '~/files/code/identity';
 import type { CodeApiRateLimitBudget } from '~/utils';
 import type { ServerRequest } from '~/types';
@@ -27,6 +31,10 @@ import {
 } from '~/utils';
 import { getCodeEnvUploadFilename, getUploadedCodeEnvFilename } from '../code/form';
 import { buildCodeEnvIdentityParams } from '~/files/code/identity';
+<<<<<<< HEAD
+=======
+import { codeExecutionHeaders } from '~/agents/execution';
+>>>>>>> upstream/main
 import { getCodeApiAuthHeaders } from '~/auth/codeapi';
 import { resolveDownloadPath } from '~/storage/path';
 
@@ -123,6 +131,13 @@ export interface ProvisionService {
      *  against the Code API that issued it, not against the default one. */
     baseURL?: string;
     routeKey?: string;
+<<<<<<< HEAD
+=======
+    /** Wire profile and worker of that deployment. A worker-bound route authorizes
+     *  only a bearer minted for its worker, exactly as its uploads and reads do. */
+    executionProfile?: CodeExecutionContext['executionProfile'];
+    bridgeWorkerId?: string;
+>>>>>>> upstream/main
   }) => Promise<Set<string>>;
 }
 
@@ -203,6 +218,44 @@ export function createProvisionService({
     };
   }
 
+<<<<<<< HEAD
+=======
+  /**
+   * Auth for a liveness probe against the route that issued the refs, matching what that
+   * route's uploads, reads and executions send. The legacy key belongs to the default
+   * Code API alone: an attached or stateful route never receives it, and a worker-bound
+   * route gets a bearer minted for its worker plus the route headers. Returns null when
+   * there is nothing to authenticate with, neither a request to mint from nor a key this
+   * route accepts, since the probe could only be rejected.
+   */
+  async function buildSessionProbeHeaders({
+    apiKey,
+    req,
+    routeKey,
+    executionProfile,
+    bridgeWorkerId,
+  }: {
+    apiKey?: string;
+    req?: ServerRequest;
+    routeKey?: string;
+    executionProfile?: CodeExecutionContext['executionProfile'];
+    bridgeWorkerId?: string;
+  }): Promise<Record<string, string> | null> {
+    const isDefaultRoute = (routeKey ?? 'default') === 'default';
+    const authHeaders = await getCodeApiAuthHeaders(req, bridgeWorkerId);
+    const legacyKey = isDefaultRoute && authHeaders.Authorization == null ? apiKey : undefined;
+    if (req == null && authHeaders.Authorization == null && !legacyKey) {
+      return null;
+    }
+    return {
+      'User-Agent': 'LibreChat/1.0',
+      ...(legacyKey ? { 'X-API-Key': legacyKey } : {}),
+      ...authHeaders,
+      ...(executionProfile ? codeExecutionHeaders({ executionProfile, bridgeWorkerId }) : {}),
+    };
+  }
+
+>>>>>>> upstream/main
   /** Env var holding the code-execution API key (symmetric with LIBRECHAT_CODE_BASEURL). */
   const CODE_API_KEY_FIELD = 'LIBRECHAT_CODE_API_KEY';
 
@@ -501,6 +554,11 @@ export function createProvisionService({
     staleSafeWindowMs = 6 * 60 * 60 * 1000,
     baseURL: routeBaseURL,
     routeKey,
+<<<<<<< HEAD
+=======
+    executionProfile,
+    bridgeWorkerId,
+>>>>>>> upstream/main
   }: {
     files: TFile[];
     apiKey?: string;
@@ -508,6 +566,11 @@ export function createProvisionService({
     staleSafeWindowMs?: number;
     baseURL?: string;
     routeKey?: string;
+<<<<<<< HEAD
+=======
+    executionProfile?: CodeExecutionContext['executionProfile'];
+    bridgeWorkerId?: string;
+>>>>>>> upstream/main
   }): Promise<Set<string>> {
     const aliveFileIds = new Set<string>();
     const now = Date.now();
@@ -556,6 +619,7 @@ export function createProvisionService({
       group.entries.push({ file_id: file.file_id, remoteFileId: ref.file_id });
     }
 
+<<<<<<< HEAD
     // One API call per session (in parallel)
     const baseURL = routeBaseURL ?? getCodeBaseURL();
     /* Minting can fail on its own, for example when the request carries no tenant
@@ -569,13 +633,54 @@ export function createProvisionService({
       logger.warn(
         `[checkSessionsAlive] Could not build Code API auth headers; treating ${files.length} reference(s) as unverified: ${(error as Error).message}`,
       );
+=======
+    if (sessionGroups.size === 0) {
+      return aliveFileIds;
+    }
+    const keepUnverified = () => {
+>>>>>>> upstream/main
       for (const file of files) {
         if (file?.file_id) {
           aliveFileIds.add(file.file_id);
         }
       }
       return aliveFileIds;
+<<<<<<< HEAD
     }
+=======
+    };
+
+    /* Minting can fail on its own, for example when the request carries no tenant
+     * context. That is an unverifiable probe, not an expired file, so it is handled
+     * like any other probe failure: every ref stays alive rather than the rejection
+     * propagating out and aborting initialization for the whole turn. */
+    let headers: Record<string, string> | null;
+    try {
+      headers = await buildSessionProbeHeaders({
+        apiKey,
+        req,
+        routeKey,
+        executionProfile,
+        bridgeWorkerId,
+      });
+    } catch (error) {
+      logger.warn(
+        `[checkSessionsAlive] Could not build Code API auth headers; treating ${files.length} reference(s) as unverified: ${(error as Error).message}`,
+      );
+      return keepUnverified();
+    }
+    /* Sending a credential the route does not accept only earns a 401, so a route with
+     * no usable credential this turn is left unverified without a request. */
+    if (headers == null) {
+      logger.debug(
+        `[checkSessionsAlive] No credential this route accepts is available; treating ${files.length} reference(s) as unverified`,
+      );
+      return keepUnverified();
+    }
+
+    // One API call per session (in parallel)
+    const baseURL = routeBaseURL ?? getCodeBaseURL();
+>>>>>>> upstream/main
     const sessionChecks = Array.from(sessionGroups.values()).map(
       async ({ session_id, identity, entries: fileEntries }) => {
         try {

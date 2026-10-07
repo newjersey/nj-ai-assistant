@@ -1,6 +1,10 @@
 import { createHash } from 'node:crypto';
 import { logger } from '@librechat/data-schemas';
 import { Constants, getCodeBaseURL } from '@librechat/agents';
+<<<<<<< HEAD
+=======
+import { stripAgentIdSuffix, resolveCodeEnvironmentSelection } from 'librechat-data-provider';
+>>>>>>> upstream/main
 import type {
   Agents,
   CodeWorkspaceOperation,
@@ -11,10 +15,31 @@ import type {
   StatefulCodeEnvironment,
   TAgentsEndpoint,
 } from 'librechat-data-provider';
+<<<<<<< HEAD
+=======
+import type { WorkspaceEditFileFeature } from '~/code/edits';
+import { isCodeEnvironmentSelectionEnabled } from '~/code/protocol';
+import { CodeWorkspaceSelectionError } from '~/code/errors';
+>>>>>>> upstream/main
 
 export const CODE_API_EXPECTED_PROFILE_HEADER = 'X-CodeAPI-Expected-Profile';
 export const CODE_API_BRIDGE_WORKER_HEADER = 'X-LibreChat-Code-Worker-ID';
 
+<<<<<<< HEAD
+=======
+/** Persisted choices are authoritative, including an empty set. All execution ingresses share
+ * this precedence so a request cannot replace an admitted conversation's machine selection. */
+export function resolveCodeExecutionWorkspaceSelections({
+  conversation,
+  request,
+}: {
+  conversation?: { codeWorkspaces?: unknown } | null;
+  request?: { codeWorkspaces?: unknown } | null;
+}): unknown {
+  return conversation?.codeWorkspaces ?? request?.codeWorkspaces;
+}
+
+>>>>>>> upstream/main
 export type CodeExecutionProfile = 'default' | 'stateful';
 export type CodeEnvironmentConfig = NonNullable<
   NonNullable<TAgentsEndpoint['statefulCodeSessions']>['environments']
@@ -38,9 +63,27 @@ export interface CodeExecutionContext {
   bridgeWorkerId?: string;
   codeEnvironmentConfigSchema?: CodeEnvironmentUserConfigSchema;
   codeEnvironmentSettings?: CodeEnvironmentUserSettings;
+<<<<<<< HEAD
   /** Live, server-validated directory selection. Never derive session reuse from this field. */
   codeWorkspace?: CodeWorkspaceSelection & {
     operations: CodeWorkspaceOperation[];
+=======
+  /** Server-derived conversation identity, activated only after worker capability negotiation. */
+  conversationWorkspaceInstanceId?: string;
+  /** Live, server-validated directory selection. Never derive session reuse from this field. */
+  codeWorkspace?: CodeWorkspaceSelection & {
+    operations: CodeWorkspaceOperation[];
+    workspaceInstanceId?: string;
+    /** The worker schedules each `.worktrees/<name>` of this root as its own lane. */
+    linkedWorktrees?: boolean;
+    /** The worker advertises the native SRT sandbox: read-only filesystem outside the workspace and `$TMPDIR`. */
+    nativeSandbox?: boolean;
+    /** Live Code API execution ceiling. Omitted by older deployments. */
+    maxCommandTimeoutMs?: number;
+    /** Edit features the worker negotiated with the Code API. Omitted by older workers. */
+    editFileFeatures?: WorkspaceEditFileFeature[];
+    instructions?: CodeWorkspaceDescriptor['instructions'];
+>>>>>>> upstream/main
     environment?: CodeWorkspaceDescriptor['environment'];
   };
 }
@@ -67,6 +110,11 @@ export function getCodeWorkspaceSelections(
     selections.set(workspace.environmentId, {
       environmentId: workspace.environmentId,
       workspaceId: workspace.workspaceId,
+<<<<<<< HEAD
+=======
+      ...(workspace.checkout == null ? {} : { checkout: workspace.checkout }),
+      ...(workspace.agentIds == null ? {} : { agentIds: [...workspace.agentIds] }),
+>>>>>>> upstream/main
     });
   }
   if (selections.size === 0) return undefined;
@@ -76,8 +124,44 @@ export function getCodeWorkspaceSelections(
 type CodeExecutionApprovalAgent = {
   id?: string | null;
   codeExecutionContext?: CodeExecutionContext | null;
+<<<<<<< HEAD
 };
 
+=======
+  /** Alternate machines a parent may route this subagent to per call. */
+  codeExecutionChoices?: readonly CodeExecutionContext[] | null;
+};
+
+function hashCodeExecutionTarget(agentId: string | null, context: CodeExecutionContext): string {
+  return createHash('sha256')
+    .update(
+      JSON.stringify([
+        agentId,
+        context.executionProfile,
+        context.baseUrl,
+        context.codeSessionKey,
+        context.executionRouteKey ?? null,
+        context.runtimeSessionHint ?? null,
+        context.environmentId ?? null,
+        context.environmentType ?? null,
+        context.bridgeWorkerId ?? null,
+        context.codeWorkspace == null
+          ? null
+          : {
+              environmentId: context.codeWorkspace.environmentId,
+              workspaceId: context.codeWorkspace.workspaceId,
+              workspaceInstanceId: context.codeWorkspace.workspaceInstanceId ?? null,
+              operations: [...new Set(context.codeWorkspace.operations)].sort(),
+              ...(context.codeWorkspace.environment
+                ? { definitionFingerprint: context.codeWorkspace.environment.fingerprint }
+                : {}),
+            },
+      ]),
+    )
+    .digest('hex');
+}
+
+>>>>>>> upstream/main
 const CODE_EXECUTION_TARGET_HASH = /^[a-f0-9]{64}$/;
 const MAX_CODE_EXECUTION_APPROVAL_TARGETS = 128;
 
@@ -90,6 +174,7 @@ export function captureCodeExecutionApprovalBinding(
   agents: readonly (CodeExecutionApprovalAgent | null | undefined)[],
 ): Agents.CodeExecutionApprovalBinding | undefined {
   const targetsByIdentity = new Map<string, Agents.CodeExecutionApprovalTargetBinding>();
+<<<<<<< HEAD
   for (const agent of agents) {
     const context = agent?.codeExecutionContext;
     if (context?.statefulSessions !== true) {
@@ -122,6 +207,30 @@ export function captureCodeExecutionApprovalBinding(
       .digest('hex');
     const target = { agentId: agent?.id ?? null, targetHash };
     targetsByIdentity.set(`${target.agentId ?? ''}\u0000${target.targetHash}`, target);
+=======
+  const addTarget = (target: Agents.CodeExecutionApprovalTargetBinding): void => {
+    targetsByIdentity.set(`${target.agentId ?? ''}\u0000${target.targetHash}`, target);
+  };
+  for (const agent of agents) {
+    const agentId = agent?.id ?? null;
+    const routeHashes = [agent?.codeExecutionContext, ...(agent?.codeExecutionChoices ?? [])]
+      .filter((context): context is CodeExecutionContext => context?.statefulSessions === true)
+      .map((context) => hashCodeExecutionTarget(agentId, context));
+    if (routeHashes.length === 0) {
+      continue;
+    }
+    /** An agent with per-call choices folds its default and every choice into one
+     * target, so each agent contributes at most one entry to the bounded binding. */
+    addTarget({
+      agentId,
+      targetHash:
+        (agent?.codeExecutionChoices?.length ?? 0) === 0
+          ? routeHashes[0]
+          : createHash('sha256')
+              .update(JSON.stringify(['choices', [...new Set(routeHashes)].sort()]))
+              .digest('hex'),
+    });
+>>>>>>> upstream/main
   }
   const targets = [...targetsByIdentity.values()];
   if (targets.length === 0) {
@@ -290,11 +399,23 @@ function resolveRuntimeSessionHint(params: {
   return `${prefix}:user:${scopeFingerprint(userId)}`;
 }
 
+<<<<<<< HEAD
+=======
+function isExecutableEnvironment(environment: CodeEnvironmentConfig): boolean {
+  return !(
+    environment.pairing?.allowPrincipalWorkers === true &&
+    environment.pairing.workerId == null &&
+    environment.workerId == null
+  );
+}
+
+>>>>>>> upstream/main
 function resolveConfiguredEnvironment(params: {
   environmentId?: string | null;
   environments?: readonly CodeEnvironmentConfig[];
 }): CodeEnvironmentConfig | undefined {
   const { environmentId, environments } = params;
+<<<<<<< HEAD
   const executableEnvironments = environments?.filter(
     (environment) =>
       !(
@@ -303,6 +424,9 @@ function resolveConfiguredEnvironment(params: {
         environment.workerId == null
       ),
   );
+=======
+  const executableEnvironments = environments?.filter(isExecutableEnvironment);
+>>>>>>> upstream/main
   if (environmentId) {
     const configured = executableEnvironments?.find(
       (environment) => environment.id === environmentId,
@@ -315,6 +439,45 @@ function resolveConfiguredEnvironment(params: {
   return executableEnvironments?.find((environment) => environment.default === true);
 }
 
+<<<<<<< HEAD
+=======
+/** Machine an agent runs on without a conversation choice, and whether a choice applies to it. */
+export function resolveAgentCodeEnvironmentRouting(params: {
+  environmentId?: string | null;
+  environmentIds?: readonly string[];
+  environments?: readonly CodeEnvironmentConfig[];
+  /** Deployment ceiling (on unless `false` or the decision protocol is off). */
+  allowEnvironmentSelection?: boolean;
+}): { defaultEnvironment?: CodeEnvironmentConfig; allowSelection: boolean } {
+  const defaultEnvironment = params.environments?.find(
+    (candidate) =>
+      isExecutableEnvironment(candidate) &&
+      (params.environmentId ? candidate.id === params.environmentId : candidate.default === true),
+  );
+  const allowSelection =
+    isCodeEnvironmentSelectionEnabled(params.allowEnvironmentSelection) &&
+    (params.environmentIds?.length ?? 0) > 0 &&
+    (defaultEnvironment?.type === 'attached' ||
+      (defaultEnvironment == null && Boolean(params.environmentId)));
+  return { defaultEnvironment, allowSelection };
+}
+
+/** Whether the principal-scoped environment list admits running on this attached machine. */
+export function isExecutableAttachedEnvironment(
+  environmentId: string,
+  environments?: readonly CodeEnvironmentConfig[],
+): boolean {
+  return (
+    environments?.some(
+      (candidate) =>
+        candidate.id === environmentId &&
+        candidate.type === 'attached' &&
+        isExecutableEnvironment(candidate),
+    ) === true
+  );
+}
+
+>>>>>>> upstream/main
 export function resolveCodeExecutionContext(params: {
   statefulSessions: boolean;
   environment?: StatefulCodeEnvironment | string | null;
@@ -323,6 +486,17 @@ export function resolveCodeExecutionContext(params: {
   userId?: string | null;
   agentId?: string | null;
   conversationId?: string | null;
+<<<<<<< HEAD
+=======
+  /** Deployment ceiling (on unless `false` or the decision protocol is off) and a persisted
+   *  agent machine allowlist are both required. */
+  allowEnvironmentSelection?: boolean;
+  environmentIds?: readonly string[];
+  workspaceSelections?: unknown;
+  /** Request-scoped subagent inheritance, keyed by saved agent ID. An inherited machine the
+   *  principal can no longer use is ignored, leaving the agent on its own route. */
+  inheritedEnvironments?: ReadonlyMap<string, string>;
+>>>>>>> upstream/main
 }): CodeExecutionContext {
   if (!params.statefulSessions) {
     return {
@@ -334,7 +508,43 @@ export function resolveCodeExecutionContext(params: {
   }
 
   const environment = normalizeStatefulCodeEnvironment(params.environment);
+<<<<<<< HEAD
   const configuredEnvironment = resolveConfiguredEnvironment(params);
+=======
+  const { defaultEnvironment, allowSelection } = resolveAgentCodeEnvironmentRouting(params);
+  const inheritedEnvironmentId =
+    params.agentId == null
+      ? undefined
+      : params.inheritedEnvironments?.get(stripAgentIdSuffix(params.agentId));
+  const selection = resolveCodeEnvironmentSelection({
+    agentId: params.agentId,
+    environmentId: params.environmentId ?? defaultEnvironment?.id,
+    environmentIds: params.environmentIds,
+    allowSelection,
+    selections: params.workspaceSelections,
+    inheritedEnvironmentId:
+      inheritedEnvironmentId != null &&
+      isExecutableAttachedEnvironment(inheritedEnvironmentId, params.environments)
+        ? inheritedEnvironmentId
+        : undefined,
+  });
+  if (!selection.valid) throw new CodeWorkspaceSelectionError('invalid');
+  if (
+    allowSelection &&
+    !params.environments?.some(
+      (candidate) => candidate.id === selection.environmentId && isExecutableEnvironment(candidate),
+    )
+  ) {
+    throw new CodeWorkspaceSelectionError('invalid');
+  }
+  const configuredEnvironment = resolveConfiguredEnvironment({
+    ...params,
+    environmentId: selection.environmentId,
+  });
+  if (allowSelection && configuredEnvironment?.type !== 'attached') {
+    throw new CodeWorkspaceSelectionError('unsupported');
+  }
+>>>>>>> upstream/main
   if (!params.userId) {
     throw new Error('Stateful code environments require an authenticated user ID.');
   }
@@ -346,6 +556,16 @@ export function resolveCodeExecutionContext(params: {
     conversationId: params.conversationId,
   });
   const executionRouteKey = createCodeExecutionRouteKey('stateful', configuredEnvironment);
+<<<<<<< HEAD
+=======
+  const conversationWorkspaceInstanceId =
+    configuredEnvironment?.type === 'attached' && params.conversationId
+      ? createHash('sha256')
+          .update('librechat-conversation-workspace-v1\0')
+          .update(JSON.stringify([params.userId, params.conversationId, configuredEnvironment.id]))
+          .digest('hex')
+      : undefined;
+>>>>>>> upstream/main
   return {
     baseUrl: getCodeExecutionBaseUrl('stateful', configuredEnvironment),
     codeSessionKey: `${Constants.EXECUTE_CODE}:${executionRouteKey}:${runtimeSessionHint}`,
@@ -358,6 +578,10 @@ export function resolveCodeExecutionContext(params: {
     bridgeWorkerId: configuredEnvironment?.workerId ?? configuredEnvironment?.pairing?.workerId,
     codeEnvironmentConfigSchema: configuredEnvironment?.configSchema,
     codeEnvironmentSettings: configuredEnvironment?.settings,
+<<<<<<< HEAD
+=======
+    ...(conversationWorkspaceInstanceId ? { conversationWorkspaceInstanceId } : {}),
+>>>>>>> upstream/main
   };
 }
 

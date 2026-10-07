@@ -44,7 +44,11 @@ jest.mock('~/hooks/Chat/useBookmarkItems', () => ({
     return mockHookState.bookmarks;
   },
 }));
+<<<<<<< HEAD
 jest.mock('~/hooks/Chat/useExportShare', () => ({
+=======
+jest.mock('~/hooks/Chat/useChatOptions', () => ({
+>>>>>>> upstream/main
   __esModule: true,
   default: () => mockHookState.exportShare,
 }));
@@ -112,8 +116,12 @@ describe('HeaderMenu', () => {
     mockHookState.temporary.isTemporary = false;
   });
 
+<<<<<<< HEAD
   // NJ: Most are removed by us
   it.skip('collapses every secondary action behind one trigger', () => {
+=======
+  it('collapses every secondary action behind one trigger', () => {
+>>>>>>> upstream/main
     render(<HeaderMenu />);
 
     expect(screen.getByTestId('header-overflow-menu')).toBeInTheDocument();
@@ -126,8 +134,12 @@ describe('HeaderMenu', () => {
     ]);
   });
 
+<<<<<<< HEAD
   // NJ: Most actions are not reachable, we disable them
   it.skip('keeps every action reachable when groups are divided', () => {
+=======
+  it('keeps every action reachable when groups are divided', () => {
+>>>>>>> upstream/main
     render(<HeaderMenu />);
 
     /** A divider is its own entry; flagging an action as one deletes it. */
@@ -153,8 +165,12 @@ describe('HeaderMenu', () => {
     expect(screen.queryByTestId('header-overflow-menu')).not.toBeInTheDocument();
   });
 
+<<<<<<< HEAD
   // NJ: Ignore, we mess with header actions too much
   it.skip('drops actions the user lacks permission for', () => {
+=======
+  it('drops actions the user lacks permission for', () => {
+>>>>>>> upstream/main
     mockAccess.BOOKMARKS = false;
     mockAccess.MULTI_CONVO = false;
 
@@ -163,8 +179,12 @@ describe('HeaderMenu', () => {
     expect(labels()).toEqual(['share', 'export', 'com_ui_temporary']);
   });
 
+<<<<<<< HEAD
   // NJ: Not valid for us
   it.skip('never opens with a leading divider when earlier groups are gated out', () => {
+=======
+  it('never opens with a leading divider when earlier groups are gated out', () => {
+>>>>>>> upstream/main
     mockAccess.BOOKMARKS = false;
     mockAccess.MULTI_CONVO = false;
 
@@ -190,7 +210,11 @@ describe('HeaderMenu', () => {
     expect(screen.getByTestId('header-menu-shared-link-indicator')).toBeInTheDocument();
     expect(screen.getByTestId('header-overflow-menu')).toHaveAttribute(
       'aria-label',
+<<<<<<< HEAD
       'com_ui_export_share_link_active',
+=======
+      'com_ui_chat_options_link_active',
+>>>>>>> upstream/main
     );
   });
 
@@ -200,13 +224,24 @@ describe('HeaderMenu', () => {
 
     rerender(<HeaderMenu trace={{ show: true, open: jest.fn() }} />);
 
+<<<<<<< HEAD
     // NJ: Share, export and temporary chat are disabled, so trace is the last group
+=======
+>>>>>>> upstream/main
     expect(labels()).toEqual([
       'com_ui_bookmarks',
       'com_ui_add_multi_conversation',
       'com_ui_trace_view',
+<<<<<<< HEAD
     ]);
     expect(rows().filter((node) => node.getAttribute('data-kind') === 'separator')).toHaveLength(1);
+=======
+      'share',
+      'export',
+      'com_ui_temporary',
+    ]);
+    expect(rows().filter((node) => node.getAttribute('data-kind') === 'separator')).toHaveLength(3);
+>>>>>>> upstream/main
   });
 
   it('keeps the trace reachable when it is the only action left', () => {
@@ -221,8 +256,12 @@ describe('HeaderMenu', () => {
     expect(rows()[0]).toHaveAttribute('data-kind', 'item');
   });
 
+<<<<<<< HEAD
   // NJ: Always skip temporary chat related functionality
   it.skip('shows temporary chat as active to sighted users, not just assistive tech', () => {
+=======
+  it('shows temporary chat as active to sighted users, not just assistive tech', () => {
+>>>>>>> upstream/main
     mockHookState.temporary.isTemporary = true;
 
     render(<HeaderMenu />);

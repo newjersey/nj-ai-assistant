@@ -326,8 +326,13 @@ export const MermaidRenderer = memo(function MermaidRenderer({
               <MermaidHeader
                 className={cn(
                   showCode
+<<<<<<< HEAD
                     ? 'relative z-20 border-b border-border-light bg-surface-secondary'
                     : 'absolute left-0 right-0 top-0 z-20',
+=======
+                    ? 'border-border-light bg-surface-secondary relative z-20 border-b'
+                    : 'absolute top-0 right-0 left-0 z-20',
+>>>>>>> upstream/main
                   showControls ? 'opacity-100' : 'pointer-events-none opacity-0',
                 )}
                 codeContent={children}
@@ -343,8 +348,13 @@ export const MermaidRenderer = memo(function MermaidRenderer({
               />
             )}
             {showCode && (
+<<<<<<< HEAD
               <div className="min-h-[150px] bg-surface-primary-alt p-4">
                 <pre className="overflow-auto whitespace-pre-wrap font-mono text-xs text-text-secondary">
+=======
+              <div className="bg-surface-primary-alt min-h-[9.375rem] p-4">
+                <pre className="text-text-secondary overflow-auto font-mono text-xs whitespace-pre-wrap">
+>>>>>>> upstream/main
                   {children}
                 </pre>
               </div>
@@ -362,7 +372,11 @@ export const MermaidRenderer = memo(function MermaidRenderer({
               data-testid={fillContainer ? 'mermaid-artifact-canvas' : undefined}
               onMouseDown={handleMouseDown}
             >
+<<<<<<< HEAD
               <div className="absolute left-2 top-2 z-10 flex items-center gap-1 rounded border border-border-light bg-surface-secondary px-2 py-1 text-xs text-text-secondary">
+=======
+              <div className="border-border-light bg-surface-secondary text-text-secondary absolute top-2 left-2 z-10 flex items-center gap-1 rounded border px-2 py-1 text-xs">
+>>>>>>> upstream/main
                 <Spinner className="h-3 w-3" />
               </div>
               <div
@@ -375,7 +389,11 @@ export const MermaidRenderer = memo(function MermaidRenderer({
                 <img
                   src={blobUrl}
                   alt={localize('com_ui_mermaid_diagram')}
+<<<<<<< HEAD
                   className="select-none opacity-70"
+=======
+                  className="opacity-70 select-none"
+>>>>>>> upstream/main
                   style={diagramStyle}
                   draggable={false}
                 />
@@ -388,7 +406,11 @@ export const MermaidRenderer = memo(function MermaidRenderer({
                 onZoomOut={handleZoomOut}
                 onReset={handleResetZoom}
                 className={cn(
+<<<<<<< HEAD
                   'absolute bottom-2 right-2 z-10 transition-opacity duration-200',
+=======
+                  'absolute right-2 bottom-2 z-10 transition-opacity duration-200',
+>>>>>>> upstream/main
                   showControls ? 'opacity-100' : 'pointer-events-none opacity-0',
                 )}
               />
@@ -402,7 +424,11 @@ export const MermaidRenderer = memo(function MermaidRenderer({
       return (
         <div
           className={cn(
+<<<<<<< HEAD
             'flex min-h-[200px] w-full items-center justify-center rounded-lg border border-border-light bg-surface-primary-alt text-text-secondary',
+=======
+            'border-border-light bg-surface-primary-alt text-text-secondary flex min-h-[12.5rem] w-full items-center justify-center rounded-lg border',
+>>>>>>> upstream/main
             fillContainer && 'h-full rounded-xl',
           )}
           role="status"
@@ -416,17 +442,29 @@ export const MermaidRenderer = memo(function MermaidRenderer({
     return (
       <div
         className={cn(
+<<<<<<< HEAD
           'w-full overflow-hidden rounded-lg border border-border-light',
           fillContainer && 'h-full rounded-xl',
         )}
       >
         <div className="flex items-center gap-2 border-b border-border-light bg-surface-secondary px-4 py-2 font-sans text-xs text-text-secondary">
+=======
+          'border-border-light w-full overflow-hidden rounded-lg border',
+          fillContainer && 'h-full rounded-xl',
+        )}
+      >
+        <div className="border-border-light bg-surface-secondary text-text-secondary flex items-center gap-2 border-b px-4 py-2 font-sans text-xs">
+>>>>>>> upstream/main
           <Spinner className="h-3 w-3" />
           <span className="font-medium">{localize('com_ui_mermaid')}</span>
         </div>
         <pre
           ref={streamingCodeRef}
+<<<<<<< HEAD
           className="max-h-[350px] min-h-[150px] overflow-auto whitespace-pre-wrap bg-surface-primary-alt p-4 font-mono text-xs text-text-secondary"
+=======
+          className="bg-surface-primary-alt text-text-secondary max-h-[21.875rem] min-h-[9.375rem] overflow-auto p-4 font-mono text-xs whitespace-pre-wrap"
+>>>>>>> upstream/main
         >
           {children}
         </pre>
@@ -436,7 +474,11 @@ export const MermaidRenderer = memo(function MermaidRenderer({
 
   if (error) {
     return (
+<<<<<<< HEAD
       <div className="w-full overflow-hidden rounded-lg border border-border-light">
+=======
+      <div className="border-border-light w-full overflow-hidden rounded-lg border">
+>>>>>>> upstream/main
         {showHeader && (
           <MermaidHeader
             codeContent={children}
@@ -445,28 +487,47 @@ export const MermaidRenderer = memo(function MermaidRenderer({
           />
         )}
         {showCode ? (
+<<<<<<< HEAD
           <div className="border-t border-border-light bg-surface-primary-alt p-4">
             <pre className="overflow-auto whitespace-pre-wrap text-xs text-text-secondary">
+=======
+          <div className="border-border-light bg-surface-primary-alt border-t p-4">
+            <pre className="text-text-secondary overflow-auto text-xs whitespace-pre-wrap">
+>>>>>>> upstream/main
               {children}
             </pre>
           </div>
         ) : (
+<<<<<<< HEAD
           <div className="border-t border-border-light bg-surface-tertiary p-4">
             <div className="mb-2 flex items-center justify-between">
               <span className="font-semibold text-text-destructive">
+=======
+          <div className="border-border-light bg-surface-tertiary border-t p-4">
+            <div className="mb-2 flex items-center justify-between">
+              <span className="text-text-destructive font-semibold">
+>>>>>>> upstream/main
                 {localize('com_ui_mermaid_failed')}
               </span>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handleRetry}
+<<<<<<< HEAD
                 className="h-auto gap-1 rounded px-2 py-1 text-xs text-text-secondary hover:bg-surface-hover"
+=======
+                className="text-text-secondary hover:bg-surface-hover h-auto gap-1 rounded px-2 py-1 text-xs"
+>>>>>>> upstream/main
               >
                 <RefreshCw className="h-3 w-3" aria-hidden="true" />
                 {localize('com_ui_retry')}
               </Button>
             </div>
+<<<<<<< HEAD
             <pre className="overflow-auto text-xs text-text-destructive">{error.message}</pre>
+=======
+            <pre className="text-text-destructive overflow-auto text-xs">{error.message}</pre>
+>>>>>>> upstream/main
           </div>
         )}
       </div>
@@ -493,7 +554,11 @@ export const MermaidRenderer = memo(function MermaidRenderer({
       )}
       <div
         className={cn(
+<<<<<<< HEAD
           'relative w-full overflow-hidden rounded-lg border border-border-light transition-all duration-200',
+=======
+          'border-border-light relative w-full overflow-hidden rounded-lg border transition-all duration-200',
+>>>>>>> upstream/main
           fillContainer && 'h-full rounded-xl',
         )}
         {...hoverHandlers}
@@ -501,7 +566,11 @@ export const MermaidRenderer = memo(function MermaidRenderer({
       >
         {showHeader && (
           <MermaidHeader
+<<<<<<< HEAD
             className="border-b border-border-light bg-surface-secondary"
+=======
+            className="border-border-light bg-surface-secondary border-b"
+>>>>>>> upstream/main
             actionsClassName="transition-opacity duration-200"
             codeContent={children}
             showCode={showCode}
@@ -517,7 +586,11 @@ export const MermaidRenderer = memo(function MermaidRenderer({
         )}
         {showCode && (
           <div className="bg-surface-primary-alt p-4">
+<<<<<<< HEAD
             <pre className="overflow-auto whitespace-pre-wrap text-xs text-text-secondary">
+=======
+            <pre className="text-text-secondary overflow-auto text-xs whitespace-pre-wrap">
+>>>>>>> upstream/main
               {children}
             </pre>
           </div>
@@ -558,7 +631,11 @@ export const MermaidRenderer = memo(function MermaidRenderer({
             onZoomOut={handleZoomOut}
             onReset={handleResetZoom}
             className={cn(
+<<<<<<< HEAD
               'absolute bottom-2 right-2 z-10 transition-opacity duration-200',
+=======
+              'absolute right-2 bottom-2 z-10 transition-opacity duration-200',
+>>>>>>> upstream/main
               showControls ? 'opacity-100' : 'pointer-events-none opacity-0',
             )}
           />

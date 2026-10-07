@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import type { RefillIntervalUnit } from 'librechat-data-provider';
+=======
+import type { BalanceRefillMode, RefillIntervalUnit } from 'librechat-data-provider';
+>>>>>>> upstream/main
 import type { Document, Types } from 'mongoose';
 
 /** Whole credits held against a balance while the request that reserved them is in flight */
@@ -12,6 +16,10 @@ export interface IBalanceReservation {
 export interface IBalancePendingRefill {
   transactionId: Types.ObjectId;
   rawAmount: number;
+<<<<<<< HEAD
+=======
+  context?: 'autoRefill' | 'balanceReset';
+>>>>>>> upstream/main
 }
 
 export interface IBalance extends Document {
@@ -23,6 +31,10 @@ export interface IBalance extends Document {
   refillIntervalUnit: RefillIntervalUnit;
   lastRefill: Date;
   refillAmount: number;
+<<<<<<< HEAD
+=======
+  refillMode?: BalanceRefillMode;
+>>>>>>> upstream/main
   tenantId?: string;
   /** Reservation state is excluded from reads unless explicitly selected */
   reservations?: IBalanceReservation[];
@@ -39,6 +51,10 @@ export interface IBalanceUpdate {
   refillIntervalValue?: number;
   refillIntervalUnit?: RefillIntervalUnit;
   refillAmount?: number;
+<<<<<<< HEAD
+=======
+  refillMode?: BalanceRefillMode;
+>>>>>>> upstream/main
   lastRefill?: Date;
 }
 
@@ -53,6 +69,17 @@ export interface BalanceReservationRequest {
   expiresAt: Date;
   /** Creates the balance record with these fields when the user has none */
   initialBalance?: IBalanceUpdate;
+<<<<<<< HEAD
+=======
+  /** Current request policy; synchronized before existing-record admission without changing credits. */
+  refillPolicy?: Pick<
+    IBalanceUpdate,
+    'refillAmount' | 'refillIntervalValue' | 'refillIntervalUnit'
+  > & {
+    autoRefillEnabled: boolean;
+    refillMode: BalanceRefillMode;
+  };
+>>>>>>> upstream/main
 }
 
 export interface BalanceReservationRenewal {

@@ -16,7 +16,11 @@ type EmptyTextPartProps = {
 /** Streaming cursor placeholder — no bottom margin to match Container's structure and prevent CLS */
 const EmptyTextPart = memo(({ underHeaderIcon = false }: EmptyTextPartProps) => {
   return (
+<<<<<<< HEAD
     <div className="text-message flex min-h-[20px] flex-col items-start gap-3 overflow-visible">
+=======
+    <div className="text-message flex min-h-[1.25rem] flex-col items-start gap-3 overflow-visible">
+>>>>>>> upstream/main
       <div className="markdown prose dark:prose-invert light w-full break-words">
         <div className={cn('absolute', underHeaderIcon && 'ps-1.5')}>
           <p className="submitting relative">

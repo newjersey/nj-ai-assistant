@@ -15,6 +15,13 @@ const {
   preflightAssistantRunContent,
   reportLocatorTraversalFailure,
   preflightAssistantUserMessageContent,
+<<<<<<< HEAD
+=======
+  settleAssistantFinal,
+  resolveAssistantProjectTurn,
+  joinChatProjectInstructions,
+  applyForcedTemporaryRequest,
+>>>>>>> upstream/main
 } = require('@librechat/api');
 const {
   Time,
@@ -48,6 +55,11 @@ const {
   reserveBalance,
   renewBalanceReservation,
   releaseBalanceReservation,
+<<<<<<< HEAD
+=======
+  getChatProject,
+  getProjectFiles,
+>>>>>>> upstream/main
   getFiles,
 } = require('~/models');
 const { logViolation, getLogStores } = require('~/cache');
@@ -62,6 +74,10 @@ const { getOpenAIClient } = require('./helpers');
  * @returns {void}
  */
 const chatV2 = async (req, res) => {
+<<<<<<< HEAD
+=======
+  applyForcedTemporaryRequest(req);
+>>>>>>> upstream/main
   const appConfig = req.config;
 
   /** @type {{files: MongoFile[]}} */
@@ -142,6 +158,28 @@ const chatV2 = async (req, res) => {
         await handleError(new Error('Request closed'));
       }
     });
+<<<<<<< HEAD
+=======
+    const projectTurn = await resolveAssistantProjectTurn(
+      {
+        userId: req.user.id,
+        tenantId: req.user.tenantId,
+        conversationId: convoId,
+        requestedProjectId: endpointOption?.chatProjectId ?? req.body?.chatProjectId,
+        resolvedConversation: req.resolvedConversation,
+        filters: req.config?.filters,
+      },
+      { getConvo, getChatProject, getProjectFiles },
+    );
+    if (projectTurn.rejection) {
+      contentRejected = true;
+      return res.status(projectTurn.rejection.status).json(projectTurn.rejection.body);
+    }
+    const existingConversation = projectTurn.conversation;
+    const projectInstructions = projectTurn.instructions;
+    req.resolvedConversation = existingConversation;
+    req.chatProjectContext = projectTurn.context;
+>>>>>>> upstream/main
 
     if (convoId && !_thread_id) {
       completedRun = true;
@@ -169,11 +207,22 @@ const chatV2 = async (req, res) => {
         transactions.reduce((acc, curr) => acc + curr.rawAmount, 0),
       );
 
+<<<<<<< HEAD
       // TODO: make promptBuffer a config option; buffer for titles, needs buffer for system instructions
       const promptBuffer = parentMessageId === Constants.NO_PARENT && !_thread_id ? 200 : 0;
       // 5 is added for labels
       let promptTokens = (await countTokens(text + (promptPrefix ?? ''))) + 5;
       promptTokens += totalPreviousTokens + promptBuffer;
+=======
+      // TODO: make promptBuffer a config option; buffer for title generation.
+      const promptBuffer = parentMessageId === Constants.NO_PARENT && !_thread_id ? 200 : 0;
+      // 5 is added for labels
+      const promptText = joinChatProjectInstructions(
+        `${text ?? ''}${promptPrefix ?? ''}`,
+        projectInstructions,
+      );
+      let promptTokens = totalPreviousTokens + (await countTokens(promptText)) + 5 + promptBuffer;
+>>>>>>> upstream/main
       // Count tokens up to the current context window
       promptTokens = Math.min(promptTokens, getModelMaxTokens(model));
 
@@ -255,6 +304,7 @@ const chatV2 = async (req, res) => {
       endpointOption,
       clientTimestamp,
     });
+<<<<<<< HEAD
 
     let existingConversationPromise;
     const getExistingConversation = () => {
@@ -264,11 +314,23 @@ const chatV2 = async (req, res) => {
       existingConversationPromise ??= getConvo(req.user.id, convoId);
       return existingConversationPromise;
     };
+=======
+    if (projectInstructions) {
+      body.additional_instructions = joinChatProjectInstructions(
+        body.additional_instructions,
+        projectInstructions,
+      );
+    }
+>>>>>>> upstream/main
 
     const getRequestFileIds = async () => {
       let thread_file_ids = [];
       if (convoId) {
+<<<<<<< HEAD
         const convo = await getExistingConversation();
+=======
+        const convo = existingConversation;
+>>>>>>> upstream/main
         if (convo && convo.file_ids) {
           thread_file_ids = convo.file_ids;
         }
@@ -363,6 +425,10 @@ const chatV2 = async (req, res) => {
       /* asynchronous */
       userMessagePromise = saveUserMessage(req, { ...requestMessage, model });
 
+<<<<<<< HEAD
+=======
+      const conversationProjectId = projectTurn.membershipProjectId;
+>>>>>>> upstream/main
       conversation = {
         conversationId,
         endpoint,
@@ -370,6 +436,10 @@ const chatV2 = async (req, res) => {
         instructions: instructions,
         assistant_id,
         // model,
+<<<<<<< HEAD
+=======
+        ...(conversationProjectId !== undefined ? { chatProjectId: conversationProjectId } : {}),
+>>>>>>> upstream/main
       };
 
       if (file_ids.length) {
@@ -542,9 +612,23 @@ const chatV2 = async (req, res) => {
       iconURL: endpointOption.iconURL,
     };
 
+<<<<<<< HEAD
     sendEvent(res, {
       final: true,
       conversation,
+=======
+    if (userMessagePromise) {
+      await userMessagePromise;
+    }
+
+    const settledConversation = await settleAssistantFinal(() =>
+      saveAssistantMessage(req, { ...responseMessage, model }),
+    );
+
+    sendEvent(res, {
+      final: true,
+      conversation: { ...conversation, ...settledConversation },
+>>>>>>> upstream/main
       requestMessage: {
         parentMessageId,
         thread_id,
@@ -552,11 +636,14 @@ const chatV2 = async (req, res) => {
     });
     res.end();
 
+<<<<<<< HEAD
     if (userMessagePromise) {
       await userMessagePromise;
     }
     await saveAssistantMessage(req, { ...responseMessage, model });
 
+=======
+>>>>>>> upstream/main
     if (parentMessageId === Constants.NO_PARENT && !_thread_id) {
       addTitle(req, {
         text,

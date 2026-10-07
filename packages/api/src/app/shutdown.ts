@@ -22,6 +22,15 @@ type ShutdownTask = {
 const tasks: ShutdownTask[] = [];
 let nextRegistrationOrder = 0;
 let isShuttingDown = false;
+<<<<<<< HEAD
+=======
+let shutdownController = new AbortController();
+
+/** Cancels fail-closed dependency waits when process shutdown begins. */
+export function getShutdownSignal(): AbortSignal {
+  return shutdownController.signal;
+}
+>>>>>>> upstream/main
 let httpServer: Server | null = null;
 let forceExitTimer: NodeJS.Timeout | null = null;
 let shutdownStartedAt: number | null = null;
@@ -68,6 +77,28 @@ export function getRemainingShutdownMs(): number | null {
   return Math.max(0, SHUTDOWN_TIMEOUT_MS - (Date.now() - shutdownStartedAt));
 }
 
+<<<<<<< HEAD
+=======
+export function getClusterShutdownBudgetMs({
+  deadlineAt,
+  forceExitMs,
+  remainingMs = getRemainingShutdownMs(),
+  elapsedMs = getShutdownElapsedMs(),
+  now = Date.now(),
+}: {
+  deadlineAt: number | null;
+  forceExitMs: number;
+  remainingMs?: number | null;
+  elapsedMs?: number | null;
+  now?: number;
+}): number | null {
+  if (remainingMs == null || elapsedMs == null) {
+    return null;
+  }
+  return Math.min(remainingMs, deadlineAt == null ? forceExitMs - elapsedMs : deadlineAt - now);
+}
+
+>>>>>>> upstream/main
 export function isShutdownInProgress(): boolean {
   return isShuttingDown;
 }
@@ -97,6 +128,10 @@ export function __resetShutdownStateForTests(): void {
   tasks.length = 0;
   nextRegistrationOrder = 0;
   isShuttingDown = false;
+<<<<<<< HEAD
+=======
+  shutdownController = new AbortController();
+>>>>>>> upstream/main
   shutdownStartedAt = null;
   httpServer = null;
   /** A drain that never settles leaves this armed. It is `unref`'d, so it does
@@ -139,6 +174,10 @@ async function shutdown(signal: NodeJS.Signals): Promise<void> {
     return;
   }
   isShuttingDown = true;
+<<<<<<< HEAD
+=======
+  shutdownController.abort();
+>>>>>>> upstream/main
   shutdownStartedAt = Date.now();
   logger.info(`Received ${signal}, draining HTTP server...`);
 

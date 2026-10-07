@@ -23,6 +23,10 @@ import type {
   TConversation,
   TEndpointsConfig,
 } from 'librechat-data-provider';
+<<<<<<< HEAD
+=======
+import type { NewConversationOptions } from './Chat/contract';
+>>>>>>> upstream/main
 import type { AssistantListItem } from '~/common';
 import {
   updateLastSelectedModel,
@@ -45,11 +49,19 @@ import {
   retainFileDeletion,
   failedFileIdsFrom,
   logger,
+<<<<<<< HEAD
+=======
+  setDocumentTitle,
+>>>>>>> upstream/main
 } from '~/utils';
 import { useDeleteFilesMutation, useGetEndpointsQuery, useGetStartupConfig } from '~/data-provider';
 import { supersedeNavigation } from './Conversations/useNavigateToConvo';
 import useGetConversation from './Conversations/useGetConversation';
 import useAssistantListMap from './Assistants/useAssistantListMap';
+<<<<<<< HEAD
+=======
+import { useChatSettings } from '~/Providers/ChatSettingsContext';
+>>>>>>> upstream/main
 import { clearUploadRecovery } from './Files/useFileHandling';
 import { useResetChatBadges } from './useChatBadges';
 import { useApplyModelSpecEffects } from './Agents';
@@ -95,7 +107,11 @@ const useNewConvo = (index = 0) => {
   const modelsQuery = useGetModelsQuery();
   const assistantsListMap = useAssistantListMap();
   const { pauseGlobalAudio } = usePauseGlobalAudio(index);
+<<<<<<< HEAD
   const saveDrafts = useRecoilValue<boolean>(store.saveDrafts);
+=======
+  const { saveDrafts } = useChatSettings();
+>>>>>>> upstream/main
   const resetBadges = useResetChatBadges();
 
   const { mutateAsync } = useDeleteFilesMutation({
@@ -288,7 +304,11 @@ const useNewConvo = (index = 0) => {
         if (conversation.conversationId === Constants.NEW_CONVO && !modelsData) {
           const appTitle = localStorage.getItem(LocalStorageKeys.APP_TITLE) ?? '';
           if (appTitle) {
+<<<<<<< HEAD
             document.title = appTitle;
+=======
+            setDocumentTitle(appTitle, true);
+>>>>>>> upstream/main
           }
           const path = `/c/${Constants.NEW_CONVO}${getParams(conversation)}`;
           /** Honor disableFocus here too: the transient focus intent survives
@@ -327,6 +347,7 @@ const useNewConvo = (index = 0) => {
       keepAddedConvos = false,
       keepComposerState = false,
       disableParams,
+<<<<<<< HEAD
     }: {
       template?: Partial<TConversation>;
       preset?: Partial<TPreset>;
@@ -340,6 +361,9 @@ const useNewConvo = (index = 0) => {
       keepComposerState?: boolean;
       disableParams?: boolean;
     } = {}) {
+=======
+    }: NewConversationOptions = {}) {
+>>>>>>> upstream/main
       const nextConversationId = _template.conversationId ?? '';
       const keepsExistingDraft =
         keepComposerState ||

@@ -1,7 +1,11 @@
+<<<<<<< HEAD
 /* eslint-disable i18next/no-literal-string */
 /* ^ We're not worried about i18n for this app ^ */
 
 import React, { useState, useEffect, useMemo } from 'react';
+=======
+import React, { useState, useMemo } from 'react';
+>>>>>>> upstream/main
 import { PermissionTypes, Permissions } from 'librechat-data-provider';
 import {
   OGDialog,
@@ -155,6 +159,7 @@ export default function MemoryEditDialog({
       <OGDialogTemplate
         title={hasUpdateAccess ? localize('com_ui_edit_memory') : localize('com_ui_view_memory')}
         showCloseButton={false}
+<<<<<<< HEAD
         className="w-11/12 md:max-w-lg"
         main={
           <div className="space-y-4">
@@ -181,6 +186,19 @@ export default function MemoryEditDialog({
 
                 {/* Usage badge - Right (memory-specific) */}
             {/*
+=======
+        className="w-11/12 md:max-w-2xl"
+        main={
+          <div className="space-y-4">
+            {/* When it last changed, and what it costs. The size is the badge's to
+                state when a limit gives it something to be a share of, and a plain
+                count otherwise: two slots, so neither is stranded mid-bar. */}
+            {memory && (
+              <div className="border-border-light bg-surface-secondary flex items-center justify-between gap-3 rounded-lg border px-3 py-2">
+                <span className="text-text-secondary min-w-0 truncate text-xs">
+                  {formatDateTime(memory.updated_at, hour12)}
+                </span>
+>>>>>>> upstream/main
                 {memoryUsage ? (
                   <MemoryUsageBadge
                     percentage={memoryUsage.percentage}
@@ -189,6 +207,7 @@ export default function MemoryEditDialog({
                     tooltipMax={memoryUsage.availableForMemory}
                   />
                 ) : (
+<<<<<<< HEAD
                   <div />
                 )}
               </div>
@@ -201,6 +220,22 @@ export default function MemoryEditDialog({
                 {localize('com_ui_key')}
                 */}
                 Label
+=======
+                  memory.tokenCount !== undefined && (
+                    <span className="text-text-secondary shrink-0 text-xs">
+                      {memory.tokenCount.toLocaleString()}{' '}
+                      {localize(memory.tokenCount === 1 ? 'com_ui_token' : 'com_ui_tokens')}
+                    </span>
+                  )
+                )}
+              </div>
+            )}
+
+            {/* Key input */}
+            <div className="space-y-2">
+              <Label htmlFor="memory-key" className="text-text-primary text-sm font-medium">
+                {localize('com_ui_key')}
+>>>>>>> upstream/main
               </Label>
               <Input
                 id="memory-key"
@@ -208,8 +243,12 @@ export default function MemoryEditDialog({
                 onChange={(e) => hasUpdateAccess && setKey(e.target.value)}
                 onBlur={() => setTouched((prev) => ({ ...prev, key: true }))}
                 onKeyDown={handleKeyPress}
+<<<<<<< HEAD
                 // placeholder={localize('com_ui_enter_key')} // NJ: Rename Key -> Label
                 placeholder="Enter label"
+=======
+                placeholder={localize('com_ui_enter_key')}
+>>>>>>> upstream/main
                 className="w-full"
                 disabled={!hasUpdateAccess}
                 aria-invalid={showKeyError && keyError != null}
@@ -225,11 +264,16 @@ export default function MemoryEditDialog({
 
             {/* Value textarea */}
             <div className="space-y-2">
+<<<<<<< HEAD
               <Label htmlFor="memory-value" className="text-sm font-medium text-text-primary">
                 {/* NJ: Rename Value -> Details
                 {localize('com_ui_value')}
                 */}
                 Details
+=======
+              <Label htmlFor="memory-value" className="text-text-primary text-sm font-medium">
+                {localize('com_ui_value')}
+>>>>>>> upstream/main
               </Label>
               <Textarea
                 id="memory-value"
@@ -237,10 +281,16 @@ export default function MemoryEditDialog({
                 onChange={(e) => hasUpdateAccess && setValue(e.target.value)}
                 onBlur={() => setTouched((prev) => ({ ...prev, value: true }))}
                 onKeyDown={handleKeyPress}
+<<<<<<< HEAD
                 // placeholder={localize('com_ui_enter_value')} // NJ: Rename Value -> Details
                 placeholder="Enter details"
                 className="min-h-[100px] w-full resize-none rounded-lg border border-border-light bg-transparent px-3 py-2 text-sm text-text-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-border-heavy disabled:cursor-not-allowed disabled:opacity-50"
                 rows={4}
+=======
+                placeholder={localize('com_ui_enter_value')}
+                className="border-border-light text-text-primary focus-visible:ring-border-heavy max-h-[45vh] min-h-[11.25rem] w-full resize-y rounded-lg border bg-transparent px-3 py-2 text-sm focus-visible:ring-1 disabled:cursor-not-allowed disabled:opacity-50"
+                rows={8}
+>>>>>>> upstream/main
                 disabled={!hasUpdateAccess}
                 aria-invalid={showValueError && valueError != null}
                 aria-describedby="memory-value-message"

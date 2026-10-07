@@ -3,6 +3,10 @@ import type { NamedExoticComponent, ReactNode } from 'react';
 import type { ProviderId } from 'librechat-data-provider';
 import type { JSX } from 'react/jsx-runtime';
 import { getProviderIconDef } from './registry';
+<<<<<<< HEAD
+=======
+import { pxToRem } from '../../utils/theme';
+>>>>>>> upstream/main
 import { ProviderIcon } from './Icon';
 import { cn } from '../../utils';
 
@@ -32,8 +36,13 @@ function ProviderAvatarComponent({
       title={def.label}
       style={{
         background: hasBrand ? def.brandColor : 'transparent',
+<<<<<<< HEAD
         width: size,
         height: size,
+=======
+        width: pxToRem(size),
+        height: pxToRem(size),
+>>>>>>> upstream/main
         color: hasBrand ? 'var(--provider-foreground, #ffffff)' : undefined,
       }}
       className={cn(

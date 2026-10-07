@@ -1,5 +1,14 @@
 const crypto = require('crypto');
+<<<<<<< HEAD
 const { sendEvent } = require('@librechat/api');
+=======
+const {
+  sendEvent,
+  rejectUnprotectedDeniedMessage,
+  stampPrivateTextMessage,
+  savePrivateTextMessage,
+} = require('@librechat/api');
+>>>>>>> upstream/main
 const { getResponseSender, Constants } = require('librechat-data-provider');
 const { sendError } = require('~/server/middleware/error');
 const { saveMessage } = require('~/models');
@@ -21,6 +30,13 @@ const { saveMessage } = require('~/models');
  * @throws {Error} Throws an error if there's an issue saving the message or sending the error.
  */
 const denyRequest = async (req, res, errorMessage) => {
+<<<<<<< HEAD
+=======
+  if (rejectUnprotectedDeniedMessage(req, res)) {
+    return;
+  }
+
+>>>>>>> upstream/main
   let responseText = errorMessage;
   if (typeof errorMessage === 'object') {
     responseText = JSON.stringify(errorMessage);
@@ -28,6 +44,7 @@ const denyRequest = async (req, res, errorMessage) => {
 
   const { messageId, conversationId: _convoId, parentMessageId, text } = req.body;
   const conversationId = _convoId ?? crypto.randomUUID();
+<<<<<<< HEAD
 
   const userMessage = {
     sender: 'User',
@@ -43,6 +60,29 @@ const denyRequest = async (req, res, errorMessage) => {
 
   if (shouldSaveMessage) {
     await saveMessage(
+=======
+  const shouldSaveMessage = Boolean(
+    _convoId && parentMessageId && parentMessageId !== Constants.NO_PARENT,
+  );
+
+  const userMessage = stampPrivateTextMessage(
+    req,
+    {
+      sender: 'User',
+      messageId: messageId ?? crypto.randomUUID(),
+      parentMessageId,
+      conversationId,
+      isCreatedByUser: true,
+      text,
+    },
+    shouldSaveMessage,
+  );
+
+  if (shouldSaveMessage) {
+    await savePrivateTextMessage(
+      saveMessage,
+      req,
+>>>>>>> upstream/main
       {
         userId: req?.user?.id,
         isTemporary: req?.resolvedConversation?.isTemporary ?? req?.body?.isTemporary,
@@ -54,6 +94,10 @@ const denyRequest = async (req, res, errorMessage) => {
     );
   }
 
+<<<<<<< HEAD
+=======
+  sendEvent(res, { message: userMessage, created: true });
+>>>>>>> upstream/main
   return await sendError(req, res, {
     sender: getResponseSender(req.body),
     messageId: crypto.randomUUID(),

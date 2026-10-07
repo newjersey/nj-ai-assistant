@@ -10,6 +10,11 @@ import type {
   StatefulCodeEnvironment,
   GraphEdge,
   Agent,
+<<<<<<< HEAD
+=======
+  AgentInstructionsPrompt,
+  RestrictedAgentInstructionsPrompt,
+>>>>>>> upstream/main
 } from 'librechat-data-provider';
 import type { OptionWithIcon, ExtendedFile } from './types';
 
@@ -37,6 +42,13 @@ export type AgentForm = {
   name: string | null;
   description: string | null;
   instructions: string | null;
+<<<<<<< HEAD
+=======
+  /** Whether instructions come from the inline editor or a linked native prompt group. */
+  instructionsSource: 'inline' | 'prompt';
+  /** The linked prompt group revision, or the restricted stub when the editor cannot view it. */
+  instructionsPrompt: AgentInstructionsPrompt | RestrictedAgentInstructionsPrompt | null;
+>>>>>>> upstream/main
   model: string | null;
   model_parameters: AgentModelParameters;
   tools?: string[];
@@ -52,7 +64,13 @@ export type AgentForm = {
   stateful_code_environment?: StatefulCodeEnvironment;
   /** Operator-configured managed or attached execution environment. */
   code_environment_id?: string | null;
+<<<<<<< HEAD
   code_workspace_id?: string;
+=======
+  code_environment_ids?: string[];
+  code_workspace_id?: string;
+  repositoryInstructions?: 'prefer' | 'defer' | 'off';
+>>>>>>> upstream/main
   /** Git authorship applied to sandboxed commands for this agent. */
   git_identity?: Agent['git_identity'];
   provider?: AgentProvider | OptionWithIcon;
@@ -63,6 +81,12 @@ export type AgentForm = {
   [AgentCapabilities.artifacts]?: ArtifactModes | string;
   recursion_limit?: number;
   support_contact?: SupportContact;
+<<<<<<< HEAD
+=======
+  conversation_starters?: string[];
+  /** Unsent starter text; builder-only, never sent to the API. */
+  conversation_starter_draft?: string;
+>>>>>>> upstream/main
   category: string;
   // Avatar management fields
   avatar_file?: File | null;

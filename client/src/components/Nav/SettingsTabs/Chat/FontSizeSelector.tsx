@@ -22,14 +22,22 @@ export default function FontSizeSelector() {
   const labelId = 'font-size-selector-label';
 
   return (
+<<<<<<< HEAD
     <div className="flex w-full items-center justify-between">
+=======
+    <div className="flex w-full flex-wrap items-center justify-between gap-2">
+>>>>>>> upstream/main
       <div id={labelId}>{localize('com_nav_font_size')}</div>
       <Dropdown
         value={fontSize}
         options={options}
         onChange={handleChange}
         testId="font-size-selector"
+<<<<<<< HEAD
         sizeClasses="z-50 w-[150px]"
+=======
+        sizeClasses="z-50 w-[9.375rem]"
+>>>>>>> upstream/main
         className="z-50"
         aria-labelledby={labelId}
       />

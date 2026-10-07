@@ -4,6 +4,10 @@ import {
   setupGracefulShutdown,
   isShutdownInProgress,
   registerShutdownTask,
+<<<<<<< HEAD
+=======
+  getClusterShutdownBudgetMs,
+>>>>>>> upstream/main
   __resetShutdownStateForTests,
 } from './shutdown';
 
@@ -18,6 +22,55 @@ const triggerSignal = (signal: NodeJS.Signals): void => {
 
 const flush = (): Promise<void> => new Promise((resolve) => setImmediate(resolve));
 
+<<<<<<< HEAD
+=======
+describe('getClusterShutdownBudgetMs', () => {
+  it('prefers the primary force-exit deadline over the worker timer', () => {
+    expect(
+      getClusterShutdownBudgetMs({
+        deadlineAt: 14_000,
+        forceExitMs: 30_000,
+        remainingMs: 60_000,
+        elapsedMs: 1_000,
+        now: 10_000,
+      }),
+    ).toBe(4_000);
+  });
+
+  it('uses the elapsed estimate when the primary deadline was not received', () => {
+    expect(
+      getClusterShutdownBudgetMs({
+        deadlineAt: null,
+        forceExitMs: 30_000,
+        remainingMs: 60_000,
+        elapsedMs: 2_000,
+      }),
+    ).toBe(28_000);
+  });
+
+  it('honors the tighter local limit and requires an active shutdown', () => {
+    expect(
+      getClusterShutdownBudgetMs({
+        deadlineAt: 15_000,
+        forceExitMs: 30_000,
+        remainingMs: 1_000,
+        elapsedMs: 5_000,
+        now: 10_000,
+      }),
+    ).toBe(1_000);
+    expect(
+      getClusterShutdownBudgetMs({
+        deadlineAt: 15_000,
+        forceExitMs: 30_000,
+        remainingMs: null,
+        elapsedMs: 5_000,
+        now: 10_000,
+      }),
+    ).toBeNull();
+  });
+});
+
+>>>>>>> upstream/main
 describe('setupGracefulShutdown', () => {
   let server: http.Server;
   let exitSpy: jest.SpyInstance;

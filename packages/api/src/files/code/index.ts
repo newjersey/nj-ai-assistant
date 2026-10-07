@@ -12,3 +12,7 @@ export * from './priming';
 export * from './process';
 export * from './publication';
 export * from './snapshot';
+<<<<<<< HEAD
+=======
+export * from './text';
+>>>>>>> upstream/main

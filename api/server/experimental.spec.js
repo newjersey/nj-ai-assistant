@@ -23,6 +23,21 @@ describe('Experimental server configuration', () => {
     expect(source).toMatch(/if \(shuttingDown\) \{[\s\S]*?return;[\s\S]*?Starting a new worker/);
   });
 
+<<<<<<< HEAD
+=======
+  it("drains background tasks within the primary's cluster shutdown deadline", () => {
+    expect(source).toMatch(
+      /registerBackgroundTaskShutdown\(\{[\s\S]*?getBudgetMs: clusterShutdownBudgetMs,[\s\S]*?\}\);/,
+    );
+    expect(source).toMatch(
+      /const clusterShutdownBudgetMs = \(\) =>\s*getClusterShutdownBudgetMs\(\{\s*deadlineAt: clusterShutdownDeadlineAt,\s*forceExitMs: CLUSTER_FORCE_EXIT_MS,\s*\}\);/,
+    );
+    expect(source).toMatch(
+      /const destroyGenerationJobManager = \(\) => \{\s*const budgetMs = clusterShutdownBudgetMs\(\);/,
+    );
+  });
+
+>>>>>>> upstream/main
   it('starts approval expiry after installing the scheduled-run callback', () => {
     const handlerIndex = source.indexOf(
       'GenerationJobManager.setApprovalExpiredHandler(recordExpiredScheduleApproval);',
@@ -73,7 +88,13 @@ describe('Experimental server configuration', () => {
 
   it('configures routed subagent controls before a worker accepts requests', () => {
     const redisReadyIndex = source.indexOf('await waitForKeyvRedisClient();');
+<<<<<<< HEAD
     const routingIndex = source.indexOf('await configureSubagentTaskRouting();');
+=======
+    const routingIndex = source.indexOf(
+      'await configureSubagentTaskRouting(baseAppConfig?.endpoints?.agents?.subagentActivity);',
+    );
+>>>>>>> upstream/main
     const listenIndex = source.indexOf('const server = app.listen');
 
     expect(redisReadyIndex).toBeGreaterThan(-1);
@@ -95,6 +116,22 @@ describe('Experimental server configuration', () => {
     expect(listenIndex).toBeGreaterThan(eventRuntimeIndex);
   });
 
+<<<<<<< HEAD
+=======
+  it('passes the same idle recovery policy to both server startup paths', () => {
+    const standard = fs.readFileSync(path.join(__dirname, 'index.js'), 'utf8');
+    for (const [entrypoint, config] of [
+      [source, 'baseAppConfig'],
+      [standard, 'appConfig'],
+    ]) {
+      const start = entrypoint.indexOf('await initializeAgentTriggerService({');
+      expect(start).toBeGreaterThan(-1);
+      const call = entrypoint.slice(start, entrypoint.indexOf('});', start));
+      expect(call).toContain(`idlePolling: ${config}?.endpoints?.agents?.eventDriven?.idlePolling`);
+    }
+  });
+
+>>>>>>> upstream/main
   it('matches the standard server pre-authentication tenant routes', () => {
     expect(source).toContain("app.use('/oauth', preAuthTenantMiddleware, routes.oauth);");
     expect(source).toContain("app.use('/api/auth', preAuthTenantMiddleware, routes.auth);");

@@ -1,8 +1,14 @@
 import { createContext, useContext } from 'react';
+<<<<<<< HEAD
 import useChatHelpers from '~/hooks/Chat/useChatHelpers';
 type TChatContext = ReturnType<typeof useChatHelpers>;
 
 export const ChatContext = createContext<TChatContext | null>(null);
+=======
+import type { ChatContract } from '~/hooks/Chat/contract';
+
+export const ChatContext = createContext<ChatContract | null>(null);
+>>>>>>> upstream/main
 export const useChatContext = () => {
   const ctx = useContext(ChatContext);
   if (!ctx) {
