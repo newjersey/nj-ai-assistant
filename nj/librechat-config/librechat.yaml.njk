@@ -91,14 +91,25 @@ endpoints:
 # We explicitly spec our models (since we only have a few models and this makes the selector simpler)
 modelSpecs:
   list:
-{% if NJ_FF_INCLUDE_SONNET_5 === "true" %}
-    - name: claude-sonnet-5
-      label: 'Claude Sonnet 5'
+{% if NJ_FF_INCLUDE_SONNET_5_5 === "true" %}
+    - name: 'Claude Sonnet 5.5'
+      label: 'Claude Sonnet 5.5'
       default: true
       preset:
         endpoint: 'bedrock'
-        model: 'us.anthropic.claude-sonnet-5'
+        model: 'us.anthropic.claude-sonnet-5-5'
 {% endif %}
+    - name: 'Claude Sonnet 5'
+      label: 'Claude Sonnet 5'
+{% if NJ_FF_SHOW_LEGACY_MODELS !== "true" %}
+      showInMenu: false
+{% endif %}
+{% if NJ_FF_INCLUDE_SONNET_5_5 !== "true" and NJ_FF_INCLUDE_SONNET_5 === "true" %}
+      default: true
+{% endif %}
+      preset:
+        endpoint: 'bedrock'
+        model: 'us.anthropic.claude-sonnet-5'
     - name: claude-sonnet-4-6
       label: 'Claude Sonnet 4.6'
       showInMenu: false
@@ -107,7 +118,10 @@ modelSpecs:
         model: 'us.anthropic.claude-sonnet-4-6'
     - name: 'Claude Sonnet 4.5'
       label: 'Claude Sonnet 4.5'
-{% if NJ_FF_INCLUDE_SONNET_5 !== "true" %}
+{% if NJ_FF_SHOW_LEGACY_MODELS !== "true" and NJ_FF_INCLUDE_SONNET_5_5 === "true" %}
+      showInMenu: false
+{% endif %}
+{% if NJ_FF_INCLUDE_SONNET_5_5 !== "true" and NJ_FF_INCLUDE_SONNET_5 !== "true" %}
       default: true
 {% endif %}
       preset:
