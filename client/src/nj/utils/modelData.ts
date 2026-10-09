@@ -20,6 +20,11 @@ const modelData: Record<string, ModelInfo> = {
     knowledgeCutoff: 'January 2026',
     released: 'June 2026',
   },
+  'us.anthropic.claude-sonnet-5-5': {
+    name: 'Claude Sonnet 5.5',
+    knowledgeCutoff: 'June 2026',
+    released: 'September 2026',
+  },
 };
 
 export function getModelInfo(modelId: string | null): ModelInfo | null {
