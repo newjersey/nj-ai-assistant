@@ -16,7 +16,11 @@ const CodeInterpreterFiles = ({ children }: { children: React.ReactNode }) => {
   const localize = useLocalize();
   return (
     <div>
+<<<<<<< HEAD
       <div className="text-token-text-tertiary mb-2 text-xs">
+=======
+      <div className="text-text-tertiary mb-2 text-xs">
+>>>>>>> upstream/main
         {localize('com_assistants_code_interpreter_files')}
       </div>
       {/* Files available to Code Interpreter only */}
@@ -75,7 +79,11 @@ export default function Knowledge({
     <div className="mb-6">
       <div className="mb-1.5 flex items-center">
         <span>
+<<<<<<< HEAD
           <label className="text-token-text-primary block font-medium">
+=======
+          <label className="text-text-primary block font-medium">
+>>>>>>> upstream/main
             {assistant_id
               ? localize('com_assistants_knowledge')
               : localize('com_assistants_knowledge_disabled')}
@@ -83,7 +91,11 @@ export default function Knowledge({
         </span>
       </div>
       <div className="flex flex-col gap-4">
+<<<<<<< HEAD
         <div className="text-token-text-tertiary rounded-lg">
+=======
+        <div className="text-text-tertiary rounded-lg">
+>>>>>>> upstream/main
           {assistant_id ? localize('com_assistants_knowledge_info') : ''}
         </div>
         {/* Files available to both tools */}
@@ -111,7 +123,11 @@ export default function Knowledge({
           <button
             type="button"
             disabled={!assistant_id}
+<<<<<<< HEAD
             className="btn btn-neutral border-token-border-light relative h-8 rounded-lg font-medium"
+=======
+            className="btn btn-neutral border-border-light relative h-8 rounded-lg font-medium"
+>>>>>>> upstream/main
             onClick={handleButtonClick}
           >
             <div className="flex w-full items-center justify-center gap-2">

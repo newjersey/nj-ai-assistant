@@ -21,9 +21,30 @@ const {
   collectModelBoundHistoricalFileIdState,
   projectModelBoundSourceFiles,
   isModelBoundAttachmentFile,
+<<<<<<< HEAD
   withBalanceReservations,
   findCheckpointSummaryPart,
   getSummaryPartText,
+=======
+  isToolOwnedAttachment,
+  withBalanceReservations,
+  findCheckpointSummaryPart,
+  getSummaryPartText,
+  resolveCheckpointMessage,
+  runAfterSeed,
+  saveTurnConversation,
+  seedTurnConversation,
+  announceReply,
+  needsRetentionConversation,
+  getConversationWriteContext,
+  savePrivateTextMessage,
+  stampPrivateTextMessage,
+  deferPrivateTextStart,
+  requirePrivateTextPersistence,
+  rejectPrivateTextAdmission,
+  bindPrivateTextPersistenceAbort,
+  persistedReasoningOverrideFields,
+>>>>>>> upstream/main
 } = require('@librechat/api');
 const {
   Constants,
@@ -32,11 +53,17 @@ const {
   ErrorTypes,
   ContentTypes,
   isCompactedLeaf,
+<<<<<<< HEAD
   excludedKeys,
   EModelEndpoint,
   isParamEndpoint,
   isAgentsEndpoint,
   isEphemeralAgentId,
+=======
+  EModelEndpoint,
+  isParamEndpoint,
+  isAgentsEndpoint,
+>>>>>>> upstream/main
   supportsBalanceCheck,
   isBedrockDocumentType,
   HITL_MESSAGE_FILTER_FIELDS,
@@ -282,6 +309,15 @@ class BaseClient {
     return false;
   }
 
+<<<<<<< HEAD
+=======
+  /** Whether a deferred parent write may still create a new conversation's row up front, so
+   * the conversation lists can return it while the run is in flight. */
+  shouldSeedDeferredConversation() {
+    return false;
+  }
+
+>>>>>>> upstream/main
   /** Returns the request-scoped deferred parent-write controller, when any. */
   getModelBoundUserMessagePersistence() {
     return this.modelBoundUserMessagePersistence;
@@ -576,6 +612,7 @@ class BaseClient {
     } = await this.setMessageOptions(opts);
     this.options.startupTelemetry?.mark('history_loaded');
 
+<<<<<<< HEAD
     const userMessage = this.resolveStartUserMessage({
       opts,
       message,
@@ -583,6 +620,18 @@ class BaseClient {
       parentMessageId,
       conversationId,
     });
+=======
+    const userMessage = stampPrivateTextMessage(
+      this.options.req,
+      this.resolveStartUserMessage({
+        opts,
+        message,
+        userMessageId,
+        parentMessageId,
+        conversationId,
+      }),
+    );
+>>>>>>> upstream/main
 
     /**
      * Attach quoted excerpts (the "Add to chat" selections from `req.body.quotes`)
@@ -599,6 +648,18 @@ class BaseClient {
       }
     }
 
+<<<<<<< HEAD
+=======
+    Object.assign(
+      userMessage,
+      persistedReasoningOverrideFields({
+        rawReasoningOverride: this.options.req?.body?.reasoningOverride,
+        isEdited: opts.isEdited,
+        isCompaction: opts.isCompaction,
+      }),
+    );
+
+>>>>>>> upstream/main
     if (typeof opts?.getReqData === 'function') {
       opts.getReqData({
         userMessage,
@@ -608,10 +669,20 @@ class BaseClient {
       });
     }
 
+<<<<<<< HEAD
     if (typeof opts?.onStart === 'function') {
       const isNewConvo = !requestConvoId && parentMessageId === Constants.NO_PARENT;
       opts.onStart(userMessage, responseMessageId, isNewConvo);
     }
+=======
+    this.privateTextStart = deferPrivateTextStart(
+      this.options.req,
+      opts?.onStart,
+      userMessage,
+      responseMessageId,
+      !requestConvoId && parentMessageId === Constants.NO_PARENT,
+    );
+>>>>>>> upstream/main
 
     return {
       ...opts,
@@ -909,6 +980,21 @@ class BaseClient {
       if (this.shouldDeferUserMessagePersistence()) {
         let state = 'pending';
         let startPersistence = startUserMessagePersistence;
+<<<<<<< HEAD
+=======
+        if (!this.skipSaveConvo && this.shouldSeedDeferredConversation()) {
+          const seed = seedTurnConversation(
+            db,
+            this.getTurnConversationFields(
+              this.options,
+              userMessage.conversationId,
+              saveOptions,
+              'api/app/clients/BaseClient.js - sendMessage #seedConversation',
+            ),
+          );
+          startPersistence = runAfterSeed(seed, startUserMessagePersistence);
+        }
+>>>>>>> upstream/main
         let resolvePersistence;
         let removeAbortListener = () => {};
         const persistencePromise = new Promise((resolve) => {
@@ -951,6 +1037,7 @@ class BaseClient {
           start,
           cancel,
         });
+<<<<<<< HEAD
         const requestAbortSignal = this.abortController?.signal;
         if (requestAbortSignal?.aborted) {
           /** Preserve the historical durability contract for Stop: abort
@@ -962,6 +1049,14 @@ class BaseClient {
           requestAbortSignal.addEventListener('abort', startOnAbort, { once: true });
           removeAbortListener = () => requestAbortSignal.removeEventListener('abort', startOnAbort);
         }
+=======
+        removeAbortListener = bindPrivateTextPersistenceAbort(
+          this.options.req,
+          this.abortController?.signal,
+          start,
+          cancel,
+        );
+>>>>>>> upstream/main
         this.modelBoundUserMessagePersistence = userMessagePersistence;
         userMessagePromise = persistencePromise;
       } else {
@@ -1009,6 +1104,10 @@ class BaseClient {
 
       completionResult = await this.sendCompletion(payload, opts);
     } catch (error) {
+<<<<<<< HEAD
+=======
+      rejectPrivateTextAdmission(this.options.req);
+>>>>>>> upstream/main
       if (userMessagePersistence?.isPending()) {
         if (isContentFilterError(error)) {
           userMessagePersistence.cancel();
@@ -1020,6 +1119,14 @@ class BaseClient {
     }
     /** A safe no-model completion (or a runtime that cannot expose the
      * admission callback) must not leave the parent-write gate pending. */
+<<<<<<< HEAD
+=======
+    await requirePrivateTextPersistence(
+      this.options.req,
+      () => (userMessagePersistence != null ? userMessagePersistence.start() : userMessagePromise),
+      this.privateTextStart,
+    );
+>>>>>>> upstream/main
     userMessagePersistence?.start();
     const { completion, metadata } = completionResult;
     if (this.abortController) {
@@ -1238,7 +1345,12 @@ class BaseClient {
       return [];
     }
 
+<<<<<<< HEAD
     const messages = (await db.getMessages({ conversationId, user: this.user })) ?? [];
+=======
+    const messages =
+      (await db.getMessages({ conversationId, user: this.user }, '+privateTextTokens')) ?? [];
+>>>>>>> upstream/main
     /** A client that reads beyond the walk below (which stops at a checkpoint
      *  summary) receives every row here; the rest keep nothing. */
     this.onHistoryLoaded?.(messages);
@@ -1323,6 +1435,7 @@ class BaseClient {
 
     const hasAddedConvo = options?.req?.body?.addedConvo != null;
     const req = options?.req;
+<<<<<<< HEAD
     if (
       req?.config?.interfaceConfig?.retentionMode === 'all' &&
       req?.config?.interfaceConfig?.generalChatRetention !== undefined &&
@@ -1343,6 +1456,15 @@ class BaseClient {
       interfaceConfig: req?.config?.interfaceConfig,
     };
     const savedMessage = await db.saveMessage(
+=======
+    if (needsRetentionConversation(req)) {
+      req.resolvedConversation = await db.getConvo(req.user.id, message.conversationId);
+    }
+    const reqCtx = getConversationWriteContext(req);
+    const savedMessage = await savePrivateTextMessage(
+      db.saveMessage,
+      req,
+>>>>>>> upstream/main
       reqCtx,
       {
         ...message,
@@ -1354,6 +1476,7 @@ class BaseClient {
       { context: 'api/app/clients/BaseClient.js - saveMessageToDatabase #saveMessage' },
     );
 
+<<<<<<< HEAD
     if (this.skipSaveConvo) {
       return { message: savedMessage };
     }
@@ -1419,12 +1542,86 @@ class BaseClient {
 
     if (req != null && conversation != null) {
       req.resolvedConversation = conversation;
+=======
+    /** Only a reply that is actually in the message history may light an indicator: a write
+     *  that resolved empty (duplicate-key recovery that could not re-read the row) would
+     *  otherwise announce a reply nobody can open. */
+    const persistedReply = savedMessage != null && message.isCreatedByUser === false;
+
+    if (this.skipSaveConvo) {
+      /* The secondary response of an override pair persists its message but deliberately skips
+         the conversation-field save, so the stamp below is never reached. The reply still has
+         to light the indicator: the primary response's stamp is older whenever this one
+         finishes later, and absent altogether when the primary failed. Best effort, because a
+         missed indicator must not fail a reply that is already persisted. */
+      /* `user` is the same id the message was just saved under; `reqCtx` carries an empty
+         string when no request object is present, which the direct-save paths do not
+         guarantee, so the fallback turns on truthiness rather than on nullishness. */
+      await announceReply(db, {
+        userId: reqCtx.userId || user || this.user,
+        conversationId: message.conversationId,
+        reply: {
+          messageId: persistedReply ? savedMessage.messageId : undefined,
+          content: message.content,
+          text: message.text,
+          attachments: message.attachments,
+          isTemporary: reqCtx.isTemporary,
+        },
+        context: 'BaseClient - skipped conversation save',
+      });
+      return { message: savedMessage };
+    }
+
+    const { conversation, initialized } = await saveTurnConversation(db, {
+      ...this.getTurnConversationFields(
+        options,
+        message.conversationId,
+        endpointOptions,
+        'api/app/clients/BaseClient.js - saveMessageToDatabase #saveConvo',
+      ),
+      ctx: reqCtx,
+      initialized: this.fetchedConvo === true,
+      savedMessageId: savedMessage?._id,
+      reply: persistedReply
+        ? {
+            messageId: savedMessage.messageId,
+            content: message.content,
+            text: message.text,
+            attachments: message.attachments,
+          }
+        : undefined,
+    });
+    if (initialized) {
+      this.fetchedConvo = true;
+>>>>>>> upstream/main
     }
 
     return { message: savedMessage, conversation };
   }
 
   /**
+<<<<<<< HEAD
+=======
+   * The conversation fields a turn's writes share.
+   * @param {Object} options - The client options snapshot.
+   * @param {string} conversationId
+   * @param {Partial<TConversation>} endpointOptions
+   * @param {string} context - Names the write in the save log.
+   */
+  getTurnConversationFields(options, conversationId, endpointOptions, context) {
+    return {
+      req: options.req,
+      conversationId,
+      endpoint: options.endpoint,
+      endpointType: options.endpointType,
+      endpointOptions,
+      agentId: options.agent?.id,
+      context,
+    };
+  }
+
+  /**
+>>>>>>> upstream/main
    * Update a message in the database.
    * @param {Partial<TMessage>} message
    */
@@ -1441,6 +1638,10 @@ class BaseClient {
    * - The message's 'role' is set to 'system'.
    * - The message's 'text' is set to its 'summary'.
    * - If the message has a 'summaryTokenCount', the message's 'tokenCount' is set to 'summaryTokenCount'.
+<<<<<<< HEAD
+=======
+   * - A message with a summary content block keeps its content from that block on, for the SDK formatter to promote.
+>>>>>>> upstream/main
    * The traversal stops at the message with the 'summary' property.
    *
    * Each message object should have an 'id' or 'messageId' property and may have a 'parentMessageId' property.
@@ -1490,6 +1691,7 @@ class BaseClient {
         break;
       }
 
+<<<<<<< HEAD
       let resolved = message;
       let hasSummary = false;
       if (summary) {
@@ -1514,11 +1716,19 @@ class BaseClient {
         }
       }
 
+=======
+      const checkpoint = summary ? resolveCheckpointMessage(message) : null;
+      const resolved = checkpoint ?? message;
+>>>>>>> upstream/main
       const shouldMap = mapMethod != null && (mapCondition != null ? mapCondition(resolved) : true);
       const processedMessage = shouldMap ? mapMethod(resolved) : resolved;
       orderedMessages.push(processedMessage);
 
+<<<<<<< HEAD
       if (hasSummary) {
+=======
+      if (checkpoint) {
+>>>>>>> upstream/main
         break;
       }
 
@@ -1844,6 +2054,7 @@ class BaseClient {
       /* An explicit `provider` path is authoritative: lazy provisioning stamps
        * `embedded`/`codeEnvRef` on files that are still meant for the model, so the
        * legacy tool-provisioning exclusion only applies to records without one. */
+<<<<<<< HEAD
       if (
         deliveryPath !== 'provider' &&
         (file.embedded === true ||
@@ -1851,6 +2062,9 @@ class BaseClient {
           file.metadata?.codeEnvRefs != null ||
           file.metadata?.fileIdentifier != null)
       ) {
+=======
+      if (deliveryPath !== 'provider' && isToolOwnedAttachment(file)) {
+>>>>>>> upstream/main
         allFiles.push(file);
         continue;
       }

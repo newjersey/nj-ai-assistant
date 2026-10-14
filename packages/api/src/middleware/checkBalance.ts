@@ -15,6 +15,10 @@ import type {
 } from '@librechat/data-schemas';
 import type { Response } from 'express';
 import type { ServerRequest } from '~/types/http';
+<<<<<<< HEAD
+=======
+import { buildBalanceUpdateFields } from './balance';
+>>>>>>> upstream/main
 
 interface TxData {
   user: string;
@@ -186,6 +190,7 @@ function buildInitialBalance(user: string, config?: BalanceConfig): IBalanceUpda
   if (config?.startBalance == null) {
     return undefined;
   }
+<<<<<<< HEAD
   const fields: IBalanceUpdate = { user, tokenCredits: config.startBalance };
   if (
     config.autoRefillEnabled &&
@@ -200,6 +205,9 @@ function buildInitialBalance(user: string, config?: BalanceConfig): IBalanceUpda
     fields.lastRefill = new Date();
   }
   return fields;
+=======
+  return buildBalanceUpdateFields(config, null, user);
+>>>>>>> upstream/main
 }
 
 /**
@@ -237,12 +245,34 @@ export async function checkBalance(
   });
 
   const expiresAt = new Date(Date.now() + ttlMs);
+<<<<<<< HEAD
+=======
+  let refillPolicy: BalanceReservationRequest['refillPolicy'];
+  if (deps.balanceConfig != null) {
+    // Initialization fields must never restore credits or restart an existing period.
+    const {
+      user: _user,
+      tokenCredits: _credits,
+      lastRefill: _lastRefill,
+      ...policy
+    } = buildBalanceUpdateFields(deps.balanceConfig, null, user);
+    refillPolicy = {
+      autoRefillEnabled: false,
+      refillMode: deps.balanceConfig.refillMode ?? 'add',
+      ...policy,
+    };
+  }
+>>>>>>> upstream/main
   const result = await deps.reserveBalance({
     user,
     reservationId,
     amount: tokenCost,
     expiresAt,
     initialBalance: buildInitialBalance(user, deps.balanceConfig),
+<<<<<<< HEAD
+=======
+    ...(refillPolicy != null ? { refillPolicy } : {}),
+>>>>>>> upstream/main
   });
 
   if (result?.reserved) {

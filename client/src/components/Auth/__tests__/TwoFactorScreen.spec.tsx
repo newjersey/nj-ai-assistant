@@ -1,9 +1,18 @@
 import { MemoryRouter } from 'react-router-dom';
+<<<<<<< HEAD
 import { act, render } from '@testing-library/react';
 import { ErrorTypes } from 'librechat-data-provider';
 import TwoFactorScreen from '../TwoFactorScreen';
 
 const mockShowToast = jest.fn();
+=======
+import { ErrorTypes } from 'librechat-data-provider';
+import { act, render, screen, fireEvent, waitFor } from '@testing-library/react';
+import TwoFactorScreen from '../TwoFactorScreen';
+
+const mockShowToast = jest.fn();
+const mockVerify = jest.fn();
+>>>>>>> upstream/main
 let mockVerifyOptions: { onError: (error: unknown) => void } | undefined;
 
 jest.mock('@librechat/client', () => ({
@@ -18,7 +27,11 @@ jest.mock('~/hooks', () => ({
 jest.mock('~/data-provider', () => ({
   useVerifyTwoFactorTempMutation: (options: { onError: (error: unknown) => void }) => {
     mockVerifyOptions = options;
+<<<<<<< HEAD
     return { mutate: jest.fn() };
+=======
+    return { mutate: mockVerify };
+>>>>>>> upstream/main
   },
 }));
 
@@ -36,6 +49,26 @@ describe('TwoFactorScreen verification errors', () => {
     mockVerifyOptions = undefined;
   });
 
+<<<<<<< HEAD
+=======
+  it.each(['deadbeef', '0123456789abcdef0123456789abcdef'])(
+    'submits the full legacy or new backup code: %s',
+    async (code) => {
+      renderScreen();
+      fireEvent.click(screen.getByRole('button', { name: 'com_ui_use_backup_code' }));
+      const input = screen.getByRole('textbox', {
+        name: 'com_ui_backup_code_verification_required',
+      });
+      expect(input).not.toHaveAttribute('maxlength');
+      fireEvent.change(input, { target: { value: code } });
+      fireEvent.click(screen.getByTestId('login-button'));
+      await waitFor(() =>
+        expect(mockVerify).toHaveBeenCalledWith({ tempToken: 'temp-token', backupCode: code }),
+      );
+    },
+  );
+
+>>>>>>> upstream/main
   it('shows a localized message when the server rejects a cross-origin submission', () => {
     renderScreen();
 

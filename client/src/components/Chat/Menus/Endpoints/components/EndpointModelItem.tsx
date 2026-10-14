@@ -93,7 +93,11 @@ function EndpointModelItemComponent({
     }
 
     return (
+<<<<<<< HEAD
       <div className="flex h-5 w-5 flex-shrink-0 items-center justify-center overflow-hidden rounded-full">
+=======
+      <div className="flex h-5 w-5 shrink-0 items-center justify-center overflow-hidden rounded-full">
+>>>>>>> upstream/main
         {content}
       </div>
     );
@@ -111,7 +115,11 @@ function EndpointModelItemComponent({
       <div className="flex w-full min-w-0 items-center gap-2 px-1 py-1">
         {renderAvatar()}
         <span className="truncate">{modelName}</span>
+<<<<<<< HEAD
         {isGlobal && <EarthIcon className="ml-1 size-4 text-surface-submit" />}
+=======
+        {isGlobal && <EarthIcon className="text-surface-submit ml-1 size-4" />}
+>>>>>>> upstream/main
       </div>
       <button
         type="button"
@@ -119,7 +127,11 @@ function EndpointModelItemComponent({
         onClick={handleFavoriteClick}
         aria-label={isFavorite ? localize('com_ui_unpin') : localize('com_ui_pin')}
         className={cn(
+<<<<<<< HEAD
           'rounded-md p-1 hover:bg-surface-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring-primary',
+=======
+          'hover:bg-surface-hover focus-visible:ring-ring-primary rounded-md p-1 focus-visible:ring-2 focus-visible:outline-hidden focus-visible:ring-inset',
+>>>>>>> upstream/main
           isFavorite
             ? 'visible'
             : // Visible by default so it's tappable on touch (no hover to
@@ -130,11 +142,19 @@ function EndpointModelItemComponent({
               'group-focus-within:visible group-hover:visible group-data-[active-item]:visible [@media(hover:hover)]:invisible',
         )}
       >
+<<<<<<< HEAD
         <MorphIcon icon={isFavorite ? PinOff : Pin} className="h-4 w-4 text-text-secondary" />
       </button>
       {isSelected && (
         <>
           <CheckCircle2 className="size-4 shrink-0 text-text-primary" aria-hidden="true" />
+=======
+        <MorphIcon icon={isFavorite ? PinOff : Pin} className="text-text-secondary h-4 w-4" />
+      </button>
+      {isSelected && (
+        <>
+          <CheckCircle2 className="text-text-primary size-4 shrink-0" aria-hidden="true" />
+>>>>>>> upstream/main
           <VisuallyHidden>{localize('com_a11y_selected')}</VisuallyHidden>
         </>
       )}

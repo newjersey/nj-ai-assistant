@@ -418,7 +418,23 @@ export function createRunFileHost<TContext extends RunFileToolContext>({
                 codeEnvRecoveryNames: undefined,
               }
             : undefined);
+<<<<<<< HEAD
         if (provisionState) provisionState.agentScopedFileIds = admittedSetupIds;
+=======
+        if (provisionState) {
+          provisionState.agentScopedFileIds = admittedSetupIds;
+          const destinations = new Map<string, string>();
+          for (const planned of [
+            source.provisionState?.codeEnvDestinations,
+            existingContext?.provisionState?.codeEnvDestinations,
+          ]) {
+            for (const [fileId, destination] of planned ?? []) {
+              if (admittedIds.has(fileId)) destinations.set(fileId, destination);
+            }
+          }
+          provisionState.codeEnvDestinations = destinations;
+        }
+>>>>>>> upstream/main
         const context: TContext = existingContext ?? {
           ...source,
           pendingProvisionedCodeFiles: undefined,

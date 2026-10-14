@@ -68,14 +68,21 @@ function SelectDropDownPop({
             <button
               data-testid="select-dropdown-button"
               className={cn(
+<<<<<<< HEAD
                 'pointer-cursor relative flex flex-col rounded-lg border border-border-light bg-surface-secondary py-2 pl-3 pr-10 text-left focus:ring-0 focus:ring-offset-0 sm:text-sm',
                 'hover:bg-surface-hover radix-state-open:bg-surface-hover',
                 'min-w-[200px] max-w-[215px] sm:min-w-full sm:max-w-full',
+=======
+                'border-border-light bg-surface-secondary relative flex cursor-pointer flex-col rounded-lg border py-2 pr-10 pl-3 text-left focus:ring-0 focus:ring-offset-0 sm:text-sm',
+                'hover:bg-surface-hover data-[state=open]:bg-surface-hover',
+                'max-w-[min(13.4375rem,90vw)] min-w-[min(12.5rem,90vw)] sm:max-w-full sm:min-w-full',
+>>>>>>> upstream/main
               )}
               aria-label={localize('com_ui_select_var', { 0: title })}
               aria-haspopup="false"
             >
               {' '}
+<<<<<<< HEAD
               {showLabel && <label className="block text-xs text-text-secondary">{title}</label>}
               <span className="inline-flex w-full">
                 <span
@@ -83,6 +90,15 @@ function SelectDropDownPop({
                     'flex h-6 items-center gap-1 text-sm text-text-primary',
                     !showLabel ? 'text-xs' : '',
                     'min-w-[75px] font-normal',
+=======
+              {showLabel && <label className="text-text-secondary block text-xs">{title}</label>}
+              <span className="inline-flex w-full">
+                <span
+                  className={cn(
+                    'text-text-primary flex h-6 items-center gap-1 text-sm',
+                    !showLabel ? 'text-xs' : '',
+                    'min-w-[4.6875rem] font-normal',
+>>>>>>> upstream/main
                   )}
                 >
                   {typeof value !== 'string' && value ? (value.label ?? '') : (value ?? '')}
@@ -96,7 +112,11 @@ function SelectDropDownPop({
                   viewBox="0 0 24 24"
                   strokeLinecap="round"
                   strokeLinejoin="round"
+<<<<<<< HEAD
                   className="h-4 w-4 text-text-tertiary"
+=======
+                  className="text-text-tertiary h-4 w-4"
+>>>>>>> upstream/main
                   height="1em"
                   width="1em"
                   xmlns="http://www.w3.org/2000/svg"
@@ -112,7 +132,11 @@ function SelectDropDownPop({
               side="bottom"
               align="start"
               className={cn(
+<<<<<<< HEAD
                 'z-50 mr-3 mt-2 max-h-[52vh] w-full max-w-[85vw] overflow-hidden overflow-y-auto rounded-lg border border-border-light bg-surface-secondary shadow-lg sm:max-w-full lg:max-h-[52vh]',
+=======
+                'border-border-light bg-surface-secondary z-50 mt-2 mr-3 max-h-[52vh] w-full max-w-[85vw] overflow-hidden overflow-y-auto rounded-lg border shadow-lg sm:max-w-full lg:max-h-[52vh]',
+>>>>>>> upstream/main
                 hasSearchRender && 'relative',
               )}
             >

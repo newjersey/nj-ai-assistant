@@ -10,7 +10,11 @@ const permissions: PermissionConfig[] = [
   { permission: Permissions.USE, labelKey: 'com_ui_marketplace_allow_use' },
 ];
 
+<<<<<<< HEAD
 const MarketplaceAdminSettings = ({ compact = false }: { compact?: boolean }) => {
+=======
+const MarketplaceAdminSettings = () => {
+>>>>>>> upstream/main
   const localize = useLocalize();
   const { showToast } = useToastContext();
 
@@ -23,6 +27,7 @@ const MarketplaceAdminSettings = ({ compact = false }: { compact?: boolean }) =>
     },
   });
 
+<<<<<<< HEAD
   const trigger = compact ? (
     <Button
       size="icon"
@@ -39,6 +44,18 @@ const MarketplaceAdminSettings = ({ compact = false }: { compact?: boolean }) =>
       aria-label={localize('com_ui_admin_settings')}
     >
       <ShieldEllipsis className="cursor-pointer" aria-hidden="true" />
+=======
+  /* `outline` matches the search field it sits beside — same border token, same
+     radius — and `size-9` keeps the two controls the same height. */
+  const trigger = (
+    <Button
+      size="icon-sm"
+      variant="outline"
+      className="size-9 shrink-0 transition-none"
+      aria-label={localize('com_ui_admin_settings')}
+    >
+      <ShieldEllipsis className="size-4" aria-hidden="true" />
+>>>>>>> upstream/main
     </Button>
   );
 

@@ -66,7 +66,11 @@ export default function AgentTool({
   return (
     <OGDialog>
       <div
+<<<<<<< HEAD
         className="group relative flex w-full items-center gap-1 rounded-lg p-1 text-sm hover:bg-gray-50 dark:hover:bg-gray-800/50"
+=======
+        className="group hover:bg-surface-secondary relative flex w-full items-center gap-1 rounded-lg p-1 text-sm"
+>>>>>>> upstream/main
         onMouseEnter={() => setIsHovering(true)}
         onMouseLeave={() => setIsHovering(false)}
         onFocus={() => setIsFocused(true)}
@@ -78,17 +82,28 @@ export default function AgentTool({
         }}
       >
         <div className="flex grow items-center">
+<<<<<<< HEAD
           <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center overflow-hidden rounded-full">
             {currentTool.icon ? (
               <div
                 className="flex h-6 w-6 items-center justify-center overflow-hidden rounded-full bg-center bg-no-repeat dark:bg-white/20"
+=======
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full">
+            {currentTool.icon ? (
+              <div
+                className="bg-surface-tertiary flex h-6 w-6 items-center justify-center overflow-hidden rounded-full bg-center bg-no-repeat"
+>>>>>>> upstream/main
                 style={{
                   backgroundImage: `url(${currentTool.icon})`,
                   backgroundSize: 'cover',
                 }}
               />
             ) : (
+<<<<<<< HEAD
               <div className="flex h-6 w-6 items-center justify-center rounded-md bg-surface-secondary text-text-secondary">
+=======
+              <div className="bg-surface-secondary text-text-secondary flex h-6 w-6 items-center justify-center rounded-md">
+>>>>>>> upstream/main
                 <Wrench className="h-3.5 w-3.5" aria-hidden="true" />
               </div>
             )}
@@ -106,7 +121,11 @@ export default function AgentTool({
             variant="ghost"
             size="icon"
             className={cn(
+<<<<<<< HEAD
               'h-7 w-7 rounded transition-all duration-200 hover:bg-surface-hover',
+=======
+              'hover:bg-surface-hover h-7 w-7 rounded transition-all duration-200',
+>>>>>>> upstream/main
               'focus:opacity-100 focus-visible:opacity-100',
               isHovering || isFocused ? 'opacity-100' : 'pointer-events-none opacity-0',
             )}
@@ -121,17 +140,28 @@ export default function AgentTool({
       <OGDialogTemplate
         showCloseButton={false}
         title={localize('com_ui_delete_tool')}
+<<<<<<< HEAD
         className="max-w-[450px]"
         main={
           <>
             <div className="flex w-full flex-col items-start gap-2 text-sm text-text-secondary">
+=======
+        className="max-w-[28.125rem]"
+        main={
+          <>
+            <div className="text-text-secondary flex w-full flex-col items-start gap-2 text-sm">
+>>>>>>> upstream/main
               <p>
                 {localize('com_ui_delete_tool_confirm')}{' '}
                 <strong>&quot;{currentTool.name}&quot;</strong>?
               </p>
               {currentTool.description && (
                 <div className="flex items-start gap-2">
+<<<<<<< HEAD
                   <CircleHelpIcon className="h-4 w-4 flex-shrink-0 text-text-secondary" />
+=======
+                  <CircleHelpIcon className="text-text-secondary h-4 w-4 shrink-0" />
+>>>>>>> upstream/main
                   <p className="text-sm">{currentTool.description}</p>
                 </div>
               )}

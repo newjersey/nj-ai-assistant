@@ -112,7 +112,11 @@ export default function ActionEditor({
       <OGDialogTemplate
         showCloseButton={false}
         title={localize('com_ui_delete_action')}
+<<<<<<< HEAD
         className="max-w-[450px]"
+=======
+        className="max-w-[28.125rem]"
+>>>>>>> upstream/main
         main={
           <Label className="text-left text-sm font-medium">
             {localize('com_ui_delete_action_confirm')}

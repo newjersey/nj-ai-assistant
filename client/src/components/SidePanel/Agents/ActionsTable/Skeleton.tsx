@@ -14,11 +14,19 @@ export default function ActionsTableSkeleton() {
   return (
     <table className="w-full table-auto text-sm" aria-busy="true" aria-live="polite">
       <thead>
+<<<<<<< HEAD
         <tr className="border-b border-border-light">
           {HEADER_KEYS.map((key) => (
             <th
               key={key}
               className="py-2 pr-3 text-left text-[11px] font-medium uppercase tracking-wide text-text-secondary"
+=======
+        <tr className="border-border-light border-b">
+          {HEADER_KEYS.map((key) => (
+            <th
+              key={key}
+              className="text-text-secondary py-2 pr-3 text-left text-[11px] font-medium tracking-wide uppercase"
+>>>>>>> upstream/main
             >
               {localize(key)}
             </th>
@@ -27,7 +35,11 @@ export default function ActionsTableSkeleton() {
       </thead>
       <tbody>
         {Array.from({ length: SKELETON_ROWS }, (_, row) => (
+<<<<<<< HEAD
           <tr key={row} className="border-b border-border-light last:border-0">
+=======
+          <tr key={row} className="border-border-light border-b last:border-0">
+>>>>>>> upstream/main
             <td className="py-2.5 pr-3">
               <Skeleton className="h-4 w-24 rounded" />
             </td>

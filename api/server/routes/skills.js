@@ -1,10 +1,17 @@
 const path = require('path');
+<<<<<<< HEAD
 const crypto = require('crypto');
+=======
+>>>>>>> upstream/main
 const multer = require('multer');
 const express = require('express');
 const {
   createImportHandler,
+<<<<<<< HEAD
   blockFilteredSkillFile,
+=======
+  createSkillUploadHandler,
+>>>>>>> upstream/main
   generateCheckAccess,
   getStorageMetadata,
   resolveRequestTenantId,
@@ -149,6 +156,7 @@ const importHandler = createImportHandler({
 // ---------------------------------------------------------------------------
 // Per-file upload handler (add a single file to an existing skill)
 // ---------------------------------------------------------------------------
+<<<<<<< HEAD
 async function uploadFileHandler(req, res) {
   try {
     const { file } = req;
@@ -253,6 +261,15 @@ async function uploadFileHandler(req, res) {
     return res.status(500).json({ error: 'Failed to upload file' });
   }
 }
+=======
+const uploadFileHandler = createSkillUploadHandler({
+  getSkillById,
+  getSkillFileByPath,
+  upsertSkillFile,
+  resolveStorage: resolveSkillStorage,
+  getStrategyFunctions,
+});
+>>>>>>> upstream/main
 
 // ---------------------------------------------------------------------------
 // Routes
@@ -306,9 +323,15 @@ router.get(
   handlers.listFiles,
 );
 
+<<<<<<< HEAD
 // Per-file upload (live — replaces 501 stub)
 router.post(
   '/:id/files',
+=======
+// Legacy upload and revision-checked editing. Older servers have no POST wildcard route.
+router.post(
+  ['/:id/files', '/:id/files/*relativePath'],
+>>>>>>> upstream/main
   canAccessSkillResource({ requiredPermission: PermissionBits.EDIT }),
   fileUploadIpLimiter,
   fileUploadUserLimiter,

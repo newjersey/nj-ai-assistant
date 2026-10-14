@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // useDocumentTitle.js
 import { useEffect } from 'react';
 
@@ -15,6 +16,15 @@ function useDocumentTitle(title: string) {
   //     }
   //   }, []
   // );
+=======
+import { useEffect } from 'react';
+import { setDocumentTitle } from '~/utils';
+
+function useDocumentTitle(title: string) {
+  useEffect(() => {
+    setDocumentTitle(title, true);
+  }, [title]);
+>>>>>>> upstream/main
 }
 
 export default useDocumentTitle;

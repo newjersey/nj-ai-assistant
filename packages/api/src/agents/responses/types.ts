@@ -275,8 +275,13 @@ export type OutputItem = MessageItem | FunctionCallItem | FunctionCallOutputItem
 export interface FunctionTool {
   type: 'function';
   name: string;
+<<<<<<< HEAD
   description?: string;
   parameters?: Record<string, unknown>;
+=======
+  description?: string | null;
+  parameters?: Record<string, unknown> | null;
+>>>>>>> upstream/main
   strict?: boolean;
 }
 
@@ -783,6 +788,14 @@ export interface ResponseContext {
   previousResponseId?: string;
   /** Instructions */
   instructions?: string;
+<<<<<<< HEAD
+=======
+  /**
+   * The caller's function tools that were actually declared to the model,
+   * echoed back on the response. Absent until the run resolves them.
+   */
+  tools?: FunctionTool[];
+>>>>>>> upstream/main
 }
 
 /** Validation result for requests */

@@ -1,5 +1,9 @@
 import { Spinner } from '@librechat/client';
+<<<<<<< HEAD
 import { Check, PlugZap, Zap } from 'lucide-react';
+=======
+import { Check, KeyRound, Zap } from 'lucide-react';
+>>>>>>> upstream/main
 import type { MCPServerStatus } from 'librechat-data-provider';
 import { useLocalize } from '~/hooks';
 import { cn } from '~/utils';
@@ -84,7 +88,14 @@ export default function MCPStatusBadge({
           role="status"
           className={cn(badgeBaseClass, 'bg-status-warning-subtle text-status-warning')}
         >
+<<<<<<< HEAD
           <PlugZap className="size-3" aria-hidden="true" />
+=======
+          {/* Credentials, the same glyph the config dialog puts on this state and
+              the row puts on the control that supplies them. A plug belongs to the
+              action that connects, not to the state of not being able to. */}
+          <KeyRound className="size-3" aria-hidden="true" />
+>>>>>>> upstream/main
           <span>{localize('com_nav_mcp_status_needs_auth')}</span>
         </div>
       );

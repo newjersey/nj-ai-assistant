@@ -15,12 +15,25 @@ const ctx: SettingsContextValue = {
   hasMultiConvo: false,
   hasPrompts: false,
   isLocalProvider: true,
+<<<<<<< HEAD
+=======
+  emailEnabled: true,
+  allowEmailChange: true,
+  passkeyLoginEnabled: false,
+  isTwoFactorPolicyProvider: true,
+>>>>>>> upstream/main
   twoFactorEnabled: false,
   allowAccountDeletion: true,
   aboutEnabled: false,
   engineTTS: 'browser',
   langfuseConnectionAccess: false,
   adminPanelURL: '',
+<<<<<<< HEAD
+=======
+  replyTabBadgeAllowed: true,
+  replyNotificationsAllowed: true,
+  replyNotificationSoundAllowed: true,
+>>>>>>> upstream/main
 };
 
 function setup(extra: Partial<SettingsContextValue> = {}, query = '') {

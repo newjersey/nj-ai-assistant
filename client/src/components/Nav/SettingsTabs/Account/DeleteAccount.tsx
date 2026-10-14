@@ -1,6 +1,10 @@
 import React, { useState, useCallback } from 'react';
 import { LockIcon, Trash } from 'lucide-react';
+<<<<<<< HEAD
 import { REGEXP_ONLY_DIGITS, REGEXP_ONLY_DIGITS_AND_CHARS } from 'input-otp';
+=======
+import { REGEXP_ONLY_DIGITS } from 'input-otp';
+>>>>>>> upstream/main
 import {
   InputOTPSeparator,
   OGDialogContent,
@@ -17,6 +21,10 @@ import {
   Input,
 } from '@librechat/client';
 import type { TDeleteUserRequest } from 'librechat-data-provider';
+<<<<<<< HEAD
+=======
+import BackupCodeInput, { isBackupCode } from '~/components/Auth/BackupCodeInput';
+>>>>>>> upstream/main
 import { useDeleteUserMutation } from '~/data-provider';
 import { useAuthContext } from '~/hooks/AuthContext';
 import { LocalizeFunction } from '~/common';
@@ -59,7 +67,11 @@ const DeleteAccount = ({ disabled = false }: { title?: string; disabled?: boolea
     [user?.email],
   );
 
+<<<<<<< HEAD
   const otpReady = !needs2FA || otpToken.length === (useBackup ? 8 : 6);
+=======
+  const otpReady = !needs2FA || (useBackup ? isBackupCode(otpToken) : otpToken.length === 6);
+>>>>>>> upstream/main
 
   return (
     <>
@@ -79,12 +91,21 @@ const DeleteAccount = ({ disabled = false }: { title?: string; disabled?: boolea
         </div>
         <OGDialogContent className="w-11/12 max-w-md">
           <OGDialogHeader>
+<<<<<<< HEAD
             <OGDialogTitle className="text-lg font-medium leading-6">
               {localize('com_nav_delete_account_confirm')}
             </OGDialogTitle>
           </OGDialogHeader>
           <div className="mb-8 text-sm text-text-primary">
             <ul className="font-semibold text-text-warning">
+=======
+            <OGDialogTitle className="text-lg leading-6 font-medium">
+              {localize('com_nav_delete_account_confirm')}
+            </OGDialogTitle>
+          </OGDialogHeader>
+          <div className="text-text-primary mb-8 text-sm">
+            <ul className="text-text-warning font-semibold">
+>>>>>>> upstream/main
               <li>{localize('com_nav_delete_warning')}</li>
               <li>{localize('com_nav_delete_data_info')}</li>
             </ul>
@@ -104,6 +125,7 @@ const DeleteAccount = ({ disabled = false }: { title?: string; disabled?: boolea
                   {localize('com_ui_2fa_verification_required')}
                 </Label>
                 <div className="flex justify-center">
+<<<<<<< HEAD
                   <InputOTP
                     value={otpToken}
                     onChange={setOtpToken}
@@ -123,6 +145,18 @@ const DeleteAccount = ({ disabled = false }: { title?: string; disabled?: boolea
                         <InputOTPSlot index={7} />
                       </InputOTPGroup>
                     ) : (
+=======
+                  {useBackup ? (
+                    <BackupCodeInput value={otpToken} onChange={setOtpToken} />
+                  ) : (
+                    <InputOTP
+                      value={otpToken}
+                      onChange={setOtpToken}
+                      maxLength={6}
+                      pattern={REGEXP_ONLY_DIGITS}
+                      className="gap-2"
+                    >
+>>>>>>> upstream/main
                       <>
                         <InputOTPGroup>
                           <InputOTPSlot index={0} />
@@ -136,8 +170,13 @@ const DeleteAccount = ({ disabled = false }: { title?: string; disabled?: boolea
                           <InputOTPSlot index={5} />
                         </InputOTPGroup>
                       </>
+<<<<<<< HEAD
                     )}
                   </InputOTP>
+=======
+                    </InputOTP>
+                  )}
+>>>>>>> upstream/main
                 </div>
                 <Button
                   type="button"
@@ -146,7 +185,11 @@ const DeleteAccount = ({ disabled = false }: { title?: string; disabled?: boolea
                     setUseBackup(!useBackup);
                     setOtpToken('');
                   }}
+<<<<<<< HEAD
                   className="h-auto p-0 text-sm font-normal text-text-primary hover:underline"
+=======
+                  className="text-text-primary h-auto p-0 text-sm font-normal hover:underline"
+>>>>>>> upstream/main
                 >
                   {useBackup ? localize('com_ui_use_2fa_code') : localize('com_ui_use_backup_code')}
                 </Button>
@@ -183,7 +226,11 @@ const renderDeleteButton = (
   <Button
     variant="destructive"
     className={cn(
+<<<<<<< HEAD
       'mt-4 w-full gap-0 bg-surface-tertiary text-text-primary transition-all duration-200 hover:bg-surface-tertiary',
+=======
+      'bg-surface-tertiary text-text-primary hover:bg-surface-tertiary mt-4 w-full gap-0 transition-all duration-200',
+>>>>>>> upstream/main
       isLocked
         ? 'cursor-not-allowed opacity-30 disabled:opacity-30'
         : 'bg-surface-destructive text-text-on-status hover:bg-surface-destructive-hover disabled:opacity-100',

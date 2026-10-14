@@ -22,6 +22,13 @@ jest.mock('~/hooks', () => ({
     key === 'com_ui_scroll_left' ? 'Scroll left' : 'Scroll right',
 }));
 
+<<<<<<< HEAD
+=======
+jest.mock('~/Providers/MCPAppsPolicyContext', () => ({
+  useMCPAppsPolicy: () => ({ enabled: true, legacyHtmlEnabled: true }),
+}));
+
+>>>>>>> upstream/main
 // Mock the UIResourceRenderer component
 jest.mock('@mcp-ui/client', () => ({
   UIResourceRenderer: ({ resource, onUIAction }: any) => (

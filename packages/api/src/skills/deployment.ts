@@ -188,6 +188,10 @@ export type DeploymentSkillBaseMethods = {
     skillId: SkillId,
     relativePath: string,
     update: { content?: string; isBinary?: boolean },
+<<<<<<< HEAD
+=======
+    expectedFileId?: string,
+>>>>>>> upstream/main
   ) => Promise<void>;
   updateSkillFileCodeEnvIds?: (
     updates: Array<{ skillId: SkillId; relativePath: string; codeEnvRef: CodeEnvRef }>,
@@ -604,6 +608,10 @@ export function createDeploymentSkillMethods<T extends DeploymentSkillBaseMethod
       skillId: SkillId,
       relativePath: string,
       update: { content?: string; isBinary?: boolean },
+<<<<<<< HEAD
+=======
+      expectedFileId?: string,
+>>>>>>> upstream/main
     ): Promise<void> => {
       const deploymentFile = registry.getFileByPath(skillId, relativePath);
       if (deploymentFile) {
@@ -616,7 +624,11 @@ export function createDeploymentSkillMethods<T extends DeploymentSkillBaseMethod
         return;
       }
       if (base.updateSkillFileContent) {
+<<<<<<< HEAD
         await base.updateSkillFileContent(skillId, relativePath, update);
+=======
+        await base.updateSkillFileContent(skillId, relativePath, update, expectedFileId);
+>>>>>>> upstream/main
       }
     },
     updateSkillFileCodeEnvIds: async (

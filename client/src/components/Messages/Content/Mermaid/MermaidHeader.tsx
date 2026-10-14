@@ -25,7 +25,11 @@ interface MermaidHeaderProps {
 }
 
 const iconBtnClass =
+<<<<<<< HEAD
   'flex items-center justify-center rounded-lg p-1.5 text-text-secondary transition-colors hover:bg-surface-hover hover:text-text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-border-heavy';
+=======
+  'flex items-center justify-center rounded-lg p-1.5 text-text-secondary transition-colors hover:bg-surface-hover hover:text-text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-focus-subtle';
+>>>>>>> upstream/main
 
 const MermaidHeader: React.FC<MermaidHeaderProps> = memo(
   ({
@@ -69,7 +73,11 @@ const MermaidHeader: React.FC<MermaidHeaderProps> = memo(
 
     return (
       <div className={cn('flex items-center justify-between gap-1 px-2 py-1', className)}>
+<<<<<<< HEAD
         <span className="rounded text-xs font-medium text-text-secondary">
+=======
+        <span className="text-text-secondary rounded text-xs font-medium">
+>>>>>>> upstream/main
           {localize('com_ui_mermaid')}
         </span>
         <div className={cn('flex items-center gap-1', actionsClassName)}>

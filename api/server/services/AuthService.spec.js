@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+/** Installed packages need real module IDs when Jest reuses a resolver across suites. */
+>>>>>>> upstream/main
 jest.mock(
   '@librechat/data-schemas',
   () => ({
@@ -7,7 +11,11 @@ jest.mock(
     DEFAULT_SESSION_EXPIRY: 900000,
     DEFAULT_REFRESH_TOKEN_EXPIRY: 604800000,
   }),
+<<<<<<< HEAD
   { virtual: true },
+=======
+  { virtual: false },
+>>>>>>> upstream/main
 );
 jest.mock(
   'librechat-data-provider',
@@ -16,7 +24,11 @@ jest.mock(
     SystemRoles: { USER: 'USER', ADMIN: 'ADMIN' },
     errorsToString: jest.fn(),
   }),
+<<<<<<< HEAD
   { virtual: true },
+=======
+  { virtual: false },
+>>>>>>> upstream/main
 );
 jest.mock(
   '@librechat/api',
@@ -60,6 +72,10 @@ jest.mock(
           : undefined;
       },
       resolveAppConfigForUser: jest.fn(async (_getAppConfig, _user) => ({})),
+<<<<<<< HEAD
+=======
+      commitPasswordReset: jest.fn(),
+>>>>>>> upstream/main
       createOpenIDSessionIdentity: jest.fn(
         ({ user, userId, openidSubject, tenantId, openidIssuer }) => {
           const normalize = (value) => {
@@ -94,7 +110,11 @@ jest.mock(
       CLOUDFRONT_SCOPE_COOKIE: 'LibreChat-CloudFront-Scope',
     };
   },
+<<<<<<< HEAD
   { virtual: true },
+=======
+  { virtual: false },
+>>>>>>> upstream/main
 );
 jest.mock('~/models', () => ({
   findUser: jest.fn(),
@@ -167,12 +187,20 @@ let resendVerificationEmail;
 let setAuthTokens;
 let setCloudFrontAuthCookies;
 let verifyEmail;
+<<<<<<< HEAD
+=======
+let commitPasswordReset;
+>>>>>>> upstream/main
 
 jest.isolateModules(() => {
   ({
     checkEmailConfig,
     isEmailDomainAllowed,
     resolveAppConfigForUser,
+<<<<<<< HEAD
+=======
+    commitPasswordReset,
+>>>>>>> upstream/main
     setRefreshTokenCookie,
     setOpenIDMarkerCookies,
     setCloudFrontCookies,
@@ -949,6 +977,10 @@ describe('requestPasswordReset', () => {
     expect(createToken).toHaveBeenCalledWith(
       expect.objectContaining({
         userId: user._id,
+<<<<<<< HEAD
+=======
+        email: user.email,
+>>>>>>> upstream/main
         type: 'password_reset',
       }),
     );
@@ -956,6 +988,7 @@ describe('requestPasswordReset', () => {
 });
 
 describe('resetPassword', () => {
+<<<<<<< HEAD
   beforeEach(() => {
     jest.clearAllMocks();
     checkEmailConfig.mockReturnValue(false);
@@ -1005,10 +1038,77 @@ describe('resetPassword', () => {
       type: 'password_reset',
     });
     updateUser.mockResolvedValue({ email: 'user@example.com' });
+=======
+  /** The reset policy itself (address binding, the compare-and-set, the email change
+   *  sweep) lives in `@librechat/api` and is covered by passwordReset.spec.ts. What
+   *  remains here is this file's wiring: which token lookup it injects, and which token
+   *  it deletes once the policy has committed. The double runs the injected lookup so
+   *  that wiring is still exercised, and decides nothing else. */
+  const resolvedUser = { email: 'user@example.com' };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    checkEmailConfig.mockReturnValue(false);
+    commitPasswordReset.mockImplementation(async (deps, { userId }) => {
+      const resetToken = await deps.findResetToken(userId);
+      return resetToken ? { ok: true, user: resolvedUser, resetToken } : { ok: false };
+    });
+  });
+
+  it('looks for a typed reset token before the untyped legacy shape', async () => {
+    findToken.mockResolvedValue(null);
+
+    const result = await resetPassword('user-reset', 'reset-token', 'new-password');
+
+    expect(result).toBeInstanceOf(Error);
+    expect(findToken).toHaveBeenNthCalledWith(
+      1,
+      { userId: 'user-reset', type: 'password_reset' },
+      { sort: { createdAt: -1 } },
+    );
+    expect(findToken).toHaveBeenNthCalledWith(
+      2,
+      { userId: 'user-reset', email: null, identifier: null, type: null },
+      { sort: { createdAt: -1 } },
+    );
+    expect(deleteTokens).not.toHaveBeenCalled();
+  });
+
+  it('hands the policy the database and password surfaces it needs', async () => {
+    findToken.mockResolvedValue({
+      token: 'reset-hash',
+      userId: 'user-reset',
+      type: 'password_reset',
+    });
+
+    await resetPassword('user-reset', 'reset-token', 'new-password');
+
+    expect(commitPasswordReset).toHaveBeenCalledWith(
+      expect.objectContaining({
+        findResetToken: expect.any(Function),
+        getUserById: expect.any(Function),
+        updateUser: expect.any(Function),
+        deleteTokens: expect.any(Function),
+        compareToken: expect.any(Function),
+        hashPassword: expect.any(Function),
+      }),
+      { userId: 'user-reset', token: 'reset-token', password: 'new-password' },
+    );
+  });
+
+  it('deletes only the typed reset token the policy consumed', async () => {
+    findToken.mockResolvedValue({
+      token: 'reset-hash',
+      userId: 'user-reset',
+      email: 'user@example.com',
+      type: 'password_reset',
+    });
+>>>>>>> upstream/main
 
     const result = await resetPassword('user-reset', 'reset-token', 'new-password');
 
     expect(result).toEqual({ message: 'Password reset was successful' });
+<<<<<<< HEAD
     expect(findToken).toHaveBeenCalledWith(
       {
         userId: 'user-reset',
@@ -1037,10 +1137,22 @@ describe('resetPassword', () => {
       return null;
     });
     updateUser.mockResolvedValue({ email: 'user@example.com' });
+=======
+    expect(deleteTokens).toHaveBeenCalledWith({ token: 'reset-hash', type: 'password_reset' });
+  });
+
+  it('deletes an untyped legacy token by its exact stored shape', async () => {
+    findToken.mockImplementation(async (query) =>
+      query.type === 'password_reset'
+        ? null
+        : { token: 'legacy-hash', userId: 'user-reset', email: null, identifier: null, type: null },
+    );
+>>>>>>> upstream/main
 
     const result = await resetPassword('user-reset', 'legacy-reset-token', 'new-password');
 
     expect(result).toEqual({ message: 'Password reset was successful' });
+<<<<<<< HEAD
     expect(findToken).toHaveBeenCalledWith(
       {
         userId: 'user-reset',
@@ -1059,11 +1171,46 @@ describe('resetPassword', () => {
     );
     expect(deleteTokens).toHaveBeenCalledWith({
       token: legacyResetHash,
+=======
+    expect(deleteTokens).toHaveBeenCalledWith({
+      token: 'legacy-hash',
+>>>>>>> upstream/main
       email: null,
       identifier: null,
       type: null,
     });
   });
+<<<<<<< HEAD
+=======
+
+  it('returns the generic error and touches nothing when the policy refuses', async () => {
+    findToken.mockResolvedValue(null);
+
+    const result = await resetPassword('user-reset', 'reset-token', 'new-password');
+
+    expect(result).toBeInstanceOf(Error);
+    expect(sendEmail).not.toHaveBeenCalled();
+    expect(deleteTokens).not.toHaveBeenCalled();
+  });
+
+  it('notifies the account once the reset has committed', async () => {
+    checkEmailConfig.mockReturnValue(true);
+    findToken.mockResolvedValue({
+      token: 'reset-hash',
+      userId: 'user-reset',
+      type: 'password_reset',
+    });
+
+    await resetPassword('user-reset', 'reset-token', 'new-password');
+
+    expect(sendEmail).toHaveBeenCalledWith(
+      expect.objectContaining({
+        email: 'user@example.com',
+        template: 'passwordReset.handlebars',
+      }),
+    );
+  });
+>>>>>>> upstream/main
 });
 
 describe('verifyEmail', () => {

@@ -45,7 +45,11 @@ const mockGenerationJobManager = {
 let mockHandlerDeps;
 const mockModels = {
   isAgentTriggerPrincipalActive: jest.fn(),
+<<<<<<< HEAD
   getConvo: jest.fn(),
+=======
+  getConvoCodeEnvironmentDecision: jest.fn(),
+>>>>>>> upstream/main
   replaceConvoCodeEnvironmentDecision: jest.fn(),
 };
 
@@ -164,7 +168,11 @@ describe('code environment routes', () => {
     await request(createApp()).get('/api/code-environments').expect(200);
 
     const { conversations, generations } = mockHandlerDeps;
+<<<<<<< HEAD
     expect(conversations.get).toBe(mockModels.getConvo);
+=======
+    expect(conversations.get).toBe(mockModels.getConvoCodeEnvironmentDecision);
+>>>>>>> upstream/main
     expect(conversations.replaceDecision).toBe(mockModels.replaceConvoCodeEnvironmentDecision);
     expect(generations).toBe(mockGenerationJobManager);
   });

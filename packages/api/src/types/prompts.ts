@@ -1,8 +1,13 @@
 import type { IPromptGroup as IPromptGroup } from '@librechat/data-schemas';
 import type { Types } from 'mongoose';
 
+<<<<<<< HEAD
 export interface PromptGroupsListResponse {
   promptGroups: IPromptGroup[];
+=======
+export interface PromptGroupsListResponse<T = IPromptGroup> {
+  promptGroups: T[];
+>>>>>>> upstream/main
   pageNumber: string;
   pageSize: string;
   pages: string;

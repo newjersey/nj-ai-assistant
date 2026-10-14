@@ -1,12 +1,21 @@
 import mongoose from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import type * as t from '~/types';
+<<<<<<< HEAD
 import { createTokenMethods } from './token';
 import tokenSchema from '~/schema/token';
+=======
+import { createTokenModel } from '~/models/token';
+import { createTokenMethods } from './token';
+>>>>>>> upstream/main
 
 /** Mocking logger */
 jest.mock('~/config/winston', () => ({
   error: jest.fn(),
+<<<<<<< HEAD
+=======
+  warn: jest.fn(),
+>>>>>>> upstream/main
   info: jest.fn(),
   debug: jest.fn(),
 }));
@@ -21,7 +30,11 @@ beforeAll(async () => {
   await mongoose.connect(mongoUri);
 
   /** Register models */
+<<<<<<< HEAD
   Token = mongoose.models.Token || mongoose.model<t.IToken>('Token', tokenSchema);
+=======
+  Token = createTokenModel(mongoose);
+>>>>>>> upstream/main
 
   /** Initialize methods */
   methods = createTokenMethods(mongoose);
@@ -34,6 +47,10 @@ afterAll(async () => {
 
 beforeEach(async () => {
   await mongoose.connection.dropDatabase();
+<<<<<<< HEAD
+=======
+  methods = createTokenMethods(mongoose);
+>>>>>>> upstream/main
 });
 
 describe('Token Methods - Detailed Tests', () => {
@@ -533,6 +550,109 @@ describe('Token Methods - Detailed Tests', () => {
     });
   });
 
+<<<<<<< HEAD
+=======
+  describe('replaceTokenIfCurrent', () => {
+    test('allows only one concurrent insert into an empty scope', async () => {
+      const userId = new mongoose.Types.ObjectId();
+      const scope = `email_change:${userId.toString()}`;
+      const candidates = [
+        {
+          userId,
+          type: 'email_change',
+          email: 'first@example.com',
+          token: 'first-token',
+          expiresIn: 900,
+        },
+        {
+          userId,
+          type: 'email_change',
+          email: 'second@example.com',
+          token: 'second-token',
+          expiresIn: 900,
+        },
+      ];
+
+      const results = await Promise.all(
+        candidates.map((candidate) => methods.replaceTokenIfCurrent(scope, null, candidate)),
+      );
+
+      expect([...results].sort()).toEqual([false, true]);
+      const winner = candidates[results.indexOf(true)];
+      const pending = await Token.findOne({ scope }).lean();
+      expect(pending?.token).toBe(winner.token);
+      expect(pending?.email).toBe(winner.email);
+      expect(await Token.countDocuments({ scope })).toBe(1);
+    });
+
+    test('allows only one concurrent replacement of the observed token', async () => {
+      const userId = new mongoose.Types.ObjectId();
+      const scope = `email_change:${userId.toString()}`;
+      await methods.replaceTokenIfCurrent(scope, null, {
+        userId,
+        type: 'email_change',
+        email: 'existing@example.com',
+        token: 'existing-token',
+        expiresIn: 900,
+      });
+
+      const candidates = [
+        {
+          userId,
+          type: 'email_change',
+          email: 'first@example.com',
+          token: 'first-token',
+          expiresIn: 900,
+        },
+        {
+          userId,
+          type: 'email_change',
+          email: 'second@example.com',
+          token: 'second-token',
+          expiresIn: 900,
+        },
+      ];
+      const results = await Promise.all(
+        candidates.map((candidate) =>
+          methods.replaceTokenIfCurrent(scope, 'existing-token', candidate),
+        ),
+      );
+
+      expect([...results].sort()).toEqual([false, true]);
+      const winner = candidates[results.indexOf(true)];
+      const pending = await Token.findOne({ scope }).lean();
+      expect(pending?.token).toBe(winner.token);
+      expect(pending?.email).toBe(winner.email);
+    });
+
+    test('preserves the current token when the expected token is stale', async () => {
+      const userId = new mongoose.Types.ObjectId();
+      const scope = `email_change:${userId.toString()}`;
+      await methods.replaceTokenIfCurrent(scope, null, {
+        userId,
+        type: 'email_change',
+        email: 'current@example.com',
+        token: 'current-token',
+        expiresIn: 900,
+      });
+
+      await expect(
+        methods.replaceTokenIfCurrent(scope, 'stale-token', {
+          userId,
+          type: 'email_change',
+          email: 'replacement@example.com',
+          token: 'replacement-token',
+          expiresIn: 900,
+        }),
+      ).resolves.toBe(false);
+
+      const pending = await Token.findOne({ scope }).lean();
+      expect(pending?.token).toBe('current-token');
+      expect(pending?.email).toBe('current@example.com');
+    });
+  });
+
+>>>>>>> upstream/main
   describe('deleteTokens', () => {
     let user1Id: mongoose.Types.ObjectId;
     let user2Id: mongoose.Types.ObjectId;

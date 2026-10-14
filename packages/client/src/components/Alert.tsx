@@ -8,20 +8,42 @@ const alertVariants: (
   props?:
     | ({
         variant?: 'info' | 'success' | 'warning' | 'error' | 'neutral' | null | undefined;
+<<<<<<< HEAD
       } & ClassProp)
     | undefined,
 ) => string = cva('relative flex gap-3 rounded-xl border px-4 py-3 text-sm', {
+=======
+        elevation?: 'flat' | 'raised' | null | undefined;
+      } & ClassProp)
+    | undefined,
+) => string = cva('relative flex gap-3 rounded-xl border border-border-light px-4 py-3 text-sm', {
+>>>>>>> upstream/main
   variants: {
     variant: {
       info: 'border-status-info-border bg-status-info-subtle text-status-info',
       success: 'border-status-success-border bg-status-success-subtle text-status-success',
       warning: 'border-status-warning-border bg-status-warning-subtle text-status-warning',
+<<<<<<< HEAD
       error: 'border-status-error-border bg-status-error-subtle text-status-error',
       neutral: 'border-status-neutral-border bg-status-neutral-subtle text-status-neutral',
     },
   },
   defaultVariants: {
     variant: 'info',
+=======
+      error: 'border-alert-error-border bg-alert-error-fill text-status-error',
+      neutral: 'border-status-neutral-border bg-status-neutral-subtle text-status-neutral',
+    },
+    /** `raised` lifts a notice off the surface it sits on with the lightest shadow. */
+    elevation: {
+      flat: '',
+      raised: 'shadow-xs',
+    },
+  },
+  defaultVariants: {
+    variant: 'info',
+    elevation: 'flat',
+>>>>>>> upstream/main
   },
 });
 
@@ -44,11 +66,24 @@ export interface AlertProps
 
 const Alert: React.ForwardRefExoticComponent<AlertProps & React.RefAttributes<HTMLDivElement>> =
   React.forwardRef<HTMLDivElement, AlertProps>(
+<<<<<<< HEAD
     ({ className, variant = 'info', icon, role = 'alert', children, ...props }, ref) => {
       const resolvedVariant = (variant ?? 'info') as AlertVariant;
       const DefaultIcon = defaultIcons[resolvedVariant];
       return (
         <div ref={ref} role={role} className={cn(alertVariants({ variant }), className)} {...props}>
+=======
+    ({ className, variant = 'info', elevation, icon, role = 'alert', children, ...props }, ref) => {
+      const resolvedVariant = (variant ?? 'info') as AlertVariant;
+      const DefaultIcon = defaultIcons[resolvedVariant];
+      return (
+        <div
+          ref={ref}
+          role={role}
+          className={cn(alertVariants({ variant, elevation }), className)}
+          {...props}
+        >
+>>>>>>> upstream/main
           {icon !== false && (
             <span className="mt-0.5 shrink-0" aria-hidden="true">
               {icon ?? <DefaultIcon className="size-4" />}

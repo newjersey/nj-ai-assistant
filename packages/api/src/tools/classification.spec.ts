@@ -12,6 +12,11 @@ import {
   getServerNameFromTool,
   agentHasDeferredTools,
 } from './classification';
+<<<<<<< HEAD
+=======
+import { bindToolApproval, getToolApprovalAuthKind } from './approval';
+import { extractMCPToolDefinition } from './classification';
+>>>>>>> upstream/main
 
 describe('classification.ts', () => {
   describe('getServerNameFromTool', () => {
@@ -543,6 +548,7 @@ describe('classification.ts', () => {
 
     it.each(
       [false, true].flatMap((definitionsOnly) => [
+<<<<<<< HEAD
         { definitionsOnly, statefulWorkspace: false, runtimes: ['bash'], supported: false },
         { definitionsOnly, statefulWorkspace: true, runtimes: ['py'], supported: false },
         { definitionsOnly, statefulWorkspace: true, runtimes: ['bash'], supported: false },
@@ -551,6 +557,41 @@ describe('classification.ts', () => {
       'gates attached PTC: definitionsOnly=$definitionsOnly stateful=$statefulWorkspace runtimes=$runtimes',
       async ({ definitionsOnly, statefulWorkspace, runtimes, supported }) => {
         const workerId = `worker-${definitionsOnly}-${statefulWorkspace}-${runtimes[0]}`;
+=======
+        {
+          definitionsOnly,
+          statefulWorkspace: false,
+          runtimes: ['bash'],
+          supported: false,
+          selected: false,
+        },
+        {
+          definitionsOnly,
+          statefulWorkspace: true,
+          runtimes: ['py'],
+          supported: false,
+          selected: false,
+        },
+        {
+          definitionsOnly,
+          statefulWorkspace: true,
+          runtimes: ['bash'],
+          supported: false,
+          selected: false,
+        },
+        {
+          definitionsOnly,
+          statefulWorkspace: false,
+          runtimes: [],
+          supported: true,
+          selected: true,
+        },
+      ]),
+    )(
+      'gates attached PTC: definitionsOnly=$definitionsOnly stateful=$statefulWorkspace runtimes=$runtimes',
+      async ({ definitionsOnly, statefulWorkspace, runtimes, supported, selected }) => {
+        const workerId = `worker-${definitionsOnly}-${statefulWorkspace}-${runtimes[0]}-${selected}`;
+>>>>>>> upstream/main
         process.env.TEST_CODE_CAPABILITY_TOKEN = 'capability-test-token';
         const fetchSpy = jest.spyOn(globalThis, 'fetch').mockResolvedValue(
           new Response(
@@ -564,6 +605,19 @@ describe('classification.ts', () => {
                 statefulWorkspace,
                 sandboxProfile: 'native-srt',
                 runtimes,
+<<<<<<< HEAD
+=======
+                ...(selected
+                  ? {
+                      workspaceTools: {
+                        protocolVersion: 1,
+                        operations: ['execute_command'],
+                        programmaticLanguages: ['bash'],
+                        workspaces: [{ id: 'project-a', operations: ['execute_command'] }],
+                      },
+                    }
+                  : {}),
+>>>>>>> upstream/main
               },
             }),
           ),
@@ -602,6 +656,21 @@ describe('classification.ts', () => {
               environmentType: 'attached',
               environmentId: 'attached',
               bridgeWorkerId: workerId,
+<<<<<<< HEAD
+=======
+              codeEnvironmentConfigSchema: {
+                limits: { defaultCommandTimeoutMs: 60_000, maxCommandTimeoutMs: 80_000 },
+              },
+              ...(selected
+                ? {
+                    codeWorkspace: {
+                      environmentId: 'attached',
+                      workspaceId: 'project-a',
+                      operations: ['execute_command' as const],
+                    },
+                  }
+                : {}),
+>>>>>>> upstream/main
             },
             codeEnvironments,
             getAppConfig: jest.fn().mockResolvedValue({
@@ -620,7 +689,37 @@ describe('classification.ts', () => {
             'direct',
             'code_execution',
           ]);
+<<<<<<< HEAD
           expect(fetchSpy).not.toHaveBeenCalled();
+=======
+          if (selected) {
+            expect(fetchSpy).toHaveBeenCalledTimes(1);
+            expect(
+              result.toolDefinitions.find((tool) => tool.name === 'run_tools_with_bash')
+                ?.description,
+            ).toContain('selected persistent workspace');
+            const definition = result.toolDefinitions.find(
+              (tool) => tool.name === 'run_tools_with_bash',
+            );
+            expect(definition?.parameters).toMatchObject({
+              properties: {
+                code: { description: expect.stringContaining('ATTACHED WORKSPACE EXECUTION') },
+                timeout: {
+                  default: 60_000,
+                  description: expect.stringContaining('Configured cap: 80000 milliseconds'),
+                },
+              },
+            });
+            expect(definition?.parameters?.properties?.code?.description).toContain(
+              '${LIBRECHAT_CODE_DATA_DIR:-/mnt/data}',
+            );
+            if (!definitionsOnly) {
+              expect(
+                result.additionalTools.find((tool) => tool.name === 'run_tools_with_bash')?.schema,
+              ).toEqual(definition?.parameters);
+            }
+          } else expect(fetchSpy).not.toHaveBeenCalled();
+>>>>>>> upstream/main
         } finally {
           fetchSpy.mockRestore();
           delete process.env.TEST_CODE_CAPABILITY_TOKEN;
@@ -704,3 +803,39 @@ describe('classification.ts', () => {
     });
   });
 });
+<<<<<<< HEAD
+=======
+
+test.each(['oauth', 'other'] as const)(
+  'classification and both registries preserve private %s auth provenance',
+  async (kind) => {
+    const tool = bindToolApproval(
+      {
+        name: 'query_mcp_db',
+        mcp: true,
+        mcpRawServerName: 'db',
+        mcpJsonSchema: { type: 'object' as const },
+      },
+      'source',
+      undefined,
+      undefined,
+      undefined,
+      kind,
+    );
+    const definition = extractMCPToolDefinition(tool);
+    expect(getToolApprovalAuthKind(definition)).toBe(kind);
+    const configured = buildToolRegistryFromAgentOptions([definition], {
+      query_mcp_db: { approval_mode: 'always' },
+    });
+    expect(getToolApprovalAuthKind(configured.get('query_mcp_db')!)).toBe(kind);
+    const plain = await buildToolClassification({
+      userId: 'user-a',
+      agentId: 'agent-a',
+      loadedTools: [tool as unknown as GenericTool],
+      definitionsOnly: true,
+      deferredToolsEnabled: false,
+    });
+    expect(getToolApprovalAuthKind(plain.toolRegistry!.get('query_mcp_db')!)).toBe(kind);
+  },
+);
+>>>>>>> upstream/main

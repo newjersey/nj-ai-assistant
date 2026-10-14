@@ -65,7 +65,11 @@ export default function SkillFileEditor({ skillId, nodeId, fileName }: SkillFile
 
   if (isLoading) {
     return (
+<<<<<<< HEAD
       <div className="flex h-full items-center justify-center bg-presentation">
+=======
+      <div className="bg-presentation flex h-full items-center justify-center">
+>>>>>>> upstream/main
         <Spinner className="text-text-tertiary" />
       </div>
     );
@@ -74,6 +78,7 @@ export default function SkillFileEditor({ skillId, nodeId, fileName }: SkillFile
   const lineCount = displayContent.split('\n').length;
 
   return (
+<<<<<<< HEAD
     <div className="flex h-full flex-col bg-presentation" onKeyDown={handleKeyDown}>
       <div className="flex items-center gap-2 border-b border-border-light px-4 py-2">
         <div className="flex min-w-0 flex-1 items-center gap-2">
@@ -83,6 +88,17 @@ export default function SkillFileEditor({ skillId, nodeId, fileName }: SkillFile
             className={cn(
               'size-2 shrink-0 transition-[opacity,color] duration-200',
               isDirty ? 'fill-current text-status-warning opacity-100' : 'opacity-0',
+=======
+    <div className="bg-presentation flex h-full flex-col" onKeyDown={handleKeyDown}>
+      <div className="border-border-light flex items-center gap-2 border-b px-4 py-2">
+        <div className="flex min-w-0 flex-1 items-center gap-2">
+          <FileText className="text-text-secondary size-4 shrink-0" aria-hidden="true" />
+          <span className="text-text-primary truncate text-sm font-medium">{fileName}</span>
+          <Circle
+            className={cn(
+              'size-2 shrink-0 transition-[opacity,color] duration-200',
+              isDirty ? 'text-status-warning fill-current opacity-100' : 'opacity-0',
+>>>>>>> upstream/main
             )}
             aria-hidden="true"
           />
@@ -107,20 +123,34 @@ export default function SkillFileEditor({ skillId, nodeId, fileName }: SkillFile
           onChange={handleChange}
           spellCheck={false}
           className={cn(
+<<<<<<< HEAD
             'size-full resize-none rounded-none border-0 bg-transparent px-4 py-3 font-mono text-[13px] leading-6 text-text-primary outline-none',
             'focus:ring-0 focus:ring-offset-0 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring-primary',
             'selection:bg-blue-500/20',
+=======
+            'text-text-primary size-full resize-none rounded-none border-0 bg-transparent px-4 py-3 font-mono text-[13px] leading-6',
+            'focus-visible:ring-ring-primary focus:ring-0 focus:ring-offset-0 focus-visible:ring-2 focus-visible:ring-inset',
+>>>>>>> upstream/main
           )}
           aria-label={`${localize('com_ui_edit')} ${fileName}`}
         />
       </div>
+<<<<<<< HEAD
       <div className="flex items-center justify-between border-t border-border-light px-4 py-1">
         <span className="text-[11px] text-text-secondary">
+=======
+      <div className="border-border-light flex items-center justify-between border-t px-4 py-1">
+        <span className="text-text-secondary text-[11px]">
+>>>>>>> upstream/main
           {lineCount === 1
             ? localize('com_ui_line_count', { 0: String(lineCount) })
             : localize('com_ui_lines_count', { 0: String(lineCount) })}
         </span>
+<<<<<<< HEAD
         <span className="text-[11px] text-text-secondary">
+=======
+        <span className="text-text-secondary text-[11px]">
+>>>>>>> upstream/main
           {isDirty ? localize('com_ui_file_modified') : localize('com_ui_saved')}
         </span>
       </div>

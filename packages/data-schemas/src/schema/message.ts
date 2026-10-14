@@ -59,6 +59,12 @@ const messageSchema: Schema<IMessage> = new Schema(
     summary: {
       type: String,
     },
+<<<<<<< HEAD
+=======
+    privateText: { type: String, select: false },
+    privacyRevision: { type: String },
+    privateTextTokens: { type: [String], select: false, default: undefined },
+>>>>>>> upstream/main
     isCreatedByUser: {
       type: Boolean,
       required: true,
@@ -270,6 +276,22 @@ const messageSchema: Schema<IMessage> = new Schema(
      * count), so they are not duplicated into the stored `text`.
      */
     quotes: { type: [String], default: undefined },
+<<<<<<< HEAD
+=======
+    /** Request-scoped reasoning selection used for this user turn. */
+    reasoningOverride: {
+      type: {
+        key: {
+          type: String,
+          enum: ['reasoning_effort', 'effort', 'thinkingLevel', 'thinkingBudget'],
+          required: true,
+        },
+        value: { type: mongoose.Schema.Types.Mixed, required: true },
+      },
+      _id: false,
+      default: undefined,
+    },
+>>>>>>> upstream/main
     /*
     attachments: {
       type: [

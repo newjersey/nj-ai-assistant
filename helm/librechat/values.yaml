@@ -16,6 +16,13 @@ global:
    # - JWT_REFRESH_SECRET
    # - MEILI_MASTER_KEY
   librechat:
+<<<<<<< HEAD
+=======
+    # A named Secret is required to exist; a typo must not generate pod-local credentials.
+    # Set to "" only when all LibreChat credentials are supplied through configEnv (strings)
+    # or global.librechat.env (supports valueFrom.secretKeyRef).
+    # Bundled Meilisearch still requires its separate auth.existingMasterKeySecret.
+>>>>>>> upstream/main
     existingSecretName: "librechat-credentials-env"
     # Used for Setting the Right Key, can be something like AZURE_API_KEY, if Azure OpenAI is used
     existingSecretApiKey: OPENAI_API_KEY
@@ -120,7 +127,11 @@ librechat-rag-api:
 
 
 image:
+<<<<<<< HEAD
   repository: danny-avila/librechat
+=======
+  repository: librechat-ai/librechat
+>>>>>>> upstream/main
   registry: registry.librechat.ai
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
@@ -144,7 +155,11 @@ serviceAccount:
   name: ""
 
 lifecycle: {}
+<<<<<<< HEAD
 # # base for adding a custom banner // see https://github.com/danny-avila/LibreChat/pull/3952 for an example
+=======
+# # base for adding a custom banner // see https://github.com/LibreChat-AI/LibreChat/pull/3952 for an example
+>>>>>>> upstream/main
 #   postStart:
 #     exec:
 #       command: ["/bin/sh", "-c", "npm run update-banner <displayFrom(Format: yyyy-mm-ddTHH:MM:SSZ)> <displayTo(Format: yyyy-mm-ddTHH:MM:SSZ)> <message> <isPublic(true/false)>"]
@@ -385,7 +400,12 @@ meilisearch:
   image:
     tag: "v1.7.3"
   auth:
+<<<<<<< HEAD
     # Use an existing Kubernetes secret for the MEILI_MASTER_KEY
+=======
+    # Separate from global.librechat.existingSecretName, even when that reference is cleared.
+    # Must contain MEILI_MASTER_KEY matching the value supplied to LibreChat.
+>>>>>>> upstream/main
     existingMasterKeySecret: "librechat-credentials-env"
 
 # Redis Parameters

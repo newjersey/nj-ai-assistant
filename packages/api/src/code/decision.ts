@@ -1,10 +1,24 @@
+<<<<<<< HEAD
 import { isCodeEnvironmentMode, isCodeWorkspaceSelections } from 'librechat-data-provider';
+=======
+import {
+  isCodeEnvironmentMode,
+  isCodeWorkspaceSelections,
+  canonicalizeCodeWorkspaceSelections,
+} from 'librechat-data-provider';
+>>>>>>> upstream/main
 import type {
   CodeEnvironmentMode,
   CodeWorkspaceSelection,
   TConversation,
 } from 'librechat-data-provider';
+<<<<<<< HEAD
 import { CodeWorkspaceSelectionError } from './capabilities';
+=======
+import type { AppConfig } from '@librechat/data-schemas';
+import { CodeWorkspaceSelectionError } from './capabilities';
+import { resolveCodeEnvironmentMoveVersion } from './config';
+>>>>>>> upstream/main
 
 export interface ConversationCodeEnvironmentDecision {
   mode: CodeEnvironmentMode;
@@ -14,6 +28,7 @@ export interface ConversationCodeEnvironmentDecision {
 export type StoredConversationDecision = Pick<
   TConversation,
   'conversationId' | 'codeEnvironmentMode' | 'codeWorkspaces'
+<<<<<<< HEAD
 >;
 
 function canonicalSelections(selections: CodeWorkspaceSelection[]): CodeWorkspaceSelection[] {
@@ -24,6 +39,12 @@ function canonicalSelections(selections: CodeWorkspaceSelection[]): CodeWorkspac
     if (left.workspaceId > right.workspaceId) return 1;
     return 0;
   });
+=======
+> & { codeEnvironmentRevision?: number };
+
+function canonicalSelections(selections: CodeWorkspaceSelection[]): CodeWorkspaceSelection[] {
+  return canonicalizeCodeWorkspaceSelections(selections);
+>>>>>>> upstream/main
 }
 
 function sameSelections(left: CodeWorkspaceSelection[], right: CodeWorkspaceSelection[]): boolean {
@@ -49,7 +70,21 @@ function validateDecision(mode: unknown, selections: unknown): ConversationCodeE
   return { mode, codeWorkspaces: canonicalSelections(selections) };
 }
 
+<<<<<<< HEAD
 /** A stored conversation always carries a decision; legacy rows infer it from their selections. */
+=======
+/**
+ * Whether the conversation already recorded a decision. A chat whose turns never involved a
+ * code-capable agent stores neither field, so it has nothing to seal: switching one to a coding
+ * agent still gets to decide. Sealing that state instead would report `without_attached` for a
+ * choice its owner never made, and reject the selection they go on to make.
+ */
+function holdsDecision(conversation: StoredConversationDecision): boolean {
+  return conversation.codeEnvironmentMode != null || (conversation.codeWorkspaces?.length ?? 0) > 0;
+}
+
+/** Reads the decision a conversation holds; legacy rows infer it from their selections. */
+>>>>>>> upstream/main
 function readPersistedDecision(
   conversation: StoredConversationDecision,
 ): ConversationCodeEnvironmentDecision {
@@ -71,7 +106,15 @@ export function resolveConversationCodeEnvironmentDecision({
   requestedSelections?: unknown;
   conversation?: StoredConversationDecision | null;
 }): ConversationCodeEnvironmentDecision {
+<<<<<<< HEAD
   if (conversation != null && conversation.conversationId === conversationId) {
+=======
+  if (
+    conversation != null &&
+    conversation.conversationId === conversationId &&
+    holdsDecision(conversation)
+  ) {
+>>>>>>> upstream/main
     const persisted = readPersistedDecision(conversation);
     if (requestedMode !== undefined && requestedMode !== persisted.mode) {
       throw new CodeWorkspaceSelectionError('locked');
@@ -106,6 +149,7 @@ export function resolveConversationCodeEnvironmentDecision({
 }
 
 export interface ConversationCodeEnvironmentMove {
+<<<<<<< HEAD
   codeWorkspaces: CodeWorkspaceSelection[];
 }
 
@@ -115,6 +159,18 @@ export interface ConversationCodeEnvironmentMove {
  * but never changes the workspace of an environment the decision already covers and never upgrades
  * a conversation that continues without an attached environment. `from` must repeat the persisted selections, so a client acting
  * on a stale view of the conversation cannot replace a decision it has not seen.
+=======
+  mode: CodeEnvironmentMode;
+  codeWorkspaces?: CodeWorkspaceSelection[];
+}
+
+/**
+ * Validates an owner's explicit replacement of a sealed decision. Attach, detach, moves and
+ * missing-workspace recovery replace the whole decision without changing history or copying files.
+ * The caller must verify live registration of every target and, for same-environment replacements,
+ * absence of the previous workspace. `from` repeats the stored selections so stale clients cannot
+ * replace a decision they have not seen. Undecided chats record their first decision on submission.
+>>>>>>> upstream/main
  */
 export function resolveConversationCodeEnvironmentMove({
   conversation,
@@ -125,6 +181,7 @@ export function resolveConversationCodeEnvironmentMove({
   from: unknown;
   to: unknown;
 }): ConversationCodeEnvironmentMove {
+<<<<<<< HEAD
   const persisted = readPersistedDecision(conversation);
   if (persisted.mode !== 'attached' || persisted.codeWorkspaces == null) {
     throw new CodeWorkspaceSelectionError('locked');
@@ -151,6 +208,32 @@ export function resolveConversationCodeEnvironmentMove({
     throw new CodeWorkspaceSelectionError('locked');
   }
   return { codeWorkspaces: canonicalSelections(to) };
+=======
+  if (!holdsDecision(conversation)) {
+    throw new CodeWorkspaceSelectionError('locked');
+  }
+  const persisted = readPersistedDecision(conversation);
+  const sealed = persisted.codeWorkspaces ?? [];
+  if (!isCodeWorkspaceSelections(from) || !sameSelections(from, sealed)) {
+    throw new CodeWorkspaceSelectionError('locked');
+  }
+  if (!isCodeWorkspaceSelections(to)) {
+    throw new CodeWorkspaceSelectionError('invalid');
+  }
+  if (to.length === 0) {
+    if (persisted.mode !== 'attached') {
+      throw new CodeWorkspaceSelectionError('locked');
+    }
+    return { mode: 'without_attached' };
+  }
+  if (persisted.mode === 'without_attached') {
+    return { mode: 'attached', codeWorkspaces: canonicalSelections(to) };
+  }
+  if (sameSelections(to, sealed)) {
+    throw new CodeWorkspaceSelectionError('locked');
+  }
+  return { mode: 'attached', codeWorkspaces: canonicalSelections(to) };
+>>>>>>> upstream/main
 }
 
 type PersistableDecisionFields = Pick<
@@ -191,8 +274,53 @@ export function resolvePersistableCodeEnvironmentDecision({
   if (conversation == null || conversation.conversationId !== conversationId) {
     return candidate;
   }
+<<<<<<< HEAD
+=======
+  /* A saved chat that held no decision records the one this run establishes, selections included:
+   * writing the mode alone would leave `attached` without the selections the next turn validates. */
+  if (!holdsDecision(conversation)) {
+    return candidate;
+  }
+>>>>>>> upstream/main
   if (conversation.codeEnvironmentMode != null || candidate.codeEnvironmentMode == null) {
     return {};
   }
   return { codeEnvironmentMode: candidate.codeEnvironmentMode };
 }
+<<<<<<< HEAD
+=======
+
+/** When moves are enabled, every ingress must publish its active job before calling this and
+ * keep it active through the fenced read. Otherwise no transition can race the decision, so reuse
+ * the owner-scoped conversation the ingress already loaded instead of writing an unused revision. */
+export async function resolveAdmittedCodeEnvironmentDecision({
+  appConfig,
+  readDecision,
+  ...request
+}: Parameters<typeof resolveConversationCodeEnvironmentDecision>[0] & {
+  appConfig: Pick<AppConfig, 'endpoints'> | undefined;
+  readDecision: (conversationId: string) => Promise<StoredConversationDecision | null | undefined>;
+}): Promise<{
+  decision: ConversationCodeEnvironmentDecision;
+  conversation: StoredConversationDecision | null | undefined;
+}> {
+  const conversation =
+    resolveCodeEnvironmentMoveVersion(appConfig) != null
+      ? await readDecision(request.conversationId)
+      : request.conversation;
+  return {
+    decision: resolveConversationCodeEnvironmentDecision({ ...request, conversation }),
+    // Keep owner-loaded metadata, but never the pre-admission environment fields. An absent
+    // stored decision must remain absent; the submitted first choice is not persisted yet.
+    conversation:
+      conversation == null
+        ? conversation
+        : {
+            ...request.conversation,
+            ...conversation,
+            codeEnvironmentMode: conversation.codeEnvironmentMode,
+            codeWorkspaces: conversation.codeWorkspaces,
+          },
+  };
+}
+>>>>>>> upstream/main

@@ -1,4 +1,8 @@
 import type { FCPMetricWithAttribution } from 'web-vitals/attribution';
+<<<<<<< HEAD
+=======
+import { isClientEventType, isClientLogsActive, recordClientEvent } from './logs';
+>>>>>>> upstream/main
 import { normalizeRumPath } from './routes';
 import { getClientBuildId } from './build';
 
@@ -13,6 +17,13 @@ type RumQueuedEvent = {
   at?: unknown;
   visibilityState?: unknown;
   attributes?: Record<string, unknown>;
+<<<<<<< HEAD
+=======
+  /** Already delivered as a client log record; persisted so a later page does not resend it. */
+  logged?: unknown;
+  /** Already sent to the RUM SDK; kept queued only until its client log record is acknowledged. */
+  actionSent?: unknown;
+>>>>>>> upstream/main
 };
 
 type NavigationTimingLike = {
@@ -60,6 +71,11 @@ declare global {
   }
 }
 
+<<<<<<< HEAD
+=======
+/** Queued events handed to the log exporter and not yet acknowledged by the collector. */
+const forwardingEvents = new WeakSet<RumQueuedEvent>();
+>>>>>>> upstream/main
 let fcpAttributionRegistered = false;
 let earlyQueueFlushed = false;
 
@@ -169,6 +185,7 @@ export function flushEarlyRumQueue(HyperDX: HyperDXActionClient): void {
 
   earlyQueueFlushed = true;
   const queuedEvents = window.__lcRumQueue?.splice(0) ?? [];
+<<<<<<< HEAD
   try {
     sessionStorage.removeItem(EARLY_RUM_QUEUE_STORAGE_KEY);
   } catch {
@@ -177,10 +194,38 @@ export function flushEarlyRumQueue(HyperDX: HyperDXActionClient): void {
   queuedEvents.forEach((event) => {
     emitEarlyRumEvent(HyperDX, event);
   });
+=======
+  queuedEvents.forEach((event) => {
+    emitEarlyRumEvent(HyperDX, event);
+  });
+  const awaitingDelivery = queuedEvents.filter(shouldRetainEvent);
+  awaitingDelivery.forEach((event) => {
+    event.actionSent = true;
+  });
+  window.__lcRumQueue?.unshift(...awaitingDelivery);
+  try {
+    persistEarlyQueue();
+  } catch {
+    HyperDX.addAction('early-rum-queue-storage-error', { operation: 'clear' });
+  }
+>>>>>>> upstream/main
 
   installRumEmitter(HyperDX);
 }
 
+<<<<<<< HEAD
+=======
+/** Persists what is still queued, or clears the stored copy once nothing is left. */
+function persistEarlyQueue(): void {
+  const queue = window.__lcRumQueue ?? [];
+  if (queue.length === 0) {
+    sessionStorage.removeItem(EARLY_RUM_QUEUE_STORAGE_KEY);
+    return;
+  }
+  sessionStorage.setItem(EARLY_RUM_QUEUE_STORAGE_KEY, JSON.stringify(queue));
+}
+
+>>>>>>> upstream/main
 export function restoreRumEmitter(HyperDX: HyperDXActionClient): void {
   installRumEmitter(HyperDX);
 }
@@ -188,12 +233,32 @@ export function restoreRumEmitter(HyperDX: HyperDXActionClient): void {
 function installRumEmitter(HyperDX: HyperDXActionClient): void {
   const clientBuildId = getClientBuildId();
   window.__lcRumPush = (type, attributes) => {
+<<<<<<< HEAD
     emitEarlyRumEvent(HyperDX, {
+=======
+    const event: RumQueuedEvent = {
+>>>>>>> upstream/main
       type,
       at: performance.now(),
       visibilityState: document.visibilityState,
       attributes: { ...attributes, clientBuildId },
+<<<<<<< HEAD
     });
+=======
+    };
+    emitEarlyRumEvent(HyperDX, event);
+    if (shouldRetainEvent(event)) {
+      event.actionSent = true;
+      const queue = (window.__lcRumQueue ??= []);
+      queue.push(event);
+      queue.splice(0, Math.max(0, queue.length - 20));
+      try {
+        persistEarlyQueue();
+      } catch {
+        /* Diagnostics should never affect app behavior. */
+      }
+    }
+>>>>>>> upstream/main
   };
 }
 
@@ -212,7 +277,18 @@ function emitEarlyRumEvent(HyperDX: HyperDXActionClient, event: RumQueuedEvent):
     return;
   }
 
+<<<<<<< HEAD
   const actionName = event.type === 'spa-route-change' ? event.type : `early-${event.type}`;
+=======
+  if (event.actionSent !== true) {
+    sendRumAction(HyperDX, event.type, event);
+  }
+  forwardEvent(event);
+}
+
+function sendRumAction(HyperDX: HyperDXActionClient, type: string, event: RumQueuedEvent): void {
+  const actionName = type === 'spa-route-change' ? type : `early-${type}`;
+>>>>>>> upstream/main
   try {
     HyperDX.addAction(
       actionName,
@@ -228,6 +304,67 @@ function emitEarlyRumEvent(HyperDX: HyperDXActionClient, event: RumQueuedEvent):
   }
 }
 
+<<<<<<< HEAD
+=======
+function markEventLogged(event: RumQueuedEvent): void {
+  forwardingEvents.delete(event);
+  event.logged = true;
+  const queue = window.__lcRumQueue;
+  const index = queue?.indexOf(event) ?? -1;
+  if (!queue || index === -1) {
+    return;
+  }
+  if (event.actionSent === true) {
+    queue.splice(index, 1);
+  }
+  try {
+    persistEarlyQueue();
+  } catch {
+    /* Diagnostics should never affect app behavior. */
+  }
+}
+
+function shouldRetainEvent(event: RumQueuedEvent): boolean {
+  return isClientLogsActive() && isClientEventType(event.type) && event.logged !== true;
+}
+
+/** Hands one queued asset event to the log exporter, tracking it until the collector acks it. */
+function forwardEvent(event: RumQueuedEvent): void {
+  if (
+    event.logged === true ||
+    forwardingEvents.has(event) ||
+    typeof event.type !== 'string' ||
+    !isClientEventType(event.type)
+  ) {
+    return;
+  }
+  forwardingEvents.add(event);
+  const accepted = recordClientEvent(
+    event.type,
+    sanitizeQueuedAttributes(event.attributes),
+    () => markEventLogged(event),
+    () => forwardingEvents.delete(event),
+  );
+  if (!accepted) {
+    forwardingEvents.delete(event);
+  }
+}
+
+/**
+ * Delivers queued stale-asset events as client log records as soon as the log exporter runs,
+ * independent of the RUM SDK loading. An event in flight is skipped by the SDK path; once the
+ * collector accepts it, it is marked in memory and in the persisted copy so no later page logs
+ * it again. An event that is never delivered stays unmarked and replays on the next load.
+ */
+export function forwardQueuedAssetEvents(): void {
+  const queue = window.__lcRumQueue;
+  if (!queue) {
+    return;
+  }
+  queue.forEach(forwardEvent);
+}
+
+>>>>>>> upstream/main
 export function queueSpaRouteChange(
   fromPath: string,
   toPath: string,

@@ -5,6 +5,10 @@ import ChatView from '../ChatView';
 
 const mockParams = jest.fn();
 const mockConversation = jest.fn();
+<<<<<<< HEAD
+=======
+const mockChatFormProps = jest.fn();
+>>>>>>> upstream/main
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
@@ -19,6 +23,10 @@ jest.mock('~/hooks/AuthContext', () => ({
 
 jest.mock('~/data-provider', () => ({
   useGetMessagesByConvoId: () => ({ data: null, isLoading: false, isFetching: false }),
+<<<<<<< HEAD
+=======
+  useProjectQuery: () => ({ data: undefined }),
+>>>>>>> upstream/main
 }));
 
 /**
@@ -49,7 +57,17 @@ jest.mock('../Footer', () => ({
 }));
 jest.mock('../Landing', () => ({ __esModule: true, default: () => <div /> }));
 jest.mock('../Messages/MessagesView', () => ({ __esModule: true, default: () => <div /> }));
+<<<<<<< HEAD
 jest.mock('../Input/ChatForm', () => ({ __esModule: true, default: () => <div /> }));
+=======
+jest.mock('../Input/ChatForm', () => ({
+  __esModule: true,
+  default: (props: Record<string, unknown>) => {
+    mockChatFormProps(props);
+    return <div />;
+  },
+}));
+>>>>>>> upstream/main
 jest.mock('../Input/ConversationStarters', () => ({ __esModule: true, default: () => <div /> }));
 
 describe('ChatView page heading', () => {
@@ -65,12 +83,15 @@ describe('ChatView page heading', () => {
     expect(headings).toHaveLength(1);
   });
 
+<<<<<<< HEAD
   test('keeps the heading visually hidden', () => {
     render(<ChatView />);
 
     expect(screen.getByRole('heading', { level: 1 })).toHaveClass('sr-only');
   });
 
+=======
+>>>>>>> upstream/main
   test('announces a localized new chat heading on the landing page', () => {
     render(<ChatView />);
 
@@ -116,6 +137,52 @@ describe('ChatView page heading', () => {
   });
 });
 
+<<<<<<< HEAD
+=======
+describe('ChatView composer preferences', () => {
+  beforeEach(() => {
+    mockParams.mockReturnValue({});
+    mockConversation.mockReturnValue(null);
+    mockChatFormProps.mockClear();
+    localStorage.clear();
+  });
+
+  /** ChatForm used to read this preference itself via `useRecoilValue(store.enterToSend)`,
+   *  reaching into app-global state the composer only consumes. ChatView now owns the
+   *  read and passes it down, the same boundary `showComposerTips` already follows. */
+  test('reads the persisted enterToSend preference and passes it into ChatForm', () => {
+    localStorage.setItem('enterToSend', JSON.stringify(false));
+
+    render(<ChatView />);
+
+    expect(mockChatFormProps).toHaveBeenCalledWith(expect.objectContaining({ enterToSend: false }));
+  });
+
+  /** The same boundary for the dictation preferences: ChatForm consumes them
+   *  but ChatView owns the reads. */
+  test('passes the persisted Auto Send Text preference and the speech init state', () => {
+    localStorage.setItem('autoSendText', JSON.stringify(3));
+
+    render(<ChatView />);
+
+    expect(mockChatFormProps).toHaveBeenCalledWith(
+      expect.objectContaining({ autoSendText: 3, speechSettingsInitialized: false }),
+    );
+  });
+
+  test.each([true, false])('passes routePending=%p into ChatForm', (routePending) => {
+    render(<ChatView routePending={routePending} />);
+    expect(mockChatFormProps).toHaveBeenCalledWith(expect.objectContaining({ routePending }));
+  });
+
+  test('falls back to the atom default when nothing is persisted', () => {
+    render(<ChatView />);
+
+    expect(mockChatFormProps).toHaveBeenCalledWith(expect.objectContaining({ enterToSend: true }));
+  });
+});
+
+>>>>>>> upstream/main
 describe('ChatView composer column', () => {
   beforeEach(() => {
     mockParams.mockReturnValue({ conversationId: 'convo-1' });
@@ -135,4 +202,16 @@ describe('ChatView composer column', () => {
     expect(composerColumn).not.toHaveClass('overflow-y-auto');
     expect(composerColumn).not.toHaveClass('scrollbar-gutter-stable');
   });
+<<<<<<< HEAD
+=======
+
+  test('layers composer overlays above positioned tool glyphs in the message column', () => {
+    const { container } = render(<ChatView />);
+
+    const composerColumn = container.querySelector('.scrollbar-gutter-spacer');
+
+    expect(composerColumn).toHaveClass('[view-transition-name:chat-form]');
+    expect(composerColumn).toHaveClass('relative', 'z-10');
+  });
+>>>>>>> upstream/main
 });

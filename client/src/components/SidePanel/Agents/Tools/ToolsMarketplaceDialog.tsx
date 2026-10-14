@@ -8,6 +8,10 @@ import {
   OGDialogTitle,
   OGDialogContent,
   OGDialogDescription,
+<<<<<<< HEAD
+=======
+  useMediaQuery,
+>>>>>>> upstream/main
   useToastContext,
 } from '@librechat/client';
 import type { AgentItem, AgentItemKind, ItemFilter } from './items/types';
@@ -21,11 +25,19 @@ import {
   mcpServerIds,
 } from './items/selectors';
 import { useAgentFileEntries, useAgentItems, useUninstallToolCredentials } from './hooks';
+<<<<<<< HEAD
+=======
+import MarketplaceSidebar, { MarketplaceFilterBar } from './MarketplaceSidebar';
+import { setSubagentsEnabled, removeHandoffs } from './items/orchestration';
+>>>>>>> upstream/main
 import { requiresFileManagerRemoval } from './items/capabilities';
 import AddMcpServerDialog from './ItemDialog/AddMcpServerDialog';
 import { computeToggleAction } from './items/mutations';
 import { useLocalize, useToolFavorites } from '~/hooks';
+<<<<<<< HEAD
 import MarketplaceSidebar from './MarketplaceSidebar';
+=======
+>>>>>>> upstream/main
 import MarketplaceCatalog from './MarketplaceCatalog';
 import ItemDialog from './ItemDialog/ItemDialog';
 import { applyFilter } from './items/filtering';
@@ -62,6 +74,12 @@ export default function ToolsMarketplaceDialog({
   const [detailItem, setDetailItem] = useState<AgentItem | null>(null);
   const [addMcpOpen, setAddMcpOpen] = useState(false);
 
+<<<<<<< HEAD
+=======
+  /** The rail is md+; below it the same navigation renders as a chip row. */
+  const isDesktop = useMediaQuery('(min-width: 768px)');
+
+>>>>>>> upstream/main
   const handleCreateNew = useCallback(
     (createKind: 'mcp' | 'action') => {
       if (createKind === 'mcp') {
@@ -123,6 +141,20 @@ export default function ToolsMarketplaceDialog({
       }
       const patch = computeToggleAction(item, { selected });
       switch (patch.type) {
+<<<<<<< HEAD
+=======
+        case 'configure':
+          setDetailItem(item);
+          break;
+        case 'subagents':
+          setValue('subagents', setSubagentsEnabled(getValues('subagents'), patch.enabled), {
+            shouldDirty: true,
+          });
+          break;
+        case 'handoffs-remove':
+          setValue('edges', removeHandoffs(getValues('edges')), { shouldDirty: true });
+          break;
+>>>>>>> upstream/main
         case 'builtin':
           setValue(patch.field as keyof AgentForm, patch.value as never, { shouldDirty: true });
           if (patch.field === AgentCapabilities.execute_code && patch.value === false) {
@@ -218,11 +250,22 @@ export default function ToolsMarketplaceDialog({
 
   return (
     <OGDialog open={open} onOpenChange={onOpenChange}>
+<<<<<<< HEAD
       <OGDialogContent className="w-11/12 max-w-[1200px] overflow-hidden rounded-2xl border-border-medium p-0 shadow-xl md:max-h-[92vh]">
+=======
+      {/* The body carries the height from md, the way it did before this change, so
+          the shell wraps it and the two cannot disagree: an explicit height on the
+          shell would leave its difference from the body's 840px ceiling as dead
+          space below the catalog on a tall screen. Below md the shell is the
+          full-bleed sheet and the body is capped to the same 100dvh, because its
+          `h-full` resolves against a grid area sized to the whole catalog. */}
+      <OGDialogContent className="border-border-medium h-[100dvh] max-h-[100dvh] w-full max-w-full overflow-hidden rounded-none p-0 shadow-xl md:h-auto md:max-h-[92vh] md:w-11/12 md:max-w-[75rem] md:rounded-2xl">
+>>>>>>> upstream/main
         <OGDialogTitle className="sr-only">{localize('com_ui_tools_marketplace')}</OGDialogTitle>
         <OGDialogDescription className="sr-only">
           {localize('com_ui_tools_marketplace_description')}
         </OGDialogDescription>
+<<<<<<< HEAD
         <div className="flex h-[88vh] max-h-[840px]">
           <MarketplaceSidebar
             activeView={view}
@@ -238,6 +281,30 @@ export default function ToolsMarketplaceDialog({
               <div className="relative flex-1">
                 <Search
                   className="pointer-events-none absolute left-3 top-1/2 z-[1] size-4 -translate-y-1/2 text-text-tertiary"
+=======
+        {/* min-w-0: as a grid item of the dialog content, an `auto` minimum would
+            size this column to the chip row's min-content and overflow the viewport. */}
+        <div className="flex h-full max-h-[100dvh] min-w-0 flex-col md:h-[88vh] md:max-h-[52.5rem] md:flex-row">
+          {isDesktop && (
+            <MarketplaceSidebar
+              activeView={view}
+              activeKind={kind}
+              onSelectView={setView}
+              onSelectKind={setKind}
+              counts={counts}
+              totalCount={catalog.length}
+              onCreateNew={handleCreateNew}
+            />
+          )}
+          <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+            {/* md:pl-6, not md:px-6: a responsive variant is emitted after the base
+                utilities, so md:px-6 would reset the pr-12 that keeps the search
+                field clear of the dialog's close button. */}
+            <div className="flex items-center gap-2 px-4 py-3 pr-12 md:py-4 md:pl-6">
+              <div className="relative flex-1">
+                <Search
+                  className="text-text-tertiary pointer-events-none absolute top-1/2 left-3 z-[1] size-4 -translate-y-1/2"
+>>>>>>> upstream/main
                   aria-hidden="true"
                 />
                 <Input
@@ -250,7 +317,22 @@ export default function ToolsMarketplaceDialog({
                 />
               </div>
             </div>
+<<<<<<< HEAD
             <div className="flex-1 overflow-y-auto p-4">
+=======
+            {!isDesktop && (
+              <MarketplaceFilterBar
+                activeView={view}
+                activeKind={kind}
+                onSelectView={setView}
+                onSelectKind={setKind}
+                counts={counts}
+                totalCount={catalog.length}
+                onCreateNew={handleCreateNew}
+              />
+            )}
+            <div className="min-h-0 flex-1 overflow-y-auto p-3 md:p-4">
+>>>>>>> upstream/main
               <MarketplaceCatalog
                 items={filtered}
                 selectedIds={selectedIds}

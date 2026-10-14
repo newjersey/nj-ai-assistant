@@ -15,6 +15,11 @@ export const contextBreakdownExpandedAtom = createStorageAtom<boolean>(
 /** Latest backend context snapshot, anchored to the run's user message for staleness checks */
 export interface ContextSnapshot extends TContextUsageEvent {
   anchorMessageId: string | null;
+<<<<<<< HEAD
+=======
+  /** Response owning a live snapshot; user-message anchors are shared by siblings. */
+  responseMessageId?: string | null;
+>>>>>>> upstream/main
   /** Output tokens finalized after this pre-call snapshot (the last call's response) */
   completedOutputTokens?: number;
 }
@@ -73,6 +78,14 @@ export const snapshotsByAnchorFamily = atomFamily((_conversationId: string) =>
   atom<Map<string, ContextSnapshot>>(new Map()),
 );
 
+<<<<<<< HEAD
+=======
+/** Response owning live usage, independent of the selected branch. */
+export const activeUsageResponseIdFamily = atomFamily((_conversationId: string) =>
+  atom<string | null>(null),
+);
+
+>>>>>>> upstream/main
 /** In-flight usage of the streaming response; flushed into the index at finalize. */
 export const pendingUsageFamily = atomFamily((_conversationId: string) =>
   atom<UsageTotals>(EMPTY_USAGE_TOTALS),
@@ -202,6 +215,10 @@ export function removeUsageAtoms(conversationId: string): void {
   contextSnapshotFamily.remove(conversationId);
   snapshotsByAnchorFamily.remove(conversationId);
   pendingUsageFamily.remove(conversationId);
+<<<<<<< HEAD
+=======
+  activeUsageResponseIdFamily.remove(conversationId);
+>>>>>>> upstream/main
   totalUsageFamily.remove(conversationId);
   liveTokensFamily.remove(conversationId);
   subagentUsageFamily.remove(conversationId);

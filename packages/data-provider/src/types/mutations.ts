@@ -47,6 +47,11 @@ export type TGenTitleRequest = {
 
 export type TGenTitleResponse = {
   title: string;
+<<<<<<< HEAD
+=======
+  titleSetByUser?: boolean;
+  titleRevision?: number;
+>>>>>>> upstream/main
 };
 
 export type PresetDeleteResponse = {

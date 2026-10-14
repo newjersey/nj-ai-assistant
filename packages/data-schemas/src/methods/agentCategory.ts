@@ -44,6 +44,7 @@ export function createAgentCategoryMethods(mongoose: typeof import('mongoose')):
   async function getCategoriesWithCounts(): Promise<(IAgentCategory & { agentCount: number })[]> {
     const Agent = mongoose.models.Agent;
 
+<<<<<<< HEAD
     const categoryCounts = await Agent.aggregate([
       { $match: { category: { $exists: true, $ne: null } } },
       { $group: { _id: '$category', count: { $sum: 1 } } },
@@ -51,6 +52,17 @@ export function createAgentCategoryMethods(mongoose: typeof import('mongoose')):
 
     const countMap = new Map(categoryCounts.map((c) => [c._id, c.count]));
     const categories = await getActiveCategories();
+=======
+    const [categoryCounts, categories] = await Promise.all([
+      Agent.aggregate([
+        { $match: { category: { $exists: true, $ne: null } } },
+        { $group: { _id: '$category', count: { $sum: 1 } } },
+      ]),
+      getActiveCategories(),
+    ]);
+
+    const countMap = new Map(categoryCounts.map((c) => [c._id, c.count]));
+>>>>>>> upstream/main
 
     return categories.map((category) => ({
       ...category,

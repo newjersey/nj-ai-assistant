@@ -1,12 +1,19 @@
 const multer = require('multer');
 const express = require('express');
+<<<<<<< HEAD
 const { sleep } = require('@librechat/agents');
+=======
+>>>>>>> upstream/main
 const {
   reportLocatorTraversalFailure,
   isEnabled,
   normalizeLimit,
   normalizeSortDirection,
   normalizeSortField,
+<<<<<<< HEAD
+=======
+  resolveConversationListFilters,
+>>>>>>> upstream/main
   CONVERSATION_SORT_FIELDS,
   openCheckpointDeletion,
   waitForGenerationPersistence,
@@ -16,20 +23,45 @@ const {
   isValidSubagentControlRequest,
   exemptAgentTriggerFromIpLimiter,
   createParentSubagentIndexHandler,
+<<<<<<< HEAD
   createSubagentThreadViewHandler,
+=======
+  createBackgroundTaskIndexHandler,
+  createBackgroundTaskCancelHandler,
+  createBackgroundTaskPolicyMiddleware,
+  createConversationPullRequestHandler,
+  createGitHubPullRequestSource,
+  createPullRequestLookup,
+  backgroundTaskRegistry,
+  createSubagentThreadViewHandler,
+  createGeneratedTitleHandler,
+  createRenameConversationHandler,
+  createMarkConvoSeenHandler,
+  createMarkConvoUnreadHandler,
+>>>>>>> upstream/main
   resolveImportMaxFileSize,
   restoreTenantContextFromReq,
   deleteAllSharedLinksWithCleanup,
   deleteConvoSharedLinksWithCleanup,
+<<<<<<< HEAD
   inspectContent,
   createContentFilter,
   isContentFilterError,
   isConversationImportError,
   contentFilterBlockResponse,
+=======
+  createContentFilter,
+  isContentFilterError,
+  isConversationImportError,
+>>>>>>> upstream/main
   extractConversationTitleContent,
   extractStoredMessageContent,
   GenerationJobManager,
   isStopConfirmed,
+<<<<<<< HEAD
+=======
+  withToolCallPreviews,
+>>>>>>> upstream/main
 } = require('@librechat/api');
 const { logger } = require('@librechat/data-schemas');
 const { CacheKeys, EModelEndpoint } = require('librechat-data-provider');
@@ -46,7 +78,15 @@ const { forkConversation, duplicateConversation } = require('~/server/utils/impo
 const { storage, importFileFilter } = require('~/server/routes/files/multer');
 const requireJwtAuth = require('~/server/middleware/requireJwtAuth');
 const { importConversations } = require('~/server/utils/import');
+<<<<<<< HEAD
 const subagentThreadTaskStore = require('~/server/services/Endpoints/agents/subagentThreadStore');
+=======
+const { getAppConfig } = require('~/server/services/Config');
+const subagentThreadTaskStore = require('~/server/services/Endpoints/agents/subagentThreadStore');
+const {
+  pendingBackgroundToolCompletions,
+} = require('~/server/services/Endpoints/agents/backgroundCompletion');
+>>>>>>> upstream/main
 const getLogStores = require('~/cache/getLogStores');
 const db = require('~/models');
 
@@ -144,6 +184,27 @@ const subagentControlHandler = createSubagentControlHandler({
   getSubagentTaskControlReceipt: db.getSubagentTaskControlReceipt,
   store: subagentThreadTaskStore,
 });
+<<<<<<< HEAD
+=======
+const markConvoSeenHandler = createMarkConvoSeenHandler({ markConvoSeen: db.markConvoSeen });
+const markConvoUnreadHandler = createMarkConvoUnreadHandler({
+  markConvoUnread: db.markConvoUnread,
+});
+const backgroundTaskPolicy = createBackgroundTaskPolicyMiddleware({ getAppConfig });
+const backgroundTaskIndexHandler = createBackgroundTaskIndexHandler({
+  registry: backgroundTaskRegistry,
+  pending: pendingBackgroundToolCompletions,
+});
+const backgroundTaskCancelHandler = createBackgroundTaskCancelHandler({
+  registry: backgroundTaskRegistry,
+});
+const conversationPullRequestHandler = createConversationPullRequestHandler({
+  getConvoLaneGit: db.getConvoLaneGit,
+  getAppConfig,
+  lookup: createPullRequestLookup({ source: createGitHubPullRequestSource({ fetchFn: fetch }) }),
+  env: process.env,
+});
+>>>>>>> upstream/main
 router.use(requireJwtAuth);
 
 const isValidProjectFilter = (projectId) =>
@@ -175,6 +236,17 @@ router.get('/', async (req, res) => {
   }
 
   try {
+<<<<<<< HEAD
+=======
+    const { filters, error: filterError } = await resolveConversationListFilters(
+      req.query,
+      getAppConfig,
+    );
+    if (filterError) {
+      return res.status(400).json({ error: filterError });
+    }
+
+>>>>>>> upstream/main
     const result = await db.getConvosByCursor(req.user.id, {
       cursor,
       limit,
@@ -185,6 +257,10 @@ router.get('/', async (req, res) => {
       sortBy,
       sortDirection,
       projectId,
+<<<<<<< HEAD
+=======
+      ...filters,
+>>>>>>> upstream/main
     });
     res.status(200).json(result);
   } catch (error) {
@@ -207,6 +283,16 @@ router.post(
   subagentControlHandler,
 );
 router.get('/:parentConversationId/subagents', parentSubagentIndexHandler);
+<<<<<<< HEAD
+=======
+router.get('/:conversationId/pull-request', conversationPullRequestHandler);
+router.get('/:conversationId/background-tasks', backgroundTaskPolicy, backgroundTaskIndexHandler);
+router.post(
+  '/:conversationId/background-tasks/cancel',
+  backgroundTaskPolicy,
+  backgroundTaskCancelHandler,
+);
+>>>>>>> upstream/main
 router.get('/:parentConversationId/subagents/:threadId', subagentThreadViewHandler);
 
 router.get('/:conversationId', async (req, res) => {
@@ -220,6 +306,7 @@ router.get('/:conversationId', async (req, res) => {
   }
 });
 
+<<<<<<< HEAD
 router.get('/gen_title/:conversationId', async (req, res) => {
   const { conversationId } = req.params;
   const titleCache = getLogStores(CacheKeys.GEN_TITLE);
@@ -441,6 +528,210 @@ router.delete('/', configMiddleware, async (req, res) => {
     });
   }
 
+=======
+router.get(
+  '/gen_title/:conversationId',
+  createGeneratedTitleHandler({
+    getConvoTitleState: db.getConvoTitleState,
+    getCache: () => getLogStores(CacheKeys.GEN_TITLE),
+    logger,
+  }),
+);
+
+const POST_DELETE_CANCEL_ATTEMPTS = 3;
+const POST_DELETE_CANCEL_BACKOFF_MS = 250;
+const GENERATION_LOOKUP_ATTEMPTS = 3;
+
+async function readGenerationForDeletion(conversationId) {
+  let lastError;
+  for (let attempt = 1; attempt <= GENERATION_LOOKUP_ATTEMPTS; attempt += 1) {
+    try {
+      return await GenerationJobManager.getCleanupJob(conversationId);
+    } catch (error) {
+      lastError = error;
+      if (attempt < GENERATION_LOOKUP_ATTEMPTS) {
+        await new Promise((resolve) => setTimeout(resolve, 25 * attempt));
+      }
+    }
+  }
+  throw lastError;
+}
+
+/** Replays a cancellation plan after deletion, retrying a transiently unreachable
+ * owner rather than losing the only pass that can stop a late-admitted child. */
+async function retryPostDeleteCancellation(cancellationPlan, deletedConversationIds) {
+  for (let attempt = 1; attempt <= POST_DELETE_CANCEL_ATTEMPTS; attempt += 1) {
+    try {
+      await subagentThreadTaskStore.cancelPlan(cancellationPlan, deletedConversationIds);
+      return;
+    } catch (error) {
+      if (attempt === POST_DELETE_CANCEL_ATTEMPTS) {
+        logger.warn('Post-delete subagent cancellation failed', error);
+        return;
+      }
+      await new Promise((resolve) => setTimeout(resolve, POST_DELETE_CANCEL_BACKOFF_MS * attempt));
+    }
+  }
+}
+
+/** Confirms every exact generation is stopped before its conversation wave is removed. */
+async function confirmAgentGenerationsDrained(
+  userId,
+  conversationIds,
+  leaseTaskIds = [],
+  tenantId,
+  ownerWide = false,
+) {
+  const drainErrors = [];
+  let conversationRunIds;
+  try {
+    conversationRunIds = ownerWide
+      ? await GenerationJobManager.getCleanupBlockingJobIdsForUser(userId, tenantId)
+      : await GenerationJobManager.getCleanupBlockingJobIdsForConversations(
+          userId,
+          conversationIds,
+          tenantId,
+        );
+  } catch (error) {
+    logger.warn('Conversation generation index lookup failed', error);
+    throw new Error('Conversation generations could not be confirmed drained.');
+  }
+  const generationIds = [...new Set([...conversationIds, ...leaseTaskIds, ...conversationRunIds])];
+  await Promise.all(
+    generationIds.map(async (conversationId) => {
+      let job;
+      try {
+        job = await readGenerationForDeletion(conversationId);
+      } catch (error) {
+        logger.warn('Deleted child generation lookup failed', error);
+        drainErrors.push(error);
+        return;
+      }
+      if (job == null || job.metadata?.userId !== userId) {
+        return;
+      }
+      const jobTenantId = job.metadata?.tenantId;
+      if (jobTenantId != null && jobTenantId !== tenantId) {
+        return;
+      }
+      const needsDrain =
+        job.status === 'running' ||
+        job.status === 'requires_action' ||
+        job.metadata?.providerDrained === false ||
+        job.metadata?.terminalPersistencePending === true ||
+        job.metadata?.terminalHostActionPending === true;
+      if (!needsDrain) return;
+      try {
+        const abortResult = await GenerationJobManager.abortJob(conversationId, {
+          expectedCreatedAt: job.createdAt,
+          awaitProviderDrain: true,
+        });
+        if (!isStopConfirmed(abortResult)) {
+          throw new Error(
+            `Could not confirm generation stop for ${conversationId}: ${abortResult?.failureReason ?? 'unknown'}`,
+          );
+        }
+        await waitForGenerationPersistence(conversationId, job.createdAt, (id) =>
+          GenerationJobManager.getCleanupJob(id),
+        );
+      } catch (error) {
+        logger.warn('Deleted child generation drain failed', error);
+        drainErrors.push(error);
+      }
+    }),
+  );
+  if (drainErrors.length > 0) {
+    throw new Error('One or more deleted child generations could not be confirmed drained.');
+  }
+}
+
+/** Repeats generation discovery after the conversation wave is gone, then always
+ * removes remnants for that immutable deletion set. A remote run may settle and
+ * leave the cleanup index between persisting and this lookup; absence from the
+ * index is therefore not evidence that the second persistence sweep is unnecessary. */
+async function drainDeletedAgentGenerations(
+  userId,
+  conversationIds,
+  leaseTaskIds = [],
+  tenantId,
+  deletion,
+) {
+  await confirmAgentGenerationsDrained(userId, conversationIds, leaseTaskIds, tenantId);
+  await db.deleteConvos(
+    userId,
+    { conversationId: { $in: conversationIds } },
+    {
+      allowEmpty: true,
+      beforeDelete: async (ids) => {
+        await deletion?.remember(ids);
+        await confirmAgentGenerationsDrained(userId, ids, [], tenantId);
+        await deletion?.remember(ids);
+      },
+    },
+  );
+  await db.deleteMessages({ user: userId, conversationId: { $in: conversationIds } });
+}
+
+/** Orders every owner-scoped agent execution against a delete-all persistence
+ * snapshot. The recovery callback repeats the non-subagent drain if the durable
+ * fence ever lapses and must be reacquired after deletion has started. */
+async function withAgentOwnerDeletionFence(userId, tenantId, deletion, recoverPersistence) {
+  const drainRemoteRuns = () => confirmAgentGenerationsDrained(userId, [], [], tenantId, true);
+  let recoveryConversationIds = [];
+  const result = await subagentThreadTaskStore.withOwnerDeletionFence(
+    userId,
+    tenantId,
+    async () => {
+      await drainRemoteRuns();
+      return deletion();
+    },
+    async () => {
+      await drainRemoteRuns();
+      /** Runs only after the fence was restored. No new provider may enter while
+       * persistence created during the gap is removed idempotently. */
+      const recovery = await recoverPersistence();
+      recoveryConversationIds = recovery.conversationIds ?? [];
+    },
+  );
+  return { result, recoveryConversationIds };
+}
+
+async function deleteOwnerConversationPersistence(userId, filter, tenantId, checkpointer) {
+  const deletion = await openCheckpointDeletion(userId, tenantId, undefined, checkpointer);
+  const result = await db.deleteConvos(userId, filter, {
+    allowEmpty: true,
+    beforeDelete: async (conversationIds) => {
+      await deletion.remember(conversationIds);
+      await confirmAgentGenerationsDrained(userId, conversationIds, [], tenantId);
+      await deletion.remember(conversationIds);
+    },
+  });
+  const targets = [...new Set([...deletion.conversationIds(), ...(result.conversationIds ?? [])])];
+  if (targets.length > 0) {
+    await drainDeletedAgentGenerations(userId, targets, [], tenantId, deletion);
+  }
+  await deletion.cleanup();
+  await db.deleteMessages({ user: userId });
+  await deletion.acknowledge();
+  return { ...result, conversationIds: targets };
+}
+
+router.delete('/', configMiddleware, async (req, res) => {
+  let filter = {};
+  const { conversationId, source, thread_id, endpoint } = req.body?.arg ?? {};
+
+  if (conversationId != null && typeof conversationId !== 'string') {
+    return res.status(400).json({ error: 'Invalid conversationId' });
+  }
+
+  // Prevent deletion of all conversations
+  if (!conversationId && !source && !thread_id && !endpoint) {
+    return res.status(400).json({
+      error: 'no parameters provided',
+    });
+  }
+
+>>>>>>> upstream/main
   if (conversationId) {
     filter = { conversationId };
   } else if (source === 'button') {
@@ -623,6 +914,11 @@ router.post('/archive', validateConvoAccess, async (req, res) => {
         preserveUpdatedAt: true,
         /** Without timestamps, an upsert would insert a conversation that has none. */
         noUpsert: true,
+<<<<<<< HEAD
+=======
+        /** Metadata-only: skip rebuilding `messages` so a concurrent append is not erased. */
+        appendMessageIds: [],
+>>>>>>> upstream/main
       },
     );
 
@@ -673,6 +969,7 @@ router.post('/pin', validateConvoAccess, async (req, res) => {
   }
 });
 
+<<<<<<< HEAD
 /** Maximum allowed length for conversation titles */
 const MAX_CONVO_TITLE_LENGTH = 1024;
 
@@ -725,6 +1022,24 @@ router.post('/update', validateConvoAccess, configMiddleware, async (req, res) =
     res.status(500).send('Error updating conversation');
   }
 });
+=======
+router.post('/seen', validateConvoAccess, markConvoSeenHandler);
+
+router.post('/unread', validateConvoAccess, markConvoUnreadHandler);
+
+router.post(
+  '/update',
+  validateConvoAccess,
+  configMiddleware,
+  createRenameConversationHandler({
+    saveConvo: db.saveConvo,
+    getConvo: db.getConvo,
+    getActiveRunIds:
+      GenerationJobManager.getCleanupBlockingJobIdsForConversations.bind(GenerationJobManager),
+    logger,
+  }),
+);
+>>>>>>> upstream/main
 
 const { importIpLimiter, importUserLimiter } = createImportLimiters();
 /** Fork and duplicate share one rate-limit budget (same "clone" operation class) */
@@ -809,13 +1124,21 @@ router.post('/fork', forkIpLimiter, forkUserLimiter, configMiddleware, async (re
       records: true,
       splitAtTarget,
       option,
+<<<<<<< HEAD
+=======
+      interfaceConfig: req.config?.interfaceConfig,
+>>>>>>> upstream/main
       filters: req.config?.filters,
       ...(req.config?.messageFilter?.pii == null
         ? {}
         : { legacyPii: req.config.messageFilter.pii }),
     });
 
+<<<<<<< HEAD
     res.json(result);
+=======
+    res.json(withToolCallPreviews(req, result));
+>>>>>>> upstream/main
   } catch (error) {
     if (isContentFilterError(error)) {
       return res.status(error.statusCode).json(error.body);
@@ -842,12 +1165,20 @@ router.post(
         userId: req.user.id,
         conversationId,
         title,
+<<<<<<< HEAD
+=======
+        interfaceConfig: req.config?.interfaceConfig,
+>>>>>>> upstream/main
         filters: req.config?.filters,
         ...(req.config?.messageFilter?.pii == null
           ? {}
           : { legacyPii: req.config.messageFilter.pii }),
       });
+<<<<<<< HEAD
       res.status(201).json(result);
+=======
+      res.status(201).json(withToolCallPreviews(req, result));
+>>>>>>> upstream/main
     } catch (error) {
       if (isContentFilterError(error)) {
         return res.status(error.statusCode).json(error.body);

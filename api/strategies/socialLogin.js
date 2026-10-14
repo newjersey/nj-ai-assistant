@@ -1,6 +1,15 @@
 const { logger } = require('@librechat/data-schemas');
 const { ErrorTypes } = require('librechat-data-provider');
+<<<<<<< HEAD
 const { isEnabled, isEmailDomainAllowed, resolveAppConfigForUser } = require('@librechat/api');
+=======
+const {
+  isEnabled,
+  findSocialUser,
+  isEmailDomainAllowed,
+  resolveAppConfigForUser,
+} = require('@librechat/api');
+>>>>>>> upstream/main
 const { createSocialUser, handleExistingUser } = require('./process');
 const { getAppConfig } = require('~/server/services/Config');
 const { findUser, updateUser } = require('~/models');
@@ -26,6 +35,7 @@ const socialLogin =
       }
 
       const providerKey = `${provider}Id`;
+<<<<<<< HEAD
       let existingUser = null;
 
       /** First try to find user by provider ID (e.g., googleId, facebookId) */
@@ -40,6 +50,10 @@ const socialLogin =
           logger.warn(`[${provider}Login] User found by email: ${email} but not by ${providerKey}`);
         }
       }
+=======
+      const lookup = { findUser, provider, providerId: id, email };
+      const existingUser = await findSocialUser(lookup);
+>>>>>>> upstream/main
 
       const appConfig = existingUser?.tenantId
         ? await resolveAppConfigForUser(getAppConfig, existingUser)
@@ -133,6 +147,10 @@ const socialLogin =
         name,
         emailVerified,
         appConfig,
+<<<<<<< HEAD
+=======
+        lookup,
+>>>>>>> upstream/main
       });
       return passResult(newUser);
     } catch (err) {

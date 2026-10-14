@@ -17,7 +17,11 @@ const db = require('~/models');
 
 const loadAddedAgent = (params) =>
   loadAddedAgentFn(params, {
+<<<<<<< HEAD
     getAgent: db.getAgent,
+=======
+    getAgent: db.getAgentWithVersionCount,
+>>>>>>> upstream/main
     getMCPServerTools,
     getAccessibleMCPServers,
   });
@@ -66,6 +70,13 @@ const loadAddedAgent = (params) =>
  *   `codeEnvAvailable`. @see InitializeAgentParams.fileSearchAvailable.
  * @param {boolean} [params.statefulSessionsAvailable] - `stateful_code_sessions`
  *   capability flag; forwarded verbatim alongside `codeEnvAvailable`.
+<<<<<<< HEAD
+=======
+ * @param {import('@librechat/api').ResolveLinkedInstructions} [params.resolveLinkedInstructions] -
+ *   Resolver for the added agent's own `instructionsPrompt` link, forwarded verbatim.
+ * @param {boolean} [params.recordLinkedPromptUsage] - Forwarded to `initializeAgent`;
+ *   defaults to `true` there when omitted.
+>>>>>>> upstream/main
  * @param {AbortSignal} [params.signal] - Owning run cancellation signal.
  * @returns {Promise<{userMCPAuthMap: Object|undefined}>} The updated userMCPAuthMap
  */
@@ -94,6 +105,11 @@ const processAddedConvo = async ({
   defaultActiveOnShare,
   codeEnvAvailable,
   fileSearchAvailable,
+<<<<<<< HEAD
+=======
+  resolveLinkedInstructions,
+  recordLinkedPromptUsage,
+>>>>>>> upstream/main
   backgroundToolsAvailable,
   toolIntentsAvailable,
   statefulSessionsAvailable,
@@ -196,6 +212,11 @@ const processAddedConvo = async ({
         }),
         codeEnvAvailable,
         fileSearchAvailable,
+<<<<<<< HEAD
+=======
+        resolveLinkedInstructions,
+        recordLinkedPromptUsage,
+>>>>>>> upstream/main
         backgroundToolsAvailable,
         toolIntentsAvailable,
         statefulSessionsAvailable,
@@ -205,6 +226,10 @@ const processAddedConvo = async ({
         signal,
       },
       {
+<<<<<<< HEAD
+=======
+        getProjectFiles: db.getProjectFiles,
+>>>>>>> upstream/main
         getFiles: db.getFiles,
         getUserKey: db.getUserKey,
         getMessages: db.getMessages,

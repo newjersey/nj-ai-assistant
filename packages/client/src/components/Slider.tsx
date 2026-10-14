@@ -1,11 +1,19 @@
 import * as React from 'react';
 import * as SliderPrimitive from '@radix-ui/react-slider';
+<<<<<<< HEAD
 import { cn } from '~/utils';
+=======
+import { cn, disabledFillClasses } from '~/utils';
+>>>>>>> upstream/main
 
 type SliderProps = React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root> & {
   className?: string;
   onDoubleClick?: () => void;
   'aria-describedby'?: string;
+<<<<<<< HEAD
+=======
+  'aria-valuetext'?: string;
+>>>>>>> upstream/main
 } & (
     | { 'aria-label': string; 'aria-labelledby'?: never }
     | { 'aria-labelledby': string; 'aria-label'?: never }
@@ -21,6 +29,10 @@ const Slider: React.ForwardRefExoticComponent<SliderProps & React.RefAttributes<
         'aria-labelledby': ariaLabelledBy,
         'aria-label': ariaLabel,
         'aria-describedby': ariaDescribedBy,
+<<<<<<< HEAD
+=======
+        'aria-valuetext': ariaValueText,
+>>>>>>> upstream/main
         ...props
       },
       ref,
@@ -45,11 +57,22 @@ const Slider: React.ForwardRefExoticComponent<SliderProps & React.RefAttributes<
         </SliderPrimitive.Track>
         <SliderPrimitive.Thumb
           {...{
+<<<<<<< HEAD
             className:
               'block h-5 w-5 rounded-full border-2 border-border-xheavy bg-surface-primary ring-offset-surface-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-text-primary focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
             'aria-labelledby': ariaLabelledBy,
             'aria-label': ariaLabel,
             'aria-describedby': ariaDescribedBy,
+=======
+            className: cn(
+              'block h-5 w-5 rounded-full border-2 border-border-xheavy bg-surface-primary ring-offset-surface-primary transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-focus-control focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
+              disabledFillClasses,
+            ),
+            'aria-labelledby': ariaLabelledBy,
+            'aria-label': ariaLabel,
+            'aria-describedby': ariaDescribedBy,
+            'aria-valuetext': ariaValueText,
+>>>>>>> upstream/main
           }}
         />
       </SliderPrimitive.Root>

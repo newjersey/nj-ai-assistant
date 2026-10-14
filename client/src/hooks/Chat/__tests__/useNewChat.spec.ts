@@ -67,10 +67,21 @@ jest.mock('recoil', () => ({
     if (typeof key === 'string' && key.startsWith('isSubmitting')) {
       return mockState.isSubmitting;
     }
+<<<<<<< HEAD
     return mockState.saveDrafts;
   },
 }));
 
+=======
+    return undefined;
+  },
+}));
+
+jest.mock('~/Providers/ChatSettingsContext', () => ({
+  useChatSettings: () => ({ saveDrafts: mockState.saveDrafts }),
+}));
+
+>>>>>>> upstream/main
 jest.mock('~/hooks/useNewConvo', () => ({
   __esModule: true,
   default: () => ({ newConversation: mockNewConversation }),
@@ -208,7 +219,10 @@ jest.mock('~/store', () => ({
     conversationIdByIndex: (index: number) => `conversationIdByIndex-${index}`,
     filesByIndex: (index: number) => `files-by-index-${index}`,
     isSubmittingFamily: (index: number) => `isSubmitting-${index}`,
+<<<<<<< HEAD
     saveDrafts: 'saveDrafts',
+=======
+>>>>>>> upstream/main
   },
 }));
 
@@ -332,6 +346,7 @@ describe('useNewChat', () => {
   });
 
   it('leaves deletion to the reset path when draft saving is off', () => {
+<<<<<<< HEAD
     mockState.saveDrafts = false;
     mockState.filesDraft = {
       fileIds: ['stored-file'],
@@ -339,6 +354,21 @@ describe('useNewChat', () => {
     };
     mockState.fileList = [
       { file_id: 'stored-file', filepath: '/uploads/stored.txt', source: 'local' },
+=======
+    /** The same draft the draft-saving case above deletes, so only the preference differs. */
+    mockState.saveDrafts = false;
+    mockState.filesDraft = {
+      fileIds: ['stored-file'],
+      pendingPastes: { 'in-flight-paste': { text: 'x', selectionStart: 0 } },
+    };
+    mockState.files = new Map([
+      ['stored-file', { file_id: 'stored-file', progress: 1 }],
+      ['in-flight-paste', { file_id: 'in-flight-paste', progress: 0.4 }],
+    ]);
+    mockState.fileList = [
+      { file_id: 'stored-file', filepath: '/uploads/stored.txt', source: 'local' },
+      { file_id: 'in-flight-paste', filepath: '/uploads/pending.txt', source: 'local' },
+>>>>>>> upstream/main
     ];
     const { result } = renderHook(() => useNewChat());
 

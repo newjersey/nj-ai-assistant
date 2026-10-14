@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import React, { useState, useMemo, useEffect } from 'react';
+=======
+import React, { useState, useMemo } from 'react';
+>>>>>>> upstream/main
 import { Waypoints, ChevronDown } from 'lucide-react';
 import { Button, Label, Input, Textarea } from '@librechat/client';
 import type { ControllerRenderProps } from 'react-hook-form';
@@ -11,6 +15,10 @@ import {
   AgentSelectInline,
   useSelectableAgents,
 } from './AgentList';
+<<<<<<< HEAD
+=======
+import { isHandoffEdge } from '../Tools/items/orchestration';
+>>>>>>> upstream/main
 import OrchestrationPattern from './OrchestrationPattern';
 import { useLocalize } from '~/hooks';
 import { CountPill } from './ui';
@@ -24,16 +32,28 @@ interface AgentHandoffsProps {
 const MAX_HANDOFFS = 10;
 
 const Connector = () => (
+<<<<<<< HEAD
   <Waypoints className="mx-auto text-text-tertiary" size={14} aria-hidden="true" />
+=======
+  <Waypoints className="text-text-tertiary mx-auto" size={14} aria-hidden="true" />
+>>>>>>> upstream/main
 );
 
 const getTargetAgentId = (to: string | string[]): string => (Array.isArray(to) ? to[0] : to);
 
 const AgentHandoffs: React.FC<AgentHandoffsProps> = ({ field, currentAgentId }) => {
   const localize = useLocalize();
+<<<<<<< HEAD
   const [newAgentId, setNewAgentId] = useState('');
   const [expandedIndices, setExpandedIndices] = useState<Set<number>>(new Set());
   const edges = useMemo(() => field.value ?? [], [field.value]);
+=======
+  const [expandedIndices, setExpandedIndices] = useState<Set<number>>(new Set());
+  const edges = useMemo(() => (field.value ?? []).filter(isHandoffEdge), [field.value]);
+  const setEdges = (next: GraphEdge[]) => {
+    field.onChange([...(field.value ?? []).filter((edge) => !isHandoffEdge(edge)), ...next]);
+  };
+>>>>>>> upstream/main
 
   const { options, getAgent } = useSelectableAgents({ currentAgentId });
   const selectedAgentIds = useMemo(
@@ -47,6 +67,7 @@ const AgentHandoffs: React.FC<AgentHandoffsProps> = ({ field, currentAgentId }) 
       ),
     [options, selectedAgentIds],
   );
+<<<<<<< HEAD
 
   useEffect(() => {
     if (!newAgentId) {
@@ -62,6 +83,30 @@ const AgentHandoffs: React.FC<AgentHandoffsProps> = ({ field, currentAgentId }) 
 
   const removeHandoffAt = (index: number) => {
     field.onChange(edges.filter((_, i) => i !== index));
+=======
+  const rowOptionsByIndex = useMemo(
+    () =>
+      edges.map((edge) => {
+        const targetAgentId = getTargetAgentId(edge.to);
+        return options.filter(
+          (option) =>
+            typeof option.value === 'string' &&
+            (option.value === targetAgentId || !selectedAgentIds.has(option.value)),
+        );
+      }),
+    [options, selectedAgentIds, edges],
+  );
+
+  const addHandoff = (agentId: string) => {
+    if (!agentId || edges.length >= MAX_HANDOFFS || selectedAgentIds.has(agentId)) {
+      return;
+    }
+    setEdges([...edges, { from: currentAgentId, to: agentId, edgeType: 'handoff' }]);
+  };
+
+  const removeHandoffAt = (index: number) => {
+    setEdges(edges.filter((_, i) => i !== index));
+>>>>>>> upstream/main
     setExpandedIndices(
       (prev) =>
         new Set(
@@ -82,13 +127,21 @@ const AgentHandoffs: React.FC<AgentHandoffsProps> = ({ field, currentAgentId }) 
 
     const updated = [...edges];
     updated[index] = { ...updated[index], to: agentId };
+<<<<<<< HEAD
     field.onChange(updated);
+=======
+    setEdges(updated);
+>>>>>>> upstream/main
   };
 
   const updateHandoffDetailsAt = (index: number, updates: Partial<GraphEdge>) => {
     const updated = [...edges];
     updated[index] = { ...updated[index], ...updates };
+<<<<<<< HEAD
     field.onChange(updated);
+=======
+    setEdges(updated);
+>>>>>>> upstream/main
   };
 
   const toggleExpanded = (index: number) => {
@@ -111,8 +164,13 @@ const AgentHandoffs: React.FC<AgentHandoffsProps> = ({ field, currentAgentId }) 
       beta
       info={
         <>
+<<<<<<< HEAD
           <p className="text-sm text-text-secondary">{localize('com_ui_agent_handoff_info')}</p>
           <p className="text-sm text-text-secondary">{localize('com_ui_agent_handoff_info_2')}</p>
+=======
+          <p className="text-text-secondary text-sm">{localize('com_ui_agent_handoff_info')}</p>
+          <p className="text-text-secondary text-sm">{localize('com_ui_agent_handoff_info_2')}</p>
+>>>>>>> upstream/main
         </>
       }
       trailing={
@@ -126,11 +184,15 @@ const AgentHandoffs: React.FC<AgentHandoffsProps> = ({ field, currentAgentId }) 
           const targetAgentId = getTargetAgentId(edge.to);
           const isExpanded = expandedIndices.has(idx);
           const targetName = getAgent(targetAgentId)?.name ?? localize('com_ui_agent');
+<<<<<<< HEAD
           const rowOptions = options.filter(
             (option) =>
               typeof option.value === 'string' &&
               (option.value === targetAgentId || !selectedAgentIds.has(option.value)),
           );
+=======
+          const rowOptions = rowOptionsByIndex[idx];
+>>>>>>> upstream/main
 
           return (
             <React.Fragment key={idx}>
@@ -151,7 +213,11 @@ const AgentHandoffs: React.FC<AgentHandoffsProps> = ({ field, currentAgentId }) 
                   <Button
                     variant="ghost"
                     size="icon"
+<<<<<<< HEAD
                     className="size-auto flex-shrink-0 rounded-lg p-1 text-text-secondary hover:bg-surface-secondary hover:text-text-primary"
+=======
+                    className="text-text-secondary hover:bg-surface-secondary hover:text-text-primary size-auto shrink-0 rounded-lg p-1"
+>>>>>>> upstream/main
                     onClick={() => toggleExpanded(idx)}
                     aria-expanded={isExpanded}
                     aria-label={localize(isExpanded ? 'com_ui_collapse' : 'com_ui_expand')}
@@ -165,11 +231,19 @@ const AgentHandoffs: React.FC<AgentHandoffsProps> = ({ field, currentAgentId }) 
                 </AgentRow>
 
                 {isExpanded && (
+<<<<<<< HEAD
                   <div className="ml-1.5 flex flex-col gap-2.5 border-l border-border-light pl-3">
                     <div>
                       <Label
                         htmlFor={`handoff-desc-${idx}`}
                         className="text-xs text-text-secondary"
+=======
+                  <div className="border-border-light ml-1.5 flex flex-col gap-2.5 border-l pl-3">
+                    <div>
+                      <Label
+                        htmlFor={`handoff-desc-${idx}`}
+                        className="text-text-secondary text-xs"
+>>>>>>> upstream/main
                       >
                         {localize('com_ui_agent_handoff_description')}
                       </Label>
@@ -189,7 +263,11 @@ const AgentHandoffs: React.FC<AgentHandoffsProps> = ({ field, currentAgentId }) 
                     <div>
                       <Label
                         htmlFor={`handoff-prompt-${idx}`}
+<<<<<<< HEAD
                         className="text-xs text-text-secondary"
+=======
+                        className="text-text-secondary text-xs"
+>>>>>>> upstream/main
                       >
                         {localize('com_ui_agent_handoff_prompt')}
                       </Label>
@@ -210,7 +288,11 @@ const AgentHandoffs: React.FC<AgentHandoffsProps> = ({ field, currentAgentId }) 
                       <div>
                         <Label
                           htmlFor={`handoff-promptkey-${idx}`}
+<<<<<<< HEAD
                           className="text-xs text-text-secondary"
+=======
+                          className="text-text-secondary text-xs"
+>>>>>>> upstream/main
                         >
                           {localize('com_ui_agent_handoff_prompt_key')}
                         </Label>
@@ -239,7 +321,11 @@ const AgentHandoffs: React.FC<AgentHandoffsProps> = ({ field, currentAgentId }) 
             {edges.length > 0 && <Connector />}
             <AddAgentSelect
               options={addAgentOptions}
+<<<<<<< HEAD
               onSelect={setNewAgentId}
+=======
+              onSelect={addHandoff}
+>>>>>>> upstream/main
               placeholder={localize('com_ui_agent_handoff_add')}
               ariaLabel={localize('com_ui_agent_var', { 0: localize('com_ui_add') })}
             />
@@ -247,7 +333,11 @@ const AgentHandoffs: React.FC<AgentHandoffsProps> = ({ field, currentAgentId }) 
         )}
 
         {edges.length >= MAX_HANDOFFS && (
+<<<<<<< HEAD
           <p className="pt-1 text-center text-xs italic text-text-tertiary">
+=======
+          <p className="text-text-tertiary pt-1 text-center text-xs italic">
+>>>>>>> upstream/main
             {localize('com_ui_agent_handoff_max', { 0: MAX_HANDOFFS })}
           </p>
         )}

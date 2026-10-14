@@ -106,7 +106,11 @@ function DynamicTags({
       }`}
     >
       <HoverCard openDelay={300}>
+<<<<<<< HEAD
         <HoverCardTrigger className="grid w-full items-center gap-2">
+=======
+        <HoverCardTrigger className="grid h-full w-full content-between items-center gap-2">
+>>>>>>> upstream/main
           <div className="flex w-full justify-between">
             <Label
               htmlFor={`${settingKey}-dynamic-input`}
@@ -114,7 +118,11 @@ function DynamicTags({
             >
               {labelCode ? (localize(label as TranslationKeys) ?? label) : label || settingKey}{' '}
               {showDefault && (
+<<<<<<< HEAD
                 <small className="opacity-40 high-contrast:opacity-100">
+=======
+                <small className="high-contrast:opacity-100 opacity-40">
+>>>>>>> upstream/main
                   (
                   {typeof defaultValue === 'undefined' || !(defaultValue as string).length
                     ? localize('com_endpoint_default_blank')
@@ -125,7 +133,11 @@ function DynamicTags({
             </Label>
           </div>
           <div>
+<<<<<<< HEAD
             <div className="mb-2 flex flex-wrap break-all rounded-lg border border-border-light bg-surface-secondary">
+=======
+            <div className="border-border-light bg-surface-secondary flex flex-wrap rounded-lg border break-all">
+>>>>>>> upstream/main
               {currentTags && currentTags.length > 0 && (
                 <div className="flex w-full gap-1 p-1">
                   {currentTags.map((tag: string, index: number) => (
@@ -166,7 +178,11 @@ function DynamicTags({
                     ? (localize(placeholder as TranslationKeys) ?? placeholder)
                     : placeholder
                 }
+<<<<<<< HEAD
                 className={cn('flex h-9 max-h-9 border-none bg-surface-secondary px-3 py-2')}
+=======
+                className={cn('bg-surface-secondary flex h-9 max-h-9 border-none px-3 py-2')}
+>>>>>>> upstream/main
               />
             </div>
           </div>

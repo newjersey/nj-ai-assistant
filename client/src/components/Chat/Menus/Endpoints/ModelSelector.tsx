@@ -73,11 +73,19 @@ function ModelSelectorContent() {
         <button
           data-testid="model-selector-button"
           aria-keyshortcuts={modelSelectorAriaKey}
+<<<<<<< HEAD
           className="my-1 flex h-9 max-w-full items-center gap-2 rounded-xl border border-border-light bg-presentation px-3 py-2 text-sm text-text-primary hover:bg-surface-active-alt"
           aria-label={localize('com_ui_select_model')}
         >
           {selectedIcon && React.isValidElement(selectedIcon) && (
             <div className="flex flex-shrink-0 items-center justify-center overflow-hidden">
+=======
+          className="border-border-chrome bg-presentation text-text-primary hover:bg-surface-active-alt rounded-theme-control my-1 flex h-9 max-w-full items-center gap-2 border px-3 py-2 text-sm"
+          aria-label={localize('com_ui_select_model')}
+        >
+          {selectedIcon && React.isValidElement(selectedIcon) && (
+            <div className="flex shrink-0 items-center justify-center overflow-hidden">
+>>>>>>> upstream/main
               {selectedIcon}
             </div>
           )}
@@ -88,7 +96,11 @@ function ModelSelectorContent() {
   );
 
   return (
+<<<<<<< HEAD
     <div className="relative flex min-w-0 max-w-[60vw] flex-col items-center gap-2 sm:max-w-xs">
+=======
+    <div className="relative flex max-w-[60vw] min-w-0 flex-col items-center gap-2 sm:max-w-xs">
+>>>>>>> upstream/main
       <Menu
         values={selectedValues}
         onValuesChange={(values: Record<string, any>) => {

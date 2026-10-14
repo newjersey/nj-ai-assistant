@@ -1,8 +1,16 @@
+<<<<<<< HEAD
 // const { fontFamily } = require('tailwindcss/defaultTheme');
 const {
   createTailwindColors,
 } = require('../packages/client/src/theme/utils/createTailwindColors.js');
 const libreChatTailwindPreset = require('../packages/client/tailwind.preset.cjs');
+=======
+// Semantic colors are declared in
+// packages/client/src/theme/tokens.css, which src/style.css imports. The radius scale and the
+// sans and mono families are theme-owned properties mapped in src/style.css.
+const libreChatTailwindPreset = require('../packages/client/tailwind.preset.cjs');
+const compatibilityColors = require('../packages/client/tailwind.compat.cjs');
+>>>>>>> upstream/main
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
@@ -15,6 +23,7 @@ module.exports = {
   darkMode: ['class'],
   presets: [libreChatTailwindPreset],
   theme: {
+<<<<<<< HEAD
     fontFamily: {
       // NJ: using Public Sans for base typography
       sans: ['Public Sans', 'Inter', 'sans-serif'],
@@ -25,6 +34,10 @@ module.exports = {
     //   mono: ['Söhne Mono', 'monospace'],
     // },
     extend: {
+=======
+    extend: {
+      colors: compatibilityColors,
+>>>>>>> upstream/main
       width: {
         authPageWidth: '370px',
       },
@@ -99,6 +112,7 @@ module.exports = {
         'refresh-link-spin': 'refresh-link-spin 650ms cubic-bezier(0.42, 0, 0.58, 1)',
         'reset-spin': 'reset-spin 500ms cubic-bezier(0.22, 1, 0.36, 1)',
       },
+<<<<<<< HEAD
       colors: createTailwindColors(),
       borderRadius: {
         lg: 'var(--radius)',
@@ -110,6 +124,19 @@ module.exports = {
   plugins: [
     require('tailwindcss-animate'),
     require('tailwindcss-radix'),
+=======
+    },
+  },
+  plugins: [
+    // tailwindcss-radix is gone: its addVariant call produces nothing under Tailwind v4, and
+    // Radix sets the same attributes it keyed off, so callers use `data-[state=open]:` and
+    // `data-[disabled]:` directly. Its last caller was a table mockup nothing rendered, removed
+    // with this upgrade rather than migrated.
+    //
+    // tailwindcss-animate is not listed here: the published preset above registers it, and
+    // Tailwind runs a plugin once per registration, so naming it again would emit every
+    // `animate-in`/`fade-in-*` utility twice.
+>>>>>>> upstream/main
     // require('@tailwindcss/typography'),
   ],
 };

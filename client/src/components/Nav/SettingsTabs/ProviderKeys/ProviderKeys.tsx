@@ -38,10 +38,18 @@ export default function ProviderKeys() {
           </Button>
         </OGDialogTrigger>
         <OGDialogContent
+<<<<<<< HEAD
           ref={contentRef}
           tabIndex={-1}
           onOpenAutoFocus={handleOpenAutoFocus}
           className="w-11/12 max-w-2xl bg-surface-dialog text-text-primary shadow-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-text-primary"
+=======
+          focusOutline="hidden"
+          ref={contentRef}
+          tabIndex={-1}
+          onOpenAutoFocus={handleOpenAutoFocus}
+          className="bg-surface-dialog text-text-primary focus-visible:ring-text-primary w-11/12 max-w-2xl shadow-2xl focus-visible:ring-2 focus-visible:ring-inset"
+>>>>>>> upstream/main
           aria-describedby={undefined}
         >
           <OGDialogHeader className="space-y-0 pr-8 text-left">
@@ -51,7 +59,11 @@ export default function ProviderKeys() {
             </div>
           </OGDialogHeader>
           {endpointsConfig && (
+<<<<<<< HEAD
             <div className="divide-y divide-border-light">
+=======
+            <div className="divide-border-light divide-y">
+>>>>>>> upstream/main
               {endpoints.map((endpoint) => (
                 <ProviderKeyRow
                   key={endpoint}

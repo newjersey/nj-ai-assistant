@@ -21,6 +21,19 @@ import type { LocalizeFunction, TMessageProps } from '~/common';
 export const TEXT_KEY_DIVIDER = '|||';
 export const STREAM_START_FAILED_METADATA_KEY = 'streamStartFailed';
 
+<<<<<<< HEAD
+=======
+/** A locally submitted user row is not canonical until the server acknowledges it. */
+export function isUnacknowledgedUserMessage(message: TMessage): boolean {
+  return (
+    message.isCreatedByUser === true &&
+    message.clientTimestamp != null &&
+    message.createdAt == null &&
+    !message.privacyRevision
+  );
+}
+
+>>>>>>> upstream/main
 type SiblingIndexLookup = (parentMessageId: string | null | undefined) => number;
 
 export type BranchSiblingIndex = {
@@ -90,6 +103,37 @@ export const getMessageBranchSiblingParentIds = (
   return Array.from(parentIds);
 };
 
+<<<<<<< HEAD
+=======
+/**
+ * True when a resumed run's user-message slot is a compaction ANCHOR rather than
+ * a turn the run created.
+ *
+ * A compaction submits no user turn: the slot names the LEAF it summarizes up
+ * to, which the server projects as identity only (`projectCompactionAnchor` —
+ * id, conversation, empty text, and no parent). Every other run publishes the
+ * turn it created, parent included (`getPreliminaryUserMessage`), so the absent
+ * parent is what separates the two.
+ *
+ * The anchor's author cannot separate them: Compact runs on whatever leaf the
+ * branch ends with and `canCompact` does not restrict its author, so the anchor
+ * is an assistant answer on one branch and a user message on the next (see
+ * `isUserInitiatedCompaction`). Testing for a non-user row recognized only the
+ * first kind and left the second rewritten on every re-attach.
+ */
+export const isCompactionAnchorProjection = (
+  userMessage?: {
+    messageId?: string;
+    parentMessageId?: string | null;
+    text?: string | null;
+  } | null,
+): boolean =>
+  userMessage?.messageId != null &&
+  userMessage.messageId !== '' &&
+  userMessage.parentMessageId == null &&
+  (userMessage.text == null || userMessage.text === '');
+
+>>>>>>> upstream/main
 export const getBranchSiblingIndexesForTarget = (
   messages: TMessage[] | null | undefined,
   targetMessageId: string | null | undefined,
@@ -639,11 +683,23 @@ const RELATIVE_TIME_DIVISIONS: { amount: number; unit: Intl.RelativeTimeFormatUn
   { amount: Number.POSITIVE_INFINITY, unit: 'year' },
 ];
 
+<<<<<<< HEAD
+=======
+/**
+ * Intl formatters are expensive to construct and every message row formats its
+ * timestamp on each render, so they are built once per locale (and clock format).
+ */
+const resolvedLocales = new Map<string, string | undefined>();
+const relativeFormatters = new Map<string, Intl.RelativeTimeFormat>();
+const absoluteFormatters = new Map<string, Intl.DateTimeFormat>();
+
+>>>>>>> upstream/main
 /** Returns the locale only when it is a syntactically valid BCP-47 tag, else undefined. */
 const resolveLocale = (locale?: string): string | undefined => {
   if (!locale) {
     return undefined;
   }
+<<<<<<< HEAD
   try {
     Intl.DateTimeFormat.supportedLocalesOf(locale);
     return locale;
@@ -654,6 +710,48 @@ const resolveLocale = (locale?: string): string | undefined => {
 
 const formatRelativeTime = (from: Date, to: Date, locale?: string): string => {
   const formatter = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' });
+=======
+  if (resolvedLocales.has(locale)) {
+    return resolvedLocales.get(locale);
+  }
+  let resolved: string | undefined;
+  try {
+    Intl.DateTimeFormat.supportedLocalesOf(locale);
+    resolved = locale;
+  } catch {
+    resolved = undefined;
+  }
+  resolvedLocales.set(locale, resolved);
+  return resolved;
+};
+
+const getRelativeFormatter = (locale?: string): Intl.RelativeTimeFormat => {
+  const key = locale ?? '';
+  let formatter = relativeFormatters.get(key);
+  if (!formatter) {
+    formatter = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' });
+    relativeFormatters.set(key, formatter);
+  }
+  return formatter;
+};
+
+const getAbsoluteFormatter = (locale?: string, hour12?: boolean): Intl.DateTimeFormat => {
+  const key = `${locale ?? ''}|${String(hour12)}`;
+  let formatter = absoluteFormatters.get(key);
+  if (!formatter) {
+    formatter = new Intl.DateTimeFormat(locale, {
+      dateStyle: 'medium',
+      timeStyle: 'short',
+      hour12,
+    });
+    absoluteFormatters.set(key, formatter);
+  }
+  return formatter;
+};
+
+const formatRelativeTime = (from: Date, to: Date, locale?: string): string => {
+  const formatter = getRelativeFormatter(locale);
+>>>>>>> upstream/main
   let duration = (from.getTime() - to.getTime()) / 1000;
   for (const division of RELATIVE_TIME_DIVISIONS) {
     if (Math.abs(duration) < division.amount) {
@@ -685,11 +783,15 @@ export const getMessageTimestamp = (
   return {
     iso: date.toISOString(),
     relative: formatRelativeTime(date, now, safeLocale),
+<<<<<<< HEAD
     absolute: new Intl.DateTimeFormat(safeLocale, {
       dateStyle: 'medium',
       timeStyle: 'short',
       hour12,
     }).format(date),
+=======
+    absolute: getAbsoluteFormatter(safeLocale, hour12).format(date),
+>>>>>>> upstream/main
     isRecent: Math.abs(now.getTime() - date.getTime()) < RECENT_THRESHOLD_MS,
   };
 };
@@ -824,6 +926,10 @@ export function areMessageFieldsEqual(
   return (
     prevMsg.messageId === nextMsg.messageId &&
     prevMsg.text === nextMsg.text &&
+<<<<<<< HEAD
+=======
+    prevMsg.privacyRevision === nextMsg.privacyRevision &&
+>>>>>>> upstream/main
     prevMsg.error === nextMsg.error &&
     prevMsg.unfinished === nextMsg.unfinished &&
     /** Read by the row: `useGenerationsByLatest` gates the Continue button on it and
@@ -832,6 +938,10 @@ export function areMessageFieldsEqual(
     prevMsg.createdAt === nextMsg.createdAt &&
     prevMsg.depth === nextMsg.depth &&
     prevMsg.isCreatedByUser === nextMsg.isCreatedByUser &&
+<<<<<<< HEAD
+=======
+    prevMsg.isUserSubmitted === nextMsg.isUserSubmitted &&
+>>>>>>> upstream/main
     (prevMsg.children?.length ?? 0) === (nextMsg.children?.length ?? 0) &&
     prevMsg.content === nextMsg.content &&
     prevMsg.model === nextMsg.model &&
@@ -846,6 +956,31 @@ export function areMessageFieldsEqual(
   );
 }
 
+<<<<<<< HEAD
+=======
+type TailRelationProps = {
+  message?: TMessage | null;
+  latestMessageId?: string;
+  latestMessageDepth?: number;
+};
+
+/**
+ * True when moving the thread's tail leaves a row's rendering unchanged. Rows read
+ * `latestMessageId` and `latestMessageDepth` only by comparing them to their own id
+ * and depth, and for whether a tail is known at all, so a submission or a server id
+ * hydration re-renders just the rows entering or leaving the tail.
+ */
+export function isSameTailRelation(prev: TailRelationProps, next: TailRelationProps): boolean {
+  return (
+    (prev.latestMessageId == null) === (next.latestMessageId == null) &&
+    (prev.latestMessageId === prev.message?.messageId) ===
+      (next.latestMessageId === next.message?.messageId) &&
+    (prev.latestMessageDepth === prev.message?.depth) ===
+      (next.latestMessageDepth === next.message?.depth)
+  );
+}
+
+>>>>>>> upstream/main
 /**
  * Comparator for the memoized message-row wrappers (Message / MessageContent /
  * MessageParts): identity-compare the scalar props, field-compare the message.

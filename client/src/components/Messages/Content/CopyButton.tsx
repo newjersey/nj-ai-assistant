@@ -12,11 +12,29 @@ interface CopyButtonProps {
   label?: string;
   copiedLabel?: string;
   portalElement?: HTMLElement | null;
+<<<<<<< HEAD
+=======
+  disabled?: boolean;
+>>>>>>> upstream/main
 }
 
 const CopyButton = React.forwardRef<HTMLButtonElement, CopyButtonProps>(
   (
+<<<<<<< HEAD
     { isCopied, iconOnly = false, onClick, tabIndex, className, label, copiedLabel, portalElement },
+=======
+    {
+      isCopied,
+      iconOnly = false,
+      onClick,
+      tabIndex,
+      className,
+      label,
+      copiedLabel,
+      portalElement,
+      disabled,
+    },
+>>>>>>> upstream/main
     ref,
   ) => {
     const localize = useLocalize();
@@ -33,6 +51,10 @@ const CopyButton = React.forwardRef<HTMLButtonElement, CopyButtonProps>(
         tabIndex={tabIndex}
         className={className}
         portalElement={portalElement}
+<<<<<<< HEAD
+=======
+        disabled={disabled}
+>>>>>>> upstream/main
       />
     );
   },

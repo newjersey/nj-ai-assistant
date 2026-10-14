@@ -3,6 +3,10 @@ name: Retarget PRs to dev
 on:
   pull_request_target:
     types: [opened, reopened, synchronize]
+<<<<<<< HEAD
+=======
+    # A deliberate canary base is never retargeted; the script also enforces this for sweeps.
+>>>>>>> upstream/main
     branches: [main]
   workflow_dispatch:
     inputs:
@@ -11,7 +15,11 @@ on:
         type: boolean
         default: true
       pr_numbers:
+<<<<<<< HEAD
         description: 'Space-separated PR numbers (default: every open pull request based on main)'
+=======
+        description: 'Space-separated PR numbers (default: open main-based PRs; canary is excluded)'
+>>>>>>> upstream/main
         required: false
         default: ''
 
@@ -41,6 +49,12 @@ jobs:
           persist-credentials: false
           sparse-checkout: .github/scripts
 
+<<<<<<< HEAD
+=======
+      - name: Verify canary base stays untouched
+        run: node --test .github/scripts/retarget-prs.test.mjs
+
+>>>>>>> upstream/main
       - name: Retarget onto dev
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -59,6 +73,12 @@ jobs:
           persist-credentials: false
           sparse-checkout: .github/scripts
 
+<<<<<<< HEAD
+=======
+      - name: Verify canary base stays untouched
+        run: node --test .github/scripts/retarget-prs.test.mjs
+
+>>>>>>> upstream/main
       - name: Retarget onto dev
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

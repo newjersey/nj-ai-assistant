@@ -13,6 +13,10 @@ export * from './Projects';
 /* Scheduled chats */
 export * from './Schedules';
 export * from './Subagents';
+<<<<<<< HEAD
+=======
+export * from './BackgroundTasks';
+>>>>>>> upstream/main
 export * from './Tools';
 export * from './Traces';
 export * from './connection';

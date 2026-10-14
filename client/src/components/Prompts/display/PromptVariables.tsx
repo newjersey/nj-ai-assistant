@@ -3,7 +3,11 @@ import { Variable, ChevronRight } from 'lucide-react';
 import { specialVariables } from 'librechat-data-provider';
 import type { TSpecialVarLabel } from 'librechat-data-provider';
 import { getSpecialVariableIcon } from '~/components/Prompts/utils';
+<<<<<<< HEAD
 import { extractUniqueVariables } from '~/utils';
+=======
+import { extractUniqueVariables, cn } from '~/utils';
+>>>>>>> upstream/main
 import { useLocalize } from '~/hooks';
 
 interface ParsedVariable {
@@ -37,7 +41,11 @@ const DropdownVariableCard = ({ parsed }: { parsed: ParsedVariable }) => {
 
   return (
     <div
+<<<<<<< HEAD
       className="bg-surface-secondary/50 rounded-lg border border-border-medium p-2.5 hover:bg-surface-secondary"
+=======
+      className="border-border-medium bg-surface-secondary/50 hover:bg-surface-secondary rounded-lg border p-2.5"
+>>>>>>> upstream/main
       role="listitem"
       aria-label={localize('com_ui_variable_with_options', {
         name: parsed.name,
@@ -45,11 +53,19 @@ const DropdownVariableCard = ({ parsed }: { parsed: ParsedVariable }) => {
       })}
     >
       <div className="mb-2 flex items-center gap-2">
+<<<<<<< HEAD
         <div className="flex size-6 items-center justify-center rounded-md bg-surface-tertiary">
           <ChevronRight className="size-3.5 text-text-secondary" aria-hidden="true" />
         </div>
         <span className="text-sm font-medium text-text-primary">{parsed.name}</span>
         <span className="rounded-full bg-surface-tertiary px-1.5 py-0.5 text-[10px] font-medium text-text-secondary">
+=======
+        <div className="bg-surface-tertiary flex size-6 items-center justify-center rounded-md">
+          <ChevronRight className="text-text-secondary size-3.5" aria-hidden="true" />
+        </div>
+        <span className="text-text-primary text-sm font-medium">{parsed.name}</span>
+        <span className="bg-surface-tertiary text-text-secondary rounded-full px-1.5 py-0.5 text-[10px] font-medium">
+>>>>>>> upstream/main
           {parsed.options.length} {localize('com_ui_options')}
         </span>
       </div>
@@ -61,7 +77,11 @@ const DropdownVariableCard = ({ parsed }: { parsed: ParsedVariable }) => {
         {parsed.options.map((option, index) => (
           <span
             key={index}
+<<<<<<< HEAD
             className="rounded-md border border-border-medium bg-transparent px-2 py-0.5 text-xs text-text-secondary transition-colors hover:bg-surface-secondary"
+=======
+            className="border-border-medium text-text-secondary hover:bg-surface-secondary rounded-md border bg-transparent px-2 py-0.5 text-xs transition-colors"
+>>>>>>> upstream/main
             role="listitem"
           >
             {option}
@@ -82,6 +102,7 @@ const SpecialVariableChip = ({ parsed }: { parsed: ParsedVariable }) => {
 
   return (
     <div
+<<<<<<< HEAD
       className="group flex items-start gap-2 rounded-lg border border-border-medium bg-transparent p-2 hover:bg-surface-secondary"
       role="listitem"
       aria-label={displayLabel}
@@ -92,6 +113,18 @@ const SpecialVariableChip = ({ parsed }: { parsed: ParsedVariable }) => {
       <div className="min-w-0 flex-1">
         <span className="text-xs font-medium text-text-primary">{displayLabel}</span>
         {description && <p className="mt-0.5 text-[11px] text-text-secondary">{description}</p>}
+=======
+      className="group border-border-medium hover:bg-surface-secondary flex items-start gap-2 rounded-lg border bg-transparent p-2"
+      role="listitem"
+      aria-label={displayLabel}
+    >
+      <div className="bg-surface-tertiary flex size-6 shrink-0 items-center justify-center rounded-md">
+        <Icon className="text-text-secondary size-3.5" aria-hidden="true" />
+      </div>
+      <div className="min-w-0 flex-1">
+        <span className="text-text-primary text-xs font-medium">{displayLabel}</span>
+        {description && <p className="text-text-secondary mt-0.5 text-[11px]">{description}</p>}
+>>>>>>> upstream/main
       </div>
     </div>
   );
@@ -99,16 +132,35 @@ const SpecialVariableChip = ({ parsed }: { parsed: ParsedVariable }) => {
 
 const SimpleVariableChip = ({ parsed }: { parsed: ParsedVariable }) => (
   <span
+<<<<<<< HEAD
     className="bg-surface-secondary/50 inline-flex items-center gap-1.5 rounded-lg border border-border-medium px-2.5 py-1.5 text-xs font-medium text-text-primary hover:bg-surface-tertiary"
     role="listitem"
   >
     <Variable className="size-3 text-text-secondary" aria-hidden="true" />
+=======
+    className="border-border-medium bg-surface-secondary/50 text-text-primary hover:bg-surface-tertiary inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-medium"
+    role="listitem"
+  >
+    <Variable className="text-text-secondary size-3" aria-hidden="true" />
+>>>>>>> upstream/main
     <span className="max-w-32 truncate">{parsed.name}</span>
   </span>
 );
 
+<<<<<<< HEAD
 const PromptVariables = ({ promptText }: { promptText: string }) => {
   const localize = useLocalize();
+=======
+const PromptVariables = ({
+  promptText,
+  inset = false,
+}: {
+  promptText: string;
+  inset?: boolean;
+}) => {
+  const localize = useLocalize();
+  const frame = inset ? 'border-border-inset-medium' : 'border-border-medium';
+>>>>>>> upstream/main
 
   const variables = useMemo(() => {
     return extractUniqueVariables(promptText || '');
@@ -138,6 +190,7 @@ const PromptVariables = ({ promptText }: { promptText: string }) => {
   }
 
   return (
+<<<<<<< HEAD
     <div className="overflow-hidden rounded-xl border border-border-medium">
       <header className="flex items-center justify-between border-b border-border-medium p-3">
         <div className="flex items-center gap-2">
@@ -147,6 +200,17 @@ const PromptVariables = ({ promptText }: { promptText: string }) => {
           </h4>
         </div>
         <span className="flex size-6 items-center justify-center rounded-full bg-surface-tertiary text-xs font-medium tabular-nums text-text-secondary">
+=======
+    <div className={cn(frame, 'overflow-hidden rounded-xl border')}>
+      <header className={cn(frame, 'flex items-center justify-between border-b p-3')}>
+        <div className="flex items-center gap-2">
+          <Variable className="text-text-secondary size-4" aria-hidden="true" />
+          <h4 className="text-text-primary text-sm font-semibold">
+            {localize('com_ui_variables')}
+          </h4>
+        </div>
+        <span className="bg-surface-tertiary text-text-secondary flex size-6 items-center justify-center rounded-full text-xs font-medium tabular-nums">
+>>>>>>> upstream/main
           {variables.length}
         </span>
       </header>
@@ -158,7 +222,11 @@ const PromptVariables = ({ promptText }: { promptText: string }) => {
       >
         {specialVars.length > 0 && (
           <section aria-label={localize('com_ui_special_variables')}>
+<<<<<<< HEAD
             <h5 className="mb-2 text-[11px] font-medium uppercase tracking-wide text-text-secondary">
+=======
+            <h5 className="text-text-secondary mb-2 text-[11px] font-medium tracking-wide uppercase">
+>>>>>>> upstream/main
               {localize('com_ui_special_variables')}
             </h5>
             <div className="grid gap-2 sm:grid-cols-2">
@@ -171,7 +239,11 @@ const PromptVariables = ({ promptText }: { promptText: string }) => {
 
         {dropdownVariables.length > 0 && (
           <section aria-label={localize('com_ui_dropdown_variables')}>
+<<<<<<< HEAD
             <h5 className="mb-2 text-[11px] font-medium uppercase tracking-wide text-text-secondary">
+=======
+            <h5 className="text-text-secondary mb-2 text-[11px] font-medium tracking-wide uppercase">
+>>>>>>> upstream/main
               {localize('com_ui_dropdown_variables')}
             </h5>
             <div className="flex flex-col gap-2">
@@ -184,7 +256,11 @@ const PromptVariables = ({ promptText }: { promptText: string }) => {
 
         {simpleVariables.length > 0 && (
           <section aria-label={localize('com_ui_text_variables')}>
+<<<<<<< HEAD
             <h5 className="mb-2 text-[11px] font-medium uppercase tracking-wide text-text-secondary">
+=======
+            <h5 className="text-text-secondary mb-2 text-[11px] font-medium tracking-wide uppercase">
+>>>>>>> upstream/main
               {localize('com_ui_text_variables')}
             </h5>
             <div className="flex flex-wrap gap-2">

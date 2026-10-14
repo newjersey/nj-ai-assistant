@@ -37,6 +37,17 @@ describe('TimePicker', () => {
     expect(screen.getByRole('radiogroup', { name: 'AM or PM' })).toBeInTheDocument();
   });
 
+<<<<<<< HEAD
+=======
+  it('inks its value in the field role like every other field', () => {
+    render(<Harness />);
+
+    const trigger = screen.getByRole('button', { name: 'Time 9:00 AM' });
+    expect(trigger).toHaveClass('text-field-text');
+    expect(trigger).not.toHaveClass('text-text-primary');
+  });
+
+>>>>>>> upstream/main
   it('announces the selected time, not just the field label', () => {
     // `aria-labelledby` REPLACES a button's child text, so pointing it at the field
     // label alone announced "Time" and left the selected value unreadable without

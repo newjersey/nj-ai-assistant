@@ -229,3 +229,17 @@ describe('areToolCallArgsComplete', () => {
     expect(areToolCallArgsComplete('[]')).toBe(false);
   });
 });
+<<<<<<< HEAD
+=======
+
+describe('cached field regexes', () => {
+  it('returns identical results across repeated calls on the same field', () => {
+    const partial = '{"command":"echo hi';
+    expect(parseJsonField(partial, 'command')).toBe('echo hi');
+    expect(parseJsonField(partial, 'command')).toBe('echo hi');
+    const many = '{"a":"1","a":"2","a":"3';
+    expect(parseJsonFieldOccurrences(many, 'a')).toEqual(['1', '2', '3']);
+    expect(parseJsonFieldOccurrences(many, 'a')).toEqual(['1', '2', '3']);
+  });
+});
+>>>>>>> upstream/main

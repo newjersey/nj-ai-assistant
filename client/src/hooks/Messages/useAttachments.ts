@@ -18,12 +18,39 @@ function agentIdOf(attachment: TAttachment): string | undefined {
   return (attachment as { agentId?: string }).agentId;
 }
 
+<<<<<<< HEAD
 /**
  * Stable identity for merging DB and live attachments. Shared with the
  * message renderer, which dedupes the same rows on the same key — two
  * definitions of what makes an attachment "the same one" is exactly the drift
  * that puts a file on screen twice in one surface and not at all in another.
  */
+=======
+function nonFileBucketKey(attachment: TAttachment): string | undefined {
+  if (fileKeyOf(attachment)) {
+    return undefined;
+  }
+  const { type } = attachment as { type?: string };
+  const toolCallId = toolCallIdOf(attachment);
+  return type != null && toolCallId != null ? `${type}:${toolCallId}` : undefined;
+}
+
+/** Missing ownership is a compatibility wildcard for historical rows; two
+ * known unequal owners identify distinct executions. */
+function nonFileOwnersCompatible(left: TAttachment, right: TAttachment): boolean {
+  const leftAgentId = agentIdOf(left);
+  const rightAgentId = agentIdOf(right);
+  const leftStepId = left.stepId;
+  const rightStepId = right.stepId;
+  return (
+    (leftAgentId == null || rightAgentId == null || leftAgentId === rightAgentId) &&
+    (leftStepId == null || rightStepId == null || leftStepId === rightStepId)
+  );
+}
+
+/** Stable file identity shared with the message renderer. Non-file DB/live
+ * reconciliation additionally compares its producer ownership below. */
+>>>>>>> upstream/main
 const attachmentKey = attachmentIdentity;
 
 /**
@@ -76,11 +103,16 @@ export default function useAttachments({
      * `artifactTypeForAttachment` see the resolved text/textFormat
      * and route through the proper PanelArtifact card. */
     const dbKeys = new Set<string>();
+<<<<<<< HEAD
+=======
+    const nonFileBuckets = new Map<string, TAttachment[]>();
+>>>>>>> upstream/main
     const merged = attachments.map((db) => {
       const key = attachmentKey(db);
       if (!key) {
         return db;
       }
+<<<<<<< HEAD
       dbKeys.add(key);
       /** Partial live records must still be reachable by their less-specific
        *  keys so an overlaid entry isn't re-appended below: bare records (no
@@ -88,11 +120,30 @@ export default function useAttachments({
        *  fileKey::toolCallId. */
       const fileKey = fileKeyOf(db);
       if (fileKey) {
+=======
+      const fileKey = fileKeyOf(db);
+      if (fileKey) {
+        /** Partial live file records must still be reachable by their
+         * less-specific keys so an overlaid entry isn't re-appended below:
+         * bare records key by file key, and agent-less records by
+         * fileKey::toolCallId. */
+        dbKeys.add(key);
+>>>>>>> upstream/main
         dbKeys.add(fileKey);
         const toolCallId = toolCallIdOf(db);
         if (toolCallId != null) {
           dbKeys.add(`${fileKey}::${toolCallId}`);
         }
+<<<<<<< HEAD
+=======
+      } else {
+        const bucketKey = nonFileBucketKey(db);
+        if (bucketKey) {
+          const bucket = nonFileBuckets.get(bucketKey) ?? [];
+          bucket.push(db);
+          nonFileBuckets.set(bucketKey, bucket);
+        }
+>>>>>>> upstream/main
       }
       const liveEntry = live.find((a) => matchesLiveEntry(db, a));
       return liveEntry ? ({ ...db, ...liveEntry } as TAttachment) : db;
@@ -102,12 +153,31 @@ export default function useAttachments({
      * message whose DB `attachments` snapshot predates them (the row is
      * patched post-finalize), so treating the DB list as exhaustive would
      * make those files vanish until a full reload. Entries whose key is
+<<<<<<< HEAD
      * already in the DB list (e.g. unkeyed file_search citations replayed
      * by the final message event) are duplicates, and entries with no
      * stable identity at all cannot be deduped — both are dropped. */
     const liveOnly = live.filter((a) => {
       const key = attachmentKey(a);
       return key != null && !dbKeys.has(key);
+=======
+     * compatible DB file key or non-file owner are replay duplicates, while
+     * entries with no stable identity at all cannot be reconciled — both are
+     * dropped. */
+    const liveOnly = live.filter((a) => {
+      const key = attachmentKey(a);
+      if (key == null) {
+        return false;
+      }
+      if (fileKeyOf(a)) {
+        return !dbKeys.has(key);
+      }
+      const bucketKey = nonFileBucketKey(a);
+      if (!bucketKey) {
+        return false;
+      }
+      return !nonFileBuckets.get(bucketKey)?.some((db) => nonFileOwnersCompatible(db, a));
+>>>>>>> upstream/main
     });
     return liveOnly.length > 0 ? [...merged, ...liveOnly] : merged;
   }, [attachments, messageAttachmentsMap, messageId]);

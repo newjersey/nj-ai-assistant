@@ -1,10 +1,25 @@
 import type { ExtendedFile, FileSetter } from '~/common';
+<<<<<<< HEAD
+=======
+import { isComposerFileTaken, releaseComposerFile } from '~/utils/composerFiles';
+>>>>>>> upstream/main
 import useSetFilesToDelete from './useSetFilesToDelete';
 
 export default function useUpdateFiles(setFiles: FileSetter) {
   const setFilesToDelete = useSetFilesToDelete();
 
+<<<<<<< HEAD
   const addFile = (newFile: ExtendedFile) => {
+=======
+  /**
+   * Always a deliberate attach: the first, synchronous step of an upload the
+   * user just started, or an explicit pick from the file panel. That intent
+   * outranks any earlier consumption of the same id: re-attaching a library
+   * file reuses its server id, so the mark is dropped rather than obeyed.
+   */
+  const addFile = (newFile: ExtendedFile) => {
+    releaseComposerFile(newFile.file_id);
+>>>>>>> upstream/main
     setFiles((currentFiles) => {
       const updatedFiles = new Map(currentFiles);
       updatedFiles.set(newFile.file_id, newFile);
@@ -12,7 +27,21 @@ export default function useUpdateFiles(setFiles: FileSetter) {
     });
   };
 
+<<<<<<< HEAD
   const replaceFile = (newFile: ExtendedFile) => {
+=======
+  /**
+   * Only ever a continuation of an upload already in the composer (conversion
+   * progress, resize, image measurement). A steer or a queued message can have
+   * consumed that attachment while those callbacks were in flight, and writing
+   * it back would resurrect a file the message already owns, so a consumed id
+   * is dropped here instead of re-entering the composer.
+   */
+  const replaceFile = (newFile: ExtendedFile) => {
+    if (isComposerFileTaken(newFile.file_id)) {
+      return;
+    }
+>>>>>>> upstream/main
     setFiles((currentFiles) => {
       const updatedFiles = new Map(currentFiles);
       updatedFiles.set(newFile.file_id, newFile);

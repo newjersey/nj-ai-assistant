@@ -7,12 +7,23 @@ import {
   PermissionBits,
 } from 'librechat-data-provider';
 import type { AllMethods, MCPServerDocument, IAgent } from '@librechat/data-schemas';
+<<<<<<< HEAD
 
 import type { IServerConfigsRepositoryInterface } from '~/mcp/registry/ServerConfigsRepositoryInterface';
 import type { ParsedServerConfig, AddServerResult } from '~/mcp/types';
 import type { ResolvedPrincipal } from '~/types/principal';
 import { MCPOAuthSecretReentryRequiredError } from '~/mcp/errors';
 import { AccessControlService } from '~/acl/accessControlService';
+=======
+import type { IServerConfigsRepositoryInterface } from '~/mcp/registry/ServerConfigsRepositoryInterface';
+import type { ParsedServerConfig, AddServerResult } from '~/mcp/types';
+import type { ResolvedPrincipal } from '~/types/principal';
+import { getUserApiKeyVariable, requireApiKeyReentryForRebinding } from '~/mcp/registry/binding';
+import { normalizeLegacyHeaderMaps } from '~/mcp/registry/compat';
+import { MCPOAuthSecretReentryRequiredError } from '~/mcp/errors';
+import { AccessControlService } from '~/acl/accessControlService';
+import { isGeneratedUserApiKeyVariable } from '~/mcp/headers';
+>>>>>>> upstream/main
 
 /**
  * Regex patterns for credential/env placeholders that should not be allowed in user-provided configs.
@@ -58,6 +69,30 @@ function sanitizeCredentialPlaceholders(
   return sanitized;
 }
 
+<<<<<<< HEAD
+=======
+/**
+ * Sanitizes every header map a shared config carries. `requestHeaders` is
+ * included because it reaches the upstream server exactly like `headers` does:
+ * left unsanitized, a user-managed config could name a privileged placeholder
+ * there and have the runtime resolve it at chat time. Absent maps stay omitted
+ * because BSON can serialize explicit undefined properties as null.
+ */
+function sanitizeConfigHeaderMaps(config: ParsedServerConfig): ParsedServerConfig {
+  const { headers, requestHeaders, ...rest } = config as ParsedServerConfig & {
+    headers?: Record<string, string>;
+    requestHeaders?: Record<string, string>;
+  };
+  return {
+    ...rest,
+    ...(headers != null && { headers: sanitizeCredentialPlaceholders(headers) }),
+    ...(requestHeaders != null && {
+      requestHeaders: sanitizeCredentialPlaceholders(requestHeaders),
+    }),
+  } as ParsedServerConfig;
+}
+
+>>>>>>> upstream/main
 function stripBlockedOAuthEndpointParams(url?: string): string | undefined {
   if (!url) {
     return url;
@@ -80,6 +115,10 @@ function sanitizeUserManagedOAuthConfig(config: ParsedServerConfig): ParsedServe
   const {
     audience: _audience,
     forward_audience_on_refresh: _forwardAudienceOnRefresh,
+<<<<<<< HEAD
+=======
+    send_resource_parameter: _sendResourceParameter,
+>>>>>>> upstream/main
     ...oauth
   } = config.oauth;
   return {
@@ -96,6 +135,7 @@ function sanitizeUserManagedOAuthConfig(config: ParsedServerConfig): ParsedServe
   };
 }
 
+<<<<<<< HEAD
 /** Normalizes legacy values that predate the current runtime config schemas. */
 function normalizePersistedConfig(config: ParsedServerConfig): ParsedServerConfig {
   const persistedConfig = config as ParsedServerConfig & {
@@ -109,6 +149,8 @@ function normalizePersistedConfig(config: ParsedServerConfig): ParsedServerConfi
   return normalizedConfig as ParsedServerConfig;
 }
 
+=======
+>>>>>>> upstream/main
 function normalizeOAuthUrl(value?: string): string | undefined {
   if (!value) {
     return value;
@@ -294,12 +336,16 @@ export class ServerConfigsDB implements IServerConfigsRepositoryInterface {
       );
     }
 
+<<<<<<< HEAD
     const sanitizedConfig = sanitizeUserManagedOAuthConfig({
       ...config,
       headers: sanitizeCredentialPlaceholders(
         (config as ParsedServerConfig & { headers?: Record<string, string> }).headers,
       ),
     } as ParsedServerConfig);
+=======
+    const sanitizedConfig = sanitizeUserManagedOAuthConfig(sanitizeConfigHeaderMaps(config));
+>>>>>>> upstream/main
 
     /** Transformed user-provided API key config (adds customUserVars and headers) */
     const transformedConfig = this.transformUserApiKeyConfig(sanitizedConfig);
@@ -343,6 +389,7 @@ export class ServerConfigsDB implements IServerConfigsRepositoryInterface {
 
     const existingServer = await this._dbMethods.findMCPServerByServerName(serverName);
 
+<<<<<<< HEAD
     let configToSave: ParsedServerConfig = sanitizeUserManagedOAuthConfig({
       ...config,
       headers: sanitizeCredentialPlaceholders(
@@ -352,6 +399,15 @@ export class ServerConfigsDB implements IServerConfigsRepositoryInterface {
 
     /** Transformed user-provided API key config (adds customUserVars and headers) */
     configToSave = this.transformUserApiKeyConfig(configToSave);
+=======
+    if (existingServer) {
+      requireApiKeyReentryForRebinding(existingServer.config, config);
+    }
+
+    let configToSave: ParsedServerConfig = sanitizeUserManagedOAuthConfig(
+      sanitizeConfigHeaderMaps(config),
+    );
+>>>>>>> upstream/main
 
     const existingOAuth = existingServer?.config?.oauth;
     const existingOAuthSecret = existingOAuth?.client_secret;
@@ -368,6 +424,12 @@ export class ServerConfigsDB implements IServerConfigsRepositoryInterface {
       }
     }
 
+<<<<<<< HEAD
+=======
+    /** Transformed user-provided API key config (adds customUserVars and headers) */
+    configToSave = this.transformUserApiKeyConfig(configToSave, existingServer?.config);
+
+>>>>>>> upstream/main
     /** Encrypted config before storing in database */
     configToSave = await this.encryptConfig(configToSave);
 
@@ -640,7 +702,11 @@ export class ServerConfigsDB implements IServerConfigsRepositoryInterface {
       ...(authorId ? { author: authorId } : {}),
     };
     return sanitizeUserManagedOAuthConfig(
+<<<<<<< HEAD
       await this.decryptConfig(normalizePersistedConfig(config)),
+=======
+      await this.decryptConfig(normalizeLegacyHeaderMaps(config)),
+>>>>>>> upstream/main
     );
   }
 
@@ -650,7 +716,14 @@ export class ServerConfigsDB implements IServerConfigsRepositoryInterface {
    * @param config - The server config to transform
    * @returns The transformed config with customUserVars and headers set up
    */
+<<<<<<< HEAD
   private transformUserApiKeyConfig(config: ParsedServerConfig): ParsedServerConfig {
+=======
+  private transformUserApiKeyConfig(
+    config: ParsedServerConfig,
+    existingConfig?: ParsedServerConfig,
+  ): ParsedServerConfig {
+>>>>>>> upstream/main
     if (!config.apiKey || config.apiKey.source !== 'user') {
       return config;
     }
@@ -661,6 +734,7 @@ export class ServerConfigsDB implements IServerConfigsRepositoryInterface {
         ? result.apiKey!.custom_header || 'X-Api-Key'
         : 'Authorization';
 
+<<<<<<< HEAD
     let headerValue: string;
     if (result.apiKey!.authorization_type === 'basic') {
       headerValue = 'Basic {{MCP_API_KEY}}';
@@ -673,6 +747,30 @@ export class ServerConfigsDB implements IServerConfigsRepositoryInterface {
     result.customUserVars = {
       ...result.customUserVars,
       MCP_API_KEY: {
+=======
+    const variable = getUserApiKeyVariable(config, existingConfig);
+    const placeholder = `{{${variable}}}`;
+    let headerValue: string;
+    if (result.apiKey!.authorization_type === 'basic') {
+      headerValue = `Basic ${placeholder}`;
+    } else if (result.apiKey!.authorization_type === 'bearer') {
+      headerValue = `Bearer ${placeholder}`;
+    } else {
+      headerValue = placeholder;
+    }
+
+    const customUserVars: NonNullable<ParsedServerConfig['customUserVars']> = {
+      ...result.customUserVars,
+    };
+    for (const name of Object.keys(customUserVars)) {
+      if (isGeneratedUserApiKeyVariable(name)) {
+        delete customUserVars[name];
+      }
+    }
+    result.customUserVars = {
+      ...customUserVars,
+      [variable]: {
+>>>>>>> upstream/main
         title: 'API Key',
         description: 'Your API key for this MCP server',
       },

@@ -78,13 +78,21 @@ const UIResourceCarousel: React.FC<UIResourceCarouselProps> = React.memo(({ uiRe
       onMouseLeave={() => setIsContainerHovered(false)}
     >
       <div
+<<<<<<< HEAD
         className={`pointer-events-none absolute left-0 top-0 z-10 h-full w-24 bg-gradient-to-r from-surface-primary to-transparent transition-opacity duration-500 ease-in-out ${
+=======
+        className={`from-surface-primary pointer-events-none absolute top-0 left-0 z-10 h-full w-24 bg-gradient-to-r to-transparent transition-opacity duration-500 ease-in-out ${
+>>>>>>> upstream/main
           showLeftArrow ? 'opacity-100' : 'opacity-0'
         }`}
       />
 
       <div
+<<<<<<< HEAD
         className={`pointer-events-none absolute right-0 top-0 z-10 h-full w-24 bg-gradient-to-l from-surface-primary to-transparent transition-opacity duration-500 ease-in-out ${
+=======
+        className={`from-surface-primary pointer-events-none absolute top-0 right-0 z-10 h-full w-24 bg-gradient-to-l to-transparent transition-opacity duration-500 ease-in-out ${
+>>>>>>> upstream/main
           showRightArrow ? 'opacity-100' : 'opacity-0'
         }`}
       />
@@ -94,7 +102,11 @@ const UIResourceCarousel: React.FC<UIResourceCarouselProps> = React.memo(({ uiRe
           variant="ghost"
           size="icon"
           onClick={() => scroll('left')}
+<<<<<<< HEAD
           className={`absolute left-2 top-1/2 z-20 h-auto w-auto -translate-y-1/2 rounded-xl bg-surface-fixed p-2 text-text-fixed shadow-lg transition-all duration-200 hover:scale-110 hover:bg-surface-fixed-hover hover:text-text-fixed hover:shadow-xl active:scale-95 ${
+=======
+          className={`bg-surface-fixed text-text-fixed hover:bg-surface-fixed-hover hover:text-text-fixed absolute top-1/2 left-2 z-20 h-auto w-auto -translate-y-1/2 rounded-xl p-2 shadow-lg transition-all duration-200 hover:scale-110 hover:shadow-xl active:scale-95 ${
+>>>>>>> upstream/main
             isContainerHovered ? 'opacity-100' : 'pointer-events-none opacity-0'
           }`}
           aria-label={localize('com_ui_scroll_left')}
@@ -114,7 +126,11 @@ const UIResourceCarousel: React.FC<UIResourceCarouselProps> = React.memo(({ uiRe
           return (
             <div
               key={index}
+<<<<<<< HEAD
               className="flex-shrink-0 transform-gpu transition-all duration-300 ease-out animate-in fade-in-0 slide-in-from-bottom-5"
+=======
+              className="animate-in fade-in-0 slide-in-from-bottom-5 shrink-0 transform-gpu transition-all duration-300 ease-out"
+>>>>>>> upstream/main
               style={{
                 width: `${width}px`,
                 minHeight: `${height}px`,
@@ -140,7 +156,11 @@ const UIResourceCarousel: React.FC<UIResourceCarouselProps> = React.memo(({ uiRe
           variant="ghost"
           size="icon"
           onClick={() => scroll('right')}
+<<<<<<< HEAD
           className={`absolute right-2 top-1/2 z-20 h-auto w-auto -translate-y-1/2 rounded-xl bg-surface-fixed p-2 text-text-fixed shadow-lg transition-all duration-200 hover:scale-110 hover:bg-surface-fixed-hover hover:text-text-fixed hover:shadow-xl active:scale-95 ${
+=======
+          className={`bg-surface-fixed text-text-fixed hover:bg-surface-fixed-hover hover:text-text-fixed absolute top-1/2 right-2 z-20 h-auto w-auto -translate-y-1/2 rounded-xl p-2 shadow-lg transition-all duration-200 hover:scale-110 hover:shadow-xl active:scale-95 ${
+>>>>>>> upstream/main
             isContainerHovered ? 'opacity-100' : 'pointer-events-none opacity-0'
           }`}
           aria-label={localize('com_ui_scroll_right')}
