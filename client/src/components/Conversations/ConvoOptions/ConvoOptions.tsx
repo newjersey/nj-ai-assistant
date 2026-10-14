@@ -1,5 +1,6 @@
 import { useState, useId, useRef, memo, useCallback, useMemo } from 'react';
 import * as Ariakit from '@ariakit/react';
+<<<<<<< HEAD
 import { useQueryClient } from '@tanstack/react-query';
 import { useParams, useNavigate } from 'react-router-dom';
 import { QueryKeys, PermissionTypes, Permissions } from 'librechat-data-provider';
@@ -39,6 +40,27 @@ import ProjectButton from './ProjectButton';
 import DeleteButton from './DeleteButton';
 import ShareButton from './ShareButton';
 import { cn } from '~/utils';
+=======
+import { QueryKeys } from 'librechat-data-provider';
+import { useQueryClient } from '@tanstack/react-query';
+import { useParams, useNavigate } from 'react-router-dom';
+import { DropdownPopup, Spinner, useToastContext } from '@librechat/client';
+import { Ellipsis, Archive, ArchiveRestore, Mail, Pen, Pin, Trash } from 'lucide-react';
+import type { TMessage } from 'librechat-data-provider';
+import type { MouseEvent } from 'react';
+import {
+  useDeleteConversationMutation,
+  useArchiveConvoMutation,
+  usePinConversationMutation,
+  useMarkConversationUnreadMutation,
+} from '~/data-provider';
+import { useChatContext, useLiveAnnouncer } from '~/Providers';
+import useDrawerViewport from '~/hooks/Nav/useDrawerViewport';
+import { useLocalize, useNewConvo } from '~/hooks';
+import { NotificationSeverity } from '~/common';
+import { cn, rowActionClasses } from '~/utils';
+import DeleteButton from './DeleteButton';
+>>>>>>> upstream/main
 /** The overflow menu and the shift-held quick action show the same archive control in two
  *  sizes, and must never disagree about which direction it moves the conversation. */
 function renderArchiveIcon(isLoading: boolean, isArchived: boolean, className: string) {
@@ -53,29 +75,54 @@ function renderArchiveIcon(isLoading: boolean, isArchived: boolean, className: s
 
 function ConvoOptions({
   conversationId,
+<<<<<<< HEAD
   chatProjectId,
   title,
   isPinned = false,
   isArchived = false,
   retainView,
   renameHandler,
+=======
+  title,
+  isPinned = false,
+  isArchived = false,
+  isUnseen = false,
+  retainView,
+  renameHandler,
+  canRename = true,
+>>>>>>> upstream/main
   isPopoverActive,
   setIsPopoverActive,
   isActiveConvo,
   isShiftHeld = false,
+<<<<<<< HEAD
 }: {
   conversationId: string | null;
   chatProjectId?: string | null;
+=======
+  isGenerating = false,
+  contextMenuPosition,
+}: {
+  conversationId: string | null;
+>>>>>>> upstream/main
   title: string | null;
   isPinned?: boolean;
   /** This row's own archive state, which the sidebar filter does not stand in for. */
   isArchived?: boolean;
+<<<<<<< HEAD
   retainView: () => void;
   renameHandler: (e: MouseEvent) => void;
+=======
+  isUnseen?: boolean;
+  retainView: () => void;
+  renameHandler: (e: MouseEvent) => void;
+  canRename?: boolean;
+>>>>>>> upstream/main
   isPopoverActive: boolean;
   setIsPopoverActive: (open: boolean) => void;
   isActiveConvo: boolean;
   isShiftHeld?: boolean;
+<<<<<<< HEAD
 }) {
   const localize = useLocalize();
   const queryClient = useQueryClient();
@@ -83,6 +130,15 @@ function ConvoOptions({
   const { index, setConversation } = useChatContext();
   const { data: startupConfig } = useGetStartupConfig();
   const { navigateToConvo } = useNavigateToConvo(index);
+=======
+  isGenerating?: boolean;
+  contextMenuPosition?: { x: number; y: number };
+}) {
+  const localize = useLocalize();
+  const queryClient = useQueryClient();
+  const isSmallScreen = useDrawerViewport();
+  const { setConversation } = useChatContext();
+>>>>>>> upstream/main
   const { showToast } = useToastContext();
   /* Archiving or restoring removes the row from the list that held it, unmounting this
      menu: the announcement has to come from a live region that outlives the row. */
@@ -99,6 +155,7 @@ function ConvoOptions({
 
   const menuId = useId();
   const menuButtonRef = useRef<HTMLButtonElement>(null);
+<<<<<<< HEAD
   const shareButtonRef = useRef<HTMLButtonElement>(null);
   const deleteButtonRef = useRef<HTMLButtonElement>(null);
   const projectButtonRef = useRef<HTMLButtonElement>(null);
@@ -114,6 +171,14 @@ function ConvoOptions({
   const archiveConvoMutation = useArchiveConvoMutation();
   const assignConversationToProject = useAssignConversationToProjectMutation();
   const pinConvoMutation = usePinConversationMutation();
+=======
+  const deleteButtonRef = useRef<HTMLButtonElement>(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+  const archiveConvoMutation = useArchiveConvoMutation();
+  const pinConvoMutation = usePinConversationMutation();
+  const markUnreadMutation = useMarkConversationUnreadMutation();
+>>>>>>> upstream/main
 
   const deleteMutation = useDeleteConversationMutation({
     onSuccess: () => {
@@ -137,6 +202,7 @@ function ConvoOptions({
     },
   });
 
+<<<<<<< HEAD
   const duplicateConversation = useDuplicateConversationMutation({
     onSuccess: (data) => {
       navigateToConvo(data.conversation);
@@ -161,18 +227,24 @@ function ConvoOptions({
   });
 
   const isDuplicateLoading = duplicateConversation.isLoading;
+=======
+>>>>>>> upstream/main
   const isArchiveLoading = archiveConvoMutation.isLoading;
   const isPinLoading = pinConvoMutation.isLoading;
   const isDeleteLoading = deleteMutation.isLoading;
 
+<<<<<<< HEAD
   const shareHandler = useCallback(() => {
     setShowShareDialog(true);
   }, []);
 
+=======
+>>>>>>> upstream/main
   const deleteHandler = useCallback(() => {
     setShowDeleteDialog(true);
   }, []);
 
+<<<<<<< HEAD
   const projectHandler = useCallback(() => {
     setShowProjectDialog(true);
   }, []);
@@ -204,6 +276,8 @@ function ConvoOptions({
     );
   }, [assignConversationToProject, conversationId, localize, setIsPopoverActive, showToast]);
 
+=======
+>>>>>>> upstream/main
   const handleInstantDelete = useCallback(
     (e: MouseEvent) => {
       e.stopPropagation();
@@ -294,6 +368,7 @@ function ConvoOptions({
     );
   }, [conversationId, isPinned, pinConvoMutation, setIsPopoverActive, showToast, localize]);
 
+<<<<<<< HEAD
   const handleDuplicateClick = useCallback(() => {
     duplicateConversation.mutate({
       conversationId: conversationId ?? '',
@@ -318,6 +393,30 @@ function ConvoOptions({
         render: (props) => <button {...props} />,
       },
       */
+=======
+  const handleMarkUnreadClick = useCallback(() => {
+    const convoId = conversationId ?? '';
+    if (!convoId) {
+      return;
+    }
+    markUnreadMutation.mutate(
+      { conversationId: convoId },
+      {
+        onSuccess: () => setIsPopoverActive(false),
+        onError: () => {
+          showToast({
+            message: localize('com_ui_mark_unread_error'),
+            severity: NotificationSeverity.ERROR,
+            showIcon: true,
+          });
+        },
+      },
+    );
+  }, [conversationId, markUnreadMutation, setIsPopoverActive, showToast, localize]);
+
+  const dropdownItems = useMemo(
+    () => [
+>>>>>>> upstream/main
       {
         label: localize(isPinned ? 'com_ui_unpin' : 'com_ui_pin'),
         onClick: handlePinClick,
@@ -325,6 +424,7 @@ function ConvoOptions({
         icon: isPinLoading ? (
           <Spinner className="size-4" />
         ) : (
+<<<<<<< HEAD
           <Pin className="icon-sm mr-2 text-text-primary" aria-hidden="true" />
         ),
       },
@@ -363,6 +463,24 @@ function ConvoOptions({
         ) : (
           <FolderX className="icon-sm mr-2 text-text-primary" aria-hidden="true" />
         ),
+=======
+          <Pin className="icon-sm text-text-primary mr-2" aria-hidden="true" />
+        ),
+      },
+      {
+        label: localize('com_ui_mark_unread'),
+        onClick: handleMarkUnreadClick,
+        /* The conversation on screen is definitionally read: its own seen triggers would
+           clear the flag the moment it is set. */
+        show: !isActiveConvo && !isUnseen,
+        icon: <Mail className="icon-sm text-text-primary mr-2" aria-hidden="true" />,
+      },
+      {
+        label: localize('com_ui_rename'),
+        onClick: renameHandler,
+        disabled: !canRename,
+        icon: <Pen className="icon-sm text-text-primary mr-2" aria-hidden="true" />,
+>>>>>>> upstream/main
       },
       {
         label: localize(isArchived ? 'com_ui_unarchive' : 'com_ui_archive'),
@@ -370,6 +488,7 @@ function ConvoOptions({
         hideOnClick: false,
         icon: renderArchiveIcon(isArchiveLoading, isArchived, 'icon-sm mr-2 text-text-primary'),
       },
+<<<<<<< HEAD
       /* NJ: Hide some elements of the dropdown
       {
         label: localize('com_ui_delete'),
@@ -379,15 +498,28 @@ function ConvoOptions({
         ariaControls: 'delete-conversation-dialog',
         /** NOTE: THE FOLLOWING PROPS ARE REQUIRED FOR MENU ITEMS THAT OPEN DIALOGS */
       /* NJ: Hide some elements of the dropdown
+=======
+      {
+        label: localize('com_ui_delete'),
+        onClick: deleteHandler,
+        icon: <Trash className="icon-sm text-text-primary mr-2" aria-hidden="true" />,
+        ariaHasPopup: 'dialog' as const,
+        ariaControls: 'delete-conversation-dialog',
+        /** NOTE: THE FOLLOWING PROPS ARE REQUIRED FOR MENU ITEMS THAT OPEN DIALOGS */
+>>>>>>> upstream/main
         hideOnClick: false,
         ref: deleteButtonRef,
         render: (props) => <button {...props} />,
       },
+<<<<<<< HEAD
       */
+=======
+>>>>>>> upstream/main
     ],
     [
       localize,
       isPinned,
+<<<<<<< HEAD
       isPinLoading,
       shareHandler,
       startupConfig,
@@ -421,6 +553,27 @@ function ConvoOptions({
   // NJ: We don't want to show archive/delete on holding shift (it makes a11y bad & is confusing)
   // eslint-disable-next-line no-constant-condition
   if (false) {
+=======
+      isUnseen,
+      isActiveConvo,
+      isPinLoading,
+      renameHandler,
+      canRename,
+      deleteHandler,
+      isArchiveLoading,
+      isArchived,
+      handlePinClick,
+      handleMarkUnreadClick,
+      handleArchiveClick,
+    ],
+  );
+
+  const buttonClassName = rowActionClasses({
+    visible: isActiveConvo === true || isPopoverActive || isSmallScreen || isGenerating,
+  });
+
+  if (isShiftHeld && isActiveConvo && !isPopoverActive && !showDeleteDialog) {
+>>>>>>> upstream/main
     return (
       <div className="flex items-center gap-0.5">
         <button
@@ -459,8 +612,18 @@ function ConvoOptions({
          * `document.body` outside it.
          */
         portal={true}
+<<<<<<< HEAD
         menuId={menuId}
         focusLoop={true}
+=======
+        getAnchorRect={
+          contextMenuPosition ? () => ({ ...contextMenuPosition, width: 0, height: 0 }) : undefined
+        }
+        menuId={menuId}
+        focusLoop={true}
+        finalFocus={menuButtonRef}
+        autoFocusOnShow={true}
+>>>>>>> upstream/main
         className="z-[125]"
         unmountOnHide={true}
         isOpen={isPopoverActive}
@@ -493,6 +656,7 @@ function ConvoOptions({
         }
         items={dropdownItems}
       />
+<<<<<<< HEAD
       {showShareDialog && (
         <ShareButton
           conversationId={conversationId ?? ''}
@@ -501,6 +665,8 @@ function ConvoOptions({
           triggerRef={shareButtonRef}
         />
       )}
+=======
+>>>>>>> upstream/main
       {showDeleteDialog && (
         <DeleteButton
           title={title ?? ''}
@@ -512,6 +678,7 @@ function ConvoOptions({
           setShowDeleteDialog={setShowDeleteDialog}
         />
       )}
+<<<<<<< HEAD
       {showProjectDialog && (
         <ProjectButton
           conversationId={conversationId ?? ''}
@@ -522,6 +689,8 @@ function ConvoOptions({
           setShowProjectDialog={setShowProjectDialog}
         />
       )}
+=======
+>>>>>>> upstream/main
     </>
   );
 }
@@ -530,11 +699,23 @@ export default memo(ConvoOptions, (prevProps, nextProps) => {
   return (
     prevProps.conversationId === nextProps.conversationId &&
     prevProps.title === nextProps.title &&
+<<<<<<< HEAD
     prevProps.chatProjectId === nextProps.chatProjectId &&
     prevProps.isPinned === nextProps.isPinned &&
     prevProps.isArchived === nextProps.isArchived &&
     prevProps.isPopoverActive === nextProps.isPopoverActive &&
     prevProps.isActiveConvo === nextProps.isActiveConvo &&
     prevProps.isShiftHeld === nextProps.isShiftHeld
+=======
+    prevProps.canRename === nextProps.canRename &&
+    prevProps.isPinned === nextProps.isPinned &&
+    prevProps.isArchived === nextProps.isArchived &&
+    prevProps.isUnseen === nextProps.isUnseen &&
+    prevProps.isPopoverActive === nextProps.isPopoverActive &&
+    prevProps.isActiveConvo === nextProps.isActiveConvo &&
+    prevProps.isShiftHeld === nextProps.isShiftHeld &&
+    prevProps.isGenerating === nextProps.isGenerating &&
+    prevProps.contextMenuPosition === nextProps.contextMenuPosition
+>>>>>>> upstream/main
   );
 });

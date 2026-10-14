@@ -1,5 +1,9 @@
 const mongoose = require('mongoose');
 const { logger } = require('@librechat/data-schemas');
+<<<<<<< HEAD
+=======
+const { resolveMCPAppsPolicy } = require('librechat-data-provider');
+>>>>>>> upstream/main
 const {
   registerShutdownTask,
   setMCPToolsChangedHandler,
@@ -7,6 +11,10 @@ const {
   setMCPToolsChangedGenerationHandler,
   setMCPToolsChangedGenerationRenewalHandler,
   setMCPToolsChangedRevisionHandler,
+<<<<<<< HEAD
+=======
+  createMCPAppBindingCodec,
+>>>>>>> upstream/main
 } = require('@librechat/api');
 const { syncStaticTools, mergeAppTools, getAppConfig, invalidateCachedTools } = require('./Config');
 const { startMCPAuthorizationFenceRetryWorker } = require('./MCPAuthorizationFenceRetry');
@@ -26,10 +34,31 @@ const { createMCPServersRegistry, createMCPManager } = require('~/config');
  * @param {{ userId?: string, role?: string }} [ctx]
  */
 async function resolveMCPAllowlists(ctx) {
+<<<<<<< HEAD
   const appConfig = await getAppConfig({ role: ctx?.role, userId: ctx?.userId });
   return {
     allowedDomains: appConfig?.mcpSettings?.allowedDomains,
     allowedAddresses: appConfig?.mcpSettings?.allowedAddresses,
+=======
+  const appConfig = await getAppConfig({
+    role: ctx?.role,
+    userId: ctx?.userId,
+    failClosed: true,
+  });
+  return {
+    allowedDomains: appConfig?.mcpSettings?.allowedDomains,
+    allowedAddresses: appConfig?.mcpSettings?.allowedAddresses,
+    mcpApps: resolveMCPAppsPolicy(
+      appConfig?.mcpSettings?.apps,
+      undefined,
+      appConfig?.mcpAppSandbox?.maxPersistedAppBytes,
+      appConfig?.mcpAppSandbox?.maxAdmissionRequestsPerMinute,
+      appConfig?.mcpAppSandbox?.url,
+      appConfig?.mcpAppSandbox?.maxActiveViews,
+      appConfig?.mcpAppSandbox?.maxActionPreviewChars,
+      appConfig?.mcpAppSandbox?.operationLimits,
+    ),
+>>>>>>> upstream/main
   };
 }
 
@@ -48,6 +77,10 @@ async function refreshChangedServerTools({
   serverConfig,
   publicationGeneration,
   publicationRevision,
+<<<<<<< HEAD
+=======
+  capabilityProfile,
+>>>>>>> upstream/main
 }) {
   await updateMCPServerTools({
     userId,
@@ -56,6 +89,10 @@ async function refreshChangedServerTools({
     serverConfig,
     ...(publicationGeneration && { publicationGeneration }),
     ...(publicationRevision && { publicationRevision }),
+<<<<<<< HEAD
+=======
+    capabilityProfile,
+>>>>>>> upstream/main
   });
   const toolCount = tools.length;
   logger.info(
@@ -107,6 +144,19 @@ async function initializeMCPs() {
       appConfig?.mcpSettings?.allowedDomains,
       appConfig?.mcpSettings?.allowedAddresses,
       resolveMCPAllowlists,
+<<<<<<< HEAD
+=======
+      resolveMCPAppsPolicy(
+        appConfig?.mcpSettings?.apps,
+        undefined,
+        appConfig?.mcpAppSandbox?.maxPersistedAppBytes,
+        appConfig?.mcpAppSandbox?.maxAdmissionRequestsPerMinute,
+        appConfig?.mcpAppSandbox?.url,
+        appConfig?.mcpAppSandbox?.maxActiveViews,
+        appConfig?.mcpAppSandbox?.maxActionPreviewChars,
+        appConfig?.mcpAppSandbox?.operationLimits,
+      ),
+>>>>>>> upstream/main
     );
   } catch (error) {
     logger.error('[MCP] Failed to initialize MCPServersRegistry:', error);
@@ -118,6 +168,10 @@ async function initializeMCPs() {
       catalogRecoveryMaxStateEntries: appConfig?.mcpSettings?.catalogRecovery?.maxStateEntries,
       catalogRecoveryMaxDetachedDiscoveries:
         appConfig?.mcpSettings?.catalogRecovery?.maxDetachedDiscoveries,
+<<<<<<< HEAD
+=======
+      appBindingCodec: createMCPAppBindingCodec(process.env.JWT_SECRET),
+>>>>>>> upstream/main
     });
     startMCPAuthorizationFenceRetryWorker(invalidateCachedTools, {
       intervalMs: appConfig?.mcpSettings?.catalogRecovery?.authorizationFenceRetryIntervalMs,

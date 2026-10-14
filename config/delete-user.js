@@ -18,6 +18,10 @@ const {
   Balance,
   Message,
   Session,
+<<<<<<< HEAD
+=======
+  Passkey,
+>>>>>>> upstream/main
   AclEntry,
   ToolCall,
   Assistant,
@@ -216,6 +220,10 @@ async function gracefulExit(code = 0) {
       PromptGroup.deleteMany({ author: uid }),
       Preset.deleteMany({ user: uid }),
       Session.deleteMany({ user: uid }),
+<<<<<<< HEAD
+=======
+      Passkey.deleteMany({ user: uid }),
+>>>>>>> upstream/main
       SharedLink.deleteMany({ user: uid }),
       ToolCall.deleteMany({ user: uid }),
       Token.deleteMany({ userId: uid }),

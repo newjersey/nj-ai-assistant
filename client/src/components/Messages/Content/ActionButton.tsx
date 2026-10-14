@@ -14,6 +14,10 @@ interface ActionButtonProps {
   tabIndex?: number;
   className?: string;
   portalElement?: HTMLElement | null;
+<<<<<<< HEAD
+=======
+  disabled?: boolean;
+>>>>>>> upstream/main
 }
 
 const ActionButton = React.forwardRef<HTMLButtonElement, ActionButtonProps>(
@@ -28,6 +32,10 @@ const ActionButton = React.forwardRef<HTMLButtonElement, ActionButtonProps>(
       tabIndex,
       className,
       portalElement,
+<<<<<<< HEAD
+=======
+      disabled = false,
+>>>>>>> upstream/main
     },
     ref,
   ) => {
@@ -38,17 +46,37 @@ const ActionButton = React.forwardRef<HTMLButtonElement, ActionButtonProps>(
         ref={ref}
         type="button"
         onClick={onClick}
+<<<<<<< HEAD
         tabIndex={tabIndex}
         aria-label={currentLabel}
         className={cn(
           'inline-flex select-none items-center justify-center text-text-secondary transition-all duration-200 ease-out',
           'hover:bg-surface-hover hover:text-text-primary',
           'focus-visible:outline focus-visible:outline-2 focus-visible:outline-border-heavy',
+=======
+        disabled={disabled}
+        tabIndex={tabIndex}
+        aria-label={currentLabel}
+        className={cn(
+          'text-text-secondary inline-flex items-center justify-center transition-all duration-200 ease-out select-none',
+          'hover:bg-surface-hover hover:text-text-primary',
+          'disabled:pointer-events-none disabled:opacity-50',
+          'focus-visible:outline-focus-subtle focus-visible:outline focus-visible:outline-2',
+>>>>>>> upstream/main
           iconOnly ? 'rounded-lg p-1.5' : 'ml-auto gap-2 rounded-md px-2 py-1',
           className,
         )}
       >
+<<<<<<< HEAD
         <MorphIcon icon={isActive ? Check : icon} size={18} />
+=======
+        <span
+          className="relative flex size-[1.125rem] items-center justify-center"
+          aria-hidden="true"
+        >
+          <MorphIcon icon={isActive ? Check : icon} size="1.125rem" />
+        </span>
+>>>>>>> upstream/main
         {!iconOnly && (
           <span className="relative overflow-hidden">
             <span

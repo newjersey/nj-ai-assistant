@@ -1,4 +1,12 @@
+<<<<<<< HEAD
 import { WebSearchToolDefinition, CalculatorToolDefinition } from '@librechat/agents';
+=======
+import {
+  WebSearchToolDefinition,
+  CalculatorToolDefinition,
+  GitHubCompareToolDefinition,
+} from '@librechat/agents';
+>>>>>>> upstream/main
 import type { ExtendedJsonSchema } from './schema';
 import { AskUserQuestionToolDefinition } from '~/agents/hitl/askUserQuestionTool';
 import { geminiToolkit } from '~/tools/toolkits/gemini';
@@ -436,6 +444,18 @@ export const toolDefinitions: Record<string, ToolRegistryDefinition> = {
  * registers the tool pair on match.
  */
 const agentToolDefinitions: Record<string, ToolRegistryDefinition> = {
+<<<<<<< HEAD
+=======
+  github_compare: {
+    name: GitHubCompareToolDefinition.name,
+    description: GitHubCompareToolDefinition.description,
+    schema: {
+      ...GitHubCompareToolDefinition.parameters,
+      required: [...GitHubCompareToolDefinition.parameters.required],
+    },
+    toolType: 'builtin',
+  },
+>>>>>>> upstream/main
   [CalculatorToolDefinition.name]: {
     name: CalculatorToolDefinition.name,
     description: CalculatorToolDefinition.description,

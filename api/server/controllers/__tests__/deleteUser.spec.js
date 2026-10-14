@@ -34,6 +34,10 @@ const mockCancelAndDrainSubagentThreads = jest.fn();
 const mockQuiesceUserSchedules = jest.fn();
 const mockDeleteSchedulesByUser = jest.fn();
 const mockRevokeUserCodeEnvironmentWorkers = jest.fn();
+<<<<<<< HEAD
+=======
+const mockDeletePasskeysByUser = jest.fn();
+>>>>>>> upstream/main
 
 jest.mock('@librechat/data-schemas', () => ({
   logger: { error: jest.fn(), info: jest.fn() },
@@ -48,6 +52,14 @@ jest.mock('librechat-data-provider', () => ({
 }));
 
 jest.mock('@librechat/api', () => ({
+<<<<<<< HEAD
+=======
+  createEmailChangeService: jest.fn(() => ({
+    requestEmailChange: jest.fn(),
+    confirmEmailChange: jest.fn(),
+  })),
+  createEmailChangeDeps: jest.fn(() => ({})),
+>>>>>>> upstream/main
   MCPOAuthHandler: {},
   MCPTokenStorage: {},
   normalizeHttpError: jest.fn(),
@@ -81,6 +93,10 @@ jest.mock('@librechat/api', () => ({
 
 jest.mock('~/models', () => ({
   deleteAllUserSessions: (...args) => mockDeleteAllUserSessions(...args),
+<<<<<<< HEAD
+=======
+  deletePasskeysByUser: (...args) => mockDeletePasskeysByUser(...args),
+>>>>>>> upstream/main
   deleteAllSharedLinks: (...args) => mockDeleteAllSharedLinks(...args),
   updateUserPlugins: (...args) => mockUpdateUserPlugins(...args),
   deleteUserById: (...args) => mockDeleteUserById(...args),
@@ -214,6 +230,10 @@ function stubDeletionMocks() {
   mockQuiesceUserSchedules.mockResolvedValue(true);
   mockDeleteSchedulesByUser.mockResolvedValue();
   mockRevokeUserCodeEnvironmentWorkers.mockResolvedValue(0);
+<<<<<<< HEAD
+=======
+  mockDeletePasskeysByUser.mockResolvedValue();
+>>>>>>> upstream/main
 }
 
 beforeEach(() => {
@@ -239,6 +259,10 @@ describe('deleteUserController - 2FA enforcement', () => {
     expect(mockRevokeUserCodeEnvironmentWorkers).toHaveBeenCalledWith(
       expect.objectContaining({ userId: 'user1' }),
     );
+<<<<<<< HEAD
+=======
+    expect(mockDeletePasskeysByUser).toHaveBeenCalledWith('user1');
+>>>>>>> upstream/main
     expect(mockVerifyOTPOrBackupCode).not.toHaveBeenCalled();
     expect(mockBeginAgentTriggerUserDeletion.mock.invocationCallOrder[0]).toBeLessThan(
       mockPrepareAgentTriggerUserPurge.mock.invocationCallOrder[0],

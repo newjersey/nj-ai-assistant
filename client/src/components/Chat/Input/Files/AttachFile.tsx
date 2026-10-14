@@ -45,8 +45,12 @@ const AttachFile = ({
             aria-keyshortcuts={ariaKey}
             disabled={isUploadDisabled}
             className={cn(
+<<<<<<< HEAD
               // NJ: Remove ring opacity, keep darker focus ring
               'flex size-theme-control items-center justify-center rounded-theme-control-round p-1 transition-colors duration-theme-fast hover:bg-surface-composer-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-text-primary',
+=======
+              'size-theme-control rounded-theme-control-round duration-theme-fast hover:bg-surface-composer-hover focus-visible:ring-text-primary/50 flex items-center justify-center p-1 transition-colors focus-visible:ring-2 focus-visible:outline-hidden',
+>>>>>>> upstream/main
             )}
             onKeyDownCapture={(e) => {
               if (!inputRef.current) {

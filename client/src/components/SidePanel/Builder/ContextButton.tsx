@@ -89,19 +89,31 @@ export default function ContextButton({
       <DialogTrigger asChild>
         <button
           className={cn(
+<<<<<<< HEAD
             'btn btn-neutral border-token-border-light relative h-9 rounded-lg font-medium',
+=======
+            'btn btn-neutral border-border-light relative h-9 rounded-lg font-medium',
+>>>>>>> upstream/main
             removeFocusOutlines,
           )}
           type="button"
         >
+<<<<<<< HEAD
           <div className="flex w-full items-center justify-center gap-2 text-red-500">
+=======
+          <div className="text-text-destructive flex w-full items-center justify-center gap-2">
+>>>>>>> upstream/main
             <TrashIcon />
           </div>
         </button>
       </DialogTrigger>
       <DialogTemplate
         title={localize('com_ui_delete_assistant')}
+<<<<<<< HEAD
         className="max-w-[450px]"
+=======
+        className="max-w-[28.125rem]"
+>>>>>>> upstream/main
         main={
           <>
             <div className="flex w-full flex-col items-center gap-2">

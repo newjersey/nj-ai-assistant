@@ -27,12 +27,21 @@ type DeleteButtonProps = {
   triggerRef?: React.RefObject<HTMLButtonElement>;
   setMenuOpen?: (open: boolean) => void;
   currentConversationId?: string;
+<<<<<<< HEAD
+=======
+  /** Read when the delete settles, for callers whose dialog outlives the route it was opened on. */
+  getCurrentConversationId?: () => string | undefined;
+>>>>>>> upstream/main
 };
 
 export function DeleteConversationDialog({
   setShowDeleteDialog,
   conversationId,
   currentConversationId,
+<<<<<<< HEAD
+=======
+  getCurrentConversationId,
+>>>>>>> upstream/main
   setMenuOpen,
   retainView,
   title,
@@ -41,6 +50,10 @@ export function DeleteConversationDialog({
   setShowDeleteDialog: (value: boolean) => void;
   conversationId: string;
   currentConversationId?: string;
+<<<<<<< HEAD
+=======
+  getCurrentConversationId?: () => string | undefined;
+>>>>>>> upstream/main
   retainView: () => void;
   title: string;
 }) {
@@ -55,7 +68,12 @@ export function DeleteConversationDialog({
   const deleteMutation = useDeleteConversationMutation({
     onSuccess: () => {
       setShowDeleteDialog(false);
+<<<<<<< HEAD
       if (currentConvoId === conversationId || currentConvoId === 'new') {
+=======
+      const openConvoId = getCurrentConversationId ? getCurrentConversationId() : currentConvoId;
+      if (openConvoId === conversationId || openConvoId === 'new') {
+>>>>>>> upstream/main
         newConversation();
         navigate('/c/new', { replace: true });
       }
@@ -86,6 +104,10 @@ export function DeleteConversationDialog({
 
   return (
     <OGDialogContent
+<<<<<<< HEAD
+=======
+      id="delete-conversation-dialog"
+>>>>>>> upstream/main
       className="w-11/12 max-w-md"
       showCloseButton={false}
       aria-describedby="delete-conversation-description"
@@ -117,6 +139,10 @@ export function DeleteConversationDialog({
 export default function DeleteButton({
   conversationId,
   currentConversationId,
+<<<<<<< HEAD
+=======
+  getCurrentConversationId,
+>>>>>>> upstream/main
   retainView,
   title,
   setMenuOpen,
@@ -138,6 +164,10 @@ export default function DeleteButton({
         setShowDeleteDialog={setShowDeleteDialog}
         conversationId={conversationId}
         currentConversationId={currentConversationId}
+<<<<<<< HEAD
+=======
+        getCurrentConversationId={getCurrentConversationId}
+>>>>>>> upstream/main
         setMenuOpen={setMenuOpen}
         retainView={retainView}
         title={title}

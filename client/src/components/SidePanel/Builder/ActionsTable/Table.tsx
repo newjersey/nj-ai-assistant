@@ -17,10 +17,14 @@ export default function DataTable<TData, TValue>({ columns, data }: DataTablePro
     <table className="w-full text-sm">
       <thead>
         {table.getHeaderGroups().map((headerGroup, i) => (
+<<<<<<< HEAD
           <tr
             key={i}
             className="border-token-border-light text-token-text-tertiary border-b text-left text-xs"
           >
+=======
+          <tr key={i} className="border-border-light text-text-tertiary border-b text-left text-xs">
+>>>>>>> upstream/main
             {headerGroup.headers.map((header, j) => (
               <th key={j} className="py-1 font-normal">
                 {header.isPlaceholder
@@ -33,7 +37,11 @@ export default function DataTable<TData, TValue>({ columns, data }: DataTablePro
       </thead>
       <tbody>
         {table.getRowModel().rows.map((row, i) => (
+<<<<<<< HEAD
           <tr key={i} className="border-token-border-light border-b">
+=======
+          <tr key={i} className="border-border-light border-b">
+>>>>>>> upstream/main
             {row.getVisibleCells().map((cell, j) => (
               <td key={j} className="py-2">
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}

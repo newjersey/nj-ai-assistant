@@ -18,6 +18,7 @@ jest.mock('~/utils', () => ({
 }));
 
 jest.mock('~/Providers', () => {
+<<<<<<< HEAD
   const react = jest.requireActual<typeof import('react')>('react');
   return {
     MessageContext: {
@@ -29,6 +30,14 @@ jest.mock('~/Providers', () => {
         value: { partIndex: number };
       }) => react.cloneElement(children, { idx: value.partIndex }),
     },
+=======
+  return {
+    /** Use the real context: cloning the immediate child assumes Part has no
+     * intervening providers and does not exercise context propagation. */
+    MessageContext: jest.requireActual<typeof import('~/Providers/MessageContext')>(
+      '~/Providers/MessageContext',
+    ).MessageContext,
+>>>>>>> upstream/main
     SearchContext: {
       Provider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
     },
@@ -129,6 +138,7 @@ jest.mock('../Container', () => ({
   ),
 }));
 
+<<<<<<< HEAD
 jest.mock('../Part', () => ({
   __esModule: true,
   default: ({
@@ -150,6 +160,39 @@ jest.mock('../Part', () => ({
     />
   ),
 }));
+=======
+jest.mock('../Part', () => {
+  const { useMessageContext } = jest.requireActual<typeof import('~/Providers/MessageContext')>(
+    '~/Providers/MessageContext',
+  );
+  const { SoleToolContext } = jest.requireActual<typeof import('../disclosure')>('../disclosure');
+  const { useContext } = jest.requireActual<typeof import('react')>('react');
+  return {
+    __esModule: true,
+    default: function MockPart({
+      part,
+      showCursor,
+      isLast,
+    }: {
+      part: TMessageContentParts;
+      showCursor?: boolean;
+      isLast?: boolean;
+    }) {
+      const { partIndex } = useMessageContext();
+      const soleTool = useContext(SoleToolContext);
+      return (
+        <div
+          data-testid={`real-part-${part.type}`}
+          data-index={partIndex}
+          data-sole-tool={String(soleTool)}
+          data-show-cursor={String(showCursor === true)}
+          data-is-last={String(isLast === true)}
+        />
+      );
+    },
+  };
+});
+>>>>>>> upstream/main
 
 jest.mock('../ParallelContent', () => ({
   /** Invokes `renderResumeAttribution` per content index like the real
@@ -187,7 +230,11 @@ beforeEach(() => {
     .mockImplementation((parts) => parts.map((part) => ({ type: 'single', part })));
 });
 
+<<<<<<< HEAD
 describe('ContentParts — interim skill cards', () => {
+=======
+describe('ContentParts: interim skill cards', () => {
+>>>>>>> upstream/main
   it('renders stateful workspace changes once at message level', () => {
     const content: TMessageContentParts[] = [
       { type: ContentTypes.TEXT, text: 'done' } as TMessageContentParts,
@@ -307,7 +354,11 @@ describe('ContentParts — interim skill cards', () => {
   });
 });
 
+<<<<<<< HEAD
 describe('ContentParts — thinking-dot header alignment', () => {
+=======
+describe('ContentParts: thinking-dot header alignment', () => {
+>>>>>>> upstream/main
   const submittingProps = { ...baseProps, isSubmitting: true, isLatestMessage: true };
   const memoryAttachment = {
     type: Tools.memory,
@@ -362,7 +413,11 @@ describe('ContentParts — thinking-dot header alignment', () => {
   });
 });
 
+<<<<<<< HEAD
 describe('ContentParts — post-steer author re-attribution', () => {
+=======
+describe('ContentParts: post-steer author re-attribution', () => {
+>>>>>>> upstream/main
   const steerPart = {
     type: ContentTypes.STEER,
     steer: 'go left',
@@ -584,6 +639,41 @@ describe('ContentParts — activity phase state', () => {
     expect(finalPart).toHaveAttribute('data-index', '2');
   });
 
+<<<<<<< HEAD
+=======
+  it('opens the only tool call inside a phase, but not one of several', () => {
+    const tool = (id: string) =>
+      ({
+        type: ContentTypes.TOOL_CALL,
+        [ContentTypes.TOOL_CALL]: { id, name: 'bash_tool', args: {}, output: 'ok' },
+      }) as unknown as TMessageContentParts;
+    const phase = (count: number) =>
+      ({
+        type: ContentTypes.ACTIVITY_LABEL,
+        [ContentTypes.ACTIVITY_LABEL]: 'Ran the setup',
+        activity_label_type: 'phase',
+        activity_start_index: 0,
+        activity_end_index: count,
+        activity_count: count,
+        pending: false,
+      }) as unknown as TMessageContentParts;
+
+    const { unmount } = render(
+      <ContentParts {...baseProps} content={[tool('tool-1'), phase(1)]} />,
+    );
+    expect(screen.getByTestId(`real-part-${ContentTypes.TOOL_CALL}`)).toHaveAttribute(
+      'data-sole-tool',
+      'true',
+    );
+    unmount();
+
+    render(<ContentParts {...baseProps} content={[tool('tool-1'), tool('tool-2'), phase(2)]} />);
+    for (const part of screen.getAllByTestId(`real-part-${ContentTypes.TOOL_CALL}`)) {
+      expect(part).toHaveAttribute('data-sole-tool', 'false');
+    }
+  });
+
+>>>>>>> upstream/main
   it('keeps a streaming cursor when a completed phase marker is the visible tail', () => {
     const phase = {
       type: ContentTypes.ACTIVITY_LABEL,
@@ -727,7 +817,11 @@ describe('ContentParts — activity phase state', () => {
   });
 });
 
+<<<<<<< HEAD
 describe('ContentParts — settled content identity across compaction', () => {
+=======
+describe('ContentParts: settled content identity across compaction', () => {
+>>>>>>> upstream/main
   /** Mirrors a captured run: the aggregator leaves holes at the source indexes
    *  of steps that produced nothing, and `finalHandler` swaps in the server's
    *  compacted array. Without the streamed-index stamp every index-derived key

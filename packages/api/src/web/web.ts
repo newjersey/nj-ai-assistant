@@ -13,12 +13,21 @@ import type { TCustomConfig, TWebSearchConfig } from 'librechat-data-provider';
 import { isSSRFTarget, resolveHostnameSSRF, getEffectivePort } from '../auth';
 
 /**
+<<<<<<< HEAD
  * User-provided URL keys that may pass through after SSRF preflight.
  */
 const USER_PROVIDED_URL_KEYS = new Set<TWebSearchKeys>([
   'searxngInstanceUrl',
   'firecrawlApiUrl',
   'jinaApiUrl',
+=======
+ * User-provided URL keys and their paired API keys, checked after SSRF preflight.
+ */
+const USER_PROVIDED_URL_KEYS = new Map<TWebSearchKeys, TWebSearchKeys>([
+  ['searxngInstanceUrl', 'searxngApiKey'],
+  ['firecrawlApiUrl', 'firecrawlApiKey'],
+  ['jinaApiUrl', 'jinaApiKey'],
+>>>>>>> upstream/main
 ]);
 
 /**
@@ -32,6 +41,10 @@ const USER_PROVIDED_OPT_IN_URL_KEYS = new Set<TWebSearchKeys>([
 const SEARCH_PROVIDER_VALUES = new Set<string>(Object.values(SearchProviders));
 const SCRAPER_PROVIDER_VALUES = new Set<string>(Object.values(ScraperProviders));
 const RERANKER_VALUES = new Set<string>(Object.values(RerankerTypes));
+<<<<<<< HEAD
+=======
+const DEFAULT_JINA_API_URL = 'https://api.jina.ai/v1/rerank';
+>>>>>>> upstream/main
 
 function isUserProvidedEnabled(field: string): boolean {
   return process.env[field] === AuthType.USER_PROVIDED;
@@ -480,6 +493,13 @@ export async function loadWebSearchAuth({
           throwError,
         });
 
+<<<<<<< HEAD
+=======
+        const jinaApiKeyIndex = allKeys.indexOf('jinaApiKey');
+        const jinaApiKeyField = allAuthFields[jinaApiKeyIndex];
+        const jinaApiKeyValue = jinaApiKeyField ? authValues[jinaApiKeyField] : undefined;
+
+>>>>>>> upstream/main
         let allFieldsAuthenticated = true;
         for (let j = 0; j < allAuthFields.length; j++) {
           const field = allAuthFields[j];
@@ -519,6 +539,22 @@ export async function loadWebSearchAuth({
             }
             continue;
           }
+<<<<<<< HEAD
+=======
+
+          if (isUserProvidedUrlKey && isFieldUserProvided) {
+            const apiKey = USER_PROVIDED_URL_KEYS.get(originalKey);
+            const apiKeyField = apiKey ? allAuthFields[allKeys.indexOf(apiKey)] : undefined;
+            const apiKeyValue = apiKeyField ? authValues[apiKeyField] : undefined;
+            if (apiKeyField && apiKeyValue && process.env[apiKeyField] === apiKeyValue) {
+              if (!optionalSet.has(field)) {
+                allFieldsAuthenticated = false;
+                break;
+              }
+              continue;
+            }
+          }
+>>>>>>> upstream/main
           if (originalKey) {
             authResult[originalKey] = value;
             contributed = true;
@@ -529,6 +565,13 @@ export async function loadWebSearchAuth({
           }
         }
 
+<<<<<<< HEAD
+=======
+        if (jinaApiKeyValue && authResult.jinaApiUrl == null) {
+          authResult.jinaApiUrl = DEFAULT_JINA_API_URL;
+        }
+
+>>>>>>> upstream/main
         if (!allFieldsAuthenticated) {
           continue;
         }

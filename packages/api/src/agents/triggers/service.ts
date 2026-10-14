@@ -1,7 +1,18 @@
+<<<<<<< HEAD
 import {
   AGENT_TRIGGER_WORKER_CAPABILITY_BACKGROUND_COMPLETION_V1,
   AGENT_TRIGGER_WORKER_CAPABILITY_DETACHED_ACTION_V1,
   AGENT_TRIGGER_WORKER_CAPABILITY_QUEUED_TURN_V1,
+=======
+import { AGENT_BACKGROUND_COMPLETION_RECEIPT_BATCHING_DEFAULT } from 'librechat-data-provider';
+import {
+  AGENT_TRIGGER_WORKER_CAPABILITY_BACKGROUND_COMPLETION_RECEIPT_V2,
+  AGENT_TRIGGER_WORKER_CAPABILITY_BACKGROUND_COMPLETION_BATCH_V3,
+  AGENT_TRIGGER_WORKER_CAPABILITY_BACKGROUND_COMPLETION_V1,
+  AGENT_TRIGGER_WORKER_CAPABILITY_DETACHED_ACTION_V1,
+  AGENT_TRIGGER_WORKER_CAPABILITY_QUEUED_TURN_V1,
+  AGENT_TRIGGER_WORKER_CAPABILITY_QUEUED_TURN_V2,
+>>>>>>> upstream/main
   logger,
   runAsSystem,
 } from '@librechat/data-schemas';
@@ -25,23 +36,60 @@ import type {
 import type { AgentTriggerEnqueueOptions, PreparedAgentTriggerDelivery } from './delivery';
 import type { BoundAddress } from '../../app/origin';
 import { AgentTriggerDeliveryDeferredError, createAgentTriggerDeliveryEngine } from './engine';
+<<<<<<< HEAD
 import { isShutdownInProgress, registerShutdownTask } from '../../app/shutdown';
+=======
+import { BACKGROUND_TOOL_COMPLETION_SOURCE } from '../backgroundCompletionWakeup';
+import { isShutdownInProgress, registerShutdownTask } from '../../app/shutdown';
+import { SUBAGENT_COMPLETION_SOURCE } from '../subagentCompletionWakeup';
+>>>>>>> upstream/main
 import { generateAgentTriggerToken } from '../../crypto/jwt';
 import { prepareAgentTriggerDelivery } from './delivery';
 import { selfOriginFromAddress } from '../../app/origin';
 import { createAgentTriggerExecutionHost } from './host';
 import { parseAgentTriggerEnvelope } from './envelope';
+<<<<<<< HEAD
+=======
+import { createIdleRecoveryLoop } from '../recovery';
+import { WAITING_RETRY_CAP_MS } from './backoff';
+
+/** Internal sources whose deliveries wait on a result or on their parent generation. */
+const COMPLETION_WAKEUP_SOURCES = [BACKGROUND_TOOL_COMPLETION_SOURCE, SUBAGENT_COMPLETION_SOURCE];
+>>>>>>> upstream/main
 
 export const AGENT_TRIGGER_TOKEN_TTL = '60s';
 const DEFAULT_USER_DRAIN_TIMEOUT_MS = 35_000;
 const DEFAULT_USER_DRAIN_POLL_MS = 100;
 const DEFAULT_PURGE_RECOVERY_INTERVAL_MS = 30_000;
+<<<<<<< HEAD
 const DEFAULT_PURGE_RECOVERY_LIMIT = 25;
 
 export interface AgentTriggerServiceOptions {
   address?: BoundAddress | string | null;
 }
 
+=======
+const DEFAULT_PURGE_RECOVERY_MAX_IDLE_INTERVAL_MS = 2 * 60_000;
+const DEFAULT_PURGE_RECOVERY_LIMIT = 25;
+
+export interface AgentTriggerServiceOptions {
+  completionResultBatchSize?: number;
+  completionReceiptBatching?: boolean;
+  address?: BoundAddress | string | null;
+  idlePolling?: {
+    queuedTurnMaxIntervalMs?: number;
+    maintenanceMaxIntervalMs?: number;
+    deliveryMaxIntervalMs?: number;
+    completionWaitMaxIntervalMs?: number;
+  };
+}
+
+/** A principal's deliveries resuming one conversation, or exact deliveries. */
+export type AgentTriggerCompletionExpedite =
+  | { user: string; conversationId: string; taskIds?: string[] }
+  | { deliveryKeys: string[] };
+
+>>>>>>> upstream/main
 export interface AgentTriggerServiceDeps {
   fetch?: AgentTriggerExecutionHostDeps['fetch'];
   getTimezone?: AgentTriggerExecutionHostDeps['getTimezone'];
@@ -55,9 +103,25 @@ export interface AgentTriggerServiceDeps {
   userDrainPollMs?: number;
   purgeRecoveryIntervalMs?: number;
   purgeRecoveryLimit?: number;
+<<<<<<< HEAD
   reclaimCheckpointDeletions?: (limit: number) => Promise<number>;
   supportsDetachedActionCompletion?: () => boolean;
   settleSourceBeforeDeadLetter?: AgentTriggerDeliveryEngineDeps['settleSourceBeforeDeadLetter'];
+=======
+  reclaimCheckpointDeletions?: (limit: number, activity?: { found: boolean }) => Promise<number>;
+  supportsDetachedActionCompletion?: () => boolean;
+  settleSourceBeforeDeadLetter?: AgentTriggerDeliveryEngineDeps['settleSourceBeforeDeadLetter'];
+  /** Subscribes to generations reaching a terminal state; returns an unsubscribe. */
+  subscribeGenerationSettled?: (
+    listener: (event: AgentTriggerGenerationSettledEvent) => void,
+  ) => () => void;
+}
+
+/** The part of a settled generation that decides which waiting deliveries it may unblock. */
+export interface AgentTriggerGenerationSettledEvent {
+  userId: string;
+  conversationId: string;
+>>>>>>> upstream/main
 }
 
 export interface AgentTriggerDeliveryReceipt {
@@ -109,11 +173,23 @@ export interface AgentTriggerDeliveryPersistence {
   releaseAgentTriggerDelivery: AgentTriggerDeliveryStore['release'];
   beginAgentTriggerDeliveryAttempt: AgentTriggerDeliveryStore['beginAttempt'];
   deferAgentTriggerDeliveryAttempt: AgentTriggerDeliveryStore['defer'];
+<<<<<<< HEAD
   completeAgentTriggerDelivery: AgentTriggerDeliveryStore['complete'];
   retireAgentTriggerDelivery: AgentTriggerDeliveryMethods['retireAgentTriggerDelivery'];
   renewAgentTriggerDeliveryProducerLease: AgentTriggerDeliveryMethods['renewAgentTriggerDeliveryProducerLease'];
   retryAgentTriggerDelivery: AgentTriggerDeliveryStore['retry'];
   deadLetterAgentTriggerDelivery: AgentTriggerDeliveryStore['dead'];
+=======
+  completeAgentTriggerDelivery: AgentTriggerDeliveryMethods['completeAgentTriggerDelivery'];
+  retireAgentTriggerDelivery: AgentTriggerDeliveryMethods['retireAgentTriggerDelivery'];
+  renewAgentTriggerDeliveryProducerLease: AgentTriggerDeliveryMethods['renewAgentTriggerDeliveryProducerLease'];
+  persistAgentBackgroundToolResult?: AgentTriggerDeliveryMethods['persistAgentBackgroundToolResult'];
+  expediteAgentTriggerDeliveries?: AgentTriggerDeliveryMethods['expediteAgentTriggerDeliveries'];
+  getAgentBackgroundToolResultClaim?: AgentTriggerDeliveryMethods['getAgentBackgroundToolResultClaim'];
+  releaseAgentBackgroundToolResultClaims?: AgentTriggerDeliveryMethods['releaseAgentBackgroundToolResultClaims'];
+  retryAgentTriggerDelivery: AgentTriggerDeliveryStore['retry'];
+  deadLetterAgentTriggerDelivery: AgentTriggerDeliveryMethods['deadLetterAgentTriggerDelivery'];
+>>>>>>> upstream/main
   getAgentTriggerDelivery: (deliveryKey: string) => Promise<AgentTriggerStoredRecord | null>;
   getAgentTriggerDeliveryStatus: (
     deliveryKey: string,
@@ -127,17 +203,41 @@ export interface AgentTriggerDeliveryPersistence {
     availableAt: Date,
   ) => Promise<AgentTriggerStoredRecord | null>;
   countActiveAgentTriggerDeliveriesByUser: (userId: string, now: Date) => Promise<number>;
+<<<<<<< HEAD
   recoverAgentTriggerLanePublications: (limit?: number) => Promise<number>;
   recoverAgentTriggerBatchReceipts: (limit?: number) => Promise<number>;
   reclaimInactiveAgentTriggerLanes: (limit?: number) => Promise<number>;
+=======
+  recoverAgentTriggerLanePublications: (
+    limit?: number,
+    activity?: { found: boolean },
+  ) => Promise<number>;
+  recoverAgentTriggerBatchReceipts: (
+    limit?: number,
+    activity?: { found: boolean },
+  ) => Promise<number>;
+  reclaimInactiveAgentTriggerLanes: (
+    limit?: number,
+    activity?: { found: boolean },
+  ) => Promise<number>;
+>>>>>>> upstream/main
   prepareAgentTriggerUserPurge: (
     userId: string,
     fenceStartedAt: Date,
     tenantId?: string,
   ) => Promise<void>;
   cancelAgentTriggerUserPurge: (userId: string, fenceStartedAt: Date) => Promise<boolean>;
+<<<<<<< HEAD
   recoverAgentTriggerUserPurges: (limit?: number) => Promise<number>;
   expireLegacyAgentEventActorReceipts?: (now: Date, limit?: number) => Promise<number>;
+=======
+  recoverAgentTriggerUserPurges: (limit?: number, activity?: { found: boolean }) => Promise<number>;
+  expireLegacyAgentEventActorReceipts?: (
+    now: Date,
+    limit?: number,
+    activity?: { found: boolean },
+  ) => Promise<number>;
+>>>>>>> upstream/main
   deleteAgentTriggerDeliveriesByUser: (userId: string) => Promise<void>;
 }
 
@@ -165,26 +265,85 @@ export interface AgentTriggerService {
     deliveryKey: string,
     sourceId: string,
     reason: string,
+<<<<<<< HEAD
     options?: { onlyIfUnclaimed?: boolean; onlyIfDead?: boolean },
   ) => Promise<boolean>;
   renewProducerLease: (deliveryKey: string, sourceId: string, leaseUntil: Date) => Promise<boolean>;
+=======
+    options?: { onlyIfUnclaimed?: boolean; onlyIfDead?: boolean; requireTransition?: boolean },
+  ) => Promise<boolean>;
+  renewProducerLease: (deliveryKey: string, sourceId: string, leaseUntil: Date) => Promise<boolean>;
+  persistBackgroundToolResult: (input: {
+    deliveryKey: string;
+    sourceId: string;
+    result: {
+      status: 'completed' | 'error' | 'cancelled';
+      output: string;
+      settledAt: Date;
+    };
+  }) => Promise<boolean>;
+  getBackgroundToolResultClaim: (
+    input: Parameters<AgentTriggerDeliveryMethods['getAgentBackgroundToolResultClaim']>[0],
+  ) => ReturnType<AgentTriggerDeliveryMethods['getAgentBackgroundToolResultClaim']>;
+  getBackgroundCompletionResultBatchSize: () => number;
+  getBackgroundCompletionReceiptBatching: () => boolean;
+  /** Longest a waiting completion delivery re-checks readiness. */
+  getCompletionWaitMaxIntervalMs: () => number;
+  /** Best effort: moves waiting completion deliveries forward after what they wait on changed. */
+  expediteCompletionWakeups: (input: AgentTriggerCompletionExpedite) => void;
+  releaseBackgroundToolResultClaims: AgentTriggerDeliveryMethods['releaseAgentBackgroundToolResultClaims'];
+>>>>>>> upstream/main
   drainUser: (userId: string) => Promise<void>;
   prepareUserPurge: (userId: string, fenceStartedAt: Date, tenantId?: string) => Promise<void>;
   cancelUserPurge: (userId: string, fenceStartedAt: Date) => Promise<boolean>;
   purgeUser: (userId: string) => Promise<void>;
 }
 
+<<<<<<< HEAD
 function createDeliveryStore(
   methods: AgentTriggerDeliveryPersistence,
   supportsDetachedActionCompletion: () => boolean,
+=======
+/** A producer can commit durable state before an inline finalizer fails. Keep
+ * its authoritative result intact, but wake maintenance for the remaining marker.
+ * Rejections are uncertain commits, so they also request recovery. Healthy writes
+ * do not turn every delivered event into a full maintenance sweep. */
+async function withMaintenanceRecovery<T>(
+  operation: (recovery: { required: boolean }) => Promise<T>,
+  wake: () => void,
+): Promise<T> {
+  const recovery = { required: false };
+  try {
+    return await operation(recovery);
+  } catch (error) {
+    recovery.required = true;
+    throw error;
+  } finally {
+    if (recovery.required) wake();
+  }
+}
+
+function createDeliveryStore(
+  methods: AgentTriggerDeliveryPersistence,
+  supportsDetachedActionCompletion: () => boolean,
+  wakeMaintenance: () => void,
+>>>>>>> upstream/main
 ): AgentTriggerDeliveryStore {
   return {
     claimNext: (input) =>
       methods.claimNextAgentTriggerDelivery({
         ...input,
         workerCapabilities: [
+<<<<<<< HEAD
           AGENT_TRIGGER_WORKER_CAPABILITY_BACKGROUND_COMPLETION_V1,
           AGENT_TRIGGER_WORKER_CAPABILITY_QUEUED_TURN_V1,
+=======
+          AGENT_TRIGGER_WORKER_CAPABILITY_BACKGROUND_COMPLETION_RECEIPT_V2,
+          AGENT_TRIGGER_WORKER_CAPABILITY_BACKGROUND_COMPLETION_BATCH_V3,
+          AGENT_TRIGGER_WORKER_CAPABILITY_BACKGROUND_COMPLETION_V1,
+          AGENT_TRIGGER_WORKER_CAPABILITY_QUEUED_TURN_V1,
+          AGENT_TRIGGER_WORKER_CAPABILITY_QUEUED_TURN_V2,
+>>>>>>> upstream/main
           ...(supportsDetachedActionCompletion()
             ? [AGENT_TRIGGER_WORKER_CAPABILITY_DETACHED_ACTION_V1]
             : []),
@@ -195,9 +354,23 @@ function createDeliveryStore(
     release: methods.releaseAgentTriggerDelivery,
     beginAttempt: methods.beginAgentTriggerDeliveryAttempt,
     defer: methods.deferAgentTriggerDeliveryAttempt,
+<<<<<<< HEAD
     complete: methods.completeAgentTriggerDelivery,
     retry: methods.retryAgentTriggerDelivery,
     dead: methods.deadLetterAgentTriggerDelivery,
+=======
+    complete: (input) =>
+      withMaintenanceRecovery(
+        (recovery) => methods.completeAgentTriggerDelivery(input, recovery),
+        wakeMaintenance,
+      ),
+    retry: methods.retryAgentTriggerDelivery,
+    dead: (input) =>
+      withMaintenanceRecovery(
+        (recovery) => methods.deadLetterAgentTriggerDelivery(input, recovery),
+        wakeMaintenance,
+      ),
+>>>>>>> upstream/main
   };
 }
 
@@ -254,10 +427,20 @@ export function createAgentTriggerService(deps: AgentTriggerServiceDeps = {}): A
     throw new TypeError('purgeRecoveryLimit must be a positive integer');
   }
   let boundOrigin: string | undefined;
+<<<<<<< HEAD
   let deliveryEngine: AgentTriggerDeliveryEngine | undefined;
   let initializePromise: Promise<void> | undefined;
   let purgeRecoveryPromise: Promise<void> | undefined;
   let purgeRecoveryTimer: NodeJS.Timeout | undefined;
+=======
+  let backgroundCompletionResultBatchSize = 8;
+  let backgroundCompletionReceiptBatching = AGENT_BACKGROUND_COMPLETION_RECEIPT_BATCHING_DEFAULT;
+  let completionWaitMaxIntervalMs = WAITING_RETRY_CAP_MS;
+  let deliveryEngine: AgentTriggerDeliveryEngine | undefined;
+  let initializePromise: Promise<void> | undefined;
+  let purgeRecoveryPromise: Promise<boolean> | undefined;
+  let purgeRecoveryLoop: ReturnType<typeof createIdleRecoveryLoop> | undefined;
+>>>>>>> upstream/main
   let deliveryReady = false;
   let stopping = false;
   const isPrincipalActive = deps.isPrincipalActive;
@@ -311,7 +494,17 @@ export function createAgentTriggerService(deps: AgentTriggerServiceDeps = {}): A
 
   const dispatchForActivePrincipal = async (
     envelope: unknown,
+<<<<<<< HEAD
     options?: { signal?: AbortSignal; attempt?: number; maxAttempts?: number },
+=======
+    options?: {
+      signal?: AbortSignal;
+      attempt?: number;
+      maxAttempts?: number;
+      deliveryClaimToken?: string;
+      requiredWorkerCapability?: string;
+    },
+>>>>>>> upstream/main
   ): Promise<AgentTriggerExecutionResult> => {
     const parsed = parseAgentTriggerEnvelope(envelope);
     await requireActivePrincipal(parsed.principal.userId);
@@ -341,9 +534,15 @@ export function createAgentTriggerService(deps: AgentTriggerServiceDeps = {}): A
     }
   };
 
+<<<<<<< HEAD
   const recoverPurges = (): Promise<void> => {
     if (deps.methods == null || stopping) {
       return Promise.resolve();
+=======
+  const recoverPurges = (): Promise<boolean> => {
+    if (deps.methods == null || stopping) {
+      return Promise.resolve(false);
+>>>>>>> upstream/main
     }
     if (purgeRecoveryPromise != null) {
       return purgeRecoveryPromise;
@@ -357,14 +556,29 @@ export function createAgentTriggerService(deps: AgentTriggerServiceDeps = {}): A
      * half-recovered batch clears a request that a later successful recovery
      * can no longer re-arm, retaining the lane permanently — so reclamation
      * still waits for a batch-recovery pass that did not fail. */
+<<<<<<< HEAD
     const isolated = (label: string, run: () => Promise<number>): Promise<number> =>
       run().catch((error) => {
+=======
+    let failed = false;
+    const activity = { found: false };
+    const isolated = async (label: string, run: () => Promise<number>): Promise<number> => {
+      try {
+        return await run();
+      } catch (error) {
+        failed = true;
+>>>>>>> upstream/main
         logger.error(
           `[agent-triggers] durable delivery maintenance step failed (${label}):`,
           error,
         );
         return 0;
+<<<<<<< HEAD
       });
+=======
+      }
+    };
+>>>>>>> upstream/main
     const current = runAsSystem(async () => {
       const [
         purgedUsers,
@@ -373,6 +587,7 @@ export function createAgentTriggerService(deps: AgentTriggerServiceDeps = {}): A
         expiredLegacyActorReceipts,
         retiredCheckpointDeletions,
       ] = await Promise.all([
+<<<<<<< HEAD
         isolated('user purges', () => methods.recoverAgentTriggerUserPurges(purgeRecoveryLimit)),
         isolated('lane publications', () =>
           methods.recoverAgentTriggerLanePublications(purgeRecoveryLimit),
@@ -380,6 +595,18 @@ export function createAgentTriggerService(deps: AgentTriggerServiceDeps = {}): A
         methods.recoverAgentTriggerBatchReceipts(purgeRecoveryLimit).then(
           (count) => ({ succeeded: true as const, count }),
           (error) => {
+=======
+        isolated('user purges', () =>
+          methods.recoverAgentTriggerUserPurges(purgeRecoveryLimit, activity),
+        ),
+        isolated('lane publications', () =>
+          methods.recoverAgentTriggerLanePublications(purgeRecoveryLimit, activity),
+        ),
+        methods.recoverAgentTriggerBatchReceipts(purgeRecoveryLimit, activity).then(
+          (count) => ({ succeeded: true as const, count }),
+          (error) => {
+            failed = true;
+>>>>>>> upstream/main
             logger.error(
               '[agent-triggers] durable delivery maintenance step failed (batch receipts):',
               error,
@@ -390,18 +617,35 @@ export function createAgentTriggerService(deps: AgentTriggerServiceDeps = {}): A
         isolated(
           'legacy actor receipts',
           () =>
+<<<<<<< HEAD
             methods.expireLegacyAgentEventActorReceipts?.(new Date(), purgeRecoveryLimit) ??
             Promise.resolve(0),
         ),
         isolated(
           'checkpoint deletion evidence',
           () => deps.reclaimCheckpointDeletions?.(purgeRecoveryLimit) ?? Promise.resolve(0),
+=======
+            methods.expireLegacyAgentEventActorReceipts?.(
+              new Date(),
+              purgeRecoveryLimit,
+              activity,
+            ) ?? Promise.resolve(0),
+        ),
+        isolated(
+          'checkpoint deletion evidence',
+          () =>
+            deps.reclaimCheckpointDeletions?.(purgeRecoveryLimit, activity) ?? Promise.resolve(0),
+>>>>>>> upstream/main
         ),
       ]);
       const recoveredBatches = batchRecovery.count;
       const reclaimedLanes = batchRecovery.succeeded
         ? await isolated('lane reclamation', () =>
+<<<<<<< HEAD
             methods.reclaimInactiveAgentTriggerLanes(purgeRecoveryLimit),
+=======
+            methods.reclaimInactiveAgentTriggerLanes(purgeRecoveryLimit, activity),
+>>>>>>> upstream/main
           )
         : 0;
       if (publishedLanes > 0) {
@@ -424,9 +668,26 @@ export function createAgentTriggerService(deps: AgentTriggerServiceDeps = {}): A
           retiredCheckpointDeletions,
         });
       }
+<<<<<<< HEAD
     })
       .catch((error) => {
         logger.error('[agent-triggers] durable delivery maintenance failed:', error);
+=======
+      return (
+        !failed &&
+        !activity.found &&
+        purgedUsers === 0 &&
+        publishedLanes === 0 &&
+        recoveredBatches === 0 &&
+        reclaimedLanes === 0 &&
+        expiredLegacyActorReceipts === 0 &&
+        retiredCheckpointDeletions === 0
+      );
+    })
+      .catch((error) => {
+        logger.error('[agent-triggers] durable delivery maintenance failed:', error);
+        return false;
+>>>>>>> upstream/main
       })
       .finally(() => {
         if (purgeRecoveryPromise === current) {
@@ -438,6 +699,7 @@ export function createAgentTriggerService(deps: AgentTriggerServiceDeps = {}): A
   };
 
   const startPurgeRecovery = (): void => {
+<<<<<<< HEAD
     if (purgeRecoveryTimer != null) {
       return;
     }
@@ -453,6 +715,51 @@ export function createAgentTriggerService(deps: AgentTriggerServiceDeps = {}): A
       clearInterval(purgeRecoveryTimer);
       purgeRecoveryTimer = undefined;
     }
+=======
+    void purgeRecoveryLoop?.start();
+  };
+
+  /** Moves waiting completion deliveries forward when what they wait on has
+   * changed, and marks held ones so their next deferral re-checks at once. The
+   * claim pass always runs: a matching delivery may already be due here without
+   * having moved. Best effort: a missed expedite only means the delivery
+   * re-checks at its backoff instead of immediately. */
+  const expediteCompletions = (input: AgentTriggerCompletionExpedite): void => {
+    const expedite = deps.methods?.expediteAgentTriggerDeliveries;
+    if (expedite == null || !deliveryReady || stopping) {
+      return;
+    }
+    void runAsSystem(() =>
+      expedite({
+        ...('user' in input
+          ? {
+              user: input.user,
+              conversationId: input.conversationId,
+              ...(input.taskIds != null && { taskIds: input.taskIds }),
+            }
+          : { deliveryKeys: input.deliveryKeys }),
+        sourceIds:
+          'user' in input && input.taskIds != null
+            ? [SUBAGENT_COMPLETION_SOURCE]
+            : COMPLETION_WAKEUP_SOURCES,
+        now: new Date(),
+      }),
+    )
+      .then(() => deliveryEngine?.wake())
+      .catch((error) =>
+        logger.warn('[agent-triggers] failed to expedite waiting completion deliveries:', error),
+      );
+  };
+
+  let unsubscribeGenerationSettled: (() => void) | undefined;
+
+  const stop = async (): Promise<void> => {
+    stopping = true;
+    deliveryReady = false;
+    unsubscribeGenerationSettled?.();
+    unsubscribeGenerationSettled = undefined;
+    await purgeRecoveryLoop?.stop();
+>>>>>>> upstream/main
     await initializePromise?.catch(() => undefined);
     await deliveryEngine?.stop();
     await purgeRecoveryPromise?.catch(() => undefined);
@@ -467,6 +774,14 @@ export function createAgentTriggerService(deps: AgentTriggerServiceDeps = {}): A
 
   return {
     initialize: (options = {}) => {
+<<<<<<< HEAD
+=======
+      backgroundCompletionResultBatchSize = options.completionResultBatchSize ?? 8;
+      backgroundCompletionReceiptBatching =
+        options.completionReceiptBatching ?? AGENT_BACKGROUND_COMPLETION_RECEIPT_BATCHING_DEFAULT;
+      completionWaitMaxIntervalMs =
+        options.idlePolling?.completionWaitMaxIntervalMs ?? WAITING_RETRY_CAP_MS;
+>>>>>>> upstream/main
       boundOrigin = selfOriginFromAddress(options.address) ?? boundOrigin;
       if (deps.methods == null || deliveryReady) {
         return Promise.resolve();
@@ -484,6 +799,18 @@ export function createAgentTriggerService(deps: AgentTriggerServiceDeps = {}): A
       const methods = deps.methods;
       initializePromise = runAsSystem(async () => {
         requireDeliveryOrigin(boundOrigin);
+<<<<<<< HEAD
+=======
+        purgeRecoveryLoop = createIdleRecoveryLoop({
+          intervalMs: purgeRecoveryIntervalMs,
+          maxIdleIntervalMs:
+            options.idlePolling?.maintenanceMaxIntervalMs ??
+            Math.max(purgeRecoveryIntervalMs, DEFAULT_PURGE_RECOVERY_MAX_IDLE_INTERVAL_MS),
+          scan: recoverPurges,
+          onError: (error) =>
+            logger.error('[agent-triggers] durable delivery maintenance failed:', error),
+        });
+>>>>>>> upstream/main
         await methods.ensureAgentTriggerDeliveryIndexes();
         if (stopping || isShutdownInProgress()) {
           throw new AgentTriggerServiceUnavailableError(
@@ -492,16 +819,39 @@ export function createAgentTriggerService(deps: AgentTriggerServiceDeps = {}): A
         }
         deliveryEngine = createAgentTriggerDeliveryEngine(
           {
+<<<<<<< HEAD
             store: createDeliveryStore(methods, supportsDetachedActionCompletion),
+=======
+            store: createDeliveryStore(methods, supportsDetachedActionCompletion, () =>
+              purgeRecoveryLoop?.wake(),
+            ),
+>>>>>>> upstream/main
             dispatch: dispatchForActivePrincipal,
             ...(deps.settleSourceBeforeDeadLetter != null && {
               settleSourceBeforeDeadLetter: deps.settleSourceBeforeDeadLetter,
             }),
           },
+<<<<<<< HEAD
           deps.deliveryOptions,
         );
         deliveryReady = true;
         deliveryEngine.start();
+=======
+          {
+            ...deps.deliveryOptions,
+            ...(options.idlePolling?.deliveryMaxIntervalMs != null && {
+              maxIdleTickMs: options.idlePolling.deliveryMaxIntervalMs,
+            }),
+          },
+        );
+        deliveryReady = true;
+        deliveryEngine.start();
+        /** Deliveries waiting on a parent resume that parent's conversation, so a
+         * settled generation wakes only those, not every waiting task of the user. */
+        unsubscribeGenerationSettled ??= deps.subscribeGenerationSettled?.(
+          ({ userId, conversationId }) => expediteCompletions({ user: userId, conversationId }),
+        );
+>>>>>>> upstream/main
         startPurgeRecovery();
         logger.info('[agent-triggers] durable delivery engine started');
       }).finally(() => {
@@ -524,7 +874,14 @@ export function createAgentTriggerService(deps: AgentTriggerServiceDeps = {}): A
       };
       await requireActivePrincipal(String(prepared.user));
       const queued = await runAsSystem(async () =>
+<<<<<<< HEAD
         methods.enqueueAgentTriggerDelivery(durableDelivery),
+=======
+        withMaintenanceRecovery(
+          () => methods.enqueueAgentTriggerDelivery(durableDelivery),
+          () => purgeRecoveryLoop?.wake(),
+        ),
+>>>>>>> upstream/main
       );
       try {
         await requireActivePrincipal(String(prepared.user));
@@ -567,7 +924,15 @@ export function createAgentTriggerService(deps: AgentTriggerServiceDeps = {}): A
       runAsSystem(async () => requireMethods().getAgentTriggerDeadLetters(limit)),
     requeue: (id, availableAt = new Date()) =>
       runAsSystem(async () => {
+<<<<<<< HEAD
         const revived = await requireMethods().requeueAgentTriggerDelivery(id, availableAt);
+=======
+        const methods = requireMethods();
+        const revived = await withMaintenanceRecovery(
+          () => methods.requeueAgentTriggerDelivery(id, availableAt),
+          () => purgeRecoveryLoop?.wake(),
+        );
+>>>>>>> upstream/main
         if (revived != null) {
           if (availableAt.getTime() > Date.now()) {
             deliveryEngine?.noteEligibleAt(availableAt);
@@ -579,6 +944,7 @@ export function createAgentTriggerService(deps: AgentTriggerServiceDeps = {}): A
       }),
     retire: (deliveryKey, sourceId, reason, options) =>
       runAsSystem(async () => {
+<<<<<<< HEAD
         const retired = await requireCleanupMethods().retireAgentTriggerDelivery({
           deliveryKey,
           sourceId,
@@ -587,24 +953,88 @@ export function createAgentTriggerService(deps: AgentTriggerServiceDeps = {}): A
           ...(options?.onlyIfUnclaimed === true ? { onlyIfUnclaimed: true } : {}),
           ...(options?.onlyIfDead === true ? { onlyIfDead: true } : {}),
         });
+=======
+        const methods = requireCleanupMethods();
+        const retired = await withMaintenanceRecovery(
+          (recovery) =>
+            methods.retireAgentTriggerDelivery(
+              {
+                deliveryKey,
+                sourceId,
+                reason,
+                settledAt: new Date(),
+                ...(options?.onlyIfUnclaimed === true ? { onlyIfUnclaimed: true } : {}),
+                ...(options?.onlyIfDead === true ? { onlyIfDead: true } : {}),
+                ...(options?.requireTransition === true ? { requireTransition: true } : {}),
+              },
+              recovery,
+            ),
+          () => purgeRecoveryLoop?.wake(),
+        );
+>>>>>>> upstream/main
         if (retired) {
           deliveryEngine?.wake();
         }
         return retired;
       }),
+<<<<<<< HEAD
     renewProducerLease: (deliveryKey, sourceId, leaseUntil) =>
       runAsSystem(async () =>
         requireMethods().renewAgentTriggerDeliveryProducerLease({
+=======
+    // A background tool keeps running while the server drains, and its result must
+    // still reach the durable receipt, so producer writes stay available after
+    // admissions and the delivery engine stop.
+    renewProducerLease: (deliveryKey, sourceId, leaseUntil) =>
+      runAsSystem(async () =>
+        requireCleanupMethods().renewAgentTriggerDeliveryProducerLease({
+>>>>>>> upstream/main
           deliveryKey,
           sourceId,
           leaseUntil,
         }),
       ),
+<<<<<<< HEAD
     drainUser,
     prepareUserPurge: (userId, fenceStartedAt, tenantId) =>
       runAsSystem(async () =>
         requireCleanupMethods().prepareAgentTriggerUserPurge(userId, fenceStartedAt, tenantId),
       ),
+=======
+    persistBackgroundToolResult: (input) =>
+      runAsSystem(async () => {
+        const persist = requireCleanupMethods().persistAgentBackgroundToolResult;
+        const persisted = persist == null ? false : await persist(input);
+        if (persisted) {
+          expediteCompletions({ deliveryKeys: [input.deliveryKey] });
+        }
+        return persisted;
+      }),
+    getBackgroundToolResultClaim: (input) =>
+      runAsSystem(async () => {
+        const getClaim = requireMethods().getAgentBackgroundToolResultClaim;
+        return getClaim == null ? null : getClaim(input);
+      }),
+    getBackgroundCompletionResultBatchSize: () => backgroundCompletionResultBatchSize,
+    getBackgroundCompletionReceiptBatching: () => backgroundCompletionReceiptBatching,
+    getCompletionWaitMaxIntervalMs: () => completionWaitMaxIntervalMs,
+    expediteCompletionWakeups: (input) => expediteCompletions(input),
+    releaseBackgroundToolResultClaims: (input) =>
+      runAsSystem(async () => {
+        const release = requireMethods().releaseAgentBackgroundToolResultClaims;
+        return release == null ? false : release(input);
+      }),
+    drainUser,
+    prepareUserPurge: (userId, fenceStartedAt, tenantId) =>
+      runAsSystem(async () => {
+        const methods = requireCleanupMethods();
+        await withMaintenanceRecovery(
+          () => methods.prepareAgentTriggerUserPurge(userId, fenceStartedAt, tenantId),
+          () => purgeRecoveryLoop?.wake(),
+        );
+        purgeRecoveryLoop?.wake();
+      }),
+>>>>>>> upstream/main
     cancelUserPurge: (userId, fenceStartedAt) =>
       runAsSystem(async () =>
         requireCleanupMethods().cancelAgentTriggerUserPurge(userId, fenceStartedAt),
@@ -613,6 +1043,17 @@ export function createAgentTriggerService(deps: AgentTriggerServiceDeps = {}): A
     // shutdown has begun. Persistence remains usable even though admissions
     // and the delivery engine are deliberately no longer ready.
     purgeUser: (userId) =>
+<<<<<<< HEAD
       runAsSystem(async () => requireCleanupMethods().deleteAgentTriggerDeliveriesByUser(userId)),
+=======
+      runAsSystem(async () => {
+        const methods = requireCleanupMethods();
+        await withMaintenanceRecovery(
+          () => methods.deleteAgentTriggerDeliveriesByUser(userId),
+          () => purgeRecoveryLoop?.wake(),
+        );
+        purgeRecoveryLoop?.wake();
+      }),
+>>>>>>> upstream/main
   };
 }

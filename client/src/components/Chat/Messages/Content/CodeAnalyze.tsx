@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { useState, useEffect } from 'react';
 import { useRecoilValue } from 'recoil';
 import { Terminal } from 'lucide-react';
@@ -7,6 +8,15 @@ import ProgressText from './ProgressText';
 import MarkdownLite from './MarkdownLite';
 import { cn } from '~/utils';
 import store from '~/store';
+=======
+import { Terminal } from 'lucide-react';
+import type { ToolCallPhase } from '~/utils/toolCallPhase';
+import { useProgress, useLocalize } from '~/hooks';
+import { useToolExpansion } from './disclosure';
+import ProgressText from './ProgressText';
+import MarkdownLite from './MarkdownLite';
+import { cn } from '~/utils';
+>>>>>>> upstream/main
 
 export default function CodeAnalyze({
   initialProgress = 0.1,
@@ -21,6 +31,7 @@ export default function CodeAnalyze({
 }) {
   const localize = useLocalize();
   const progress = useProgress(initialProgress);
+<<<<<<< HEAD
   const autoExpand = useRecoilValue(store.autoExpandTools);
   const [showCode, setShowCode] = useState(autoExpand);
 
@@ -38,6 +49,15 @@ export default function CodeAnalyze({
       }
       return next;
     });
+=======
+  const [showCode, setShowCode] = useToolExpansion(true);
+
+  const handleToggleCode = () => {
+    setShowCode(!showCode);
+    if (!showCode) {
+      onExpand?.();
+    }
+>>>>>>> upstream/main
   };
 
   const logs = outputs.reduce((acc, output) => {
@@ -71,7 +91,11 @@ export default function CodeAnalyze({
           icon={
             <Terminal
               className={cn(
+<<<<<<< HEAD
                 'size-4 shrink-0 text-text-secondary',
+=======
+                'text-text-secondary size-4 shrink-0',
+>>>>>>> upstream/main
                 phase === 'running' && 'animate-pulse',
               )}
               aria-hidden="true"
@@ -80,6 +104,7 @@ export default function CodeAnalyze({
         />
       </div>
       {showCode && (
+<<<<<<< HEAD
         <div className="code-analyze-block mb-3 mt-0.5 overflow-hidden rounded-xl bg-black">
           <MarkdownLite content={code ? `\`\`\`python\n${code}\n\`\`\`` : ''} />
           {logs && (
@@ -92,6 +117,15 @@ export default function CodeAnalyze({
                 }}
               >
                 <pre className="shrink-0">{logs}</pre>
+=======
+        <div className="code-analyze-block bg-surface-code mt-0.5 mb-3 overflow-hidden rounded-xl">
+          <MarkdownLite content={code ? `\`\`\`python\n${code}\n\`\`\`` : ''} />
+          {logs && (
+            <div className="bg-surface-tertiary p-4 text-xs">
+              <div className="text-text-secondary mb-1">{localize('com_ui_result')}</div>
+              <div className="prose flex flex-col-reverse">
+                <pre className="text-text-primary! shrink-0">{logs}</pre>
+>>>>>>> upstream/main
               </div>
             </div>
           )}

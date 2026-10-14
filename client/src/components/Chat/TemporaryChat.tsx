@@ -7,7 +7,11 @@ import { cn } from '~/utils';
 
 export function TemporaryChat() {
   const localize = useLocalize();
+<<<<<<< HEAD
   const { show, isTemporary, toggle } = useTemporaryChat();
+=======
+  const { show, isTemporary, isEnforced, toggle } = useTemporaryChat();
+>>>>>>> upstream/main
   const tooltipDescription = useShortcutHint('toggleTemporaryChat', localize('com_ui_temporary'));
   const ariaKey = useShortcutAriaKey('toggleTemporaryChat');
 
@@ -15,6 +19,7 @@ export function TemporaryChat() {
     return null;
   }
 
+<<<<<<< HEAD
   return (
     <div className="relative flex flex-wrap items-center gap-2">
       <TooltipAnchor
@@ -30,6 +35,27 @@ export function TemporaryChat() {
               isTemporary
                 ? 'bg-surface-active'
                 : 'bg-presentation shadow-sm hover:bg-surface-active-alt',
+=======
+  const label = isEnforced ? localize('com_ui_temporary_enforced') : localize('com_ui_temporary');
+
+  return (
+    <div className="relative flex flex-wrap items-center gap-2">
+      <TooltipAnchor
+        description={isEnforced ? label : tooltipDescription}
+        render={
+          <button
+            onClick={toggle}
+            aria-label={label}
+            aria-pressed={isTemporary}
+            aria-disabled={isEnforced}
+            aria-keyshortcuts={isEnforced ? undefined : ariaKey}
+            className={cn(
+              'border-border-chrome text-text-primary inline-flex size-9 shrink-0 items-center justify-center rounded-xl border transition-all ease-in-out',
+              isTemporary
+                ? 'bg-surface-active'
+                : 'bg-presentation hover:bg-surface-active-alt shadow-xs',
+              isEnforced && 'cursor-not-allowed',
+>>>>>>> upstream/main
             )}
           >
             <HatGlasses className="icon-md" aria-hidden="true" />
@@ -58,7 +84,11 @@ export function TemporaryChatIndicator() {
       tone="neutral"
       size="theme"
       shape="theme"
+<<<<<<< HEAD
       className="flex-shrink-0"
+=======
+      className="shrink-0"
+>>>>>>> upstream/main
       leading={<HatGlasses className="size-4 shrink-0" aria-hidden="true" />}
     >
       <span className="max-md:sr-only">{localize('com_ui_temporary')}</span>

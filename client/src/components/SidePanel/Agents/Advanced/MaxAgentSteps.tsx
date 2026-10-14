@@ -13,10 +13,14 @@ export default function MaxAgentSteps() {
     <HoverCard openDelay={50}>
       <div className="flex flex-col gap-1.5">
         <div className="flex items-center gap-1.5">
+<<<<<<< HEAD
           <Label
             htmlFor="recursion_limit"
             className="w-auto text-[13px] font-semibold text-text-primary"
           >
+=======
+          <Label htmlFor="recursion_limit" className="w-auto text-[13px] font-medium">
+>>>>>>> upstream/main
             {localize('com_ui_agent_recursion_limit')}
           </Label>
           <InfoTrigger />
@@ -47,7 +51,11 @@ export default function MaxAgentSteps() {
       </div>
       <HoverCardPortal>
         <HoverCardContent side={ESide.Top} className="w-80">
+<<<<<<< HEAD
           <p className="text-sm text-text-secondary">
+=======
+          <p className="text-text-secondary text-sm">
+>>>>>>> upstream/main
             {localize('com_ui_agent_recursion_limit_info')}
           </p>
         </HoverCardContent>

@@ -79,7 +79,11 @@ const CLIPPING_OVERFLOWS = new Set(['auto', 'scroll', 'hidden']);
  */
 const findClippingAncestors = (element: HTMLElement): HTMLElement[] => {
   const clippers: HTMLElement[] = [];
+<<<<<<< HEAD
   let current = element.parentElement;
+=======
+  let current: HTMLElement | null = element;
+>>>>>>> upstream/main
   while (current && current !== document.body) {
     const { overflowX, overflowY } = getComputedStyle(current);
     if (CLIPPING_OVERFLOWS.has(overflowX) || CLIPPING_OVERFLOWS.has(overflowY)) {
@@ -179,6 +183,7 @@ const readSelection = (): Reading | null => {
   };
 };
 
+<<<<<<< HEAD
 /**
  * Whether the selection is still on screen, judged against the window
  * intersected with every ancestor that clips it, on both axes. Text slipping
@@ -193,10 +198,22 @@ const isAnchorVisible = (anchor: Anchor, clippers: HTMLElement[]): boolean => {
   let right = window.innerWidth;
   for (let index = 0; index < clippers.length; index++) {
     const bounds = clippers[index].getBoundingClientRect();
+=======
+/** Use only the visible part of a selection to place the popup. A long code
+ * line can extend far beyond its scroll container even while partly selected. */
+const clipAnchor = (anchor: Anchor, clippers: HTMLElement[]): Anchor | null => {
+  let top = Math.max(0, anchor.top);
+  let bottom = Math.min(window.innerHeight, anchor.bottom);
+  let left = Math.max(0, anchor.left);
+  let right = Math.min(window.innerWidth, anchor.right);
+  for (const clipper of clippers) {
+    const bounds = clipper.getBoundingClientRect();
+>>>>>>> upstream/main
     top = Math.max(top, bounds.top);
     bottom = Math.min(bottom, bounds.bottom);
     left = Math.max(left, bounds.left);
     right = Math.min(right, bounds.right);
+<<<<<<< HEAD
     if (top > bottom || left > right) {
       return false;
     }
@@ -204,6 +221,96 @@ const isAnchorVisible = (anchor: Anchor, clippers: HTMLElement[]): boolean => {
   return (
     anchor.bottom >= top && anchor.top <= bottom && anchor.right >= left && anchor.left <= right
   );
+=======
+    if (top >= bottom || left >= right) {
+      return null;
+    }
+  }
+  return top < bottom && left < right ? { top, bottom, left, right } : null;
+};
+
+/** Selected text can cross from a clipped code block into unclipped prose. Clip
+ * each consecutive text fragment to its own ancestors before merging the visible bounds. */
+const visibleAnchor = (range: Range, anchor: Anchor, clippers: HTMLElement[]): Anchor | null => {
+  if (
+    range.startContainer === range.endContainer &&
+    range.startContainer.nodeType === Node.TEXT_NODE
+  ) {
+    return clipAnchor(anchor, clippers);
+  }
+
+  const ancestors = new Map<HTMLElement, HTMLElement[]>();
+  const clippersFor = (element: HTMLElement): HTMLElement[] => {
+    const cached = ancestors.get(element);
+    if (cached) {
+      return cached;
+    }
+    const parent = element.parentElement;
+    const outer = parent && parent !== document.body ? clippersFor(parent) : [];
+    const { overflowX, overflowY } = getComputedStyle(element);
+    const found =
+      CLIPPING_OVERFLOWS.has(overflowX) || CLIPPING_OVERFLOWS.has(overflowY)
+        ? [element, ...outer]
+        : outer;
+    ancestors.set(element, found);
+    return found;
+  };
+
+  let first: Text | null = null;
+  let last: Text | null = null;
+  let groupClippers: HTMLElement[] = [];
+  let visible: Anchor | null = null;
+  const measureGroup = () => {
+    if (!first || !last) {
+      return;
+    }
+    const fragment = document.createRange();
+    fragment.setStart(first, first === range.startContainer ? range.startOffset : 0);
+    fragment.setEnd(last, last === range.endContainer ? range.endOffset : last.length);
+    const bounds = anchorFromRect(fragment.getBoundingClientRect());
+    const clipped = bounds && clipAnchor(bounds, groupClippers);
+    if (!clipped) {
+      return;
+    }
+    visible = visible
+      ? {
+          top: Math.min(visible.top, clipped.top),
+          bottom: Math.max(visible.bottom, clipped.bottom),
+          left: Math.min(visible.left, clipped.left),
+          right: Math.max(visible.right, clipped.right),
+        }
+      : clipped;
+  };
+
+  const walker = document.createTreeWalker(range.commonAncestorContainer, NodeFilter.SHOW_TEXT);
+  if (range.startContainer.nodeType === Node.TEXT_NODE) {
+    walker.currentNode = range.startContainer;
+  }
+  for (
+    let node =
+      range.startContainer.nodeType === Node.TEXT_NODE ? walker.currentNode : walker.nextNode();
+    node;
+    node = walker.nextNode()
+  ) {
+    if (range.comparePoint(node, 0) > 0) {
+      break;
+    }
+    if (!node.textContent || !range.intersectsNode(node) || !node.parentElement) {
+      continue;
+    }
+    const next = node as Text;
+    const nextClippers = clippersFor(node.parentElement as HTMLElement);
+    if (first && groupClippers !== nextClippers) {
+      measureGroup();
+      first = null;
+    }
+    first ??= next;
+    last = next;
+    groupClippers = nextClippers;
+  }
+  measureGroup();
+  return visible;
+>>>>>>> upstream/main
 };
 
 /** Place the popup on the preferred side, falling back to the other side and
@@ -321,7 +428,12 @@ function QuoteButton({ conversationId }: { conversationId: string }) {
        *  tracked during the settle window, so a selection scrolled out of the
        *  chat in those 300ms would otherwise be published off-screen and
        *  clamped into view, stranding the popup over unrelated UI. */
+<<<<<<< HEAD
       if (!reading || !isAnchorVisible(reading.anchor, reading.clippers)) {
+=======
+      const anchor = reading && visibleAnchor(reading.range, reading.anchor, reading.clippers);
+      if (!reading || !anchor) {
+>>>>>>> upstream/main
         hide();
         return;
       }
@@ -333,9 +445,15 @@ function QuoteButton({ conversationId }: { conversationId: string }) {
         !previous ||
         previous.text !== reading.text ||
         previous.viaTouch !== touch ||
+<<<<<<< HEAD
         !sameAnchor(previous.anchor, reading.anchor)
       ) {
         presentSelection({ text: reading.text, anchor: reading.anchor, viaTouch: touch });
+=======
+        !sameAnchor(previous.anchor, anchor)
+      ) {
+        presentSelection({ text: reading.text, anchor, viaTouch: touch });
+>>>>>>> upstream/main
       }
     };
 
@@ -403,8 +521,14 @@ function QuoteButton({ conversationId }: { conversationId: string }) {
       if (!range) {
         return;
       }
+<<<<<<< HEAD
       const anchor = anchorFromRect(range.getBoundingClientRect());
       if (!anchor || !isAnchorVisible(anchor, clippersRef.current)) {
+=======
+      const bounds = anchorFromRect(range.getBoundingClientRect());
+      const anchor = bounds && visibleAnchor(range, bounds, clippersRef.current);
+      if (!anchor) {
+>>>>>>> upstream/main
         hide();
         return;
       }
@@ -554,7 +678,11 @@ function QuoteButton({ conversationId }: { conversationId: string }) {
         display: 'none',
       }}
       className={cn(
+<<<<<<< HEAD
         'fixed z-50 inline-flex items-center gap-1.5 rounded-full border border-border-light bg-surface-secondary text-sm font-medium text-text-primary shadow-lg transition-colors hover:bg-surface-tertiary',
+=======
+        'border-border-chrome bg-surface-secondary text-text-primary hover:bg-surface-tertiary fixed z-50 inline-flex items-center gap-1.5 rounded-full border text-sm font-medium shadow-lg transition-colors',
+>>>>>>> upstream/main
         /** Comfortable tap target when the selection came from a finger. */
         'px-3 py-1.5 data-[touch=true]:min-h-11 data-[touch=true]:px-4 data-[touch=true]:py-2.5',
       )}

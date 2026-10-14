@@ -84,7 +84,11 @@ const BookmarkForm = ({
       <div className="space-y-4">
         {/* Tag name input */}
         <div className="space-y-2">
+<<<<<<< HEAD
           <Label htmlFor="bookmark-tag" className="text-sm font-medium text-text-primary">
+=======
+          <Label htmlFor="bookmark-tag" className="text-text-primary text-sm font-medium">
+>>>>>>> upstream/main
             {localize('com_ui_bookmarks_title')}
           </Label>
           <Input
@@ -120,11 +124,19 @@ const BookmarkForm = ({
           <Label
             id="bookmark-description-label"
             htmlFor="bookmark-description"
+<<<<<<< HEAD
             className="text-sm font-medium text-text-primary"
+=======
+            className="text-text-primary text-sm font-medium"
+>>>>>>> upstream/main
           >
             {localize('com_ui_bookmarks_description')}
           </Label>
           <TextareaAutosize
+<<<<<<< HEAD
+=======
+            focusOutline="hidden"
+>>>>>>> upstream/main
             {...register('description', {
               maxLength: {
                 value: 1048,
@@ -138,10 +150,17 @@ const BookmarkForm = ({
             disabled={false}
             placeholder={localize('com_ui_enter_description')}
             className={cn(
+<<<<<<< HEAD
               'min-h-[100px] w-full resize-none rounded-lg border border-border-light',
               'bg-transparent px-3 py-2 text-sm text-text-primary',
               'placeholder:text-text-tertiary',
               'focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-border-heavy',
+=======
+              'border-border-light min-h-[6.25rem] w-full resize-none rounded-lg border',
+              'text-text-primary bg-transparent px-3 py-2 text-sm',
+              'placeholder:text-text-tertiary',
+              'focus-visible:ring-border-heavy focus-visible:ring-1',
+>>>>>>> upstream/main
             )}
             aria-labelledby="bookmark-description-label"
             aria-invalid={!!errors.description}
@@ -161,7 +180,11 @@ const BookmarkForm = ({
                   {...field}
                   checked={field.value}
                   onCheckedChange={field.onChange}
+<<<<<<< HEAD
                   className="size-4 cursor-pointer"
+=======
+                  className="cursor-pointer"
+>>>>>>> upstream/main
                   value={field.value?.toString()}
                   aria-label={localize('com_ui_bookmarks_add_to_conversation')}
                 />
@@ -170,7 +193,11 @@ const BookmarkForm = ({
             <button
               type="button"
               aria-label={localize('com_ui_bookmarks_add_to_conversation')}
+<<<<<<< HEAD
               className="cursor-pointer text-sm text-text-primary"
+=======
+              className="text-text-primary cursor-pointer text-sm"
+>>>>>>> upstream/main
               onClick={() =>
                 setValue('addToConversation', !(getValues('addToConversation') ?? false), {
                   shouldDirty: true,

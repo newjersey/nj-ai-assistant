@@ -2,7 +2,11 @@ import { memo, useState, useRef, useEffect } from 'react';
 import { AutoSizer, List } from 'react-virtualized';
 import { EModelEndpoint } from 'librechat-data-provider';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
+<<<<<<< HEAD
 import { Input, Spinner, useCombobox } from '@librechat/client';
+=======
+import { Input, Spinner, useCombobox, useRemScale } from '@librechat/client';
+>>>>>>> upstream/main
 import type { RecoilState } from 'recoil';
 import type { MentionOption, ConvoGenerator } from '~/common';
 import { useGetConversation, useLocalize, TranslationKeys } from '~/hooks';
@@ -34,6 +38,10 @@ function MentionContent({
   includeAssistants = true,
 }: Omit<MentionProps, 'index'>) {
   const localize = useLocalize();
+<<<<<<< HEAD
+=======
+  const remScale = useRemScale();
+>>>>>>> upstream/main
   const getConversation = useGetConversation(0);
   const assistantsMap = useAssistantsMapContext();
   const setShowPopover = useSetRecoilState(popoverAtom);
@@ -181,11 +189,19 @@ function MentionContent({
 
   return (
     <div className="absolute bottom-28 z-10 w-full space-y-2">
+<<<<<<< HEAD
       <div className="popover border-token-border-light rounded-2xl border bg-surface-secondary p-2 shadow-lg">
         <Input
           ref={initInputRef}
           placeholder={localize(placeholder)}
           className="mb-1 h-auto w-full rounded-none border-0 bg-surface-secondary p-2 text-sm text-text-primary focus:outline-none"
+=======
+      <div className="popover border-border-light bg-surface-secondary rounded-theme-popover border p-2 shadow-lg">
+        <Input
+          ref={initInputRef}
+          placeholder={localize(placeholder)}
+          className="bg-surface-secondary text-text-primary mb-1 h-auto w-full rounded-none border-0 p-2 text-sm"
+>>>>>>> upstream/main
           autoComplete="off"
           value={searchValue}
           onKeyDown={(e) => {
@@ -235,7 +251,11 @@ function MentionContent({
           }}
         />
         {open && isLoading && matches.length === 0 && (
+<<<<<<< HEAD
           <div className="flex h-32 items-center justify-center text-text-primary">
+=======
+          <div className="text-text-primary flex h-32 items-center justify-center">
+>>>>>>> upstream/main
             <Spinner />
           </div>
         )}
@@ -246,11 +266,19 @@ function MentionContent({
                 <List
                   width={width}
                   overscanRowCount={5}
+<<<<<<< HEAD
                   rowHeight={ROW_HEIGHT}
                   rowCount={matches.length}
                   rowRenderer={rowRenderer}
                   scrollToIndex={activeIndex}
                   height={Math.min(matches.length * ROW_HEIGHT, 160)}
+=======
+                  rowHeight={ROW_HEIGHT * remScale}
+                  rowCount={matches.length}
+                  rowRenderer={rowRenderer}
+                  scrollToIndex={activeIndex}
+                  height={Math.min(matches.length * ROW_HEIGHT, 160) * remScale}
+>>>>>>> upstream/main
                 />
               )}
             </AutoSizer>

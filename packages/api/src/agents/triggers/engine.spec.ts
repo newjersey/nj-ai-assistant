@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+import { context, ROOT_CONTEXT } from '@opentelemetry/api';
+>>>>>>> upstream/main
 import type {
   AgentTriggerDeliveryFailure,
   AgentTriggerDeliveryRecord,
@@ -73,7 +77,16 @@ describe('createAgentTriggerDeliveryEngine', () => {
 
     expect(dispatch).toHaveBeenCalledWith(
       { version: 1 },
+<<<<<<< HEAD
       { signal: expect.any(AbortSignal), attempt: 1, maxAttempts: 8 },
+=======
+      {
+        signal: expect.any(AbortSignal),
+        attempt: 1,
+        maxAttempts: 8,
+        deliveryClaimToken: 'claim-1',
+      },
+>>>>>>> upstream/main
     );
     expect(store.beginAttempt).toHaveBeenCalledWith({
       id: 'delivery-row-1',
@@ -91,6 +104,169 @@ describe('createAgentTriggerDeliveryEngine', () => {
     });
   });
 
+<<<<<<< HEAD
+=======
+  it.each([
+    ['honours a longer requested wait', '30', 30_000],
+    ['keeps the default re-check for a shorter request', '1', 5_000],
+    ['keeps the default re-check without a request', undefined, 5_000],
+  ])('%s for a readiness deferral', async (_label, retryAfter, expectedDelayMs) => {
+    const store = storeWith();
+    const dispatch = jest.fn(async () => {
+      throw new AgentTriggerExecutionError('The parent generation has not settled yet.', {
+        mode: 'continue',
+        certainty: 'definite',
+        code: 'PARENT_NOT_READY',
+        retryable: true,
+        deferWithoutAttempt: true,
+        ...(retryAfter != null && { retryAfter }),
+      });
+    });
+    const engine = createAgentTriggerDeliveryEngine(
+      { store, dispatch, now: () => START, workerId: 'worker-1' },
+      { concurrency: 1 },
+    );
+
+    await engine.runTick();
+
+    expect(store.defer).toHaveBeenCalledWith(
+      expect.objectContaining({
+        availableAt: new Date(START.getTime() + expectedDelayMs),
+      }),
+    );
+    expect(store.retry).not.toHaveBeenCalled();
+  });
+
+  it('re-dispatches at once a delivery its deferral found expedited while held', async () => {
+    const dispatchesWithin = async (deferred: boolean | 'expedited'): Promise<number> => {
+      jest.useFakeTimers();
+      try {
+        /** Models the store: the deferred row is claimable again only when the
+         * deferral honored a wake marker and moved it to now. */
+        let claimable = true;
+        const store = storeWith({
+          claimNext: jest.fn(async () => {
+            if (!claimable) {
+              return null;
+            }
+            claimable = false;
+            return delivery();
+          }),
+          defer: jest.fn(async () => {
+            claimable = deferred === 'expedited';
+            return deferred;
+          }),
+        });
+        let dispatches = 0;
+        const dispatch = jest.fn(async () => {
+          dispatches++;
+          if (dispatches > 1) {
+            return successResult();
+          }
+          throw new AgentTriggerExecutionError('The parent generation has not settled yet.', {
+            mode: 'continue',
+            certainty: 'definite',
+            code: 'PARENT_NOT_READY',
+            retryable: true,
+            deferWithoutAttempt: true,
+            retryAfter: '30',
+          });
+        });
+        const engine = createAgentTriggerDeliveryEngine(
+          { store, dispatch, now: () => START, workerId: 'worker-1' },
+          { concurrency: 1, tickMs: 60_000, maxIdleTickMs: 60_000 },
+        );
+        engine.start();
+        await jest.advanceTimersByTimeAsync(100);
+        await engine.stop();
+        return dispatches;
+      } finally {
+        jest.useRealTimers();
+      }
+    };
+
+    await expect(dispatchesWithin(true)).resolves.toBe(1);
+    await expect(dispatchesWithin('expedited')).resolves.toBe(2);
+  });
+
+  it('reclaims an ordering release made due by a held wake signal without waiting for its stale deadline', async () => {
+    jest.useFakeTimers();
+    try {
+      let claimable = true;
+      const store = storeWith({
+        claimNext: jest.fn(async () => {
+          if (!claimable) return null;
+          claimable = false;
+          return delivery();
+        }),
+        findEarlierUnsettled: jest
+          .fn()
+          .mockResolvedValueOnce({ availableAt: new Date(START.getTime() + 60_000) })
+          .mockResolvedValue(null),
+        release: jest.fn(async () => {
+          claimable = true;
+          return true;
+        }),
+      });
+      const dispatch = jest.fn(async () => successResult());
+      const engine = createAgentTriggerDeliveryEngine(
+        { store, dispatch, now: () => START },
+        { concurrency: 1, tickMs: 60_000, maxIdleTickMs: 60_000 },
+      );
+      engine.start();
+      await jest.advanceTimersByTimeAsync(100);
+      await engine.stop();
+      expect(store.release).toHaveBeenCalledTimes(1);
+      expect(dispatch).toHaveBeenCalledTimes(1);
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it('runs each claim pass under the root trace context', async () => {
+    const withContext = jest.spyOn(context, 'with');
+    const store = storeWith({ claimNext: jest.fn(async () => null) });
+    const engine = createAgentTriggerDeliveryEngine(
+      { store, dispatch: jest.fn(async () => successResult()), now: () => START },
+      { concurrency: 1 },
+    );
+
+    try {
+      await engine.runTick();
+      expect(withContext).toHaveBeenCalledWith(ROOT_CONTEXT, expect.any(Function));
+      expect(store.claimNext).toHaveBeenCalled();
+    } finally {
+      withContext.mockRestore();
+    }
+  });
+
+  it('arms each poll timer under the root trace context', async () => {
+    jest.useFakeTimers();
+    const withContext = jest.spyOn(context, 'with');
+    try {
+      const store = storeWith({ claimNext: jest.fn(async () => null) });
+      const engine = createAgentTriggerDeliveryEngine(
+        { store, dispatch: jest.fn(async () => successResult()), now: () => START },
+        { concurrency: 1, tickMs: 1_000 },
+      );
+      engine.start();
+      await jest.advanceTimersByTimeAsync(0);
+
+      const timersArmed = withContext.mock.results.filter(
+        (result, index) =>
+          withContext.mock.calls[index][0] === ROOT_CONTEXT &&
+          result.type === 'return' &&
+          typeof (result.value as { unref?: unknown } | undefined)?.unref === 'function',
+      );
+      expect(timersArmed.length).toBeGreaterThan(0);
+      await engine.stop();
+    } finally {
+      withContext.mockRestore();
+      jest.useRealTimers();
+    }
+  });
+
+>>>>>>> upstream/main
   it('persists generation identity when a bound continuation starts', async () => {
     const envelope = createAgentTriggerEnvelope({
       mode: 'continue',
@@ -589,6 +765,35 @@ describe('createAgentTriggerDeliveryEngine', () => {
     expect(store.dead).toHaveBeenCalledWith(expect.objectContaining({ claimToken: 'claim-1' }));
   });
 
+<<<<<<< HEAD
+=======
+  it.each([false, true])(
+    'offers configured receipt recovery when already exhausted is %s',
+    async (exhausted) => {
+      const store = storeWith({
+        claimNext: jest.fn(async () => delivery({ attempts: exhausted ? 1 : 0 })),
+      });
+      const engine = createAgentTriggerDeliveryEngine(
+        {
+          store,
+          now: () => START,
+          dispatch: async () => {
+            throw new Error('database unavailable');
+          },
+        },
+        { concurrency: 1, maxAttempts: 1, retryCapMs: 123_000 },
+      );
+      await engine.runTick();
+      expect(store.dead).toHaveBeenCalledWith(
+        expect.objectContaining({
+          receiptRetryAt: new Date(START.getTime() + 123_000),
+          error: expect.objectContaining({ retryable: true }),
+        }),
+      );
+    },
+  );
+
+>>>>>>> upstream/main
   it('bounds a persisted last failure before exhausting its source', async () => {
     const oversized = 'x'.repeat(3_000);
     const store = storeWith({

@@ -15,6 +15,10 @@ import type {
   ProviderInitializeParams,
 } from '~/types';
 import { getLLMConfig as getAnthropicLLMConfig } from '~/endpoints/anthropic/llm';
+<<<<<<< HEAD
+=======
+import { resolveModelTransportTimeouts } from '~/agents/config';
+>>>>>>> upstream/main
 import { extractDefaultParams } from '~/endpoints/openai/llm';
 import { isUserProvided, checkUserKeyExpiry } from '~/utils';
 import { getOpenAIConfig } from '~/endpoints/openai/config';
@@ -311,6 +315,10 @@ export async function initializeCustom(
     reverseProxyUrl: baseURL ?? null,
     baseURLIsUserProvided: userProvidesURL,
     allowedAddresses: appConfig?.endpoints?.allowedAddresses,
+<<<<<<< HEAD
+=======
+    transportTimeouts: resolveModelTransportTimeouts(appConfig?.endpoints?.agents),
+>>>>>>> upstream/main
     proxy: PROXY ?? null,
     ...customOptions,
   };

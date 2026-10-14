@@ -51,6 +51,7 @@ const WorkspaceChange = memo(({ attachment }: { attachment: StatefulWorkspaceAtt
   });
 
   return (
+<<<<<<< HEAD
     <div className="flex min-w-0 items-center gap-2 rounded-lg bg-surface-secondary px-3 py-2">
       <div className="min-w-0 flex-1">
         <div className="truncate text-sm font-medium text-text-primary" title={filename}>
@@ -58,6 +59,15 @@ const WorkspaceChange = memo(({ attachment }: { attachment: StatefulWorkspaceAtt
         </div>
         {path !== filename && (
           <div className="truncate text-xs text-text-secondary" title={path}>
+=======
+    <div className="bg-surface-secondary flex min-w-0 items-center gap-2 rounded-lg px-3 py-2">
+      <div className="min-w-0 flex-1">
+        <div className="text-text-primary truncate text-sm font-medium" title={filename}>
+          {filename}
+        </div>
+        {path !== filename && (
+          <div className="text-text-secondary truncate text-xs" title={path}>
+>>>>>>> upstream/main
             {path}
           </div>
         )}
@@ -104,12 +114,20 @@ export default function WorkspaceChanges({
   return (
     <div className="my-2 max-w-xl">
       <Button
+<<<<<<< HEAD
         variant="ghost"
+=======
+        variant="disclosure"
+>>>>>>> upstream/main
         aria-expanded={isExpanded}
         aria-controls={panelId}
         aria-label={`${localize('com_ui_workspace_changes')}: ${countLabel}`}
         onClick={() => setIsExpanded((previous) => !previous)}
+<<<<<<< HEAD
         className="h-auto max-w-full justify-start py-1 pl-0 pr-2 font-normal text-text-secondary"
+=======
+        className="text-text-secondary h-auto max-w-full justify-start py-1 pr-2 pl-0 font-normal"
+>>>>>>> upstream/main
       >
         <Files className="size-4 shrink-0" aria-hidden="true" />
         <span className="shrink-0 font-medium">{localize('com_ui_workspace_changes')}</span>

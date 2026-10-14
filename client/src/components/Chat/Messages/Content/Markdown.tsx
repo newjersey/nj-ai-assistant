@@ -19,7 +19,12 @@ const Markdown = memo(function Markdown({ content = '', isLatestMessage }: TCont
   const LaTeXParsing = useRecoilValue<boolean>(store.LaTeXParsing);
   const isInitializing = content === '';
 
+<<<<<<< HEAD
   const animate = smoothStreaming && isLatestMessage && isSubmitting;
+=======
+  const streaming = isLatestMessage && isSubmitting;
+  const animate = smoothStreaming && streaming;
+>>>>>>> upstream/main
 
   // Hydration signal for the fade: substantial content already present at the
   // render where `animate` flips on means resumed/switched-to/follow-up
@@ -52,6 +57,10 @@ const Markdown = memo(function Markdown({ content = '', isLatestMessage }: TCont
     <MarkdownErrorBoundary content={content} codeExecution={true}>
       <MarkdownBlocks
         content={content}
+<<<<<<< HEAD
+=======
+        streaming={streaming}
+>>>>>>> upstream/main
         remarkPlugins={getRemarkPlugins(LaTeXParsing)}
         rehypePlugins={getRehypePlugins()}
         components={getMarkdownComponents()}

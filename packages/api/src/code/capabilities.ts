@@ -1,13 +1,28 @@
 import { logger } from '@librechat/data-schemas';
+<<<<<<< HEAD
 import { ErrorTypes, isCodeWorkspaceSelections } from 'librechat-data-provider';
 import type {
   CodeWorkspaceSelection,
   CodeWorkspaceSelectionErrorReason,
 } from 'librechat-data-provider';
+=======
+import {
+  isCodeWorkspaceSelections,
+  isLinkedWorktreeRoutingAllowed,
+  canonicalizeCodeWorkspaceSelections,
+  isCodeWorkspaceCheckoutAvailable,
+} from 'librechat-data-provider';
+import type { CodeWorkspaceSelection } from 'librechat-data-provider';
+>>>>>>> upstream/main
 import type { CodeEnvironmentConfig, CodeExecutionContext } from '~/agents/execution';
 import type { createAppConfigService } from '~/app/service';
 import type { CodeBridgeWorkerStatus } from './bridge';
 export type { CodeWorkspaceSelectionErrorReason } from 'librechat-data-provider';
+<<<<<<< HEAD
+=======
+export { CodeWorkspaceSelectionError } from './errors';
+import { CodeWorkspaceSelectionError } from './errors';
+>>>>>>> upstream/main
 import {
   CodeBridgeStatusError,
   createCodeBridgeStatusPoller,
@@ -18,6 +33,7 @@ export type CodeCapabilityConfigLoader = ReturnType<typeof createAppConfigServic
 
 const pollWorkerStatus = createCodeBridgeStatusPoller();
 
+<<<<<<< HEAD
 function codeWorkspaceSelectionErrorMessage(reason: CodeWorkspaceSelectionErrorReason): string {
   switch (reason) {
     case 'required':
@@ -44,11 +60,26 @@ export class CodeWorkspaceSelectionError extends Error {
     super(codeWorkspaceSelectionErrorMessage(reason));
     this.name = 'CodeWorkspaceSelectionError';
   }
+=======
+/** The worker's default label for native SRT workspace commands, optionally `:<command-policy-preset>`. */
+const NATIVE_SANDBOX_PROFILE = 'anthropic-srt';
+
+/**
+ * Whether the worker reports the native SRT command sandbox, whose filesystem is
+ * read-only outside the workspace and a private `$TMPDIR`. A custom operator
+ * label is not recognized, so its description omits the claim.
+ */
+export function isNativeSandboxProfile(profile: string | undefined): boolean {
+  return (
+    profile === NATIVE_SANDBOX_PROFILE || profile?.startsWith(`${NATIVE_SANDBOX_PROFILE}:`) === true
+  );
+>>>>>>> upstream/main
 }
 
 function canonicalWorkspaceSelections(
   selections: CodeWorkspaceSelection[],
 ): CodeWorkspaceSelection[] {
+<<<<<<< HEAD
   return [...selections].sort((left, right) => {
     if (left.environmentId < right.environmentId) return -1;
     if (left.environmentId > right.environmentId) return 1;
@@ -56,6 +87,9 @@ function canonicalWorkspaceSelections(
     if (left.workspaceId > right.workspaceId) return 1;
     return 0;
   });
+=======
+  return canonicalizeCodeWorkspaceSelections(selections);
+>>>>>>> upstream/main
 }
 
 function sameWorkspaceSelections(
@@ -173,29 +207,85 @@ export async function resolveCodeExecutionWorkspaceContext({
   if (!workspace) {
     throw new CodeWorkspaceSelectionError('missing');
   }
+<<<<<<< HEAD
+=======
+  const supportsIsolation = workspace.workspaceInstances?.includes('git_worktree') === true;
+  if (
+    !isCodeWorkspaceCheckoutAvailable(
+      selection,
+      workspace,
+      context.codeEnvironmentConfigSchema?.workspaces?.allowCheckoutSelection === true,
+    ) ||
+    (selection.checkout === 'isolated' && !context.conversationWorkspaceInstanceId)
+  ) {
+    throw new CodeWorkspaceSelectionError('unsupported');
+  }
+  const usesIsolation =
+    selection.checkout !== 'source' && supportsIsolation && context.conversationWorkspaceInstanceId;
+>>>>>>> upstream/main
   return {
     ...context,
     codeWorkspace: {
       ...selection,
       operations: [...(workspace.operations ?? status.operations)],
+<<<<<<< HEAD
+=======
+      ...(usesIsolation ? { workspaceInstanceId: context.conversationWorkspaceInstanceId } : {}),
+      ...(isLinkedWorktreeRoutingAllowed(
+        context.codeEnvironmentConfigSchema?.workspaces?.linkedWorktrees,
+      ) &&
+      workspace.workspaceScopes?.includes('git_linked_worktree') &&
+      !usesIsolation
+        ? { linkedWorktrees: true }
+        : {}),
+      ...(isNativeSandboxProfile(status.sandboxProfile) ? { nativeSandbox: true } : {}),
+      ...(status.maxCommandTimeoutMs == null
+        ? {}
+        : { maxCommandTimeoutMs: status.maxCommandTimeoutMs }),
+      ...(status.editFileFeatures?.length
+        ? { editFileFeatures: [...status.editFileFeatures] }
+        : {}),
+      ...(workspace.instructions ? { instructions: workspace.instructions } : {}),
+>>>>>>> upstream/main
       ...(workspace.environment ? { environment: workspace.environment } : {}),
     },
   };
 }
 
+<<<<<<< HEAD
 /** Attached workers must confirm both a stateful workspace and the Bash runtime. */
+=======
+/** Require explicit capability support for the selected execution route. */
+>>>>>>> upstream/main
 export async function supportsProgrammaticCodeExecution(
   context?: CodeExecutionContext,
   environments?: readonly CodeEnvironmentConfig[],
   getAppConfig?: CodeCapabilityConfigLoader,
 ): Promise<boolean> {
   if (context?.environmentType !== 'attached') return true;
+<<<<<<< HEAD
   /** Programmatic Bash uses Code API's generic exec endpoint, which has no
    * workspace identifier. A fully resolved attached context therefore cannot
    * use it until that protocol can preserve the selected-root boundary. */
   if (context.codeWorkspace != null) return false;
   try {
     const status = await readAuthorizedAttachedWorkerStatus(context, environments, getAppConfig);
+=======
+  try {
+    const status = await readAuthorizedAttachedWorkerStatus(context, environments, getAppConfig);
+    if (context.codeWorkspace != null) {
+      const selected = context.codeWorkspace;
+      const workspace = status.workspaces?.find(({ id }) => id === selected.workspaceId);
+      return (
+        status.status === 'ready' &&
+        selected.environmentId === context.environmentId &&
+        selected.operations.includes('execute_command') &&
+        workspace != null &&
+        (workspace.operations ?? status.operations)?.includes('execute_command') === true &&
+        status.programmaticLanguages?.includes('bash') === true
+      );
+    }
+>>>>>>> upstream/main
     return (
       status.status === 'ready' &&
       status.statefulWorkspace === true &&

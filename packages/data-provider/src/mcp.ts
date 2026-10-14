@@ -9,6 +9,12 @@ import { extractEnvVariable } from './utils';
  */
 export const MAX_MCP_ICON_PATH_LENGTH = 256 * 1024;
 
+<<<<<<< HEAD
+=======
+/** Keep persistence admission waits below the shared lease's 15-minute lifetime. */
+export const MAX_MCP_OAUTH_PERSISTENCE_WAIT_MS = 14 * 60_000;
+
+>>>>>>> upstream/main
 const validateOAuthClientCredentials = (
   oauth: {
     client_id?: string;
@@ -109,6 +115,30 @@ const OAuthOptionsBaseSchema = z.object({
    * Ignored when `audience` itself is not configured.
    */
   forward_audience_on_refresh: z.boolean().optional(),
+<<<<<<< HEAD
+=======
+  /**
+   * Whether to send the RFC 8707 `resource` parameter on `/authorize`, the
+   * `authorization_code` exchange and the `refresh_token` grant. The value is the
+   * canonical resource identifier from the MCP server's Protected Resource Metadata
+   * (RFC 9728), never an operator-supplied string.
+   *
+   * Default: `true`. RFC 8707 makes `resource` OPTIONAL, and authorization servers
+   * that reject it cannot complete a flow that sends it: Microsoft Entra ID v2.0
+   * fails an `/authorize` request carrying both `resource` and `scope` with
+   * `AADSTS9010010`. Set to `false` for those providers, and rely on `scope` (or
+   * `audience` above) to obtain an API-scoped token.
+   *
+   * Opting out suppresses the parameter only. Protected Resource Metadata is still
+   * discovered, still validated against the MCP server URL (RFC 9728 §3.3), and
+   * still recorded on the stored client binding, so scope discovery, authorization
+   * server discovery and re-authentication checks are unaffected.
+   *
+   * This field is only accepted from trusted/admin MCP configuration and is rejected
+   * from user-managed servers.
+   */
+  send_resource_parameter: z.boolean().optional(),
+>>>>>>> upstream/main
   /** OAuth revocation endpoint (optional - can be auto-discovered) */
   revocation_endpoint: z
     .string()
@@ -145,6 +175,10 @@ const userOAuthEndpointUrlSchema = z
 const UserOAuthOptionsSchema = OAuthOptionsBaseSchema.omit({
   audience: true,
   forward_audience_on_refresh: true,
+<<<<<<< HEAD
+=======
+  send_resource_parameter: true,
+>>>>>>> upstream/main
 })
   .extend({
     authorization_url: userOAuthEndpointUrlSchema.optional(),
@@ -153,6 +187,10 @@ const UserOAuthOptionsSchema = OAuthOptionsBaseSchema.omit({
     revocation_endpoint: userOAuthEndpointUrlSchema.optional(),
     audience: z.never().optional(),
     forward_audience_on_refresh: z.never().optional(),
+<<<<<<< HEAD
+=======
+    send_resource_parameter: z.never().optional(),
+>>>>>>> upstream/main
   })
   .superRefine(validateOAuthClientCredentials);
 
@@ -186,6 +224,29 @@ const BaseOptionsSchema = z.object({
   sseReadTimeout: z.number().int().positive().optional(),
   initTimeout: z.number().int().nonnegative().optional(),
   /**
+<<<<<<< HEAD
+=======
+   * How long (ms) a replica waits for another replica's in-flight OAuth refresh-token redemption
+   * before failing the attempt as retryable. Raise it for a slow token endpoint; lower it to fail
+   * faster. Default when unset: 15_000. Clamped to 30_000, half the window after which a
+   * redemption aborts itself, because this wait runs inside the redemption that window governs.
+   *
+   * Positive rather than non-negative: zero would mean "never wait for a peer", which fails every
+   * contended refresh instead of adopting the rotation a peer is about to store, and that is the
+   * common case this wait exists to serve. Omit the field to take the default.
+   */
+  oauthRefreshWaitTimeout: z.number().int().positive().optional(),
+  /** Enable only after every replica has upgraded to the coordinated OAuth writer protocol. Default: false. */
+  oauthRefreshCoordination: z.boolean().optional(),
+  /** Wait (ms) for callback/adoption persistence and publication. Default: 15_000; maximum: 840_000. */
+  oauthPersistenceWaitTimeout: z
+    .number()
+    .int()
+    .positive()
+    .max(MAX_MCP_OAUTH_PERSISTENCE_WAIT_MS)
+    .optional(),
+  /**
+>>>>>>> upstream/main
    * Whether the server is offered in chat.
    *
    * `false` hides it from the chat dropdown (MCPSelect) AND bars it from the
@@ -362,6 +423,16 @@ export const SSEOptionsSchema = BaseOptionsSchema.extend({
   type: z.literal('sse').default('sse'),
   headers: z.record(z.string(), z.string()).optional(),
   /**
+<<<<<<< HEAD
+=======
+   * Headers resolved from the live chat request and merged over `headers`.
+   * Omitted during catalog discovery, which has no request context, so a
+   * `{{LIBRECHAT_BODY_*}}` placeholder here does not block tool listing.
+   * On a duplicate header name the resolved `requestHeaders` value wins.
+   */
+  requestHeaders: z.record(z.string(), z.string()).optional(),
+  /**
+>>>>>>> upstream/main
    * On-Behalf-Of (OBO) token exchange configuration.
    * When configured, LibreChat exchanges the logged-in user's federated access token
    * for a token scoped to this MCP server via the OAuth 2.0 OBO flow (jwt-bearer grant).
@@ -390,6 +461,16 @@ export const StreamableHTTPOptionsSchema = BaseOptionsSchema.extend({
   type: z.union([z.literal('streamable-http'), z.literal('http')]),
   headers: z.record(z.string(), z.string()).optional(),
   /**
+<<<<<<< HEAD
+=======
+   * Headers resolved from the live chat request and merged over `headers`.
+   * Omitted during catalog discovery, which has no request context, so a
+   * `{{LIBRECHAT_BODY_*}}` placeholder here does not block tool listing.
+   * On a duplicate header name the resolved `requestHeaders` value wins.
+   */
+  requestHeaders: z.record(z.string(), z.string()).optional(),
+  /**
+>>>>>>> upstream/main
    * On-Behalf-Of (OBO) token exchange configuration.
    * When configured, LibreChat exchanges the logged-in user's federated access token
    * for a token scoped to this MCP server via the OAuth 2.0 OBO flow (jwt-bearer grant).
@@ -434,6 +515,12 @@ const omitServerManagedFields = <T extends z.ZodObject<z.ZodRawShape>>(schema: T
     timeout: true,
     sseReadTimeout: true,
     initTimeout: true,
+<<<<<<< HEAD
+=======
+    oauthRefreshWaitTimeout: true,
+    oauthRefreshCoordination: true,
+    oauthPersistenceWaitTimeout: true,
+>>>>>>> upstream/main
     chatMenu: true,
     serverInstructions: true,
     requiresOAuth: true,

@@ -29,6 +29,10 @@ jest.mock('@ariakit/react', () => ({
 }));
 jest.mock('~/utils', () => ({
   cn: (...classes: Array<string | false | null | undefined>) => classes.filter(Boolean).join(' '),
+<<<<<<< HEAD
+=======
+  rowActionClasses: () => 'row-action',
+>>>>>>> upstream/main
 }));
 jest.mock('librechat-data-provider', () => ({
   QueryKeys: { messages: 'messages' },
@@ -58,6 +62,10 @@ jest.mock('@librechat/client', () => ({
   buttonVariants: () => '',
   useToastContext: () => ({ showToast: jest.fn() }),
   useMediaQuery: () => false,
+<<<<<<< HEAD
+=======
+  useRemScale: () => 1,
+>>>>>>> upstream/main
 }));
 
 jest.mock('~/data-provider', () => ({
@@ -67,6 +75,10 @@ jest.mock('~/data-provider', () => ({
   useGetStartupConfig: () => ({ data: { sharedLinksEnabled: false } }),
   useArchiveConvoMutation: () => ({ mutate: mockArchiveMutate, isLoading: false }),
   usePinConversationMutation: () => ({ mutate: jest.fn(), isLoading: false }),
+<<<<<<< HEAD
+=======
+  useMarkConversationUnreadMutation: () => ({ mutate: jest.fn(), isLoading: false }),
+>>>>>>> upstream/main
 }));
 
 jest.mock('~/hooks', () => ({

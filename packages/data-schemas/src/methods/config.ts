@@ -6,7 +6,12 @@ import type { IConfig } from '~/types';
 import { BASE_CONFIG_PRINCIPAL_ID } from '~/admin/capabilities';
 import { escapeRegExp } from '~/utils/string';
 
+<<<<<<< HEAD
 function getTombstonePathsToClear(fieldPath: string): string[] {
+=======
+/** Tombstones a field write clears: the written path and its ancestors below the section. */
+export function getTombstonePathsToClear(fieldPath: string): string[] {
+>>>>>>> upstream/main
   const parts = fieldPath.split('.');
   if (parts.length <= 1) {
     return [fieldPath];

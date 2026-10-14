@@ -43,8 +43,13 @@ const {
   configureServerTimeouts,
   setupGracefulShutdown,
   registerShutdownTask,
+<<<<<<< HEAD
   getRemainingShutdownMs,
   getShutdownElapsedMs,
+=======
+  getClusterShutdownBudgetMs,
+  registerBackgroundTaskShutdown,
+>>>>>>> upstream/main
   configureMessageFilterRegexValidator,
   configureFileConfigRegexEngine,
   configureAgentEventRuntime,
@@ -85,7 +90,10 @@ const { getAppConfig } = require('./services/Config');
 const staticCache = require('./utils/staticCache');
 const optionalJwtAuth = require('./middleware/optionalJwtAuth');
 const noIndex = require('./middleware/noIndex');
+<<<<<<< HEAD
 const routes = require('./routes');
+=======
+>>>>>>> upstream/main
 const agentEventMethods = require('~/models');
 
 /** Route admin file-config MIME patterns through a linear-time engine (ReDoS-safe) on upload. */
@@ -386,6 +394,7 @@ if (cluster.isMaster) {
    *  after signalling. Measure against that, and hold back a reserve for the tasks after this
    *  one. Abandoning an unrecorded drain fences the next generation permanently. */
   const CLUSTER_TEARDOWN_RESERVE_MS = 3_000;
+<<<<<<< HEAD
   const destroyGenerationJobManager = () => {
     const remaining = getRemainingShutdownMs();
     const elapsed = getShutdownElapsedMs();
@@ -404,6 +413,20 @@ if (cluster.isMaster) {
         0,
         Math.min(remaining, primaryRemaining) - CLUSTER_TEARDOWN_RESERVE_MS,
       ),
+=======
+  const clusterShutdownBudgetMs = () =>
+    getClusterShutdownBudgetMs({
+      deadlineAt: clusterShutdownDeadlineAt,
+      forceExitMs: CLUSTER_FORCE_EXIT_MS,
+    });
+  const destroyGenerationJobManager = () => {
+    const budgetMs = clusterShutdownBudgetMs();
+    if (budgetMs == null) {
+      return GenerationJobManager.destroy();
+    }
+    return GenerationJobManager.destroy({
+      settlementBudgetMs: Math.max(0, budgetMs - CLUSTER_TEARDOWN_RESERVE_MS),
+>>>>>>> upstream/main
     });
   };
   // Tear down stream resources before shared caches and telemetry exporters shut down.
@@ -446,7 +469,10 @@ if (cluster.isMaster) {
     logger.info(`Worker ${process.pid} initializing...`);
 
     await waitForKeyvRedisClient();
+<<<<<<< HEAD
     await configureSubagentTaskRouting();
+=======
+>>>>>>> upstream/main
 
     if (typeof Bun !== 'undefined') {
       axios.defaults.headers.common['Accept-Encoding'] = 'gzip';
@@ -508,6 +534,14 @@ if (cluster.isMaster) {
     // principal) still merges DB `__base__` overrides, which must not drive which hook
     // modules load in every worker (matches api/server/index.js's baseOnly usage).
     const baseAppConfig = await getAppConfig({ baseOnly: true });
+<<<<<<< HEAD
+=======
+    await configureSubagentTaskRouting(baseAppConfig?.endpoints?.agents?.subagentActivity);
+    registerBackgroundTaskShutdown({
+      interruptGraceMs: baseAppConfig?.endpoints?.agents?.backgroundTasks?.shutdownInterruptGraceMs,
+      getBudgetMs: clusterShutdownBudgetMs,
+    });
+>>>>>>> upstream/main
     configureAgentEventRuntime(baseAppConfig?.endpoints?.agents?.eventDriven);
     const toolApproval = baseAppConfig?.endpoints?.agents?.toolApproval;
     await loadToolApprovalHooks(toolApproval?.enabled ? toolApproval.hooks : undefined, {
@@ -519,6 +553,13 @@ if (cluster.isMaster) {
       await updateInterfacePerms({ appConfig, getRoleByName, updateAccessPermissions });
     });
 
+<<<<<<< HEAD
+=======
+    /* Route modules build their rate limiters as they load, so they load only after the
+     * startup checks have applied `rateLimits` from librechat.yaml. */
+    const routes = require('./routes');
+
+>>>>>>> upstream/main
     /** Load index.html for SPA serving */
     const indexPath = path.join(appConfig.paths.dist, 'index.html');
     let indexHTML = fs.readFileSync(indexPath, 'utf8');
@@ -541,7 +582,10 @@ if (cluster.isMaster) {
        so the answer is the deployment's base configuration, like index.js. */
     indexHTML = injectConfiguredFooterBootstrap(indexHTML, {
       customFooter: process.env.CUSTOM_FOOTER,
+<<<<<<< HEAD
       interfaceConfig: baseAppConfig?.interfaceConfig,
+=======
+>>>>>>> upstream/main
     });
 
     const cspPolicy = createCspPolicy();
@@ -669,6 +713,11 @@ if (cluster.isMaster) {
     app.use('/api/tags', routes.tags);
     app.use('/api/mcp', routes.mcp);
 
+<<<<<<< HEAD
+=======
+    app.use('/api', routes.openapi);
+
+>>>>>>> upstream/main
     /** 404 for unmatched API routes */
     app.use('/api', apiNotFound);
 
@@ -703,7 +752,18 @@ if (cluster.isMaster) {
         await initializeMCPs();
         await initializeOAuthReconnectManager();
         await checkMigrations();
+<<<<<<< HEAD
         await initializeAgentTriggerService({ address: server.address() });
+=======
+        await initializeAgentTriggerService({
+          address: server.address(),
+          completionResultBatchSize:
+            baseAppConfig?.endpoints?.agents?.backgroundTasks?.completionResultBatchSize,
+          completionReceiptBatching:
+            baseAppConfig?.endpoints?.agents?.backgroundTasks?.completionReceiptBatching,
+          idlePolling: baseAppConfig?.endpoints?.agents?.eventDriven?.idlePolling,
+        });
+>>>>>>> upstream/main
       } catch (initErr) {
         logger.error(`Worker ${process.pid} post-listen initialization failed:`, initErr);
         process.exit(1);

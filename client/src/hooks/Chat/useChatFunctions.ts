@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+import { useCallback, useEffect, useRef } from 'react';
+>>>>>>> upstream/main
 import { v4 } from 'uuid';
 import { useStore } from 'jotai';
 import { cloneDeep } from 'lodash';
@@ -15,8 +19,16 @@ import {
   replaceSpecialVars,
   isAssistantsEndpoint,
   getDefaultParamsEndpoint,
+<<<<<<< HEAD
 } from 'librechat-data-provider';
 import type {
+=======
+  isReasoningOverrideSupported,
+  resolveReasoningSettingForTarget,
+} from 'librechat-data-provider';
+import type {
+  Agent,
+>>>>>>> upstream/main
   TMessage,
   TSubmission,
   TConversation,
@@ -30,6 +42,10 @@ import type { TAskFunction, ExtendedFile } from '~/common';
 import {
   logger,
   requestChatFocus,
+<<<<<<< HEAD
+=======
+  resolveAgentTarget,
+>>>>>>> upstream/main
   markPasteSubmitted,
   hasStreamStartFailed,
   isSubmittableMessage,
@@ -37,12 +53,31 @@ import {
   getRouteChatProjectId,
   stripStreamedIndexStamps,
 } from '~/utils';
+<<<<<<< HEAD
+=======
+import {
+  getReasoningStateKey,
+  pendingReasoningOverrideFamily,
+} from '~/components/Chat/Input/Composer/state';
+import {
+  withSubmittedCodeDecision,
+  resolveSubmittedCodeApprovalMode,
+} from '~/hooks/Agents/codeDecision';
+>>>>>>> upstream/main
 import useFocusRegeneratedResponse from '~/hooks/Chat/useFocusRegeneratedResponse';
 import useGetConversation from '~/hooks/Conversations/useGetConversation';
 import useCodeApprovalMode from '~/hooks/Agents/useCodeApprovalMode';
 import useSetFilesToDelete from '~/hooks/Files/useSetFilesToDelete';
+<<<<<<< HEAD
 import useCodeWorkspace from '~/hooks/Agents/useCodeWorkspace';
 import useGetSender from '~/hooks/Conversations/useGetSender';
+=======
+import { useAgentsMapContext } from '~/Providers/AgentsMapContext';
+import { useChatSettings } from '~/Providers/ChatSettingsContext';
+import useCodeWorkspace from '~/hooks/Agents/useCodeWorkspace';
+import useGetSender from '~/hooks/Conversations/useGetSender';
+import { activeUsageResponseIdFamily } from '~/store/usage';
+>>>>>>> upstream/main
 import { revealedQueuedTurnFamily } from '~/store/steer';
 import store, { useGetEphemeralAgent } from '~/store';
 import { startupConfigKey } from '~/data-provider';
@@ -56,7 +91,18 @@ const STALE_SEND_REVALIDATION_MS = 5_000;
 
 const logChatRequest = (request: Record<string, unknown>) => {
   logger.log('=====================================\nAsk function called with:');
+<<<<<<< HEAD
   logger.dir(request);
+=======
+  logger.dir({
+    conversationId: request.conversationId,
+    messageId: request.messageId,
+    parentMessageId: request.parentMessageId,
+    isEdited: request.isEdited,
+    isContinued: request.isContinued,
+    isRegenerate: request.isRegenerate,
+  });
+>>>>>>> upstream/main
   logger.log('=====================================');
 };
 
@@ -165,12 +211,21 @@ export function getRegenerateSubmissionMessages({
 }): TMessage[] {
   if (targetResponseMessage?.messageId) {
     /**
+<<<<<<< HEAD
      * Remove the response being regenerated and its descendants only — NOT a
      * flat `slice(0, targetIndex)`, which also drops unrelated sibling branches
      * that merely sit later in the array. That collapse made the optimistic
      * render briefly lose other branches mid-regenerate (visible flash, and the
      * scroll jumping to the shrunken content). Keeping them holds the thread —
      * and scroll — steady. This array is render-only; the server regenerates
+=======
+     * Remove the response being regenerated and its descendants only: NOT a
+     * flat `slice(0, targetIndex)`, which also drops unrelated sibling branches
+     * that merely sit later in the array. That collapse made the optimistic
+     * render briefly lose other branches mid-regenerate (visible flash, and the
+     * scroll jumping to the shrunken content). Keeping them holds the thread
+     * (and scroll) steady. This array is render-only; the server regenerates
+>>>>>>> upstream/main
      * from `parentMessageId`, so removing by subtree never affects the payload.
      */
     const removed = new Set<string>([targetResponseMessage.messageId]);
@@ -204,6 +259,10 @@ export default function useChatFunctions({
   isSubmitting,
   latestMessage,
   setSubmission,
+<<<<<<< HEAD
+=======
+  setConversation,
+>>>>>>> upstream/main
   conversation: immutableConversation,
 }: {
   index?: number;
@@ -216,14 +275,28 @@ export default function useChatFunctions({
   files?: Map<string, ExtendedFile>;
   setFiles?: SetterOrUpdater<Map<string, ExtendedFile>>;
   setSubmission: SetterOrUpdater<TSubmission | null>;
+<<<<<<< HEAD
 }) {
   const navigate = useNavigate();
+=======
+  /** Supplied by the host that owns the conversation atom, so a send records the decision it
+   *  established without this hook becoming a second writer of that state. */
+  setConversation: SetterOrUpdater<TConversation | null>;
+}) {
+  const navigate = useNavigate();
+  const reasoningStore = useStore();
+>>>>>>> upstream/main
   const getSender = useGetSender();
   const { user } = useAuthContext();
   const queryClient = useQueryClient();
   const setFilesToDelete = useSetFilesToDelete();
   const getEphemeralAgent = useGetEphemeralAgent();
+<<<<<<< HEAD
   const isTemporary = useRecoilValue(store.isTemporary);
+=======
+  const agentsMap = useAgentsMapContext();
+  const { isTemporary } = useChatSettings();
+>>>>>>> upstream/main
   const { getExpiry } = useUserKey(immutableConversation?.endpoint ?? '');
   const setIsSubmitting = useSetRecoilState(store.isSubmittingFamily(index));
   const setSubmissionStart = useSetRecoilState(store.submissionStartFamily(index));
@@ -232,11 +305,39 @@ export default function useChatFunctions({
   const jotaiStore = useStore();
   const getConversation = useGetConversation(index);
   const addedConversation = useRecoilValue(store.conversationByKeySelector(1));
+<<<<<<< HEAD
   const { modes: codeApprovalModes, selected: fallbackCodeApprovalMode } = useCodeApprovalMode(
     immutableConversation,
     addedConversation,
   );
   const codeWorkspaceState = useCodeWorkspace(immutableConversation, addedConversation);
+=======
+  const codeWorkspaceState = useCodeWorkspace(immutableConversation, addedConversation);
+  const { modes: codeApprovalModes, selected: fallbackCodeApprovalMode } = useCodeApprovalMode(
+    immutableConversation,
+    addedConversation,
+    codeWorkspaceState.mode,
+  );
+
+  /**
+   * `ask` refuses while `isSubmitting`, but that Recoil value only reads true
+   * from the next commit onwards: a double Enter or a double click inside one
+   * browser task would both pass that check and start two generations. This
+   * ref closes the gap synchronously, matching the queue send lock shared by
+   * `useSteering` and `useQueueDrain`.
+   *
+   * Released on every commit that is not submitting rather than only on a
+   * `true -> false` transition: a start that never flips `isSubmitting` here
+   * (Assistants set it from the SSE handler, and a start that fails outright
+   * never sets it at all) would otherwise latch the composer shut for good.
+   */
+  const askInFlightRef = useRef(false);
+  useEffect(() => {
+    if (!isSubmitting) {
+      askInFlightRef.current = false;
+    }
+  });
+>>>>>>> upstream/main
 
   /**
    * Atomically read + reset the per-conversation queue of manually-invoked
@@ -281,6 +382,21 @@ export default function useChatFunctions({
     [],
   );
 
+<<<<<<< HEAD
+=======
+  const drainPendingReasoning = useCallback(
+    (stateKey: string): TMessage['reasoningOverride'] => {
+      const reasoningAtom = pendingReasoningOverrideFamily(stateKey);
+      const reasoningOverride = reasoningStore.get(reasoningAtom);
+      if (reasoningOverride != null) {
+        reasoningStore.set(reasoningAtom, undefined);
+      }
+      return reasoningOverride;
+    },
+    [reasoningStore],
+  );
+
+>>>>>>> upstream/main
   const ask: TAskFunction = (
     {
       text,
@@ -302,6 +418,10 @@ export default function useChatFunctions({
       targetResponseMessageId,
       overrideManualSkills,
       overrideQuotes,
+<<<<<<< HEAD
+=======
+      overrideReasoning,
+>>>>>>> upstream/main
       addedConvo,
       overrideClientRequestId,
       overrideRecoverySteerId,
@@ -312,30 +432,50 @@ export default function useChatFunctions({
     text = text.trim();
     /**
      * Attached files make an otherwise empty draft submittable, e.g. replying
+<<<<<<< HEAD
      * to an agent that asked for a document upload. Replayed turns (regenerate,
      * or save-and-submit carrying `overrideFiles`) reuse stored attachments that
      * aren't in the compose `files` map, so count those too and never re-block a
      * regenerate of an already-validated file-only turn.
      */
     const replayFileCount = overrideFiles?.length ?? 0;
+=======
+     * to an agent that asked for a document upload. When a caller supplies
+     * `overrideFiles`, that array is authoritative, even when empty. A text-only
+     * App action must not become submittable just because the user has staged
+     * a file for a different, unsent composer message.
+     */
+    const availableFileCount = overrideFiles == null ? (files?.size ?? 0) : overrideFiles.length;
+>>>>>>> upstream/main
     /** A compaction sends no text: it replays the branch, like a regenerate,
      *  with the response placeholder parented onto the leaf. */
     const regenerateShaped = isRegenerate || compact;
     if (
+<<<<<<< HEAD
       !!isSubmitting ||
       jotaiStore.get(revealedQueuedTurnFamily(immutableConversation?.conversationId ?? '')) !=
         null ||
       (!regenerateShaped && !isSubmittableMessage(text, (files?.size ?? 0) + replayFileCount))
+=======
+      askInFlightRef.current ||
+      !!isSubmitting ||
+      jotaiStore.get(revealedQueuedTurnFamily(immutableConversation?.conversationId ?? '')) !=
+        null ||
+      (!regenerateShaped && !isSubmittableMessage(text, availableFileCount))
+>>>>>>> upstream/main
     ) {
       return false;
     }
 
     const conversation = cloneDeep(immutableConversation);
     const latestCodeApprovalMode = getConversation()?.codeApprovalMode;
+<<<<<<< HEAD
     const codeApprovalMode =
       latestCodeApprovalMode != null && codeApprovalModes.includes(latestCodeApprovalMode)
         ? latestCodeApprovalMode
         : fallbackCodeApprovalMode;
+=======
+>>>>>>> upstream/main
     const latestCodeWorkspaces = getConversation()?.codeWorkspaces ?? conversation?.codeWorkspaces;
     const latestCodeEnvironmentMode =
       getConversation()?.codeEnvironmentMode ?? conversation?.codeEnvironmentMode;
@@ -348,6 +488,15 @@ export default function useChatFunctions({
       return false;
     }
     const { codeEnvironmentMode, codeWorkspaces } = workspaceSubmission;
+<<<<<<< HEAD
+=======
+    const codeApprovalMode = resolveSubmittedCodeApprovalMode({
+      requested: latestCodeApprovalMode,
+      modes: codeApprovalModes,
+      fallback: fallbackCodeApprovalMode,
+      codeEnvironmentMode,
+    });
+>>>>>>> upstream/main
 
     const endpoint = conversation?.endpoint;
     if (endpoint === null) {
@@ -372,7 +521,11 @@ export default function useChatFunctions({
      * Warm-switch revalidation guard: a navigation invalidates the target's
      * cache and renders it while a background refetch reconciles. Deriving
      * parentMessageId from that cache could fork from an outdated tail, so
+<<<<<<< HEAD
      * refuse (composer keeps the text) until the refetch settles — but only
+=======
+     * refuse (composer keeps the text) until the refetch settles, but only
+>>>>>>> upstream/main
      * when the cache is actually old: a just-streamed cache (fresh
      * `dataUpdatedAt`) is locally authoritative, and gating it would block
      * rapid follow-ups during the post-run reconcile.
@@ -407,11 +560,22 @@ export default function useChatFunctions({
     setShowStopButton(false);
 
     const ephemeralAgent = getEphemeralAgent(conversationId ?? Constants.NEW_CONVO);
+<<<<<<< HEAD
+=======
+    const endpointsConfig = queryClient.getQueryData<TEndpointsConfig>([QueryKeys.endpoints]);
+    const startupConfig = queryClient.getQueryData<TStartupConfig>(startupConfigKey(true));
+    const endpointType = getEndpointField(endpointsConfig, endpoint, 'type');
+    const defaultParamsEndpoint = getDefaultParamsEndpoint(endpointsConfig, endpoint);
+>>>>>>> upstream/main
     /**
      * Manual skill selection resolution:
      *  - Explicit `overrideManualSkills` wins (regenerate / save-and-submit
      *    pass the original user message's persisted `manualSkills` so the
+<<<<<<< HEAD
      *    resubmitted turn primes the same skills — the pills are still
+=======
+     *    resubmitted turn primes the same skills: the pills are still
+>>>>>>> upstream/main
      *    visible to the user, it would be strange to quietly drop them).
      *  - Regenerate / continue / edit without an override → empty, and the
      *    compose-time atom is deliberately NOT drained (those flows replay
@@ -446,6 +610,41 @@ export default function useChatFunctions({
         quotes = drainPendingQuotes(conversationId ?? Constants.NEW_CONVO);
       }
     }
+<<<<<<< HEAD
+=======
+    let reasoningOverride = overrideReasoning ?? undefined;
+    if (overrideReasoning === undefined && !regenerateShaped && !isContinued && !isEdited) {
+      reasoningOverride = drainPendingReasoning(getReasoningStateKey(conversationId, index));
+    }
+    if (reasoningOverride != null) {
+      const isAgent = isAgentsEndpoint(endpoint);
+      const agentId = isAgent ? conversation?.agent_id : undefined;
+      const savedAgent =
+        agentId != null
+          ? (queryClient.getQueryData<Agent>([QueryKeys.agent, agentId]) ?? agentsMap?.[agentId])
+          : undefined;
+      const agentTarget = isAgent ? resolveAgentTarget(agentId, savedAgent) : undefined;
+      const effectiveEndpoint = isAgent ? agentTarget?.provider : endpoint;
+      const effectiveModel = isAgent ? agentTarget?.model : conversation?.model;
+      const effectiveEndpointType = getEndpointField(endpointsConfig, effectiveEndpoint, 'type');
+      const customParams =
+        effectiveEndpoint == null ? undefined : endpointsConfig?.[effectiveEndpoint]?.customParams;
+      const supportedSetting =
+        effectiveEndpoint == null
+          ? undefined
+          : resolveReasoningSettingForTarget({
+              endpoint: effectiveEndpointType ?? effectiveEndpoint,
+              model: effectiveModel,
+              isAgent,
+              defaultParamsEndpoint: customParams?.defaultParamsEndpoint,
+              reasoningFormat: customParams?.reasoningFormat,
+              paramDefinitions: customParams?.paramDefinitions,
+            });
+      if (!isReasoningOverrideSupported(reasoningOverride, supportedSetting)) {
+        reasoningOverride = undefined;
+      }
+    }
+>>>>>>> upstream/main
     const isEditOrContinue = isEdited || isContinued;
 
     let currentMessages: TMessage[] = overrideMessages ?? cachedMessages ?? [];
@@ -517,11 +716,15 @@ export default function useChatFunctions({
       thread_id = currentMessages.find((message) => message.thread_id)?.thread_id;
     }
 
+<<<<<<< HEAD
     const endpointsConfig = queryClient.getQueryData<TEndpointsConfig>([QueryKeys.endpoints]);
     const startupConfig = queryClient.getQueryData<TStartupConfig>(startupConfigKey(true));
     const endpointType = getEndpointField(endpointsConfig, endpoint, 'type');
     const iconURL = conversation?.iconURL;
     const defaultParamsEndpoint = getDefaultParamsEndpoint(endpointsConfig, endpoint);
+=======
+    const iconURL = conversation?.iconURL;
+>>>>>>> upstream/main
 
     /** This becomes part of the `endpointOption` */
     const convo = parseCompactConvo({
@@ -581,6 +784,10 @@ export default function useChatFunctions({
        * also merges these into the model-facing user text at request time.
        */
       quotes: quotes.length > 0 ? quotes : undefined,
+<<<<<<< HEAD
+=======
+      reasoningOverride,
+>>>>>>> upstream/main
     };
 
     /** The leaf's files already sit in history; a compaction re-attaches nothing. */
@@ -594,6 +801,7 @@ export default function useChatFunctions({
       currentMsg.files = [...submissionFiles];
       /** Queued override files were consumed just like composer files, so mark their identities
        * as submitted before later draft cleanup can classify the restored paste as unsent. */
+<<<<<<< HEAD
       submissionFiles.forEach((file) => {
         markPasteSubmitted(file.file_id);
         markPasteSubmitted(file.temp_file_id);
@@ -601,6 +809,16 @@ export default function useChatFunctions({
       // Caller-supplied overrideFiles were consumed elsewhere (queued
       // during-run messages take theirs out of the composer at queue time,
       // so clearing here would eat attachments staged for the user's NEXT send.
+=======
+      const submittedFileIds: (string | undefined)[] = [];
+      for (const file of submissionFiles) {
+        submittedFileIds.push(file.file_id, file.temp_file_id);
+      }
+      markPasteSubmitted(...submittedFileIds);
+      // Caller-supplied overrideFiles were consumed elsewhere (queued
+      // during-run messages take theirs out of the composer at queue time);
+      // clearing here would eat attachments staged for the user's NEXT send.
+>>>>>>> upstream/main
       if (isRegenerate) {
         setFiles(new Map());
         setFilesToDelete({});
@@ -611,6 +829,7 @@ export default function useChatFunctions({
       // `overrideFiles` (even empty) is authoritative for the submission:
       // auto-drained queued messages must never vacuum up attachments the
       // user has staged in the composer for their NEXT message.
+<<<<<<< HEAD
       currentMsg.files = Array.from(files.values()).map((file) => ({
         file_id: file.file_id,
         filepath: file.filepath,
@@ -627,6 +846,24 @@ export default function useChatFunctions({
         markPasteSubmitted(file.file_id);
         markPasteSubmitted(file.temp_file_id);
       });
+=======
+      const submittedFileIds: (string | undefined)[] = [];
+      currentMsg.files = [];
+      for (const [key, file] of files) {
+        currentMsg.files.push({
+          file_id: file.file_id,
+          filepath: file.filepath,
+          filename: file.filename,
+          type: file.type ?? '',
+          llmDeliveryPath: file.llmDeliveryPath,
+          height: file.height,
+          width: file.width,
+        });
+        submittedFileIds.push(key, file.file_id, file.temp_file_id);
+      }
+      // Publish every alias before clearing the composer or its draft.
+      markPasteSubmitted(...submittedFileIds);
+>>>>>>> upstream/main
       setFiles(new Map());
       setFilesToDelete({});
     }
@@ -662,7 +899,11 @@ export default function useChatFunctions({
       /**
        * Seed the assistant placeholder with the turn's manually-invoked
        * skill names so `ContentParts` can render interim `SkillCall` cards
+<<<<<<< HEAD
        * from the very first render — no round-trip through the `created`
+=======
+       * from the very first render: no round-trip through the `created`
+>>>>>>> upstream/main
        * SSE event required. Rides along with every subsequent spread
        * (`useStepHandler` response construction, `updateContent` result
        * spreads) and drops out naturally at `finalHandler` when the
@@ -777,6 +1018,16 @@ export default function useChatFunctions({
       queuedMessageOrigin: overrideQueuedMessageOrigin,
     };
 
+<<<<<<< HEAD
+=======
+    /** Bind before publishing the optimistic tail, not after the first provider
+     * event: a waiting request already owns a turn even when no usage exists. */
+    jotaiStore.set(
+      activeUsageResponseIdFamily(conversationId ?? Constants.NEW_CONVO),
+      initialResponse.messageId,
+    );
+
+>>>>>>> upstream/main
     if (regenerateShaped) {
       setMessages([...submissionMessages, initialResponse]);
       focusRegeneratedResponse(initialResponse.parentMessageId);
@@ -784,9 +1035,34 @@ export default function useChatFunctions({
       setMessages([...submissionMessages, currentMsg, initialResponse]);
     }
 
+<<<<<<< HEAD
     setSubmissionStart(Date.now());
     setSubmission(submission);
     logger.dir('message_stream', submission, { depth: null });
+=======
+    /** Carry the submitted choice through the first saved-chat event instead of re-deriving it
+     *  from agent defaults. This is optimistic: the SSE error path reconciles an existing chat
+     *  with its authoritative server decision if admission fails. */
+    setConversation((current) =>
+      current == null || current.conversationId !== conversation?.conversationId
+        ? current
+        : withSubmittedCodeDecision(current, workspaceSubmission),
+    );
+    /** Armed at the point of no return: every refusal above returns before it,
+     *  so a rejected send never has to unwind the guard, and `ask` runs to
+     *  completion synchronously, which is the whole window it has to cover. */
+    askInFlightRef.current = true;
+    setSubmissionStart(Date.now());
+    setSubmission(submission);
+    logger.dir('message_stream', {
+      conversationId,
+      messageId: currentMsg.messageId,
+      parentMessageId: currentMsg.parentMessageId,
+      isEdited: isEditOrContinue,
+      isRegenerate: regenerateShaped,
+      isContinued,
+    });
+>>>>>>> upstream/main
   };
 
   const regenerate = (
@@ -816,6 +1092,11 @@ export default function useChatFunctions({
           /** Carry the original user message's quoted excerpts forward so the
            *  regenerated response is sent the same referenced context. */
           overrideQuotes: parentMessage.quotes,
+<<<<<<< HEAD
+=======
+          /** Replay the exact request-scoped reasoning selection used by this turn. */
+          overrideReasoning: parentMessage.reasoningOverride ?? null,
+>>>>>>> upstream/main
         },
       );
     } else {

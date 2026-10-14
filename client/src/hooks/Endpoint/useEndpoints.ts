@@ -104,10 +104,13 @@ export const useEndpoints = ({
       if (includedEndpoints.size > 0 && !includedEndpoints.has(endpoints[i])) {
         continue;
       }
+<<<<<<< HEAD
       // NJ: We only want to show the "agents" endpoints; no customizing direct LLM endpoints
       if (endpoints[i] !== EModelEndpoint.agents) {
         continue;
       }
+=======
+>>>>>>> upstream/main
       result.push(endpoints[i]);
     }
 

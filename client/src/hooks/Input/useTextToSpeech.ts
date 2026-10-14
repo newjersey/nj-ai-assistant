@@ -1,5 +1,10 @@
+<<<<<<< HEAD
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { useRef, useMemo, useEffect, useState } from 'react';
+=======
+import { useRef, useMemo, useEffect, useState } from 'react';
+import { useRecoilState, useRecoilValue } from 'recoil';
+>>>>>>> upstream/main
 import { parseTextParts } from 'librechat-data-provider';
 import type { TMessageContentParts } from 'librechat-data-provider';
 import type { Option } from '~/common';
@@ -120,7 +125,13 @@ const useTextToSpeech = (props?: TUseTextToSpeech) => {
       if (isMouseDownRef.current) {
         const messageContent = content ?? '';
         const parsedMessage =
+<<<<<<< HEAD
           typeof messageContent === 'string' ? messageContent : parseTextParts(messageContent);
+=======
+          typeof messageContent === 'string'
+            ? messageContent
+            : parseTextParts(messageContent, true);
+>>>>>>> upstream/main
         generateSpeech(parsedMessage, false);
       }
     }, 1000);
@@ -140,7 +151,11 @@ const useTextToSpeech = (props?: TUseTextToSpeech) => {
     } else {
       const messageContent = content ?? '';
       const parsedMessage =
+<<<<<<< HEAD
         typeof messageContent === 'string' ? messageContent : parseTextParts(messageContent);
+=======
+        typeof messageContent === 'string' ? messageContent : parseTextParts(messageContent, true);
+>>>>>>> upstream/main
       generateSpeech(parsedMessage, false);
     }
   };

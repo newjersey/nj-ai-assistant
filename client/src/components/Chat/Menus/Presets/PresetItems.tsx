@@ -109,6 +109,7 @@ const PresetItems: FC<{
 
   return (
     <>
+<<<<<<< HEAD
       <div className="flex min-w-[300px] items-center gap-3 border-b border-border-light bg-surface-secondary px-3 py-2 md:min-w-[400px]">
         <div className="min-w-0 flex-1">
           <p className="text-sm font-medium text-text-primary">
@@ -116,6 +117,15 @@ const PresetItems: FC<{
           </p>
           {hasPresets && (
             <p className="truncate text-xs text-text-secondary">
+=======
+      <div className="border-border-light bg-surface-secondary flex min-w-[min(18.75rem,90vw)] items-center gap-3 border-b px-3 py-2 md:min-w-[min(25rem,90vw)]">
+        <div className="min-w-0 flex-1">
+          <p className="text-text-primary text-sm font-medium">
+            {localize('com_endpoint_examples')}
+          </p>
+          {hasPresets && (
+            <p className="text-text-secondary truncate text-xs">
+>>>>>>> upstream/main
               {defaultPreset
                 ? `${localize('com_endpoint_preset_default_item')} ${defaultPreset.title}`
                 : localize('com_endpoint_preset_default_none')}
@@ -136,7 +146,11 @@ const PresetItems: FC<{
               aria-label={localize('com_ui_more_options')}
               aria-expanded={isMenuOpen}
               className={cn(
+<<<<<<< HEAD
                 'inline-flex size-8 shrink-0 items-center justify-center rounded-theme-control transition-colors hover:bg-surface-hover hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-text-primary',
+=======
+                'rounded-theme-control hover:bg-surface-hover hover:text-text-primary focus-visible:ring-text-primary inline-flex size-8 shrink-0 items-center justify-center transition-colors focus-visible:ring-2 focus-visible:outline-hidden',
+>>>>>>> upstream/main
                 isMenuOpen ? 'bg-surface-hover text-text-primary' : 'text-text-secondary',
               )}
             >
@@ -173,7 +187,11 @@ const PresetItems: FC<{
             event.preventDefault();
             invoker.focus();
           }}
+<<<<<<< HEAD
           className="w-11/12 max-w-md rounded-theme-surface sm:rounded-theme-surface"
+=======
+          className="rounded-theme-surface sm:rounded-theme-surface w-11/12 max-w-md"
+>>>>>>> upstream/main
         >
           <AlertDialogHeader>
             <AlertDialogTitle>{localize('com_ui_clear_presets')}</AlertDialogTitle>
@@ -194,6 +212,7 @@ const PresetItems: FC<{
       </AlertDialog>
       {presets && presets.length === 0 && (
         <div className="flex min-h-40 flex-col items-center justify-center gap-3 px-6 py-8 text-center">
+<<<<<<< HEAD
           <div className="rounded-full bg-surface-secondary p-2.5 text-text-secondary">
             <BookCopy className="size-5" aria-hidden="true" />
           </div>
@@ -202,6 +221,16 @@ const PresetItems: FC<{
               {localize('com_endpoint_no_presets')}
             </p>
             <p className="max-w-sm text-xs leading-5 text-text-secondary">
+=======
+          <div className="bg-surface-secondary text-text-secondary rounded-full p-2.5">
+            <BookCopy className="size-5" aria-hidden="true" />
+          </div>
+          <div className="space-y-1">
+            <p className="text-text-primary text-sm font-medium">
+              {localize('com_endpoint_no_presets')}
+            </p>
+            <p className="text-text-secondary max-w-sm text-xs leading-5">
+>>>>>>> upstream/main
               {localize('com_endpoint_no_presets_description')}
             </p>
           </div>
@@ -236,11 +265,19 @@ const PresetItems: FC<{
               <Close asChild key={`preset-${presetId}`}>
                 <div key={`preset-${presetId}`}>
                   <Flipped flipId={presetId}>
+<<<<<<< HEAD
                     <div className="group m-1.5 flex items-center gap-2 rounded-theme-control px-3 py-1.5 text-sm hover:bg-surface-hover">
                       <Button
                         variant="ghost"
                         type="button"
                         className="h-auto min-w-0 flex-1 justify-start gap-1 rounded-theme-control bg-transparent p-2 text-left text-xs font-normal hover:bg-transparent focus-visible:ring-offset-0"
+=======
+                    <div className="group rounded-theme-control hover:bg-surface-hover m-1.5 flex items-center gap-2 px-3 py-1.5 text-sm">
+                      <Button
+                        variant="ghost"
+                        type="button"
+                        className="rounded-theme-control h-auto min-w-0 flex-1 justify-start gap-1 bg-transparent p-2 text-left text-xs font-normal hover:bg-transparent focus-visible:ring-offset-0"
+>>>>>>> upstream/main
                         onClick={() => onSelectPreset(preset)}
                         aria-label={presetTitle}
                         data-testid={`preset-item-${presetId}`}
@@ -269,12 +306,20 @@ const PresetItems: FC<{
                             <Button
                               variant="ghost"
                               className={cn(
+<<<<<<< HEAD
                                 'm-0 h-full rounded-theme-control-round bg-transparent p-2 text-text-tertiary hover:text-text-primary focus:text-text-primary',
+=======
+                                'rounded-theme-control-round text-text-tertiary hover:text-text-primary focus:text-text-primary m-0 h-full bg-transparent p-2',
+>>>>>>> upstream/main
                                 defaultPreset?.presetId === presetId
                                   ? ''
                                   : // opacity keeps buttons in the tab order; pointer-events-none
                                     // while transparent so touch/pointer cannot hit invisible controls
+<<<<<<< HEAD
                                     'sm:pointer-events-none sm:opacity-0 sm:transition-opacity sm:focus:pointer-events-auto sm:focus:opacity-100 sm:group-focus-within:pointer-events-auto sm:group-focus-within:opacity-100 sm:group-hover:pointer-events-auto sm:group-hover:opacity-100',
+=======
+                                    'sm:pointer-events-none sm:opacity-0 sm:transition-opacity sm:group-focus-within:pointer-events-auto sm:group-focus-within:opacity-100 sm:group-hover:pointer-events-auto sm:group-hover:opacity-100 sm:focus:pointer-events-auto sm:focus:opacity-100',
+>>>>>>> upstream/main
                               )}
                               onClick={(e) => {
                                 e.preventDefault();
@@ -292,7 +337,11 @@ const PresetItems: FC<{
                           render={
                             <Button
                               variant="ghost"
+<<<<<<< HEAD
                               className="m-0 h-full rounded-theme-control-round p-2 text-text-tertiary hover:text-text-primary focus:text-text-primary sm:pointer-events-none sm:opacity-0 sm:transition-opacity sm:focus:pointer-events-auto sm:focus:opacity-100 sm:group-focus-within:pointer-events-auto sm:group-focus-within:opacity-100 sm:group-hover:pointer-events-auto sm:group-hover:opacity-100"
+=======
+                              className="rounded-theme-control-round text-text-tertiary hover:text-text-primary focus:text-text-primary m-0 h-full p-2 sm:pointer-events-none sm:opacity-0 sm:transition-opacity sm:group-focus-within:pointer-events-auto sm:group-focus-within:opacity-100 sm:group-hover:pointer-events-auto sm:group-hover:opacity-100 sm:focus:pointer-events-auto sm:focus:opacity-100"
+>>>>>>> upstream/main
                               onClick={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
@@ -309,7 +358,11 @@ const PresetItems: FC<{
                           render={
                             <Button
                               variant="ghost"
+<<<<<<< HEAD
                               className="m-0 h-full rounded-theme-control-round p-2 text-text-tertiary hover:text-text-primary focus:text-text-primary sm:pointer-events-none sm:opacity-0 sm:transition-opacity sm:focus:pointer-events-auto sm:focus:opacity-100 sm:group-focus-within:pointer-events-auto sm:group-focus-within:opacity-100 sm:group-hover:pointer-events-auto sm:group-hover:opacity-100"
+=======
+                              className="rounded-theme-control-round text-text-tertiary hover:text-text-primary focus:text-text-primary m-0 h-full p-2 sm:pointer-events-none sm:opacity-0 sm:transition-opacity sm:group-focus-within:pointer-events-auto sm:group-focus-within:opacity-100 sm:group-hover:pointer-events-auto sm:group-hover:opacity-100 sm:focus:pointer-events-auto sm:focus:opacity-100"
+>>>>>>> upstream/main
                               onClick={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();

@@ -1,6 +1,15 @@
+<<<<<<< HEAD
 import { expect, test } from '@playwright/test';
 import type { Locator, Page } from '@playwright/test';
 import {
+=======
+import { randomUUID } from 'node:crypto';
+import { UNSEEN_REPLY_WATERMARK } from 'librechat-data-provider';
+import { expect, test } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
+import {
+  conversationRow,
+>>>>>>> upstream/main
   selectMockEndpoint,
   getAccessToken,
   MOCK_ENDPOINTS,
@@ -9,13 +18,22 @@ import {
   fetchJson,
 } from './helpers';
 
+<<<<<<< HEAD
+=======
+import { getE2EUser } from '../../setup/user';
+import { deleteConversations, seedConversations, withMongo } from './db';
+
+>>>>>>> upstream/main
 type TagCount = { tag: string; count: number };
 
 const uniqueName = (prefix: string) =>
   `${prefix}-${Date.now().toString(36)}-${Math.floor(Math.random() * 1e4)}`;
 
+<<<<<<< HEAD
 const firstConversation = (page: Page) => page.getByTestId('convo-item').first();
 
+=======
+>>>>>>> upstream/main
 /** The header bookmark menu (the nav filter button shares the `bookmark-menu` testid). */
 const headerBookmarkButton = (page: Page) => page.locator('#bookmark-menu-button');
 
@@ -103,6 +121,38 @@ async function deleteConversation(page: Page, conversation: Locator): Promise<vo
 
 test.describe('bookmark counts', () => {
   test.describe.configure({ timeout: 120_000 });
+<<<<<<< HEAD
+=======
+  let unreadId: string;
+
+  test.beforeEach(async () => {
+    unreadId = randomUUID();
+    const previous = new Date(Date.now() - 86_400_000);
+    await seedConversations(getE2EUser().email, [
+      {
+        conversationId: unreadId,
+        title: 'Finished sidebar decoy',
+        updatedAt: previous,
+      },
+    ]);
+    await withMongo(async (db) => {
+      await db.collection('conversations').updateOne(
+        { conversationId: unreadId },
+        {
+          $set: {
+            lastResponseAt: previous,
+            lastSeenAt: new Date(UNSEEN_REPLY_WATERMARK),
+            isMarkedUnread: false,
+          },
+        },
+      );
+    });
+  });
+
+  test.afterEach(async () => {
+    await deleteConversations([unreadId]);
+  });
+>>>>>>> upstream/main
 
   test('drops a bookmark count to zero when its only conversation is deleted', async ({ page }) => {
     const tag = uniqueName('E2E Bookmark');
@@ -110,8 +160,17 @@ test.describe('bookmark counts', () => {
     await startBookmarkableChat(page);
     await createBookmarkForActiveChat(page, tag);
     expect(await getTagCount(page, tag)).toBe(1);
+<<<<<<< HEAD
 
     await deleteConversation(page, firstConversation(page));
+=======
+    await expect(page.getByTestId('convo-item').first()).not.toHaveAttribute(
+      'data-conversation-id',
+      new URL(page.url()).pathname.split('/c/')[1],
+    );
+
+    await deleteConversation(page, conversationRow(page));
+>>>>>>> upstream/main
 
     await expect.poll(() => getTagCount(page, tag), { timeout: 15000 }).toBe(0);
   });
@@ -124,19 +183,33 @@ test.describe('bookmark counts', () => {
     // Conversation A: create the bookmark (count -> 1).
     await startBookmarkableChat(page);
     await createBookmarkForActiveChat(page, tag);
+<<<<<<< HEAD
     const titleA = uniqueName('Bookmark A');
     await renameConversation(page, firstConversation(page), titleA);
+=======
+    const conversationAUrl = page.url();
+    const titleA = uniqueName('Bookmark A');
+    await renameConversation(page, conversationRow(page), titleA);
+>>>>>>> upstream/main
     expect(await getTagCount(page, tag)).toBe(1);
 
     // Conversation B: attach the same bookmark (count -> 2).
     await startBookmarkableChat(page);
     await addExistingBookmarkToActiveChat(page, tag);
     const titleB = uniqueName('Bookmark B');
+<<<<<<< HEAD
     await renameConversation(page, firstConversation(page), titleB);
     expect(await getTagCount(page, tag)).toBe(2);
 
     // Deleting A leaves the count at 1 because B still carries the bookmark.
     const conversationA = page.getByTestId('convo-item').filter({ hasText: titleA });
+=======
+    await renameConversation(page, conversationRow(page), titleB);
+    expect(await getTagCount(page, tag)).toBe(2);
+
+    // Deleting A leaves the count at 1 because B still carries the bookmark.
+    const conversationA = conversationRow(page, conversationAUrl);
+>>>>>>> upstream/main
     await deleteConversation(page, conversationA);
 
     await expect.poll(() => getTagCount(page, tag), { timeout: 15000 }).toBe(1);

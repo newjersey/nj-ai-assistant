@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+import { memo } from 'react';
+>>>>>>> upstream/main
 import { cn } from '~/utils';
 
 const HUNK_HEADER = /^@@ -(\d+)(?:,\d+)? \+(\d+)(?:,\d+)? @@/;
@@ -159,6 +163,58 @@ function lineNumber(line: DiffLine): number | undefined {
   return line.type === 'del' ? line.oldLine : (line.newLine ?? line.oldLine);
 }
 
+<<<<<<< HEAD
+=======
+interface DiffRowProps {
+  type: DiffLine['type'];
+  text: string;
+  num?: number;
+  hasLineNumbers: boolean;
+}
+
+/** Primitive props only: `parseUnifiedDiff` rebuilds every line object on each
+ *  streamed delta, so memo has to compare values, not object identity. */
+const DiffRow = memo(function DiffRow({ type, text, num, hasLineNumbers }: DiffRowProps) {
+  if (type === 'hunk') {
+    if (!text) {
+      return <div className="border-border-light mx-3 my-1.5 border-t" />;
+    }
+    return <div className="text-text-tertiary px-3 py-0.5 text-[11px] select-none">{text}</div>;
+  }
+  return (
+    <div
+      className={cn(
+        'flex',
+        type === 'add' && 'bg-status-success-subtle',
+        type === 'del' && 'bg-status-error-subtle',
+      )}
+    >
+      {hasLineNumbers && (
+        <span className="text-text-tertiary w-9 shrink-0 pr-1 text-right text-[11px] select-none">
+          {num ?? ''}
+        </span>
+      )}
+      <span
+        className={cn(
+          'shrink-0 text-center font-semibold select-none',
+          hasLineNumbers ? 'w-5' : 'w-6',
+          type === 'add' && 'text-status-success',
+          type === 'del' && 'text-status-error',
+        )}
+      >
+        {LINE_MARKERS[type]}
+      </span>
+      <span className="text-text-primary min-w-0 flex-1 pr-3 break-words whitespace-pre-wrap">
+        {text || ' '}
+      </span>
+    </div>
+  );
+});
+
+/** Index keys are safe: the parser walks the text top to bottom and the stream
+ *  only appends, so a row's index, type and line numbers are stable once
+ *  emitted. Only the trailing, still-growing line changes, and its props do too. */
+>>>>>>> upstream/main
 export default function DiffView({ parsed }: { parsed: ParsedDiff }) {
   const { lines, hasLineNumbers } = parsed;
   const firstContentIndex = lines.findIndex((line) => line.type !== 'hunk');
@@ -166,6 +222,7 @@ export default function DiffView({ parsed }: { parsed: ParsedDiff }) {
   return (
     <div
       data-testid="diff-view"
+<<<<<<< HEAD
       className="max-h-[300px] overflow-y-auto bg-surface-code py-2 font-mono text-xs leading-5"
     >
       {lines.map((line, index) => {
@@ -210,6 +267,22 @@ export default function DiffView({ parsed }: { parsed: ParsedDiff }) {
               {line.text || ' '}
             </span>
           </div>
+=======
+      className="bg-surface-code max-h-[300px] overflow-y-auto py-2 font-mono text-xs leading-5"
+    >
+      {lines.map((line, index) => {
+        if (line.type === 'hunk' && (index < firstContentIndex || firstContentIndex === -1)) {
+          return null;
+        }
+        return (
+          <DiffRow
+            key={index}
+            type={line.type}
+            text={line.text}
+            num={lineNumber(line)}
+            hasLineNumbers={hasLineNumbers}
+          />
+>>>>>>> upstream/main
         );
       })}
     </div>

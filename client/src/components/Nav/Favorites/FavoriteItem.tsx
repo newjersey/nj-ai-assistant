@@ -32,6 +32,10 @@ type ModelFavoriteProps = FavoriteItemBaseProps & {
   type: 'model';
   item: FavoriteModel;
   onSelectEndpoint?: (endpoint?: EModelEndpoint | string | null, kwargs?: Kwargs) => void;
+<<<<<<< HEAD
+=======
+  endpointsConfig?: TEndpointsConfig;
+>>>>>>> upstream/main
 };
 
 type SpecFavoriteProps = FavoriteItemBaseProps & {
@@ -105,7 +109,17 @@ export default function FavoriteItem(props: FavoriteItemProps) {
     }
     return (
       <div className="mr-2 h-5 w-5">
+<<<<<<< HEAD
         <MinimalIcon endpoint={props.item.endpoint} size={20} isCreatedByUser={false} />
+=======
+        <MinimalIcon
+          endpoint={props.item.endpoint}
+          endpointsConfig={props.endpointsConfig}
+          model={props.item.model}
+          size={20}
+          isCreatedByUser={false}
+        />
+>>>>>>> upstream/main
       </div>
     );
   };
@@ -130,7 +144,11 @@ export default function FavoriteItem(props: FavoriteItemProps) {
       tabIndex={0}
       aria-label={ariaLabel}
       aria-keyshortcuts={keyShortcuts}
+<<<<<<< HEAD
       className="group relative flex w-full cursor-pointer items-center justify-between rounded-lg p-2 text-sm text-text-primary outline-none hover:bg-surface-active-alt focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-text-primary"
+=======
+      className="group text-text-primary hover:bg-surface-nav-hover focus-visible:ring-text-primary relative flex w-full cursor-pointer items-center justify-between rounded-lg p-2 text-sm outline-hidden focus-visible:ring-2 focus-visible:outline-hidden focus-visible:ring-inset"
+>>>>>>> upstream/main
       onClick={handleClick}
       onKeyDown={handleKeyDown}
       data-testid="favorite-item"

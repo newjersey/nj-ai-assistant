@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 const { createChunkProcessor, splitTextIntoChunks } = require('./streamAudio');
+=======
+const { splitTextIntoChunks } = require('./streamAudio');
+>>>>>>> upstream/main
 
 jest.mock('keyv');
 
@@ -55,6 +59,7 @@ jest.mock('~/cache/getLogStores', () => {
   });
 });
 
+<<<<<<< HEAD
 describe('processChunks', () => {
   let processChunks;
   let mockMessageCache;
@@ -151,6 +156,8 @@ describe('processChunks', () => {
   });
 });
 
+=======
+>>>>>>> upstream/main
 describe('splitTextIntoChunks', () => {
   test('splits text into chunks of specified size with default separators', () => {
     const text = 'This is a test. This is only a test! Make sure it works properly? Okay.';

@@ -7,7 +7,18 @@ import {
   Time,
 } from 'librechat-data-provider';
 import type { Model, Types } from 'mongoose';
+<<<<<<< HEAD
 import type { IAclEntry, CacheStore, IPrompt, IPromptGroup, IPromptGroupDocument } from '~/types';
+=======
+import type {
+  IAclEntry,
+  CacheStore,
+  IPrompt,
+  IPromptGroup,
+  IPromptRecord,
+  IPromptGroupDocument,
+} from '~/types';
+>>>>>>> upstream/main
 import { getTenantId, scopedCacheKey, SYSTEM_TENANT_ID } from '~/config/tenantContext';
 import { isValidObjectIdString } from '~/utils/objectId';
 import { escapeRegExp } from '~/utils/string';
@@ -91,6 +102,21 @@ async function readAccessGeneration(cache: CacheStore): Promise<string | undefin
   }
 }
 
+<<<<<<< HEAD
+=======
+/**
+ * Plain listing inputs. `name` is a case-insensitive substring; `category` is the stored
+ * category value, where an empty string selects groups without a category.
+ */
+export interface PromptGroupListParams {
+  accessibleIds?: Array<string | Types.ObjectId>;
+  name?: string;
+  category?: string;
+  limit?: number | string | null;
+  after?: string | null;
+}
+
+>>>>>>> upstream/main
 export interface PromptMethods {
   getPromptGroups(filter: Record<string, unknown>): Promise<
     | {
@@ -105,12 +131,16 @@ export interface PromptMethods {
   getAllPromptGroups(
     filter: Record<string, unknown>,
   ): Promise<Record<string, unknown>[] | { message: string }>;
+<<<<<<< HEAD
   getListPromptGroupsByAccess(params: {
     accessibleIds?: Types.ObjectId[];
     otherParams?: Record<string, unknown>;
     limit?: number | null;
     after?: string | null;
   }): Promise<{
+=======
+  getListPromptGroupsByAccess(params: PromptGroupListParams): Promise<{
+>>>>>>> upstream/main
     object: 'list';
     data: Record<string, unknown>[];
     first_id: string | null;
@@ -128,6 +158,7 @@ export interface PromptMethods {
   savePrompt(saveData: {
     prompt: Record<string, unknown>;
     author: string | Types.ObjectId;
+<<<<<<< HEAD
   }): Promise<{ prompt: IPrompt } | { message: string }>;
   getPrompts(
     filter: Record<string, unknown>,
@@ -135,6 +166,11 @@ export interface PromptMethods {
   getPrompt(
     filter: Record<string, unknown>,
   ): Promise<Record<string, unknown> | null | { message: string }>;
+=======
+  }): Promise<{ prompt: IPromptRecord }>;
+  getPrompts(filter: Record<string, unknown>): Promise<IPromptRecord[]>;
+  getPrompt(filter: Record<string, unknown>): Promise<IPromptRecord | null>;
+>>>>>>> upstream/main
   getRandomPromptGroups(filter: {
     skip: number | string;
     limit: number | string;
@@ -158,7 +194,11 @@ export interface PromptMethods {
   updatePromptGroup(
     filter: Record<string, unknown>,
     data: Record<string, unknown>,
+<<<<<<< HEAD
   ): Promise<IPromptGroupDocument | { message: string }>;
+=======
+  ): Promise<IPromptGroup>;
+>>>>>>> upstream/main
   makePromptProduction(promptId: string): Promise<{ message: string }>;
   updatePromptLabels(_id: string, labels: unknown): Promise<{ message: string }>;
 }
@@ -365,6 +405,7 @@ export function createPromptMethods(
    */
   async function getListPromptGroupsByAccess({
     accessibleIds = [],
+<<<<<<< HEAD
     otherParams = {},
     limit = null,
     after = null,
@@ -374,6 +415,13 @@ export function createPromptMethods(
     limit?: number | null;
     after?: string | null;
   }): Promise<{
+=======
+    name,
+    category,
+    limit = null,
+    after = null,
+  }: PromptGroupListParams): Promise<{
+>>>>>>> upstream/main
     object: 'list';
     data: Record<string, unknown>[];
     first_id: string | null;
@@ -388,9 +436,20 @@ export function createPromptMethods(
       : null;
 
     const baseQuery: Record<string, unknown> = {
+<<<<<<< HEAD
       ...otherParams,
       _id: { $in: accessibleIds },
     };
+=======
+      _id: { $in: accessibleIds },
+    };
+    if (name) {
+      baseQuery.name = new RegExp(escapeRegExp(name), 'i');
+    }
+    if (category != null) {
+      baseQuery.category = category;
+    }
+>>>>>>> upstream/main
 
     let matchQuery: Record<string, unknown> = baseQuery;
 
@@ -569,6 +628,7 @@ export function createPromptMethods(
   async function savePrompt(saveData: {
     prompt: Record<string, unknown>;
     author: string | Types.ObjectId;
+<<<<<<< HEAD
   }) {
     try {
       const Prompt = mongoose.models.Prompt as Model<IPrompt>;
@@ -592,11 +652,31 @@ export function createPromptMethods(
       logger.error('Error saving prompt', error);
       return { message: 'Error saving prompt' };
     }
+=======
+  }): Promise<{ prompt: IPromptRecord }> {
+    const Prompt = mongoose.models.Prompt as Model<IPrompt>;
+    const { prompt, author } = saveData;
+    const newPromptData = { ...prompt, author };
+
+    let newPrompt;
+    try {
+      newPrompt = await Prompt.create(newPromptData);
+    } catch (error: unknown) {
+      if (!(error as Error)?.message?.includes('groupId_1_version_1')) {
+        throw error;
+      }
+      await Prompt.db.collection('prompts').dropIndex('groupId_1_version_1');
+      newPrompt = await Prompt.create(newPromptData);
+    }
+
+    return { prompt: newPrompt.toObject<IPromptRecord>() };
+>>>>>>> upstream/main
   }
 
   /**
    * Get prompts by filter.
    */
+<<<<<<< HEAD
   async function getPrompts(filter: Record<string, unknown>) {
     try {
       const Prompt = mongoose.models.Prompt as Model<IPrompt>;
@@ -605,11 +685,17 @@ export function createPromptMethods(
       logger.error('Error getting prompts', error);
       return { message: 'Error getting prompts' };
     }
+=======
+  async function getPrompts(filter: Record<string, unknown>): Promise<IPromptRecord[]> {
+    const Prompt = mongoose.models.Prompt as Model<IPrompt>;
+    return await Prompt.find(filter).sort({ createdAt: -1 }).lean<IPromptRecord[]>();
+>>>>>>> upstream/main
   }
 
   /**
    * Get a single prompt by filter.
    */
+<<<<<<< HEAD
   async function getPrompt(filter: Record<string, unknown>) {
     try {
       const Prompt = mongoose.models.Prompt as Model<IPrompt>;
@@ -621,6 +707,14 @@ export function createPromptMethods(
       logger.error('Error getting prompt', error);
       return { message: 'Error getting prompt' };
     }
+=======
+  async function getPrompt(filter: Record<string, unknown>): Promise<IPromptRecord | null> {
+    const Prompt = mongoose.models.Prompt as Model<IPrompt>;
+    if (filter.groupId) {
+      filter.groupId = new ObjectId(filter.groupId as string);
+    }
+    return await Prompt.findOne(filter).lean<IPromptRecord>();
+>>>>>>> upstream/main
   }
 
   /**
@@ -687,6 +781,7 @@ export function createPromptMethods(
    * Get a single prompt group by filter, with productionPrompt populated via $lookup.
    */
   async function getPromptGroup(filter: Record<string, unknown>) {
+<<<<<<< HEAD
     try {
       const PromptGroup = mongoose.models.PromptGroup as Model<IPromptGroupDocument>;
       // Cast string _id to ObjectId for aggregation (findOne auto-casts, aggregate does not)
@@ -725,6 +820,41 @@ export function createPromptMethods(
       logger.error('Error getting prompt group', error);
       return null;
     }
+=======
+    const PromptGroup = mongoose.models.PromptGroup as Model<IPromptGroupDocument>;
+    // Cast string _id to ObjectId for aggregation (findOne auto-casts, aggregate does not)
+    const matchFilter = { ...filter };
+    if (typeof matchFilter._id === 'string') {
+      matchFilter._id = new ObjectId(matchFilter._id);
+    }
+    const tenantId = getTenantId();
+    const useTenantFilter = tenantId && tenantId !== SYSTEM_TENANT_ID;
+
+    const result = await PromptGroup.aggregate([
+      { $match: matchFilter },
+      {
+        $lookup: {
+          from: 'prompts',
+          localField: 'productionId',
+          foreignField: '_id',
+          as: 'productionPrompt',
+        },
+      },
+      { $unwind: { path: '$productionPrompt', preserveNullAndEmptyArrays: true } },
+    ]);
+    const group = result[0] || null;
+    if (
+      group?.productionPrompt &&
+      useTenantFilter &&
+      group.productionPrompt.tenantId !== tenantId
+    ) {
+      group.productionPrompt = null;
+    }
+    if (group?.author) {
+      group.author = group.author.toString();
+    }
+    return group;
+>>>>>>> upstream/main
   }
 
   /**
@@ -1077,6 +1207,7 @@ export function createPromptMethods(
   /**
    * Update a prompt group.
    */
+<<<<<<< HEAD
   async function updatePromptGroup(filter: Record<string, unknown>, data: Record<string, unknown>) {
     try {
       const PromptGroup = mongoose.models.PromptGroup as Model<IPromptGroupDocument>;
@@ -1096,11 +1227,29 @@ export function createPromptMethods(
       logger.error('Error updating prompt group', error);
       return { message: 'Error updating prompt group' };
     }
+=======
+  async function updatePromptGroup(
+    filter: Record<string, unknown>,
+    data: Record<string, unknown>,
+  ): Promise<IPromptGroup> {
+    const PromptGroup = mongoose.models.PromptGroup as Model<IPromptGroupDocument>;
+    const updatedDoc = await PromptGroup.findOneAndUpdate(filter, data, {
+      new: true,
+      upsert: false,
+    }).lean();
+
+    if (!updatedDoc) {
+      throw new Error('Prompt group not found');
+    }
+
+    return updatedDoc as unknown as IPromptGroup;
+>>>>>>> upstream/main
   }
 
   /**
    * Make a prompt the production prompt for its group.
    */
+<<<<<<< HEAD
   async function makePromptProduction(promptId: string) {
     try {
       const Prompt = mongoose.models.Prompt as Model<IPrompt>;
@@ -1125,6 +1274,23 @@ export function createPromptMethods(
       logger.error('Error making prompt production', error);
       return { message: 'Error making prompt production' };
     }
+=======
+  async function makePromptProduction(promptId: string): Promise<{ message: string }> {
+    const Prompt = mongoose.models.Prompt as Model<IPrompt>;
+    const PromptGroup = mongoose.models.PromptGroup as Model<IPromptGroupDocument>;
+
+    const prompt = await Prompt.findById(promptId).lean();
+
+    if (!prompt) {
+      throw new Error('Prompt not found');
+    }
+
+    await PromptGroup.findByIdAndUpdate(prompt.groupId, { productionId: prompt._id }, { new: true })
+      .lean()
+      .exec();
+
+    return { message: 'Prompt production made successfully' };
+>>>>>>> upstream/main
   }
 
   /**

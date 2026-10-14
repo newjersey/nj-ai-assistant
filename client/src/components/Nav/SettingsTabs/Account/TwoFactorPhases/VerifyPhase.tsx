@@ -1,5 +1,9 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+<<<<<<< HEAD
+=======
+import { REGEXP_ONLY_DIGITS } from 'input-otp';
+>>>>>>> upstream/main
 import {
   Button,
   InputOTP,
@@ -7,7 +11,10 @@ import {
   InputOTPSeparator,
   InputOTPSlot,
 } from '@librechat/client';
+<<<<<<< HEAD
 import { REGEXP_ONLY_DIGITS } from 'input-otp';
+=======
+>>>>>>> upstream/main
 import { useLocalize } from '~/hooks';
 
 const fadeAnimation = {
@@ -34,9 +41,16 @@ export const VerifyPhase: React.FC<VerifyPhaseProps> = ({
   const localize = useLocalize();
 
   return (
+<<<<<<< HEAD
     <motion.div {...fadeAnimation} className="space-y-8">
       <div className="flex justify-center">
         <InputOTP
+=======
+    <motion.div {...fadeAnimation} className="text-text-primary space-y-8">
+      <div className="flex justify-center">
+        <InputOTP
+          aria-label={localize('com_ui_2fa_verification_required')}
+>>>>>>> upstream/main
           value={token}
           onChange={onTokenChange}
           maxLength={6}

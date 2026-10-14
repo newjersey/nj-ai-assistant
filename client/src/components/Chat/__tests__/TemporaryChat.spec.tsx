@@ -1,9 +1,17 @@
 import React from 'react';
 import { RecoilRoot } from 'recoil';
+<<<<<<< HEAD
+=======
+import userEvent from '@testing-library/user-event';
+>>>>>>> upstream/main
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import type { TConversation } from 'librechat-data-provider';
 import { TemporaryChat, TemporaryChatIndicator } from '../TemporaryChat';
+<<<<<<< HEAD
+=======
+import ChatSettingsProvider from '~/routes/ChatSettings';
+>>>>>>> upstream/main
 import store from '~/store';
 
 jest.mock('@librechat/client', () => ({
@@ -20,6 +28,19 @@ jest.mock('~/hooks', () => ({
   useLocalize: () => (key: string) => (key === 'com_ui_temporary' ? 'Temporary Chat' : key),
 }));
 
+<<<<<<< HEAD
+=======
+let mockRetentionMode: string | undefined;
+
+jest.mock('~/data-provider', () => ({
+  useGetStartupConfig: () => ({ data: { interface: { retentionMode: mockRetentionMode } } }),
+}));
+
+beforeEach(() => {
+  mockRetentionMode = undefined;
+});
+
+>>>>>>> upstream/main
 function renderChat(
   ui: React.ReactElement,
   { isTemporary, conversation }: { isTemporary: boolean; conversation?: Partial<TConversation> },
@@ -33,7 +54,11 @@ function renderChat(
         }
       }}
     >
+<<<<<<< HEAD
       {ui}
+=======
+      <ChatSettingsProvider>{ui}</ChatSettingsProvider>
+>>>>>>> upstream/main
     </RecoilRoot>,
   );
 }
@@ -55,6 +80,29 @@ describe('TemporaryChat', () => {
     );
   });
 
+<<<<<<< HEAD
+=======
+  it('locks the toggle on when the administrator enforces temporary chats', () => {
+    mockRetentionMode = 'ephemeral';
+    renderChat(<TemporaryChat />, { isTemporary: false });
+
+    const toggle = screen.getByRole('button', { name: 'com_ui_temporary_enforced' });
+    expect(toggle).toHaveAttribute('aria-pressed', 'true');
+    expect(toggle).toHaveAttribute('aria-disabled', 'true');
+    expect(toggle).not.toHaveAttribute('aria-keyshortcuts');
+  });
+
+  it('keeps the toggle on after a click under enforced temporary chats', async () => {
+    mockRetentionMode = 'ephemeral';
+    renderChat(<TemporaryChat />, { isTemporary: false });
+
+    const toggle = screen.getByRole('button', { name: 'com_ui_temporary_enforced' });
+    await userEvent.click(toggle);
+
+    expect(toggle).toHaveAttribute('aria-pressed', 'true');
+  });
+
+>>>>>>> upstream/main
   it('retires the toggle once the conversation has started', () => {
     renderChat(<TemporaryChat />, {
       isTemporary: true,

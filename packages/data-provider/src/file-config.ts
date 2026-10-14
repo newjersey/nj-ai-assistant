@@ -1,8 +1,19 @@
 import { z } from 'zod';
 import type { EndpointFileConfig, FileConfig, RegexLike } from './types/files';
+<<<<<<< HEAD
 import { EModelEndpoint, isAgentsEndpoint, isDocumentSupportedProvider } from './schemas';
 import { normalizeEndpointName } from './utils';
 
+=======
+import type { ResponsesApiRouting } from './types';
+import { EModelEndpoint, isAgentsEndpoint, isDocumentSupportedProvider } from './schemas';
+import { gpt6Tier, gptPointReleaseFamily } from './families';
+import { normalizeEndpointName } from './utils';
+
+/** Parallel storage deletions during rollback of a failed skill archive import. */
+export const DEFAULT_SKILL_IMPORT_CLEANUP_CONCURRENCY = 8;
+
+>>>>>>> upstream/main
 export const supportsFiles = {
   [EModelEndpoint.openAI]: true,
   [EModelEndpoint.google]: true,
@@ -231,6 +242,53 @@ export const resolveUseResponsesApi = (
   conversationValue?: boolean | null,
 ): boolean | undefined => agentValue ?? conversationValue ?? undefined;
 
+<<<<<<< HEAD
+=======
+/** Models whose native OpenAI and Azure execution defaults to Responses. Keep
+ * this shared with client upload routing so documents follow the API that the
+ * backend will actually invoke. Explicit false remains an opt-out. */
+export const prefersResponsesApiByModel = (model?: string | null): boolean =>
+  gpt6Tier(model) != null;
+
+/** The server has transport and administrator settings the browser cannot see.
+ * Missing policy never enables model-based uploads (including during upgrades). */
+export const resolveEffectiveUseResponsesApi = ({
+  value,
+  endpoint,
+  model,
+  routing,
+  webSearch,
+}: {
+  value?: boolean | null;
+  endpoint?: string | null;
+  model?: string | null;
+  routing?: ResponsesApiRouting;
+  webSearch?: boolean | null;
+}): boolean | undefined => {
+  if (endpoint !== EModelEndpoint.openAI && endpoint !== EModelEndpoint.azureOpenAI) {
+    return value ?? undefined;
+  }
+  let policy = model ? routing?.[model] : undefined;
+  /** A native point release follows its family until the server lists it. Azure
+   * routing is keyed by configured deployments, so a family's policy there says
+   * nothing about a release that is not deployed. */
+  const releaseFamily =
+    endpoint === EModelEndpoint.openAI && model ? gptPointReleaseFamily(model) : undefined;
+  if (!policy && releaseFamily) {
+    policy = routing?.[releaseFamily];
+  }
+  const tier = gpt6Tier(model);
+  if (!policy && tier) {
+    policy = routing?.[`gpt-6-${tier}-*`];
+  }
+  policy ??= routing?.['*'];
+  if (!policy) return value ?? undefined;
+  if (webSearch && policy.withWebSearch) policy = policy.withWebSearch;
+  if (value == null) return policy.default;
+  return value ? policy.on : policy.off;
+};
+
+>>>>>>> upstream/main
 export const isBedrockDocumentType = (mimeType?: string): boolean =>
   mimeType != null && mimeType in bedrockDocumentFormats;
 
@@ -536,6 +594,10 @@ export const fileConfig = {
   },
   skills: {
     fileSizeLimit: defaultSkillImportSizeLimit,
+<<<<<<< HEAD
+=======
+    importCleanupConcurrency: DEFAULT_SKILL_IMPORT_CLEANUP_CONCURRENCY,
+>>>>>>> upstream/main
   },
   serverFileSizeLimit: defaultSizeLimit,
   avatarSizeLimit: mbToBytes(2),
@@ -563,7 +625,24 @@ export const fileConfig = {
   },
 };
 
+<<<<<<< HEAD
 const supportedMimeTypesSchema = z.array(z.string()).optional();
+=======
+const supportedMimeTypesSchema = z
+  .array(
+    z.string().superRefine((pattern, context) => {
+      try {
+        compileMimeRegex(pattern);
+      } catch {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Invalid MIME type regex: not supported by the configured regex engine',
+        });
+      }
+    }),
+  )
+  .optional();
+>>>>>>> upstream/main
 
 export const DefaultLLMDeliveryPath = z.enum(['provider', 'text', 'none']);
 export type TDefaultLLMDeliveryPath = z.infer<typeof DefaultLLMDeliveryPath>;
@@ -588,6 +667,10 @@ export const endpointFileConfigSchema = z.object({
 
 const skillFileConfigSchema = z.object({
   fileSizeLimit: z.number().min(0).optional(),
+<<<<<<< HEAD
+=======
+  importCleanupConcurrency: z.number().int().positive().optional(),
+>>>>>>> upstream/main
 });
 
 export const fileConfigSchema = z.object({
@@ -638,9 +721,23 @@ export type TFileConfig = z.infer<typeof fileConfigSchema>;
  */
 let compileMimeRegex: (pattern: string) => RegexLike = (pattern) => new RegExp(pattern);
 
+<<<<<<< HEAD
 /** Override the MIME-pattern compiler; the server injects a linear-time engine at startup. */
 export const setFileConfigRegexCompiler = (compile: (pattern: string) => RegexLike): void => {
   compileMimeRegex = compile;
+=======
+type DynamicFileConfig = z.infer<typeof fileConfigSchema>;
+
+/** Merged results are memoized per `dynamic` object identity; callers must treat them as read-only. */
+let mergedConfigCache = new WeakMap<DynamicFileConfig, FileConfig>();
+let staticMergedConfig: FileConfig | undefined;
+
+/** Override the MIME-pattern compiler; the server injects a linear-time engine at startup. */
+export const setFileConfigRegexCompiler = (compile: (pattern: string) => RegexLike): void => {
+  compileMimeRegex = compile;
+  mergedConfigCache = new WeakMap();
+  staticMergedConfig = undefined;
+>>>>>>> upstream/main
 };
 
 /** Returned when every configured pattern fails to compile, so consumers that read an empty
@@ -1156,7 +1253,23 @@ export function getEndpointFileConfig(params: {
   return defaultConfig;
 }
 
+<<<<<<< HEAD
 export function mergeFileConfig(dynamic: z.infer<typeof fileConfigSchema> | undefined): FileConfig {
+=======
+export function mergeFileConfig(dynamic: DynamicFileConfig | undefined): FileConfig {
+  if (!dynamic) {
+    return (staticMergedConfig ??= buildMergedFileConfig(undefined));
+  }
+  let merged = mergedConfigCache.get(dynamic);
+  if (!merged) {
+    merged = buildMergedFileConfig(dynamic);
+    mergedConfigCache.set(dynamic, merged);
+  }
+  return merged;
+}
+
+function buildMergedFileConfig(dynamic: DynamicFileConfig | undefined): FileConfig {
+>>>>>>> upstream/main
   const mergedConfig: FileConfig = {
     ...fileConfig,
     endpoints: {
@@ -1214,6 +1327,16 @@ export function mergeFileConfig(dynamic: z.infer<typeof fileConfigSchema> | unde
     mergedConfig.fileContextCharLimit = dynamic.fileContextCharLimit;
   }
 
+<<<<<<< HEAD
+=======
+  if (dynamic.skills?.importCleanupConcurrency !== undefined) {
+    mergedConfig.skills = {
+      ...mergedConfig.skills,
+      importCleanupConcurrency: dynamic.skills.importCleanupConcurrency,
+    };
+  }
+
+>>>>>>> upstream/main
   if (dynamic.skills?.fileSizeLimit !== undefined) {
     mergedConfig.skills = {
       ...mergedConfig.skills,

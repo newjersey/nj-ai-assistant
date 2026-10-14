@@ -1,4 +1,8 @@
 export * from './Audio';
+<<<<<<< HEAD
+=======
+export * from './Auth';
+>>>>>>> upstream/main
 export * from './Assistants';
 export * from './Agents';
 export * from './Chat';
@@ -52,3 +56,7 @@ export {
 export type { CatalogId } from './useCatalogWarmup';
 export { default as useClockFormat } from './useClockFormat';
 export { default as useWeekStart } from './useWeekStart';
+<<<<<<< HEAD
+=======
+export { default as useScrollFade } from './useScrollFade';
+>>>>>>> upstream/main

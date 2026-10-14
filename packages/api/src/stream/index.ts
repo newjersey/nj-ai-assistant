@@ -4,6 +4,11 @@ export {
   type CreateGenerationJobOptions,
   type GenerationJobManagerOptions,
   type TerminalJobClaim,
+<<<<<<< HEAD
+=======
+  type GenerationSettledEvent,
+  type GenerationSettledListener,
+>>>>>>> upstream/main
   GENERATION_RECOVERY_FAILED_ERROR,
   TERMINAL_PUBLICATION_RECONNECT_ERROR,
 } from './GenerationJobManager';
@@ -22,6 +27,10 @@ export type {
   IJobStore,
   IJobStoreV2,
   DetachedAgentEventActionStoreMode,
+<<<<<<< HEAD
+=======
+  ScheduleProviderOwner,
+>>>>>>> upstream/main
 } from './interfaces/IJobStore';
 // Canonical "is this approval live?" predicate — one definition shared by the
 // stores, the approval lifecycle, and the status route / message middleware.
@@ -56,14 +65,38 @@ export type { JobStoreV2RequiredMethod } from './jobStoreCapabilities';
 export {
   buildRecoveredSteerPayload,
   canonicalRecoveryFileIds,
+<<<<<<< HEAD
+=======
+  getSteerRecoveryFailure,
+>>>>>>> upstream/main
   RecoveredSteerPayloadMismatchError,
 } from './SteerRecovery';
 export type { RecoveredSteerPayload } from './SteerRecovery';
 
+<<<<<<< HEAD
+=======
+export { logGenerationStartFailure } from './admission';
+export type { GenerationStartFailureContext } from './admission';
+
+>>>>>>> upstream/main
 export { createStreamServices } from './createStreamServices';
 export type { StreamServicesConfig, StreamServices } from './createStreamServices';
 export { filterPersistableAbortContent, hasPersistableAbortContent } from './abortContent';
 export { getGenerationElapsedMs } from './elapsed';
+<<<<<<< HEAD
+=======
+export {
+  projectTerminalEvent,
+  TRANSIENT_MESSAGE_FIELDS,
+  TRANSIENT_FILE_FIELDS,
+  TRANSIENT_ATTACHMENT_FIELDS,
+} from './terminalProjection';
+export type {
+  ProjectedFinalEvent,
+  ProjectedMessageFields,
+  TransientMessageField,
+} from './terminalProjection';
+>>>>>>> upstream/main
 
 // Implementations (for advanced use cases)
 export { InMemoryJobStore } from './implementations/InMemoryJobStore';
@@ -72,3 +105,10 @@ export { RedisJobStore } from './implementations/RedisJobStore';
 export { RedisEventTransport } from './implementations/RedisEventTransport';
 
 export { waitForGenerationPersistence } from './persistence';
+<<<<<<< HEAD
+=======
+export { waitForGenerationSettled } from './settled';
+export type { GenerationSettledSource, GenerationSettledWaitOptions } from './settled';
+
+export type { GenerationSettlementState } from './interfaces/IJobStore';
+>>>>>>> upstream/main

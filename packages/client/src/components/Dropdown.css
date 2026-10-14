@@ -1,6 +1,7 @@
 .popover-ui {
   display: flex;
   max-height: min(var(--popover-available-height, 1700px), 1700px);
+<<<<<<< HEAD
   flex-direction: column;
   overflow: auto;
   overscroll-behavior: contain;
@@ -14,6 +15,25 @@
   box-shadow:
     0 10px 15px -3px rgb(0 0 0 / 0.1),
     0 4px 6px -4px rgb(0 0 0 / 0.1);
+=======
+  max-width: min(calc(100vw - 1rem), var(--popover-available-width, 100vw));
+  flex-direction: column;
+  overflow: auto;
+  overscroll-behavior: contain;
+  border-radius: var(--theme-menu-radius, 0.7rem);
+  border-width: 1px;
+  border-style: solid;
+  border-color: rgb(var(--border-menu) / var(--border-menu-alpha, var(--border-light-alpha, 1)));
+  background-color: rgb(var(--surface-popover));
+  padding: 0.5rem;
+  color: rgb(var(--text-primary));
+  /* The `menuShadow` role, whose light default is this literal. */
+  box-shadow: var(
+    --theme-menu-shadow,
+    0 10px 15px -3px rgb(0 0 0 / 0.1),
+    0 4px 6px -4px rgb(0 0 0 / 0.1)
+  );
+>>>>>>> upstream/main
   transform-origin: var(--popover-transform-origin, top);
   opacity: 0;
   transition-property: opacity, scale;
@@ -46,16 +66,30 @@ html.high-contrast .popover-ui {
 
 .popover-ui:focus-visible,
 .popover-ui[data-focus-visible] {
+<<<<<<< HEAD
   outline: 2px solid rgb(var(--text-primary));
+=======
+  outline: 2px solid rgb(var(--focus-control));
+>>>>>>> upstream/main
   outline-offset: -1px;
 }
 
 .popover-ui:where(.dark, .dark *) {
+<<<<<<< HEAD
   background-color: rgb(var(--surface-secondary));
   color: rgb(var(--text-secondary));
   box-shadow:
     0 10px 15px -3px rgb(0 0 0 / 0.25),
     0 4px 6px -4px rgb(0 0 0 / 0.1);
+=======
+  background-color: rgb(var(--surface-popover));
+  color: rgb(var(--text-secondary));
+  box-shadow: var(
+    --theme-menu-shadow,
+    0 10px 15px -3px rgb(0 0 0 / 0.25),
+    0 4px 6px -4px rgb(0 0 0 / 0.1)
+  );
+>>>>>>> upstream/main
 }
 
 .select-item {
@@ -64,7 +98,11 @@ html.high-contrast .popover-ui {
   scroll-margin: 0.5rem;
   align-items: center;
   gap: 0.5rem;
+<<<<<<< HEAD
   border-radius: 0.5rem;
+=======
+  border-radius: var(--theme-radius-lg, 0.5rem);
+>>>>>>> upstream/main
   padding: 0.5rem;
   outline: none !important;
 }

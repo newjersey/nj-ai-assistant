@@ -62,7 +62,11 @@ export default function GroupSidePanel({
   return (
     <div id="prompts-panel" className={cn('flex h-full w-full flex-col', className)}>
       {onClose && (
+<<<<<<< HEAD
         <div className="flex items-center justify-end px-2 py-[2px] md:py-2">
+=======
+        <div className="flex items-center justify-end px-2 py-0.5 md:py-2">
+>>>>>>> upstream/main
           <TooltipAnchor
             description={localize('com_nav_close_sidebar')}
             render={
@@ -73,7 +77,11 @@ export default function GroupSidePanel({
                 data-testid="close-prompts-panel-button"
                 aria-label={localize('com_nav_close_sidebar')}
                 aria-expanded={true}
+<<<<<<< HEAD
                 className="rounded-full border-none bg-transparent p-2 hover:bg-surface-hover md:rounded-xl"
+=======
+                className="hover:bg-surface-hover rounded-full border-none bg-transparent p-2 md:rounded-xl"
+>>>>>>> upstream/main
                 onClick={onClose}
               >
                 <Sidebar />
@@ -83,13 +91,22 @@ export default function GroupSidePanel({
         </div>
       )}
       <div className="relative flex min-h-0 flex-1 flex-col">
+<<<<<<< HEAD
         {/* Sticky header: filter and toggles stay put while the list scrolls */}
         <div className="shrink-0 space-y-2 px-3 pb-2 text-text-primary">{children}</div>
+=======
+        {/* Sticky header: it brings its own padding via PanelHeader */}
+        <div className="text-text-primary shrink-0">{children}</div>
+>>>>>>> upstream/main
         <PanelContent
           ref={containerRef}
           isLoading={!!groupsQuery.isLoading}
           skeleton={<PromptGroupSkeleton />}
+<<<<<<< HEAD
           className="scrollbar-gutter-stable flex flex-col gap-2 overflow-x-hidden pb-3 pl-3 pr-1 text-text-primary"
+=======
+          className="text-text-primary flex scrollbar-gutter-stable flex-col gap-2 overflow-x-hidden pr-1 pb-3 pl-3"
+>>>>>>> upstream/main
         >
           <List groups={promptGroups} isChatRoute={isChatRoute} />
           {/* Appending the next page, so the loaded rows stay put */}

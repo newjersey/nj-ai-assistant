@@ -1,7 +1,11 @@
 import { memo, useId, useMemo, useRef, useState } from 'react';
 import * as Ariakit from '@ariakit/react';
 import { Ellipsis, FolderInput, FolderX, Trash2 } from 'lucide-react';
+<<<<<<< HEAD
 import { DropdownPopup, Spinner, useToastContext } from '@librechat/client';
+=======
+import { Spinner, DropdownPopup, buttonVariants, useToastContext } from '@librechat/client';
+>>>>>>> upstream/main
 import type { TConversation } from 'librechat-data-provider';
 import type { MenuItemProps } from '~/common';
 import ProjectButton from '~/components/Conversations/ConvoOptions/ProjectButton';
@@ -40,7 +44,11 @@ function ProjectChatOptions({ conversation, isMenuOpen, setIsMenuOpen }: Project
       {
         label: localize('com_ui_change_project'),
         onClick: () => setShowProjectDialog(true),
+<<<<<<< HEAD
         icon: <FolderInput className="size-4 text-text-secondary" aria-hidden="true" />,
+=======
+        icon: <FolderInput className="text-text-secondary size-4" aria-hidden="true" />,
+>>>>>>> upstream/main
         /** Hiding the menu here restores focus to the trigger, which the dialog
          *  mounting alongside it reads as an outside interaction and closes on.
          *  Both dialogs receive setIsMenuOpen and close the menu themselves. */
@@ -76,7 +84,11 @@ function ProjectChatOptions({ conversation, isMenuOpen, setIsMenuOpen }: Project
         icon: assignConversationToProject.isLoading ? (
           <Spinner className="size-4" />
         ) : (
+<<<<<<< HEAD
           <FolderX className="size-4 text-text-secondary" aria-hidden="true" />
+=======
+          <FolderX className="text-text-secondary size-4" aria-hidden="true" />
+>>>>>>> upstream/main
         ),
       },
       {
@@ -84,7 +96,11 @@ function ProjectChatOptions({ conversation, isMenuOpen, setIsMenuOpen }: Project
         onClick: () => setShowDeleteDialog(true),
         hideOnClick: false,
         render: (props) => <button {...props} />,
+<<<<<<< HEAD
         icon: <Trash2 className="size-4 text-text-secondary" aria-hidden="true" />,
+=======
+        icon: <Trash2 className="text-text-secondary size-4" aria-hidden="true" />,
+>>>>>>> upstream/main
       },
     ];
   }, [
@@ -105,17 +121,28 @@ function ProjectChatOptions({ conversation, isMenuOpen, setIsMenuOpen }: Project
         menuId={menuId}
         isOpen={isMenuOpen}
         setIsOpen={setIsMenuOpen}
+<<<<<<< HEAD
         className="z-[125] min-w-44"
+=======
+        className="z-[125]"
+        minWidth="11rem"
+>>>>>>> upstream/main
         iconClassName="mr-2 text-text-secondary"
         trigger={
           <Ariakit.MenuButton
             ref={menuButtonRef}
             aria-label={localize('com_nav_convo_menu_options')}
             className={cn(
+<<<<<<< HEAD
               'flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-text-secondary outline-none transition-colors',
               'hover:bg-surface-hover hover:text-text-primary',
               'focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-text-primary',
               isMenuOpen && 'bg-surface-hover text-text-primary',
+=======
+              buttonVariants({ variant: 'row-action', size: 'icon-sm' }),
+              'text-text-secondary rounded-lg',
+              isMenuOpen && 'bg-surface-hover-alt text-text-primary',
+>>>>>>> upstream/main
             )}
           >
             <Ellipsis className="h-4 w-4" aria-hidden="true" />

@@ -182,3 +182,9 @@ export {
   createAggregatorEventHandlers,
   type ResponseAggregator,
 } from './service';
+<<<<<<< HEAD
+=======
+
+// Client-side tool execution
+export { createClientToolHandoff, type ClientToolHandoff } from './clientTools';
+>>>>>>> upstream/main

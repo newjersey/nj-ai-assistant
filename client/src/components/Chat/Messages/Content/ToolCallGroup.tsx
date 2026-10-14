@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { useState, useRef, useMemo, useEffect, useCallback } from 'react';
 import { useRecoilValue } from 'recoil';
 import { Button } from '@librechat/client';
@@ -14,10 +15,25 @@ import type { PartWithIndex } from './ParallelContent';
 import {
   cn,
   getToolDisplayLabel,
+=======
+import { useState, useRef, useMemo, useEffect, useContext, useCallback } from 'react';
+import { useRecoilValue } from 'recoil';
+import { Tools, Constants, ContentTypes } from 'librechat-data-provider';
+import { ChevronDown, ListChecks, MessageCircleQuestion, Users } from 'lucide-react';
+import type { TAttachment, TMessageContentParts } from 'librechat-data-provider';
+import type { PartWithIndex } from './ParallelContent';
+import type { ToolMeta } from './outcome';
+import {
+  cn,
+  getToolDisplayLabel,
+  getPartKeyIndex,
+  hasPendingAuthInPart,
+>>>>>>> upstream/main
   hasPendingApprovalInPart,
   getBatchActivityLabelPart,
   getActivityLabelText,
 } from '~/utils';
+<<<<<<< HEAD
 import { useLocalize, useExpandCollapse, scheduleMessageContentLayoutReconcile } from '~/hooks';
 import { parseBackgroundHandle, splitBackgroundAttachments } from './Parts/handle';
 import { ASK_USER_QUESTION, getSubmittedAskAnswer } from '~/utils/approval';
@@ -198,6 +214,38 @@ function getToolMeta(
   return null;
 }
 
+=======
+import {
+  FoldRail,
+  RailGlyph,
+  useFoldPath,
+  useRailHover,
+  revealFoldHeader,
+  FoldHeaderContext,
+} from './rail';
+import {
+  FailedRevealContext,
+  FailedRevealPill,
+  useFailedReveal,
+  useFailedRevealTrigger,
+} from './reveal';
+import { useLocalize, useExpandCollapse, scheduleMessageContentLayoutReconcile } from '~/hooks';
+import { ASK_USER_QUESTION, getSubmittedAskAnswer } from '~/utils/approval';
+import { ToolAuthWarning, ToolAuthWarningContext } from './auth';
+import { LoneGroupContext, SoleToolContext } from './disclosure';
+import { useMCPIconMap, useMCPServerNames } from '~/hooks/MCP';
+import { AttachmentGroup, ReasoningCompact } from './Parts';
+import { getOutcomeStatus, summarizeSpan } from './outcome';
+import { FOLD_RAIL_CLASSES, ROW_GLYPH_SLOT } from './rows';
+import { MCPAppViews } from '~/components/MCPUIResource';
+import { parseToolName } from '~/utils/toolLabels';
+import { StackedToolIcons } from './ToolOutput';
+import { mapAttachments } from '~/utils/map';
+import { getSourceDomains } from './sources';
+import SearchVerticals from './verticals';
+import store from '~/store';
+
+>>>>>>> upstream/main
 interface ToolCallGroupProps {
   parts: PartWithIndex[];
   isSubmitting: boolean;
@@ -211,6 +259,12 @@ interface ToolCallGroupProps {
   ) => React.ReactNode;
   lastContentIdx: number;
   groupAttachments?: TAttachment[];
+<<<<<<< HEAD
+=======
+  /** The group's owned attachments for header glyphs AND outcomes, even when
+   *  a parent phase hoists the files and `groupAttachments` is withheld. */
+  sourceAttachments?: TAttachment[];
+>>>>>>> upstream/main
   initialExpansionState?: ToolCallGroupExpansionState;
   onExpansionChange?: (state: ToolCallGroupExpansionState) => void;
   /** Activity-label part terminating this block; when it carries generated
@@ -224,6 +278,11 @@ interface ToolCallGroupProps {
    *  blocks the run, and hiding that card behind a second collapsed
    *  disclosure would bury the action the run is waiting on. */
   withinActivityPhase?: boolean;
+<<<<<<< HEAD
+=======
+  /** The phase header owns the failure pill even while its live groups stay expandable. */
+  parentPhaseOwnsFailurePill?: boolean;
+>>>>>>> upstream/main
 }
 
 export type ToolCallGroupExpansionState = {
@@ -239,27 +298,47 @@ export default function ToolCallGroup({
   renderPart,
   lastContentIdx,
   groupAttachments,
+<<<<<<< HEAD
+=======
+  sourceAttachments,
+>>>>>>> upstream/main
   initialExpansionState,
   onExpansionChange,
   labelPart,
   withinActivityPhase = false,
+<<<<<<< HEAD
+=======
+  parentPhaseOwnsFailurePill = false,
+>>>>>>> upstream/main
 }: ToolCallGroupProps) {
   const localize = useLocalize();
   const mcpIconMap = useMCPIconMap();
   const mcpServerNames = useMCPServerNames();
   const rootRef = useRef<HTMLDivElement | null>(null);
+<<<<<<< HEAD
+=======
+  const headerRef = useRef<HTMLDivElement | null>(null);
+  const railHover = useRailHover();
+  const phaseHeader = useContext(FoldHeaderContext);
+>>>>>>> upstream/main
   const cancelLayoutReconcileRef = useRef<(() => void) | null>(null);
   const retainedForPendingApprovalRef = useRef(false);
 
   /** Re-keyed by tool-call id so each part's metadata sees only its own
    *  attachments: `groupAttachments` arrives flattened across the group. */
   const attachmentsByToolCallId = useMemo(
+<<<<<<< HEAD
     () => mapAttachments(groupAttachments ?? []),
     [groupAttachments],
+=======
+    () => mapAttachments(sourceAttachments ?? groupAttachments ?? []),
+    [sourceAttachments, groupAttachments],
+>>>>>>> upstream/main
   );
   /** `parts` may include interleaved reasoning ("Thoughts") parts that render
    *  inside the body but are not actions. Count and summarize only the real
    *  tool calls so the header and stacked icons stay accurate. */
+<<<<<<< HEAD
   const toolMetadata = useMemo(
     () =>
       parts
@@ -268,6 +347,17 @@ export default function ToolCallGroup({
     [parts, attachmentsByToolCallId],
   );
   const count = toolMetadata.length;
+=======
+  const toolMetadata = useMemo(() => {
+    const summary = summarizeSpan(
+      parts.map(({ part }) => part),
+      attachmentsByToolCallId,
+    );
+    return parts.map(({ part }) => summary.metaOf(part)).filter((m): m is ToolMeta => m != null);
+  }, [parts, attachmentsByToolCallId]);
+  const count = toolMetadata.length;
+  const phaseSole = useContext(SoleToolContext);
+>>>>>>> upstream/main
   /** Approval state is read from the RAW parts, not `toolMetadata`: a pending
    *  call can be nested inside a subagent's content, which never surfaces as
    *  a tool entry here. */
@@ -285,9 +375,35 @@ export default function ToolCallGroup({
   const labelSettled =
     activityLabelText.length > 0 &&
     (labelPart?.part as { pending?: boolean } | undefined)?.pending !== true;
+<<<<<<< HEAD
   const allCompleted = useMemo(
     () => labelSettled || toolMetadata.every((m) => m.hasOutput === true),
     [toolMetadata, labelSettled],
+=======
+  /** A detached task's dispatch step closes with a handle as its output, so
+   *  the call reads as done while the work is still going. Only the code
+   *  cards interpret that handle and say "Running in background"; a generic
+   *  MCP or action row reports the closed step as ran, and the header must
+   *  not contradict the row it sits above. */
+  const detachedRunning = useMemo(
+    () =>
+      toolMetadata.some(
+        (m) =>
+          m.background === 'running' &&
+          !m.cancelled &&
+          !m.failed &&
+          parseToolName(m.name, mcpServerNames).friendlyKey === 'com_ui_tool_name_code',
+      ),
+    [toolMetadata, mcpServerNames],
+  );
+  const allCompleted = useMemo(
+    () => !detachedRunning && (labelSettled || toolMetadata.every((m) => m.hasOutput === true)),
+    [toolMetadata, labelSettled, detachedRunning],
+  );
+  const sourceDomains = useMemo(
+    () => getSourceDomains(sourceAttachments ?? groupAttachments, 3),
+    [sourceAttachments, groupAttachments],
+>>>>>>> upstream/main
   );
   const iconToolNames = useMemo(() => toolMetadata.map((m) => m.iconName), [toolMetadata]);
 
@@ -300,10 +416,27 @@ export default function ToolCallGroup({
     let fileSearchCount = 0;
     let subagentCount = 0;
     let askQuestionCount = 0;
+<<<<<<< HEAD
     let failedCount = 0;
     let cancelledCount = 0;
 
     for (const tool of toolMetadata) {
+=======
+    let taskCheckCount = 0;
+    let failedCount = 0;
+    let cancelledCount = 0;
+    let preparingCount = 0;
+    let executingCount = 0;
+
+    for (const tool of toolMetadata) {
+      if (!tool.hasOutput && !tool.failed && !tool.cancelled) {
+        if (tool.preparing) {
+          preparingCount++;
+        } else {
+          executingCount++;
+        }
+      }
+>>>>>>> upstream/main
       if (tool.name === Tools.web_search) {
         webSearchCount++;
       } else if (tool.name === 'file_search' || tool.name === 'retrieval') {
@@ -312,6 +445,11 @@ export default function ToolCallGroup({
         subagentCount++;
       } else if (tool.name === ASK_USER_QUESTION) {
         askQuestionCount++;
+<<<<<<< HEAD
+=======
+      } else if (tool.name === Constants.CHECK_BACKGROUND_TASK) {
+        taskCheckCount++;
+>>>>>>> upstream/main
       }
       if (tool.failed) {
         failedCount++;
@@ -339,8 +477,16 @@ export default function ToolCallGroup({
       fileSearchCount,
       subagentCount,
       askQuestionCount,
+<<<<<<< HEAD
       failedCount,
       cancelledCount,
+=======
+      taskCheckCount,
+      failedCount,
+      cancelledCount,
+      preparingCount,
+      executingCount,
+>>>>>>> upstream/main
       toolNameSummary,
     };
   }, [toolMetadata, localize, mcpServerNames]);
@@ -371,6 +517,11 @@ export default function ToolCallGroup({
    *  tools: ask_user_question") with a question glyph. */
   const allAskQuestions =
     activitySummary.askQuestionCount > 0 && activitySummary.askQuestionCount === count;
+<<<<<<< HEAD
+=======
+  const allTaskChecks =
+    activitySummary.taskCheckCount > 0 && activitySummary.taskCheckCount === count;
+>>>>>>> upstream/main
   /**
    * An answered question is the group's completion proof. The `tool_call`
    * part carries no output until the turn finalizes, so `allCompleted` stays
@@ -404,7 +555,13 @@ export default function ToolCallGroup({
   /** Past tense once the turn is settled — matches the Asking/Asked record
    *  card. While a multi-question turn streams, the still-open question's
    *  tool_call part has no output yet, so keep the present tense. */
+<<<<<<< HEAD
   const groupDone = allCompleted || !isSubmitting;
+=======
+  /** A detached task keeps the group in the running tense after the response
+   *  ends: its handle is the call's output, but the work is still going. */
+  const groupDone = (allCompleted || !isSubmitting) && !detachedRunning;
+>>>>>>> upstream/main
   const askQuestionsDone = allAskQuestions && (groupDone || askQuestionsAnswered);
 
   /** One verdict for the header's tense, its glyph and its icon animation —
@@ -414,6 +571,12 @@ export default function ToolCallGroup({
 
   /** For a single-tool group, lead with the tool's own (capitalized) label
    *  instead of the generic "Used 1 tool: name", which reads awkwardly. */
+<<<<<<< HEAD
+=======
+  const singleToolIsCode =
+    toolMetadata[0]?.name != null &&
+    parseToolName(toolMetadata[0].name, mcpServerNames).friendlyKey === 'com_ui_tool_name_code';
+>>>>>>> upstream/main
   const singleToolLabel = useMemo(() => {
     const raw = getToolDisplayLabel(toolMetadata[0]?.name ?? '', localize, mcpServerNames);
     return raw ? raw.charAt(0).toUpperCase() + raw.slice(1) : '';
@@ -442,6 +605,10 @@ export default function ToolCallGroup({
   );
   const [userOverride, setUserOverride] = useState(initialState != null);
   const [shouldRenderBody, setShouldRenderBody] = useState(isExpanded);
+<<<<<<< HEAD
+=======
+  useFoldPath(rootRef, shouldRenderBody);
+>>>>>>> upstream/main
   const previousIsExpandedRef = useRef(isExpanded);
   const { style: expandStyle, ref: expandRef } = useExpandCollapse(isExpanded);
   const notifyLayoutChange = useCallback(() => {
@@ -466,6 +633,22 @@ export default function ToolCallGroup({
 
   useEffect(() => {
     if (autoCollapse && !userOverride) {
+<<<<<<< HEAD
+=======
+      /** A row that held focus goes inert with the collapse, so focus moves to
+       *  the header first rather than falling to the document. */
+      const header = headerRef.current?.querySelector<HTMLElement>('button');
+      const active = document.activeElement;
+      if (
+        header != null &&
+        active != null &&
+        active !== header &&
+        rootRef.current?.contains(active) === true &&
+        !headerRef.current?.contains(active)
+      ) {
+        header.focus();
+      }
+>>>>>>> upstream/main
       setIsExpanded(false);
     }
   }, [autoCollapse, userOverride]);
@@ -480,6 +663,19 @@ export default function ToolCallGroup({
     onExpansionChange?.({ isExpanded: nextExpanded, userOverride: true });
   }, [isExpanded, onExpansionChange]);
 
+<<<<<<< HEAD
+=======
+  /** The rail stays drawn while the panel animates shut, so a second click on
+   *  it must not reopen what the first one closed. */
+  const handleRailCollapse = useCallback(() => {
+    if (!isExpanded) {
+      return;
+    }
+    revealFoldHeader(rootRef.current, headerRef.current, phaseHeader?.header.current);
+    handleToggle();
+  }, [isExpanded, handleToggle, phaseHeader]);
+
+>>>>>>> upstream/main
   const handleToolExpand = useCallback(() => {
     setUserOverride(true);
     setShouldRenderBody(true);
@@ -487,6 +683,22 @@ export default function ToolCallGroup({
     onExpansionChange?.({ isExpanded: true, userOverride: true });
   }, [onExpansionChange]);
 
+<<<<<<< HEAD
+=======
+  /** The group relays a request for its failures: from the pill beside its
+   *  own header when it stands alone, or from a phase above. Either way it
+   *  opens, then issues the request to its rows once they are mounted — a
+   *  request passed straight through would reach rows that do not exist yet. */
+  const { value: revealValue, requestReveal } = useFailedRevealTrigger(
+    isExpanded && shouldRenderBody,
+  );
+  const handleRevealFailed = useCallback(() => {
+    handleToolExpand();
+    requestReveal();
+  }, [handleToolExpand, requestReveal]);
+  useFailedReveal(activitySummary.failedCount > 0, handleRevealFailed);
+
+>>>>>>> upstream/main
   const handleTransitionEnd = useCallback(
     (event: React.TransitionEvent<HTMLDivElement>) => {
       if (event.target !== event.currentTarget) {
@@ -530,6 +742,22 @@ export default function ToolCallGroup({
    *  read as the activity the assistant performed. Mixed implementation-level
    *  tool calls fall back to the user-facing concept of "actions". */
   const resolveGroupLabel = (): string => {
+<<<<<<< HEAD
+=======
+    if (isGroupLive && activitySummary.preparingCount > 0 && activitySummary.executingCount === 0) {
+      if (count === 1) {
+        return singleToolLabel
+          ? localize('com_ui_tool_preparing', { 0: singleToolLabel })
+          : localize('com_assistants_preparing_action');
+      }
+      return localize(
+        activitySummary.preparingCount === 1
+          ? 'com_ui_preparing_one_action'
+          : 'com_ui_preparing_n_actions',
+        { 0: String(activitySummary.preparingCount) },
+      );
+    }
+>>>>>>> upstream/main
     if (allSubagents) {
       if (count === 1) {
         return localize(subagentsDone ? 'com_ui_subagent_complete' : 'com_ui_subagent_running');
@@ -548,6 +776,14 @@ export default function ToolCallGroup({
         ? localize('com_ui_asked_n_questions', { 0: String(count) })
         : localize('com_ui_asking_n_questions', { 0: String(count) });
     }
+<<<<<<< HEAD
+=======
+    if (allTaskChecks) {
+      return localize(
+        groupDone ? 'com_ui_background_tasks_checked' : 'com_ui_background_tasks_checking',
+      );
+    }
+>>>>>>> upstream/main
     if (activitySummary.webSearchCount === count) {
       return localize(groupDone ? 'com_ui_web_searched' : 'com_ui_web_searching');
     }
@@ -560,6 +796,40 @@ export default function ToolCallGroup({
       );
     }
     if (count === 1) {
+<<<<<<< HEAD
+=======
+      /** A bare "Code" reads as a category, not as what the call is doing, so
+       *  the code tool says the verb its live row says. Other tools already
+       *  name an action ("Create File"). */
+      if (singleToolLabel && singleToolIsCode) {
+        /** Only a success signal earns "Ran": a detached task's output is its
+         *  handle, a stopped or failed call did not run to the end, and a
+         *  legacy record that was cut off has no output to show for it. */
+        const only = toolMetadata[0];
+        const rawCall = parts.find(({ part }) => part.type === ContentTypes.TOOL_CALL)?.part;
+        const legacyCall =
+          rawCall?.type === ContentTypes.TOOL_CALL
+            ? (rawCall[ContentTypes.TOOL_CALL] as { runStepStatus?: unknown; progress?: number })
+            : undefined;
+        /** The card infers a stop from a legacy record with no step status whose
+         *  progress never reached 1 once the stream is over, and `Part` supplies
+         *  0.1 when the field is absent; the metadata does not. */
+        const interrupted =
+          !isSubmitting && legacyCall?.runStepStatus == null && (legacyCall?.progress ?? 0.1) < 1;
+        if (only?.failed) {
+          return localize('com_ui_failed_subject', { 0: singleToolLabel });
+        }
+        if (only?.cancelled || interrupted) {
+          return localize('com_ui_cancelled');
+        }
+        if (!groupDone) {
+          return localize('com_assistants_running_var', { 0: singleToolLabel });
+        }
+        return only?.hasOutput
+          ? localize('com_assistants_completed_function', { 0: singleToolLabel })
+          : singleToolLabel;
+      }
+>>>>>>> upstream/main
       return singleToolLabel || localize('com_ui_used_one_tool');
     }
     return localize(groupDone ? 'com_ui_ran_n_actions' : 'com_ui_running_n_actions', {
@@ -573,6 +843,7 @@ export default function ToolCallGroup({
   const groupDetailParts: string[] = [];
   if (searchesOnly && count > 1) {
     groupDetailParts.push(localize('com_ui_n_searches', { 0: String(count) }));
+<<<<<<< HEAD
   } else if (!allSubagents && !allAskQuestions && count > 1) {
     groupDetailParts.push(activitySummary.toolNameSummary);
   }
@@ -583,6 +854,22 @@ export default function ToolCallGroup({
         { 0: String(activitySummary.failedCount) },
       ),
     );
+=======
+  } else if (allTaskChecks && count > 1) {
+    groupDetailParts.push(localize('com_ui_background_tasks_n_checks', { 0: String(count) }));
+  } else if (!allSubagents && !allAskQuestions && count > 1) {
+    groupDetailParts.push(activitySummary.toolNameSummary);
+  }
+  const failedNote =
+    activitySummary.failedCount > 0
+      ? localize('com_ui_n_of_n_actions_failed', {
+          0: String(activitySummary.failedCount),
+          1: String(count),
+        })
+      : '';
+  if (failedNote !== '') {
+    groupDetailParts.push(failedNote);
+>>>>>>> upstream/main
   }
   /** A stopped action is settled but not successful, and its only other notice
    *  lives inside the panel the group is about to collapse, so the header has
@@ -601,15 +888,42 @@ export default function ToolCallGroup({
   const groupAriaLabel = [groupLabel, groupDetail, hasReasoning ? localize('com_ui_thoughts') : '']
     .filter(Boolean)
     .join(', ');
+<<<<<<< HEAD
   /** Single category glyph for homogeneous groups (else StackedToolIcons). */
   const CategoryIcon = allSubagents ? Users : MessageCircleQuestion;
+=======
+  /** Standing alone, the group shows its failure count on the pill beside
+   *  the header, which is also the way to the failed rows; the text keeps it
+   *  only for the accessible name. Inside a phase the pill is the phase's,
+   *  so the group's detail says it in text. */
+  const showsFailurePill =
+    !withinActivityPhase && !parentPhaseOwnsFailurePill && activitySummary.failedCount > 0;
+  const visibleGroupDetail = showsFailurePill
+    ? groupDetailParts.filter((part) => part && part !== failedNote).join(' · ')
+    : groupDetail;
+  /** Single category glyph for homogeneous groups (else StackedToolIcons). */
+  let CategoryIcon = ListChecks;
+  if (allSubagents) {
+    CategoryIcon = Users;
+  } else if (allAskQuestions) {
+    CategoryIcon = MessageCircleQuestion;
+  }
+  const iconStatus = getOutcomeStatus({
+    failed: activityFailed ? 1 : activitySummary.failedCount,
+    cancelled: activitySummary.cancelledCount,
+  });
+>>>>>>> upstream/main
 
   const hasActiveToolCall = useMemo(
     () => isSubmitting && toolMetadata.some((m) => m && !m.hasOutput),
     [toolMetadata, isSubmitting],
   );
   const hasPendingAuthRequest = useMemo(
+<<<<<<< HEAD
     () => parts.some(({ part }) => hasPendingAuth(part)),
+=======
+    () => parts.some(({ part }) => hasPendingAuthInPart(part)),
+>>>>>>> upstream/main
     [parts],
   );
 
@@ -621,6 +935,7 @@ export default function ToolCallGroup({
   }, [hasActiveToolCall, userOverride, suppressAutoExpand]);
 
   return (
+<<<<<<< HEAD
     <div className="mb-2 mt-1" ref={rootRef}>
       <Button
         variant="ghost"
@@ -682,6 +997,83 @@ export default function ToolCallGroup({
           aria-hidden="true"
         />
       </Button>
+=======
+    <div className="mt-1 mb-2" ref={rootRef} data-fold-root="">
+      <div className="flex w-full items-center gap-2" ref={headerRef}>
+        <button
+          type="button"
+          className={cn(
+            'text-text-secondary hover:text-text-secondary focus-visible:ring-focus-subtle inline-flex h-auto min-w-0 flex-1 items-center justify-start gap-2 rounded-none bg-transparent p-0 py-1 hover:bg-transparent focus-visible:ring-2 focus-visible:ring-offset-0 focus-visible:outline-none',
+            /** An open header is the title of the rows under it, so it is the
+             *  one line in the fold set in the primary colour. */
+            isExpanded && 'text-text-primary hover:text-text-primary',
+          )}
+          onClick={handleToggle}
+          aria-expanded={isExpanded}
+          aria-label={groupAriaLabel}
+        >
+          <RailGlyph hover={railHover}>
+            {iconStatus == null && (allSubagents || allAskQuestions || allTaskChecks) ? (
+              /** Homogeneous categories keep the same glyph as their individual
+               *  cards instead of stacking identical tool icons. */
+              <div
+                className={cn(
+                  ROW_GLYPH_SLOT,
+                  'text-text-secondary',
+                  isGroupLive && 'text-text-primary animate-pulse',
+                )}
+                aria-hidden="true"
+              >
+                <CategoryIcon size={14} />
+              </div>
+            ) : (
+              <div className={ROW_GLYPH_SLOT} aria-hidden="true">
+                <StackedToolIcons
+                  toolNames={iconToolNames}
+                  mcpIconMap={mcpIconMap}
+                  maxIcons={4}
+                  sourceDomains={sourceDomains}
+                  status={iconStatus}
+                  isAnimating={isGroupLive}
+                />
+              </div>
+            )}
+          </RailGlyph>
+          <span
+            className={cn(
+              'tool-status-text min-w-0 truncate font-medium',
+              activityFailed && 'text-text-warning',
+            )}
+            role="status"
+            title={groupLabel}
+          >
+            {groupLabel}
+          </span>
+          {visibleGroupDetail && (
+            <span
+              className="text-text-secondary max-w-[40%] min-w-0 truncate text-xs font-normal"
+              title={visibleGroupDetail}
+            >
+              · {visibleGroupDetail}
+            </span>
+          )}
+          <ChevronDown
+            className={cn(
+              'text-text-secondary size-4 shrink-0 transition-transform duration-200 ease-out',
+              isExpanded && 'rotate-180',
+            )}
+            aria-hidden="true"
+          />
+        </button>
+        {!withinActivityPhase && !parentPhaseOwnsFailurePill && (
+          <FailedRevealPill
+            count={activitySummary.failedCount}
+            total={count}
+            onReveal={handleRevealFailed}
+          />
+        )}
+      </div>
+>>>>>>> upstream/main
       <div
         style={expandStyle}
         onTransitionEnd={handleTransitionEnd}
@@ -689,6 +1081,7 @@ export default function ToolCallGroup({
         data-testid="tool-call-group-panel"
       >
         {shouldRenderBody && (
+<<<<<<< HEAD
           <div className="overflow-hidden" ref={expandRef}>
             <ToolAuthWarningContext.Provider value>
               <div className="flex flex-col py-0.5">
@@ -735,6 +1128,77 @@ export default function ToolCallGroup({
               </div>
             </ToolAuthWarningContext.Provider>
             {hasPendingAuthRequest && <ToolAuthWarning className="mb-1 mt-2.5" />}
+=======
+          <div
+            className={cn('overflow-hidden', FOLD_RAIL_CLASSES)}
+            ref={expandRef}
+            data-fold-panel=""
+          >
+            <FoldRail
+              hover={railHover}
+              expanded={isExpanded && (phaseHeader?.expanded ?? true)}
+              onCollapse={handleRailCollapse}
+            />
+            <ToolAuthWarningContext.Provider value>
+              <FailedRevealContext.Provider value={revealValue}>
+                <LoneGroupContext.Provider value={count === 1}>
+                  <SoleToolContext.Provider value={phaseSole ?? count === 1}>
+                    <div className="flex flex-col py-0.5">
+                      {parts.map(({ part, idx }, partIndex) => {
+                        if (part.type === ContentTypes.THINK) {
+                          const think = part.think;
+                          const reasoning =
+                            typeof think === 'string' ? think : (think?.value ?? '');
+                          /** A detached-subagent projection carries an empty THINK
+                           *  part flagged `reasoning_unavailable`, which `Part`
+                           *  renders as a `ReasoningMarker`. `ReasoningCompact` has
+                           *  no text to show and returns null, so the marker has to
+                           *  keep going through the standalone path or it vanishes
+                           *  the moment its call joins a group. */
+                          if (reasoning.trim() === '' && part.reasoning_unavailable === true) {
+                            return renderPart(
+                              part,
+                              idx,
+                              isLast && idx === lastContentIdx,
+                              handleToolExpand,
+                            );
+                          }
+                          const streaming = isSubmitting && idx === lastContentIdx;
+                          const isAfterTool =
+                            partIndex > 0 &&
+                            parts[partIndex - 1]?.part.type === ContentTypes.TOOL_CALL;
+                          /** Mirrors the standalone `Reasoning` path: the authored
+                           *  label wins, generic text is only a fallback. */
+                          const generatedLabel = part.reasoning_label?.trim();
+                          const label =
+                            generatedLabel ||
+                            (streaming ? localize('com_ui_thinking') : localize('com_ui_thoughts'));
+                          return (
+                            <ReasoningCompact
+                              key={`reasoning-${idx}`}
+                              partKeyIndex={getPartKeyIndex(part, idx)}
+                              reasoning={reasoning}
+                              label={label}
+                              showThinking={showThinking}
+                              isAfterTool={isAfterTool}
+                              isStreaming={streaming}
+                            />
+                          );
+                        }
+                        return renderPart(
+                          part,
+                          idx,
+                          isLast && idx === lastContentIdx,
+                          handleToolExpand,
+                        );
+                      })}
+                    </div>
+                  </SoleToolContext.Provider>
+                </LoneGroupContext.Provider>
+              </FailedRevealContext.Provider>
+            </ToolAuthWarningContext.Provider>
+            {hasPendingAuthRequest && <ToolAuthWarning className="mt-2.5 mb-1" />}
+>>>>>>> upstream/main
           </div>
         )}
       </div>
@@ -742,6 +1206,10 @@ export default function ToolCallGroup({
         <>
           <SearchVerticals attachments={groupAttachments} />
           <AttachmentGroup attachments={groupAttachments} />
+<<<<<<< HEAD
+=======
+          <MCPAppViews attachments={groupAttachments} />
+>>>>>>> upstream/main
         </>
       )}
     </div>

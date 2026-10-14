@@ -1,5 +1,9 @@
 import React, { memo } from 'react';
+<<<<<<< HEAD
 import { ProviderIcon } from '@librechat/client';
+=======
+import { pxToRem, ProviderIcon } from '@librechat/client';
+>>>>>>> upstream/main
 import type { TModelSpec, TEndpointsConfig } from 'librechat-data-provider';
 import { EntityEndpointMark, isEntityEndpoint } from '~/components/Endpoints/EntityEndpointMark';
 import { URLIcon } from '~/components/Endpoints/URLIcon';
@@ -24,7 +28,11 @@ const SpecIcon: React.FC<SpecIconProps> = ({ currentSpec, endpointsConfig, agent
       <URLIcon
         iconURL={imageURL}
         altName={currentSpec.name}
+<<<<<<< HEAD
         containerStyle={{ width: 20, height: 20 }}
+=======
+        containerStyle={{ width: pxToRem(20), height: pxToRem(20) }}
+>>>>>>> upstream/main
         className="icon-md shrink-0 overflow-hidden rounded-full"
         provider={fallbackProvider}
       />

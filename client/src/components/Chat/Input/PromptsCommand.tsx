@@ -1,7 +1,11 @@
 import { useState, useRef, useEffect, useMemo, memo, useCallback } from 'react';
 import { AutoSizer, List } from 'react-virtualized';
 import { useSetRecoilState, useRecoilValue } from 'recoil';
+<<<<<<< HEAD
 import { Input, Spinner, useCombobox } from '@librechat/client';
+=======
+import { Input, Spinner, useCombobox, useRemScale } from '@librechat/client';
+>>>>>>> upstream/main
 import type { TPromptGroup } from 'librechat-data-provider';
 import type { PromptOption } from '~/common';
 import useInitPopoverInput from '~/hooks/Input/useInitPopoverInput';
@@ -63,6 +67,10 @@ function PromptsCommand({
   submitPrompt: (textPrompt: string) => void;
 }) {
   const localize = useLocalize();
+<<<<<<< HEAD
+=======
+  const remScale = useRemScale();
+>>>>>>> upstream/main
   const { mutate: recordUsage } = useRecordPromptUsage();
   const promptGroupsContext = usePromptGroupsContext();
   const { allPromptGroups, hasAccess, requestAllPromptGroups } = promptGroupsContext ?? {};
@@ -216,11 +224,19 @@ function PromptsCommand({
       textAreaRef={textAreaRef}
     >
       <div className="absolute bottom-28 z-10 w-full space-y-2">
+<<<<<<< HEAD
         <div className="popover border-token-border-light rounded-2xl border bg-surface-tertiary-alt p-2 shadow-lg">
           <Input
             ref={initInputRef}
             placeholder={localize('com_ui_command_usage_placeholder')}
             className="mb-1 h-auto w-full rounded-none border-0 bg-surface-tertiary-alt p-2 text-sm text-text-primary focus:outline-none"
+=======
+        <div className="popover border-border-light bg-surface-tertiary-alt rounded-theme-popover border p-2 shadow-lg">
+          <Input
+            ref={initInputRef}
+            placeholder={localize('com_ui_command_usage_placeholder')}
+            className="bg-surface-tertiary-alt text-text-primary mb-1 h-auto w-full rounded-none border-0 p-2 text-sm"
+>>>>>>> upstream/main
             autoComplete="off"
             value={searchValue}
             onKeyDown={(e) => {
@@ -267,7 +283,11 @@ function PromptsCommand({
             }}
           />
           {open && isLoading && matches.length === 0 && (
+<<<<<<< HEAD
             <div className="flex h-32 items-center justify-center text-text-primary">
+=======
+            <div className="text-text-primary flex h-32 items-center justify-center">
+>>>>>>> upstream/main
               <Spinner />
             </div>
           )}
@@ -278,11 +298,19 @@ function PromptsCommand({
                   <List
                     width={width}
                     overscanRowCount={5}
+<<<<<<< HEAD
                     rowHeight={ROW_HEIGHT}
                     rowCount={matches.length}
                     rowRenderer={rowRenderer}
                     scrollToIndex={activeIndex}
                     height={Math.min(matches.length * ROW_HEIGHT, 160)}
+=======
+                    rowHeight={ROW_HEIGHT * remScale}
+                    rowCount={matches.length}
+                    rowRenderer={rowRenderer}
+                    scrollToIndex={activeIndex}
+                    height={Math.min(matches.length * ROW_HEIGHT, 160) * remScale}
+>>>>>>> upstream/main
                   />
                 )}
               </AutoSizer>

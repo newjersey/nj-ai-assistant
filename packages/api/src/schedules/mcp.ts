@@ -3,6 +3,7 @@ import {
   AgentCapabilities,
   Constants,
   EModelEndpoint,
+<<<<<<< HEAD
   MAX_SUBAGENT_DEPTH,
   MAX_SUBAGENT_GRAPH_NODES,
   MAX_SUBAGENT_RUN_CONFIGS,
@@ -13,6 +14,14 @@ import {
   normalizeMCPToolKey,
   normalizeServerName,
   resolveModelCatalogKey,
+=======
+  Permissions,
+  PermissionTypes,
+  buildServerNameAliases,
+  normalizeMCPToolKey,
+  normalizeServerName,
+  stripServerNamePrefix,
+>>>>>>> upstream/main
 } from 'librechat-data-provider';
 import type {
   IUser,
@@ -27,11 +36,19 @@ import type {
   UpstreamTokenProviderResolver,
   UpstreamTokenTarget,
 } from '../mcp/oauth/obo';
+<<<<<<< HEAD
+=======
+import type { ScheduleMCPExecution, createScheduleMCPExecution } from './authorization/execution';
+>>>>>>> upstream/main
 import type { ParsedServerConfig, UserMCPConnectionOptions } from '../mcp/types';
 import type { CheckAccessParams } from '../middleware/access';
 import type { MCPToolsSnapshot } from '../mcp/connection';
 import type { GetAppConfigOptions } from '../app/service';
 import type { ScheduledTokenContext } from './context';
+<<<<<<< HEAD
+=======
+import type { ScheduledMCPBearerHost } from './bearer';
+>>>>>>> upstream/main
 import type { ScheduleMCPPreflight } from './types';
 import {
   MCPAuthenticationRejectedError,
@@ -44,14 +61,26 @@ import {
   findShadowedServerNames,
   createDeadlineAbortSignal,
 } from '../mcp/utils';
+<<<<<<< HEAD
 import { MCPConfigInitializationCanceledError } from '../mcp/registry/MCPServersRegistry';
 import { createMCPRequestContext, cleanupMCPRequestContext } from '../mcp/request';
 import { isScheduleFireRequest, readScheduleFireContext } from './trigger';
+=======
+import { ScheduledMCPPolicyError, isScheduledMCPCandidate } from './authorization/policy';
+import { MCPConfigInitializationCanceledError } from '../mcp/registry/MCPServersRegistry';
+import { createMCPRequestContext, cleanupMCPRequestContext } from '../mcp/request';
+import { attachScheduledMCPBearer, ScheduledMCPBearerError } from './bearer';
+import { isScheduleFireRequest, readScheduleFireContext } from './trigger';
+import { resolveScheduledMCPRequirements } from './requirements';
+>>>>>>> upstream/main
 import { getAppConfigOptionsFromUser } from '../app/service';
 import { createConcurrencyLimiter } from '../utils/promise';
 import { OboTokenResolutionError } from '../mcp/oauth/obo';
 import { OpenIDReauthRequiredError } from '../utils/oidc';
+<<<<<<< HEAD
 import { resolveReachableGraph } from '../agents/edges';
+=======
+>>>>>>> upstream/main
 import { formatMCPServerTools } from '../mcp/tools';
 import { checkAccess } from '../middleware/access';
 import { detachOnAbort } from '../utils/promises';
@@ -165,6 +194,10 @@ export function getScheduleMCPFailureCode(
 }
 
 interface ScheduleMCPDeps {
+<<<<<<< HEAD
+=======
+  scheduledBearerHost?: ScheduledMCPBearerHost;
+>>>>>>> upstream/main
   resolveAgentGraphAccess: (access: {
     userId: string;
     role?: string | null;
@@ -189,6 +222,10 @@ interface ScheduleMCPDeps {
   ) => Promise<Record<string, ParsedServerConfig>>;
   findPluginAuthsByKeys: PluginAuthMethods['findPluginAuthsByKeys'];
   resolveUpstreamTokenProvider?: HostUpstreamTokenProviderResolver;
+<<<<<<< HEAD
+=======
+  execution?: ReturnType<typeof createScheduleMCPExecution>;
+>>>>>>> upstream/main
   connect: (options: UserMCPConnectionOptions) => Promise<{
     fetchToolsSnapshot: (deadlineMs?: number, signal?: AbortSignal) => Promise<MCPToolsSnapshot>;
   }>;
@@ -199,6 +236,29 @@ export function createScheduleMCPPreflight(deps: ScheduleMCPDeps): ScheduleMCPPr
   const sharedProbeLimit = createConcurrencyLimiter(MAX_SHARED_MCP_PREFLIGHT_CONCURRENCY);
   const runPreflight: ScheduleMCPPreflight = async (agentId, principal, options) => {
     const signal = options.signal;
+<<<<<<< HEAD
+=======
+    let execution: ScheduleMCPExecution | undefined;
+    try {
+      execution =
+        options.scheduleId && deps.execution
+          ? await deps.execution.resolve(
+              {
+                scheduleId: options.scheduleId,
+                ownerId: principal.id,
+                tenantId: principal.tenantId ?? null,
+                agentId,
+                invocationMode: 'delegated',
+              },
+              options.stage ?? 'invoke',
+              { manual: options.manual === true },
+            )
+          : undefined;
+    } catch (error) {
+      if (error instanceof ScheduledMCPPolicyError) throw new ScheduleMCPError(error.outcomes);
+      throw error;
+    }
+>>>>>>> upstream/main
     const throwIfAborted = () => {
       if (signal?.aborted) throw signal.reason ?? new Error('MCP preflight aborted');
     };
@@ -215,6 +275,7 @@ export function createScheduleMCPPreflight(deps: ScheduleMCPDeps): ScheduleMCPPr
       });
       return appConfig;
     };
+<<<<<<< HEAD
     const tools: Array<{ name: string; agentId: string }> = [];
     const serverHints = new Set<string>();
     const graphEdges: NonNullable<AgentGraphNode['edges']> = [];
@@ -523,11 +584,35 @@ export function createScheduleMCPPreflight(deps: ScheduleMCPDeps): ScheduleMCPPr
       );
       for (const name of agent.mcpServerNames ?? []) serverHints.add(name);
     }
+=======
+    const { tools, serverHints, candidates } = await resolveScheduledMCPRequirements(
+      agentId,
+      user,
+      deps,
+      loadAppConfig,
+      signal,
+    );
+>>>>>>> upstream/main
     const selectedTools = tools.filter(
       ({ name }) =>
         name.includes(Constants.mcp_delimiter) &&
         !name.startsWith(`${Constants.mcp_server}${Constants.mcp_delimiter}`),
     );
+<<<<<<< HEAD
+=======
+    if (execution?.enrolled) {
+      const denied = candidates.find(({ name }) => !isScheduledMCPCandidate(name));
+      if (denied || selectedTools.length === 0) {
+        throw new ScheduleMCPError(
+          new ScheduledMCPPolicyError(
+            denied ? 'tool_policy_denied' : 'binding_mismatch',
+            '',
+            denied?.agentId ?? agentId,
+          ).outcomes,
+        );
+      }
+    }
+>>>>>>> upstream/main
     if (selectedTools.length === 0) return [];
 
     const effectiveConfig = await loadAppConfig();
@@ -686,6 +771,24 @@ export function createScheduleMCPPreflight(deps: ScheduleMCPDeps): ScheduleMCPPr
           requestProbeLimit(() =>
             sharedProbeLimit(async (): Promise<ScheduleMCPOutcome[]> => {
               const context = createMCPRequestContext();
+<<<<<<< HEAD
+=======
+              if (options.scheduleId)
+                attachScheduledMCPBearer(
+                  context,
+                  {
+                    scheduleId: options.scheduleId,
+                    ownerId: principal.id,
+                    tenantId: user.tenantId ?? null,
+                    agentId,
+                    invocationMode: 'delegated',
+                  },
+                  deps.scheduledBearerHost,
+                  options.stage ?? 'invoke',
+                  options.signal,
+                  { manual: options.manual === true },
+                );
+>>>>>>> upstream/main
               try {
                 throwIfAborted();
                 const serverConfig = servers[server];
@@ -716,6 +819,30 @@ export function createScheduleMCPPreflight(deps: ScheduleMCPDeps): ScheduleMCPPr
                   });
                   const snapshot = await connection.fetchToolsSnapshot(options.deadlineMs, signal);
                   if (snapshot.authenticationError) throw snapshot.authenticationError;
+<<<<<<< HEAD
+=======
+                  if (execution) {
+                    for (const [toolKey, owners] of toolAgentIds.get(server) ?? []) {
+                      const [selectionName] = splitMCPToolKey(toolKey, authoritativeCandidates);
+                      const definitions = snapshot.tools.filter(
+                        (tool) =>
+                          tool.name === selectionName ||
+                          stripServerNamePrefix(tool.name, normalizeServerName(server)) ===
+                            selectionName,
+                      );
+                      for (const ownerId of owners) {
+                        await execution.bind(ownerId, selectionName).authorize({
+                          user,
+                          serverName: server,
+                          serverConfig,
+                          toolName: definitions.length === 1 ? definitions[0].name : '',
+                          loadTools: async () => snapshot,
+                          signal,
+                        });
+                      }
+                    }
+                  }
+>>>>>>> upstream/main
                   const available = new Set(
                     Object.keys(formatMCPServerTools(server, snapshot.tools)),
                   );
@@ -751,6 +878,25 @@ export function createScheduleMCPPreflight(deps: ScheduleMCPDeps): ScheduleMCPPr
                     missingOwners.size > 0 ? missingOwners : undefined,
                   );
                 } catch (error) {
+<<<<<<< HEAD
+=======
+                  if (
+                    error instanceof ScheduledMCPBearerError ||
+                    error instanceof ScheduledMCPPolicyError
+                  )
+                    return error.outcomes;
+                  if (
+                    error instanceof OboTokenResolutionError &&
+                    error.reason === 'missing_upstream_provider'
+                  ) {
+                    return outcomesForOwners(server, 'mcp_configuration_missing').map(
+                      (outcome) => ({
+                        ...outcome,
+                        detail: 'unattended_auth_required' as const,
+                      }),
+                    );
+                  }
+>>>>>>> upstream/main
                   return outcomesForOwners(
                     server,
                     reauth ||

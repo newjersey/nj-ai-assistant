@@ -1,11 +1,17 @@
 import { memo, useMemo, useState, useEffect, useCallback } from 'react';
+<<<<<<< HEAD
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import type { TFile, TMessage } from 'librechat-data-provider';
+=======
+import type { TFile, TMessage } from 'librechat-data-provider';
+import SteerReceipt, { type SteerReceiptState } from '~/components/Chat/Steering/Receipt';
+>>>>>>> upstream/main
 import FilePreviewDialog from '~/components/Chat/Messages/Content/FilePreviewDialog';
 import MessageTimestamp from '~/components/Chat/Messages/ui/MessageTimestamp';
 import MessageQuotes from '~/components/Chat/Messages/Content/MessageQuotes';
 import { cn, hydrateFileDeliveryMetadata, usesImagePreview } from '~/utils';
 import MarkdownLite from '~/components/Chat/Messages/Content/MarkdownLite';
+<<<<<<< HEAD
 import FileContainer from '~/components/Chat/Input/Files/FileContainer';
 import { useFileMapContext, useShareContext } from '~/Providers';
 import SteerReceipt from '~/components/Chat/Steering/Receipt';
@@ -13,6 +19,14 @@ import Image from '~/components/Chat/Messages/Content/Image';
 import CollapsibleText from './CollapsibleText';
 import { useLocalize } from '~/hooks';
 import store from '~/store';
+=======
+import { useMessagePartsHost } from '~/Providers/MessagePartsHostContext';
+import FileContainer from '~/components/Chat/Input/Files/FileContainer';
+import Image from '~/components/Chat/Messages/Content/Image';
+import CollapsibleText from './CollapsibleText';
+import { useShareContext } from '~/Providers';
+import { useLocalize } from '~/hooks';
+>>>>>>> upstream/main
 
 /**
  * A mid-run steering message rendered as a standard user message inside the
@@ -30,6 +44,10 @@ const SteerPart = memo(function SteerPart({
   steerId,
   createdAt,
   isSubmitting = false,
+<<<<<<< HEAD
+=======
+  receiptState = 'applied',
+>>>>>>> upstream/main
 }: {
   steer: string;
   files?: TMessage['files'];
@@ -43,6 +61,7 @@ const SteerPart = memo(function SteerPart({
    *  steering identity while it is the live thing at the end, then settles
    *  to timestamp gray (always settled on reload, share, and search). */
   isSubmitting?: boolean;
+<<<<<<< HEAD
 }) {
   const localize = useLocalize();
   /** Read the atom rather than the auth context: AuthContextProvider mirrors the
@@ -53,6 +72,19 @@ const SteerPart = memo(function SteerPart({
   const usernameDisplay = useRecoilValue<boolean>(store.UsernameDisplay);
   const enableUserMsgMarkdown = useRecoilValue<boolean>(store.enableUserMsgMarkdown);
   const collapseLongUserMessages = useRecoilValue<boolean>(store.collapseLongUserMessages);
+=======
+  /** Pending renderer state must never claim server application early. */
+  receiptState?: SteerReceiptState;
+}) {
+  const localize = useLocalize();
+  const { useUser, useFileMap, useUserTextPreferences, useLiveAppliedSteer } =
+    useMessagePartsHost();
+  const user = useUser();
+  const { isSharedConvo } = useShareContext();
+  const fileMap = useFileMap();
+  const { usernameDisplay, enableUserMsgMarkdown, collapseLongUserMessages } =
+    useUserTextPreferences();
+>>>>>>> upstream/main
 
   /** The share surface must never label the SHARER's steers with the
    *  viewer's identity; always the generic user label there. */
@@ -92,8 +124,12 @@ const SteerPart = memo(function SteerPart({
    *  identity consumes its id whether it animated or not, so nothing lingers.
    *  The membership selector scopes the subscription to THIS id — stamping or
    *  consuming one steer never re-renders the other mounted parts. */
+<<<<<<< HEAD
   const isLiveApplied = useRecoilValue(store.liveAppliedSteerFamily(steerId ?? ''));
   const setLiveAppliedIds = useSetRecoilState(store.liveAppliedSteerIds);
+=======
+  const [isLiveApplied, consumeLiveApplied] = useLiveAppliedSteer(steerId ?? '');
+>>>>>>> upstream/main
   const [captured, setCaptured] = useState<{ id: string | undefined; animate: boolean }>({
     id: steerId,
     animate: isLiveApplied,
@@ -106,10 +142,15 @@ const SteerPart = memo(function SteerPart({
     if (steerId == null || steerId.length === 0) {
       return;
     }
+<<<<<<< HEAD
     setLiveAppliedIds((prev) =>
       prev.includes(steerId) ? prev.filter((id) => id !== steerId) : prev,
     );
   }, [steerId, setLiveAppliedIds]);
+=======
+    consumeLiveApplied(steerId);
+  }, [steerId, consumeLiveApplied]);
+>>>>>>> upstream/main
 
   if (typeof steer !== 'string' || steer.length === 0) {
     return null;
@@ -123,10 +164,17 @@ const SteerPart = memo(function SteerPart({
     >
       <div className="user-turn relative flex w-fit max-w-[90%] flex-col items-end sm:max-w-[85%]">
         <h2 className="sr-only">{label}</h2>
+<<<<<<< HEAD
         <div className="flex max-w-full flex-col items-start gap-2 rounded-theme-surface rounded-br-theme-control bg-surface-tertiary px-theme-normal py-2.5">
           <MessageQuotes quotes={quotes} />
           {(imageFiles.length > 0 || otherFiles.length > 0) && (
             <div className="flex flex-wrap gap-2">
+=======
+        <div className="rounded-theme-surface rounded-br-theme-control bg-surface-user-message px-theme-normal flex max-w-full flex-col items-start gap-2 py-2.5">
+          <MessageQuotes quotes={quotes} />
+          {(imageFiles.length > 0 || otherFiles.length > 0) && (
+            <div className="flex w-full flex-wrap gap-2">
+>>>>>>> upstream/main
               {otherFiles.map((file) => (
                 <FileContainer
                   key={file.file_id}
@@ -134,6 +182,7 @@ const SteerPart = memo(function SteerPart({
                   onClick={() => setSelectedFile(file)}
                 />
               ))}
+<<<<<<< HEAD
               {imageFiles.map((file) => (
                 <Image
                   key={file.file_id}
@@ -143,6 +192,21 @@ const SteerPart = memo(function SteerPart({
                   altText={file.filename ?? localize('com_ui_attached_image')}
                 />
               ))}
+=======
+              {imageFiles.length > 0 && (
+                <div className="ml-auto flex max-w-full flex-wrap justify-end gap-2">
+                  {imageFiles.map((file) => (
+                    <Image
+                      key={file.file_id}
+                      imagePath={file.preview ?? file.filepath ?? ''}
+                      height={file.height ?? 1920}
+                      width={file.width ?? 1080}
+                      altText={file.filename ?? localize('com_ui_attached_image')}
+                    />
+                  ))}
+                </div>
+              )}
+>>>>>>> upstream/main
             </div>
           )}
           <CollapsibleText enabled={collapseLongUserMessages}>
@@ -161,9 +225,15 @@ const SteerPart = memo(function SteerPart({
          *  flush under the bubble's bottom-right corner. Leading them would
          *  park them wherever the hover-revealed time happens to end, and that
          *  width changes as the relative string ticks. */}
+<<<<<<< HEAD
         <div className="mt-1 flex min-h-8 items-center justify-end gap-2 text-text-secondary">
           <MessageTimestamp value={timestamp} className="ml-0" />
           <SteerReceipt state="applied" live={isSubmitting} animateIn={animateIn} />
+=======
+        <div className="text-text-secondary mt-1 flex min-h-8 items-center justify-end gap-2">
+          <MessageTimestamp value={timestamp} className="ml-0" />
+          <SteerReceipt state={receiptState} live={isSubmitting} animateIn={animateIn} />
+>>>>>>> upstream/main
         </div>
       </div>
       {otherFiles.length > 0 && (

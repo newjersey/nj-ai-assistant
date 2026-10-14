@@ -76,19 +76,28 @@ describe('useAppStartup: MCP permission gating', () => {
   beforeEach(() => {
     mockInstallCloudFrontImageRetry.mockClear();
     mockUseMCPServersQuery.mockReturnValue({ data: undefined, isLoading: false });
+<<<<<<< HEAD
     mockUseMCPToolsQuery.mockReturnValue({ data: undefined, isLoading: false });
+=======
+>>>>>>> upstream/main
     mockUseCatalogReady.mockReturnValue(true);
   });
 
   it('checks the MCP_SERVERS.USE permission via useHasAccess', () => {
     mockUseHasAccess.mockReturnValue(false);
 
+<<<<<<< HEAD
     renderHook(
       () => useAppStartup({ startupConfig: undefined, user: mockUser, mcpWarmupAllowed: true }),
       {
         wrapper,
       },
     );
+=======
+    renderHook(() => useAppStartup({ startupConfig: undefined, user: mockUser }), {
+      wrapper,
+    });
+>>>>>>> upstream/main
 
     expect(mockUseHasAccess).toHaveBeenCalledWith({
       permissionType: PermissionTypes.MCP_SERVERS,
@@ -96,6 +105,7 @@ describe('useAppStartup: MCP permission gating', () => {
     });
   });
 
+<<<<<<< HEAD
   it('suppresses all MCP queries when user lacks MCP_SERVERS.USE', () => {
     mockUseHasAccess.mockReturnValue(false);
 
@@ -212,6 +222,33 @@ describe('useAppStartup: MCP permission gating', () => {
     );
 
     expect(mockUseMCPToolsQuery).toHaveBeenCalledWith({ enabled: false });
+=======
+  it('suppresses the MCP server query when user lacks MCP_SERVERS.USE', () => {
+    mockUseHasAccess.mockReturnValue(false);
+
+    renderHook(() => useAppStartup({ startupConfig: undefined, user: mockUser }), { wrapper });
+
+    expect(mockUseMCPServersQuery).toHaveBeenCalledWith({ enabled: false });
+  });
+
+  it('suppresses server metadata warmup until the catalog is released', () => {
+    mockUseHasAccess.mockReturnValue(true);
+    mockUseCatalogReady.mockReturnValue(false);
+
+    renderHook(() => useAppStartup({ startupConfig: undefined, user: mockUser }), { wrapper });
+
+    expect(mockUseCatalogReady).toHaveBeenCalledWith('mcpServers');
+    expect(mockUseMCPServersQuery).toHaveBeenCalledWith({ enabled: false });
+  });
+
+  it('warms server metadata without discovering MCP tools during app startup', () => {
+    mockUseHasAccess.mockReturnValue(true);
+
+    renderHook(() => useAppStartup({ startupConfig: undefined, user: mockUser }), { wrapper });
+
+    expect(mockUseMCPServersQuery).toHaveBeenCalledWith({ enabled: true });
+    expect(mockUseMCPToolsQuery).not.toHaveBeenCalled();
+>>>>>>> upstream/main
   });
 
   it('installs CloudFront image retry from startup config', () => {
@@ -225,7 +262,11 @@ describe('useAppStartup: MCP permission gating', () => {
       },
     } as never;
 
+<<<<<<< HEAD
     renderHook(() => useAppStartup({ startupConfig, user: mockUser, mcpWarmupAllowed: true }), {
+=======
+    renderHook(() => useAppStartup({ startupConfig, user: mockUser }), {
+>>>>>>> upstream/main
       wrapper,
     });
 

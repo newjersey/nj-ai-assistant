@@ -171,6 +171,7 @@ function DynamicSlider({
       )}
     >
       <HoverCard openDelay={300}>
+<<<<<<< HEAD
         <HoverCardTrigger className="grid w-full items-center gap-2">
           <div className="flex w-full items-center justify-between">
             <Label
@@ -180,6 +181,17 @@ function DynamicSlider({
               {labelCode ? (localize(label as TranslationKeys) ?? label) : label || settingKey}{' '}
               {showDefault && (
                 <small className="opacity-40 high-contrast:opacity-100">
+=======
+        <HoverCardTrigger className="grid h-full w-full content-between items-center gap-2">
+          <div className="flex w-full items-center justify-between">
+            <Label
+              htmlFor={`${settingKey}-dynamic-setting`}
+              className="text-left text-xs font-medium break-words"
+            >
+              {labelCode ? (localize(label as TranslationKeys) ?? label) : label || settingKey}{' '}
+              {showDefault && (
+                <small className="high-contrast:opacity-100 opacity-40">
+>>>>>>> upstream/main
                   ({localize('com_endpoint_default')}: {getDefaultDisplayValue()})
                 </small>
               )}
@@ -202,7 +214,11 @@ function DynamicSlider({
                   defaultTextProps,
                   cn(
                     optionText,
+<<<<<<< HEAD
                     'reset-rc-number-input reset-rc-number-input-text-right h-auto w-12 border-0 py-1 text-xs group-hover/temp:border-border-light',
+=======
+                    'reset-rc-number-input reset-rc-number-input-text-right group-hover/temp:border-border-light h-auto w-12 border-0 py-1 text-xs',
+>>>>>>> upstream/main
                   ),
                 )}
               />
@@ -217,7 +233,11 @@ function DynamicSlider({
                   defaultTextProps,
                   cn(
                     optionText,
+<<<<<<< HEAD
                     'reset-rc-number-input h-auto w-14 border-0 py-1 pl-1 text-center text-xs group-hover/temp:border-border-light',
+=======
+                    'reset-rc-number-input group-hover/temp:border-border-light h-auto w-14 border-0 py-1 pl-1 text-center text-xs',
+>>>>>>> upstream/main
                   ),
                 )}
               />
@@ -228,7 +248,15 @@ function DynamicSlider({
             disabled={readonly}
             value={[
               isEnum
+<<<<<<< HEAD
                 ? enumToNumeric[(selectedValue as number) ?? '']
+=======
+                ? // A model switch may hide a saved enum value. Keep its stored value
+                  // but retain a valid thumb so keyboard users can choose a supported one.
+                  (enumToNumeric[String(selectedValue ?? '')] ??
+                  enumToNumeric[String(defaultValue)] ??
+                  0)
+>>>>>>> upstream/main
                 : ((inputValue as number) ?? (defaultValue as number)),
             ]}
             onValueChange={(value) => handleValueChange(value[0])}

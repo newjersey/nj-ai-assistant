@@ -484,11 +484,22 @@ describe('userGroup methods', () => {
   });
 
   describe('getUserPrincipals caching', () => {
+<<<<<<< HEAD
     function createFakeCache() {
       const store = new Map<string, unknown>();
       return {
         store,
         get: jest.fn(async (key: string) => store.get(key)),
+=======
+    function createFakeCache({ onRead }: { onRead?: () => Promise<void> } = {}) {
+      const store = new Map<string, unknown>();
+      return {
+        store,
+        get: jest.fn(async (key: string) => {
+          await onRead?.();
+          return store.get(key);
+        }),
+>>>>>>> upstream/main
         set: jest.fn(async (key: string, value: unknown) => {
           store.set(key, value);
         }),
@@ -497,6 +508,32 @@ describe('userGroup methods', () => {
       };
     }
 
+<<<<<<< HEAD
+=======
+    /**
+     * Holds each cache read until `callers` of them are inside the miss window together, so a
+     * test about deduplicating concurrent builds actually gets concurrent builds. Delaying
+     * every read by a fixed few milliseconds instead leaves the overlap up to the scheduler:
+     * under load the first build can finish before a later caller reads, and that caller then
+     * takes the miss path on its own, which is correct behaviour but not what such a test is
+     * asserting. Reads after the barrier opens pass straight through, so a caller that reads
+     * again mid-build (after taking the lock, say) cannot deadlock.
+     */
+    function arrivalBarrier(callers: number) {
+      let arrived = 0;
+      let open!: () => void;
+      const allArrived = new Promise<void>((resolve) => {
+        open = resolve;
+      });
+      return async () => {
+        if (++arrived >= callers) {
+          open();
+        }
+        await allArrived;
+      };
+    }
+
+>>>>>>> upstream/main
     function createCachedMethods(cache: ReturnType<typeof createFakeCache>) {
       return createUserGroupMethods(mongoose, { getCache: jest.fn(() => cache) });
     }
@@ -758,6 +795,7 @@ describe('userGroup methods', () => {
 
     it('deduplicates concurrent cache builds for the same member key', async () => {
       const user = await createTestUser({ idOnTheSource: 'dedup-ext-1' });
+<<<<<<< HEAD
       const cache = {
         get: jest.fn(async () => {
           await new Promise((resolve) => setTimeout(resolve, 10));
@@ -766,6 +804,10 @@ describe('userGroup methods', () => {
         set: jest.fn(async () => undefined),
       };
       const cachedMethods = createUserGroupMethods(mongoose, { getCache: jest.fn(() => cache) });
+=======
+      const cache = createFakeCache({ onRead: arrivalBarrier(3) });
+      const cachedMethods = createCachedMethods(cache);
+>>>>>>> upstream/main
       const params = {
         userId: user._id.toString(),
         role: SystemRoles.USER,
@@ -787,11 +829,15 @@ describe('userGroup methods', () => {
     it('shares one lock and DB build across concurrent same-process callers', async () => {
       const user = await createTestUser({ idOnTheSource: 'lock-ext-1' });
       const cache = {
+<<<<<<< HEAD
         get: jest.fn(async () => {
           await new Promise((resolve) => setTimeout(resolve, 10));
           return undefined;
         }),
         set: jest.fn(async () => undefined),
+=======
+        ...createFakeCache({ onRead: arrivalBarrier(3) }),
+>>>>>>> upstream/main
         acquireLock: jest.fn(async () => 'lock-token'),
         releaseLock: jest.fn(async () => undefined),
         lockWaitMs: 5000,

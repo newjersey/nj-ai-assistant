@@ -21,6 +21,10 @@ import {
   useUninstallToolCredentials,
 } from './hooks';
 import { useSkillsInfiniteQuery, useDeleteAgentAction } from '~/data-provider';
+<<<<<<< HEAD
+=======
+import { setSubagentsEnabled, removeHandoffs } from './items/orchestration';
+>>>>>>> upstream/main
 import { requiresFileManagerRemoval } from './items/capabilities';
 import { useRemoveMCPTool, useVisibleTools } from '~/hooks/MCP';
 import ToolsMarketplaceDialog from './ToolsMarketplaceDialog';
@@ -124,6 +128,20 @@ export default function ToolsSection({ agentId }: Props) {
       }
       const patch = computeToggleAction(item, { selected: true });
       switch (patch.type) {
+<<<<<<< HEAD
+=======
+        case 'configure':
+          setDialogItem(item);
+          break;
+        case 'subagents':
+          setValue('subagents', setSubagentsEnabled(getValues('subagents'), patch.enabled), {
+            shouldDirty: true,
+          });
+          break;
+        case 'handoffs-remove':
+          setValue('edges', removeHandoffs(getValues('edges')), { shouldDirty: true });
+          break;
+>>>>>>> upstream/main
         case 'builtin':
           setValue(patch.field as keyof AgentForm, patch.value as never, { shouldDirty: true });
           if (patch.field === AgentCapabilities.execute_code && patch.value === false) {
@@ -280,7 +298,11 @@ export default function ToolsSection({ agentId }: Props) {
         <OGDialogTemplate
           showCloseButton={false}
           title={localize('com_ui_delete_action')}
+<<<<<<< HEAD
           className="max-w-[450px]"
+=======
+          className="max-w-[28.125rem]"
+>>>>>>> upstream/main
           main={
             <Label className="text-left text-sm font-medium">
               {localize('com_ui_delete_action_confirm')}
@@ -305,7 +327,11 @@ export default function ToolsSection({ agentId }: Props) {
         <OGDialogTemplate
           showCloseButton={false}
           title={localize('com_ui_delete_tool')}
+<<<<<<< HEAD
           className="max-w-[450px]"
+=======
+          className="max-w-[28.125rem]"
+>>>>>>> upstream/main
           main={
             <Label className="text-left text-sm font-medium">
               {localize('com_ui_delete_tool_confirm')}
@@ -349,10 +375,17 @@ function SelectedSection({
   return (
     <div className="mb-3 flex flex-col">
       <div className="mb-1 flex items-center justify-between">
+<<<<<<< HEAD
         <label className="block text-[11px] font-medium uppercase tracking-wide text-text-secondary">
           {title}
           {badge != null && (
             <span className="ml-1.5 inline-flex h-4 min-w-[16px] items-center justify-center rounded-full bg-surface-tertiary px-1.5 text-[10px] font-medium normal-case tracking-normal text-text-secondary">
+=======
+        <label className="text-text-secondary block text-[11px] font-medium tracking-wide uppercase">
+          {title}
+          {badge != null && (
+            <span className="bg-surface-tertiary text-text-secondary ml-1.5 inline-flex h-4 min-w-[1rem] items-center justify-center rounded-full px-1.5 text-[10px] font-medium tracking-normal normal-case">
+>>>>>>> upstream/main
               {badge}
             </span>
           )}
@@ -361,7 +394,11 @@ function SelectedSection({
           type="button"
           onClick={onAdd}
           aria-label={addLabel}
+<<<<<<< HEAD
           className="inline-flex h-7 items-center gap-1.5 rounded-lg px-2 text-xs font-medium text-text-secondary transition hover:bg-surface-secondary hover:text-text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-ring-primary"
+=======
+          className="text-text-secondary hover:bg-surface-secondary hover:text-text-primary focus-visible:ring-ring-primary inline-flex h-7 items-center gap-1.5 rounded-lg px-2 text-xs font-medium transition focus:outline-hidden focus-visible:ring-2"
+>>>>>>> upstream/main
         >
           <Plus className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden="true" />
           {localize('com_ui_add')}
@@ -371,11 +408,19 @@ function SelectedSection({
         <button
           type="button"
           onClick={onAdd}
+<<<<<<< HEAD
           className="flex w-full flex-col items-center gap-1 rounded-xl border border-dashed border-border-light px-2 py-4 text-text-secondary transition-colors hover:border-border-medium hover:bg-surface-secondary hover:text-text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-ring-primary"
         >
           <Plus className="h-4 w-4" aria-hidden="true" />
           <span className="text-xs">{emptyLabel}</span>
           <span className="text-[11px] text-text-secondary">{emptyHint}</span>
+=======
+          className="border-border-medium text-text-secondary hover:border-border-heavy hover:bg-surface-secondary hover:text-text-primary focus-visible:ring-ring-primary flex w-full flex-col items-center gap-1 rounded-xl border border-dashed px-2 py-4 transition-colors focus:outline-hidden focus-visible:ring-2"
+        >
+          <Plus className="h-4 w-4" aria-hidden="true" />
+          <span className="text-xs">{emptyLabel}</span>
+          <span className="text-text-secondary text-[11px]">{emptyHint}</span>
+>>>>>>> upstream/main
         </button>
       ) : (
         <ul className="flex flex-col gap-1.5">

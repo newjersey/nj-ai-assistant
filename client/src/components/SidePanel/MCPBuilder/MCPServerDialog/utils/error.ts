@@ -3,6 +3,10 @@ import type { TranslationKeys } from '~/hooks';
 type Localize = (key: TranslationKeys) => string;
 
 const MCP_ERROR_MESSAGE_KEYS: Record<string, TranslationKeys> = {
+<<<<<<< HEAD
+=======
+  MCP_API_KEY_REENTRY_REQUIRED: 'com_ui_mcp_api_key_reentry_required',
+>>>>>>> upstream/main
   MCP_INSPECTION_FAILED: 'com_ui_mcp_server_connection_failed',
   MCP_DOMAIN_NOT_ALLOWED: 'com_ui_mcp_domain_not_allowed',
   MCP_OAUTH_SECRET_REENTRY_REQUIRED: 'com_ui_mcp_oauth_secret_reentry_required',

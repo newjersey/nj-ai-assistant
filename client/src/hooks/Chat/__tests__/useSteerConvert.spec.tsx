@@ -1,6 +1,13 @@
 import React from 'react';
 import { act, renderHook } from '@testing-library/react';
+<<<<<<< HEAD
 import { RecoilRoot, useRecoilValue, useSetRecoilState, type MutableSnapshot } from 'recoil';
+=======
+import { getDefaultStore, useAtomValue, useSetAtom } from 'jotai';
+import { RecoilRoot, useRecoilValue, type MutableSnapshot } from 'recoil';
+import { recoveryDispositionsFamily } from '~/components/Chat/Steering/recovery';
+import { queuedMessagesByConvoId, resetQueueFamilies } from '~/hooks/Chat/queue';
+>>>>>>> upstream/main
 import useSteerConvert from '../useSteerConvert';
 import store from '~/store';
 
@@ -32,11 +39,19 @@ function setup(initialize?: (snapshot: MutableSnapshot) => void) {
   );
   return renderHook(
     () => {
+<<<<<<< HEAD
       const setQueue = useSetRecoilState(store.queuedMessagesByConvoId(CONVO_ID));
       return {
         convert: useSteerConvert(),
         chips: useRecoilValue(store.pendingSteersByConvoId(CONVO_ID)),
         queue: useRecoilValue(store.queuedMessagesByConvoId(CONVO_ID)),
+=======
+      const setQueue = useSetAtom(queuedMessagesByConvoId(CONVO_ID));
+      return {
+        convert: useSteerConvert(),
+        chips: useRecoilValue(store.pendingSteersByConvoId(CONVO_ID)),
+        queue: useAtomValue(queuedMessagesByConvoId(CONVO_ID)),
+>>>>>>> upstream/main
         applied: useRecoilValue(store.appliedSteerIdsByConvoId(CONVO_ID)),
         // Mirrors `useQueueDrain` dequeuing the head item after auto-send.
         drainQueue: () => setQueue((prev) => prev.slice(1)),
@@ -46,8 +61,16 @@ function setup(initialize?: (snapshot: MutableSnapshot) => void) {
   );
 }
 
+<<<<<<< HEAD
 describe('useSteerConvert', () => {
   beforeEach(() => {
+=======
+beforeEach(() => resetQueueFamilies());
+
+describe('useSteerConvert', () => {
+  beforeEach(() => {
+    getDefaultStore().set(recoveryDispositionsFamily(CONVO_ID), {});
+>>>>>>> upstream/main
     mockFileMap = {};
   });
 
@@ -138,7 +161,11 @@ describe('useSteerConvert', () => {
     };
     const after = { id: 'queue-after', text: 'still queued', createdAt: 20 };
     const { result } = setup(({ set }) => {
+<<<<<<< HEAD
       set(store.queuedMessagesByConvoId(CONVO_ID), [after]);
+=======
+      getDefaultStore().set(queuedMessagesByConvoId(CONVO_ID), [after]);
+>>>>>>> upstream/main
       set(store.pendingSteersByConvoId(CONVO_ID), [
         {
           steerId: 'server-replacement-id',
@@ -173,6 +200,45 @@ describe('useSteerConvert', () => {
     expect(result.current.applied).toContain('server-replacement-id');
   });
 
+<<<<<<< HEAD
+=======
+  it.each(['cancelled', 'dismissed'] as const)(
+    'does not resurrect a %s recovery after remount or redelivery',
+    (disposition) => {
+      getDefaultStore().set(recoveryDispositionsFamily(CONVO_ID), { source: disposition });
+      const { result } = setup();
+      act(() =>
+        result.current.convert(CONVO_ID, [{ steerId: 'source', text: 'old words' }], {
+          generationProtocolVersion: 2,
+          allowPreviouslyConvertedIds: ['source'],
+        }),
+      );
+      expect(result.current.queue).toEqual([]);
+    },
+  );
+
+  it('does not make a held recovery sendable when a legacy claim arrives', () => {
+    getDefaultStore().set(recoveryDispositionsFamily(CONVO_ID), { source: 'blocked' });
+    const item = {
+      id: 'leftover',
+      text: 'original words',
+      recoverySteerId: 'source',
+      clientRequestId: 'attempt',
+      createdAt: 1,
+    };
+    const { result } = setup(() =>
+      getDefaultStore().set(queuedMessagesByConvoId(CONVO_ID), [item]),
+    );
+    act(() =>
+      result.current.convert(CONVO_ID, [{ steerId: 'source', text: 'original words' }], {
+        generationProtocolVersion: 1,
+      }),
+    );
+    expect(result.current.queue).toContainEqual(item);
+    expect(result.current.queue.every((row) => row.recoverySteerId === 'source')).toBe(true);
+  });
+
+>>>>>>> upstream/main
   it('recovers a v1 leftover as an ordinary local follow-up without receipt binding', () => {
     const { result } = setup();
     act(() => {
@@ -192,6 +258,24 @@ describe('useSteerConvert', () => {
     ]);
   });
 
+<<<<<<< HEAD
+=======
+  it('keeps a local v2 failure ordinary when no server receipt exists', () => {
+    const { result } = setup();
+    act(() => {
+      result.current.convert(
+        CONVO_ID,
+        [{ steerId: 'local-failure', text: 'queue locally', createdAt: 1 }],
+        { generationProtocolVersion: 2, bindRecoverySource: false },
+      );
+    });
+
+    expect(result.current.queue).toEqual([
+      { id: 'local-failure', text: 'queue locally', createdAt: 1 },
+    ]);
+  });
+
+>>>>>>> upstream/main
   it('correlates a terminal leftover that arrives before the 202 ACK', () => {
     const original = {
       id: 'queue-before-ack',
@@ -201,7 +285,11 @@ describe('useSteerConvert', () => {
     };
     const after = { id: 'queue-after-race', text: 'after', createdAt: 20 };
     const { result } = setup(({ set }) => {
+<<<<<<< HEAD
       set(store.queuedMessagesByConvoId(CONVO_ID), [after]);
+=======
+      getDefaultStore().set(queuedMessagesByConvoId(CONVO_ID), [after]);
+>>>>>>> upstream/main
       set(store.pendingSteersByConvoId(CONVO_ID), [
         {
           steerId: 'local-correlation-id',
@@ -284,8 +372,13 @@ describe('useSteerConvert', () => {
   });
 
   it('keeps interrupt front-inserts ahead of chronologically older steers', () => {
+<<<<<<< HEAD
     const { result } = setup(({ set }) => {
       set(store.queuedMessagesByConvoId(CONVO_ID), [
+=======
+    const { result } = setup(() => {
+      getDefaultStore().set(queuedMessagesByConvoId(CONVO_ID), [
+>>>>>>> upstream/main
         { id: 'urgent', text: 'interrupt message', createdAt: 100, priority: true },
       ]);
     });
@@ -296,6 +389,47 @@ describe('useSteerConvert', () => {
     expect(result.current.queue.map((item) => item.id)).toEqual(['urgent', 'old']);
   });
 
+<<<<<<< HEAD
+=======
+  /* The rail can be reordered by hand, and that order decides what sends next.
+     A conversion arriving afterwards may only place its own items; sorting the
+     whole list would quietly restore the order the messages were written in. */
+  it('leaves a hand-reordered queue in the order the user left it', () => {
+    const { result } = setup(({ set }) => {
+      set(store.pendingSteersByConvoId(CONVO_ID), [
+        { steerId: 'srv-late', text: 'converted', status: 'pending' as const, createdAt: 9 },
+      ]);
+      // As if the user had dragged the newest message to the front.
+      getDefaultStore().set(queuedMessagesByConvoId(CONVO_ID), [
+        { id: 'm3', text: 'third, promoted', createdAt: 3 },
+        { id: 'm1', text: 'first', createdAt: 1 },
+        { id: 'm2', text: 'second', createdAt: 2 },
+      ]);
+    });
+    act(() => {
+      result.current.convert(CONVO_ID, [{ steerId: 'srv-late', text: 'converted', createdAt: 9 }]);
+    });
+    expect(result.current.queue.map((item) => item.id)).toEqual(['m3', 'm1', 'm2', 'srv-late']);
+  });
+
+  it('still places a converted steer ahead of messages written after it', () => {
+    const { result } = setup(({ set }) => {
+      set(store.pendingSteersByConvoId(CONVO_ID), [
+        { steerId: 'srv-early', text: 'accepted first', status: 'pending' as const, createdAt: 1 },
+      ]);
+      getDefaultStore().set(queuedMessagesByConvoId(CONVO_ID), [
+        { id: 'later', text: 'queued afterwards', createdAt: 5 },
+      ]);
+    });
+    act(() => {
+      result.current.convert(CONVO_ID, [
+        { steerId: 'srv-early', text: 'accepted first', createdAt: 1 },
+      ]);
+    });
+    expect(result.current.queue.map((item) => item.id)).toEqual(['srv-early', 'later']);
+  });
+
+>>>>>>> upstream/main
   it('is idempotent across double delivery (abort response + final SSE event)', () => {
     const { result } = setup();
     const steers = [{ steerId: 'srv-2', text: 'delivered twice', createdAt: 5 }];

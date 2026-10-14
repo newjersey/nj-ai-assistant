@@ -1,9 +1,18 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
+<<<<<<< HEAD
 import { useSetAtom } from 'jotai';
 import { useQueryClient } from '@tanstack/react-query';
 import { Constants, QueryKeys, isAssistantsEndpoint } from 'librechat-data-provider';
 import { useRecoilState, useRecoilValue, useSetRecoilState, useRecoilCallback } from 'recoil';
 import type { TMessage } from 'librechat-data-provider';
+=======
+import { useSetAtom, useStore } from 'jotai';
+import { useQueryClient } from '@tanstack/react-query';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { Constants, QueryKeys, isAssistantsEndpoint } from 'librechat-data-provider';
+import type { TMessage } from 'librechat-data-provider';
+import type { ChatContract } from './contract';
+>>>>>>> upstream/main
 import {
   useGetStartupConfig,
   useAbortStreamMutation,
@@ -11,9 +20,15 @@ import {
 } from '~/data-provider';
 import { useLatestMessage, useLatestMessageId } from '~/hooks/Messages/useLatestMessage';
 import { siblingIdxFamily, siblingKey } from '~/components/Chat/Messages/Thread/state';
+<<<<<<< HEAD
 import useChatFunctions from '~/hooks/Chat/useChatFunctions';
 import useSteerConvert from '~/hooks/Chat/useSteerConvert';
 import { logEvent } from '~/nj/analytics/logEvent';
+=======
+import { drainAfterAbortByIndex, runEndByIndex } from '~/hooks/Chat/queue';
+import useChatFunctions from '~/hooks/Chat/useChatFunctions';
+import useSteerConvert from '~/hooks/Chat/useSteerConvert';
+>>>>>>> upstream/main
 import { resolveAbortSteerTarget } from '~/utils';
 import useNewConvo from '~/hooks/useNewConvo';
 import { getMessageCacheIds } from './cache';
@@ -21,7 +36,11 @@ import { useAbortCleanup } from './abort';
 import store from '~/store';
 
 // this to be set somewhere else
+<<<<<<< HEAD
 export default function useChatHelpers(index = 0, paramId?: string) {
+=======
+export default function useChatHelpers(index = 0, paramId?: string): ChatContract {
+>>>>>>> upstream/main
   const clearAllSubmissions = store.useClearSubmissionState();
   const [files, setFiles] = useRecoilState(store.filesByIndex(index));
   const [filesLoading, setFilesLoading] = useState(false);
@@ -36,6 +55,7 @@ export default function useChatHelpers(index = 0, paramId?: string) {
   /** Async abort responses can settle after this pane has moved to another
    * conversation and armed its own interrupt. Clear only the intent owned by
    * the request that produced the response. */
+<<<<<<< HEAD
   const clearInterruptDrain = useRecoilCallback(
     ({ snapshot, set }) =>
       (convoId: string, generationCreatedAt: number) => {
@@ -82,6 +102,45 @@ export default function useChatHelpers(index = 0, paramId?: string) {
         });
       },
     [index],
+=======
+  const queueStore = useStore();
+  const clearInterruptDrain = useCallback(
+    (convoId: string, generationCreatedAt: number) => {
+      const armed = queueStore.get(drainAfterAbortByIndex(index));
+      if (
+        armed !== false &&
+        armed.conversationId === convoId &&
+        armed.generationCreatedAt === generationCreatedAt
+      ) {
+        queueStore.set(drainAfterAbortByIndex(index), false);
+      }
+    },
+    [index, queueStore],
+  );
+
+  /** A missing job cannot deliver FINAL, so release its armed interrupt queue. */
+  const signalInterruptDrain = useCallback(
+    (convoId: string, generationCreatedAt: number, armedConversationId = convoId) => {
+      const armed = queueStore.get(drainAfterAbortByIndex(index));
+      const runEnd = queueStore.get(runEndByIndex(index));
+      const matchesArm =
+        armed !== false &&
+        armed.conversationId === armedConversationId &&
+        armed.generationCreatedAt === generationCreatedAt;
+      const alreadySignaled =
+        runEnd?.conversationId === convoId && runEnd.generationCreatedAt === generationCreatedAt;
+      if (!matchesArm || alreadySignaled) {
+        return;
+      }
+      queueStore.set(runEndByIndex(index), {
+        conversationId: convoId,
+        outcome: 'aborted',
+        endedAt: Date.now(),
+        generationCreatedAt,
+      });
+    },
+    [index, queueStore],
+>>>>>>> upstream/main
   );
 
   const { newConversation } = useNewConvo(index);
@@ -110,6 +169,13 @@ export default function useChatHelpers(index = 0, paramId?: string) {
   const setSiblingIdx = useSetAtom(
     siblingIdxFamily(siblingKey(latestMessage?.parentMessageId ?? null)),
   );
+<<<<<<< HEAD
+=======
+  /** The setter is rebound whenever the tail's parent changes (every turn); the
+   *  ref keeps `handleContinue` referentially stable so rows do not re-render. */
+  const setSiblingIdxRef = useRef(setSiblingIdx);
+  setSiblingIdxRef.current = setSiblingIdx;
+>>>>>>> upstream/main
 
   const setMessages = useCallback(
     (messages: TMessage[]) => {
@@ -162,6 +228,10 @@ export default function useChatHelpers(index = 0, paramId?: string) {
     conversation,
     latestMessage,
     setSubmission,
+<<<<<<< HEAD
+=======
+    setConversation,
+>>>>>>> upstream/main
   });
 
   const askRef = useRef(_ask);
@@ -189,7 +259,21 @@ export default function useChatHelpers(index = 0, paramId?: string) {
     );
 
     if (parentMessage && parentMessage.isCreatedByUser) {
+<<<<<<< HEAD
       ask({ ...parentMessage }, { isContinued: true, isRegenerate: true, isEdited: true });
+=======
+      ask(
+        { ...parentMessage },
+        {
+          isContinued: true,
+          isRegenerate: true,
+          isEdited: true,
+          overrideManualSkills: parentMessage.manualSkills,
+          overrideQuotes: parentMessage.quotes,
+          overrideReasoning: parentMessage.reasoningOverride ?? null,
+        },
+      );
+>>>>>>> upstream/main
     } else {
       console.error(
         'Failed to regenerate the message: parentMessage not found, or not created by user.',
@@ -214,8 +298,11 @@ export default function useChatHelpers(index = 0, paramId?: string) {
       isAssistants,
     });
 
+<<<<<<< HEAD
     logEvent('stop_generation');
 
+=======
+>>>>>>> upstream/main
     // For non-assistants endpoints (using resumable streams), call abort endpoint first
     if (conversationId && !isAssistants) {
       /** Stop is a generation-scoped mutation. `isSubmitting` becomes true
@@ -225,7 +312,11 @@ export default function useChatHelpers(index = 0, paramId?: string) {
         return;
       }
       // The aborted run's final SSE can land (and the interrupt drain can
+<<<<<<< HEAD
       // start the NEXT submission) while the abort response is in flight —
+=======
+      // start the NEXT submission) while the abort response is in flight;
+>>>>>>> upstream/main
       // the fallback clear below must not tear down that new run.
       const submissionAtAbort = captureSubmission();
       try {
@@ -253,7 +344,10 @@ export default function useChatHelpers(index = 0, paramId?: string) {
             refetchType: 'all',
           });
           queryClient.invalidateQueries({ queryKey: ['streamStatus', conversationId] });
+<<<<<<< HEAD
           clearSubmissionsUnlessReplaced(submissionAtAbort);
+=======
+>>>>>>> upstream/main
           return;
         }
         if (canUseV2AbortResponse && response?.persistenceFailed === true) {
@@ -271,7 +365,11 @@ export default function useChatHelpers(index = 0, paramId?: string) {
           });
           return;
         }
+<<<<<<< HEAD
         // The response's `aborted` field is the RESOLVED job id — authoritative
+=======
+        // The response's `aborted` field is the RESOLVED job id, authoritative
+>>>>>>> upstream/main
         // when this turn still holds the `new` placeholder. Chips and the drain
         // signal land where the mounted composer's queue machinery looks, while
         // the parked-copy claim uses the resolved id the server keyed it under.
@@ -279,11 +377,20 @@ export default function useChatHelpers(index = 0, paramId?: string) {
           conversationId,
           resolvedId: response?.aborted,
         });
+<<<<<<< HEAD
         // Steers the run never injected ride the abort response. Consume them
         // here as well as on the SSE final event — clearing submissions below
         // can close the stream before that event lands, and conversion
         // dedupes by steer id so double delivery is a no-op. `claimParked`
         // reconciles the replayable parked copy if the final raced this response.
+=======
+        /** Keep the submission attached until FINAL/status reconciles history.
+         * Clearing on the ACK can close SSE during terminal authorization and
+         * strand the preliminary response as an unsaved follow-up parent.
+         * Only terminal reconciliation may release the interrupt queue. */
+        // Restore uninjected steers from the ACK as well as FINAL. Conversion
+        // dedupes by steer id; `claimParked` reconciles the replayable copy.
+>>>>>>> upstream/main
         if (Array.isArray(response?.pendingSteers)) {
           convertSteersToQueued(chipConvoId, response.pendingSteers, {
             claimParked: true,
@@ -291,10 +398,13 @@ export default function useChatHelpers(index = 0, paramId?: string) {
             generationProtocolVersion: canUseV2AbortResponse ? 2 : 1,
           });
         }
+<<<<<<< HEAD
         signalInterruptDrain(chipConvoId, activeGenerationCreatedAt, conversationId);
         // The SSE will receive a `done` event with `aborted: true` and clean up
         // We still clear submissions as a fallback
         clearSubmissionsUnlessReplaced(submissionAtAbort);
+=======
+>>>>>>> upstream/main
       } catch (error) {
         console.error('[useChatHelpers] Abort failed:', error);
         const errorData = (
@@ -376,9 +486,15 @@ export default function useChatHelpers(index = 0, paramId?: string) {
     (e: React.MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
       continueGeneration();
+<<<<<<< HEAD
       setSiblingIdx(0);
     },
     [continueGeneration, setSiblingIdx],
+=======
+      setSiblingIdxRef.current(0);
+    },
+    [continueGeneration],
+>>>>>>> upstream/main
   );
 
   const [preset, setPreset] = useRecoilState(store.presetByIndex(index));
@@ -394,13 +510,21 @@ export default function useChatHelpers(index = 0, paramId?: string) {
   const feedbackEnabled = startupConfig != null && startupConfig.interface?.feedback !== false;
 
   return useMemo(
+<<<<<<< HEAD
     () => ({
+=======
+    (): ChatContract => ({
+>>>>>>> upstream/main
       newConversation,
       conversation,
       setConversation,
       isSubmitting,
       setIsSubmitting,
       getMessages,
+<<<<<<< HEAD
+=======
+      messagesKey: queryParam,
+>>>>>>> upstream/main
       setMessages,
       setSiblingIdx,
       latestMessageId,
@@ -433,6 +557,10 @@ export default function useChatHelpers(index = 0, paramId?: string) {
       isSubmitting,
       setIsSubmitting,
       getMessages,
+<<<<<<< HEAD
+=======
+      queryParam,
+>>>>>>> upstream/main
       setMessages,
       setSiblingIdx,
       latestMessageId,

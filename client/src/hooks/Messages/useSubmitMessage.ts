@@ -1,7 +1,11 @@
 import { useCallback } from 'react';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { replaceSpecialVars } from 'librechat-data-provider';
+<<<<<<< HEAD
 import type { TMessage } from 'librechat-data-provider';
+=======
+import type { TMessage, TReasoningOverride } from 'librechat-data-provider';
+>>>>>>> upstream/main
 import { useChatContext, useChatFormContext, useAddedChatContext } from '~/Providers';
 import { useGetLatestMessage } from '~/hooks/Messages/useLatestMessage';
 import { useAuthContext } from '~/hooks/AuthContext';
@@ -24,6 +28,10 @@ export default function useSubmitMessage() {
       overrideFiles?: TMessage['files'];
       overrideQuotes?: string[];
       overrideManualSkills?: string[];
+<<<<<<< HEAD
+=======
+      overrideReasoning?: TReasoningOverride | null;
+>>>>>>> upstream/main
       overrideClientRequestId?: string;
       overrideRecoverySteerId?: string;
       overrideExpectedPredecessorCreatedAt?: number;
@@ -55,6 +63,10 @@ export default function useSubmitMessage() {
           overrideFiles: data.overrideFiles,
           overrideQuotes: data.overrideQuotes,
           overrideManualSkills: data.overrideManualSkills,
+<<<<<<< HEAD
+=======
+          overrideReasoning: data.overrideReasoning,
+>>>>>>> upstream/main
           overrideClientRequestId: data.overrideClientRequestId,
           overrideRecoverySteerId: data.overrideRecoverySteerId,
           overrideExpectedPredecessorCreatedAt: data.overrideExpectedPredecessorCreatedAt,

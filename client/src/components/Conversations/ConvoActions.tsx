@@ -1,12 +1,21 @@
+<<<<<<< HEAD
 import { memo, useState } from 'react';
 import { Ellipsis } from 'lucide-react';
 import { Button, useMediaQuery } from '@librechat/client';
 import type { MouseEvent } from 'react';
+=======
+import { memo, useState, useEffect } from 'react';
+import { Ellipsis } from 'lucide-react';
+import { Button } from '@librechat/client';
+import type { MouseEvent } from 'react';
+import useDrawerViewport from '~/hooks/Nav/useDrawerViewport';
+>>>>>>> upstream/main
 import { ConvoOptions } from './ConvoOptions';
 import { useLocalize } from '~/hooks';
 
 export type ConvoActionsProps = {
   conversationId: string | null;
+<<<<<<< HEAD
   chatProjectId?: string | null;
   title: string | null;
   isPinned?: boolean;
@@ -14,6 +23,18 @@ export type ConvoActionsProps = {
   isActiveConvo: boolean;
   isShiftHeld?: boolean;
   isPopoverActive: boolean;
+=======
+  title: string | null;
+  canRename?: boolean;
+  isPinned?: boolean;
+  isArchived?: boolean;
+  isUnseen?: boolean;
+  isActiveConvo: boolean;
+  isShiftHeld?: boolean;
+  isPopoverActive: boolean;
+  isGenerating?: boolean;
+  contextMenuPosition?: { x: number; y: number };
+>>>>>>> upstream/main
   /** True once the pointer or focus has reached the row. */
   hasInteracted: boolean;
   retainView: () => void;
@@ -52,13 +73,29 @@ function ConvoActions({
   hasInteracted,
   isActiveConvo,
   isPopoverActive,
+<<<<<<< HEAD
+=======
+  isGenerating = false,
+>>>>>>> upstream/main
   onOpenChange,
   ...options
 }: ConvoActionsProps) {
   const localize = useLocalize();
+<<<<<<< HEAD
   const isSmallScreen = useMediaQuery('(max-width: 768px)');
   const [hasOpenedMenu, setHasOpenedMenu] = useState(false);
 
+=======
+  const isSmallScreen = useDrawerViewport();
+  const [hasOpenedMenu, setHasOpenedMenu] = useState(false);
+
+  useEffect(() => {
+    if (isPopoverActive) {
+      setHasOpenedMenu(true);
+    }
+  }, [isPopoverActive]);
+
+>>>>>>> upstream/main
   const handleOpenChange = (open: boolean) => {
     if (open) {
       setHasOpenedMenu(true);
@@ -68,12 +105,20 @@ function ConvoActions({
 
   const showMenu = isSmallScreen
     ? isPopoverActive || isActiveConvo || hasOpenedMenu
+<<<<<<< HEAD
     : hasInteracted || isActiveConvo;
+=======
+    : isPopoverActive || hasOpenedMenu || hasInteracted || isActiveConvo;
+>>>>>>> upstream/main
 
   if (showMenu) {
     return (
       <ConvoOptions
         {...options}
+<<<<<<< HEAD
+=======
+        isGenerating={isGenerating}
+>>>>>>> upstream/main
         isActiveConvo={isActiveConvo}
         isPopoverActive={isPopoverActive}
         setIsPopoverActive={handleOpenChange}
@@ -81,7 +126,11 @@ function ConvoActions({
     );
   }
 
+<<<<<<< HEAD
   if (!isSmallScreen) {
+=======
+  if (!isSmallScreen && !isGenerating) {
+>>>>>>> upstream/main
     return null;
   }
 
@@ -91,7 +140,11 @@ function ConvoActions({
       variant="ghost"
       aria-label={localize('com_nav_convo_menu_options')}
       data-testid="convo-options-trigger"
+<<<<<<< HEAD
       className="size-9 text-text-secondary"
+=======
+      className="size-9"
+>>>>>>> upstream/main
       onClick={(event) => {
         event.stopPropagation();
         handleOpenChange(true);

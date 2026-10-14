@@ -37,6 +37,10 @@ jest.mock('@librechat/api', () => ({
 }));
 
 jest.mock('~/models', () => ({
+<<<<<<< HEAD
+=======
+  initializeMessageBudget: jest.fn(),
+>>>>>>> upstream/main
   saveMessage: (...args) => mockSaveMessage(...args),
 }));
 
@@ -89,7 +93,14 @@ describe('SSE stream tenant isolation', () => {
       checkpointIds: ['checkpoint-a'],
     });
     mockDeleteAgentCheckpoint.mockResolvedValue(undefined);
+<<<<<<< HEAD
     mockSaveMessage.mockResolvedValue({ persisted: true });
+=======
+    mockSaveMessage.mockImplementation(async (_context, message) => ({
+      ...message,
+      persisted: true,
+    }));
+>>>>>>> upstream/main
     mockGenerationJobManager.getActiveJobIdsForUser.mockResolvedValue([]);
     mockGenerationJobManager.steering.claim.mockResolvedValue([]);
     mockGenerationJobManager.steering.claimDetailed.mockResolvedValue({
@@ -507,6 +518,28 @@ describe('SSE stream tenant isolation', () => {
       expect(res.body.active).toBe(true);
     });
 
+<<<<<<< HEAD
+=======
+    it.each([true, false])(
+      'reports the run temporary state %s recorded at admission',
+      async (isTemporary) => {
+        mockUserId = 'user-123';
+        mockTenantId = 'tenant-a';
+        mockGenerationJobManager.getJob.mockResolvedValue({
+          metadata: { userId: 'user-123', tenantId: 'tenant-a', isTemporary },
+          status: 'running',
+          createdAt: Date.now(),
+        });
+        mockGenerationJobManager.getResumeState.mockResolvedValue(null);
+
+        const res = await request(app).get('/agents/chat/status/conv-123');
+
+        expect(res.status).toBe(200);
+        expect(res.body.isTemporary).toBe(isTemporary);
+      },
+    );
+
+>>>>>>> upstream/main
     it('preserves the immutable v2 marker on an active status response', async () => {
       mockGenerationJobManager.getJob.mockResolvedValue({
         metadata: { userId: 'user-123', generationProtocolVersion: 2 },
@@ -982,7 +1015,11 @@ describe('SSE stream tenant isolation', () => {
         1,
         expect.any(Object),
         expect.objectContaining({ messageId: 'user-1', isCreatedByUser: true }),
+<<<<<<< HEAD
         expect.any(Object),
+=======
+        expect.objectContaining({ insertOnly: true }),
+>>>>>>> upstream/main
       );
       expect(mockSaveMessage).toHaveBeenNthCalledWith(
         2,

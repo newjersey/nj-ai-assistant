@@ -1,7 +1,12 @@
 import { useState } from 'react';
 import { Button } from '@librechat/client';
 import { Check, Clock, Code2, Captions, Info, Zap } from 'lucide-react';
+<<<<<<< HEAD
 import type { AgentToolType } from 'librechat-data-provider';
+=======
+import type { AgentToolType, AgentToolApprovalMode } from 'librechat-data-provider';
+import ApprovalOption from './ApprovalOption';
+>>>>>>> upstream/main
 import OptionToggle from './OptionToggle';
 import { useLocalize } from '~/hooks';
 import { cn } from '~/utils';
@@ -26,6 +31,14 @@ interface MCPToolItemProps {
   onToggleProgrammatic: () => void;
   onToggleBackground: () => void;
   onToggleIntent: () => void;
+<<<<<<< HEAD
+=======
+  approvalConstraint?: 'ask' | 'deny';
+  approvalAgentId?: string;
+  approvalMode?: AgentToolApprovalMode;
+  approvalsEnabled?: boolean;
+  onApprovalModeChange?: (mode?: AgentToolApprovalMode) => void;
+>>>>>>> upstream/main
 }
 
 const iconButton = 'size-6 rounded-md';
@@ -48,6 +61,14 @@ export default function MCPToolItem({
   programmaticToolsAvailable,
   backgroundToolsEnabled,
   toolIntentsEnabled,
+<<<<<<< HEAD
+=======
+  approvalMode,
+  approvalConstraint,
+  approvalAgentId,
+  approvalsEnabled,
+  onApprovalModeChange,
+>>>>>>> upstream/main
 }: MCPToolItemProps) {
   const localize = useLocalize();
   const [expanded, setExpanded] = useState(false);
@@ -57,7 +78,11 @@ export default function MCPToolItem({
 
   return (
     <div className="overflow-hidden rounded-lg">
+<<<<<<< HEAD
       <div className="flex items-center gap-1 rounded-lg pr-1 transition-colors hover:bg-surface-secondary">
+=======
+      <div className="hover:bg-surface-secondary flex items-center gap-1 rounded-lg pr-1 transition-colors">
+>>>>>>> upstream/main
         <button
           type="button"
           onClick={onToggleSelect}
@@ -65,19 +90,31 @@ export default function MCPToolItem({
           aria-label={tool.metadata.name}
           className={cn(
             'flex min-w-0 flex-1 items-center gap-2.5 rounded-lg p-2 text-left',
+<<<<<<< HEAD
             'focus:outline-none focus-visible:ring-2 focus-visible:ring-ring-primary',
+=======
+            'focus-visible:ring-ring-primary focus:outline-hidden focus-visible:ring-2',
+>>>>>>> upstream/main
           )}
         >
           <span
             aria-hidden="true"
             className={cn(
+<<<<<<< HEAD
               'flex size-4 shrink-0 items-center justify-center rounded border border-border-medium transition-colors',
+=======
+              'border-border-medium flex size-4 shrink-0 items-center justify-center rounded border transition-colors',
+>>>>>>> upstream/main
               isSelected && 'bg-surface-inverted text-text-inverted',
             )}
           >
             {isSelected && <Check className="size-4" />}
           </span>
+<<<<<<< HEAD
           <span className="min-w-0 flex-1 truncate text-sm text-text-primary">
+=======
+          <span className="text-text-primary min-w-0 flex-1 truncate text-sm">
+>>>>>>> upstream/main
             {tool.metadata.name}
           </span>
         </button>
@@ -88,7 +125,11 @@ export default function MCPToolItem({
               pressed={isDeferred}
               label={localize('com_ui_mcp_defer_loading')}
               tooltip={localize('com_ui_mcp_click_to_defer')}
+<<<<<<< HEAD
               activeBorderClass="border-series-4"
+=======
+              activeClass="border-series-4 text-series-4 hover:text-series-4"
+>>>>>>> upstream/main
               onToggle={onToggleDefer}
             />
           )}
@@ -102,7 +143,11 @@ export default function MCPToolItem({
                   ? 'com_ui_mcp_click_to_programmatic'
                   : 'com_ui_mcp_programmatic_requires_code',
               )}
+<<<<<<< HEAD
               activeBorderClass="border-series-6"
+=======
+              activeClass="border-series-6 text-series-6 hover:text-series-6"
+>>>>>>> upstream/main
               disabled={!programmaticToolsAvailable && !isProgrammatic}
               onToggle={onToggleProgrammatic}
             />
@@ -113,7 +158,11 @@ export default function MCPToolItem({
               pressed={isBackground}
               label={localize('com_ui_mcp_background')}
               tooltip={localize('com_ui_mcp_click_to_background')}
+<<<<<<< HEAD
               activeBorderClass="border-series-1"
+=======
+              activeClass="border-series-1 text-series-1 hover:text-series-1"
+>>>>>>> upstream/main
               onToggle={onToggleBackground}
             />
           )}
@@ -126,10 +175,27 @@ export default function MCPToolItem({
               tooltip={localize(
                 intentDisabled ? 'com_ui_mcp_intent_programmatic' : 'com_ui_mcp_click_to_intent',
               )}
+<<<<<<< HEAD
               activeBorderClass="border-series-3"
               onToggle={onToggleIntent}
             />
           )}
+=======
+              activeClass="border-series-3 text-series-3 hover:text-series-3"
+              onToggle={onToggleIntent}
+            />
+          )}
+          {onApprovalModeChange && (
+            <ApprovalOption
+              constraint={approvalConstraint}
+              agentId={approvalAgentId}
+              toolName={tool.tool_id}
+              mode={approvalMode}
+              onChange={onApprovalModeChange}
+              disabled={!approvalsEnabled}
+            />
+          )}
+>>>>>>> upstream/main
           <Button
             variant="ghost"
             size="icon"
@@ -158,11 +224,19 @@ export default function MCPToolItem({
         <div className="min-h-0 overflow-hidden">
           <div
             className={cn(
+<<<<<<< HEAD
               'border-t border-border-light px-3 py-3 transition-opacity duration-200 ease-out motion-reduce:transition-none',
               expanded ? 'opacity-100' : 'opacity-0',
             )}
           >
             <p className="max-h-44 overflow-y-auto whitespace-pre-wrap text-xs leading-relaxed text-text-secondary">
+=======
+              'border-border-light border-t px-3 py-3 transition-opacity duration-200 ease-out motion-reduce:transition-none',
+              expanded ? 'opacity-100' : 'opacity-0',
+            )}
+          >
+            <p className="text-text-secondary max-h-44 overflow-y-auto text-xs leading-relaxed whitespace-pre-wrap">
+>>>>>>> upstream/main
               {description || localize('com_ui_mcp_no_description')}
             </p>
           </div>

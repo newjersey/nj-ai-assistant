@@ -2,7 +2,11 @@ import React from 'react';
 import { RecoilRoot } from 'recoil';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
+<<<<<<< HEAD
 import temporaryStore from '~/store/temporary';
+=======
+import { ChatSettingsContext, defaultChatSettings } from '~/Providers/ChatSettingsContext';
+>>>>>>> upstream/main
 import Landing from '../Landing';
 
 let mockConversation: Record<string, unknown> | null = null;
@@ -26,6 +30,10 @@ jest.mock('@librechat/client', () => ({
   BirthdayIcon: () => <span data-testid="birthday-icon" />,
   TooltipAnchor: ({ children }: { children: React.ReactNode }) => <span>{children}</span>,
   SplitText: ({ text }: { text: string }) => <span>{text}</span>,
+<<<<<<< HEAD
+=======
+  useRemScale: () => 1,
+>>>>>>> upstream/main
 }));
 
 jest.mock('~/Providers', () => ({
@@ -88,14 +96,25 @@ jest.mock('~/components/Endpoints/ConvoIcon', () => () => <span data-testid="con
 
 function renderLanding({ isTemporary = false }: { isTemporary?: boolean } = {}) {
   return render(
+<<<<<<< HEAD
     <RecoilRoot initializeState={({ set }) => set(temporaryStore.isTemporary, isTemporary)}>
       <Landing centerFormOnLanding={false} />
+=======
+    <RecoilRoot>
+      <ChatSettingsContext.Provider value={{ ...defaultChatSettings, isTemporary }}>
+        <Landing centerFormOnLanding={false} />
+      </ChatSettingsContext.Provider>
+>>>>>>> upstream/main
     </RecoilRoot>,
   );
 }
 
+<<<<<<< HEAD
 // NJ: We've hidden this in the UI
 describe.skip('Landing agent contact', () => {
+=======
+describe('Landing agent contact', () => {
+>>>>>>> upstream/main
   beforeEach(() => {
     mockConversation = null;
     mockAgentsMap = undefined;
@@ -125,6 +144,32 @@ describe.skip('Landing agent contact', () => {
     expect(screen.queryByRole('link', { name: 'Owner User' })).not.toBeInTheDocument();
   });
 
+<<<<<<< HEAD
+=======
+  it('renders the email link without inline baseline space beside the contact label', () => {
+    mockConversation = {
+      endpoint: 'agents',
+      agent_id: 'agent-1',
+    };
+    mockAgentsMap = {
+      'agent-1': {
+        id: 'agent-1',
+        name: 'LibreChat',
+        description: 'Contact Danny if you see any errors',
+        support_contact: { email: 'messagedaniel@pm.me' },
+      },
+    };
+
+    renderLanding();
+
+    const link = screen.getByRole('link', { name: 'messagedaniel@pm.me' });
+    expect(link).toHaveAttribute('href', 'mailto:messagedaniel@pm.me');
+    expect(link).toHaveClass('block');
+    expect(link).not.toHaveClass('inline-block');
+    expect(screen.getByText('Contact:').parentElement).toHaveClass('items-center');
+  });
+
+>>>>>>> upstream/main
   it('does not show contact when the selected agent is missing from agentsMap', () => {
     mockConversation = {
       endpoint: 'agents',
@@ -159,8 +204,12 @@ describe.skip('Landing agent contact', () => {
   });
 });
 
+<<<<<<< HEAD
 // NJ: Skip all temporary chat functionality
 describe.skip('Landing temporary chat empty state', () => {
+=======
+describe('Landing temporary chat empty state', () => {
+>>>>>>> upstream/main
   beforeEach(() => {
     mockConversation = null;
     mockAgentsMap = undefined;

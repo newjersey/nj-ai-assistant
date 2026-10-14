@@ -55,7 +55,11 @@ export default function PopoverButtons({
         label: localize(showExamples === true ? 'com_hide_examples' : 'com_show_examples'),
         buttonClass: isGenerativeModel === true || isTextModel ? 'disabled' : '',
         handler: triggerExamples,
+<<<<<<< HEAD
         icon: <MessagesSquared className={cn('mr-1 w-[14px]', iconClass)} />,
+=======
+        icon: <MessagesSquared className={cn('mr-1 w-[0.875rem]', iconClass)} />,
+>>>>>>> upstream/main
       },
     ],
   };
@@ -75,7 +79,11 @@ export default function PopoverButtons({
         buttonClass: '',
         type: 'alternative',
         handler: () => setSettingsView(SettingsViews.advanced),
+<<<<<<< HEAD
         icon: <DataIcon className={cn('mr-1 h-6 w-[14px]', iconClass)} />,
+=======
+        icon: <DataIcon className={cn('mr-1 h-6 w-[0.875rem]', iconClass)} />,
+>>>>>>> upstream/main
       },
     ],
     [SettingsViews.advanced]: [
@@ -84,7 +92,11 @@ export default function PopoverButtons({
         buttonClass: '',
         type: 'alternative',
         handler: () => setSettingsView(SettingsViews.default),
+<<<<<<< HEAD
         icon: <AssistantIcon className={cn('mr-1 h-6 w-[14px]', iconClass)} />,
+=======
+        icon: <AssistantIcon className={cn('mr-1 h-6 w-[0.875rem]', iconClass)} />,
+>>>>>>> upstream/main
       },
     ],
   };
@@ -102,8 +114,13 @@ export default function PopoverButtons({
             type="button"
             className={cn(
               button.buttonClass,
+<<<<<<< HEAD
               'border border-border-medium focus:ring-1 focus:ring-ring-primary',
               'ml-1 h-full bg-transparent px-2 py-1 text-xs font-normal text-text-primary hover:bg-surface-hover',
+=======
+              'border-border-medium focus:ring-ring-primary border focus:ring-1',
+              'text-text-primary hover:bg-surface-hover ml-1 h-full bg-transparent px-2 py-1 text-xs font-normal',
+>>>>>>> upstream/main
               buttonClass ?? '',
             )}
             onClick={button.handler}
@@ -114,15 +131,24 @@ export default function PopoverButtons({
         ))}
       </div>
       {disabled ? null : (
+<<<<<<< HEAD
         <div className="flex w-[150px] items-center justify-end">
+=======
+        <div className="flex w-[9.375rem] items-center justify-end">
+>>>>>>> upstream/main
           {additionalButtons[settingsView].map((button, index) => (
             <Button
               key={`button-${index}`}
               type="button"
               className={cn(
                 button.buttonClass,
+<<<<<<< HEAD
                 'flex justify-center border border-border-medium focus:ring-1 focus:ring-ring-primary',
                 'h-full w-full bg-transparent px-2 py-1 text-xs font-normal text-text-primary hover:bg-surface-hover',
+=======
+                'border-border-medium focus:ring-ring-primary flex justify-center border focus:ring-1',
+                'text-text-primary hover:bg-surface-hover h-full w-full bg-transparent px-2 py-1 text-xs font-normal',
+>>>>>>> upstream/main
                 buttonClass ?? '',
               )}
               onClick={button.handler}

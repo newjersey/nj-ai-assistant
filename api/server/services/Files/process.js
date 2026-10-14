@@ -265,6 +265,7 @@ const processDeleteRequest = async ({ req, files }) => {
     await initializeClients();
   }
 
+<<<<<<< HEAD
   const agentFiles = [];
 
   for (const file of files) {
@@ -275,6 +276,10 @@ const processDeleteRequest = async ({ req, files }) => {
         file_id: file.file_id,
       });
     }
+=======
+  for (const file of files) {
+    const source = file.source ?? FileSources.local;
+>>>>>>> upstream/main
 
     if (source === FileSources.text) {
       resolvedFileIds.add(file.file_id);
@@ -313,6 +318,7 @@ const processDeleteRequest = async ({ req, files }) => {
     });
   }
 
+<<<<<<< HEAD
   if (agentFiles.length > 0) {
     promises.push(
       db.removeAgentResourceFiles({
@@ -322,6 +328,8 @@ const processDeleteRequest = async ({ req, files }) => {
     );
   }
 
+=======
+>>>>>>> upstream/main
   await Promise.allSettled(promises);
   const deletedFileIds = [...resolvedFileIds];
   let metadataDeletedFileIds = deletedFileIds;
@@ -334,6 +342,12 @@ const processDeleteRequest = async ({ req, files }) => {
       metadataDeletedFileIds = [];
       throw error;
     }
+<<<<<<< HEAD
+=======
+    /* The only place a delete removes agent references, and it runs after the metadata delete
+       succeeded: a file that kept its storage, its chunks or its record keeps its references too,
+       so the agent it was removed from can be asked again (see issue #12776). */
+>>>>>>> upstream/main
     if (metadataDeletedFileIds.length > 0) {
       try {
         await db.removeAgentResourceFilesFromAllAgents({ file_ids: metadataDeletedFileIds });

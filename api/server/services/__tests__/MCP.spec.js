@@ -4,6 +4,17 @@ const mockRegistry = {
 };
 const mockUpstreamTokenProvider = jest.fn().mockResolvedValue(null);
 const mockCreateOpenIDSessionTokenProvider = jest.fn(() => mockUpstreamTokenProvider);
+<<<<<<< HEAD
+=======
+const defaultMCPAppsPolicy = {
+  enabled: false,
+  legacyHtmlEnabled: true,
+  maxAdmissionRequestsPerMinute: 240,
+  maxActiveViews: 3,
+  maxActionPreviewChars: 16384,
+  maxPersistedAppBytes: 1048576,
+};
+>>>>>>> upstream/main
 
 jest.mock('~/config', () => ({
   getMCPServersRegistry: jest.fn(() => mockRegistry),
@@ -13,6 +24,10 @@ jest.mock('~/config', () => ({
 }));
 
 jest.mock('@librechat/data-schemas', () => ({
+<<<<<<< HEAD
+=======
+  ...jest.requireActual('@librechat/data-schemas'),
+>>>>>>> upstream/main
   getTenantId: jest.fn(() => 'tenant-1'),
   logger: { debug: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn() },
 }));
@@ -90,7 +105,11 @@ const {
   cacheMCPServerTools,
 } = require('~/server/services/Config');
 const { reinitMCPServer } = require('~/server/services/Tools/mcp');
+<<<<<<< HEAD
 const { getUserMCPAuthMap } = require('@librechat/api');
+=======
+const { getUserMCPAuthMap, STANDARD_MCP_CAPABILITY_PROFILE } = require('@librechat/api');
+>>>>>>> upstream/main
 const {
   createMCPTool,
   healMcpToolNames,
@@ -132,7 +151,16 @@ describe('getAssistantToolDefinitions', () => {
       },
       accessibleServerNames: ['app-server'],
     });
+<<<<<<< HEAD
     expect(getMCPServerTools).toHaveBeenCalledWith('u1', 'app-server', serverConfig);
+=======
+    expect(getMCPServerTools).toHaveBeenCalledWith(
+      'u1',
+      'app-server',
+      serverConfig,
+      STANDARD_MCP_CAPABILITY_PROFILE,
+    );
+>>>>>>> upstream/main
   });
 
   it('recovers and re-caches a referenced server when its slice is missing', async () => {
@@ -158,6 +186,11 @@ describe('getAssistantToolDefinitions', () => {
       serverTools: { [toolKey]: mcpDefinition },
       serverConfig,
       publicationGeneration: 'connection-generation',
+<<<<<<< HEAD
+=======
+      publicationRevision: undefined,
+      capabilityProfile: STANDARD_MCP_CAPABILITY_PROFILE,
+>>>>>>> upstream/main
     });
   });
 
@@ -184,6 +217,11 @@ describe('getAssistantToolDefinitions', () => {
       serverConfig,
       userMCPAuthMap,
       upstreamTokenProvider: mockUpstreamTokenProvider,
+<<<<<<< HEAD
+=======
+      recoveryPolicy: undefined,
+      mcpApps: defaultMCPAppsPolicy,
+>>>>>>> upstream/main
       oboIdentityContext: {
         appUserId: 'u1',
         openidSubject: undefined,

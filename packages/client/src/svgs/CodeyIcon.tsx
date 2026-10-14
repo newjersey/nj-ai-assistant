@@ -13,7 +13,11 @@ export default function CodeyIcon({
       // height="100%"
       width={size}
       height={size}
+<<<<<<< HEAD
       className={cn('dark:fill-white', className)}
+=======
+      className={cn('fill-text-primary', className)}
+>>>>>>> upstream/main
       viewBox="0 0 18 18"
       preserveAspectRatio="xMidYMid meet"
       focusable="false"

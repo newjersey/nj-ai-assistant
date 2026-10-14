@@ -4,10 +4,21 @@ import {
   azureEndpointSchema,
   endpointSchema,
   RetentionMode,
+<<<<<<< HEAD
   configSchema,
   interfaceSchema,
   fileStorageSchema,
   fileStrategiesSchema,
+=======
+  isAllDataRetention,
+  isForcedTemporaryRetention,
+  configSchema,
+  balanceSchema,
+  interfaceSchema,
+  fileStorageSchema,
+  fileStrategiesSchema,
+  normalizeAgentSelectorLimit,
+>>>>>>> upstream/main
   SKILL_SYNC_MAX_INTERVAL_MINUTES,
   summarizationTriggerSchema,
   summarizationConfigSchema,
@@ -1126,6 +1137,28 @@ describe('configSchema fileStrategy', () => {
   });
 });
 
+<<<<<<< HEAD
+=======
+describe('configSchema fileListLimit', () => {
+  it('defaults fileListLimit to 100 for existing configurations', () => {
+    const result = configSchema.parse({ version: '1.3.7' });
+    expect(result.fileListLimit).toBe(100);
+  });
+
+  it('accepts a positive integer override', () => {
+    const result = configSchema.safeParse({ version: '1.3.7', fileListLimit: 250 });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.fileListLimit).toBe(250);
+    }
+  });
+
+  it.each([0, -1, 1.5])('rejects invalid fileListLimit %p', (fileListLimit) => {
+    expect(configSchema.safeParse({ version: '1.3.7', fileListLimit }).success).toBe(false);
+  });
+});
+
+>>>>>>> upstream/main
 describe('configSchema skillSync', () => {
   it('accepts a GitHub skill sync source with explicit paths and credential key', () => {
     const result = configSchema.safeParse({
@@ -1470,6 +1503,27 @@ describe('interfaceSchema', () => {
 
     expect(result.defaultPinnedTools).toBeUndefined();
   });
+<<<<<<< HEAD
+=======
+
+  it('accepts the ephemeral retention mode', () => {
+    const result = interfaceSchema.parse({ retentionMode: RetentionMode.EPHEMERAL });
+    expect(result.retentionMode).toBe(RetentionMode.EPHEMERAL);
+    expect(RetentionMode.EPHEMERAL).toBe('ephemeral');
+  });
+
+  it('classifies ephemeral as forced-temporary, all-data retention', () => {
+    expect(isAllDataRetention(RetentionMode.EPHEMERAL)).toBe(true);
+    expect(isAllDataRetention(RetentionMode.ALL)).toBe(true);
+    expect(isAllDataRetention(RetentionMode.TEMPORARY)).toBe(false);
+    expect(isAllDataRetention(undefined)).toBe(false);
+
+    expect(isForcedTemporaryRetention(RetentionMode.EPHEMERAL)).toBe(true);
+    expect(isForcedTemporaryRetention(RetentionMode.ALL)).toBe(false);
+    expect(isForcedTemporaryRetention(RetentionMode.TEMPORARY)).toBe(false);
+    expect(isForcedTemporaryRetention(undefined)).toBe(false);
+  });
+>>>>>>> upstream/main
 });
 
 describe('summarizationTriggerSchema', () => {
@@ -1882,12 +1936,20 @@ describe('interface.traceViewer', () => {
       parse({
         enabled: true,
         showInputOutput: true,
+<<<<<<< HEAD
+=======
+        showToolNames: true,
+>>>>>>> upstream/main
         maxRecords: 500,
         maxContentLength: 2000,
         requestsPerMinute: 10,
         requestTimeoutMs: 30_000,
       }),
     ).toBe(true);
+<<<<<<< HEAD
+=======
+    expect(parse({ showToolNames: 'yes' })).toBe(false);
+>>>>>>> upstream/main
     expect(parse({ requestTimeoutMs: 999 })).toBe(false);
     expect(parse({ requestTimeoutMs: 300_001 })).toBe(false);
     expect(parse({ maxRecords: 0 })).toBe(false);
@@ -1901,11 +1963,25 @@ describe('interface.traceViewer', () => {
     expect(interfaceSchema.parse({}).traceViewer).toBeUndefined();
   });
 
+<<<<<<< HEAD
+=======
+  it('names tool rounds from the tracing backend only when asked to', () => {
+    expect(resolveTraceViewerConfig({ enabled: true }).showToolNames).toBe(false);
+    expect(resolveTraceViewerConfig({ enabled: true, showToolNames: true }).showToolNames).toBe(
+      true,
+    );
+  });
+
+>>>>>>> upstream/main
   it('re-validates overrides that bypassed the schema', () => {
     expect(
       resolveTraceViewerConfig({
         enabled: 'true',
         showInputOutput: 1,
+<<<<<<< HEAD
+=======
+        showToolNames: 'true',
+>>>>>>> upstream/main
         maxRecords: 50_000,
         maxContentLength: -5,
         requestsPerMinute: Number.NaN,
@@ -1914,6 +1990,10 @@ describe('interface.traceViewer', () => {
     ).toEqual({
       enabled: false,
       showInputOutput: false,
+<<<<<<< HEAD
+=======
+      showToolNames: false,
+>>>>>>> upstream/main
       maxRecords: 10_000,
       maxContentLength: traceViewerDefaults.maxContentLength,
       requestsPerMinute: traceViewerDefaults.requestsPerMinute,
@@ -1921,3 +2001,64 @@ describe('interface.traceViewer', () => {
     });
   });
 });
+<<<<<<< HEAD
+=======
+
+describe('interfaceSchema agentSelectorLimit', () => {
+  it('defaults the unsearched agents selector list to ten entries', () => {
+    const result = interfaceSchema.parse({});
+    expect(result.agentSelectorLimit).toBe(10);
+  });
+
+  it('honors a deployment override and rejects out-of-bounds values', () => {
+    expect(interfaceSchema.parse({ agentSelectorLimit: 25 }).agentSelectorLimit).toBe(25);
+    expect(interfaceSchema.safeParse({ agentSelectorLimit: 0 }).success).toBe(false);
+    expect(interfaceSchema.safeParse({ agentSelectorLimit: 101 }).success).toBe(false);
+  });
+
+  it('normalizes runtime values that bypassed the schema back into bounds', () => {
+    expect(normalizeAgentSelectorLimit(25)).toBe(25);
+    expect(normalizeAgentSelectorLimit(undefined)).toBe(10);
+    expect(normalizeAgentSelectorLimit(0)).toBe(10);
+    expect(normalizeAgentSelectorLimit(101)).toBe(10);
+    expect(normalizeAgentSelectorLimit('10')).toBe(10);
+  });
+});
+
+describe('balance refill mode', () => {
+  test('keeps additive refill as the default for existing configurations', () => {
+    expect(balanceSchema.parse({ autoRefillEnabled: true }).refillMode).toBe('add');
+  });
+  test('accepts weekly non-accumulating reset with percentage display', () => {
+    expect(
+      balanceSchema.parse({
+        enabled: true,
+        startBalance: 300000000,
+        autoRefillEnabled: true,
+        refillIntervalValue: 1,
+        refillIntervalUnit: 'weeks',
+        refillAmount: 300000000,
+        refillMode: 'reset',
+        display: 'percent',
+      }),
+    ).toMatchObject({ refillMode: 'reset', display: 'percent' });
+  });
+  test('rejects unsupported refill modes', () => {
+    expect(balanceSchema.safeParse({ refillMode: 'rollover' }).success).toBe(false);
+  });
+});
+
+describe('reset interval validation', () => {
+  test.each([0, -1, 0.5, 1.5])(
+    'rejects reset interval %s while preserving additive settings',
+    (refillIntervalValue) => {
+      expect(balanceSchema.safeParse({ refillMode: 'reset', refillIntervalValue }).success).toBe(
+        false,
+      );
+      expect(balanceSchema.safeParse({ refillMode: 'add', refillIntervalValue }).success).toBe(
+        true,
+      );
+    },
+  );
+});
+>>>>>>> upstream/main

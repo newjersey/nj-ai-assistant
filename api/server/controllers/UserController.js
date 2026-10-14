@@ -1,8 +1,22 @@
+<<<<<<< HEAD
 const mongoose = require('mongoose');
 const { logger } = require('@librechat/data-schemas');
 const {
   getNewS3URL,
   needsRefresh,
+=======
+const bcrypt = require('bcryptjs');
+const mongoose = require('mongoose');
+const { logger, runAsSystem, tenantStorage } = require('@librechat/data-schemas');
+const {
+  getNewS3URL,
+  needsRefresh,
+  comparePassword,
+  checkEmailConfig,
+  createEmailChangeService,
+  createEmailChangeDeps,
+  resolveEmailChangeSettings,
+>>>>>>> upstream/main
   GenerationJobManager,
   getAppConfigOptionsFromUser,
   normalizeHttpError,
@@ -40,8 +54,35 @@ const {
   quiesceUserSchedules,
   restoreUserSchedulesFromDeletion,
 } = require('~/server/services/Schedules');
+<<<<<<< HEAD
 const db = require('~/models');
 
+=======
+const { sendEmail } = require('~/server/utils');
+const db = require('~/models');
+
+const emailChangeService = createEmailChangeService(
+  createEmailChangeDeps({
+    store: {
+      findUser: db.findUser,
+      getUserById: db.getUserById,
+      updateUser: db.updateUser,
+      findToken: db.findToken,
+      replaceTokenIfCurrent: db.replaceTokenIfCurrent,
+      deleteTokens: db.deleteTokens,
+    },
+    withTenant: (tenantId, operation) =>
+      tenantId ? tenantStorage.run({ tenantId }, operation) : runAsSystem(operation),
+    comparePassword: (user, password) =>
+      comparePassword(user, password, { compare: bcrypt.compare }),
+    sendEmail,
+    getAppConfig,
+    clientDomain: process.env.DOMAIN_CLIENT ?? 'http://localhost:3080',
+    appName: process.env.APP_TITLE || 'LibreChat',
+  }),
+);
+
+>>>>>>> upstream/main
 const PUBLIC_USER_RESPONSE_FIELDS = [
   '_id',
   'id',
@@ -503,6 +544,10 @@ const deleteUserController = async (req, res) => {
 
     await db.deleteMessages({ user: user.id });
     await db.deleteAllUserSessions({ userId: user.id });
+<<<<<<< HEAD
+=======
+    await db.deletePasskeysByUser(user.id);
+>>>>>>> upstream/main
     await db.deleteTransactions({ user: user.id });
     await db.deleteUserKey({ userId: user.id, all: true });
     await db.deleteBalances({ user: user._id });
@@ -630,12 +675,52 @@ const resendVerificationController = async (req, res) => {
   }
 };
 
+<<<<<<< HEAD
+=======
+const requestEmailChangeController = async (req, res) => {
+  try {
+    const userId = req.user?._id?.toString?.() ?? req.user?.id?.toString?.();
+    if (!userId) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+    const result = await emailChangeService.requestEmailChange({
+      body: req.body,
+      userId,
+      tenantId: req.user?.tenantId,
+      allowedDomains: req.config?.registration?.allowedDomains,
+      settings: resolveEmailChangeSettings(req.config?.emailChange),
+      emailEnabled: checkEmailConfig(),
+      ip: req.ip,
+    });
+    return res.status(result.status).json({ message: result.message, code: result.code });
+  } catch (error) {
+    logger.error('[requestEmailChangeController]', error);
+    return res.status(500).json({ message: 'Something went wrong.' });
+  }
+};
+
+const confirmEmailChangeController = async (req, res) => {
+  try {
+    const result = await emailChangeService.confirmEmailChange({ body: req.body, ip: req.ip });
+    return res.status(result.status).json({ message: result.message, code: result.code });
+  } catch (error) {
+    logger.error('[confirmEmailChangeController]', error);
+    return res.status(500).json({ message: 'Something went wrong.' });
+  }
+};
+
+>>>>>>> upstream/main
 module.exports = {
   getUserController,
   getTermsStatusController,
   acceptTermsController,
   deleteUserController,
   verifyEmailController,
+<<<<<<< HEAD
+=======
+  requestEmailChangeController,
+  confirmEmailChangeController,
+>>>>>>> upstream/main
   updateUserPluginsController,
   resendVerificationController,
   deleteUserMcpServers,

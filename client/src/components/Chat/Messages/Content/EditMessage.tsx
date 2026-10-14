@@ -86,6 +86,10 @@ const EditMessage = ({
         /** Carry the edited user message's quoted excerpts forward so the new
          *  turn sends the same referenced context the pills still show. */
         overrideQuotes: message.quotes,
+<<<<<<< HEAD
+=======
+        overrideReasoning: message.reasoningOverride ?? null,
+>>>>>>> upstream/main
         addedConvo: getAddedConvo() || undefined,
       },
     );
@@ -124,6 +128,10 @@ const EditMessage = ({
          *  the regenerated response is primed and given the same context as the first. */
         overrideManualSkills: parentMessage.manualSkills,
         overrideQuotes: parentMessage.quotes,
+<<<<<<< HEAD
+=======
+        overrideReasoning: parentMessage.reasoningOverride ?? null,
+>>>>>>> upstream/main
         addedConvo: getAddedConvo() || undefined,
       },
     );
@@ -162,6 +170,10 @@ const EditMessage = ({
       );
       if (!isInMessages) {
         message.text = data.text;
+<<<<<<< HEAD
+=======
+        message.privacyRevision = undefined;
+>>>>>>> upstream/main
       } else {
         setMessages(
           messages.map((msg) =>
@@ -169,6 +181,10 @@ const EditMessage = ({
               ? {
                   ...msg,
                   text: data.text,
+<<<<<<< HEAD
+=======
+                  privacyRevision: undefined,
+>>>>>>> upstream/main
                 }
               : msg,
           ),
@@ -187,10 +203,17 @@ const EditMessage = ({
         e.preventDefault();
         submitButtonRef.current?.click();
       }
+<<<<<<< HEAD
       // if (e.key === 's' && (e.ctrlKey || e.metaKey)) {
       //   e.preventDefault();
       //   saveButtonRef.current?.click();
       // }
+=======
+      if (e.key === 's' && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
+        saveButtonRef.current?.click();
+      }
+>>>>>>> upstream/main
       if (e.key === 'Escape') {
         e.preventDefault();
         enterEdit(true);
@@ -231,6 +254,10 @@ const EditMessage = ({
       >
         {saveError && <Alert variant="error">{localize('com_ui_save_message_error')}</Alert>}
         <TextareaAutosize
+<<<<<<< HEAD
+=======
+          focusOutline="hidden"
+>>>>>>> upstream/main
           {...registerProps}
           ref={(e) => {
             ref(e);
@@ -240,9 +267,14 @@ const EditMessage = ({
           data-testid="message-text-editor"
           className={cn(
             'message-editor-text max-h-[65vh] min-h-24 w-full resize-y whitespace-pre-wrap',
+<<<<<<< HEAD
             'break-words rounded-lg border border-border-medium bg-surface-tertiary-alt',
             'px-3 py-2 text-text-primary',
             'focus-visible:outline-none',
+=======
+            'border-border-medium bg-surface-tertiary-alt rounded-lg border break-words',
+            'text-text-primary px-3 py-2',
+>>>>>>> upstream/main
             isRTL ? 'text-right' : 'text-left',
             'disabled:opacity-50 md:max-h-[75vh]',
           )}
@@ -260,7 +292,11 @@ const EditMessage = ({
             English labels need, and a translated label needs more still. */}
         <footer className="flex flex-wrap items-center justify-between gap-2">
           <span
+<<<<<<< HEAD
             className="line-clamp-2 min-w-0 flex-1 text-xs text-text-secondary"
+=======
+            className="text-text-secondary line-clamp-2 min-w-0 flex-1 text-xs"
+>>>>>>> upstream/main
             aria-live="polite"
           >
             {getStatusMessage()}
@@ -274,7 +310,10 @@ const EditMessage = ({
             >
               {localize('com_ui_cancel')}
             </Button>
+<<<<<<< HEAD
             {/* NJ: Comment Save, save+submit is right there
+=======
+>>>>>>> upstream/main
             <Button
               ref={saveButtonRef}
               size="sm"
@@ -286,7 +325,10 @@ const EditMessage = ({
                 ? localize('com_ui_saving')
                 : localize('com_ui_save')}
             </Button>
+<<<<<<< HEAD
             */}
+=======
+>>>>>>> upstream/main
             {/* A rerun with no edits is a first-class action, not a mistake: a cancelled
                 or failed response, or a backend restarted on different parameters, has
                 to be reissued byte-for-byte. Validity gates only an edited USER draft,

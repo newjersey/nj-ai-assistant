@@ -2,6 +2,15 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import CollapsibleText from '../CollapsibleText';
 
+<<<<<<< HEAD
+=======
+let mockRemScale = 1;
+jest.mock('@librechat/client', () => ({
+  ...jest.requireActual('@librechat/client'),
+  useRemScale: () => mockRemScale,
+}));
+
+>>>>>>> upstream/main
 jest.mock('~/hooks', () => ({
   useLocalize: () => (key: string) => key,
 }));
@@ -17,6 +26,13 @@ const linkLabel = 'focusable link';
 const stubScrollHeight = (height: number) =>
   jest.spyOn(HTMLElement.prototype, 'scrollHeight', 'get').mockReturnValue(height);
 
+<<<<<<< HEAD
+=======
+beforeEach(() => {
+  mockRemScale = 1;
+});
+
+>>>>>>> upstream/main
 describe('CollapsibleText', () => {
   it('renders children untouched while the preference is off', () => {
     const scrollHeight = stubScrollHeight(5000);
@@ -168,6 +184,92 @@ describe('CollapsibleText', () => {
     }
   });
 
+<<<<<<< HEAD
+=======
+  it.each([
+    [0.5, 128, 131],
+    [1.5, 384, 395],
+  ])(
+    'scales the collapsed boundary and tolerance with the root at %s',
+    (scale, collapsedMaxHeight, scrollHeight) => {
+      mockRemScale = scale;
+      const scroll = stubScrollHeight(scrollHeight);
+      try {
+        render(
+          <CollapsibleText enabled={true}>
+            <p>{plainMessage}</p>
+          </CollapsibleText>,
+        );
+        expect(screen.queryByRole('button')).toBeNull();
+        const region = screen.getByText(plainMessage).closest('[id]');
+        expect(region).not.toHaveStyle({ maxHeight: `${collapsedMaxHeight}px` });
+      } finally {
+        scroll.mockRestore();
+      }
+    },
+  );
+
+  it.each([
+    [0.5, 128],
+    [1.5, 384],
+  ])('uses the scaled boundary when revealing focused content at %s', (scale, boundary) => {
+    mockRemScale = scale;
+    const scroll = stubScrollHeight(boundary * 2);
+    try {
+      render(
+        <CollapsibleText enabled={true}>
+          <p>
+            <a href="#target">{linkLabel}</a>
+          </p>
+        </CollapsibleText>,
+      );
+      const link = screen.getByRole('link');
+      link.getBoundingClientRect = () =>
+        ({
+          top: boundary + 1,
+          bottom: boundary + 2,
+          height: 1,
+          width: 40,
+          left: 0,
+          right: 40,
+        }) as DOMRect;
+      fireEvent(link, new FocusEvent('focusin', { bubbles: true }));
+      expect(screen.getByRole('button', { name: 'com_ui_show_less' })).toHaveAttribute(
+        'aria-expanded',
+        'true',
+      );
+    } finally {
+      scroll.mockRestore();
+    }
+  });
+
+  it('re-measures overflow when the root scale changes', () => {
+    mockRemScale = 1.5;
+    const scroll = stubScrollHeight(390);
+    try {
+      const { rerender } = render(
+        <CollapsibleText enabled={true}>
+          <p>{plainMessage}</p>
+        </CollapsibleText>,
+      );
+      expect(screen.queryByRole('button')).toBeNull();
+
+      mockRemScale = 0.5;
+      rerender(
+        <CollapsibleText enabled={true}>
+          <p>{plainMessage}</p>
+        </CollapsibleText>,
+      );
+      expect(screen.getByRole('button', { name: 'com_ui_show_more' })).toHaveAttribute(
+        'aria-expanded',
+        'false',
+      );
+    } finally {
+      scroll.mockRestore();
+    }
+  });
+
+>>>>>>> upstream/main
   it('expands in place and offers show less', () => {
     const scrollHeight = stubScrollHeight(500);
     try {

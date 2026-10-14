@@ -21,7 +21,11 @@ function getHandlers() {
       registry: getCodeEnvironmentRegistry(),
       principalIsActive: db.isAgentTriggerPrincipalActive,
       conversations: {
+<<<<<<< HEAD
         get: db.getConvo,
+=======
+        get: db.getConvoCodeEnvironmentDecision,
+>>>>>>> upstream/main
         replaceDecision: db.replaceConvoCodeEnvironmentDecision,
       },
       generations: GenerationJobManager,

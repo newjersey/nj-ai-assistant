@@ -33,9 +33,15 @@ async function invalidateCodeEnvironmentConfigCache(tenantId) {
   await getCodeEnvironmentRegistry().invalidateAccessibleConfigurations(tenantId);
 }
 
+<<<<<<< HEAD
 const loadBaseConfig = async () => {
   /** @type {TCustomConfig} */
   const config = (await loadCustomConfig()) ?? {};
+=======
+const loadBaseConfig = async (mode) => {
+  /** @type {TCustomConfig} */
+  const config = (await loadCustomConfig(true, { mode })) ?? {};
+>>>>>>> upstream/main
   /** @type {Record<string, FunctionTool>} */
   const systemTools = loadAndFormatTools({
     adminFilter: config.filteredTools,
@@ -68,6 +74,12 @@ const { getAppConfig, clearAppConfigCache, clearOverrideCache } = createAppConfi
   },
 });
 
+<<<<<<< HEAD
+=======
+// Config owns the reader; models never import this module to obtain it.
+db.initializeMessageBudget(getAppConfig);
+
+>>>>>>> upstream/main
 /**
  * Invalidate all config-related caches after an admin config mutation.
  * Clears the base config, per-principal override caches, tool caches,

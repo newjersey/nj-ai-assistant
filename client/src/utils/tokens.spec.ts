@@ -202,6 +202,39 @@ describe('token index', () => {
     expect(totals.estTokens).toBe(5);
   });
 
+<<<<<<< HEAD
+=======
+  it('estimates a previewed tool call from its stored lengths, not the preview', () => {
+    buildIndex(CONVO, [
+      msg('u1', Constants.NO_PARENT, true, 12),
+      {
+        messageId: 'a1',
+        parentMessageId: 'u1',
+        isCreatedByUser: false,
+        conversationId: CONVO,
+        text: '',
+        content: [
+          {
+            type: 'tool_call',
+            tool_call: {
+              name: 'run',
+              args: 'aa',
+              argsTruncated: true,
+              argsLength: 17,
+              output: 'o…o',
+              outputTruncated: true,
+              outputLength: 20,
+            },
+          },
+        ],
+      } as unknown as TMessage,
+    ]);
+
+    /** name 3 + stored args 17 + stored output 20 = 40 chars / 4 = 10. */
+    expect(sumBranch(CONVO, 'a1').estTokens).toBe(10);
+  });
+
+>>>>>>> upstream/main
   it('exposes the count-less tail estimate so live output is not double-counted', () => {
     buildIndex(CONVO, [
       msg('u1', Constants.NO_PARENT, true, 12),
@@ -844,6 +877,50 @@ describe('per-message usage index (branch + total)', () => {
     expect(sumTotalUsage(CONVO)).toEqual(EMPTY_USAGE);
   });
 
+<<<<<<< HEAD
+=======
+  it('selects only the viewed response as the last turn across compaction and regeneration', () => {
+    buildIndex(CONVO, [
+      msg('u1', Constants.NO_PARENT, true, 10),
+      responseMsg('a1', 'u1', 50, USAGE_A),
+      msg('u2', 'a1', true, 20),
+      {
+        ...responseMsg('a2', 'u2', 80, { ...USAGE_B, cacheRead: 400, cacheWrite: 30 }),
+        metadata: {
+          usage: { ...USAGE_B, cacheRead: 400, cacheWrite: 30 },
+          summaryUsedTokens: 500,
+        },
+      },
+      responseMsg('a2-alt', 'u2', 60, { ...USAGE_A, cost: 0 }),
+    ]);
+
+    expect(sumBranch(CONVO, 'a2').lastTurnUsage).toEqual({
+      input: 200,
+      output: 80,
+      cacheRead: 400,
+      cacheWrite: 30,
+      cost: 0.02,
+      costKnown: true,
+    });
+    expect(sumBranch(CONVO, 'a2').usage.input).toBe(300);
+    expect(sumBranch(CONVO, 'a2-alt').lastTurnUsage?.cost).toBe(0);
+    expect(sumBranch(CONVO, 'u2').lastTurnUsage).toBeUndefined();
+    expect(sumTotalUsage(CONVO).cacheRead).toBe(400);
+  });
+
+  it('does not borrow an ancestor response when the selected tail has no usage', () => {
+    buildIndex(CONVO, [
+      msg('u1', Constants.NO_PARENT, true, 10),
+      responseMsg('a1', 'u1', 50, USAGE_A),
+      msg('u2', 'a1', true, 10),
+      msg('a2', 'u2', false, 20),
+    ]);
+    expect(sumBranch(CONVO, 'a2').lastTurnUsage).toBeUndefined();
+    expect(sumBranch(CONVO, 'a2').usage.cost).toBe(0.01);
+    expect(sumBranch(CONVO, 'u2').lastTurnUsage).toBeUndefined();
+  });
+
+>>>>>>> upstream/main
   it('preserves a prior entry usage when a rebuilt message lacks metadata.usage', () => {
     /** Live finalize flushes usage into the index before persisted metadata
      *  reaches the cache; a mid-session rebuild from a cache message without
@@ -861,6 +938,10 @@ describe('per-message usage index (branch + total)', () => {
     buildIndex(CONVO, [msg('u1', Constants.NO_PARENT, true, 10), msg('a1', 'u1', false, 50)]);
     expect(sumBranch(CONVO, 'a1').usage.cost).toBeCloseTo(0.01);
     expect(sumBranch(CONVO, 'a1').usage.input).toBe(100);
+<<<<<<< HEAD
+=======
+    expect(sumBranch(CONVO, 'a1').lastTurnUsage?.cost).toBeCloseTo(0.01);
+>>>>>>> upstream/main
   });
 
   it('restores branch cost from sticky history after regenerate drops then re-adds a sibling', () => {
@@ -1016,14 +1097,27 @@ describe('per-message usage index (branch + total)', () => {
         'a1',
         {
           contextBudget: 1000,
+<<<<<<< HEAD
           breakdown: { maxContextTokens: 1000, instructionTokens: 100, messageTokens: 60 },
+=======
+          breakdown: {
+            maxContextTokens: 1000,
+            instructionTokens: 100,
+            summaryTokens: 25,
+            messageTokens: 60,
+          },
+>>>>>>> upstream/main
         },
       ],
       /** Nothing to read at all — skipped rather than counted as a full window. */
       ['a2', { contextBudget: 1000, breakdown: { maxContextTokens: 1000 } }],
     ]);
 
+<<<<<<< HEAD
     expect(collectAnchorSeries(CONVO, 'a2', anchors)).toEqual([{ used: 160, basis: 'breakdown' }]);
+=======
+    expect(collectAnchorSeries(CONVO, 'a2', anchors)).toEqual([{ used: 185, basis: 'breakdown' }]);
+>>>>>>> upstream/main
   });
 
   it('latestExchangeTokens sums the tail response and its user turn', () => {

@@ -67,10 +67,48 @@ const readArtifacts = async () =>
     id: el.getAttribute('data-id'),
   }));
 
+<<<<<<< HEAD
 describe('MarkdownBlocks artifact-index parity (e2e)', () => {
   it('assigns document-order indices to multiple artifacts', async () => {
     const content = `${artifact('a', 'A')}\n\n${artifact('b', 'B')}`;
     render(wrap(<Markdown content={content} isLatestMessage={false} />));
+=======
+/** The latest message of a conversation, generating while `submitting` holds. */
+const liveView = (content: string, submitting: boolean) => (
+  <MemoryRouter>
+    <RecoilRoot>
+      <MessageContext.Provider
+        value={{
+          messageId: 'm1',
+          isExpanded: true,
+          isSubmitting: submitting,
+          isLatestMessage: true,
+        }}
+      >
+        <Markdown content={content} isLatestMessage={true} />
+      </MessageContext.Provider>
+    </RecoilRoot>
+  </MemoryRouter>
+);
+
+/**
+ * A finished message renders through one pipeline; one that streamed in this view
+ * renders per block. Every parity case has to hold on both paths.
+ */
+const renderMessage = (content: string, streamed: boolean) => {
+  const rendered = render(liveView(content, streamed));
+  rendered.rerender(liveView(content, false));
+  return rendered;
+};
+
+describe.each([
+  ['a finished', false],
+  ['a streamed', true],
+])('MarkdownBlocks artifact-index parity (e2e) in %s message', (_label, streamed) => {
+  it('assigns document-order indices to multiple artifacts', async () => {
+    const content = `${artifact('a', 'A')}\n\n${artifact('b', 'B')}`;
+    renderMessage(content, streamed);
+>>>>>>> upstream/main
 
     expect(await readArtifacts()).toEqual([
       { idx: '0', id: 'a' },
@@ -85,7 +123,11 @@ describe('MarkdownBlocks artifact-index parity (e2e)', () => {
     const oldIdx = await readArtifacts();
     unmount();
 
+<<<<<<< HEAD
     render(wrap(<Markdown content={content} isLatestMessage={false} />));
+=======
+    renderMessage(content, streamed);
+>>>>>>> upstream/main
     const newIdx = await readArtifacts();
 
     expect(newIdx).toEqual(oldIdx);
@@ -95,16 +137,32 @@ describe('MarkdownBlocks artifact-index parity (e2e)', () => {
     ]);
   });
 
+<<<<<<< HEAD
+=======
+  /**
+   * A finished message moves to per-block rendering on its first edit, and per
+   * block the base-aware keys remount the blocks whose index shifted.
+   */
+>>>>>>> upstream/main
   it('refreshes artifact indices when an in-place edit inserts an artifact before another', async () => {
     const before = `Intro.\n\n${artifact('b', 'B')}`;
     const after = `${artifact('a', 'A')}\n\n${artifact('b', 'B')}`;
 
+<<<<<<< HEAD
     const { rerender } = render(wrap(<Markdown content={before} isLatestMessage={false} />));
     expect(await readArtifacts()).toEqual([{ idx: '0', id: 'b' }]);
 
     rerender(wrap(<Markdown content={after} isLatestMessage={false} />));
     // 'b' was index 0; inserting 'a' before it shifts its base to 1. Without the
     // base-aware block key its ref-cached index would stay 0 (duplicating 'a').
+=======
+    const { rerender } = renderMessage(before, streamed);
+    expect(await readArtifacts()).toEqual([{ idx: '0', id: 'b' }]);
+
+    rerender(liveView(after, false));
+    // 'b' was index 0; inserting 'a' before it shifts it to 1. Without a remount
+    // its ref-cached index would stay 0 (duplicating 'a').
+>>>>>>> upstream/main
     expect(await readArtifacts()).toEqual([
       { idx: '0', id: 'a' },
       { idx: '1', id: 'b' },
@@ -115,7 +173,11 @@ describe('MarkdownBlocks artifact-index parity (e2e)', () => {
     // `:artifact{}` (text directive) renders as literal text, not an Artifact, so
     // the following real artifact must still be index 0.
     const content = `See :artifact{identifier="x"} inline.\n\n${artifact('a', 'A')}`;
+<<<<<<< HEAD
     render(wrap(<Markdown content={content} isLatestMessage={false} />));
+=======
+    renderMessage(content, streamed);
+>>>>>>> upstream/main
 
     expect(await readArtifacts()).toEqual([{ idx: '0', id: 'a' }]);
   });
@@ -141,7 +203,11 @@ describe('MarkdownBlocks artifact-index parity (e2e)', () => {
       ':::',
     ].join('\n');
 
+<<<<<<< HEAD
     render(wrap(<Markdown content={content} isLatestMessage={false} />));
+=======
+    renderMessage(content, streamed);
+>>>>>>> upstream/main
 
     const [artifactNode] = await screen.findAllByTestId('art');
     expect(artifactNode.getAttribute('data-content')).toBe(`${markdown}\n`);

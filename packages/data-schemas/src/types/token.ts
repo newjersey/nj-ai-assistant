@@ -4,6 +4,10 @@ export interface IToken extends Document {
   userId: Types.ObjectId;
   email?: string;
   type?: string;
+<<<<<<< HEAD
+=======
+  scope?: string;
+>>>>>>> upstream/main
   identifier?: string;
   token: string;
   createdAt: Date;
@@ -16,6 +20,10 @@ export interface TokenCreateData {
   userId: Types.ObjectId | string;
   email?: string;
   type?: string;
+<<<<<<< HEAD
+=======
+  scope?: string;
+>>>>>>> upstream/main
   identifier?: string;
   token: string;
   expiresIn: number;
@@ -27,6 +35,10 @@ export interface TokenQuery {
   token?: string;
   email?: string | null;
   type?: string | null;
+<<<<<<< HEAD
+=======
+  scope?: string;
+>>>>>>> upstream/main
   identifier?: string | RegExp | null;
   /** Internal optimistic-concurrency selector for OAuth token record generations. */
   metadataCredentialSetId?: string | null;
@@ -35,6 +47,10 @@ export interface TokenQuery {
 export interface TokenUpdateData {
   email?: string;
   type?: string;
+<<<<<<< HEAD
+=======
+  scope?: string;
+>>>>>>> upstream/main
   identifier?: string;
   token?: string;
   expiresAt?: Date;

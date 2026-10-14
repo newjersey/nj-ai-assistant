@@ -43,7 +43,11 @@ Scheduled chats remain experimental and default-off.
   `experimental.js` clustered entrypoint does not arm the engine and rejects schedule writes.
 - Deferred account deletion blocks new remote API admission but cannot yet drain already-admitted
   OpenAI-compatible or Responses requests; see
+<<<<<<< HEAD
   [#14594](https://github.com/danny-avila/LibreChat/issues/14594).
+=======
+  [#14594](https://github.com/LibreChat-AI/LibreChat/issues/14594).
+>>>>>>> upstream/main
 
 ## Test debt
 

@@ -1,6 +1,10 @@
 import type {
   TUserFavorite,
   RefillIntervalUnit,
+<<<<<<< HEAD
+=======
+  BalanceRefillMode,
+>>>>>>> upstream/main
   StatefulCodeEnvironment,
 } from 'librechat-data-provider';
 import type { Document, Types } from 'mongoose';
@@ -20,6 +24,10 @@ export interface IUser extends Document {
   username?: string;
   email: string;
   emailVerified: boolean;
+<<<<<<< HEAD
+=======
+  emailChangedAt?: Date;
+>>>>>>> upstream/main
   password?: string;
   avatar?: string;
   provider: string;
@@ -35,6 +43,14 @@ export interface IUser extends Document {
   plugins?: string[];
   openidIssuer?: string;
   twoFactorEnabled?: boolean;
+<<<<<<< HEAD
+=======
+  /**
+   * When required enrollment promoted this account. Access tokens are stateless, so this is the
+   * cutoff that retires the ones minted while the account still had no second factor.
+   */
+  twoFactorEnrolledAt?: Date | null;
+>>>>>>> upstream/main
   totpSecret?: string;
   backupCodes?: Array<{
     codeHash: string;
@@ -47,6 +63,15 @@ export interface IUser extends Document {
     used: boolean;
     usedAt?: Date | null;
   }>;
+<<<<<<< HEAD
+=======
+  /** Instant of the last credential change; bearer tokens issued before it are rejected */
+  credentialsChangedAt?: Date | null;
+  /** SHA-256 hash of the one-time nonce that authorizes the backup-code acknowledgement step. */
+  twoFactorAcknowledgementNonceHash?: string | null;
+  /** SHA-256 hash of the one-time nonce that authorizes required-enrollment finalization. */
+  twoFactorFinalizationNonceHash?: string | null;
+>>>>>>> upstream/main
   refreshToken?: Array<{
     refreshToken: string;
   }>;
@@ -79,6 +104,33 @@ export interface IUser extends Document {
   openidTokens?: OIDCTokens;
 }
 
+<<<<<<< HEAD
+=======
+/**
+ * Predicates that bind a required two-factor enrollment mutation to the exact state its
+ * caller observed. Every supplied field is ANDed into the compare-and-swap filter, so a
+ * concurrent regeneration, acknowledgement, or finalization loses the race and fails closed.
+ */
+export interface TwoFactorEnrollmentGuard {
+  pendingTotpSecret?: string;
+  pendingBackupCodes?: NonNullable<IUser['pendingBackupCodes']>;
+  twoFactorAcknowledgementNonceHash?: string;
+  twoFactorFinalizationNonceHash?: string;
+}
+
+/** Fields a required two-factor enrollment step may write; `null` clears the stored value. */
+export interface TwoFactorEnrollmentUpdate {
+  totpSecret?: string | null;
+  backupCodes?: NonNullable<IUser['backupCodes']>;
+  twoFactorEnabled?: boolean;
+  twoFactorEnrolledAt?: Date;
+  pendingTotpSecret?: string | null;
+  pendingBackupCodes?: NonNullable<IUser['pendingBackupCodes']>;
+  twoFactorAcknowledgementNonceHash?: string | null;
+  twoFactorFinalizationNonceHash?: string | null;
+}
+
+>>>>>>> upstream/main
 export interface OIDCTokens {
   access_token?: string;
   id_token?: string;
@@ -93,6 +145,10 @@ export interface BalanceConfig {
   refillIntervalValue?: number;
   refillIntervalUnit?: RefillIntervalUnit;
   refillAmount?: number;
+<<<<<<< HEAD
+=======
+  refillMode?: BalanceRefillMode;
+>>>>>>> upstream/main
   reservationTtlMs?: number;
 }
 
@@ -100,6 +156,26 @@ export interface CreateUserRequest extends Partial<IUser> {
   email: string;
 }
 
+<<<<<<< HEAD
+=======
+/** A user's own fields, without Mongoose document members. */
+type UserFields = Omit<IUser, keyof Document>;
+
+/**
+ * A stored user as plain data with a storage-neutral id: what `.lean()` queries and `.toObject()`
+ * return. New contracts take and return this rather than the `IUser` document type.
+ */
+export type UserRecord = UserFields & { _id: { toString(): string } };
+
+/** The fields a new user is created with, as plain data. */
+export type NewUserData = Partial<UserFields> & { email: string };
+
+/** The created user, or `user_exists` when an account already holds its email or provider identity. */
+export type CreateUserIfAbsentResult =
+  | { ok: true; value: UserRecord }
+  | { ok: false; error: { code: 'user_exists' } };
+
+>>>>>>> upstream/main
 export interface UpdateUserRequest {
   name?: string;
   username?: string;

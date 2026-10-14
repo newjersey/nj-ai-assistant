@@ -21,13 +21,22 @@ export type AgentParameterConfig = {
 
 export type ResolvedAgentParameterSettings = {
   /**
+<<<<<<< HEAD
    * Every parameter the endpoint schema defines for this model. Pruning reads
    * this, so a value the role may not *see* is still recognised and preserved:
+=======
+   * Every parameter the endpoint schema defines after administrator drops. Pruning reads
+   * this, so a value hidden by the model or role is still recognised and preserved:
+>>>>>>> upstream/main
    * dropping it here would delete another user's configuration on an unrelated
    * save by someone without the permission.
    */
   parameters: SettingDefinition[];
+<<<<<<< HEAD
   /** The subset that gets a control. Role-gated parameters are absent. */
+=======
+  /** The subset that gets a control. Model-hidden and role-gated parameters are absent. */
+>>>>>>> upstream/main
   visibleParameters: SettingDefinition[];
   schemaResolved: boolean;
 };
@@ -67,6 +76,7 @@ export function resolveAgentParameterSettings({
     agentParamSettings[combinedKey] ?? agentParamSettings[overriddenEndpointKey];
   const overriddenParams = customParams?.paramDefinitions;
   const overriddenParamsMap = keyBy(overriddenParams ?? [], 'key');
+<<<<<<< HEAD
   const modelAwareParams = applyModelAwareDefaults(
     (defaultParams ?? []).filter((param) => param != null && !dropParamsSet.has(param.key)),
     overriddenEndpointKey,
@@ -75,11 +85,33 @@ export function resolveAgentParameterSettings({
   const parameters = modelAwareParams.map(
     (param) => (overriddenParamsMap[param.key] as SettingDefinition) ?? param,
   );
+=======
+  /** Keep endpoint-recognized keys independent of model visibility. Only explicit
+   * administrator drops remove keys from the schema used by both save paths. */
+  const endpointParams = (defaultParams ?? []).filter(
+    (param) => param != null && !dropParamsSet.has(param.key),
+  );
+  const applyOverride = (param: SettingDefinition) =>
+    (overriddenParamsMap[param.key] as SettingDefinition) ?? param;
+  const parameters = endpointParams.map(applyOverride);
+  const visibleParameters = applyModelAwareDefaults(
+    endpointParams,
+    overriddenEndpointKey,
+    model,
+    resolvedEndpointsConfig[provider]?.responsesApiRouting,
+  )
+    .map(applyOverride)
+    .filter((param) => param.key !== 'web_search' || webSearchAllowed);
+>>>>>>> upstream/main
 
   return {
     schemaResolved: defaultParams != null || overriddenParams != null,
     parameters,
+<<<<<<< HEAD
     visibleParameters: parameters.filter((param) => param.key !== 'web_search' || webSearchAllowed),
+=======
+    visibleParameters,
+>>>>>>> upstream/main
   };
 }
 

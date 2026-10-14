@@ -13,7 +13,10 @@ const {
   isUserSourced,
   createAuthIdentityContext,
   MCPConnection,
+<<<<<<< HEAD
   MCPErrorCodes,
+=======
+>>>>>>> upstream/main
   MCPCatalogCapacityError,
   splitMCPToolKey,
   normalizeServerName,
@@ -21,9 +24,13 @@ const {
   redactServerSecrets,
   sanitizeMcpIconPath,
   redactAllServerSecrets,
+<<<<<<< HEAD
   isMCPDomainNotAllowedError,
   isMCPInspectionFailedError,
   isMCPOAuthSecretReentryRequiredError,
+=======
+  getMCPErrorResponse,
+>>>>>>> upstream/main
   prepareMCPServerOAuthDeletion,
   cleanupDeletedMCPServerOAuthUsers,
 } = require('@librechat/api');
@@ -35,6 +42,10 @@ const {
   PermissionTypes,
   MCP_USER_INPUT_FIELDS,
   MCPServerUserInputSchema,
+<<<<<<< HEAD
+=======
+  resolveMCPAppsPolicy,
+>>>>>>> upstream/main
 } = require('librechat-data-provider');
 const {
   resolveConfigServers,
@@ -61,6 +72,7 @@ const db = require('~/models');
  * @returns {import('express').Response | null} Response if handled, null if not an MCP error
  */
 function handleMCPError(error, res) {
+<<<<<<< HEAD
   if (isMCPDomainNotAllowedError(error)) {
     return res.status(error.statusCode).json({
       error: error.code,
@@ -105,6 +117,10 @@ function handleMCPError(error, res) {
   }
 
   return null;
+=======
+  const response = getMCPErrorResponse(error);
+  return response ? res.status(response.statusCode).json(response.body) : null;
+>>>>>>> upstream/main
 }
 
 /** Disposes a stale local connection after its DB-backed config has changed. */
@@ -181,6 +197,19 @@ const getMCPTools = async (req, res) => {
     }
 
     const mcpConfig = await resolveAllMcpConfigs(userId, req.user);
+<<<<<<< HEAD
+=======
+    const mcpApps = resolveMCPAppsPolicy(
+      req.config?.mcpSettings?.apps,
+      undefined,
+      req.config?.mcpAppSandbox?.maxPersistedAppBytes,
+      req.config?.mcpAppSandbox?.maxAdmissionRequestsPerMinute,
+      req.config?.mcpAppSandbox?.url,
+      req.config?.mcpAppSandbox?.maxActiveViews,
+      req.config?.mcpAppSandbox?.maxActionPreviewChars,
+      req.config?.mcpAppSandbox?.operationLimits,
+    );
+>>>>>>> upstream/main
     /**
      * A server whose normalized name is claimed by an earlier server produces
      * IDENTICAL model-facing tool keys — selecting its tools would silently
@@ -231,6 +260,10 @@ const getMCPTools = async (req, res) => {
         oboIdentityContext,
         signal: catalogAbortController.signal,
         recoveryPolicy: req.config?.mcpSettings?.catalogRecovery,
+<<<<<<< HEAD
+=======
+        mcpApps,
+>>>>>>> upstream/main
       });
     } finally {
       res.off('close', abortCatalogLoad);

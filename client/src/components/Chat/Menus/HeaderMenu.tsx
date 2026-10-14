@@ -10,7 +10,11 @@ import type * as t from '~/common';
 import { BookmarkContext } from '~/Providers/BookmarkContext';
 import useBookmarkItems from '~/hooks/Chat/useBookmarkItems';
 import useTemporaryChat from '~/hooks/Chat/useTemporaryChat';
+<<<<<<< HEAD
 import useExportShare from '~/hooks/Chat/useExportShare';
+=======
+import useChatOptions from '~/hooks/Chat/useChatOptions';
+>>>>>>> upstream/main
 import useMultiConvo from '~/hooks/Chat/useMultiConvo';
 import { useHasAccess, useLocalize } from '~/hooks';
 import { cn } from '~/utils';
@@ -25,8 +29,16 @@ export default function HeaderMenu({
   startupConfig,
   trace,
   className,
+<<<<<<< HEAD
 }: {
   startupConfig?: TStartupConfig;
+=======
+  readOnly = false,
+}: {
+  startupConfig?: TStartupConfig;
+  /** A read-only subagent thread offers share and export but no edits to the chat. */
+  readOnly?: boolean;
+>>>>>>> upstream/main
   /** Owned by the header, which also renders the desktop trace button from it. */
   trace?: TraceControl;
   className?: string;
@@ -51,13 +63,25 @@ export default function HeaderMenu({
   const multiConvo = useMultiConvo();
   const temporary = useTemporaryChat();
   const bookmarks = useBookmarkItems({ enabled: hasAccessToBookmarks === true });
+<<<<<<< HEAD
   const exportShare = useExportShare({
     isSharedButtonEnabled: startupConfig?.sharedLinksEnabled ?? false,
+=======
+  const exportShare = useChatOptions({
+    isSharedButtonEnabled: startupConfig?.sharedLinksEnabled ?? false,
+    readOnly,
+    closeMenu: () => setIsOpen(false),
+>>>>>>> upstream/main
   });
 
   const showBookmarks = hasAccessToBookmarks === true && bookmarks.show;
   const showCompare = hasAccessToMultiConvo === true && multiConvo.show;
+<<<<<<< HEAD
   const showTemporary = hasAccessToTemporaryChat === true && temporary.show;
+=======
+  const showTemporary =
+    (hasAccessToTemporaryChat === true || temporary.isEnforced) && temporary.show;
+>>>>>>> upstream/main
 
   const items: t.MenuItemProps[] = [];
 
@@ -74,9 +98,15 @@ export default function HeaderMenu({
       id: 'header-bookmarks',
       label: localize('com_ui_bookmarks'),
       icon: bookmarks.hasBookmarks ? (
+<<<<<<< HEAD
         <BookmarkFilledIcon className="size-4 text-text-secondary" />
       ) : (
         <BookmarkIcon className="size-4 text-text-secondary" />
+=======
+        <BookmarkFilledIcon className="text-text-secondary size-4" />
+      ) : (
+        <BookmarkIcon className="text-text-secondary size-4" />
+>>>>>>> upstream/main
       ),
       subItems: bookmarks.items,
     });
@@ -86,7 +116,11 @@ export default function HeaderMenu({
     items.push({
       id: 'header-compare',
       label: localize('com_ui_add_multi_conversation'),
+<<<<<<< HEAD
       icon: <PlusCircle className="size-4 text-text-secondary" />,
+=======
+      icon: <PlusCircle className="text-text-secondary size-4" />,
+>>>>>>> upstream/main
       onClick: multiConvo.addConversation,
     });
   }
@@ -95,11 +129,16 @@ export default function HeaderMenu({
     pushGroup({
       id: 'header-trace',
       label: localize('com_ui_trace_view'),
+<<<<<<< HEAD
       icon: <ChartNoAxesGantt className="size-4 text-text-secondary" />,
+=======
+      icon: <ChartNoAxesGantt className="text-text-secondary size-4" />,
+>>>>>>> upstream/main
       onClick: trace.open,
     });
   }
 
+<<<<<<< HEAD
   /* NJ: We disable exporting/sharing
   if (exportShare.show) {
     pushGroup(...exportShare.items);
@@ -117,11 +156,33 @@ export default function HeaderMenu({
         <Check className="size-4 text-text-primary" />
       ) : (
         <HatGlasses className="size-4 text-text-secondary" />
+=======
+  if (exportShare.show) {
+    pushGroup(...exportShare.items);
+  }
+
+  if (showTemporary) {
+    pushGroup({
+      id: 'header-temporary',
+      label: temporary.isEnforced
+        ? localize('com_ui_temporary_enforced')
+        : localize('com_ui_temporary'),
+      ariaChecked: temporary.isTemporary,
+      disabled: temporary.isEnforced,
+      className: temporary.isTemporary ? 'bg-surface-active' : undefined,
+      icon: temporary.isTemporary ? (
+        <Check className="text-text-primary size-4" />
+      ) : (
+        <HatGlasses className="text-text-secondary size-4" />
+>>>>>>> upstream/main
       ),
       onClick: temporary.toggle,
     });
   }
+<<<<<<< HEAD
   */
+=======
+>>>>>>> upstream/main
 
   if (items.length === 0) {
     return null;
@@ -129,7 +190,11 @@ export default function HeaderMenu({
 
   /** Mirrors the desktop share button, which surfaces an active link in its tooltip. */
   const triggerDescription = exportShare.hasSharedLink
+<<<<<<< HEAD
     ? localize('com_ui_export_share_link_active')
+=======
+    ? localize('com_ui_chat_options_link_active')
+>>>>>>> upstream/main
     : localize('com_ui_more_options');
 
   return (
@@ -156,7 +221,11 @@ export default function HeaderMenu({
                     size="icon"
                     variant="outline"
                     className={cn(
+<<<<<<< HEAD
                       'relative size-9 flex-shrink-0 rounded-xl bg-presentation hover:bg-surface-active-alt',
+=======
+                      'bg-presentation hover:bg-surface-active-alt relative size-9 shrink-0 rounded-xl',
+>>>>>>> upstream/main
                       className,
                     )}
                   />
@@ -165,7 +234,11 @@ export default function HeaderMenu({
                 <Ellipsis className="icon-md" aria-hidden="true" />
                 {exportShare.hasSharedLink && (
                   <span
+<<<<<<< HEAD
                     className="absolute -right-0.5 -top-0.5 size-2 rounded-full bg-status-info ring-2 ring-presentation"
+=======
+                    className="bg-status-info ring-presentation absolute -top-0.5 -right-0.5 size-2 rounded-full ring-2"
+>>>>>>> upstream/main
                     data-testid="header-menu-shared-link-indicator"
                     aria-hidden="true"
                   />

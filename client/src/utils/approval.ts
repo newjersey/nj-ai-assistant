@@ -110,7 +110,14 @@ function tagApprovalOnPart(
       approval: {
         actionId,
         allowed_decisions: reviewConfig?.allowed_decisions ?? [],
+<<<<<<< HEAD
         description: request.description,
+=======
+        remember_scope: reviewConfig?.remember_scope,
+        remember_unavailable: reviewConfig?.remember_unavailable,
+        description: request.description,
+        ...(reviewConfig?.allow_always === true && { allow_always: true }),
+>>>>>>> upstream/main
       },
     };
     changed = true;

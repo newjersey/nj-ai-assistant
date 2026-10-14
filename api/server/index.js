@@ -27,6 +27,10 @@ const {
   createSecurityHeaders,
   performStartupChecks,
   handleJsonParseError,
+<<<<<<< HEAD
+=======
+  excludeRumBodyParser,
+>>>>>>> upstream/main
   GenerationJobManager,
   QUERY_DEVTOOLS_HEADER,
   createStreamServices,
@@ -48,6 +52,10 @@ const {
   requestContextMiddleware,
   registerShutdownTask,
   getRemainingShutdownMs,
+<<<<<<< HEAD
+=======
+  registerBackgroundTaskShutdown,
+>>>>>>> upstream/main
   configureServerTimeouts,
   setupGracefulShutdown,
   updateInterfacePermissions,
@@ -86,10 +94,14 @@ const createSpaFallback = require('./utils/fallback');
 const { getAppConfig } = require('./services/Config');
 const staticCache = require('./utils/staticCache');
 const noIndex = require('./middleware/noIndex');
+<<<<<<< HEAD
 const routes = require('./routes');
 const agentEventMethods = require('~/models');
 const { njContentSecurityPolicy } = require('~/nj/nj-helmet');
 const { njCronJobs } = require('~/nj/nj-cron');
+=======
+const agentEventMethods = require('~/models');
+>>>>>>> upstream/main
 
 /** Route admin file-config MIME patterns through a linear-time engine (ReDoS-safe) on upload. */
 configureFileConfigRegexEngine();
@@ -172,7 +184,10 @@ const SHUTDOWN_TEARDOWN_RESERVE_MS = 10_000;
 
 const startServer = async () => {
   await waitForKeyvRedisClient();
+<<<<<<< HEAD
   await configureSubagentTaskRouting();
+=======
+>>>>>>> upstream/main
   const { metricsMiddleware, metricsRouter } = createMetrics({
     collectAgentEventActorStorageMetrics: () =>
       runAsSystem(async () => {
@@ -233,6 +248,13 @@ const startServer = async () => {
     logger.error('[sweepOrphanedPreviews] Background sweep failed:', err);
   });
   const appConfig = await getAppConfig({ baseOnly: true });
+<<<<<<< HEAD
+=======
+  await configureSubagentTaskRouting(appConfig?.endpoints?.agents?.subagentActivity);
+  registerBackgroundTaskShutdown({
+    interruptGraceMs: appConfig?.endpoints?.agents?.backgroundTasks?.shutdownInterruptGraceMs,
+  });
+>>>>>>> upstream/main
   configureAgentEventRuntime(appConfig?.endpoints?.agents?.eventDriven);
   warnOnUnreachableDeliveryPaths(appConfig);
   initializeFileStorage(appConfig);
@@ -271,6 +293,13 @@ const startServer = async () => {
     await updateInterfacePermissions({ appConfig, getRoleByName, updateAccessPermissions });
   });
 
+<<<<<<< HEAD
+=======
+  /* Route modules build their rate limiters as they load, so they load only after the
+   * startup checks have applied `rateLimits` from librechat.yaml. */
+  const routes = require('./routes');
+
+>>>>>>> upstream/main
   const indexPath = path.join(appConfig.paths.dist, 'index.html');
   let indexHTML = fs.readFileSync(indexPath, 'utf8');
 
@@ -294,7 +323,10 @@ const startServer = async () => {
      caller's and the client prefers it. */
   indexHTML = injectConfiguredFooterBootstrap(indexHTML, {
     customFooter: process.env.CUSTOM_FOOTER,
+<<<<<<< HEAD
     interfaceConfig: appConfig?.interfaceConfig,
+=======
+>>>>>>> upstream/main
   });
 
   const cspPolicy = createCspPolicy();
@@ -334,9 +366,14 @@ const startServer = async () => {
   app.use('/api/agents/chat', agentStartupIngressMiddleware);
   app.use(metricsMiddleware);
   app.use(noIndex);
+<<<<<<< HEAD
   app.use(express.json({ limit: '3mb' }));
   app.use(express.urlencoded({ extended: true, limit: '3mb' }));
   app.use(njContentSecurityPolicy());
+=======
+  app.use(excludeRumBodyParser(express.json({ limit: '3mb' })));
+  app.use(excludeRumBodyParser(express.urlencoded({ extended: true, limit: '3mb' })));
+>>>>>>> upstream/main
   app.use(handleJsonParseError);
 
   /**
@@ -451,6 +488,11 @@ const startServer = async () => {
 
   app.use('/metrics', metricsRouter);
 
+<<<<<<< HEAD
+=======
+  app.use('/api', routes.openapi);
+
+>>>>>>> upstream/main
   /** 404 for unmatched API routes */
   app.use('/api', apiNotFound);
 
@@ -495,13 +537,27 @@ const startServer = async () => {
       });
       await checkMigrations();
 
+<<<<<<< HEAD
       njCronJobs();
 
+=======
+>>>>>>> upstream/main
       const inspectFlags = process.execArgv.some((arg) => arg.startsWith('--inspect'));
       if (inspectFlags || isEnabled(process.env.MEM_DIAG)) {
         memoryDiagnostics.start();
       }
+<<<<<<< HEAD
       await initializeAgentTriggerService({ address: server.address() });
+=======
+      await initializeAgentTriggerService({
+        address: server.address(),
+        completionResultBatchSize:
+          appConfig?.endpoints?.agents?.backgroundTasks?.completionResultBatchSize,
+        completionReceiptBatching:
+          appConfig?.endpoints?.agents?.backgroundTasks?.completionReceiptBatching,
+        idlePolling: appConfig?.endpoints?.agents?.eventDriven?.idlePolling,
+      });
+>>>>>>> upstream/main
       const scheduleEngineArmed = (await initializeScheduleEngine()) != null;
       scheduleEngineState = scheduleEngineArmed ? 'armed' : 'unavailable';
       if (!scheduleEngineArmed) {

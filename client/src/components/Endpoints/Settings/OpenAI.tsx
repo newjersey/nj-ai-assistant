@@ -1,9 +1,17 @@
 import { useMemo } from 'react';
+<<<<<<< HEAD
 import { getSettingsKeys } from 'librechat-data-provider';
 import type { SettingDefinition } from 'librechat-data-provider';
 import type { TModelSelectProps } from '~/common';
 import { componentMapping } from '~/components/SidePanel/Parameters/components';
 import { presetSettings } from 'librechat-data-provider';
+=======
+import { presetSettings, getSettingsKeys, applyModelAwareDefaults } from 'librechat-data-provider';
+import type { SettingDefinition } from 'librechat-data-provider';
+import type { TModelSelectProps } from '~/common';
+import { componentMapping } from '~/components/SidePanel/Parameters/components';
+import { useGetEndpointsQuery } from '~/data-provider';
+>>>>>>> upstream/main
 
 export default function OpenAISettings({
   conversation,
@@ -11,13 +19,39 @@ export default function OpenAISettings({
   models,
   readonly,
 }: TModelSelectProps) {
+<<<<<<< HEAD
+=======
+  const { data: endpointsConfig } = useGetEndpointsQuery();
+>>>>>>> upstream/main
   const parameters = useMemo(() => {
     const [combinedKey, endpointKey] = getSettingsKeys(
       conversation?.endpointType ?? conversation?.endpoint ?? '',
       conversation?.model ?? '',
     );
+<<<<<<< HEAD
     return presetSettings[combinedKey] ?? presetSettings[endpointKey];
   }, [conversation]);
+=======
+    const settings = presetSettings[combinedKey] ?? presetSettings[endpointKey];
+    if (!settings) {
+      return undefined;
+    }
+    return {
+      col1: applyModelAwareDefaults(
+        settings.col1,
+        endpointKey,
+        conversation?.model ?? undefined,
+        endpointsConfig?.[conversation?.endpoint ?? '']?.responsesApiRouting,
+      ),
+      col2: applyModelAwareDefaults(
+        settings.col2,
+        endpointKey,
+        conversation?.model ?? undefined,
+        endpointsConfig?.[conversation?.endpoint ?? '']?.responsesApiRouting,
+      ),
+    };
+  }, [conversation, endpointsConfig]);
+>>>>>>> upstream/main
 
   if (!parameters) {
     return null;
@@ -34,7 +68,10 @@ export default function OpenAISettings({
     const { key, default: defaultValue, ...rest } = setting;
 
     const props = {
+<<<<<<< HEAD
       key,
+=======
+>>>>>>> upstream/main
       settingKey: key,
       defaultValue,
       ...rest,
@@ -44,10 +81,17 @@ export default function OpenAISettings({
     };
 
     if (key === 'model') {
+<<<<<<< HEAD
       return <Component {...props} options={models} />;
     }
 
     return <Component {...props} />;
+=======
+      return <Component key={key} {...props} options={models} />;
+    }
+
+    return <Component key={key} {...props} />;
+>>>>>>> upstream/main
   };
 
   return (
