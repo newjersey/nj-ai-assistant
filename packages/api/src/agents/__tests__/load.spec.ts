@@ -11,18 +11,31 @@ import type {
 } from 'librechat-data-provider';
 import type { AppConfig } from '@librechat/data-schemas';
 import type { LoadAgentParams, LoadAgentDeps } from '../load';
+<<<<<<< HEAD
+=======
+import { STANDARD_MCP_CAPABILITY_PROFILE } from '~/mcp/capabilities';
+>>>>>>> upstream/main
 import { loadAddedAgent } from '../added';
 import { loadAgent } from '../load';
 
 let Agent: mongoose.Model<unknown>;
 let createAgent: ReturnType<typeof createMethods>['createAgent'];
+<<<<<<< HEAD
 let getAgent: ReturnType<typeof createMethods>['getAgent'];
+=======
+let getAgentWithVersionCount: ReturnType<typeof createMethods>['getAgentWithVersionCount'];
+>>>>>>> upstream/main
 
 const mockGetMCPServerTools = jest.fn();
 const mockGetAccessibleMCPServers = jest.fn();
 
 const deps: LoadAgentDeps = {
+<<<<<<< HEAD
   getAgent: (searchParameter) => getAgent(searchParameter) as Promise<LibreChatAgent | null>,
+=======
+  getAgent: (searchParameter) =>
+    getAgentWithVersionCount(searchParameter) as Promise<LibreChatAgent | null>,
+>>>>>>> upstream/main
   getMCPServerTools: mockGetMCPServerTools,
   getAccessibleMCPServers: mockGetAccessibleMCPServers,
 };
@@ -37,7 +50,11 @@ describe('loadAgent', () => {
     await mongoose.connect(mongoUri);
     const methods = createMethods(mongoose);
     createAgent = methods.createAgent;
+<<<<<<< HEAD
     getAgent = methods.getAgent;
+=======
+    getAgentWithVersionCount = methods.getAgentWithVersionCount;
+>>>>>>> upstream/main
   }, 20000);
 
   afterAll(async () => {
@@ -164,7 +181,16 @@ describe('loadAgent', () => {
     );
 
     expect(mockGetMCPServerTools).toHaveBeenCalledTimes(1);
+<<<<<<< HEAD
     expect(mockGetMCPServerTools).toHaveBeenCalledWith('user123', 'server1', undefined);
+=======
+    expect(mockGetMCPServerTools).toHaveBeenCalledWith(
+      'user123',
+      'server1',
+      undefined,
+      STANDARD_MCP_CAPABILITY_PROFILE,
+    );
+>>>>>>> upstream/main
     expect(result?.tools).toContain(`${Constants.mcp_all}${Constants.mcp_delimiter}body-scoped`);
     expect(result?.tools).toContain('tool1_mcp_server1');
   });
@@ -334,7 +360,16 @@ describe('loadAgent', () => {
       deps,
     );
 
+<<<<<<< HEAD
     expect(mockGetMCPServerTools).toHaveBeenCalledWith('user123', 'overlay', overlayConfig);
+=======
+    expect(mockGetMCPServerTools).toHaveBeenCalledWith(
+      'user123',
+      'overlay',
+      overlayConfig,
+      STANDARD_MCP_CAPABILITY_PROFILE,
+    );
+>>>>>>> upstream/main
     expect(result?.tools).toContain('overlay_tool_mcp_overlay');
   });
 
@@ -869,7 +904,16 @@ describe('loadAgent', () => {
       deps,
     );
 
+<<<<<<< HEAD
     expect(mockGetMCPServerTools).toHaveBeenCalledWith('user123', 'overlay', overlayConfig);
+=======
+    expect(mockGetMCPServerTools).toHaveBeenCalledWith(
+      'user123',
+      'overlay',
+      overlayConfig,
+      STANDARD_MCP_CAPABILITY_PROFILE,
+    );
+>>>>>>> upstream/main
     expect(result?.tools).toContain('overlay_tool_mcp_overlay');
   });
 

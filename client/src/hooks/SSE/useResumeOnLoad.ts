@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+<<<<<<< HEAD
 import { useStore } from 'jotai';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSetRecoilState, useRecoilValue, useRecoilCallback } from 'recoil';
@@ -22,16 +23,50 @@ import {
   getBranchSiblingIndexesForTarget,
   hydrateFileDeliveryMetadata,
 } from '~/utils';
+=======
+import { useRecoilValue } from 'recoil';
+import { useQueryClient } from '@tanstack/react-query';
+import { useStore, useAtom, useSetAtom, useAtomValue } from 'jotai';
+import {
+  Constants,
+  QueryKeys,
+  isAssistantsEndpoint,
+  isForcedTemporaryRetention,
+} from 'librechat-data-provider';
+import {
+  revealedQueuedTurnFamily,
+  activeGenerationCreatedAtByConvoId,
+  useIsSubmitting,
+  submissionStartFamily,
+  submissionByIndex,
+  useSubmission,
+} from '@librechat/chat/react';
+import {
+  hasSubmissionUserMessage,
+  getGenerationProtocolVersion,
+  supportsGenerationProtocolV2,
+  buildMinimalResumeSubmission,
+  resumeStateMatchesSubmission,
+  getResumeBranchTargetMessageId,
+  buildSubmissionFromResumeState,
+} from '@librechat/chat';
+import type { TMessage, Agents } from 'librechat-data-provider';
+>>>>>>> upstream/main
 import {
   useStreamStatus,
   useActiveJobs,
   useAgentQueuedTurns,
+<<<<<<< HEAD
+=======
+  useGetStartupConfig,
+>>>>>>> upstream/main
   streamStatusQueryKey,
   isQueuedTurnSuccessorOwed,
   extendActiveJobsGrace,
   ACTIVE_JOBS_SUCCESSOR_GRACE_MS,
 } from '~/data-provider';
 import {
+<<<<<<< HEAD
   getGenerationProtocolVersion,
   supportsGenerationProtocolV2,
 } from '~/data-provider/SSE/protocol';
@@ -41,6 +76,19 @@ import { agentQueuedTurnsQueryKey } from '~/data-provider/SSE/queuedTurns';
 import useSteerConvert from '~/hooks/Chat/useSteerConvert';
 import { revealedQueuedTurnFamily } from '~/store/steer';
 import { useFileMapContext } from '~/Providers';
+=======
+  isDetachedRunManual,
+  resolveDetachedRunEnd,
+  pendingRunEndByConvoId,
+  detachedRunByConvoId,
+} from '~/hooks/Chat/queue';
+import { siblingIdxFamily, siblingKey } from '~/components/Chat/Messages/Thread/state';
+import { pendingApprovalActionFamily } from '~/components/Chat/approval/state';
+import { dedupeSteersById, getBranchSiblingIndexesForTarget } from '~/utils';
+import { agentQueuedTurnsQueryKey } from '~/data-provider/SSE/queuedTurns';
+import { resumeRequestsAtom } from '~/hooks/Chat/resume';
+import useSteerState from './steer';
+>>>>>>> upstream/main
 import store from '~/store';
 
 /**
@@ -49,6 +97,7 @@ import store from '~/store';
  */
 const ACTIVE_JOB_REARM_INTERVAL_MS = 5_000;
 
+<<<<<<< HEAD
 function hasSubmissionUserMessage(
   submission: TSubmission | null,
   messages: TMessage[] | undefined,
@@ -244,6 +293,8 @@ function buildSubmissionFromResumeState(
   };
 }
 
+=======
+>>>>>>> upstream/main
 /**
  * Hook to resume streaming if navigating to a conversation with active generation.
  * Checks stream status via React Query and sets submission if active job found.
@@ -261,6 +312,7 @@ export default function useResumeOnLoad(
   runIndex = 0,
   messagesLoaded = true,
 ) {
+<<<<<<< HEAD
   const fileMap = useFileMapContext();
   const jotaiStore = useStore();
   const queryClient = useQueryClient();
@@ -270,12 +322,27 @@ export default function useResumeOnLoad(
   const isSubmitting = useRecoilValue(store.isSubmittingFamily(runIndex));
   const attachedGenerationCreatedAt = useRecoilValue(
     store.activeGenerationCreatedAtByConvoId(conversationId ?? ''),
+=======
+  const jotaiStore = useStore();
+  const queryClient = useQueryClient();
+  const setSubmission = useSetAtom(submissionByIndex(runIndex));
+  const setSubmissionStart = useSetAtom(submissionStartFamily(runIndex));
+  const currentSubmission = useSubmission(runIndex);
+  const isSubmitting = useIsSubmitting(runIndex);
+  const attachedGenerationCreatedAt = useAtomValue(
+    activeGenerationCreatedAtByConvoId(conversationId ?? ''),
+>>>>>>> upstream/main
   );
   const currentConversation = useRecoilValue(store.conversationByIndex(runIndex));
   const endpoint = currentConversation?.endpoint;
   const endpointType = currentConversation?.endpointType;
   const actualEndpoint = endpointType ?? endpoint;
   const resumableEnabled = !isAssistantsEndpoint(actualEndpoint);
+<<<<<<< HEAD
+=======
+  const { data: startupConfig, isFetched: startupConfigSettled } = useGetStartupConfig();
+  const isRetentionForced = isForcedTemporaryRetention(startupConfig?.interface?.retentionMode);
+>>>>>>> upstream/main
   // Track conversations we've already processed (either resumed or skipped)
   const processedConvoRef = useRef<string | null>(null);
   /**
@@ -319,6 +386,7 @@ export default function useResumeOnLoad(
   );
 
   /** Restore pending-steer chips for steers the server still has queued
+<<<<<<< HEAD
    *  (injected ones already live inside the resumed aggregatedContent). */
   const convertSteersToQueued = useSteerConvert();
 
@@ -441,6 +509,18 @@ export default function useResumeOnLoad(
       },
     [],
   );
+=======
+   *  (injected ones already live inside the resumed aggregatedContent). Always
+   *  reconcile against the server's still-queued list (mirrors the sync-path
+   *  re-seed in useResumableSSE): a steer applied while this client was away is
+   *  absent there, so an EMPTY list must clear stale local pending chips. */
+  const {
+    seedSteerChips: restoreSteerChips,
+    settleAppliedSteerParts,
+    convertSteersToQueued,
+    updateActiveGenerationCreatedAt,
+  } = useSteerState();
+>>>>>>> upstream/main
 
   // Check for active stream when conversation changes
   const submissionConvoId = currentSubmission?.conversation?.conversationId;
@@ -801,6 +881,10 @@ export default function useResumeOnLoad(
   const shouldCheck =
     resumableEnabled &&
     messagesLoaded && // Wait for messages to load before checking
+<<<<<<< HEAD
+=======
+    startupConfigSettled && // The forced retention mode decides the rebuilt submission's temporary state
+>>>>>>> upstream/main
     !hasActiveSubmissionForThisConvo && // Allow if no submission or a confirmed stale submission
     !!conversationId &&
     conversationId !== Constants.NEW_CONVO &&
@@ -838,6 +922,13 @@ export default function useResumeOnLoad(
       return;
     }
 
+<<<<<<< HEAD
+=======
+    if (!startupConfigSettled) {
+      return;
+    }
+
+>>>>>>> upstream/main
     // Don't resume if we already have an active submission FOR THIS CONVERSATION
     // A stale submission with undefined/different conversationId should not block us
     if (hasActiveSubmissionForThisConvo) {
@@ -962,18 +1053,69 @@ export default function useResumeOnLoad(
       // `unrecoveredSteers` above — same empty-list reconcile as the resume path.
       settleAppliedSteerParts(conversationId, getMessages());
       restoreSteerChips(conversationId, undefined);
+<<<<<<< HEAD
+=======
+      /** A run this pane stopped watching when the user left has ended on the server, which
+       *  deleted the job. Its persisted response tells how it ended; parking that end lets the
+       *  queue drain send a follow-up queued during the run, as an attached run would have.
+       *  The cached history still holds the optimistic response the pane left, which lacks the
+       *  persisted stop and error flags, so only a successful refetch of history may resolve it;
+       *  when that fails or predates the saved response, the next visit tries again. */
+      const detachedFamily = detachedRunByConvoId(conversationId);
+      const detachedRun = jotaiStore.get(detachedFamily);
+      const parkDetachedEnd = () => {
+        if (detachedRun == null || jotaiStore.get(detachedFamily) !== detachedRun) {
+          return;
+        }
+        if (isDetachedRunManual(jotaiStore.get, conversationId, detachedRun)) {
+          jotaiStore.set(detachedFamily, null);
+          return;
+        }
+        const end = resolveDetachedRunEnd(conversationId, detachedRun, getMessages());
+        if (end == null) {
+          return;
+        }
+        jotaiStore.set(detachedFamily, null);
+        jotaiStore.set(pendingRunEndByConvoId(conversationId), end);
+      };
+      /** A run left for a manual send is retired without a read instead of refetching on every
+       *  visit; the check repeats after the read, since a receipt can settle meanwhile. */
+      if (detachedRun != null && isDetachedRunManual(jotaiStore.get, conversationId, detachedRun)) {
+        jotaiStore.set(detachedFamily, null);
+      } else if (detachedRun != null) {
+        queryClient
+          .refetchQueries(
+            { queryKey: [QueryKeys.messages, conversationId], exact: true },
+            { throwOnError: true },
+          )
+          .then(parkDetachedEnd, () => undefined);
+      }
+>>>>>>> upstream/main
       processedConvoRef.current = conversationId;
       return;
     }
 
+<<<<<<< HEAD
+=======
+    /** Still generating: a marker left for this run stays until the resume's stream delivers its
+     *  end or its recovery reads it from history, and the resume's start retires a marker left
+     *  for any other run, so the job deleted between this read and the attach is not lost. */
+>>>>>>> upstream/main
     processedConvoRef.current = conversationId;
     if (handoffGenerationKey != null) {
       consumedHandoffGenerationRef.current = handoffGenerationKey;
     }
     if (streamStatus.createdAt != null) {
+<<<<<<< HEAD
       setActiveGenerationCreatedAt(
         conversationId,
         streamStatus.createdAt,
+=======
+      updateActiveGenerationCreatedAt(
+        conversationId,
+        streamStatus.createdAt,
+        undefined,
+>>>>>>> upstream/main
         generationProtocolVersion,
       );
     }
@@ -1028,6 +1170,7 @@ export default function useResumeOnLoad(
         conversationId,
         streamStatus.createdAt,
         generationProtocolVersion,
+<<<<<<< HEAD
       );
       setSubmission(submission);
     } else {
@@ -1059,6 +1202,23 @@ export default function useResumeOnLoad(
         resumeGenerationProtocolVersion: GenerationProtocolVersion;
       };
       setSubmission(submission);
+=======
+        streamStatus.isTemporary === true || isRetentionForced,
+      );
+      setSubmission(submission);
+    } else {
+      setSubmission(
+        buildMinimalResumeSubmission({
+          messages,
+          conversationId,
+          streamId: streamStatus.streamId,
+          createdAt: streamStatus.createdAt,
+          aggregatedContent: streamStatus.aggregatedContent,
+          isTemporary: streamStatus.isTemporary === true || isRetentionForced,
+          generationProtocolVersion,
+        }),
+      );
+>>>>>>> upstream/main
     }
   }, [
     conversationId,
@@ -1081,9 +1241,17 @@ export default function useResumeOnLoad(
     restoreSteerChips,
     settleAppliedSteerParts,
     convertSteersToQueued,
+<<<<<<< HEAD
     setActiveGenerationCreatedAt,
     jotaiStore,
     externalRunArm,
+=======
+    updateActiveGenerationCreatedAt,
+    jotaiStore,
+    externalRunArm,
+    isRetentionForced,
+    startupConfigSettled,
+>>>>>>> upstream/main
   ]);
 
   // Reset processedConvoRef when conversation changes to allow re-checking
@@ -1189,4 +1357,54 @@ export default function useResumeOnLoad(
     setSubmission,
     queryClient,
   ]);
+<<<<<<< HEAD
+=======
+
+  /**
+   * An explicit `resumeStream` request takes the announcement's path: the
+   * status read decides whether anything is running, and the effect above
+   * builds the resume submission that `useResumableSSE` attaches through the
+   * host transport. The request is consumed either way: one made while this
+   * pane is already attached is answered by that attachment.
+   */
+  const [resumeRequests, setResumeRequests] = useAtom(resumeRequestsAtom);
+  const resumeRequested = !!conversationId && resumeRequests.has(conversationId);
+  /** The route can name a conversation before this pane has loaded it; until then the endpoint
+   *  that decides resumability is the previous conversation's, so the request waits. */
+  const routeConversationLoaded = currentConversation?.conversationId === conversationId;
+  useEffect(() => {
+    if (!resumeRequested || !conversationId || !routeConversationLoaded) {
+      return;
+    }
+    setResumeRequests((pending) => {
+      const next = new Set(pending);
+      next.delete(conversationId);
+      return next;
+    });
+    if (!resumableEnabled || conversationId === Constants.NEW_CONVO) {
+      return;
+    }
+    if (hasLiveSubmissionForThisConvo) {
+      return;
+    }
+    /** A finished submission still installed reads as attached to the check above. */
+    if (hasActiveSubmissionForThisConvo) {
+      setSubmission(null);
+    }
+    queryClient.invalidateQueries({ queryKey: streamStatusQueryKey(conversationId) });
+    queryClient.invalidateQueries({ queryKey: [QueryKeys.messages, conversationId] });
+    processedConvoRef.current = null;
+    setExternalRunArm((arm) => arm + 1);
+  }, [
+    conversationId,
+    resumeRequested,
+    routeConversationLoaded,
+    setResumeRequests,
+    resumableEnabled,
+    hasActiveSubmissionForThisConvo,
+    hasLiveSubmissionForThisConvo,
+    setSubmission,
+    queryClient,
+  ]);
+>>>>>>> upstream/main
 }

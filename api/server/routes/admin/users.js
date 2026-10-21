@@ -1,7 +1,19 @@
 const express = require('express');
 const mongoose = require('mongoose');
+<<<<<<< HEAD
 const { createAdminUsersHandlers, revokeUserCodeEnvironmentWorkers } = require('@librechat/api');
 const { SystemCapabilities } = require('@librechat/data-schemas');
+=======
+const {
+  GenerationJobManager,
+  openCheckpointDeletion,
+  deleteAllSharedLinksWithCleanup,
+  createErasureResolver,
+  createAdminUsersHandlers,
+  revokeUserCodeEnvironmentWorkers,
+} = require('@librechat/api');
+const { SystemCapabilities, runAsSystem, tenantStorage } = require('@librechat/data-schemas');
+>>>>>>> upstream/main
 const { requireCapability } = require('~/server/middleware/roles/capabilities');
 const { requireJwtAuth } = require('~/server/middleware');
 const {
@@ -10,11 +22,43 @@ const {
   cancelAgentTriggerUserPurge,
   purgeAgentTriggerDeliveriesForUser,
 } = require('~/server/services/Agents/triggers');
+<<<<<<< HEAD
+=======
+const { processDeleteRequest } = require('~/server/services/Files/process');
+const { invalidateCachedTools } = require('~/server/services/Config/getCachedTools');
+const { getMCPManager, getMCPServersRegistry } = require('~/config');
+const { maybeUninstallOAuthMCP } = require('~/server/services/MCP/oauthCleanup');
+const subagentThreadTaskStore = require('~/server/services/Endpoints/agents/subagentThreadStore');
+const {
+  quiesceUserSchedules,
+  restoreUserSchedulesFromDeletion,
+} = require('~/server/services/Schedules');
+>>>>>>> upstream/main
 const db = require('~/models');
 const { getAppConfig, invalidateCodeEnvironmentConfigCache } = require('~/server/services/Config');
 
 const router = express.Router();
 
+<<<<<<< HEAD
+=======
+const resolveErasure = createErasureResolver({
+  withTenant: (tenantId, operation) =>
+    tenantId ? tenantStorage.run({ tenantId }, operation) : runAsSystem(operation),
+  db,
+  getAppConfig,
+  getMCPManager,
+  processDeleteRequest,
+  invalidateCachedTools,
+  mcpOAuth: {
+    getRegistry: getMCPServersRegistry,
+    getUserPrincipals: db.getUserPrincipals,
+    uninstallOAuthMCP: maybeUninstallOAuthMCP,
+  },
+  openCheckpointDeletion,
+  deleteSharedLinks: (userId) => deleteAllSharedLinksWithCleanup(userId, { awaitCleanup: true }),
+});
+
+>>>>>>> upstream/main
 const requireAdminAccess = requireCapability(SystemCapabilities.ACCESS_ADMIN);
 const requireReadUsers = requireCapability(SystemCapabilities.READ_USERS);
 // const requireManageUsers = requireCapability(SystemCapabilities.MANAGE_USERS);
@@ -39,6 +83,16 @@ const handlers = createAdminUsersHandlers({
   invalidateCodeEnvironmentConfigCache,
   deleteConfig: db.deleteConfig,
   deleteAclEntries: db.deleteAclEntries,
+<<<<<<< HEAD
+=======
+  deletePasskeysByUser: db.deletePasskeysByUser,
+  resolveErasure,
+  cancelSubagentTasks: (userId, tenantId) =>
+    subagentThreadTaskStore.cancelAndDrainForOwner(userId, tenantId),
+  quiesceUserSchedules,
+  restoreUserSchedulesFromDeletion,
+  generationJobs: GenerationJobManager,
+>>>>>>> upstream/main
 });
 
 router.use(requireJwtAuth, requireAdminAccess);

@@ -1,9 +1,14 @@
+<<<<<<< HEAD
 const jwt = require('jsonwebtoken');
 const { logger } = require('@librechat/data-schemas');
+=======
+const { createEnrollmentControllers, clearCloudFrontCookies } = require('@librechat/api');
+>>>>>>> upstream/main
 const {
   verifyTOTP,
   getTOTPSecret,
   verifyBackupCode,
+<<<<<<< HEAD
 } = require('~/server/services/twoFactorService');
 const { setAuthTokens } = require('~/server/services/AuthService');
 const { getUserById } = require('~/models');
@@ -59,3 +64,21 @@ const verify2FAWithTempToken = async (req, res) => {
 };
 
 module.exports = { verify2FAWithTempToken };
+=======
+  generateBackupCodes,
+} = require('~/server/services/twoFactorService');
+const { setAuthTokens } = require('~/server/services/AuthService');
+const { getUserById, updateTwoFactorEnrollment, deleteAllUserSessions } = require('~/models');
+
+module.exports = createEnrollmentControllers({
+  getUserById,
+  getTOTPSecret,
+  verifyTOTP,
+  verifyBackupCode,
+  generateBackupCodes,
+  updateTwoFactorEnrollment,
+  deleteAllUserSessions,
+  setAuthTokens,
+  clearCloudFrontCookies,
+});
+>>>>>>> upstream/main

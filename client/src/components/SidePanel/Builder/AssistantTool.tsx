@@ -65,6 +65,7 @@ export default function AssistantTool({
           {currentTool.icon && (
             <div className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full">
               <div
+<<<<<<< HEAD
                 className="flex h-6 w-6 items-center justify-center overflow-hidden rounded-full bg-center bg-no-repeat dark:bg-white/20"
                 style={{ backgroundImage: `url(${currentTool.icon})`, backgroundSize: 'cover' }}
               />
@@ -74,6 +75,14 @@ export default function AssistantTool({
             className="h-9 grow px-3 py-2"
             style={{ textOverflow: 'ellipsis', wordBreak: 'break-all', overflow: 'hidden' }}
           >
+=======
+                className="bg-surface-tertiary flex h-6 w-6 items-center justify-center overflow-hidden rounded-full bg-(image:--tool-icon) bg-cover bg-center bg-no-repeat"
+                style={{ '--tool-icon': `url(${currentTool.icon})` } as React.CSSProperties}
+              />
+            </div>
+          )}
+          <div className="h-9 grow overflow-hidden px-3 py-2 break-all text-ellipsis">
+>>>>>>> upstream/main
             {currentTool.name}
           </div>
         </div>
@@ -82,7 +91,11 @@ export default function AssistantTool({
           <OGDialogTrigger asChild>
             <button
               type="button"
+<<<<<<< HEAD
               className="flex h-9 w-9 min-w-9 items-center justify-center rounded-lg transition-colors duration-200 hover:bg-gray-200 dark:hover:bg-gray-700"
+=======
+              className="hover:bg-surface-hover flex h-9 w-9 min-w-9 items-center justify-center rounded-lg transition-colors duration-200"
+>>>>>>> upstream/main
             >
               <TrashIcon />
             </button>
@@ -92,7 +105,11 @@ export default function AssistantTool({
       <OGDialogTemplate
         showCloseButton={false}
         title={localize('com_ui_delete_tool')}
+<<<<<<< HEAD
         className="max-w-[450px]"
+=======
+        className="max-w-[28.125rem]"
+>>>>>>> upstream/main
         main={
           <Label className="text-left text-sm font-medium">
             {localize('com_ui_delete_tool_confirm')}

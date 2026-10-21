@@ -57,10 +57,13 @@ jest.mock('~/server/services/PermissionService', () => ({
   getEffectivePermissions: jest.fn().mockResolvedValue(0),
 }));
 
+<<<<<<< HEAD
 jest.mock('~/server/services/Files', () => ({
   hasAccessToFilesViaAgent: jest.fn(),
 }));
 
+=======
+>>>>>>> upstream/main
 jest.mock('~/server/utils/files', () => ({
   cleanFileName: (name) => name,
   getContentDisposition: (name) => `attachment; filename="${name}"`,

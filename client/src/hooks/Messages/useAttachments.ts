@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { useRecoilValue } from 'recoil';
+<<<<<<< HEAD
 import type { TAttachment, TFile } from 'librechat-data-provider';
 import { useSearchResultsByTurn } from './useSearchResultsByTurn';
 import { attachmentIdentity } from '~/utils/media';
@@ -46,6 +47,13 @@ function matchesLiveEntry(db: TAttachment, live: TAttachment): boolean {
   return dbAgentId == null || liveAgentId == null || dbAgentId === liveAgentId;
 }
 
+=======
+import type { TAttachment } from 'librechat-data-provider';
+import { useSearchResultsByTurn } from './useSearchResultsByTurn';
+import { mergeAttachments } from '~/utils/attachments';
+import store from '~/store';
+
+>>>>>>> upstream/main
 export default function useAttachments({
   messageId,
   attachments,
@@ -54,6 +62,7 @@ export default function useAttachments({
   attachments?: TAttachment[];
 }) {
   const messageAttachmentsMap = useRecoilValue(store.messageAttachmentsMap);
+<<<<<<< HEAD
   const messageAttachments = useMemo<TAttachment[]>(() => {
     const live = messageAttachmentsMap[messageId ?? ''];
     if (!attachments || attachments.length === 0) {
@@ -111,6 +120,12 @@ export default function useAttachments({
     });
     return liveOnly.length > 0 ? [...merged, ...liveOnly] : merged;
   }, [attachments, messageAttachmentsMap, messageId]);
+=======
+  const messageAttachments = useMemo<TAttachment[]>(
+    () => mergeAttachments(attachments, messageAttachmentsMap[messageId ?? '']),
+    [attachments, messageAttachmentsMap, messageId],
+  );
+>>>>>>> upstream/main
 
   const searchResults = useSearchResultsByTurn(messageAttachments);
 

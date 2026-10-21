@@ -274,6 +274,10 @@ describeLive('Amazon DocumentDB - 2026-08-30 audit surface', () => {
     });
 
     it('probes the classic-operator replacements the fix would use', async () => {
+<<<<<<< HEAD
+=======
+      expect.hasAssertions();
+>>>>>>> upstream/main
       await probe('$max update operator', () =>
         getDb()
           .collection(probeCollection)
@@ -291,6 +295,10 @@ describeLive('Amazon DocumentDB - 2026-08-30 audit surface', () => {
 
   describe('production shapes (drives the real methods)', () => {
     it('site 1 - claimNextAgentTriggerDelivery', async () => {
+<<<<<<< HEAD
+=======
+      expect.hasAssertions();
+>>>>>>> upstream/main
       await probe('enqueueAgentTriggerDelivery', () =>
         triggerMethods.enqueueAgentTriggerDelivery({
           deliveryKey,
@@ -314,6 +322,10 @@ describeLive('Amazon DocumentDB - 2026-08-30 audit surface', () => {
     });
 
     it('site 2 - renewAgentTriggerDeliveryProducerLease', async () => {
+<<<<<<< HEAD
+=======
+      expect.hasAssertions();
+>>>>>>> upstream/main
       await probe('renewAgentTriggerDeliveryProducerLease', () =>
         triggerMethods.renewAgentTriggerDeliveryProducerLease({
           deliveryKey,
@@ -325,6 +337,10 @@ describeLive('Amazon DocumentDB - 2026-08-30 audit surface', () => {
     });
 
     it('site 3 - claimBackgroundToolResults', async () => {
+<<<<<<< HEAD
+=======
+      expect.hasAssertions();
+>>>>>>> upstream/main
       /** This method returns `not_found`/`not_ready` before it ever builds the
        * update, so an unseeded probe would report a false `accepted`. Seed a
        * terminal, wakeup-eligible, unclaimed task so the claim path is reached. */
@@ -360,6 +376,10 @@ describeLive('Amazon DocumentDB - 2026-08-30 audit surface', () => {
     });
 
     it('site 4 - releaseBackgroundToolResultClaims', async () => {
+<<<<<<< HEAD
+=======
+      expect.hasAssertions();
+>>>>>>> upstream/main
       await probe('releaseBackgroundToolResultClaims', () =>
         messageMethods.releaseBackgroundToolResultClaims({
           userId: String(userId),
@@ -374,6 +394,10 @@ describeLive('Amazon DocumentDB - 2026-08-30 audit surface', () => {
     });
 
     it('site 5 - getMessagesForSubagentThreadView ($$REMOVE path)', async () => {
+<<<<<<< HEAD
+=======
+      expect.hasAssertions();
+>>>>>>> upstream/main
       await probe('getMessagesForSubagentThreadView (list)', () =>
         messageMethods.getMessagesForSubagentThreadView({
           user: String(userId),
@@ -386,6 +410,10 @@ describeLive('Amazon DocumentDB - 2026-08-30 audit surface', () => {
     });
 
     it('site 6 - getMessagesForSubagentThreadView ($facet path)', async () => {
+<<<<<<< HEAD
+=======
+      expect.hasAssertions();
+>>>>>>> upstream/main
       await probe('getMessagesForSubagentThreadView (selected)', () =>
         messageMethods.getMessagesForSubagentThreadView({
           user: String(userId),
@@ -399,6 +427,10 @@ describeLive('Amazon DocumentDB - 2026-08-30 audit surface', () => {
     });
 
     it('listSubagentTasksForThreads ($regexMatch path)', async () => {
+<<<<<<< HEAD
+=======
+      expect.hasAssertions();
+>>>>>>> upstream/main
       await probe('listSubagentTasksForThreads', () =>
         messageMethods.listSubagentTasksForThreads({
           user: String(userId),
@@ -418,6 +450,10 @@ describeLive('Amazon DocumentDB - 2026-08-30 audit surface', () => {
     });
 
     it('site 7 - updateToolCallResult', async () => {
+<<<<<<< HEAD
+=======
+      expect.hasAssertions();
+>>>>>>> upstream/main
       const settleMessageId = `audit-settle-${runId}`;
       await mongoose.models.Message.create({
         messageId: settleMessageId,

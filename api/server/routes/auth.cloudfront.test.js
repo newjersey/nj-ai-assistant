@@ -4,8 +4,19 @@ const request = require('supertest');
 const mockForceRefreshCloudFrontAuthCookies = jest.fn();
 
 jest.mock('@librechat/api', () => ({
+<<<<<<< HEAD
   createSetBalanceConfig: jest.fn(() => (req, res, next) => next()),
   forceRefreshCloudFrontAuthCookies: (...args) => mockForceRefreshCloudFrontAuthCookies(...args),
+=======
+  limiterCache: jest.fn(),
+  createTwoFactorManagementLimiter: jest.fn(() => (req, res, next) => next()),
+  createSetBalanceConfig: jest.fn(() => (req, res, next) => next()),
+  requireTwoFactorSetupToken: jest.fn((req, res, next) => next()),
+  requireTwoFactorSetupAcknowledgementToken: jest.fn((req, res, next) => next()),
+  requireTwoFactorSetupFinalizationToken: jest.fn((req, res, next) => next()),
+  forceRefreshCloudFrontAuthCookies: (...args) => mockForceRefreshCloudFrontAuthCookies(...args),
+  blockTwoFactorDisableWhenRequired: jest.fn((req, res, next) => next()),
+>>>>>>> upstream/main
 }));
 
 jest.mock('~/server/controllers/AuthController', () => ({
@@ -26,6 +37,22 @@ jest.mock('~/server/controllers/TwoFactorController', () => ({
 
 jest.mock('~/server/controllers/auth/TwoFactorAuthController', () => ({
   verify2FAWithTempToken: jest.fn((req, res) => res.status(200).end()),
+<<<<<<< HEAD
+=======
+  confirm2FASetupWithTempToken: jest.fn((req, res) => res.status(200).end()),
+  acknowledge2FASetup: jest.fn((req, res) => res.status(200).end()),
+  finalize2FASetup: jest.fn((req, res) => res.status(200).end()),
+}));
+
+jest.mock('~/server/controllers/auth/PasskeyController', () => ({
+  listPasskeys: jest.fn((req, res) => res.status(204).end()),
+  updatePasskey: jest.fn((req, res) => res.status(204).end()),
+  removePasskey: jest.fn((req, res) => res.status(204).end()),
+  authenticatePasskey: jest.fn((req, res, next) => next()),
+  loginPasskeyOptions: jest.fn((req, res) => res.status(204).end()),
+  registerPasskeyOptions: jest.fn((req, res) => res.status(204).end()),
+  registerPasskeyVerify: jest.fn((req, res) => res.status(204).end()),
+>>>>>>> upstream/main
 }));
 
 jest.mock('~/server/controllers/auth/LogoutController', () => ({
@@ -51,9 +78,21 @@ jest.mock('~/server/middleware', () => {
     logHeaders: pass,
     requireSameOrigin: pass,
     loginLimiter: pass,
+<<<<<<< HEAD
     setTwoFactorTempUser: pass,
     twoFactorTempLimiter: pass,
     checkBan: pass,
+=======
+    passkeyLimiter: pass,
+    passkeyStepUpLimiter: pass,
+    setTwoFactorTempUser: pass,
+    setTwoFactorAcknowledgementTempUser: pass,
+    setTwoFactorFinalizationTempUser: pass,
+    twoFactorTempLimiter: pass,
+    twoFactorSetupLimiter: pass,
+    checkBan: pass,
+    blockRetiredSetupToken: pass,
+>>>>>>> upstream/main
     validateEmailLogin: pass,
     requireLocalAuth: pass,
     requireLdapAuth: pass,

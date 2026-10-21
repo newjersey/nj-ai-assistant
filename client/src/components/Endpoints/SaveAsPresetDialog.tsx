@@ -77,7 +77,11 @@ const SaveAsPresetDialog = ({ open, onOpenChange, preset }: TEditPresetProps) =>
                 value={title || ''}
                 onChange={(e) => setTitle(e.target.value || '')}
                 placeholder={localize('com_endpoint_preset_custom_name_placeholder')}
+<<<<<<< HEAD
                 className="flex h-10 max-h-10 w-full resize-none rounded-theme-control border-border-medium px-3 py-2"
+=======
+                className="rounded-theme-control flex h-10 max-h-10 w-full resize-none"
+>>>>>>> upstream/main
               />
             </div>
           </form>

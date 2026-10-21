@@ -1,4 +1,5 @@
 import { request } from 'librechat-data-provider';
+<<<<<<< HEAD
 
 export const GENERATION_PROTOCOL_VERSION = 2 as const;
 export const GENERATION_PROTOCOL_HEADER = 'X-LibreChat-Generation-Protocol';
@@ -29,6 +30,18 @@ export const supportsGenerationProtocolV2 = (value: unknown): boolean =>
 export const generationProtocolHeaders = (): Record<string, string> => ({
   [GENERATION_PROTOCOL_HEADER]: String(GENERATION_PROTOCOL_VERSION),
 });
+=======
+import { GENERATION_PROTOCOL_VERSION, generationProtocolHeaders } from '@librechat/chat';
+
+export {
+  GENERATION_PROTOCOL_HEADER,
+  GENERATION_PROTOCOL_VERSION,
+  generationProtocolHeaders,
+  getGenerationProtocolVersion,
+  supportsGenerationProtocolV2,
+} from '@librechat/chat';
+export type { GenerationProtocolVersion } from '@librechat/chat';
+>>>>>>> upstream/main
 
 export const withGenerationProtocolQuery = (url: string): string =>
   `${url}${url.includes('?') ? '&' : '?'}generationProtocolVersion=${GENERATION_PROTOCOL_VERSION}`;

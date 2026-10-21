@@ -139,6 +139,14 @@ export function createSystemGrantMethods(mongoose: typeof import('mongoose')): {
     principalId: string | Types.ObjectId,
     options?: { tenantId?: string; session?: ClientSession },
   ) => Promise<ISystemGrant[]>;
+<<<<<<< HEAD
+=======
+  findGrantsForPrincipal: (
+    principalType: PrincipalType,
+    principalId: string | Types.ObjectId,
+    options?: { tenantId?: string },
+  ) => Promise<ISystemGrant[]>;
+>>>>>>> upstream/main
 } {
   function tenantCondition(tenantId?: string): FilterQuery<ISystemGrant> {
     return tenantId != null
@@ -590,6 +598,23 @@ export function createSystemGrantMethods(mongoose: typeof import('mongoose')): {
     return removed;
   }
 
+<<<<<<< HEAD
+=======
+  /** Reads the grants {@link deleteGrantsForPrincipal} would remove, without removing them. */
+  async function findGrantsForPrincipal(
+    principalType: PrincipalType,
+    principalId: string | Types.ObjectId,
+    options?: { tenantId?: string },
+  ): Promise<ISystemGrant[]> {
+    const SystemGrant = mongoose.models.SystemGrant as Model<ISystemGrant>;
+    return SystemGrant.find({
+      principalType,
+      principalId: normalizePrincipalId(principalId, principalType),
+      ...(options?.tenantId != null && { tenantId: options.tenantId }),
+    }).lean<ISystemGrant[]>();
+  }
+
+>>>>>>> upstream/main
   return {
     grantCapability,
     seedSystemGrants,
@@ -602,6 +627,10 @@ export function createSystemGrantMethods(mongoose: typeof import('mongoose')): {
     getCapabilitiesForPrincipal,
     getCapabilitiesForPrincipals,
     deleteGrantsForPrincipal,
+<<<<<<< HEAD
+=======
+    findGrantsForPrincipal,
+>>>>>>> upstream/main
   };
 }
 

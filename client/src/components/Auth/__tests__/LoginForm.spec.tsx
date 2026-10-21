@@ -18,6 +18,10 @@ const mockStartupConfig: TStartupConfig = {
   githubLoginEnabled: true,
   googleLoginEnabled: true,
   openidLoginEnabled: true,
+<<<<<<< HEAD
+=======
+  passkeyLoginEnabled: false,
+>>>>>>> upstream/main
   appleLoginEnabled: false,
   openidLabel: 'Test OpenID',
   openidImageUrl: 'http://test-server.com',
@@ -40,6 +44,10 @@ const mockStartupConfig: TStartupConfig = {
   sharedLinksEnabled: true,
   publicSharedLinksEnabled: true,
   allowAccountDeletion: true,
+<<<<<<< HEAD
+=======
+  allowEmailChange: true,
+>>>>>>> upstream/main
 };
 
 const setup = ({
@@ -117,7 +125,11 @@ test('renders login form', () => {
       setError={jest.fn()}
     />,
   );
+<<<<<<< HEAD
   expect(getByLabelText(/email/i)).toHaveClass('h-auto');
+=======
+  expect(getByLabelText(/email/i)).toHaveClass('h-theme-auth-field');
+>>>>>>> upstream/main
   expect(getByLabelText(/password/i)).toBeInTheDocument();
 });
 

@@ -23,6 +23,10 @@ export function createToolFavoriteMethods(mongoose: typeof import('mongoose')): 
   getToolFavorites: (userId: string) => Promise<t.IToolFavoriteLean[]>;
   addToolFavorite: (params: t.ToolFavoriteParams) => Promise<t.AddToolFavoriteResult>;
   removeToolFavorite: (params: t.ToolFavoriteParams) => Promise<t.RemoveToolFavoriteResult>;
+<<<<<<< HEAD
+=======
+  deleteUserToolFavorites: (userId: string) => Promise<number>;
+>>>>>>> upstream/main
 } {
   async function getToolFavorites(userId: string): Promise<t.IToolFavoriteLean[]> {
     const ToolFavorite = mongoose.models.ToolFavorite;
@@ -80,10 +84,24 @@ export function createToolFavoriteMethods(mongoose: typeof import('mongoose')): 
     return { ok: true, removed: result.deletedCount > 0 };
   }
 
+<<<<<<< HEAD
+=======
+  /** Account erasure: removes every favorite the user saved. */
+  async function deleteUserToolFavorites(userId: string): Promise<number> {
+    const ToolFavorite = mongoose.models.ToolFavorite;
+    const result = await ToolFavorite.deleteMany({ user: userId });
+    return result.deletedCount;
+  }
+
+>>>>>>> upstream/main
   return {
     getToolFavorites,
     addToolFavorite,
     removeToolFavorite,
+<<<<<<< HEAD
+=======
+    deleteUserToolFavorites,
+>>>>>>> upstream/main
   };
 }
 

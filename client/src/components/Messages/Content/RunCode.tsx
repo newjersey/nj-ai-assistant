@@ -1,16 +1,26 @@
 import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import debounce from 'lodash/debounce';
+<<<<<<< HEAD
 import { useRecoilCallback } from 'recoil';
+=======
+>>>>>>> upstream/main
 import { Tools } from 'librechat-data-provider';
 import { SquareTerminal, Check, X } from 'lucide';
 import { MorphIcon, Spinner, TooltipAnchor, useToastContext } from '@librechat/client';
 import type { IconNode } from '@librechat/client';
 import type { CodeBarProps } from '~/common';
+<<<<<<< HEAD
+=======
+import { useChatSettings } from '~/Providers/ChatSettingsContext';
+>>>>>>> upstream/main
 import { useToolCallMutation } from '~/data-provider';
 import { cn, normalizeLanguage } from '~/utils';
 import { useMessageContext } from '~/Providers';
 import { useLocalize } from '~/hooks';
+<<<<<<< HEAD
 import store from '~/store';
+=======
+>>>>>>> upstream/main
 
 type RunState = 'idle' | 'loading' | 'success' | 'error';
 
@@ -33,6 +43,7 @@ const RunCode: React.FC<CodeBarProps & { iconOnly?: boolean }> = React.memo(
 
     const { messageId, conversationId, partIndex } = useMessageContext();
     const normalizedLang = useMemo(() => normalizeLanguage(lang), [lang]);
+<<<<<<< HEAD
     // Read at click time so retention context is current without re-rendering every code block.
     const getIsTemporary = useRecoilCallback(
       ({ snapshot }) =>
@@ -40,6 +51,13 @@ const RunCode: React.FC<CodeBarProps & { iconOnly?: boolean }> = React.memo(
           snapshot.getPromise(store.isTemporary),
       [],
     );
+=======
+    const { isTemporary } = useChatSettings();
+    /** Read at execution time, so toggling temporary chat neither rebuilds the debounced run
+     *  (cancelling one already clicked) nor sends the flag the click was made under. */
+    const isTemporaryRef = useRef(isTemporary);
+    isTemporaryRef.current = isTemporary;
+>>>>>>> upstream/main
 
     const handleExecute = useCallback(async () => {
       const codeString: string = codeRef.current?.textContent ?? '';
@@ -59,6 +77,7 @@ const RunCode: React.FC<CodeBarProps & { iconOnly?: boolean }> = React.memo(
         conversationId: conversationId ?? '',
         lang: normalizedLang,
         code: codeString,
+<<<<<<< HEAD
         isTemporary: await getIsTemporary(),
       });
     }, [
@@ -71,6 +90,11 @@ const RunCode: React.FC<CodeBarProps & { iconOnly?: boolean }> = React.memo(
       normalizedLang,
       getIsTemporary,
     ]);
+=======
+        isTemporary: isTemporaryRef.current,
+      });
+    }, [codeRef, execute, partIndex, messageId, blockIndex, conversationId, normalizedLang]);
+>>>>>>> upstream/main
 
     const debouncedExecute = useMemo(
       () => debounce(handleExecute, 1000, { leading: true }),
@@ -118,9 +142,15 @@ const RunCode: React.FC<CodeBarProps & { iconOnly?: boolean }> = React.memo(
         aria-label={label}
         aria-busy={isLoading || undefined}
         className={cn(
+<<<<<<< HEAD
           'inline-flex select-none items-center justify-center text-text-secondary transition-all duration-200 ease-out',
           'hover:bg-surface-hover hover:text-text-primary',
           'focus-visible:outline focus-visible:outline-2 focus-visible:outline-border-heavy',
+=======
+          'text-text-secondary inline-flex items-center justify-center transition-all duration-200 ease-out select-none',
+          'hover:bg-surface-hover hover:text-text-primary',
+          'focus-visible:outline-focus-subtle focus-visible:outline focus-visible:outline-2',
+>>>>>>> upstream/main
           'disabled:pointer-events-none disabled:opacity-50',
           isError && 'text-text-destructive hover:text-text-destructive',
           iconOnly
@@ -128,10 +158,20 @@ const RunCode: React.FC<CodeBarProps & { iconOnly?: boolean }> = React.memo(
             : 'ml-auto gap-2 rounded-lg p-1.5 md:rounded-md md:px-2 md:py-1',
         )}
       >
+<<<<<<< HEAD
         <span className="relative flex size-[18px] items-center justify-center" aria-hidden="true">
           <MorphIcon
             icon={stateIcon}
             size={18}
+=======
+        <span
+          className="relative flex size-[1.125rem] items-center justify-center"
+          aria-hidden="true"
+        >
+          <MorphIcon
+            icon={stateIcon}
+            size="1.125rem"
+>>>>>>> upstream/main
             className={cn(
               'absolute transition-opacity duration-300',
               isLoading ? 'opacity-0' : 'opacity-100',
@@ -143,7 +183,11 @@ const RunCode: React.FC<CodeBarProps & { iconOnly?: boolean }> = React.memo(
               isLoading ? 'opacity-100' : 'opacity-0',
             )}
           >
+<<<<<<< HEAD
             {isLoading && <Spinner size={18} />}
+=======
+            {isLoading && <Spinner className="m-auto size-[1.125rem]" />}
+>>>>>>> upstream/main
           </span>
         </span>
         {!iconOnly && (

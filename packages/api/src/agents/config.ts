@@ -1,8 +1,35 @@
+<<<<<<< HEAD
+=======
+import {
+  DEFAULT_AGENT_MODEL_RESPONSE_BODY_TIMEOUT_MS,
+  DEFAULT_AGENT_MODEL_RESPONSE_HEADERS_TIMEOUT_MS,
+} from 'librechat-data-provider';
+>>>>>>> upstream/main
 import type { TAgentsEndpoint } from 'librechat-data-provider';
 import { CREATE_FILE_TOOL_NAME } from '~/agents/tools';
 
 const DEFAULT_RECURSION_LIMIT = 50;
 
+<<<<<<< HEAD
+=======
+export interface ModelTransportTimeouts {
+  bodyTimeout: number;
+  headersTimeout: number;
+}
+
+export function resolveModelTransportTimeouts(
+  agentsEConfig: Partial<TAgentsEndpoint> | undefined,
+): ModelTransportTimeouts {
+  return {
+    bodyTimeout:
+      agentsEConfig?.modelResponseBodyTimeoutMs ?? DEFAULT_AGENT_MODEL_RESPONSE_BODY_TIMEOUT_MS,
+    headersTimeout:
+      agentsEConfig?.modelResponseHeadersTimeoutMs ??
+      DEFAULT_AGENT_MODEL_RESPONSE_HEADERS_TIMEOUT_MS,
+  };
+}
+
+>>>>>>> upstream/main
 /**
  * Mirrors `RECURSION_MULTIPLIER` in `@librechat/agents` `SubagentExecutor`,
  * which derives a subagent's graph `recursionLimit` as `maxTurns * 3`. Keep in

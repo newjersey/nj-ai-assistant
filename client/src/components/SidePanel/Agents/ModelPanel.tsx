@@ -12,8 +12,16 @@ import {
 import type * as t from 'librechat-data-provider';
 import type { AgentForm, AgentModelPanelProps, StringOption } from '~/common';
 import { pruneAgentModelParameters, resolveAgentParameterSettings } from './parameters';
+<<<<<<< HEAD
 import { componentMapping } from '~/components/SidePanel/Parameters/components';
 import { useGetEndpointsQuery, useGetStartupConfig } from '~/data-provider';
+=======
+import { groupParameters, hasControl } from '~/components/SidePanel/Parameters/groups';
+import { componentMapping } from '~/components/SidePanel/Parameters/components';
+import { useGetEndpointsQuery, useGetStartupConfig } from '~/data-provider';
+import { useModelReasoning } from '~/hooks/Endpoint/useModelReasoning';
+import Sections from '~/components/SidePanel/Parameters/Sections';
+>>>>>>> upstream/main
 import { useLocalize, useHasAccess } from '~/hooks';
 import { useLiveAnnouncer } from '~/Providers';
 import { Panel } from '~/common';
@@ -64,6 +72,10 @@ export default function ModelPanel({
 
   const { data: endpointsConfig = {} } = useGetEndpointsQuery();
   const { data: startupConfig } = useGetStartupConfig();
+<<<<<<< HEAD
+=======
+  const { modelReasoning } = useModelReasoning(endpointsConfig, provider, model ?? '');
+>>>>>>> upstream/main
 
   const bedrockRegions = useMemo(() => {
     return endpointsConfig?.[provider]?.availableRegions ?? [];
@@ -82,12 +94,25 @@ export default function ModelPanel({
         provider,
         startupConfig,
         webSearchAllowed,
+<<<<<<< HEAD
       }),
     [endpointsConfig, model, provider, startupConfig, webSearchAllowed],
+=======
+        modelReasoning,
+      }),
+    [endpointsConfig, model, modelReasoning, provider, startupConfig, webSearchAllowed],
+>>>>>>> upstream/main
   );
   /** The rendered set omits role-gated controls; `parameterSettings.parameters`
    *  stays complete so the pruning effect below still recognises them. */
   const { visibleParameters: parameters } = parameterSettings;
+<<<<<<< HEAD
+=======
+  const webSearchBlocked =
+    !webSearchAllowed &&
+    (modelParameters?.web_search === true ||
+      parameterSettings.parameters.some((parameter) => parameter.key === 'web_search'));
+>>>>>>> upstream/main
 
   /**
    * Prunes `model_parameters` entries that no longer have a visible control (e.g. a
@@ -105,6 +130,25 @@ export default function ModelPanel({
     setValue('model_parameters', prunedParameters);
   }, [parameterSettings, getValues, setValue]);
 
+<<<<<<< HEAD
+=======
+  /** Same grouping as the chat panel: region choices are filled in first, and a
+   *  control with nothing to render is dropped so no section stands empty. */
+  const sections = useMemo(
+    () =>
+      groupParameters(
+        (parameters ?? [])
+          .map((setting) =>
+            setting.key === 'region' && bedrockRegions.length > 0
+              ? { ...setting, options: bedrockRegions }
+              : setting,
+          )
+          .filter((setting) => componentMapping[setting.component] != null && hasControl(setting)),
+      ),
+    [parameters, bedrockRegions],
+  );
+
+>>>>>>> upstream/main
   const setOption = (optionKey: keyof t.AgentModelParameters) => (value: t.AgentParameterValue) => {
     setValue(`model_parameters.${optionKey}`, value);
   };
@@ -122,6 +166,7 @@ export default function ModelPanel({
           size="icon"
           onClick={() => setActivePanel(Panel.builder)}
           aria-label={localize('com_ui_back_to_builder')}
+<<<<<<< HEAD
           className="h-10 w-10 flex-shrink-0 rounded-xl text-text-secondary hover:bg-surface-secondary hover:text-text-primary"
         >
           <ChevronLeft className="h-5 w-5" strokeWidth={1.75} aria-hidden="true" />
@@ -130,6 +175,19 @@ export default function ModelPanel({
           {localize('com_ui_model_parameters')}
         </h2>
         <span aria-hidden="true" className="h-10 w-10" />
+=======
+          className="text-text-secondary hover:bg-surface-secondary shrink-0 rounded-xl"
+        >
+          <ChevronLeft className="h-5 w-5" strokeWidth={1.75} aria-hidden="true" />
+        </Button>
+        <h2 className="text-text-primary text-center text-base font-semibold">
+          {localize('com_ui_model_parameters')}
+        </h2>
+        <span
+          aria-hidden="true"
+          className="size-theme-button min-h-theme-target min-w-theme-target"
+        />
+>>>>>>> upstream/main
       </header>
       <div>
         {/* Endpoint aka Provider for Agents */}
@@ -137,7 +195,11 @@ export default function ModelPanel({
           <label
             id="provider-label"
             className={cn(
+<<<<<<< HEAD
               'mb-1 block text-[11px] font-medium uppercase tracking-wide text-text-secondary',
+=======
+              'text-text-secondary text-2xs mb-1 block font-medium tracking-wide uppercase',
+>>>>>>> upstream/main
               modelsPending && 'opacity-60',
             )}
             htmlFor="provider"
@@ -185,14 +247,22 @@ export default function ModelPanel({
                       label: typeof provider === 'string' ? provider : provider.label,
                       value: typeof provider === 'string' ? provider : provider.value,
                     }))}
+<<<<<<< HEAD
                     className={cn(error ? 'border-2 border-border-destructive' : '')}
+=======
+                    className={cn(error ? 'border-border-destructive border-2' : '')}
+>>>>>>> upstream/main
                     ariaLabel={localize('com_ui_provider')}
                     disabled={selectionDisabled}
                     isCollapsed={false}
                     showCarat={true}
                   />
                   {error && (
+<<<<<<< HEAD
                     <span className="mt-1 text-xs text-text-destructive" role="alert">
+=======
+                    <span className="text-text-destructive mt-1 text-xs" role="alert">
+>>>>>>> upstream/main
                       {localize('com_ui_field_required')}
                     </span>
                   )}
@@ -206,7 +276,11 @@ export default function ModelPanel({
           <label
             id="model-label"
             className={cn(
+<<<<<<< HEAD
               'mb-1 block text-[11px] font-medium uppercase tracking-wide text-text-secondary',
+=======
+              'text-text-secondary text-2xs mb-1 block font-medium tracking-wide uppercase',
+>>>>>>> upstream/main
               (!provider || modelsPending) && 'opacity-60',
             )}
             htmlFor="model"
@@ -241,14 +315,22 @@ export default function ModelPanel({
                     disabled={!provider || selectionDisabled}
                     className={cn(
                       'disabled:opacity-50',
+<<<<<<< HEAD
                       error ? 'border-2 border-border-destructive' : '',
+=======
+                      error ? 'border-border-destructive border-2' : '',
+>>>>>>> upstream/main
                     )}
                     ariaLabel={localize('com_ui_model')}
                     isCollapsed={false}
                     showCarat={true}
                   />
                   {provider && error && (
+<<<<<<< HEAD
                     <span className="mt-1 text-xs text-text-destructive" role="alert">
+=======
+                    <span className="text-text-destructive mt-1 text-xs" role="alert">
+>>>>>>> upstream/main
                       {localize('com_ui_field_required')}
                     </span>
                   )}
@@ -263,6 +345,7 @@ export default function ModelPanel({
           )}
         </div>
       </div>
+<<<<<<< HEAD
       {/* Model Parameters */}
       {parameters && (
         <div className="h-auto max-w-full">
@@ -292,13 +375,32 @@ export default function ModelPanel({
               );
             })}
           </div>
+=======
+      {webSearchBlocked && (
+        <Alert variant="warning" role="status">
+          {localize('com_ui_native_web_search_denied')}
+        </Alert>
+      )}
+      {/* Model Parameters */}
+      {sections.length > 0 && (
+        <div className="h-auto max-w-full">
+          <Sections
+            sections={sections}
+            setOption={setOption as t.TSetOption}
+            conversation={modelParameters as Partial<t.TConversation>}
+          />
+>>>>>>> upstream/main
         </div>
       )}
       {/* Reset Parameters Button */}
       <Button
         variant="outline"
         onClick={handleResetParameters}
+<<<<<<< HEAD
         className="mt-2 h-9 w-full rounded-xl px-4 font-medium text-text-secondary hover:bg-surface-secondary hover:text-text-primary"
+=======
+        className="text-text-secondary hover:bg-surface-secondary mt-2 h-9 w-full rounded-xl font-medium"
+>>>>>>> upstream/main
       >
         <RotateCcw className="h-4 w-4" strokeWidth={1.75} aria-hidden="true" />
         {localize('com_ui_reset_var', { 0: localize('com_ui_model_parameters') })}

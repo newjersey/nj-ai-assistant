@@ -114,6 +114,14 @@ if (process.env.E2E_MCP_LIST_CHANGED === 'true') {
 }
 
 async function main() {
+<<<<<<< HEAD
+=======
+  const expectedUserToken = process.env.E2E_MCP_EXPECTED_USER_TOKEN;
+  if (expectedUserToken && process.env.E2E_MCP_USER_TOKEN !== expectedUserToken) {
+    console.error('[fake-mcp-server] E2E_MCP_USER_TOKEN does not match the expected value');
+    process.exit(1);
+  }
+>>>>>>> upstream/main
   await server.connect(new StdioServerTransport());
 }
 

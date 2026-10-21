@@ -7,7 +7,16 @@ export interface IServerConfigsRepositoryInterface {
   add(serverName: string, config: ParsedServerConfig, userId?: string): Promise<AddServerResult>;
 
   //ACL Entry check if update is possible
+<<<<<<< HEAD
   update(serverName: string, config: ParsedServerConfig, userId?: string): Promise<void>;
+=======
+  /** Resolves to the config as persisted when the store can report it. */
+  update(
+    serverName: string,
+    config: ParsedServerConfig,
+    userId?: string,
+  ): Promise<ParsedServerConfig | void>;
+>>>>>>> upstream/main
 
   /** Atomic add-or-update without requiring callers to inspect error messages. */
   upsert(serverName: string, config: ParsedServerConfig, userId?: string): Promise<void>;
@@ -45,7 +54,12 @@ export interface IServerConfigsRepositoryInterface {
   ): Promise<ParsedServerConfig | undefined>;
 
   //ACL Entry check if remove is possible
+<<<<<<< HEAD
   remove(serverName: string, userId?: string): Promise<void>;
+=======
+  /** Resolves to false when the store knew no such server, so a no-op is distinguishable. */
+  remove(serverName: string, userId?: string): Promise<boolean | void>;
+>>>>>>> upstream/main
 
   //ACL Entry check if read is possible
   get(serverName: string, userId?: string): Promise<ParsedServerConfig | undefined>;

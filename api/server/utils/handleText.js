@@ -59,6 +59,7 @@ const createOnProgress = (
   return { onProgress, getPartialText, sendIntermediateMessage };
 };
 
+<<<<<<< HEAD
 const handleText = async (response) => {
   let { text } = response;
   response.text = text;
@@ -117,6 +118,8 @@ function formatAction(action) {
   return formattedAction;
 }
 
+=======
+>>>>>>> upstream/main
 /**
  * Generate the configuration for a given key and base URL.
  * @param {string} key
@@ -163,10 +166,14 @@ function generateConfig(key, baseURL, endpoint) {
 }
 
 module.exports = {
+<<<<<<< HEAD
   handleText,
   formatSteps,
   formatAction,
   generateConfig,
   addSpaceIfNeeded,
+=======
+  generateConfig,
+>>>>>>> upstream/main
   createOnProgress,
 };

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { v4 } from 'uuid';
 import { useAtomValue, useStore } from 'jotai';
@@ -370,6 +371,58 @@ function reconcileServerQueuedTurns(
   });
   return [...retained, ...projected].sort(compareQueuedMessages);
 }
+=======
+import { useCallback, useMemo, useRef } from 'react';
+import { useAtomValue } from 'jotai';
+import { useSteerHost } from '@librechat/chat/react';
+import { hasLiveRunPause, selectLiveMessageState } from '@librechat/chat';
+import {
+  Constants,
+  isAgentsEndpoint,
+  isAssistantsEndpoint,
+  DEFAULT_QUEUED_SEND_LOCK_TIMEOUT_MS,
+} from 'librechat-data-provider';
+import {
+  revealedQueuedTurnFamily,
+  pendingSteersByConvoId,
+  activeGenerationCreatedAtByConvoId,
+  activeGenerationProtocolVersionByConvoId,
+} from '@librechat/chat/react';
+import type { TMessage, TConversation, CodeEnvironmentMode } from 'librechat-data-provider';
+import type { SubmitSteerOptions, QueuedMessageContext } from '@librechat/chat';
+import type { QueuedMessageOrigin } from '~/hooks/Chat/queue';
+import type { ExtendedFile, FileSetter } from '~/common';
+import type { PendingSteer } from '~/hooks/Chat/queue';
+import type { DuringRunAction } from './contract';
+import {
+  getReasoningStateKey,
+  pendingReasoningOverrideFamily,
+} from '~/components/Chat/Input/Composer/state';
+import useQueuedTurnReceipts from './steering/receipts';
+import useDuringRunActions from './steering/actions';
+import useQueuedRecovery from './steering/recovery';
+import useComposerTake from './steering/composer';
+import useQueueEnqueue from './steering/enqueue';
+import useSubmitSteer from './steering/submit';
+import { carriedSteerContext } from '~/utils';
+import useSteerChips from './steering/chips';
+import useQueuedSend from './steering/send';
+import useQueueRows from './steering/rows';
+
+export type { DuringRunAction };
+
+export type { QueuedMessageContext } from '@librechat/chat';
+export { resolveAcknowledgedSteer } from './steering/chips';
+
+export {
+  getSteerErrorCode,
+  hasLiveRunPause,
+  hasLiveToolApproval,
+  isDefiniteSteerRejection,
+} from '@librechat/chat';
+export { hydrateFileDeliveryMetadata as mergeQueuedTurnFileMetadata } from '@librechat/chat';
+export type { SteerErrorCode } from '@librechat/chat';
+>>>>>>> upstream/main
 
 export interface UseSteeringParams {
   /** Consume the actual storage key selected by the composer’s autosave owner. */
@@ -377,15 +430,30 @@ export interface UseSteeringParams {
   index: number;
   conversationId: string;
   conversation: TConversation | null;
+<<<<<<< HEAD
   isSubmitting: boolean;
   answerModeActive: boolean;
   /** Composer attachments — consumed into queued items (steering is text-only). */
+=======
+  addedConversation?: TConversation | null;
+  /** The workspace mode the composer resolved for the next turn. */
+  codeEnvironmentMode?: CodeEnvironmentMode;
+  isSubmitting: boolean;
+  answerModeActive: boolean;
+  /** Host-owned preparation hold; existing queued-message and Stop actions remain independent. */
+  composerDisabled?: boolean;
+  /** Composer attachments: consumed into queued items (steering is text-only). */
+>>>>>>> upstream/main
   files?: Map<string, ExtendedFile>;
   setFiles?: FileSetter;
   /** Uploads still in flight: during-run submits are held like the send button. */
   filesLoading?: boolean;
   /** Submits text (and optional attachments/quotes/skills) as a normal new
+<<<<<<< HEAD
    *  turn. Overrides are always explicit — a queued item is the FULL
+=======
+   *  turn. Overrides are always explicit; a queued item is the FULL
+>>>>>>> upstream/main
    *  submission context, so absent fields must send as empty, never vacuum
    *  the composer. Returns `false` when `ask` refused without sending
    *  (in-flight guard, history not cached yet) so callers can restore
@@ -402,8 +470,13 @@ export interface UseSteeringParams {
 /**
  * The composer's during-run brain: decides what Enter does while a run is
  * generating (steer vs queue, per the user preference and run state), owns the
+<<<<<<< HEAD
  * pending-steer / queued-message chip state, and implements the three actions
  * — steer (POST + optimistic chip), queue (client-side), and interrupt & send
+=======
+ * pending-steer / queued-message chip state, and implements the three actions:
+ * steer (POST + optimistic chip), queue (client-side), and interrupt & send
+>>>>>>> upstream/main
  * (abort, then auto-send via the one-shot drain override).
  */
 export default function useSteering({
@@ -411,14 +484,23 @@ export default function useSteering({
   index,
   conversationId,
   conversation,
+<<<<<<< HEAD
   isSubmitting,
   answerModeActive,
+=======
+  addedConversation,
+  codeEnvironmentMode,
+  isSubmitting,
+  answerModeActive,
+  composerDisabled = false,
+>>>>>>> upstream/main
   files,
   setFiles,
   filesLoading = false,
   sendNow,
   stopGenerating,
 }: UseSteeringParams) {
+<<<<<<< HEAD
   const localize = useLocalize();
   const { showToast } = useToastContext();
   const jotaiStore = useStore();
@@ -436,6 +518,22 @@ export default function useSteering({
   const setDefaultAction = useSetRecoilState(store.duringRunDefaultAction);
   const steerInterruptsByDefault = useRecoilValue(store.steerInterruptsByDefault);
 
+=======
+  const composerDisabledRef = useRef(composerDisabled);
+  composerDisabledRef.current = composerDisabled;
+  const host = useSteerHost();
+  const {
+    queuedSendLockTimeoutMs,
+    duringRunDefaultAction: defaultAction,
+    setDuringRunDefaultAction: setDefaultAction,
+  } = host.useSettings();
+
+  const codeApprovalMode = host.useCodeApprovalMode(
+    conversation,
+    addedConversation,
+    codeEnvironmentMode,
+  );
+>>>>>>> upstream/main
   const endpoint = conversation?.endpointType ?? conversation?.endpoint;
   const steerable = !isAssistantsEndpoint(endpoint);
   const hasRealConvoId =
@@ -444,6 +542,7 @@ export default function useSteering({
   /** v1 gates the during-run UI to the primary composer, like the HITL popover. */
   const enabled = steerable && index === 0;
   const queueKey = hasRealConvoId ? conversationId : Constants.NEW_CONVO;
+<<<<<<< HEAD
   const queuedMessages = useRecoilValue(store.queuedMessagesByConvoId(queueKey));
   const setQueuedMessages = useSetRecoilState(store.queuedMessagesByConvoId(queueKey));
   const knownClientRequestIds = useMemo(
@@ -496,10 +595,21 @@ export default function useSteering({
     reconciliationUntil,
     expectsReceipts,
   );
+=======
+  const reasoningStateKey = getReasoningStateKey(conversationId, index);
+  const sendLockTimeoutMs = queuedSendLockTimeoutMs ?? DEFAULT_QUEUED_SEND_LOCK_TIMEOUT_MS;
+  const pendingReasoningOverride = useAtomValue(pendingReasoningOverrideFamily(reasoningStateKey));
+  const { applyQueuedTurnReceipts, finishQueuedTurnEnqueue } = useQueuedTurnReceipts({
+    conversationId,
+    queueKey,
+    serverQueueEnabled,
+  });
+>>>>>>> upstream/main
   /** Retain admission ownership through history hydration and stream attach;
    * ordinary sends must not overtake the server-owned successor. */
   const pendingReveal = useAtomValue(revealedQueuedTurnFamily(queueKey));
   const revealPending = pendingReveal != null;
+<<<<<<< HEAD
   const activeGenerationCreatedAt = useRecoilValue(
     store.activeGenerationCreatedAtByConvoId(queueKey),
   );
@@ -622,11 +732,19 @@ export default function useSteering({
     const timer = window.setTimeout(expire, delay);
     return () => window.clearTimeout(timer);
   }, [nextReconciliationExpiry, serverQueueEnabled, setQueuedMessages]);
+=======
+  const activeGenerationCreatedAt = useAtomValue(activeGenerationCreatedAtByConvoId(queueKey));
+  const activeGenerationProtocolVersion = useAtomValue(
+    activeGenerationProtocolVersionByConvoId(queueKey),
+  );
+
+>>>>>>> upstream/main
   /** The start POST installs this epoch before any live mutation may be sent.
    * `isSubmitting` flips earlier so the user can keep typing; during that
    * bounded interval submits degrade to the local queue and Stop/steer refuse. */
   const canControlGeneration = activeGenerationCreatedAt != null;
   const duringRunActive = enabled && (isSubmitting || revealPending) && !answerModeActive;
+<<<<<<< HEAD
   /** Queue rows can be sent concurrently. Keep their captured origins while
    *  absent so a later capture still sees the complete logical queue. Origins
    *  are isolated per conversation because this hook survives navigation. */
@@ -731,6 +849,34 @@ export default function useSteering({
    * assistant placeholders are siblings of their eventual persisted response,
    * so they anchor through their stable user parent. */
   const latestMessage = useLatestMessage(index, hasRealConvoId ? conversationId : null);
+=======
+  const pendingSteers = useAtomValue(pendingSteersByConvoId(queueKey));
+
+  const rows = useQueueRows({
+    index,
+    queueKey,
+    conversationId,
+    isSubmitting,
+    pendingSteers,
+    activeGenerationCreatedAt,
+  });
+  const {
+    updateQueuedMessage,
+    removeQueued,
+    holdQueued,
+    toggleQueuedHold,
+    downgradeServerQueuedTurn,
+    reorderQueued,
+    restoreQueuedOrder,
+    restoreQueued,
+    rewakeDrain,
+    armDrainAfterAbort,
+  } = rows;
+  /** Capture a durable branch anchor into a server queued turn. Optimistic
+   * assistant placeholders are siblings of their eventual persisted response,
+   * so they anchor through their stable user parent. */
+  const latestMessage = host.useLatestMessage(index, hasRealConvoId ? conversationId : null);
+>>>>>>> upstream/main
   const liveMessageState = useMemo(() => selectLiveMessageState(latestMessage), [latestMessage]);
   /** Both approval cards and `ask_user_question` suspend the current
    * generation while keeping its submission slot occupied. Answer mode hides
@@ -738,6 +884,7 @@ export default function useSteering({
    * to know a live generation exists so they remain discoverable and disabled
    * instead of looking as though the action disappeared. */
   const pausedOnApproval =
+<<<<<<< HEAD
     enabled && isSubmitting ? answerModeActive || (liveMessageState?.approval ?? false) : false;
 
   /** Whether a steer can reach the live run right now — independent of the
@@ -752,12 +899,25 @@ export default function useSteering({
   const effectiveAction: DuringRunAction = canSteer ? defaultAction : 'queue';
 
   /** Live submission state for POST callbacks — the closure value can be
+=======
+    enabled && isSubmitting ? answerModeActive || hasLiveRunPause(latestMessage) : false;
+  const canSteer = hasRealConvoId && canControlGeneration && !pausedOnApproval;
+  const canSendQueuedNow = (!isSubmitting && !revealPending) || (duringRunActive && canSteer);
+
+  /** A live steer cannot change the provider request already in flight.
+   * Stage a full queued turn instead, and expose that same effective action to
+   * Enter, the button and the hint. */
+  const effectiveAction: DuringRunAction =
+    canSteer && pendingReasoningOverride == null ? defaultAction : 'queue';
+  /** Live submission state for POST callbacks: the closure value can be
+>>>>>>> upstream/main
    *  stale by the time the steer response arrives. */
   const isSubmittingRef = useRef(isSubmitting);
   isSubmittingRef.current = isSubmitting;
   const visibleConversationRef = useRef(conversationId);
   visibleConversationRef.current = conversationId;
 
+<<<<<<< HEAD
   /**
    * How each conversation's last run ended, kept because `useQueueDrain`
    * CONSUMES the one-shot signal — by the time a reclaim resolves it is already
@@ -1904,6 +2064,49 @@ export default function useSteering({
     },
     [filesLoading, enqueue, takeComposerFiles, takeComposerContext, takeComposerDraft],
   );
+=======
+  const chips = useSteerChips({ visibleConversationRef, isSubmittingRef });
+  const { replaceSteerChip } = chips;
+  const { enqueue } = useQueueEnqueue({
+    queueKey,
+    conversationId,
+    serverQueueEnabled,
+    codeApprovalMode,
+    liveParentMessageId: liveMessageState?.parentMessageId,
+    pendingReveal,
+    activeGenerationCreatedAt,
+    applyQueuedTurnReceipts,
+    finishQueuedTurnEnqueue,
+    updateQueuedMessage,
+  });
+  const { discardQueued, dismissRecovery } = useQueuedRecovery({
+    queueKey,
+    conversationId,
+    hasRealConvoId,
+    applyQueuedTurnReceipts,
+    downgradeServerQueuedTurn,
+    removeQueued,
+  });
+  const composer = useComposerTake({
+    conversationId,
+    reasoningStateKey,
+    files,
+    setFiles,
+  });
+
+  const submitSteer = useSubmitSteer({
+    conversationId,
+    hasRealConvoId,
+    activeGenerationCreatedAt,
+    activeGenerationProtocolVersion,
+    visibleConversationRef,
+    isSubmittingRef,
+    sendNow,
+    chips,
+    rows,
+    enqueue,
+  });
+>>>>>>> upstream/main
 
   /** Retry a failed chip through the normal steer path. */
   const retrySteer = useCallback(
@@ -1914,7 +2117,11 @@ export default function useSteering({
       context?: QueuedMessageContext,
       opts?: SubmitSteerOptions,
     ) => {
+<<<<<<< HEAD
       /** A failed interrupt-steer must retry AS an interrupt — resubmitting it
+=======
+      /** A failed interrupt-steer must retry AS an interrupt; resubmitting it
+>>>>>>> upstream/main
        *  as an ordinary steer would silently let generation run on. */
       submitSteer(text, steerFiles, context, {
         ...opts,
@@ -1938,7 +2145,11 @@ export default function useSteering({
    * Routed through the shared conversion rather than `enqueue` so it obeys the
    * same invariant as the leftover-steer path: the item keeps its ORIGINAL id
    * and `createdAt`, so a steer accepted before a later follow-up still drains
+<<<<<<< HEAD
    * ahead of it — a fresh `Date.now()` would sort it last.
+=======
+   * ahead of it; a fresh `Date.now()` would sort it last.
+>>>>>>> upstream/main
    *
    * The reclaim is a round-trip, so the run can end while it is in flight and
    * the drain can consume its one-shot run-end signal against an empty queue,
@@ -1967,12 +2178,18 @@ export default function useSteering({
           skipUsageMark: true,
         });
       }
+<<<<<<< HEAD
       const lastRunEnd = runEndsRef.current.get(conversationId);
       if (lastRunEnd?.outcome === 'completed') {
         rearmDrain(conversationId, lastRunEnd);
       }
     },
     [conversationId, enqueue, rearmDrain, restoreQueued],
+=======
+      rewakeDrain(conversationId);
+    },
+    [conversationId, enqueue, rewakeDrain, restoreQueued],
+>>>>>>> upstream/main
   );
 
   /** Convert a failed/unsent steer chip into a queued follow-up. */
@@ -1994,6 +2211,7 @@ export default function useSteering({
     [conversationId, replaceSteerChip, restoreQueued, enqueue],
   );
 
+<<<<<<< HEAD
   /** Chip action: send a queued message into the live run instead. Keys on
    *  steer availability, not the default action — a queue-preferring user
    *  clicking send-now explicitly asked to inject into the live run. The
@@ -2207,6 +2425,45 @@ export default function useSteering({
   );
 
   /** Memoized so consumers like `memo(PendingSteerChips)` can bail on the
+=======
+  const { sendQueuedNow } = useQueuedSend({
+    index,
+    queueKey,
+    isSubmitting,
+    duringRunActive,
+    canSteer,
+    sendLockTimeoutMs,
+    sendNow,
+    submitSteer,
+    rows,
+    discardQueued,
+  });
+  const {
+    steerFromComposer,
+    queueFromComposer,
+    interruptAndSend,
+    interruptSteer,
+    submitDuringRun,
+  } = useDuringRunActions({
+    composerDisabledRef,
+    filesLoading,
+    canSteer,
+    canControlGeneration,
+    hasRealConvoId,
+    duringRunActive,
+    pausedOnApproval,
+    effectiveAction,
+    pendingReasoningOverride,
+    enqueue,
+    composer,
+    takeComposerDraft,
+    submitSteer,
+    armDrainAfterAbort,
+    stopGenerating,
+  });
+
+  /** Memoized so consumers like `memo(Bar)` and `memo(Queue)` can bail on the
+>>>>>>> upstream/main
    * `steering` prop; a fresh literal here would defeat them every render. */
   return useMemo(
     () => ({
@@ -2218,6 +2475,10 @@ export default function useSteering({
       canSendQueuedNow,
       effectiveAction,
       defaultAction,
+<<<<<<< HEAD
+=======
+      pendingReasoningOverride,
+>>>>>>> upstream/main
       pausedOnApproval,
       setDefaultAction,
       submitDuringRun,
@@ -2230,7 +2491,17 @@ export default function useSteering({
       queueReclaimedSteer,
       enqueue,
       removeQueued,
+<<<<<<< HEAD
       discardQueued,
+=======
+      holdQueued,
+      toggleQueuedHold,
+      discardQueued,
+      dismissRecovery,
+      rewakeDrain,
+      reorderQueued,
+      restoreQueuedOrder,
+>>>>>>> upstream/main
       sendQueuedNow,
       interruptAndSend,
       interruptSteer,
@@ -2244,6 +2515,10 @@ export default function useSteering({
       canSendQueuedNow,
       effectiveAction,
       defaultAction,
+<<<<<<< HEAD
+=======
+      pendingReasoningOverride,
+>>>>>>> upstream/main
       pausedOnApproval,
       setDefaultAction,
       submitDuringRun,
@@ -2256,7 +2531,17 @@ export default function useSteering({
       queueReclaimedSteer,
       enqueue,
       removeQueued,
+<<<<<<< HEAD
       discardQueued,
+=======
+      holdQueued,
+      toggleQueuedHold,
+      discardQueued,
+      dismissRecovery,
+      rewakeDrain,
+      reorderQueued,
+      restoreQueuedOrder,
+>>>>>>> upstream/main
       sendQueuedNow,
       interruptAndSend,
       interruptSteer,

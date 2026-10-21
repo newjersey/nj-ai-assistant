@@ -9,6 +9,10 @@ import {
   InfoHoverCard,
   useOnClickOutside,
 } from '@librechat/client';
+<<<<<<< HEAD
+=======
+import { clearTTSCache, hasLegacyTTSCache, hasCachedTTSAudio } from '~/utils';
+>>>>>>> upstream/main
 import { useLocalize } from '~/hooks';
 import { ESide } from '~/common';
 
@@ -22,9 +26,13 @@ export const DeleteCache = ({ disabled = false }: { disabled?: boolean }) => {
   useOnClickOutside(contentRef, () => confirmClear && setConfirmClear(false), []);
 
   const checkCache = useCallback(async () => {
+<<<<<<< HEAD
     const cache = await caches.open('tts-responses');
     const keys = await cache.keys();
     setIsCacheEmpty(keys.length === 0);
+=======
+    setIsCacheEmpty(!hasCachedTTSAudio() && !(await hasLegacyTTSCache()));
+>>>>>>> upstream/main
   }, []);
 
   useEffect(() => {
@@ -33,10 +41,18 @@ export const DeleteCache = ({ disabled = false }: { disabled?: boolean }) => {
 
   const revokeAllUserKeys = useCallback(async () => {
     setIsLoading(true);
+<<<<<<< HEAD
     const cache = await caches.open('tts-responses');
     await cache.keys().then((keys) => Promise.all(keys.map((key) => cache.delete(key))));
     setIsLoading(false);
   }, []);
+=======
+    await clearTTSCache();
+    /** A legacy delete that failed leaves the action available for another try. */
+    await checkCache();
+    setIsLoading(false);
+  }, [checkCache]);
+>>>>>>> upstream/main
 
   return (
     <div className="flex items-center justify-between">
@@ -47,7 +63,11 @@ export const DeleteCache = ({ disabled = false }: { disabled?: boolean }) => {
       <OGDialog open={open} onOpenChange={setOpen}>
         <OGDialogTrigger asChild>
           <Button
+<<<<<<< HEAD
             variant="destructive"
+=======
+            variant="destructive-soft"
+>>>>>>> upstream/main
             onClick={() => setOpen(true)}
             disabled={disabled || isCacheEmpty}
             aria-labelledby="delete-cache-label"
@@ -58,7 +78,11 @@ export const DeleteCache = ({ disabled = false }: { disabled?: boolean }) => {
         <OGDialogTemplate
           showCloseButton={false}
           title={localize('com_nav_confirm_clear')}
+<<<<<<< HEAD
           className="max-w-[450px]"
+=======
+          className="max-w-[28.125rem]"
+>>>>>>> upstream/main
           main={
             <Label className="text-left text-sm font-medium">
               {localize('com_nav_clear_cache_confirm_message')}

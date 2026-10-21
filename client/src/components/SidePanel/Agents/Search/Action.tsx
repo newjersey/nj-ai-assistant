@@ -61,7 +61,11 @@ export default function Action({
         variant="outline"
         onClick={() => setIsDialogOpen(true)}
         aria-haspopup="dialog"
+<<<<<<< HEAD
         className="w-full justify-center gap-2"
+=======
+        className="w-full justify-center"
+>>>>>>> upstream/main
       >
         <MorphIcon
           icon={isToolAuthenticated ? CircleCheck : KeyRound}

@@ -24,13 +24,22 @@ const handlers = createAdminConfigHandlers({
   tombstoneConfigField: db.tombstoneConfigField,
   unsetConfigField: db.unsetConfigField,
   deleteConfig: db.deleteConfig,
+<<<<<<< HEAD
   toggleConfigActive: db.toggleConfigActive,
+=======
+  toggleConfigActiveTracked: db.toggleConfigActiveTracked,
+>>>>>>> upstream/main
   hasAnyConfigReadAccess,
   getReadableConfigSections,
   hasConfigCapability,
   hasCapability,
   getAppConfig,
   invalidateConfigCaches,
+<<<<<<< HEAD
+=======
+  recordAuditEntry: db.recordAuditEntry,
+  auditFailClosed: process.env.AUDIT_LOG_FAIL_CLOSED === 'true',
+>>>>>>> upstream/main
 });
 
 router.use(requireJwtAuth, requireAdminAccess);

@@ -7,6 +7,10 @@ import type {
   TFile,
 } from 'librechat-data-provider';
 import type { QueryClient } from '@tanstack/react-query';
+<<<<<<< HEAD
+=======
+import { invalidateRecentFiles } from '~/utils/files';
+>>>>>>> upstream/main
 import { handleMemoryArtifact } from '~/utils/memory';
 import store from '~/store';
 
@@ -55,6 +59,10 @@ export default function useAttachmentHandler(queryClient?: QueryClient) {
         }
         return [fileData, ...oldData];
       });
+<<<<<<< HEAD
+=======
+      invalidateRecentFiles(queryClient);
+>>>>>>> upstream/main
     }
 
     if (queryClient && data.type === Tools.memory && data[Tools.memory]) {

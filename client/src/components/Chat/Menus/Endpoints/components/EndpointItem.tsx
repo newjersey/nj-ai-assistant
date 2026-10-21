@@ -61,7 +61,11 @@ const SettingsButton = ({
         'text-text-secondary transition-colors duration-150',
         'hover:bg-surface-tertiary hover:text-text-primary',
         'focus-visible:bg-surface-tertiary focus-visible:text-text-primary',
+<<<<<<< HEAD
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-text-primary focus-visible:ring-offset-1',
+=======
+        'focus-visible:ring-text-primary focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:outline-hidden',
+>>>>>>> upstream/main
         className,
       )}
       aria-label={`${text} ${endpoint.label}`}
@@ -70,7 +74,11 @@ const SettingsButton = ({
       <span
         aria-hidden="true"
         className={cn(
+<<<<<<< HEAD
           'grid overflow-hidden transition-[grid-template-columns,opacity] duration-150 ease-out',
+=======
+          'grid overflow-hidden transition-all duration-150 ease-out',
+>>>>>>> upstream/main
           'grid-cols-[0fr] opacity-0',
           'group-hover/button:grid-cols-[1fr] group-hover/button:opacity-100',
           'group-focus-visible/button:grid-cols-[1fr] group-focus-visible/button:opacity-100',
@@ -312,7 +320,11 @@ export function EndpointItem({ endpoint, endpointIndex }: EndpointItemProps) {
               )}
               {isEndpointSelected && (
                 <>
+<<<<<<< HEAD
                   <CheckCircle2 className="size-4 shrink-0 text-text-primary" aria-hidden="true" />
+=======
+                  <CheckCircle2 className="text-text-primary size-4 shrink-0" aria-hidden="true" />
+>>>>>>> upstream/main
                   <VisuallyHidden>{localize('com_a11y_selected')}</VisuallyHidden>
                 </>
               )}
@@ -343,14 +355,22 @@ export function EndpointItem({ endpoint, endpointIndex }: EndpointItemProps) {
               side="top"
               render={
                 <span className="flex items-center">
+<<<<<<< HEAD
                   <MousePointerClick className="size-4 text-text-secondary" aria-hidden="true" />
+=======
+                  <MousePointerClick className="text-text-secondary size-4" aria-hidden="true" />
+>>>>>>> upstream/main
                 </span>
               }
             />
           )}
           {isEndpointSelected && !isAssistantsNotLoaded && (
             <>
+<<<<<<< HEAD
               <CheckCircle2 className="size-4 shrink-0 text-text-primary" aria-hidden="true" />
+=======
+              <CheckCircle2 className="text-text-primary size-4 shrink-0" aria-hidden="true" />
+>>>>>>> upstream/main
               <VisuallyHidden>{localize('com_a11y_selected')}</VisuallyHidden>
             </>
           )}

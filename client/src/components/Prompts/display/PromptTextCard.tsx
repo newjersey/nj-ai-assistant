@@ -52,8 +52,13 @@ const PromptTextCard = ({ mainText }: PromptTextCardProps) => {
   }, [mainText, showToast, localize, isCopied]);
 
   return (
+<<<<<<< HEAD
     <div className="relative flex h-full flex-col rounded-xl border border-border-medium bg-transparent">
       <div className="absolute right-2 top-2 z-10">
+=======
+    <div className="border-border-medium relative flex h-full flex-col rounded-xl border bg-transparent">
+      <div className="absolute top-2 right-2 z-10">
+>>>>>>> upstream/main
         <TooltipAnchor
           description={isCopied ? localize('com_ui_copied') : localize('com_ui_copy')}
           render={
@@ -67,7 +72,13 @@ const PromptTextCard = ({ mainText }: PromptTextCardProps) => {
               }
               aria-live="polite"
             >
+<<<<<<< HEAD
               <MorphIcon icon={isCopied ? Check : Copy} className="size-4 text-text-secondary" />
+=======
+              <span className="text-text-secondary flex">
+                <MorphIcon icon={isCopied ? Check : Copy} className="size-4" />
+              </span>
+>>>>>>> upstream/main
             </Button>
           }
         />
@@ -88,7 +99,11 @@ const PromptTextCard = ({ mainText }: PromptTextCardProps) => {
           ]}
           /** @ts-ignore */
           components={{ p: PromptVariableGfm, code: codeNoExecution }}
+<<<<<<< HEAD
           className="markdown prose dark:prose-invert light my-1 max-w-none break-words text-text-primary"
+=======
+          className="markdown prose light text-text-primary my-1 max-w-none break-words"
+>>>>>>> upstream/main
         >
           {mainText}
         </ReactMarkdown>

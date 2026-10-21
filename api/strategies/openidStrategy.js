@@ -13,9 +13,18 @@ const {
   findOpenIDUser,
   getOpenIdEmail,
   getOpenIdIssuer,
+<<<<<<< HEAD
   getBalanceConfig,
   selectOpenIdRole,
   getTokenCacheTtlMs,
+=======
+  createOpenIDUser,
+  getBalanceConfig,
+  selectOpenIdRole,
+  getTokenCacheTtlMs,
+  recordIdpRoleChange,
+  applyOpenIDProfile,
+>>>>>>> upstream/main
   getAvatarSaveParams,
   isEmailDomainAllowed,
   getAvatarFileStrategy,
@@ -28,7 +37,18 @@ const {
 } = require('@librechat/api');
 const { getStrategyFunctions } = require('~/server/services/Files/strategies');
 const { resizeAvatar } = require('~/server/services/Files/images/avatar');
+<<<<<<< HEAD
 const { findUser, createUser, updateUser, findRolesByNames } = require('~/models');
+=======
+const {
+  findUser,
+  updateUser,
+  findRolesByNames,
+  findBalanceByUser,
+  recordAuditEntry,
+  createUserIfAbsent,
+} = require('~/models');
+>>>>>>> upstream/main
 const { getAppConfig } = require('~/server/services/Config');
 const getLogStores = require('~/cache/getLogStores');
 
@@ -580,14 +600,23 @@ async function processOpenIDAuth(tokenset, existingUsersOnly = false) {
     throw new Error('Email domain not allowed');
   }
 
+<<<<<<< HEAD
   const result = await findOpenIDUser({
+=======
+  const lookup = {
+>>>>>>> upstream/main
     findUser,
     email: email,
     openidId: claims.sub || userinfo.sub,
     openidIssuer,
     idOnTheSource: claims.oid || userinfo.oid,
     strategyName: 'openidStrategy',
+<<<<<<< HEAD
   });
+=======
+  };
+  const result = await findOpenIDUser(lookup);
+>>>>>>> upstream/main
   let user = result.user;
   const error = result.error;
 
@@ -595,7 +624,11 @@ async function processOpenIDAuth(tokenset, existingUsersOnly = false) {
     throw new Error(ErrorTypes.AUTH_FAILED);
   }
 
+<<<<<<< HEAD
   const appConfig = user?.tenantId ? await resolveAppConfigForUser(getAppConfig, user) : baseConfig;
+=======
+  let appConfig = user?.tenantId ? await resolveAppConfigForUser(getAppConfig, user) : baseConfig;
+>>>>>>> upstream/main
 
   if (!isEmailDomainAllowed(email, appConfig?.registration?.allowedDomains)) {
     logger.error(
@@ -676,6 +709,7 @@ async function processOpenIDAuth(tokenset, existingUsersOnly = false) {
     throw new Error('User does not exist');
   }
 
+<<<<<<< HEAD
   if (!user) {
     user = {
       provider: 'openid',
@@ -705,6 +739,33 @@ async function processOpenIDAuth(tokenset, existingUsersOnly = false) {
     }
   }
 
+=======
+  const profile = {
+    openidId: userinfo.sub,
+    openidIssuer,
+    username,
+    name: fullName,
+    email,
+    emailVerified: userinfo.email_verified || false,
+    idOnTheSource: userinfo.oid,
+  };
+
+  if (!user) {
+    ({ user, appConfig } = await createOpenIDUser({
+      lookup,
+      profile,
+      appConfig,
+      getAppConfig,
+      getBalanceConfig,
+      createUserIfAbsent,
+      findBalanceByUser,
+    }));
+  } else {
+    user = applyOpenIDProfile(user, profile);
+  }
+
+  const roleBeforeClaims = user.role;
+>>>>>>> upstream/main
   const adminRole = process.env.OPENID_ADMIN_ROLE;
   const adminRoleParameterPath = process.env.OPENID_ADMIN_ROLE_PARAMETER_PATH;
   const adminRoleTokenKind = process.env.OPENID_ADMIN_ROLE_TOKEN_KIND;
@@ -742,11 +803,19 @@ async function processOpenIDAuth(tokenset, existingUsersOnly = false) {
     if (adminRoles && (adminRoles === true || adminRoleValues.includes(adminRole))) {
       user.role = SystemRoles.ADMIN;
       adminRoleGranted = true;
+<<<<<<< HEAD
       logger.info(`[openidStrategy] User ${username} is an admin based on role: ${adminRole}`);
     } else if (user.role === SystemRoles.ADMIN) {
       user.role = SystemRoles.USER;
       logger.info(
         `[openidStrategy] User ${username} demoted from admin - role no longer present in token`,
+=======
+      logger.info(`[openidStrategy] User ${user._id} is an admin based on role: ${adminRole}`);
+    } else if (user.role === SystemRoles.ADMIN) {
+      user.role = SystemRoles.USER;
+      logger.info(
+        `[openidStrategy] User ${user._id} demoted from admin - role no longer present in token`,
+>>>>>>> upstream/main
       );
     }
   }
@@ -813,6 +882,7 @@ async function processOpenIDAuth(tokenset, existingUsersOnly = false) {
   }
 
   user = await updateUser(user._id, user);
+<<<<<<< HEAD
 
   logger.info(
     `[openidStrategy] login success openidId: ${user.openidId} | email: ${user.email} | username: ${user.username} `,
@@ -825,6 +895,18 @@ async function processOpenIDAuth(tokenset, existingUsersOnly = false) {
       },
     },
   );
+=======
+  await recordIdpRoleChange({
+    recordAuditEntry,
+    userId: String(user._id),
+    previousRole: roleBeforeClaims,
+    role: user.role,
+    source: 'openid_login',
+    tenantId: user.tenantId,
+  });
+
+  logger.info(`[openidStrategy] login success for user: ${user._id}`);
+>>>>>>> upstream/main
 
   return {
     ...user,

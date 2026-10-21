@@ -4,9 +4,14 @@ import {
   mergeFileConfig,
   fileConfig,
 } from 'librechat-data-provider';
+<<<<<<< HEAD
 import type { AppConfig, IMongoFile } from '@librechat/data-schemas';
 import type { RegexLike, TFile } from 'librechat-data-provider';
 import type { ServerRequest } from '~/types';
+=======
+import type { RegexLike, TFile } from 'librechat-data-provider';
+import type { AppConfig } from '@librechat/data-schemas';
+>>>>>>> upstream/main
 
 /**
  * Checks if a MIME type is supported by the endpoint configuration
@@ -21,6 +26,7 @@ function isMimeTypeSupported(mimeType: string, supportedMimeTypes?: RegexLike[])
   return fileConfig.checkType(mimeType, supportedMimeTypes);
 }
 
+<<<<<<< HEAD
 /**
  * Filters out files based on endpoint configuration including:
  * - Disabled status
@@ -65,11 +71,17 @@ export function isLegacyFileUploadUX(
   return endpointFileConfig?.legacyFileUploadUX === true;
 }
 
+=======
+>>>>>>> upstream/main
 type EndpointPolicyFile = Pick<TFile, 'bytes' | 'type'> & {
   source?: string;
   metadata?: { routingMimeType?: string };
 };
 
+<<<<<<< HEAD
+=======
+/** Request-free endpoint file-policy adapter used by Agent execution hosts. */
+>>>>>>> upstream/main
 export function filterFilesByEndpointRuntimeConfig<T extends EndpointPolicyFile>(
   appConfig: AppConfig | undefined,
   params: {

@@ -1,8 +1,19 @@
 import { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import { useRecoilValue } from 'recoil';
 import { useToastContext } from '@librechat/client';
+<<<<<<< HEAD
 import { useTextToSpeechMutation, useVoicesQuery } from '~/data-provider';
 import { useLocalize } from '~/hooks';
+=======
+import {
+  getTTSCacheKey,
+  setCachedTTSAudio,
+  getCachedTTSAudio,
+  getTTSCacheGeneration,
+} from '~/utils';
+import { useTextToSpeechMutation, useVoicesQuery } from '~/data-provider';
+import { useLocalize, useAuthContext } from '~/hooks';
+>>>>>>> upstream/main
 import store from '~/store';
 
 const createFormData = (text: string, voice: string) => {
@@ -28,6 +39,10 @@ function useTextToSpeechExternal({
   index = 0,
 }: TUseTTSExternal) {
   const localize = useLocalize();
+<<<<<<< HEAD
+=======
+  const { user } = useAuthContext();
+>>>>>>> upstream/main
   const { showToast } = useToastContext();
   const voice = useRecoilValue(store.voice);
   const cacheTTS = useRecoilValue(store.cacheTTS);
@@ -36,6 +51,11 @@ function useTextToSpeechExternal({
   const [downloadFile, setDownloadFile] = useState(false);
 
   const promiseAudioRef = useRef<HTMLAudioElement | null>(null);
+<<<<<<< HEAD
+=======
+  /** The cache generation each request started in, so audio from before a logout is not kept. */
+  const requestGenerations = useRef(new WeakMap<FormData, number>());
+>>>>>>> upstream/main
 
   /* Global Audio Variables */
   const globalIsFetching = useRecoilValue(store.globalAudioFetchingFamily(index));
@@ -105,11 +125,20 @@ function useTextToSpeechExternal({
         const inputText = (variables.get('input') ?? '') as string;
         const audioBlob = new Blob([data], { type: 'audio/mpeg' });
 
+<<<<<<< HEAD
         if (cacheTTS && inputText) {
           const cache = await caches.open('tts-responses');
           const request = new Request(inputText);
           const response = new Response(audioBlob);
           cache.put(request, response);
+=======
+        const generation = requestGenerations.current.get(variables);
+        if (cacheTTS && inputText && generation != null) {
+          /** Not awaited: caching must never delay playback. */
+          void getTTSCacheKey(inputText, (variables.get('voice') ?? '') as string, user?.id).then(
+            (cacheKey) => cacheKey && setCachedTTSAudio(cacheKey, audioBlob, generation),
+          );
+>>>>>>> upstream/main
         }
 
         const blobUrl = URL.createObjectURL(audioBlob);
@@ -134,6 +163,10 @@ function useTextToSpeechExternal({
 
   const startMutation = (text: string, download: boolean) => {
     const formData = createFormData(text, voice ?? '');
+<<<<<<< HEAD
+=======
+    requestGenerations.current.set(formData, getTTSCacheGeneration());
+>>>>>>> upstream/main
     setDownloadFile(download);
     processAudio(formData);
   };
@@ -147,12 +180,21 @@ function useTextToSpeechExternal({
   };
 
   const handleCachedResponse = async (text: string, download: boolean) => {
+<<<<<<< HEAD
     const cachedResponse = await caches.match(text);
     if (!cachedResponse) {
       return startMutation(text, download);
     }
     const audioBlob = await cachedResponse.blob();
     const blobUrl = URL.createObjectURL(audioBlob);
+=======
+    const cacheKey = await getTTSCacheKey(text, voice ?? '', user?.id);
+    const cachedAudio = cacheKey ? getCachedTTSAudio(cacheKey) : undefined;
+    if (!cachedAudio) {
+      return startMutation(text, download);
+    }
+    const blobUrl = URL.createObjectURL(cachedAudio);
+>>>>>>> upstream/main
     if (download) {
       downloadAudio(blobUrl);
     } else {

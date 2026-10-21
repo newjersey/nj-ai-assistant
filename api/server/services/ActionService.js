@@ -9,6 +9,10 @@ const {
   logAxiosError,
   detachOnAbort,
   getTokenExpiresAt,
+<<<<<<< HEAD
+=======
+  getOAuthCallbackUrl,
+>>>>>>> upstream/main
   refreshAccessToken,
   GenerationJobManager,
   createSSRFSafeAgents,
@@ -225,7 +229,14 @@ async function createActionTool({
 
               const stateToken = jwt.sign(statePayload, JWT_SECRET, { expiresIn: '10m' });
               try {
+<<<<<<< HEAD
                 const redirectUri = `${process.env.DOMAIN_CLIENT}/api/actions/${action_id}/oauth/callback`;
+=======
+                const redirectUri = getOAuthCallbackUrl(
+                  process.env.DOMAIN_SERVER || 'http://localhost:3080',
+                  `/api/actions/${action_id}/oauth/callback`,
+                );
+>>>>>>> upstream/main
                 const params = new URLSearchParams({
                   client_id: metadata.oauth_client_id,
                   scope: metadata.auth.scope,
@@ -280,7 +291,11 @@ async function createActionTool({
                     state: stateToken,
                     userId: userId,
                     client_url: metadata.auth.client_url,
+<<<<<<< HEAD
                     redirect_uri: `${process.env.DOMAIN_SERVER}/api/actions/${action_id}/oauth/callback`,
+=======
+                    redirect_uri: redirectUri,
+>>>>>>> upstream/main
                     token_exchange_method: metadata.auth.token_exchange_method,
                     allowedAddresses,
                     /** Encrypted values */

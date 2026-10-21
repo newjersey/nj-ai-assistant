@@ -3,8 +3,13 @@ import { Button } from '@librechat/client';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type { UIResource } from 'librechat-data-provider';
 import UIResourceRenderer, { isSupportedUIResource } from '~/components/MCPUIResource/Renderer';
+<<<<<<< HEAD
 import { useOptionalMessagesOperations } from '~/Providers';
 import { handleUIAction } from '~/utils';
+=======
+import { useMessagePartsHost } from '~/Providers/MessagePartsHostContext';
+import { cn, handleUIAction } from '~/utils';
+>>>>>>> upstream/main
 import { useLocalize } from '~/hooks';
 
 interface UIResourceCarouselProps {
@@ -17,7 +22,11 @@ const UIResourceCarousel: React.FC<UIResourceCarouselProps> = React.memo(({ uiRe
   const [showRightArrow, setShowRightArrow] = useState(true);
   const [isContainerHovered, setIsContainerHovered] = useState(false);
   const scrollContainerRef = React.useRef<HTMLDivElement>(null);
+<<<<<<< HEAD
   const { ask } = useOptionalMessagesOperations();
+=======
+  const ask = useMessagePartsHost().useMessagesAsk();
+>>>>>>> upstream/main
   const supportedUIResources = React.useMemo(
     () => uiResources.filter(isSupportedUIResource),
     [uiResources],
@@ -78,25 +87,42 @@ const UIResourceCarousel: React.FC<UIResourceCarouselProps> = React.memo(({ uiRe
       onMouseLeave={() => setIsContainerHovered(false)}
     >
       <div
+<<<<<<< HEAD
         className={`pointer-events-none absolute left-0 top-0 z-10 h-full w-24 bg-gradient-to-r from-surface-primary to-transparent transition-opacity duration-500 ease-in-out ${
+=======
+        className={`from-surface-primary pointer-events-none absolute top-0 left-0 z-10 h-full w-24 bg-gradient-to-r to-transparent transition-opacity duration-500 ease-in-out ${
+>>>>>>> upstream/main
           showLeftArrow ? 'opacity-100' : 'opacity-0'
         }`}
       />
 
       <div
+<<<<<<< HEAD
         className={`pointer-events-none absolute right-0 top-0 z-10 h-full w-24 bg-gradient-to-l from-surface-primary to-transparent transition-opacity duration-500 ease-in-out ${
+=======
+        className={`from-surface-primary pointer-events-none absolute top-0 right-0 z-10 h-full w-24 bg-gradient-to-l to-transparent transition-opacity duration-500 ease-in-out ${
+>>>>>>> upstream/main
           showRightArrow ? 'opacity-100' : 'opacity-0'
         }`}
       />
 
       {showLeftArrow && (
         <Button
+<<<<<<< HEAD
           variant="ghost"
           size="icon"
           onClick={() => scroll('left')}
           className={`absolute left-2 top-1/2 z-20 h-auto w-auto -translate-y-1/2 rounded-xl bg-surface-fixed p-2 text-text-fixed shadow-lg transition-all duration-200 hover:scale-110 hover:bg-surface-fixed-hover hover:text-text-fixed hover:shadow-xl active:scale-95 ${
             isContainerHovered ? 'opacity-100' : 'pointer-events-none opacity-0'
           }`}
+=======
+          variant="carousel-nav"
+          onClick={() => scroll('left')}
+          className={cn(
+            'absolute top-1/2 left-2 z-20 -translate-y-1/2 transition-all duration-200 hover:scale-110 active:scale-95',
+            isContainerHovered ? 'opacity-100' : 'pointer-events-none opacity-0',
+          )}
+>>>>>>> upstream/main
           aria-label={localize('com_ui_scroll_left')}
         >
           <ChevronLeft className="h-5 w-5" />
@@ -114,7 +140,11 @@ const UIResourceCarousel: React.FC<UIResourceCarouselProps> = React.memo(({ uiRe
           return (
             <div
               key={index}
+<<<<<<< HEAD
               className="flex-shrink-0 transform-gpu transition-all duration-300 ease-out animate-in fade-in-0 slide-in-from-bottom-5"
+=======
+              className="animate-in fade-in-0 slide-in-from-bottom-5 shrink-0 transform-gpu transition-all duration-300 ease-out"
+>>>>>>> upstream/main
               style={{
                 width: `${width}px`,
                 minHeight: `${height}px`,
@@ -137,12 +167,21 @@ const UIResourceCarousel: React.FC<UIResourceCarouselProps> = React.memo(({ uiRe
 
       {showRightArrow && (
         <Button
+<<<<<<< HEAD
           variant="ghost"
           size="icon"
           onClick={() => scroll('right')}
           className={`absolute right-2 top-1/2 z-20 h-auto w-auto -translate-y-1/2 rounded-xl bg-surface-fixed p-2 text-text-fixed shadow-lg transition-all duration-200 hover:scale-110 hover:bg-surface-fixed-hover hover:text-text-fixed hover:shadow-xl active:scale-95 ${
             isContainerHovered ? 'opacity-100' : 'pointer-events-none opacity-0'
           }`}
+=======
+          variant="carousel-nav"
+          onClick={() => scroll('right')}
+          className={cn(
+            'absolute top-1/2 right-2 z-20 -translate-y-1/2 transition-all duration-200 hover:scale-110 active:scale-95',
+            isContainerHovered ? 'opacity-100' : 'pointer-events-none opacity-0',
+          )}
+>>>>>>> upstream/main
           aria-label={localize('com_ui_scroll_right')}
         >
           <ChevronRight className="h-5 w-5" />

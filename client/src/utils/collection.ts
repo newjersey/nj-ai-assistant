@@ -87,6 +87,7 @@ export const deleteData = <TCollection, TData>(
   return newData;
 };
 
+<<<<<<< HEAD
 /**
  * Normalize the data so that the number of data on each page is within pageSize
  */
@@ -135,6 +136,8 @@ export const normalizeData = <TCollection, TData>(
   };
 };
 
+=======
+>>>>>>> upstream/main
 export const updateFields = <TCollection, TData>(
   data: InfiniteData<TCollection>,
   updatedItem: Partial<TData>,

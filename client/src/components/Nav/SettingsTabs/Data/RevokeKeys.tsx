@@ -42,7 +42,11 @@ export const RevokeKeys = ({
       <OGDialog open={open} onOpenChange={setOpen}>
         <OGDialogTrigger asChild>
           <Button
+<<<<<<< HEAD
             variant="destructive"
+=======
+            variant="destructive-soft"
+>>>>>>> upstream/main
             onClick={() => setOpen(true)}
             disabled={disabled}
             aria-labelledby="revoke-info-label"
@@ -53,7 +57,11 @@ export const RevokeKeys = ({
         <OGDialogTemplate
           showCloseButton={false}
           title={localize('com_ui_revoke_keys')}
+<<<<<<< HEAD
           className="max-w-[450px]"
+=======
+          className="max-w-[28.125rem]"
+>>>>>>> upstream/main
           main={
             <Label className="text-left text-sm font-medium">
               {localize('com_ui_revoke_keys_confirm')}

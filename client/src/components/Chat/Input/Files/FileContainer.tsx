@@ -21,6 +21,11 @@ const FileContainer = ({
   buttonClassName,
   containerClassName,
   onDelete,
+<<<<<<< HEAD
+=======
+  removeLabel,
+  removeDisabled,
+>>>>>>> upstream/main
   onClick,
 }: {
   file: Partial<ExtendedFile | TFile>;
@@ -56,6 +61,12 @@ const FileContainer = ({
   buttonClassName?: string;
   containerClassName?: string;
   onDelete?: () => void;
+<<<<<<< HEAD
+=======
+  /** Accessible name for the remove control; defaults to a generic "Remove file". */
+  removeLabel?: string;
+  removeDisabled?: boolean;
+>>>>>>> upstream/main
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
 }) => {
   const fileType = getFileType(overrideType ?? file.type);
@@ -67,12 +78,20 @@ const FileContainer = ({
     buttonClassName,
   );
   const focusRing =
+<<<<<<< HEAD
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-text-primary focus-visible:ring-offset-1 focus-visible:ring-offset-surface-primary';
+=======
+    'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-text-primary focus-visible:ring-offset-1 focus-visible:ring-offset-surface-primary';
+>>>>>>> upstream/main
   /** The full-bleed target sits inside the surface's `overflow-hidden`, so an offset ring
    * would be clipped away entirely; the inset ring draws within the target's own box and the
    * matching radius keeps it inside the surface's rounded corners. */
   const insetFocusRing =
+<<<<<<< HEAD
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-text-primary';
+=======
+    'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-text-primary';
+>>>>>>> upstream/main
 
   const details = (
     <div className="w-56 p-1.5">
@@ -98,7 +117,11 @@ const FileContainer = ({
                  * center still opens the editor. The colour shift answers focus as well as
                  * hover: the ring already announces focus, but leaving the two input modes
                  * with different feedback is a difference with no reason behind it. */
+<<<<<<< HEAD
                 'pointer-events-auto relative z-10 inline-block max-w-full truncate rounded text-left align-middle leading-4 text-text-secondary underline underline-offset-2 hover:text-text-primary focus-visible:text-text-primary',
+=======
+                'text-text-secondary hover:text-text-primary focus-visible:text-text-primary pointer-events-auto relative z-10 inline-block max-w-full truncate rounded text-left align-middle leading-4 underline underline-offset-2',
+>>>>>>> upstream/main
                 focusRing,
               )}
             >
@@ -106,7 +129,11 @@ const FileContainer = ({
             </button>
           ) : (
             (subtitle ?? (
+<<<<<<< HEAD
               <div className="truncate text-text-secondary" title={fileType.title}>
+=======
+              <div className="text-text-secondary truncate" title={fileType.title}>
+>>>>>>> upstream/main
                 {fileType.title}
               </div>
             ))
@@ -118,7 +145,11 @@ const FileContainer = ({
 
   return (
     <div
+<<<<<<< HEAD
       className={cn('group relative inline-block text-sm text-text-primary', containerClassName)}
+=======
+      className={cn('group text-text-primary relative inline-block text-sm', containerClassName)}
+>>>>>>> upstream/main
     >
       {subtitleAction != null ? (
         <div className={surfaceClassName}>
@@ -144,7 +175,11 @@ const FileContainer = ({
           {details}
         </button>
       )}
+<<<<<<< HEAD
       {onDelete && <RemoveFile onRemove={onDelete} />}
+=======
+      {onDelete && <RemoveFile onRemove={onDelete} label={removeLabel} disabled={removeDisabled} />}
+>>>>>>> upstream/main
     </div>
   );
 };

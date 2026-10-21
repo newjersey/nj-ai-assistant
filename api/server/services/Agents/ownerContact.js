@@ -1,4 +1,5 @@
 const { logger } = require('@librechat/data-schemas');
+<<<<<<< HEAD
 const { ResourceType, PrincipalType, PermissionBits } = require('librechat-data-provider');
 const { hasSupportContact, resolveAgentOwnerContact } = require('@librechat/api');
 const db = require('~/models');
@@ -81,6 +82,18 @@ const attachOwnerContacts = async (agents) => {
     return agent;
   });
 };
+=======
+const { attachAgentOwnerContacts } = require('@librechat/api');
+const db = require('~/models');
+
+const attachOwnerContacts = (agents) =>
+  attachAgentOwnerContacts(agents, {
+    getFirstOwnerIdsByResource: (resourceType, resourceIds) =>
+      db.getFirstOwnerIdsByResource(resourceType, resourceIds),
+    findOwnerContactUsers: db.findOwnerContactUsers,
+    logger,
+  });
+>>>>>>> upstream/main
 
 module.exports = {
   attachOwnerContacts,

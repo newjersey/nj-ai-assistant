@@ -8,7 +8,11 @@ rag:
     EMBEDDINGS_PROVIDER: openai
 
 image:
+<<<<<<< HEAD
   repository: danny-avila/librechat-rag-api-dev-lite # there is rag-api-dev and rag-api-dev-lite. currently only lite is docuimented
+=======
+  repository: librechat-ai/librechat-rag-api-dev-lite # there is rag-api-dev and rag-api-dev-lite. currently only lite is docuimented
+>>>>>>> upstream/main
   registry: registry.librechat.ai
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.

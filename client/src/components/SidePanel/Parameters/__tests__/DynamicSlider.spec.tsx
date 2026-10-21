@@ -1,5 +1,10 @@
 import React from 'react';
+<<<<<<< HEAD
 import { render, screen, act, fireEvent } from '@testing-library/react';
+=======
+import { ReasoningEffort } from 'librechat-data-provider';
+import { render, screen, act, fireEvent, waitFor } from '@testing-library/react';
+>>>>>>> upstream/main
 import type { TSetOption, SettingRange } from 'librechat-data-provider';
 import DynamicSlider from '../DynamicSlider';
 import { ChatContext } from '~/Providers';
@@ -51,6 +56,30 @@ function setupSentinel(conversationValue: number) {
 }
 
 describe('DynamicSlider', () => {
+<<<<<<< HEAD
+=======
+  it('keeps a valid keyboard thumb when a saved enum value is no longer offered', async () => {
+    const commit = jest.fn();
+    const setOption = jest.fn(() => commit);
+    render(
+      <ChatContext.Provider value={chatContextValue}>
+        <DynamicSlider
+          settingKey="reasoning_effort"
+          label="Reasoning Effort"
+          defaultValue=""
+          options={['', 'none', 'low', 'medium', 'high', 'xhigh', 'max']}
+          conversation={{ reasoning_effort: ReasoningEffort.minimal }}
+          setOption={setOption}
+        />
+      </ChatContext.Provider>,
+    );
+    const slider = screen.getByRole('slider', { name: 'Reasoning Effort' });
+    expect(slider).toHaveAttribute('aria-valuenow', '0');
+    fireEvent.keyDown(slider, { key: 'End' });
+    await waitFor(() => expect(commit).toHaveBeenLastCalledWith('max'));
+  });
+
+>>>>>>> upstream/main
   beforeEach(() => {
     jest.useFakeTimers();
   });

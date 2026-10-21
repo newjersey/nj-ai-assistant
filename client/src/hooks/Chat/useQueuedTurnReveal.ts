@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useSyncExternalStore } from 'react';
+<<<<<<< HEAD
 import { useRecoilValue } from 'recoil';
 import { useStore, useAtomValue } from 'jotai';
 import { QueryKeys } from 'librechat-data-provider';
@@ -38,6 +39,26 @@ export const selectQueuedTurnReveal = (
   }
   return queue.find(isAdmissible) ?? null;
 };
+=======
+import { useStore, useAtomValue } from 'jotai';
+import { QueryKeys } from 'librechat-data-provider';
+import { useQueryClient } from '@tanstack/react-query';
+import { isAdmissibleQueuedTurn } from '@librechat/chat';
+import {
+  revealedQueuedTurnFamily,
+  activeGenerationCreatedAtByConvoId,
+  useIsSubmitting,
+  isSubmittingFamily,
+} from '@librechat/chat/react';
+import type { TMessage, TAgentQueuedTurnReceipt } from 'librechat-data-provider';
+import type { RevealedQueuedTurn } from '@librechat/chat/react';
+import type { StreamStatusResponse } from '~/data-provider/SSE/queries';
+import type { QueuedMessage, RunEnd } from '~/hooks/Chat/queue';
+import { agentQueuedTurnsQueryKey } from '~/data-provider/SSE/queuedTurns';
+import { streamStatusQueryKey } from '~/data-provider/SSE/queries';
+
+export { selectQueuedTurnReveal } from '@librechat/chat';
+>>>>>>> upstream/main
 
 /** The thread has moved past the response the reveal follows: the admitted
  *  turn, or any other turn, now parents on it. */
@@ -89,8 +110,13 @@ export default function useQueuedTurnReveal(
   const queryClient = useQueryClient();
   const revealKey = conversationId ?? '';
   const reveal = useAtomValue(revealedQueuedTurnFamily(revealKey));
+<<<<<<< HEAD
   const isSubmitting = useRecoilValue(store.isSubmittingFamily(index));
   const activeEpoch = useRecoilValue(store.activeGenerationCreatedAtByConvoId(revealKey));
+=======
+  const isSubmitting = useIsSubmitting(index);
+  const activeEpoch = useAtomValue(activeGenerationCreatedAtByConvoId(revealKey));
+>>>>>>> upstream/main
   const readHandoff = useCallback(
     (intent: RevealedQueuedTurn) => {
       const receipts = queryClient.getQueryData<TAgentQueuedTurnReceipt[]>(
@@ -99,6 +125,10 @@ export default function useQueuedTurnReveal(
       const status = queryClient.getQueryData<StreamStatusResponse>(
         streamStatusQueryKey(revealKey),
       );
+<<<<<<< HEAD
+=======
+      const submitting = jotaiStore.get(isSubmittingFamily(index));
+>>>>>>> upstream/main
       let generationCreatedAt = intent.generationCreatedAt;
       let waiting = false;
       for (const receipt of receipts ?? []) {
@@ -120,7 +150,11 @@ export default function useQueuedTurnReveal(
         settled:
           (receipts != null && shouldRollbackReveal(receipts, intent)) ||
           (generationCreatedAt != null &&
+<<<<<<< HEAD
             ((isSubmitting && activeEpoch != null && activeEpoch > generationCreatedAt) ||
+=======
+            ((submitting && activeEpoch != null && activeEpoch > generationCreatedAt) ||
+>>>>>>> upstream/main
               (!waiting &&
                 status?.active === false &&
                 (status.status === 'complete' ||
@@ -130,7 +164,11 @@ export default function useQueuedTurnReveal(
                 status.createdAt > generationCreatedAt))),
       };
     },
+<<<<<<< HEAD
     [queryClient, revealKey, isSubmitting, activeEpoch],
+=======
+    [queryClient, jotaiStore, index, revealKey, activeEpoch],
+>>>>>>> upstream/main
   );
   const subscribe = useCallback(
     (notify: () => void) =>
@@ -165,7 +203,11 @@ export default function useQueuedTurnReveal(
         end.responseMessageId == null ||
         end.generationCreatedAt == null ||
         item.clientRequestId == null ||
+<<<<<<< HEAD
         !isAdmissible(item)
+=======
+        !isAdmissibleQueuedTurn(item)
+>>>>>>> upstream/main
       ) {
         return;
       }
@@ -203,7 +245,11 @@ export default function useQueuedTurnReveal(
     } else if (handoff.generationCreatedAt !== reveal.generationCreatedAt) {
       jotaiStore.set(family, { ...reveal, generationCreatedAt: handoff.generationCreatedAt });
     }
+<<<<<<< HEAD
   }, [jotaiStore, revealKey, reveal, readHandoff, handoffVersion]);
+=======
+  }, [jotaiStore, revealKey, reveal, readHandoff, handoffVersion, isSubmitting]);
+>>>>>>> upstream/main
 
   return revealQueuedTurn;
 }

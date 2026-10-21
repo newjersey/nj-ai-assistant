@@ -13,12 +13,24 @@ import type { FilterQuery, ClientSession, DeleteResult } from 'mongoose';
 import type { Response } from 'express';
 import type { ValidationError } from '~/types/error';
 import type { ServerRequest } from '~/types/http';
+<<<<<<< HEAD
+=======
+import type { RecordAuditEntry } from './audit';
+import { getSafeErrorMetadata } from '~/utils/errors';
+import { cascadeStep, runCascade } from './cascade';
+import { createAdminAuditEmitter } from './audit';
+>>>>>>> upstream/main
 import { parsePagination } from './pagination';
 
 type GroupListFilter = Pick<GroupFilterOptions, 'source' | 'search'>;
 
 const VALID_GROUP_SOURCES: ReadonlySet<string> = new Set(['local', 'entra']);
 const MAX_CREATE_MEMBER_IDS = 500;
+<<<<<<< HEAD
+=======
+/** Member ids per audit entry, so group creation writes a few ordered entries. */
+const AUDIT_MEMBER_CHUNK = 100;
+>>>>>>> upstream/main
 const MAX_SEARCH_LENGTH = 200;
 const MAX_NAME_LENGTH = 500;
 const MAX_DESCRIPTION_LENGTH = 2000;
@@ -46,30 +58,55 @@ export interface AdminGroupsDeps {
     session?: ClientSession,
   ) => Promise<IGroup | null>;
   createGroup: (groupData: Partial<IGroup>, session?: ClientSession) => Promise<IGroup>;
+<<<<<<< HEAD
   updateGroupById: (
     groupId: string | Types.ObjectId,
     data: Partial<Pick<IGroup, 'name' | 'description' | 'email' | 'avatar'>>,
     session?: ClientSession,
   ) => Promise<IGroup | null>;
+=======
+  /** Sets the fields and reports, from the write itself, whether any value changed. */
+  updateGroupFieldsTracked: (
+    groupId: string | Types.ObjectId,
+    data: Partial<Pick<IGroup, 'name' | 'description' | 'email' | 'avatar'>>,
+  ) => Promise<{ group: IGroup; changed: boolean; changedFields: string[] } | null>;
+>>>>>>> upstream/main
   deleteGroup: (
     groupId: string | Types.ObjectId,
     session?: ClientSession,
   ) => Promise<IGroup | null>;
+<<<<<<< HEAD
+=======
+  /** `changed` is decided by the write itself: true only when the membership was altered. */
+>>>>>>> upstream/main
   addUserToGroup: (
     userId: string | Types.ObjectId,
     groupId: string | Types.ObjectId,
     session?: ClientSession,
+<<<<<<< HEAD
   ) => Promise<{ user: IUser; group: IGroup | null }>;
+=======
+  ) => Promise<{ user: IUser; group: IGroup | null; changed: boolean }>;
+>>>>>>> upstream/main
   removeUserFromGroup: (
     userId: string | Types.ObjectId,
     groupId: string | Types.ObjectId,
     session?: ClientSession,
+<<<<<<< HEAD
   ) => Promise<{ user: IUser; group: IGroup | null }>;
   removeMemberById: (
     groupId: string | Types.ObjectId,
     memberId: string,
     session?: ClientSession,
   ) => Promise<IGroup | null>;
+=======
+  ) => Promise<{ user: IUser; group: IGroup | null; changed: boolean }>;
+  removeMemberByIdTracked: (
+    groupId: string | Types.ObjectId,
+    memberId: string,
+    session?: ClientSession,
+  ) => Promise<{ group: IGroup | null; changed: boolean }>;
+>>>>>>> upstream/main
   findUsers: (
     searchCriteria: FilterQuery<IUser>,
     fieldsToSelect?: string | string[] | null,
@@ -82,6 +119,28 @@ export interface AdminGroupsDeps {
     principalType: PrincipalType;
     principalId: string | Types.ObjectId;
   }) => Promise<DeleteResult>;
+<<<<<<< HEAD
+=======
+  /** Re-creates a removed config override in full, only if none exists, when the group
+   * deletion cannot finish. ACL entries are never restored. Resolves to whether it inserted. */
+  restoreConfig?: (snapshot: Record<string, unknown>) => Promise<boolean>;
+  /** Reads the override before it is removed, so a rejected removal whose commit was
+   * lost in transit can still be put back. */
+  findConfigByPrincipal?: (
+    principalType: PrincipalType,
+    principalId: string,
+    options?: { includeInactive?: boolean },
+  ) => Promise<object | null>;
+  /** Optional audit emission for group mutations; fail-open unless `auditFailClosed`. */
+  recordAuditEntry?: RecordAuditEntry;
+  /** When true, a failed audit write surfaces as a 5xx after the mutation has
+   * been persisted. Defaults to fail-open. */
+  auditFailClosed?: boolean;
+}
+
+function groupTarget(group: Pick<IGroup, 'name'> & { _id?: unknown }, id?: string) {
+  return { type: 'group', id: id ?? String(group._id ?? ''), name: group.name };
+>>>>>>> upstream/main
 }
 
 export function createAdminGroupsHandlers(deps: AdminGroupsDeps): {
@@ -99,6 +158,7 @@ export function createAdminGroupsHandlers(deps: AdminGroupsDeps): {
     countGroups,
     findGroupById,
     createGroup,
+<<<<<<< HEAD
     updateGroupById,
     deleteGroup,
     addUserToGroup,
@@ -109,6 +169,32 @@ export function createAdminGroupsHandlers(deps: AdminGroupsDeps): {
     deleteAclEntries,
   } = deps;
 
+=======
+    updateGroupFieldsTracked,
+    deleteGroup,
+    addUserToGroup,
+    removeUserFromGroup,
+    removeMemberByIdTracked,
+    findUsers,
+    deleteConfig,
+    deleteAclEntries,
+    restoreConfig,
+    findConfigByPrincipal,
+    recordAuditEntry,
+    auditFailClosed,
+  } = deps;
+
+  const emitRevocationAudit = createAdminAuditEmitter({
+    recordAuditEntry,
+    logPrefix: '[adminGroups]',
+  });
+  const emitAudit = createAdminAuditEmitter({
+    recordAuditEntry,
+    failClosed: auditFailClosed,
+    logPrefix: '[adminGroups]',
+  });
+
+>>>>>>> upstream/main
   async function listGroupsHandler(req: ServerRequest, res: Response) {
     try {
       const { search, source } = req.query as { search?: string; source?: string };
@@ -131,7 +217,11 @@ export function createAdminGroupsHandlers(deps: AdminGroupsDeps): {
       ]);
       return res.status(200).json({ groups, total, limit, offset });
     } catch (error) {
+<<<<<<< HEAD
       logger.error('[adminGroups] listGroups error:', error);
+=======
+      logger.error('[adminGroups] listGroups error:', getSafeErrorMetadata(error));
+>>>>>>> upstream/main
       return res.status(500).json({ error: 'Failed to list groups' });
     }
   }
@@ -148,7 +238,11 @@ export function createAdminGroupsHandlers(deps: AdminGroupsDeps): {
       }
       return res.status(200).json({ group });
     } catch (error) {
+<<<<<<< HEAD
       logger.error('[adminGroups] getGroup error:', error);
+=======
+      logger.error('[adminGroups] getGroup error:', getSafeErrorMetadata(error));
+>>>>>>> upstream/main
       return res.status(500).json({ error: 'Failed to get group' });
     }
   }
@@ -222,12 +316,36 @@ export function createAdminGroupsHandlers(deps: AdminGroupsDeps): {
         memberIds,
         ...(body.idOnTheSource ? { idOnTheSource: body.idOnTheSource } : {}),
       });
+<<<<<<< HEAD
+=======
+      await emitAudit(req, {
+        action: 'group.created',
+        target: groupTarget(group),
+        metadata: { source: group.source ?? null, memberCount: memberIds.length },
+      });
+      /** The initial members gain group-scoped access, so each is recorded like a member add
+       * (bounded by MAX_CREATE_MEMBER_IDS; sequential to keep the audit chain ordered). */
+      const unique = [...new Set(memberIds)];
+      for (let i = 0; i < unique.length; i += AUDIT_MEMBER_CHUNK) {
+        const chunk = unique.slice(i, i + AUDIT_MEMBER_CHUNK);
+        await emitAudit(req, {
+          action: 'group.member_added',
+          severity: 'warning',
+          target: groupTarget(group),
+          metadata: { userIds: chunk.join(','), count: chunk.length },
+        });
+      }
+>>>>>>> upstream/main
       return res.status(201).json({ group });
     } catch (error) {
       if ((error as ValidationError).name === 'ValidationError') {
         return res.status(400).json({ error: (error as ValidationError).message });
       }
+<<<<<<< HEAD
       logger.error('[adminGroups] createGroup error:', error);
+=======
+      logger.error('[adminGroups] createGroup error:', getSafeErrorMetadata(error));
+>>>>>>> upstream/main
       return res.status(500).json({ error: 'Failed to create group' });
     }
   }
@@ -285,16 +403,37 @@ export function createAdminGroupsHandlers(deps: AdminGroupsDeps): {
         return res.status(400).json({ error: 'No valid fields to update' });
       }
 
+<<<<<<< HEAD
       const group = await updateGroupById(id, updateData);
       if (!group) {
         return res.status(404).json({ error: 'Group not found' });
       }
+=======
+      /** The write itself reports whether it changed a value, so overlapping identical
+       * requests record one entry. */
+      const result = await updateGroupFieldsTracked(id, updateData);
+      if (!result) {
+        return res.status(404).json({ error: 'Group not found' });
+      }
+      const { group, changed, changedFields } = result;
+      if (changed) {
+        await emitAudit(req, {
+          action: 'group.updated',
+          target: groupTarget(group, id),
+          metadata: { fields: [...changedFields].sort().join(',') },
+        });
+      }
+>>>>>>> upstream/main
       return res.status(200).json({ group });
     } catch (error) {
       if ((error as ValidationError).name === 'ValidationError') {
         return res.status(400).json({ error: (error as ValidationError).message });
       }
+<<<<<<< HEAD
       logger.error('[adminGroups] updateGroup error:', error);
+=======
+      logger.error('[adminGroups] updateGroup error:', getSafeErrorMetadata(error));
+>>>>>>> upstream/main
       return res.status(500).json({ error: 'Failed to update group' });
     }
   }
@@ -305,15 +444,56 @@ export function createAdminGroupsHandlers(deps: AdminGroupsDeps): {
       if (!isValidObjectIdString(id)) {
         return res.status(400).json({ error: 'Invalid group ID format' });
       }
+<<<<<<< HEAD
       const deleted = await deleteGroup(id);
       if (!deleted) {
         return res.status(404).json({ error: 'Group not found' });
       }
       /**
+=======
+      const existing = await findGroupById(id);
+      if (!existing) {
+        return res.status(404).json({ error: 'Group not found' });
+      }
+      const target = groupTarget(existing, id);
+      /**
+       * The attempt is recorded as `pending` before any removal so a crash mid-cascade
+       * still leaves a trail, but the write is started without being awaited: deleting a
+       * group revokes access, so audit latency must not delay the cleanup. Every
+       * later entry waits for it to settle to keep the chain ordered.
+       * A `success` or `failure` entry is appended once the outcome is known.
+       */
+      const attempt = emitRevocationAudit(req, {
+        action: 'group.deleted',
+        outcome: 'pending',
+        severity: 'warning',
+        target,
+      });
+      const record = async (outcome: 'success' | 'failure', code?: string) => {
+        await attempt;
+        return emitRevocationAudit(req, {
+          action: 'group.deleted',
+          outcome,
+          severity: 'warning',
+          target,
+          ...(code ? { metadata: { code } } : {}),
+        });
+      };
+      const recordFailure = (code: string) => record('failure', code);
+      /**
+       * Config overrides and ACL entries are keyed by group id, so they are
+       * removed before the group itself: if any removal fails the group stays
+       * and the admin can retry, instead of leaving orphaned entries that a later
+       * principal could inherit. Only the config override is put back (insert-only,
+       * so one written since is kept): removing it can widen what members may do,
+       * while ACL entries stay removed because that only narrows access and
+       * re-inserting them could resurrect a grant revoked in the meantime.
+>>>>>>> upstream/main
        * deleteAclEntries is a raw deleteMany wrapper with no type casting.
        * grantPermission stores group principalId as ObjectId, so we must
        * cast here. deleteConfig normalizes internally.
        */
+<<<<<<< HEAD
       const cleanupResults = await Promise.allSettled([
         deleteConfig(PrincipalType.GROUP, id),
         deleteAclEntries({
@@ -329,6 +509,194 @@ export function createAdminGroupsHandlers(deps: AdminGroupsDeps): {
       return res.status(200).json({ success: true, id });
     } catch (error) {
       logger.error('[adminGroups] deleteGroup error:', error);
+=======
+      let restoreFailed = false;
+      const cascade = await runCascade(
+        [
+          cascadeStep(
+            'config',
+            () => deleteConfig(PrincipalType.GROUP, id),
+            restoreConfig
+              ? async (config) => {
+                  if (!config) {
+                    return;
+                  }
+                  const snapshot = (config as { toObject?: () => unknown }).toObject?.() ?? config;
+                  let restored: boolean;
+                  try {
+                    restored = await restoreConfig(snapshot as Record<string, unknown>);
+                    restoreFailed = false;
+                  } catch (error) {
+                    restoreFailed = true;
+                    throw error;
+                  }
+                  if (!restored) {
+                    logger.warn('[adminGroups] config restore skipped, override exists:', id);
+                  }
+                }
+              : undefined,
+            findConfigByPrincipal
+              ? () => findConfigByPrincipal(PrincipalType.GROUP, id, { includeInactive: true })
+              : undefined,
+          ),
+          cascadeStep('acl', () =>
+            deleteAclEntries({
+              principalType: PrincipalType.GROUP,
+              principalId: new Types.ObjectId(id),
+            }),
+          ),
+        ],
+        '[adminGroups]',
+      );
+      /**
+       * Puts the config override back. When that restore itself fails the group would live on
+       * without its restriction, so the deletion is completed instead of retaining it.
+       */
+      const compensate = async (): Promise<'restored' | 'stuck' | 'missing' | IGroup> => {
+        await cascade.compensate();
+        if (!restoreFailed) {
+          return 'restored';
+        }
+        logger.error('[adminGroups] config restore failed, completing the deletion:', id);
+        let removed: IGroup | null = null;
+        try {
+          removed = await deleteGroup(id);
+          if (!removed) {
+            /** Another request deleted the group first; this one removed nothing. */
+            return 'missing';
+          }
+        } catch (error) {
+          /** The delete may have committed before it threw (post-delete cache work); a confirmed
+           * absence is a completed deletion. */
+          const absent = await findGroupById(id).then(
+            (group) => group == null,
+            () => false,
+          );
+          if (!absent) {
+            logger.error(
+              '[adminGroups] group left without its config override:',
+              id,
+              getSafeErrorMetadata(error),
+            );
+            return 'stuck';
+          }
+          removed = existing;
+        }
+        /** The group is gone for good, so a leftover ACL entry is orphaned: retry its removal once. */
+        await deleteAclEntries({
+          principalType: PrincipalType.GROUP,
+          principalId: new Types.ObjectId(id),
+        }).catch((aclError) =>
+          logger.error(
+            '[adminGroups] acl cleanup retry failed after group deletion:',
+            getSafeErrorMetadata(aclError),
+          ),
+        );
+        return removed;
+      };
+      /** Every member loses group-scoped access, so the affected accounts are recorded (chunked). */
+      const recordMemberRemovals = async (group: IGroup) => {
+        /** Keeps the chain causal: the pending attempt precedes the member entries. */
+        await attempt;
+        const revoked = [...new Set(group.memberIds ?? [])];
+        for (let i = 0; i < revoked.length; i += AUDIT_MEMBER_CHUNK) {
+          const chunk = revoked.slice(i, i + AUDIT_MEMBER_CHUNK);
+          await emitRevocationAudit(req, {
+            action: 'group.member_removed',
+            severity: 'warning',
+            target: groupTarget(group, id),
+            metadata: { userIds: chunk.join(','), count: chunk.length, cause: 'group_deleted' },
+          });
+        }
+      };
+      const compensatedResponse = async (outcome: 'stuck' | 'missing' | IGroup) => {
+        if (outcome === 'missing') {
+          await recordFailure('not_found');
+          return res.status(404).json({ error: 'Group not found' });
+        }
+        if (outcome !== 'stuck') {
+          await recordMemberRemovals(outcome);
+          res.status(200).json({ success: true, id });
+          await record('success');
+          return res;
+        }
+        await recordFailure('GROUP_RESTORE_FAILED');
+        return res.status(500).json({
+          error: 'Failed to delete group and its config override could not be restored',
+          code: 'GROUP_RESTORE_FAILED',
+        });
+      };
+      const cleanupFailedResponse = async () => {
+        await recordFailure('GROUP_CLEANUP_FAILED');
+        return res.status(500).json({
+          error: 'Failed to remove the group permissions and config; the group was not deleted',
+          code: 'GROUP_CLEANUP_FAILED',
+        });
+      };
+
+      if (cascade.failed.length > 0) {
+        /** A concurrent delete may have removed the group meanwhile; restoring its config would
+         * orphan it. When the lookup itself fails the group state is unknown, and putting the
+         * override back is the safe side: a leftover override only restricts, a lost one widens. */
+        const gone = await findGroupById(id).then(
+          (group) => group == null,
+          () => false,
+        );
+        if (!gone) {
+          const outcome = await compensate();
+          if (outcome !== 'restored') {
+            return compensatedResponse(outcome);
+          }
+        }
+        return cleanupFailedResponse();
+      }
+
+      let deleted: IGroup | null;
+      try {
+        deleted = await deleteGroup(id);
+      } catch (error) {
+        logger.error(
+          '[adminGroups] deleteGroup failed after cascade cleanup:',
+          getSafeErrorMetadata(error),
+        );
+        /** The delete may have committed before it threw. Restoring dependents for a
+         * group that is gone would orphan them. */
+        const lookup = await findGroupById(id).then(
+          (group) => ({ known: true, group }),
+          () => ({ known: false, group: null }),
+        );
+        if (lookup.known && lookup.group) {
+          const outcome = await compensate();
+          if (outcome !== 'restored') {
+            return compensatedResponse(outcome);
+          }
+          await recordFailure('GROUP_CLEANUP_FAILED');
+          return res.status(500).json({ error: 'Failed to delete group' });
+        }
+        if (!lookup.known) {
+          /** Unknown state favors the restriction: a leftover override narrows access, a lost one widens it. */
+          const outcome = await compensate();
+          if (outcome !== 'restored') {
+            return compensatedResponse(outcome);
+          }
+          logger.error('[adminGroups] group state unverifiable after delete failure:', id);
+          await recordFailure('GROUP_STATE_UNVERIFIABLE');
+          return res.status(500).json({ error: 'Failed to delete group' });
+        }
+        /** Confirmed absent: the deletion did commit. */
+        deleted = existing;
+      }
+      if (!deleted) {
+        await recordFailure('not_found');
+        return res.status(404).json({ error: 'Group not found' });
+      }
+      await recordMemberRemovals(deleted);
+      res.status(200).json({ success: true, id });
+      await record('success');
+      return res;
+    } catch (error) {
+      logger.error('[adminGroups] deleteGroup error:', getSafeErrorMetadata(error));
+>>>>>>> upstream/main
       return res.status(500).json({ error: 'Failed to delete group' });
     }
   }
@@ -395,7 +763,11 @@ export function createAdminGroupsHandlers(deps: AdminGroupsDeps): {
 
       return res.status(200).json({ members, total, limit, offset });
     } catch (error) {
+<<<<<<< HEAD
       logger.error('[adminGroups] getGroupMembers error:', error);
+=======
+      logger.error('[adminGroups] getGroupMembers error:', getSafeErrorMetadata(error));
+>>>>>>> upstream/main
       return res.status(500).json({ error: 'Failed to get group members' });
     }
   }
@@ -416,10 +788,25 @@ export function createAdminGroupsHandlers(deps: AdminGroupsDeps): {
           .json({ error: 'Only native user ObjectIds can be added via this endpoint' });
       }
 
+<<<<<<< HEAD
       const { group } = await addUserToGroup(userId, id);
       if (!group) {
         return res.status(404).json({ error: 'Group not found' });
       }
+=======
+      const { group, changed } = await addUserToGroup(userId, id);
+      if (!group) {
+        return res.status(404).json({ error: 'Group not found' });
+      }
+      if (changed) {
+        await emitAudit(req, {
+          action: 'group.member_added',
+          severity: 'warning',
+          target: groupTarget(group, id),
+          metadata: { userId },
+        });
+      }
+>>>>>>> upstream/main
       return res.status(200).json({ group });
     } catch (error) {
       const message = error instanceof Error ? error.message : '';
@@ -427,7 +814,11 @@ export function createAdminGroupsHandlers(deps: AdminGroupsDeps): {
       if (isNotFound) {
         return res.status(404).json({ error: 'User not found' });
       }
+<<<<<<< HEAD
       logger.error('[adminGroups] addGroupMember error:', error);
+=======
+      logger.error('[adminGroups] addGroupMember error:', getSafeErrorMetadata(error));
+>>>>>>> upstream/main
       return res.status(500).json({ error: 'Failed to add member' });
     }
   }
@@ -437,6 +828,7 @@ export function createAdminGroupsHandlers(deps: AdminGroupsDeps): {
    * (which resolves the user), falling back to a raw $pull if the user record
    * no longer exists. Returns null only when the group itself is not found.
    */
+<<<<<<< HEAD
   async function removeObjectIdMember(groupId: string, userId: string): Promise<IGroup | null> {
     try {
       const { group } = await removeUserFromGroup(userId, groupId);
@@ -445,6 +837,19 @@ export function createAdminGroupsHandlers(deps: AdminGroupsDeps): {
       const msg = err instanceof Error ? err.message : '';
       if (msg === 'User not found' || msg.startsWith('User not found:')) {
         return removeMemberById(groupId, userId);
+=======
+  async function removeObjectIdMember(
+    groupId: string,
+    userId: string,
+  ): Promise<{ group: IGroup | null; changed: boolean }> {
+    try {
+      const { group, changed } = await removeUserFromGroup(userId, groupId);
+      return { group, changed };
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : '';
+      if (msg === 'User not found' || msg.startsWith('User not found:')) {
+        return removeMemberByIdTracked(groupId, userId);
+>>>>>>> upstream/main
       }
       throw err;
     }
@@ -457,16 +862,36 @@ export function createAdminGroupsHandlers(deps: AdminGroupsDeps): {
         return res.status(400).json({ error: 'Invalid group ID format' });
       }
 
+<<<<<<< HEAD
       const group = isValidObjectIdString(userId)
         ? await removeObjectIdMember(id, userId)
         : await removeMemberById(id, userId);
+=======
+      const { group, changed } = isValidObjectIdString(userId)
+        ? await removeObjectIdMember(id, userId)
+        : await removeMemberByIdTracked(id, userId);
+>>>>>>> upstream/main
 
       if (!group) {
         return res.status(404).json({ error: 'Group not found' });
       }
+<<<<<<< HEAD
       return res.status(200).json({ success: true });
     } catch (error) {
       logger.error('[adminGroups] removeGroupMember error:', error);
+=======
+      if (changed) {
+        await emitAudit(req, {
+          action: 'group.member_removed',
+          severity: 'warning',
+          target: groupTarget(group, id),
+          metadata: { userId },
+        });
+      }
+      return res.status(200).json({ success: true });
+    } catch (error) {
+      logger.error('[adminGroups] removeGroupMember error:', getSafeErrorMetadata(error));
+>>>>>>> upstream/main
       return res.status(500).json({ error: 'Failed to remove member' });
     }
   }

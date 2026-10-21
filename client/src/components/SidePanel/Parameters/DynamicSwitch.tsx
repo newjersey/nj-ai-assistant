@@ -10,6 +10,10 @@ function DynamicSwitch({
   label = '',
   settingKey,
   defaultValue,
+<<<<<<< HEAD
+=======
+  enumMappings,
+>>>>>>> upstream/main
   description = '',
   columnSpan,
   setOption,
@@ -32,7 +36,15 @@ function DynamicSwitch({
     preventDelayedUpdate: true,
   });
 
+<<<<<<< HEAD
   const selectedValue = conversation?.[settingKey] ?? defaultValue;
+=======
+  const savedValue = conversation?.[settingKey] ?? defaultValue;
+  const effectiveValue = enumMappings?.[String(savedValue)];
+  const selectedValue = typeof effectiveValue === 'boolean' ? effectiveValue : savedValue;
+  const routeIsForced =
+    typeof enumMappings?.true === 'boolean' && enumMappings.true === enumMappings.false;
+>>>>>>> upstream/main
 
   const handleCheckedChange = (checked: boolean) => {
     setInputValue(checked);
@@ -46,6 +58,7 @@ function DynamicSwitch({
       }`}
     >
       <HoverCard openDelay={300}>
+<<<<<<< HEAD
         <HoverCardTrigger className="grid w-full items-center gap-2">
           <div className="flex justify-between">
             <Label
@@ -71,6 +84,35 @@ function DynamicSwitch({
               labelCode ? (localize(label as TranslationKeys) ?? label) : label || settingKey
             }
           />
+=======
+        <HoverCardTrigger asChild>
+          <div className="grid h-full w-full content-between items-center gap-2">
+            <div className="flex justify-between">
+              <Label
+                htmlFor={`${settingKey}-dynamic-switch`}
+                className="text-left text-xs font-medium break-words"
+              >
+                {labelCode ? (localize(label as TranslationKeys) ?? label) : label || settingKey}{' '}
+                {showDefault && (
+                  <small className="high-contrast:opacity-100 opacity-40">
+                    ({localize('com_endpoint_default')}:{' '}
+                    {defaultValue != null ? localize('com_ui_on') : localize('com_ui_off')})
+                  </small>
+                )}
+              </Label>
+            </div>
+            <Switch
+              id={`${settingKey}-dynamic-switch`}
+              checked={selectedValue}
+              onCheckedChange={handleCheckedChange}
+              disabled={readonly || routeIsForced}
+              className="flex"
+              aria-label={
+                labelCode ? (localize(label as TranslationKeys) ?? label) : label || settingKey
+              }
+            />
+          </div>
+>>>>>>> upstream/main
         </HoverCardTrigger>
         {description && (
           <OptionHover

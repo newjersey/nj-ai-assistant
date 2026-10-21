@@ -1,4 +1,5 @@
 import type { Logger as WinstonLogger } from 'winston';
+<<<<<<< HEAD
 import type { z } from 'zod';
 import type { webSearchSchema } from '../config';
 
@@ -16,6 +17,11 @@ export type SearchProvider = 'serper' | 'searxng' | 'tavily' | 'keenable';
 export type ScraperProvider = 'firecrawl' | 'serper' | 'tavily' | 'keenable';
 export type RerankerType = 'infinity' | 'jina' | 'cohere' | 'none';
 
+=======
+
+export type SearchRefType = 'search' | 'image' | 'news' | 'video' | 'ref';
+
+>>>>>>> upstream/main
 export interface Highlight {
   score: number;
   text: string;
@@ -71,6 +77,7 @@ export interface Source {
   date?: string;
 }
 
+<<<<<<< HEAD
 export interface SearchConfig {
   searchProvider?: SearchProvider;
   serperApiKey?: string;
@@ -85,11 +92,14 @@ export interface SearchConfig {
   keenableSearchOptions?: KeenableConfig['keenableSearchOptions'];
 }
 
+=======
+>>>>>>> upstream/main
 export type References = {
   links: MediaReference[];
   images: MediaReference[];
   videos: MediaReference[];
 };
+<<<<<<< HEAD
 export interface ScrapeResult {
   url: string;
   error?: boolean;
@@ -197,6 +207,8 @@ export interface CohereRerankerResponse {
 
 export type SafeSearchLevel = 0 | 1 | 2;
 
+=======
+>>>>>>> upstream/main
 export type Logger = WinstonLogger;
 export interface MediaReference {
   originalUrl: string;
@@ -212,6 +224,7 @@ export type UsedReferences = {
 
 /** Firecrawl */
 
+<<<<<<< HEAD
 export interface FirecrawlScrapeOptions {
   formats?: string[];
   includeTags?: string[];
@@ -304,6 +317,8 @@ export interface FirecrawlScraperConfig {
   logger?: Logger;
 }
 
+=======
+>>>>>>> upstream/main
 /** Serper API */
 export interface VideoResult {
   title?: string;
@@ -353,6 +368,7 @@ export interface ShoppingResult {
   position?: number;
 }
 
+<<<<<<< HEAD
 export interface ScholarResult {
   title?: string;
   link?: string;
@@ -362,6 +378,8 @@ export interface ScholarResult {
   citedBy?: number;
 }
 
+=======
+>>>>>>> upstream/main
 export interface ImageResult {
   title?: string;
   imageUrl?: string;
@@ -377,6 +395,7 @@ export interface ImageResult {
   position?: number;
 }
 
+<<<<<<< HEAD
 export interface SerperSearchPayload extends SerperSearchInput {
   /**
    * Search type/vertical
@@ -400,6 +419,8 @@ export type SerperSearchParameters = Pick<SerperSearchPayload, 'q' | 'type'> & {
   engine: 'google';
 };
 
+=======
+>>>>>>> upstream/main
 export interface OrganicResult {
   position?: number;
   title?: string;
@@ -446,6 +467,7 @@ export interface PeopleAlsoAskResult {
 }
 
 export type RelatedSearches = Array<{ query: string }>;
+<<<<<<< HEAD
 
 export interface SerperSearchInput {
   /**
@@ -611,3 +633,5 @@ export interface SearXNGResult {
   publishedDate?: string;
   img_src?: string;
 }
+=======
+>>>>>>> upstream/main

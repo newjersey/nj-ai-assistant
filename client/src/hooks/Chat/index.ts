@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 export { default as useNewChat } from './useNewChat';
 export { default as useMultiConvo } from './useMultiConvo';
 export { default as useTemporaryChat } from './useTemporaryChat';
@@ -8,10 +9,19 @@ export { default as useAddedResponse } from './useAddedResponse';
 export { default as useChatFunctions } from './useChatFunctions';
 export { default as useCompactConversation } from './useCompactConversation';
 export { default as useGetAddedConvo } from './useGetAddedConvo';
+=======
+export { default as useChatHelpers } from './useChatHelpers';
+export { default as useTokenLimits } from './useTokenLimits';
+export { default as useTokenUsage } from './useTokenUsage';
+export { default as useChatFunctions } from './useChatFunctions';
+>>>>>>> upstream/main
 export { default as useIdChangeEffect } from './useIdChangeEffect';
 export { default as useFocusChatEffect } from './useFocusChatEffect';
 export { default as useQueueDrain } from './useQueueDrain';
 export { default as useQueuedTurnReveal } from './useQueuedTurnReveal';
 export { default as useSteering } from './useSteering';
+<<<<<<< HEAD
 export { default as useSteerCancel, useSteerReclaim } from './useSteerCancel';
+=======
+>>>>>>> upstream/main
 export { default as useSteerConvert } from './useSteerConvert';

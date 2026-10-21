@@ -1,6 +1,10 @@
 import { useEffect, useRef } from 'react';
 import { useRecoilCallback, useSetRecoilState } from 'recoil';
 import type { TAttachment, TFile, TFilePreview } from 'librechat-data-provider';
+<<<<<<< HEAD
+=======
+import { useMessageContext } from '~/Providers/MessageContext';
+>>>>>>> upstream/main
 import { useFilePreview } from '~/data-provider';
 import { useShareContext } from '~/Providers';
 import store from '~/store';
@@ -61,6 +65,7 @@ export default function useAttachmentPreviewSync(
   attachment: TAttachment | undefined,
 ): UseAttachmentPreviewSyncResult {
   const setAttachmentsMap = useSetRecoilState(store.messageAttachmentsMap);
+<<<<<<< HEAD
   /* `useRecoilCallback` reads/writes without subscribing this hook to
    * the per-file_id flag — we only ever set it on the pending→ready
    * edge, so subscribing would cause needless re-renders. */
@@ -95,10 +100,41 @@ export default function useAttachmentPreviewSync(
     mountedDuringStreamRef.current = readInitialIsSubmitting();
   }
 
+=======
+  const { isSubmitting, messageId: contextMessageId } = useMessageContext();
+  /* `useRecoilCallback` writes without subscribing this hook to
+   * another message or file's pending→ready flag. */
+  const flagJustResolved = useRecoilCallback(
+    ({ set }) =>
+      (ownerId: string, id: string) => {
+        set(store.previewJustResolved([ownerId, id]), true);
+      },
+    [],
+  );
+>>>>>>> upstream/main
   const file = (attachment ?? undefined) as Partial<TFile> | undefined;
   const fileId = file?.file_id;
   const baseStatus: 'pending' | 'ready' | 'failed' = file?.status ?? 'ready';
   const messageId = (attachment as Partial<TAttachment> | undefined)?.messageId;
+<<<<<<< HEAD
+=======
+  const ownerMessageId = contextMessageId || messageId;
+  /** A reused row must observe the pending→ready edge for its current owner, not its last one. */
+  const streamRef = useRef({
+    ownerMessageId,
+    fileId,
+    wasSubmitting: isSubmitting === true,
+    previousStatus: null as 'pending' | 'ready' | 'failed' | null,
+  });
+  if (streamRef.current.ownerMessageId !== ownerMessageId || streamRef.current.fileId !== fileId) {
+    streamRef.current = {
+      ownerMessageId,
+      fileId,
+      wasSubmitting: isSubmitting === true,
+      previousStatus: null,
+    };
+  }
+>>>>>>> upstream/main
 
   const { shareId } = useShareContext();
   const enabled = !!fileId && baseStatus === 'pending';
@@ -113,30 +149,56 @@ export default function useAttachmentPreviewSync(
   const previewError = polled?.previewError ?? file?.previewError;
 
   /* Track the previous effective status so we can fire the
+<<<<<<< HEAD
    * pending→ready edge exactly once per session. Two gates have to
    * pass for the auto-open flag to flip:
    *   1. We actually observed the transition (prev → curr).
    *   2. The hook mounted during an active stream — i.e. the file is
    *      part of the user's current turn, not a history load. A
+=======
+   * pending→ready edge for the owning message and file. Two gates have to
+   * pass for the auto-open flag to flip:
+   *   1. We actually observed the transition (prev → curr).
+   *   2. This message mounted during its own active stream, not a
+   *      historical sibling displayed while another turn submits. A
+>>>>>>> upstream/main
    *      page-navigation mount (or refresh) of a stale-pending DB
    *      record will see the same transition when polling catches
    *      up, but we must NOT auto-open in that case — the user is
    *      revisiting old work, not waiting on a fresh result.
+<<<<<<< HEAD
    * Refs are read inline so the effect doesn't have to list them as
    * deps (mutating a ref doesn't subscribe). */
   const prevStatusRef = useRef<'pending' | 'ready' | 'failed' | null>(null);
   useEffect(() => {
     const prev = prevStatusRef.current;
     prevStatusRef.current = effectiveStatus;
+=======
+   * The per-owner ref is reset before the effect when a different message
+   * or file takes this row, so a transition from the previous owner
+   * cannot be mistaken for a fresh preview. */
+  useEffect(() => {
+    const prev = streamRef.current.previousStatus;
+    streamRef.current.previousStatus = effectiveStatus;
+>>>>>>> upstream/main
     if (
       prev === 'pending' &&
       effectiveStatus === 'ready' &&
       fileId &&
+<<<<<<< HEAD
       mountedDuringStreamRef.current === true
     ) {
       flagJustResolved(fileId);
     }
   }, [effectiveStatus, fileId, flagJustResolved]);
+=======
+      ownerMessageId &&
+      streamRef.current.wasSubmitting
+    ) {
+      flagJustResolved(ownerMessageId, fileId);
+    }
+  }, [effectiveStatus, fileId, ownerMessageId, flagJustResolved]);
+>>>>>>> upstream/main
 
   /* On a terminal poll response (ready or failed), upsert into the
    * shared attachments map. Mirrors the SSE handler's by-file_id

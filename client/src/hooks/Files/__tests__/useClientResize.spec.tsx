@@ -132,10 +132,17 @@ describe('useClientResize', () => {
       expect(result.current.isEnforced).toBe(false);
     });
 
+<<<<<<< HEAD
     it('defaults to off when the user has no stored setting', () => {
       const { result } = renderHook(() => useClientResize(), { wrapper });
 
       expect(result.current.isEnabled).toBe(false);
+=======
+    it('defaults to on when the user has no stored setting', () => {
+      const { result } = renderHook(() => useClientResize(), { wrapper });
+
+      expect(result.current.isEnabled).toBe(true);
+>>>>>>> upstream/main
     });
   });
 

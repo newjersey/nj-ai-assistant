@@ -2,6 +2,10 @@ import { Types } from 'mongoose';
 import { randomUUID } from 'node:crypto';
 import {
   AGENT_TRIGGER_WORKER_CAPABILITY_QUEUED_TURN_V1,
+<<<<<<< HEAD
+=======
+  AGENT_TRIGGER_WORKER_CAPABILITY_QUEUED_TURN_V2,
+>>>>>>> upstream/main
   logger,
   runAsSystem,
 } from '@librechat/data-schemas';
@@ -23,6 +27,10 @@ import type { AgentTriggerDeliveryFailure } from './triggers/engine';
 import { getAgentTriggerIdempotencyKey, parseAgentTriggerEnvelope } from './triggers/envelope';
 import { createAgentTriggerEnvelope } from './triggers/envelope';
 import { AgentTriggerExecutionError } from './triggers/host';
+<<<<<<< HEAD
+=======
+import { createIdleRecoveryLoop } from './recovery';
+>>>>>>> upstream/main
 
 export const AGENT_QUEUED_TURN_SOURCE = 'agent-queued-turn';
 const AGENT_QUEUED_TURN_EVENT = 'agent.queued-turn';
@@ -32,6 +40,10 @@ const RECONCILIATION_LEASE_MS = 2 * 60 * 1000;
 const RECONCILIATION_BACKOFF_BASE_MS = 5_000;
 const RECONCILIATION_BACKOFF_MAX_MS = 5 * 60 * 1000;
 const DEFAULT_RECOVERY_INTERVAL_MS = 30_000;
+<<<<<<< HEAD
+=======
+const DEFAULT_RECOVERY_MAX_IDLE_INTERVAL_MS = 2 * 60_000;
+>>>>>>> upstream/main
 const DEFAULT_RECOVERY_LIMIT = 100;
 const MAX_FAILURE_CODE_LENGTH = 128;
 const MAX_FAILURE_MESSAGE_LENGTH = 2048;
@@ -87,7 +99,11 @@ export interface AgentQueuedTurnSchedulerDeps {
 }
 
 export interface AgentQueuedTurnScheduler {
+<<<<<<< HEAD
   initialize: () => Promise<void>;
+=======
+  initialize: (options?: { maxIdleIntervalMs?: number }) => Promise<void>;
+>>>>>>> upstream/main
   stop: () => Promise<void>;
   schedule: (turn: AgentQueuedTurnRecord) => Promise<string>;
   recover: () => Promise<number>;
@@ -107,7 +123,11 @@ export interface AgentQueuedTurnLifecycle {
     rawSource: unknown,
     input: AgentQueuedTurnExecutionAdmission,
   ) => Promise<boolean>;
+<<<<<<< HEAD
   initialize: () => Promise<void>;
+=======
+  initialize: (options?: { maxIdleIntervalMs?: number }) => Promise<void>;
+>>>>>>> upstream/main
   stop: () => Promise<void>;
   schedule: (turn: AgentQueuedTurnRecord) => Promise<string>;
   cancel: (
@@ -644,6 +664,11 @@ function createAgentQueuedTurnResolver({
       ...(claim.files != null && { files: claim.files }),
       ...(claim.quotes != null && { quotes: claim.quotes }),
       ...(claim.manualSkills != null && { manualSkills: claim.manualSkills }),
+<<<<<<< HEAD
+=======
+      ...(claim.codeApprovalMode != null && { codeApprovalMode: claim.codeApprovalMode }),
+      ...(claim.reasoningOverride != null && { reasoningOverride: claim.reasoningOverride }),
+>>>>>>> upstream/main
       admissionSource: {
         source: AGENT_QUEUED_TURN_SOURCE,
         sourceId: claim.queuedTurnId,
@@ -696,7 +721,24 @@ function createAgentQueuedTurnResolver({
   };
 }
 
+<<<<<<< HEAD
 function deliveryEnvelope(turn: AgentQueuedTurnRecord) {
+=======
+function deliveryEnvelope(
+  turn: Pick<
+    AgentQueuedTurnRecord,
+    | 'queuedTurnId'
+    | 'createdAt'
+    | 'user'
+    | 'tenantId'
+    | 'text'
+    | 'agentId'
+    | 'conversationId'
+    | 'parentMessageId'
+    | 'codeApprovalMode'
+  >,
+) {
+>>>>>>> upstream/main
   const occurredAt = turn.createdAt.getTime();
   return createAgentTriggerEnvelope({
     mode: 'continue',
@@ -708,7 +750,11 @@ function deliveryEnvelope(turn: AgentQueuedTurnRecord) {
       ...(turn.tenantId != null && { tenantId: turn.tenantId }),
     },
     event: {
+<<<<<<< HEAD
       id: turn.queuedTurnId,
+=======
+      id: turn.codeApprovalMode != null ? `${turn.queuedTurnId}:v2` : turn.queuedTurnId,
+>>>>>>> upstream/main
       type: AGENT_QUEUED_TURN_EVENT,
       occurredAt,
       source: { id: AGENT_QUEUED_TURN_SOURCE, type: 'internal' },
@@ -723,6 +769,19 @@ function deliveryEnvelope(turn: AgentQueuedTurnRecord) {
   });
 }
 
+<<<<<<< HEAD
+=======
+/** Reserve before insertion: an old projection computes the v1 key and cannot
+ * publish this row, even if the producer crashes before scheduling it. */
+export function createQueuedTurnDeliveryReservation(
+  input: Parameters<AgentQueuedTurnMethods['enqueueAgentQueuedTurn']>[0],
+): { queuedTurnId: string; deliveryKey: string } {
+  const queuedTurnId = new Types.ObjectId().toString();
+  const envelope = deliveryEnvelope({ ...input, queuedTurnId, createdAt: new Date() });
+  return { queuedTurnId, deliveryKey: getAgentTriggerIdempotencyKey(envelope) };
+}
+
+>>>>>>> upstream/main
 /** Repairs the intentional record-first outbox seam by replaying a stable
  * delivery identity until the queue row records the scheduling receipt. */
 function createAgentQueuedTurnScheduler({
@@ -732,10 +791,19 @@ function createAgentQueuedTurnScheduler({
   recoveryIntervalMs = DEFAULT_RECOVERY_INTERVAL_MS,
   recoveryLimit = DEFAULT_RECOVERY_LIMIT,
 }: AgentQueuedTurnSchedulerDeps): AgentQueuedTurnScheduler {
+<<<<<<< HEAD
   let timer: NodeJS.Timeout | undefined;
   let recovery: Promise<number> | undefined;
 
   const schedule = async (turn: AgentQueuedTurnRecord): Promise<string> => {
+=======
+  let loop: ReturnType<typeof createIdleRecoveryLoop> | undefined;
+  let initialization: Promise<void> | undefined;
+  let stopped = false;
+  let recovery: Promise<{ repaired: number; idle: boolean }> | undefined;
+
+  const publish = async (turn: AgentQueuedTurnRecord): Promise<string> => {
+>>>>>>> upstream/main
     const envelope = deliveryEnvelope(turn);
     const deliveryKey = getAgentTriggerIdempotencyKey(envelope);
     const reserved = await runAsSystem(() =>
@@ -755,7 +823,14 @@ function createAgentQueuedTurnScheduler({
        * A lane per durable row prevents a later published delivery from
        * blocking recovery of an earlier record-first outbox row. */
       orderingKey: `agent-queued-turn-delivery:${turn.queuedTurnId}`,
+<<<<<<< HEAD
       requiredWorkerCapability: AGENT_TRIGGER_WORKER_CAPABILITY_QUEUED_TURN_V1,
+=======
+      requiredWorkerCapability:
+        turn.codeApprovalMode != null
+          ? AGENT_TRIGGER_WORKER_CAPABILITY_QUEUED_TURN_V2
+          : AGENT_TRIGGER_WORKER_CAPABILITY_QUEUED_TURN_V1,
+>>>>>>> upstream/main
     });
     if (receipt.deliveryKey !== deliveryKey) {
       throw new Error('The queued turn delivery identity changed during publication');
@@ -776,13 +851,27 @@ function createAgentQueuedTurnScheduler({
     return receipt.deliveryKey;
   };
 
+<<<<<<< HEAD
   const recover = (): Promise<number> => {
+=======
+  const schedule = async (turn: AgentQueuedTurnRecord): Promise<string> => {
+    try {
+      return await publish(turn);
+    } catch (error) {
+      loop?.wake();
+      throw error;
+    }
+  };
+
+  const recoverPass = (): Promise<{ repaired: number; idle: boolean }> => {
+>>>>>>> upstream/main
     if (recovery != null) {
       return recovery;
     }
     const task = (async () => {
       const reconciliationNow = new Date();
       const reconciliationClaimId = randomUUID();
+<<<<<<< HEAD
       const [turns, quarantined] = await Promise.all([
         runAsSystem(() => methods.findQueuedTurnsNeedingDelivery(recoveryLimit)),
         runAsSystem(() =>
@@ -795,6 +884,29 @@ function createAgentQueuedTurnScheduler({
           }),
         ),
       ]);
+=======
+      const activity = { found: false };
+      const discoveries = await Promise.allSettled([
+        runAsSystem(() => methods.findQueuedTurnsNeedingDelivery(recoveryLimit, activity)),
+        runAsSystem(() =>
+          methods.claimQueuedTurnsForAdmissionReconciliation(
+            {
+              claimId: reconciliationClaimId,
+              claimBy: PROCESS_CLAIM_OWNER,
+              now: reconciliationNow,
+              leaseUntil: new Date(reconciliationNow.getTime() + RECONCILIATION_LEASE_MS),
+              limit: recoveryLimit,
+            },
+            activity,
+          ),
+        ),
+      ]);
+      // A rejected discovery must not release the single-flight guard while
+      // its sibling is still writing reconciliation leases in Mongo.
+      const [deliveries, reconciliations] = discoveries;
+      const turns = deliveries.status === 'fulfilled' ? deliveries.value : [];
+      const quarantined = reconciliations.status === 'fulfilled' ? reconciliations.value : [];
+>>>>>>> upstream/main
       let repaired = 0;
       for (const turn of quarantined) {
         const deliveryKey = turn.deliveryKey;
@@ -805,8 +917,16 @@ function createAgentQueuedTurnScheduler({
         ) {
           continue;
         }
+<<<<<<< HEAD
         const defer = () =>
           runAsSystem(() =>
+=======
+        const defer = async () => {
+          const availableAt = new Date(
+            Date.now() + reconciliationBackoff(turn.reconciliationAttempts),
+          );
+          const deferred = await runAsSystem(() =>
+>>>>>>> upstream/main
             methods.deferAgentQueuedTurnAdmissionReconciliation({
               user: turn.user,
               ...(turn.tenantId != null && { tenantId: turn.tenantId }),
@@ -815,11 +935,21 @@ function createAgentQueuedTurnScheduler({
               deliveryKey,
               claimId: reconciliationClaimId,
               claimBy: PROCESS_CLAIM_OWNER,
+<<<<<<< HEAD
               availableAt: new Date(
                 Date.now() + reconciliationBackoff(turn.reconciliationAttempts),
               ),
             }),
           );
+=======
+              availableAt,
+            }),
+          );
+          if (deferred) {
+            loop?.noteEligibleAt(availableAt);
+          }
+        };
+>>>>>>> upstream/main
         try {
           const isIndeterminate =
             turn.terminalReceipt?.outcome === 'dead' &&
@@ -894,7 +1024,11 @@ function createAgentQueuedTurnScheduler({
       }
       for (const turn of turns) {
         try {
+<<<<<<< HEAD
           await schedule(turn);
+=======
+          await publish(turn);
+>>>>>>> upstream/main
           repaired += 1;
         } catch (error) {
           logger.warn(
@@ -904,7 +1038,15 @@ function createAgentQueuedTurnScheduler({
           );
         }
       }
+<<<<<<< HEAD
       return repaired;
+=======
+      // Do not strand leases already acquired by the successful discovery just
+      // because its independent sibling failed. Process them, then report failure.
+      if (deliveries.status === 'rejected') throw deliveries.reason;
+      if (reconciliations.status === 'rejected') throw reconciliations.reason;
+      return { repaired, idle: !activity.found && turns.length === 0 && quarantined.length === 0 };
+>>>>>>> upstream/main
     })();
     recovery = task;
     void task.then(
@@ -921,10 +1063,15 @@ function createAgentQueuedTurnScheduler({
     );
     return task;
   };
+<<<<<<< HEAD
+=======
+  const recover = async (): Promise<number> => (await recoverPass()).repaired;
+>>>>>>> upstream/main
 
   return {
     schedule,
     recover,
+<<<<<<< HEAD
     initialize: async () => {
       await runAsSystem(() => methods.ensureAgentQueuedTurnIndexes());
       timer = setInterval(() => {
@@ -943,6 +1090,45 @@ function createAgentQueuedTurnScheduler({
         timer = undefined;
       }
       await recovery;
+=======
+    initialize: (options = {}) => {
+      if (initialization != null) {
+        return initialization;
+      }
+      if (stopped) {
+        return Promise.resolve();
+      }
+      const maxIdleIntervalMs =
+        options.maxIdleIntervalMs ??
+        Math.max(recoveryIntervalMs, DEFAULT_RECOVERY_MAX_IDLE_INTERVAL_MS);
+      const next = (async () => {
+        loop = createIdleRecoveryLoop({
+          intervalMs: recoveryIntervalMs,
+          maxIdleIntervalMs,
+          scan: async () => (await recoverPass()).idle,
+          onError: (error) =>
+            logger.warn('[agentQueuedTurns] Delivery recovery pass failed', error),
+        });
+        await runAsSystem(() => methods.ensureAgentQueuedTurnIndexes());
+        if (!stopped) {
+          await loop.start();
+        }
+      })();
+      initialization = next.catch((error: unknown) => {
+        if (!stopped) {
+          initialization = undefined;
+          loop = undefined;
+        }
+        throw error;
+      });
+      return initialization;
+    },
+    stop: async () => {
+      stopped = true;
+      await loop?.stop();
+      await initialization?.catch(() => undefined);
+      await recovery?.catch(() => undefined);
+>>>>>>> upstream/main
     },
   };
 }

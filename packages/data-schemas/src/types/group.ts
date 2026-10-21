@@ -15,6 +15,12 @@ export interface IGroup extends Document {
   createdAt?: Date;
   updatedAt?: Date;
   tenantId?: string;
+<<<<<<< HEAD
+=======
+  /** Derived search tokens (see `~/utils/search`); `select: false`. */
+  nameTokens?: string[];
+  emailTokens?: string[];
+>>>>>>> upstream/main
 }
 
 export interface CreateGroupRequest {

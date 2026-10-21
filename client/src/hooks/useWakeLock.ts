@@ -42,7 +42,11 @@ const DEBUG_WAKE_LOCK = false;
  *
  * @example
  * ```tsx
+<<<<<<< HEAD
  * const isGeneratingResponse = useRecoilValue(anySubmittingSelector);
+=======
+ * const isGeneratingResponse = useAtomValue(anySubmittingAtom);
+>>>>>>> upstream/main
  * useWakeLock(isGeneratingResponse);
  * ```
  *

@@ -7,12 +7,23 @@ import {
   PermissionBits,
 } from 'librechat-data-provider';
 import type { AllMethods, MCPServerDocument, IAgent } from '@librechat/data-schemas';
+<<<<<<< HEAD
 
 import type { IServerConfigsRepositoryInterface } from '~/mcp/registry/ServerConfigsRepositoryInterface';
 import type { ParsedServerConfig, AddServerResult } from '~/mcp/types';
 import type { ResolvedPrincipal } from '~/types/principal';
 import { MCPOAuthSecretReentryRequiredError } from '~/mcp/errors';
 import { AccessControlService } from '~/acl/accessControlService';
+=======
+import type { IServerConfigsRepositoryInterface } from '~/mcp/registry/ServerConfigsRepositoryInterface';
+import type { ParsedServerConfig, AddServerResult } from '~/mcp/types';
+import type { ResolvedPrincipal } from '~/types/principal';
+import { getUserApiKeyVariable, requireApiKeyReentryForRebinding } from '~/mcp/registry/binding';
+import { MCPCommittedWriteError, MCPOAuthSecretReentryRequiredError } from '~/mcp/errors';
+import { normalizeLegacyHeaderMaps } from '~/mcp/registry/compat';
+import { AccessControlService } from '~/acl/accessControlService';
+import { isGeneratedUserApiKeyVariable } from '~/mcp/headers';
+>>>>>>> upstream/main
 
 /**
  * Regex patterns for credential/env placeholders that should not be allowed in user-provided configs.
@@ -58,6 +69,30 @@ function sanitizeCredentialPlaceholders(
   return sanitized;
 }
 
+<<<<<<< HEAD
+=======
+/**
+ * Sanitizes every header map a shared config carries. `requestHeaders` is
+ * included because it reaches the upstream server exactly like `headers` does:
+ * left unsanitized, a user-managed config could name a privileged placeholder
+ * there and have the runtime resolve it at chat time. Absent maps stay omitted
+ * because BSON can serialize explicit undefined properties as null.
+ */
+function sanitizeConfigHeaderMaps(config: ParsedServerConfig): ParsedServerConfig {
+  const { headers, requestHeaders, ...rest } = config as ParsedServerConfig & {
+    headers?: Record<string, string>;
+    requestHeaders?: Record<string, string>;
+  };
+  return {
+    ...rest,
+    ...(headers != null && { headers: sanitizeCredentialPlaceholders(headers) }),
+    ...(requestHeaders != null && {
+      requestHeaders: sanitizeCredentialPlaceholders(requestHeaders),
+    }),
+  } as ParsedServerConfig;
+}
+
+>>>>>>> upstream/main
 function stripBlockedOAuthEndpointParams(url?: string): string | undefined {
   if (!url) {
     return url;
@@ -80,6 +115,10 @@ function sanitizeUserManagedOAuthConfig(config: ParsedServerConfig): ParsedServe
   const {
     audience: _audience,
     forward_audience_on_refresh: _forwardAudienceOnRefresh,
+<<<<<<< HEAD
+=======
+    send_resource_parameter: _sendResourceParameter,
+>>>>>>> upstream/main
     ...oauth
   } = config.oauth;
   return {
@@ -96,6 +135,7 @@ function sanitizeUserManagedOAuthConfig(config: ParsedServerConfig): ParsedServe
   };
 }
 
+<<<<<<< HEAD
 /** Normalizes legacy values that predate the current runtime config schemas. */
 function normalizePersistedConfig(config: ParsedServerConfig): ParsedServerConfig {
   const persistedConfig = config as ParsedServerConfig & {
@@ -109,6 +149,8 @@ function normalizePersistedConfig(config: ParsedServerConfig): ParsedServerConfi
   return normalizedConfig as ParsedServerConfig;
 }
 
+=======
+>>>>>>> upstream/main
 function normalizeOAuthUrl(value?: string): string | undefined {
   if (!value) {
     return value;
@@ -249,7 +291,15 @@ export class ServerConfigsDB implements IServerConfigsRepositoryInterface {
    * @param userId - The user ID (optional - if not provided, checks publicly accessible agents)
    * @returns true if user has VIEW access to at least one agent that has this MCP server
    */
+<<<<<<< HEAD
   private async hasAccessViaAgent(serverName: string, userId?: string): Promise<boolean> {
+=======
+  private async hasAccessViaAgent(
+    serverName: string,
+    userId?: string,
+    role?: string,
+  ): Promise<boolean> {
+>>>>>>> upstream/main
     const candidateIds = await this._dbMethods.getAgentIdsByMCPServerName(serverName);
     if (candidateIds.length === 0) {
       return false;
@@ -258,6 +308,10 @@ export class ServerConfigsDB implements IServerConfigsRepositoryInterface {
     const accessibleAgentIds = userId
       ? await this._aclService.findAccessibleResources({
           userId,
+<<<<<<< HEAD
+=======
+          role,
+>>>>>>> upstream/main
           requiredPermissions: PermissionBits.VIEW,
           resourceType: ResourceType.AGENT,
           resourceIds: candidateIds,
@@ -294,12 +348,16 @@ export class ServerConfigsDB implements IServerConfigsRepositoryInterface {
       );
     }
 
+<<<<<<< HEAD
     const sanitizedConfig = sanitizeUserManagedOAuthConfig({
       ...config,
       headers: sanitizeCredentialPlaceholders(
         (config as ParsedServerConfig & { headers?: Record<string, string> }).headers,
       ),
     } as ParsedServerConfig);
+=======
+    const sanitizedConfig = sanitizeUserManagedOAuthConfig(sanitizeConfigHeaderMaps(config));
+>>>>>>> upstream/main
 
     /** Transformed user-provided API key config (adds customUserVars and headers) */
     const transformedConfig = this.transformUserApiKeyConfig(sanitizedConfig);
@@ -310,6 +368,7 @@ export class ServerConfigsDB implements IServerConfigsRepositoryInterface {
       author: userId,
       reservedServerNames,
     });
+<<<<<<< HEAD
     await this._aclService.grantPermission({
       principalType: PrincipalType.USER,
       principalId: userId,
@@ -322,6 +381,26 @@ export class ServerConfigsDB implements IServerConfigsRepositoryInterface {
       serverName: createdServer.serverName,
       config: await this.mapDBServerToParsedConfig(createdServer),
     };
+=======
+    const created = {
+      serverName: createdServer.serverName,
+      config: await this.mapDBServerToParsedConfig(createdServer),
+    };
+    try {
+      await this._aclService.grantPermission({
+        principalType: PrincipalType.USER,
+        principalId: userId,
+        resourceType: ResourceType.MCPSERVER,
+        resourceId: createdServer._id,
+        accessRoleId: AccessRoleIds.MCPSERVER_OWNER,
+        grantedBy: userId,
+      });
+    } catch (error) {
+      /** The server exists already, so the failure must not read as a create that never happened. */
+      throw new MCPCommittedWriteError(created, error);
+    }
+    return created;
+>>>>>>> upstream/main
   }
 
   /**
@@ -334,7 +413,11 @@ export class ServerConfigsDB implements IServerConfigsRepositoryInterface {
     serverName: string,
     config: ParsedServerConfig,
     userId?: string,
+<<<<<<< HEAD
   ): Promise<void> {
+=======
+  ): Promise<ParsedServerConfig> {
+>>>>>>> upstream/main
     if (!userId) {
       throw new Error(
         '[ServerConfigsDB.update] User ID is required to update a database-stored MCP server.',
@@ -343,6 +426,7 @@ export class ServerConfigsDB implements IServerConfigsRepositoryInterface {
 
     const existingServer = await this._dbMethods.findMCPServerByServerName(serverName);
 
+<<<<<<< HEAD
     let configToSave: ParsedServerConfig = sanitizeUserManagedOAuthConfig({
       ...config,
       headers: sanitizeCredentialPlaceholders(
@@ -352,6 +436,15 @@ export class ServerConfigsDB implements IServerConfigsRepositoryInterface {
 
     /** Transformed user-provided API key config (adds customUserVars and headers) */
     configToSave = this.transformUserApiKeyConfig(configToSave);
+=======
+    if (existingServer) {
+      requireApiKeyReentryForRebinding(existingServer.config, config);
+    }
+
+    let configToSave: ParsedServerConfig = sanitizeUserManagedOAuthConfig(
+      sanitizeConfigHeaderMaps(config),
+    );
+>>>>>>> upstream/main
 
     const existingOAuth = existingServer?.config?.oauth;
     const existingOAuthSecret = existingOAuth?.client_secret;
@@ -368,6 +461,12 @@ export class ServerConfigsDB implements IServerConfigsRepositoryInterface {
       }
     }
 
+<<<<<<< HEAD
+=======
+    /** Transformed user-provided API key config (adds customUserVars and headers) */
+    configToSave = this.transformUserApiKeyConfig(configToSave, existingServer?.config);
+
+>>>>>>> upstream/main
     /** Encrypted config before storing in database */
     configToSave = await this.encryptConfig(configToSave);
 
@@ -398,7 +497,15 @@ export class ServerConfigsDB implements IServerConfigsRepositoryInterface {
       };
     }
 
+<<<<<<< HEAD
     await this._dbMethods.updateMCPServer(serverName, { config: configToSave });
+=======
+    const saved = await this._dbMethods.updateMCPServer(serverName, { config: configToSave });
+    if (!saved) {
+      throw new Error(`[ServerConfigsDB.update] MCP server "${serverName}" no longer exists.`);
+    }
+    return await this.mapDBServerToParsedConfig(saved);
+>>>>>>> upstream/main
   }
 
   /**
@@ -417,7 +524,11 @@ export class ServerConfigsDB implements IServerConfigsRepositoryInterface {
           'Config-source servers should use configCacheRepo, not dbConfigsRepo.',
       );
     }
+<<<<<<< HEAD
     return this.update(serverName, config, userId);
+=======
+    await this.update(serverName, config, userId);
+>>>>>>> upstream/main
   }
 
   /**
@@ -425,11 +536,16 @@ export class ServerConfigsDB implements IServerConfigsRepositoryInterface {
    * @param serverName - The serverName of the server to remove
    * @param userId - User performing the deletion (for logging)
    */
+<<<<<<< HEAD
   public async remove(serverName: string, userId?: string): Promise<void> {
+=======
+  public async remove(serverName: string, userId?: string): Promise<boolean> {
+>>>>>>> upstream/main
     logger.debug(`[ServerConfigsDB.remove] removing ${serverName}. UserId: ${userId}`);
     const deletedServer = await this._dbMethods.deleteMCPServer(serverName);
     if (deletedServer && deletedServer._id) {
       logger.debug(`[ServerConfigsDB.remove] removing all permissions entries of ${serverName}.`);
+<<<<<<< HEAD
       await this._aclService.removeAllPermissions({
         resourceType: ResourceType.MCPSERVER,
         resourceId: deletedServer._id!,
@@ -437,6 +553,20 @@ export class ServerConfigsDB implements IServerConfigsRepositoryInterface {
       return;
     }
     logger.warn(`[ServerConfigsDB.remove] server with serverName ${serverName} does not exist`);
+=======
+      try {
+        await this._aclService.removeAllPermissions({
+          resourceType: ResourceType.MCPSERVER,
+          resourceId: deletedServer._id!,
+        });
+      } catch (error) {
+        throw new MCPCommittedWriteError(true, error);
+      }
+      return true;
+    }
+    logger.warn(`[ServerConfigsDB.remove] server with serverName ${serverName} does not exist`);
+    return false;
+>>>>>>> upstream/main
   }
 
   /**
@@ -445,6 +575,7 @@ export class ServerConfigsDB implements IServerConfigsRepositoryInterface {
    * @param userId - the user id provide the scope of the request. If the user Id is not provided, only publicly visible servers are returned.
    * @returns The parsed server config or undefined if not found. If accessed via agent, consumeOnly will be true.
    */
+<<<<<<< HEAD
   public async get(serverName: string, userId?: string): Promise<ParsedServerConfig | undefined> {
     const server = await this._dbMethods.findMCPServerByServerName(serverName);
     if (!server) return undefined;
@@ -464,12 +595,48 @@ export class ServerConfigsDB implements IServerConfigsRepositoryInterface {
       if (hasAgentAccess) {
         logger.debug(
           `[ServerConfigsDB.get] accessing ${serverName} via public agent (consumeOnly)`,
+=======
+  public async get(
+    serverName: string,
+    userId?: string,
+    role?: string,
+  ): Promise<ParsedServerConfig | undefined> {
+    if (userId) {
+      /** Each lookup is bounded to this server or the agents that reference it. Resolve the
+       *  principal set once so direct and agent ACL checks can start together. */
+      const [server, principalsList, candidateIds] = await Promise.all([
+        this._dbMethods.findMCPServerByServerName(serverName),
+        this._aclService.getUserPrincipals({ userId, role }),
+        this._dbMethods.getAgentIdsByMCPServerName(serverName),
+      ]);
+      if (!server) return undefined;
+
+      const [directlyAccessibleIds, accessibleAgentIds] = await Promise.all([
+        this._aclService.findAccessibleResourcesForPrincipals({
+          principalsList,
+          resourceType: ResourceType.MCPSERVER,
+          requiredPermissions: PermissionBits.VIEW,
+          resourceIds: [server._id],
+        }),
+        this.findAccessibleAgentIds(candidateIds, userId, principalsList),
+      ]);
+      if (directlyAccessibleIds.some((id) => id.toString() === server._id.toString())) {
+        logger.debug(
+          `[ServerConfigsDB.get] getting ${serverName} for user with the UserId: ${userId}`,
+        );
+        return await this.mapDBServerToParsedConfig(server);
+      }
+      if (accessibleAgentIds.length > 0) {
+        logger.debug(
+          `[ServerConfigsDB.get] user ${userId} accessing ${serverName} via agent (consumeOnly)`,
+>>>>>>> upstream/main
         );
         return {
           ...(await this.mapDBServerToParsedConfig(server)),
           consumeOnly: true,
         };
       }
+<<<<<<< HEAD
 
       return undefined;
     }
@@ -494,6 +661,26 @@ export class ServerConfigsDB implements IServerConfigsRepositoryInterface {
       logger.debug(
         `[ServerConfigsDB.get] user ${userId} accessing ${serverName} via agent (consumeOnly)`,
       );
+=======
+      return undefined;
+    }
+
+    const server = await this._dbMethods.findMCPServerByServerName(serverName);
+    if (!server) return undefined;
+    const directlyAccessibleMCPIds = (
+      await this._aclService.findPubliclyAccessibleResources({
+        resourceType: ResourceType.MCPSERVER,
+        requiredPermissions: PermissionBits.VIEW,
+      })
+    ).map((id) => id.toString());
+    if (directlyAccessibleMCPIds.indexOf(server._id.toString()) > -1) {
+      return await this.mapDBServerToParsedConfig(server);
+    }
+
+    const hasAgentAccess = await this.hasAccessViaAgent(serverName);
+    if (hasAgentAccess) {
+      logger.debug(`[ServerConfigsDB.get] accessing ${serverName} via public agent (consumeOnly)`);
+>>>>>>> upstream/main
       return {
         ...(await this.mapDBServerToParsedConfig(server)),
         consumeOnly: true,
@@ -640,7 +827,11 @@ export class ServerConfigsDB implements IServerConfigsRepositoryInterface {
       ...(authorId ? { author: authorId } : {}),
     };
     return sanitizeUserManagedOAuthConfig(
+<<<<<<< HEAD
       await this.decryptConfig(normalizePersistedConfig(config)),
+=======
+      await this.decryptConfig(normalizeLegacyHeaderMaps(config)),
+>>>>>>> upstream/main
     );
   }
 
@@ -650,7 +841,14 @@ export class ServerConfigsDB implements IServerConfigsRepositoryInterface {
    * @param config - The server config to transform
    * @returns The transformed config with customUserVars and headers set up
    */
+<<<<<<< HEAD
   private transformUserApiKeyConfig(config: ParsedServerConfig): ParsedServerConfig {
+=======
+  private transformUserApiKeyConfig(
+    config: ParsedServerConfig,
+    existingConfig?: ParsedServerConfig,
+  ): ParsedServerConfig {
+>>>>>>> upstream/main
     if (!config.apiKey || config.apiKey.source !== 'user') {
       return config;
     }
@@ -661,6 +859,7 @@ export class ServerConfigsDB implements IServerConfigsRepositoryInterface {
         ? result.apiKey!.custom_header || 'X-Api-Key'
         : 'Authorization';
 
+<<<<<<< HEAD
     let headerValue: string;
     if (result.apiKey!.authorization_type === 'basic') {
       headerValue = 'Basic {{MCP_API_KEY}}';
@@ -673,6 +872,30 @@ export class ServerConfigsDB implements IServerConfigsRepositoryInterface {
     result.customUserVars = {
       ...result.customUserVars,
       MCP_API_KEY: {
+=======
+    const variable = getUserApiKeyVariable(config, existingConfig);
+    const placeholder = `{{${variable}}}`;
+    let headerValue: string;
+    if (result.apiKey!.authorization_type === 'basic') {
+      headerValue = `Basic ${placeholder}`;
+    } else if (result.apiKey!.authorization_type === 'bearer') {
+      headerValue = `Bearer ${placeholder}`;
+    } else {
+      headerValue = placeholder;
+    }
+
+    const customUserVars: NonNullable<ParsedServerConfig['customUserVars']> = {
+      ...result.customUserVars,
+    };
+    for (const name of Object.keys(customUserVars)) {
+      if (isGeneratedUserApiKeyVariable(name)) {
+        delete customUserVars[name];
+      }
+    }
+    result.customUserVars = {
+      ...customUserVars,
+      [variable]: {
+>>>>>>> upstream/main
         title: 'API Key',
         description: 'Your API key for this MCP server',
       },

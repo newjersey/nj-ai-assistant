@@ -1,4 +1,5 @@
 import React from 'react';
+<<<<<<< HEAD
 import { handleDoubleClick } from '~/utils';
 
 export const CodeVariableGfm: React.ElementType = ({ children }: { children: React.ReactNode }) => {
@@ -11,6 +12,8 @@ export const CodeVariableGfm: React.ElementType = ({ children }: { children: Rea
     </code>
   );
 };
+=======
+>>>>>>> upstream/main
 
 const variableRegex = /{{(.*?)}}/g;
 
@@ -21,7 +24,11 @@ const highlightVariables = (text: string): React.ReactNode[] => {
       return (
         <b
           key={index}
+<<<<<<< HEAD
           className="ml-[0.5] rounded-lg bg-amber-100 p-[1px] font-medium text-text-warning dark:bg-transparent"
+=======
+          className="bg-status-warning-subtle text-text-warning ml-[0.5] rounded-lg p-0.25 font-medium"
+>>>>>>> upstream/main
         >
           {`{{${part}}}`}
         </b>

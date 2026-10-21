@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { createContext, useContext } from 'react';
 
 type MessageContext = {
@@ -14,3 +15,6 @@ type MessageContext = {
 
 export const MessageContext = createContext<MessageContext>({} as MessageContext);
 export const useMessageContext = () => useContext(MessageContext);
+=======
+export { MessageContext, useMessageContext } from '@librechat/chat/react';
+>>>>>>> upstream/main

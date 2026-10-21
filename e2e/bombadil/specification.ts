@@ -438,14 +438,35 @@ export const multiConversationAlwaysRendersTwoColumns = always(() =>
 export const sidebarNavigationEventuallySelectsTarget = always(() => {
   const expectedIndex = clickedConversationIndex(ui.current.lastAction);
   return now(() => expectedIndex !== null).implies(
+<<<<<<< HEAD
     eventually(
       () =>
+=======
+    eventually(() => {
+      const action = ui.current.lastAction;
+      const newerIndex = clickedConversationIndex(action);
+      const startsNewConversation =
+        typeof action === 'object' &&
+        action !== null &&
+        'Click' in action &&
+        action.Click.name === 'New conversation';
+      if (startsNewConversation || (newerIndex !== null && newerIndex !== expectedIndex)) {
+        return true;
+      }
+      return (
+>>>>>>> upstream/main
         expectedIndex !== null &&
         isPersistedConversation(ui.current.path) &&
         ui.current.activeConversationIndexes.length === 1 &&
         ui.current.activeConversationIndexes[0] === expectedIndex &&
+<<<<<<< HEAD
         ui.current.messageIds.length > 0,
     ).within(10, 'seconds'),
+=======
+        ui.current.messageIds.length > 0
+      );
+    }).within(10, 'seconds'),
+>>>>>>> upstream/main
   );
 });
 

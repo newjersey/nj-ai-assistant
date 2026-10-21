@@ -1,5 +1,9 @@
 import { logger } from '@librechat/data-schemas';
 import type { PreparedCodeOutputEntry } from '~/files/code/preflight';
+<<<<<<< HEAD
+=======
+import type { GenerationSettledWaitOptions } from '../stream/settled';
+>>>>>>> upstream/main
 import type { CodeExecutionContext } from './execution';
 import type { ServerRequest } from '~/types';
 
@@ -12,6 +16,12 @@ import type { ServerRequest } from '~/types';
 const BACKGROUND_PATCH_RETRY_DELAYS_MS = [
   250, 500, 1_000, 2_000, 5_000, 10_000, 20_000, 30_000, 60_000, 120_000, 180_000, 240_000, 300_000,
 ];
+<<<<<<< HEAD
+=======
+/** Bounded final attempts after the dispatch epoch has finished or disappeared.
+ * Live terminal persistence is waited for explicitly, not inferred from this delay. */
+const SETTLED_PATCH_RETRY_DELAYS_MS = [1_000, 5_000, 15_000, 30_000];
+>>>>>>> upstream/main
 interface HarvestFileRef {
   id: string;
   name: string;
@@ -40,15 +50,31 @@ export interface BackgroundToolResultState {
   settledAt: Date;
   /** This exact task owns a pre-registered automatic continuation delivery. */
   completionWakeup?: true;
+<<<<<<< HEAD
+=======
+  /** Independent receipts retain task-local delivery ownership. */
+  completionReceipt?: true;
+>>>>>>> upstream/main
   resultClaim?: {
     kind: 'manual' | 'wakeup';
     claimId: string;
     claimedAt: Date;
     generationId?: string;
+<<<<<<< HEAD
+=======
+    receiptReconciled?: true;
+>>>>>>> upstream/main
   };
 }
 
 export interface CodeHarvestDeps {
+<<<<<<< HEAD
+=======
+  /** Generation identity captured by the host at dispatch, not at harvest time. */
+  generationCreatedAt?: number;
+  /** The stream owning that epoch; nested child conversations must observe their own. */
+  generationStreamId?: string | null;
+>>>>>>> upstream/main
   req: ServerRequest;
   /** Data-schemas method: idempotent tool-call part patch + attachment append. */
   updateToolCallResult: (params: {
@@ -93,6 +119,15 @@ export interface CodeHarvestDeps {
     fileId: string;
     previewRevision?: number;
   }) => void;
+<<<<<<< HEAD
+=======
+  /** Waits for the dispatch epoch, including terminal persistence. Read outages
+   * remain retryable; replacement ends the wait without following a successor. */
+  waitForGenerationSettled?: (
+    conversationId: string,
+    options?: GenerationSettledWaitOptions,
+  ) => Promise<boolean>;
+>>>>>>> upstream/main
 }
 
 export interface CodeHarvestParams {
@@ -117,12 +152,19 @@ export interface CodeHarvestParams {
   /** Re-reads local claim ownership on every retry so a same-generation
    * manual poll cannot be overwritten by a later automatic continuation. */
   resolveBackgroundTask?: () => BackgroundToolResultState;
+<<<<<<< HEAD
+=======
+  /** Called once generated files are stored, before the row patch, which can
+   * wait for the dispatch turn to end: a poll in that turn needs them now. */
+  onFilesPersisted?: (attachments: unknown[]) => void;
+>>>>>>> upstream/main
 }
 
 export type CodeHarvestHandler = (
   params: CodeHarvestParams,
 ) => Promise<{ attachments: unknown[]; deliveryReady?: boolean } | null>;
 
+<<<<<<< HEAD
 const sleep = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
 
 async function persistBackgroundToolResultRow(
@@ -142,6 +184,41 @@ async function persistBackgroundToolResultRow(
 ): Promise<boolean> {
   const { resolveBackgroundTask, ...persistedParams } = params;
   for (let attempt = 0; attempt <= BACKGROUND_PATCH_RETRY_DELAYS_MS.length; attempt++) {
+=======
+type BackgroundResultRowParams = {
+  userId: string;
+  messageId: string;
+  conversationId: string;
+  toolCallId: string;
+  stepId?: string;
+  agentId?: string;
+  output?: string;
+  attachments?: unknown[];
+  backgroundTask?: BackgroundToolResultState;
+  resolveBackgroundTask?: () => BackgroundToolResultState;
+};
+
+/** Resolves `true` once `interrupt` fires, or `false` after `ms`; never both. */
+function sleepUnlessInterrupted(ms: number, interrupt?: Promise<void>): Promise<boolean> {
+  return new Promise((resolve) => {
+    const timer = setTimeout(() => resolve(false), ms);
+    void interrupt?.then(() => {
+      clearTimeout(timer);
+      resolve(true);
+    });
+  });
+}
+
+/** `false` once `interrupt` cut the schedule short, so the caller can retry at once. */
+async function anchorBackgroundToolResultRow(
+  updateToolCallResult: CodeHarvestDeps['updateToolCallResult'],
+  params: BackgroundResultRowParams,
+  retryDelaysMs: readonly number[],
+  interrupt?: Promise<void>,
+): Promise<boolean> {
+  const { resolveBackgroundTask, ...persistedParams } = params;
+  for (let attempt = 0; attempt <= retryDelaysMs.length; attempt++) {
+>>>>>>> upstream/main
     const currentBackgroundTask = resolveBackgroundTask?.() ?? persistedParams.backgroundTask;
     const result = await updateToolCallResult({
       ...persistedParams,
@@ -151,14 +228,84 @@ async function persistBackgroundToolResultRow(
     if (result.matched && !result.unfinished) {
       return true;
     }
+<<<<<<< HEAD
     if (attempt === BACKGROUND_PATCH_RETRY_DELAYS_MS.length) {
       break;
     }
     await sleep(BACKGROUND_PATCH_RETRY_DELAYS_MS[attempt]);
+=======
+    if (attempt === retryDelaysMs.length) {
+      break;
+    }
+    if (await sleepUnlessInterrupted(retryDelaysMs[attempt], interrupt)) {
+      return false;
+    }
+>>>>>>> upstream/main
   }
   return false;
 }
 
+<<<<<<< HEAD
+=======
+/**
+ * Patches the result onto the dispatch turn's row, which is absent or unfinished
+ * while that turn streams. The patch is retried on a schedule, but the turn
+ * settling is what actually makes the row patchable, so a settle observed
+ * mid-schedule retries at once instead of at the next scheduled step. A turn that
+ * outlives the schedule is waited for rather than given up. Only a positive
+ * settle cuts the schedule short: an unknown generation state keeps the schedule.
+ */
+async function persistBackgroundToolResultRow(
+  updateToolCallResult: CodeHarvestDeps['updateToolCallResult'],
+  params: BackgroundResultRowParams,
+  waitForGenerationSettled?: CodeHarvestDeps['waitForGenerationSettled'],
+  generationCreatedAt?: number,
+): Promise<boolean> {
+  if (waitForGenerationSettled == null) {
+    return anchorBackgroundToolResultRow(
+      updateToolCallResult,
+      params,
+      BACKGROUND_PATCH_RETRY_DELAYS_MS,
+    );
+  }
+  const listening = new AbortController();
+  const settlement = waitForGenerationSettled(params.conversationId, {
+    signal: listening.signal,
+    ...(generationCreatedAt == null ? {} : { generationCreatedAt }),
+  }).catch((error: unknown) => {
+    logger.warn(
+      `[background] Failed waiting for the dispatch turn of message ${params.messageId} to settle:`,
+      error,
+    );
+    return false;
+  });
+  const settledTurn = new Promise<void>((resolve) => {
+    void settlement.then((settled) => {
+      if (settled) resolve();
+    });
+  });
+  try {
+    const anchored = await anchorBackgroundToolResultRow(
+      updateToolCallResult,
+      params,
+      BACKGROUND_PATCH_RETRY_DELAYS_MS,
+      settledTurn,
+    );
+    if (anchored) {
+      return true;
+    }
+    await settlement;
+    return anchorBackgroundToolResultRow(
+      updateToolCallResult,
+      params,
+      SETTLED_PATCH_RETRY_DELAYS_MS,
+    );
+  } finally {
+    listening.abort();
+  }
+}
+
+>>>>>>> upstream/main
 /** Persists an ordinary detached tool result without invoking code-artifact processing. */
 export function createBackgroundToolResultHandler(
   deps: Pick<CodeHarvestDeps, 'req' | 'updateToolCallResult'>,
@@ -216,6 +363,12 @@ export function createBackgroundCodeResultHandler(deps: CodeHarvestDeps): CodeHa
     preflightCodeOutputBatch,
     processCodeOutput,
     runPreviewFinalize,
+<<<<<<< HEAD
+=======
+    waitForGenerationSettled,
+    generationCreatedAt,
+    generationStreamId,
+>>>>>>> upstream/main
   } = deps;
   return async ({
     toolCallId,
@@ -231,6 +384,10 @@ export function createBackgroundCodeResultHandler(deps: CodeHarvestDeps): CodeHa
     reapply,
     backgroundTask,
     resolveBackgroundTask,
+<<<<<<< HEAD
+=======
+    onFilesPersisted,
+>>>>>>> upstream/main
   }) => {
     const userId = req.user?.id;
     if (!userId || !messageId || !conversationId) {
@@ -309,6 +466,7 @@ export function createBackgroundCodeResultHandler(deps: CodeHarvestDeps): CodeHa
       }
     }
 
+<<<<<<< HEAD
     const deliveryReady = await persistBackgroundToolResultRow(updateToolCallResult, {
       userId,
       messageId,
@@ -325,6 +483,32 @@ export function createBackgroundCodeResultHandler(deps: CodeHarvestDeps): CodeHa
       logger.warn(
         `[background] Could not anchor code result onto message ${messageId} (tool call ${toolCallId}); ` +
           'the dispatch turn never persisted. Poll delivery still returns the result.',
+=======
+    onFilesPersisted?.(attachments);
+    const deliveryReady = await persistBackgroundToolResultRow(
+      updateToolCallResult,
+      {
+        userId,
+        messageId,
+        conversationId,
+        toolCallId,
+        stepId,
+        agentId,
+        output,
+        attachments,
+        ...(backgroundTask != null ? { backgroundTask } : {}),
+        ...(resolveBackgroundTask != null ? { resolveBackgroundTask } : {}),
+      },
+      waitForGenerationSettled,
+      generationStreamId == null || generationStreamId === conversationId
+        ? generationCreatedAt
+        : undefined,
+    );
+    if (!deliveryReady) {
+      logger.warn(
+        `[background] Could not anchor code result onto message ${messageId} (tool call ${toolCallId}); ` +
+          'the dispatch turn ended without saving that tool call. Poll delivery still returns the result.',
+>>>>>>> upstream/main
       );
     }
     return { attachments, ...(backgroundTask != null ? { deliveryReady } : {}) };

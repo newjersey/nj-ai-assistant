@@ -1,4 +1,5 @@
 import { useMemo, useCallback, useState, useEffect, useRef } from 'react';
+<<<<<<< HEAD
 import { useRecoilValue } from 'recoil';
 import { HatGlasses } from 'lucide-react';
 import { easings } from '@react-spring/web';
@@ -16,6 +17,23 @@ import temporaryStore from '~/store/temporary';
 
 const containerClassName =
   'shadow-stroke relative flex h-full items-center justify-center rounded-full bg-presentation text-text-primary dark:after:shadow-none ';
+=======
+import { HatGlasses } from 'lucide-react';
+import { easings } from '@react-spring/web';
+import { EModelEndpoint } from 'librechat-data-provider';
+import { BirthdayIcon, TooltipAnchor, SplitText, useRemScale } from '@librechat/client';
+import { useChatContext, useAgentsMapContext, useAssistantsMapContext } from '~/Providers';
+import Description, { isHtmlDescription } from '~/components/ui/Description';
+import { useGetEndpointsQuery, useGetStartupConfig } from '~/data-provider';
+import { getIconEndpoint, getEntity, getModelSpec } from '~/utils';
+import { useLocalize, useAuthContext, useGreeting } from '~/hooks';
+import { useChatSettings } from '~/Providers/ChatSettingsContext';
+import AgentContact from '~/components/Agents/AgentContact';
+import ConvoIcon from '~/components/Endpoints/ConvoIcon';
+
+const containerClassName =
+  'relative flex h-full items-center justify-center rounded-full bg-presentation text-text-primary';
+>>>>>>> upstream/main
 
 /** Stable references: fresh literals re-initialized SplitText's springs and
  * re-rendered every grapheme span on each Landing render. */
@@ -27,7 +45,11 @@ function getTextSizeClass(text: string | undefined | null) {
     return 'text-xl sm:text-2xl';
   }
 
+<<<<<<< HEAD
   if (text.length < 40) {
+=======
+  if (text.length < 56) {
+>>>>>>> upstream/main
     return 'text-2xl sm:text-4xl';
   }
 
@@ -46,7 +68,12 @@ export default function Landing({ centerFormOnLanding }: { centerFormOnLanding: 
   const { data: endpointsConfig } = useGetEndpointsQuery();
   const { user } = useAuthContext();
   const localize = useLocalize();
+<<<<<<< HEAD
   const isTemporary = useRecoilValue(temporaryStore.isTemporary);
+=======
+  const remScale = useRemScale();
+  const { isTemporary } = useChatSettings();
+>>>>>>> upstream/main
 
   const [textHasMultipleLines, setTextHasMultipleLines] = useState(false);
   const [lineCount, setLineCount] = useState(1);
@@ -65,7 +92,11 @@ export default function Landing({ centerFormOnLanding }: { centerFormOnLanding: 
     });
   }, [conversation?.endpoint, conversation?.iconURL, endpointsConfig]);
 
+<<<<<<< HEAD
   const { entity, isAgent, isAssistant } = getEntity({
+=======
+  const { entity, isAgent } = getEntity({
+>>>>>>> upstream/main
     endpoint: endpointType,
     agentsMap,
     assistantMap,
@@ -80,7 +111,14 @@ export default function Landing({ centerFormOnLanding }: { centerFormOnLanding: 
 
   const brandedSpecLabel = modelSpec?.showOnLanding ? modelSpec.label : '';
   const brandedSpecDescription = (modelSpec?.showOnLanding && modelSpec.description) || '';
+<<<<<<< HEAD
   const name = isTemporary ? '' : (entity?.name ?? brandedSpecLabel);
+=======
+  const name =
+    isTemporary || startupConfig?.interface?.landingHeading === 'greeting'
+      ? ''
+      : (entity?.name ?? brandedSpecLabel);
+>>>>>>> upstream/main
   const description = isTemporary
     ? localize('com_ui_temporary_description')
     : ((entity?.description || brandedSpecDescription || conversation?.greeting) ?? '');
@@ -104,7 +142,11 @@ export default function Landing({ centerFormOnLanding }: { centerFormOnLanding: 
     if (contentRef.current) {
       setContentHeight(contentRef.current.offsetHeight);
     }
+<<<<<<< HEAD
   }, [lineCount, description, selectedAgent]);
+=======
+  }, [lineCount, description, selectedAgent, remScale]);
+>>>>>>> upstream/main
 
   const getDynamicMargin = useMemo(() => {
     let margin = 'mb-0';
@@ -135,6 +177,7 @@ export default function Landing({ centerFormOnLanding }: { centerFormOnLanding: 
     ? localize('com_ui_temporary')
     : (resolvedWelcome ?? scheduledGreeting);
 
+<<<<<<< HEAD
   // NJ: We normally fully customize the landing page, but if you're talking to an agent,
   // we want to make it more obvious what's going on, so we partially revert to normal layout
   if (isAgent && name) {
@@ -156,10 +199,18 @@ export default function Landing({ centerFormOnLanding }: { centerFormOnLanding: 
     >
       <div ref={contentRef} className="flex flex-col items-center gap-0 p-2">
         {/* NJ: We have our own custom landing content
+=======
+  return (
+    <div
+      className={`flex h-full transform-gpu flex-col items-center justify-center pb-16 transition-all duration-200 ${centerFormOnLanding ? 'max-h-full sm:max-h-0' : 'max-h-full'} ${getDynamicMargin}`}
+    >
+      <div ref={contentRef} className="flex flex-col items-center gap-0 p-2">
+>>>>>>> upstream/main
         <div
           className={`flex ${textHasMultipleLines ? 'flex-col' : 'flex-col md:flex-row'} items-center justify-center gap-2`}
         >
           <div className={`relative size-10 justify-center ${textHasMultipleLines ? 'mb-2' : ''}`}>
+<<<<<<< HEAD
             {isTemporary ? (
               <div className={containerClassName}>
                 <HatGlasses className="h-2/3 w-2/3 text-text-primary" aria-hidden="true" />
@@ -179,6 +230,29 @@ export default function Landing({ centerFormOnLanding }: { centerFormOnLanding: 
             {startupConfig?.showBirthdayIcon && (
               <TooltipAnchor
                 className="absolute bottom-[27px] right-2"
+=======
+            <div className="avatar-stroke size-full rounded-full dark:after:shadow-none">
+              {isTemporary ? (
+                <div className={containerClassName}>
+                  <HatGlasses className="text-text-primary h-2/3 w-2/3" aria-hidden="true" />
+                </div>
+              ) : (
+                <ConvoIcon
+                  agentsMap={agentsMap}
+                  assistantMap={assistantMap}
+                  conversation={conversation}
+                  endpointsConfig={endpointsConfig}
+                  containerClassName={containerClassName}
+                  context="landing"
+                  className="text-text-primary h-2/3 w-2/3"
+                  size={41}
+                />
+              )}
+            </div>
+            {startupConfig?.showBirthdayIcon && (
+              <TooltipAnchor
+                className="absolute right-2 bottom-[1.6875rem]"
+>>>>>>> upstream/main
                 description={localize('com_ui_happy_birthday')}
                 aria-label={localize('com_ui_happy_birthday')}
               >
@@ -186,12 +260,20 @@ export default function Landing({ centerFormOnLanding }: { centerFormOnLanding: 
               </TooltipAnchor>
             )}
           </div>
+<<<<<<< HEAD
           {((isAgent || isAssistant) && name) || name ? (
+=======
+          {name ? (
+>>>>>>> upstream/main
             <div className="flex flex-col items-center gap-0 p-2">
               <SplitText
                 key={`split-text-${name}`}
                 text={name}
+<<<<<<< HEAD
                 className={`${getTextSizeClass(name)} font-medium text-text-primary`}
+=======
+                className={`${getTextSizeClass(name)} text-text-primary font-medium`}
+>>>>>>> upstream/main
                 delay={50}
                 textAlign="center"
                 animationFrom={greetingAnimationFrom}
@@ -206,7 +288,11 @@ export default function Landing({ centerFormOnLanding }: { centerFormOnLanding: 
             <SplitText
               key={`split-text-${greetingText}${user?.name ? '-user' : ''}`}
               text={greetingText}
+<<<<<<< HEAD
               className={`${getTextSizeClass(greetingText)} font-medium text-text-primary`}
+=======
+              className={`${getTextSizeClass(greetingText)} text-text-primary font-medium`}
+>>>>>>> upstream/main
               delay={50}
               textAlign="center"
               animationFrom={greetingAnimationFrom}
@@ -223,7 +309,11 @@ export default function Landing({ centerFormOnLanding }: { centerFormOnLanding: 
           description={description}
           className={
             descriptionIsHTML
+<<<<<<< HEAD
               ? 'animate-fadeIn mt-4 flex max-w-md items-center justify-center gap-2 text-center text-sm font-normal text-text-primary [&_img]:inline-block [&_img]:h-4 [&_img]:w-4'
+=======
+              ? 'animate-fadeIn text-text-primary mt-4 flex max-w-md items-center justify-center gap-2 text-center text-sm font-normal [&_img]:inline-block [&_img]:h-4 [&_img]:w-4'
+>>>>>>> upstream/main
               : `animate-fadeIn mt-4 max-w-md text-center text-sm font-normal ${isTemporary ? 'text-text-secondary' : 'text-text-primary'}`
           }
         />
@@ -233,8 +323,11 @@ export default function Landing({ centerFormOnLanding }: { centerFormOnLanding: 
             className="animate-fadeIn mt-2 max-w-md justify-center text-center text-sm"
           />
         )}
+<<<<<<< HEAD
         */}
         <NewJerseyLanding />
+=======
+>>>>>>> upstream/main
       </div>
     </div>
   );

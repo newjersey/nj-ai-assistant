@@ -1,4 +1,5 @@
 import React, { useRef } from 'react';
+<<<<<<< HEAD
 import { useDrag, useDrop } from 'react-dnd';
 import { GripVertical } from 'lucide-react';
 import type { TConversationTag } from 'librechat-data-provider';
@@ -6,6 +7,15 @@ import { TooltipAnchor, useToastContext } from '@librechat/client';
 import { useConversationTagMutation } from '~/data-provider';
 import { NotificationSeverity } from '~/common';
 import BookmarkCardActions from './BookmarkCardActions';
+=======
+import { GripVertical } from 'lucide-react';
+import { useDrag, useDrop } from 'react-dnd';
+import { useToastContext } from '@librechat/client';
+import type { TConversationTag } from 'librechat-data-provider';
+import { useConversationTagMutation } from '~/data-provider';
+import BookmarkCardActions from './BookmarkCardActions';
+import { NotificationSeverity } from '~/common';
+>>>>>>> upstream/main
 import { useLocalize } from '~/hooks';
 import { cn } from '~/utils';
 
@@ -77,13 +87,19 @@ export default function BookmarkCard({ bookmark, position, moveRow }: BookmarkCa
     <div
       ref={ref}
       className={cn(
+<<<<<<< HEAD
         'flex cursor-move items-center gap-2 rounded-lg px-3 py-2.5',
         'border border-border-light bg-transparent',
         'hover:bg-surface-secondary',
+=======
+        'group flex cursor-move items-center gap-2 rounded-lg px-3 py-2.5',
+        'hover:bg-surface-active-alt bg-transparent',
+>>>>>>> upstream/main
         isDragging && 'opacity-50',
       )}
     >
       {/* Drag handle */}
+<<<<<<< HEAD
       <GripVertical className="size-4 shrink-0 text-text-tertiary" aria-hidden="true" />
 
       {/* Tag name */}
@@ -106,6 +122,17 @@ export default function BookmarkCard({ bookmark, position, moveRow }: BookmarkCa
       <div className="shrink-0">
         <BookmarkCardActions bookmark={bookmark} />
       </div>
+=======
+      <GripVertical className="text-text-tertiary size-4 shrink-0" aria-hidden="true" />
+
+      {/* Tag name */}
+      <span className="text-text-primary min-w-0 flex-1 truncate text-sm font-medium">
+        {bookmark.tag}
+      </span>
+
+      {/* Actions */}
+      <BookmarkCardActions bookmark={bookmark} />
+>>>>>>> upstream/main
     </div>
   );
 }

@@ -38,8 +38,13 @@ function Switcher({
         id: `nav-panel-${link.id}`,
         label: localize(link.title),
         ariaChecked: link.id === activeId,
+<<<<<<< HEAD
         className: link.id === activeId ? 'bg-surface-active-alt' : undefined,
         icon: <link.icon className="size-5 text-text-primary" aria-hidden="true" />,
+=======
+        className: link.id === activeId ? 'bg-surface-nav-selected' : undefined,
+        icon: <link.icon className="text-text-primary size-5" aria-hidden="true" />,
+>>>>>>> upstream/main
         onClick: () => {
           if (link.onClick) {
             link.onClick();
@@ -75,7 +80,11 @@ function Switcher({
       isOpen={isOpen}
       setIsOpen={setIsOpen}
       items={items}
+<<<<<<< HEAD
       className="min-w-[240px]"
+=======
+      minWidth="15rem"
+>>>>>>> upstream/main
       iconClassName="mr-2 size-5"
       trigger={
         <Ariakit.MenuButton
@@ -90,15 +99,26 @@ function Switcher({
            */
           className={cn(
             buttonVariants({ variant: 'ghost' }),
+<<<<<<< HEAD
             'h-10 min-w-0 flex-1 justify-start px-2 text-text-primary',
           )}
         >
           <activeLink.icon className="size-5 flex-shrink-0" aria-hidden="true" />
+=======
+            'text-text-primary h-10 min-w-0 flex-1 justify-start px-2',
+          )}
+        >
+          <activeLink.icon className="size-5 shrink-0" aria-hidden="true" />
+>>>>>>> upstream/main
           {/* Grows so the chevron settles on the trailing edge rather than trailing the label. */}
           <span className="flex-1 truncate text-left text-sm font-medium">
             {localize(activeLink.title)}
           </span>
+<<<<<<< HEAD
           <ChevronDown className="size-4 flex-shrink-0 text-text-secondary" aria-hidden="true" />
+=======
+          <ChevronDown className="text-text-secondary size-4 shrink-0" aria-hidden="true" />
+>>>>>>> upstream/main
         </Ariakit.MenuButton>
       }
     />

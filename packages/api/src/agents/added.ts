@@ -7,9 +7,17 @@ import {
   getEphemeralSender,
   appendAgentIdSuffix,
   encodeEphemeralAgentId,
+<<<<<<< HEAD
 } from 'librechat-data-provider';
 import type { Agent, AgentToolOptions, TConversation, TModelSpec } from 'librechat-data-provider';
 import type { AppConfig } from '@librechat/data-schemas';
+=======
+  resolveMCPAppsPolicy,
+} from 'librechat-data-provider';
+import type { Agent, AgentToolOptions, TConversation, TModelSpec } from 'librechat-data-provider';
+import type { AppConfig } from '@librechat/data-schemas';
+import type { MCPClientCapabilityProfile } from '~/mcp/capabilities';
+>>>>>>> upstream/main
 import type { ParsedServerConfig } from '~/mcp/types';
 import {
   requiresEphemeralUserConnection,
@@ -17,6 +25,10 @@ import {
   validateMCPServerConfig,
 } from '~/mcp/utils';
 import { ASK_USER_QUESTION_TOOL_NAME } from '~/agents/hitl/askUserQuestionTool';
+<<<<<<< HEAD
+=======
+import { resolveMCPClientCapabilityProfile } from '~/mcp/capabilities';
+>>>>>>> upstream/main
 import { synthesizeBackgroundToolOptions } from '~/agents/background';
 import { mergeSynthesizedToolOptions } from '~/agents/selection';
 import { synthesizeIntentToolOptions } from '~/agents/intent';
@@ -55,11 +67,22 @@ function applyModelSpecSubagents(
 }
 
 export interface LoadAddedAgentDeps {
+<<<<<<< HEAD
   getAgent: (searchParameter: { id: string }) => Promise<Agent | null>;
+=======
+  /** Resolves the agent without its `versions` history; `version` carries the count. */
+  getAgent: (searchParameter: {
+    id: string;
+  }) => Promise<(Agent & { version?: number; versions?: { length: number } }) | null>;
+>>>>>>> upstream/main
   getMCPServerTools: (
     userId: string,
     serverName: string,
     serverConfig?: ParsedServerConfig,
+<<<<<<< HEAD
+=======
+    capabilityProfile?: MCPClientCapabilityProfile,
+>>>>>>> upstream/main
   ) => Promise<Record<string, unknown> | null>;
   /** The MCP servers this user can reach, with the registry's tier precedence
    *  already applied — the resolution behind the client's catalog. Omitted, the
@@ -99,9 +122,14 @@ export async function loadAddedAgent(
       return null;
     }
 
+<<<<<<< HEAD
     const agentRecord = agent as Record<string, unknown>;
     const versions = agentRecord.versions as unknown[] | undefined;
     agentRecord.version = versions ? versions.length : 0;
+=======
+    const agentRecord = agent as Agent & { version?: number; versions?: { length: number } };
+    agentRecord.version ??= agentRecord.versions?.length ?? 0;
+>>>>>>> upstream/main
     agent.id = appendAgentIdSuffix(agent.id, 1);
     return agent;
   }
@@ -127,6 +155,12 @@ export async function loadAddedAgent(
   }
 
   const appConfig = req.config as AppConfig | undefined;
+<<<<<<< HEAD
+=======
+  const capabilityProfile = resolveMCPClientCapabilityProfile(
+    resolveMCPAppsPolicy(appConfig?.mcpSettings?.apps),
+  );
+>>>>>>> upstream/main
   const ephemeralAgent = rest.ephemeralAgent as
     | {
         mcp?: string[];
@@ -247,7 +281,11 @@ export async function loadAddedAgent(
     const serverTools =
       overlayConfig && requiresEphemeralUserConnection(overlayConfig)
         ? null
+<<<<<<< HEAD
         : await deps.getMCPServerTools(userId, mcpServer, overlayConfig);
+=======
+        : await deps.getMCPServerTools(userId, mcpServer, overlayConfig, capabilityProfile);
+>>>>>>> upstream/main
     if (!serverTools) {
       tools.push(`${mcp_all}${mcp_delimiter}${mcpServer}`);
       addedServers.add(mcpServer);

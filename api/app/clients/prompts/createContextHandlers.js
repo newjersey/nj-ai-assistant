@@ -1,4 +1,5 @@
 const axios = require('axios');
+<<<<<<< HEAD
 const { isEnabled, generateShortLivedToken, logAxiosError } = require('@librechat/api');
 
 const footer = `Use the context as your learned knowledge to better answer the user.
@@ -154,6 +155,26 @@ function createContextHandlers(req, userMessageContent) {
     processFile,
     createContext,
   };
+=======
+const {
+  isEnabled,
+  generateShortLivedToken,
+  logAxiosError,
+  createRagContextHandlers,
+} = require('@librechat/api');
+
+function createContextHandlers(req, userMessageContent) {
+  return createRagContextHandlers({
+    req,
+    userMessageContent,
+    ragApiUrl: process.env.RAG_API_URL,
+    fullContextSetting: process.env.RAG_USE_FULL_CONTEXT,
+    httpClient: axios,
+    isEnabled,
+    generateShortLivedToken,
+    logAxiosError,
+  });
+>>>>>>> upstream/main
 }
 
 module.exports = createContextHandlers;

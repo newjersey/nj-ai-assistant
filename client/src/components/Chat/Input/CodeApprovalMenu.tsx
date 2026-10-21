@@ -1,4 +1,5 @@
 import * as Ariakit from '@ariakit/react';
+<<<<<<< HEAD
 import { useQueryClient } from '@tanstack/react-query';
 import { QueryKeys, Constants } from 'librechat-data-provider';
 import { TooltipAnchor, composerControlClasses } from '@librechat/client';
@@ -7,6 +8,17 @@ import type { CodeApprovalMode, TConversation } from 'librechat-data-provider';
 import type { LucideIcon } from 'lucide-react';
 import type { SetterOrUpdater } from 'recoil';
 import type { TranslationKeys } from '~/hooks';
+=======
+import { TooltipAnchor } from '@librechat/client';
+import { useQueryClient } from '@tanstack/react-query';
+import { QueryKeys, Constants } from 'librechat-data-provider';
+import { Check, ChevronDown, FilePen, FileQuestionMark, FileTerminal } from 'lucide-react';
+import type { TConversation, CodeApprovalMode, CodeEnvironmentMode } from 'librechat-data-provider';
+import type { LucideIcon } from 'lucide-react';
+import type { SetterOrUpdater } from 'recoil';
+import type { TranslationKeys } from '~/hooks';
+import { chipClasses, chipMenuClasses, chipMenuItemClasses, chipMenuHeadingClasses } from './chip';
+>>>>>>> upstream/main
 import { useCodeApprovalModePreference } from '~/hooks/Agents/codeApprovalPreference';
 import { useCodeApprovalMode, useLocalize } from '~/hooks';
 import { cn } from '~/utils';
@@ -41,17 +53,34 @@ const modeOptions: Record<
 export default function CodeApprovalMenu({
   conversation,
   addedConversation,
+<<<<<<< HEAD
+=======
+  codeEnvironmentMode,
+>>>>>>> upstream/main
   setConversation,
   disabled,
 }: {
   conversation: TConversation | null;
   addedConversation?: TConversation | null;
+<<<<<<< HEAD
+=======
+  /** The workspace mode the composer resolved for the next turn. */
+  codeEnvironmentMode?: CodeEnvironmentMode;
+>>>>>>> upstream/main
   setConversation: SetterOrUpdater<TConversation | null>;
   disabled: boolean;
 }) {
   const localize = useLocalize();
   const queryClient = useQueryClient();
+<<<<<<< HEAD
   const { available, modes, selected } = useCodeApprovalMode(conversation, addedConversation);
+=======
+  const { available, modes, selected } = useCodeApprovalMode(
+    conversation,
+    addedConversation,
+    codeEnvironmentMode,
+  );
+>>>>>>> upstream/main
   const preference = useCodeApprovalModePreference();
   const menuStore = Ariakit.useMenuStore({ focusLoop: true, placement: 'top-start' });
   const isOpen = menuStore.useState('open');
@@ -92,7 +121,13 @@ export default function CodeApprovalMenu({
     <Ariakit.MenuProvider store={menuStore}>
       <TooltipAnchor
         description={localize('com_ui_code_approval_mode')}
+<<<<<<< HEAD
         disabled={isOpen}
+=======
+        /** `disabled` here would mark the open chip itself `aria-disabled`; only the hover
+         *  tooltip has to stand down while the menu covers it. */
+        showOnHover={!isOpen}
+>>>>>>> upstream/main
         render={
           <Ariakit.MenuButton
             disabled={disabled}
@@ -101,26 +136,40 @@ export default function CodeApprovalMenu({
               modeOptions[selected].label,
             )}`}
             className={cn(
+<<<<<<< HEAD
               composerControlClasses(),
               'min-w-0 max-w-full px-2.5 md:px-theme-normal',
+=======
+              chipClasses,
+>>>>>>> upstream/main
               isOpen && 'bg-surface-hover',
               disabled && 'cursor-not-allowed opacity-50',
             )}
           />
         }
       >
+<<<<<<< HEAD
         <SelectedIcon className="size-4 shrink-0 text-text-secondary" aria-hidden="true" />
         <span className="min-w-0 max-w-[12rem] truncate">
+=======
+        <SelectedIcon className="text-text-secondary size-4 shrink-0" aria-hidden="true" />
+        <span className="max-w-[12rem] min-w-0 truncate">
+>>>>>>> upstream/main
           {localize(modeOptions[selected].label)}
         </span>
         <ChevronDown
           className={cn(
+<<<<<<< HEAD
             'size-3 shrink-0 text-text-secondary transition-transform',
+=======
+            'text-text-secondary size-3 shrink-0 transition-transform',
+>>>>>>> upstream/main
             isOpen && 'rotate-180',
           )}
           aria-hidden="true"
         />
       </TooltipAnchor>
+<<<<<<< HEAD
       <Ariakit.Menu
         portal={true}
         gutter={8}
@@ -138,6 +187,11 @@ export default function CodeApprovalMenu({
           render={<div />}
           className="px-2.5 py-1.5 text-xs font-medium text-text-secondary"
         >
+=======
+      <Ariakit.Menu portal={true} gutter={8} unmountOnHide={true} className={chipMenuClasses}>
+        {/* Names the menu without adding an `h1` to the page outline. */}
+        <Ariakit.MenuHeading render={<div />} className={chipMenuHeadingClasses}>
+>>>>>>> upstream/main
           {localize('com_ui_code_approval_mode')}
         </Ariakit.MenuHeading>
         {modes.map((mode) => {
@@ -151,6 +205,7 @@ export default function CodeApprovalMenu({
               checked={isSelected}
               hideOnClick={true}
               onChange={() => selectMode(mode)}
+<<<<<<< HEAD
               className={cn(
                 'group flex w-full cursor-pointer items-start gap-3 rounded-lg px-2.5 py-2',
                 'outline-none transition-colors duration-theme-fast',
@@ -165,6 +220,17 @@ export default function CodeApprovalMenu({
               </div>
               {isSelected && (
                 <Check className="mt-0.5 size-4 shrink-0 text-text-primary" aria-hidden="true" />
+=======
+              className={cn(chipMenuItemClasses(isSelected), 'items-start')}
+            >
+              <Icon className="text-text-secondary mt-0.5 size-4 shrink-0" aria-hidden="true" />
+              <div className="min-w-0 flex-1 text-left">
+                <div className="text-text-primary text-sm font-medium">{localize(label)}</div>
+                <p className="text-text-secondary text-xs">{localize(description)}</p>
+              </div>
+              {isSelected && (
+                <Check className="text-text-primary mt-0.5 size-4 shrink-0" aria-hidden="true" />
+>>>>>>> upstream/main
               )}
             </Ariakit.MenuItemRadio>
           );

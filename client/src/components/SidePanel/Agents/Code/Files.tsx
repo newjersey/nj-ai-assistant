@@ -72,7 +72,11 @@ function Files({
   return (
     <div className="mb-2 w-full">
       <div className="flex flex-col gap-3">
+<<<<<<< HEAD
         <div className="rounded-lg text-xs text-text-secondary">
+=======
+        <div className="text-text-secondary rounded-lg text-xs">
+>>>>>>> upstream/main
           {localize('com_agents_run_code_files')}
         </div>
         <FileRow
@@ -98,7 +102,11 @@ function Files({
           <input
             multiple={true}
             type="file"
+<<<<<<< HEAD
             style={{ display: 'none' }}
+=======
+            className="hidden"
+>>>>>>> upstream/main
             tabIndex={-1}
             ref={fileInputRef}
             disabled={uploadDisabled}

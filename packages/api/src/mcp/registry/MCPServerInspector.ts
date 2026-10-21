@@ -5,8 +5,15 @@ import type { MCPConnection } from '~/mcp/connection';
 import type * as t from '~/mcp/types';
 import {
   hasCustomUserVars,
+<<<<<<< HEAD
   hasRuntimeContextPlaceholders,
   hasRuntimeUrlPlaceholders,
+=======
+  applyRequestHeaders,
+  hasRuntimeContextPlaceholders,
+  hasRuntimeUrlPlaceholders,
+  toCatalogConnectionConfig,
+>>>>>>> upstream/main
   isUserSourced,
 } from '~/mcp/utils';
 import { isMCPDomainAllowed, extractMCPServerDomain } from '~/auth/domain';
@@ -15,6 +22,10 @@ import { isDirectOpenIDBearerRecoveryEnabled } from '~/mcp/openid';
 import { MCPConnectionFactory } from '~/mcp/MCPConnectionFactory';
 import { MCPDomainNotAllowedError } from '~/mcp/errors';
 import { detectOAuthRequirement } from '~/mcp/oauth';
+<<<<<<< HEAD
+=======
+import { isToolHiddenFromModel } from '~/mcp/apps';
+>>>>>>> upstream/main
 import { isEnabled } from '~/utils';
 
 /**
@@ -74,6 +85,15 @@ export class MCPServerInspector {
     this.warnOnUnrestrictedRuntimeUrl();
     await this.detectOAuth();
 
+<<<<<<< HEAD
+=======
+    /** Startup inspection is catalog work with no chat request, so the chat-only
+     *  headers come off before BOTH the eligibility gate and the probe. Left on,
+     *  a `{{LIBRECHAT_BODY_*}}` placeholder there fails
+     *  `hasRuntimeContextPlaceholders` and skips inspection altogether — the
+     *  very outcome `requestHeaders` exists to avoid. */
+    const catalogConfig = toCatalogConnectionConfig(this.config);
+>>>>>>> upstream/main
     if (
       this.config.startup !== false &&
       !this.config.requiresOAuth &&
@@ -81,14 +101,23 @@ export class MCPServerInspector {
       // user-provided API key is supplied per-user at connect time; an unauthenticated
       // probe here would 401 against a bearer server and fail inspection
       this.config.apiKey?.source !== 'user' &&
+<<<<<<< HEAD
       !hasRuntimeContextPlaceholders(this.config) &&
+=======
+      !hasRuntimeContextPlaceholders(catalogConfig) &&
+>>>>>>> upstream/main
       !this.config.obo
     ) {
       let tempConnection = false;
       if (!this.connection) {
         tempConnection = true;
         this.connection = await MCPConnectionFactory.create({
+<<<<<<< HEAD
           serverConfig: this.config,
+=======
+          serverConfig: catalogConfig,
+          serverDefinition: this.config,
+>>>>>>> upstream/main
           serverName: this.serverName,
           dbSourced: isUserSourced(this.config),
           useSSRFProtection: this.useSSRFProtection,
@@ -124,7 +153,11 @@ export class MCPServerInspector {
   }
 
   private async detectOAuth(): Promise<void> {
+<<<<<<< HEAD
     if (isDirectOpenIDBearerRecoveryEnabled(this.config)) {
+=======
+    if (isDirectOpenIDBearerRecoveryEnabled(applyRequestHeaders(this.config))) {
+>>>>>>> upstream/main
       this.config.requiresOAuth = false;
       this.config.oauthMetadata = null;
       return;
@@ -201,6 +234,12 @@ export class MCPServerInspector {
       keyServerName,
     );
     tools.forEach((tool) => {
+<<<<<<< HEAD
+=======
+      if (isToolHiddenFromModel(tool)) {
+        return;
+      }
+>>>>>>> upstream/main
       const keyToolName = keyToolNames.get(tool.name) ?? tool.name;
       const name = `${keyToolName}${Constants.mcp_delimiter}${keyServerName}`;
       toolFunctions[name] = {

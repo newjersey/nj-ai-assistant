@@ -1,9 +1,20 @@
+<<<<<<< HEAD
 import { renderHook, act } from '@testing-library/react';
 import { Constants, EModelEndpoint } from 'librechat-data-provider';
 import type { TConversation } from 'librechat-data-provider';
 
 const mockDeleteFiles = jest.fn();
 const mockSetFiles = jest.fn();
+=======
+import { getDefaultStore } from 'jotai';
+import { filesFamily } from '@librechat/chat/react';
+import { renderHook, act } from '@testing-library/react';
+import { Constants, EModelEndpoint } from 'librechat-data-provider';
+import type { TConversation } from 'librechat-data-provider';
+import type { ExtendedFile } from '~/common';
+
+const mockDeleteFiles = jest.fn();
+>>>>>>> upstream/main
 const mockRemoveTabAttachmentPresence = jest.fn();
 const mockCollectForeignAttachmentClaims = jest.fn(
   (_excludeDraftIds: string[], _excludeOwnPane?: number | 'tab') => new Set(mockForeignClaims),
@@ -33,12 +44,21 @@ jest.mock('react-router-dom', () => ({
   useSearchParams: () => [new URLSearchParams()],
 }));
 
+<<<<<<< HEAD
 jest.mock('recoil', () => ({
   useRecoilState: () => [mockFiles, mockSetFiles],
   useRecoilValue: (key: string) => {
     if (key === 'saveDrafts') {
       return false;
     }
+=======
+jest.mock('~/Providers/ChatSettingsContext', () => ({
+  useChatSettings: () => ({ saveDrafts: false }),
+}));
+
+jest.mock('recoil', () => ({
+  useRecoilValue: (key: string) => {
+>>>>>>> upstream/main
     if (key === 'saveBadgesState') {
       return true;
     }
@@ -97,7 +117,10 @@ jest.mock('../Assistants/useAssistantListMap', () => ({
   default: () => ({}),
 }));
 jest.mock('../Files/useFileHandling', () => ({ clearUploadRecovery: jest.fn() }));
+<<<<<<< HEAD
 jest.mock('../useChatBadges', () => ({ useResetChatBadges: () => jest.fn() }));
+=======
+>>>>>>> upstream/main
 jest.mock('../Agents', () => ({ useApplyModelSpecEffects: () => jest.fn() }));
 jest.mock('../Audio', () => ({ usePauseGlobalAudio: () => ({ pauseGlobalAudio: jest.fn() }) }));
 jest.mock('~/Providers', () => ({ useAgentsMapContext: () => ({}) }));
@@ -107,9 +130,12 @@ jest.mock('~/store', () => ({
   default: {
     defaultPreset: 'defaultPreset',
     saveBadgesState: 'saveBadgesState',
+<<<<<<< HEAD
     saveDrafts: 'saveDrafts',
     filesByIndex: () => 'filesByIndex',
     submissionByIndex: () => 'submissionByIndex',
+=======
+>>>>>>> upstream/main
     useClearConvoState: () => jest.fn(),
     useSetConversationAtom: () => ({ setConversation: jest.fn() }),
   },
@@ -183,6 +209,13 @@ describe('useNewConvo reset cleanup', () => {
       filepath: '/uploads/own-file.txt',
       source: 'local',
     });
+<<<<<<< HEAD
+=======
+    /** The hook reads the real pane atom, so each pane a test renders starts on this map. */
+    for (const index of [0, 2]) {
+      getDefaultStore().set(filesFamily(index), mockFiles as Map<string, ExtendedFile>);
+    }
+>>>>>>> upstream/main
   });
 
   it('does not delete a file claimed by another tab but deletes an unclaimed file', () => {

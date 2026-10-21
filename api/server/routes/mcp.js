@@ -6,6 +6,10 @@ const {
   Permissions,
   PermissionBits,
   PermissionTypes,
+<<<<<<< HEAD
+=======
+  resolveMCPAppsPolicy,
+>>>>>>> upstream/main
 } = require('librechat-data-provider');
 const {
   getBasePath,
@@ -43,6 +47,21 @@ const {
   getMCPTools,
 } = require('~/server/controllers/mcp');
 const {
+<<<<<<< HEAD
+=======
+  readMCPResource,
+  listMCPResources,
+  listMCPResourceTemplates,
+  appToolCall,
+  validateMCPApp,
+  serveMCPSandbox,
+  requireMCPAppsEnabled,
+} = require('~/server/controllers/mcpApps');
+const mcpAppAdmissionLimiter = require('~/server/middleware/limiters/mcpAppAdmissionLimiter');
+const mcpAppToolCallLimiter = require('~/server/middleware/limiters/mcpAppToolCallLimiter');
+const mcpAppResourceLimiter = require('~/server/middleware/limiters/mcpAppResourceLimiter');
+const {
+>>>>>>> upstream/main
   getOAuthReconnectionManager,
   getMCPServersRegistry,
   getFlowStateManager,
@@ -339,6 +358,7 @@ router.get('/:serverName/oauth/callback', async (req, res) => {
 
     const hasCsrf = validateOAuthCsrf(req, res, flowId, OAUTH_CSRF_COOKIE_PATH);
     const hasSession = !hasCsrf && validateOAuthSession(req, parsedFlowId.userId);
+<<<<<<< HEAD
     let hasActiveFlow = false;
     if (!hasCsrf && !hasSession) {
       const pendingFlow = await flowManager.getFlowState(flowId, 'mcp_oauth');
@@ -363,6 +383,15 @@ router.get('/:serverName/oauth/callback', async (req, res) => {
           hasSessionCookie: !!req.cookies?.[OAUTH_SESSION_COOKIE],
         },
       );
+=======
+
+    if (!hasCsrf && !hasSession) {
+      logger.error('[MCP OAuth] CSRF validation failed: no valid CSRF or session cookie', {
+        flowId,
+        hasCsrfCookie: !!req.cookies?.[OAUTH_CSRF_COOKIE],
+        hasSessionCookie: !!req.cookies?.[OAUTH_SESSION_COOKIE],
+      });
+>>>>>>> upstream/main
       return res.redirect(`${basePath}/oauth/error?error=csrf_validation_failed`);
     }
 
@@ -533,6 +562,11 @@ router.get('/:serverName/oauth/callback', async (req, res) => {
                 completeAuthorization: completePersistedFlow,
                 persistTokens: async (candidateTokens, onStoreCommitted) =>
                   (await MCPTokenStorage.storeTokens({
+<<<<<<< HEAD
+=======
+                    flowManager,
+                    persistenceWaitTimeoutMs: flowState.oauthPersistenceWaitTimeout,
+>>>>>>> upstream/main
                     userId: flowState.userId,
                     serverName,
                     tokens: candidateTokens,
@@ -985,6 +1019,19 @@ router.post(
         }),
         oboIdentityContext,
         recoveryPolicy: req.config?.mcpSettings?.catalogRecovery,
+<<<<<<< HEAD
+=======
+        mcpApps: resolveMCPAppsPolicy(
+          req.config?.mcpSettings?.apps,
+          undefined,
+          req.config?.mcpAppSandbox?.maxPersistedAppBytes,
+          req.config?.mcpAppSandbox?.maxAdmissionRequestsPerMinute,
+          req.config?.mcpAppSandbox?.url,
+          req.config?.mcpAppSandbox?.maxActiveViews,
+          req.config?.mcpAppSandbox?.maxActionPreviewChars,
+          req.config?.mcpAppSandbox?.operationLimits,
+        ),
+>>>>>>> upstream/main
       });
 
       if (!result) {
@@ -1310,4 +1357,85 @@ router.delete(
   (req, res) => deleteMCPServerController(req, res, maybeUninstallOAuthMCP),
 );
 
+<<<<<<< HEAD
+=======
+// --- MCP Apps Support ---
+
+/**
+ * Validate that a persisted MCP App still targets its originating server configuration
+ * @route POST /api/mcp/app/validate
+ */
+router.post(
+  '/app/validate',
+  requireJwtAuth,
+  mcpAppAdmissionLimiter,
+  checkMCPUsePermissions,
+  requireMCPAppsEnabled,
+  mcpAppResourceLimiter,
+  validateMCPApp,
+);
+
+/**
+ * Read a UI resource from an MCP server
+ * @route POST /api/mcp/resources/read
+ */
+router.post(
+  '/resources/read',
+  requireJwtAuth,
+  mcpAppAdmissionLimiter,
+  checkMCPUsePermissions,
+  requireMCPAppsEnabled,
+  mcpAppResourceLimiter,
+  readMCPResource,
+);
+
+/**
+ * List resources available on an MCP server
+ * @route POST /api/mcp/resources/list
+ */
+router.post(
+  '/resources/list',
+  requireJwtAuth,
+  mcpAppAdmissionLimiter,
+  checkMCPUsePermissions,
+  requireMCPAppsEnabled,
+  mcpAppResourceLimiter,
+  listMCPResources,
+);
+
+/**
+ * List resource templates available on an MCP server
+ * @route POST /api/mcp/resources/templates/list
+ */
+router.post(
+  '/resources/templates/list',
+  requireJwtAuth,
+  mcpAppAdmissionLimiter,
+  checkMCPUsePermissions,
+  requireMCPAppsEnabled,
+  mcpAppResourceLimiter,
+  listMCPResourceTemplates,
+);
+
+/**
+ * Proxy tool calls from MCP App iframe to MCP server
+ * @route POST /api/mcp/app-tool-call
+ */
+router.post(
+  '/app-tool-call',
+  requireJwtAuth,
+  mcpAppAdmissionLimiter,
+  checkMCPUsePermissions,
+  requireMCPAppsEnabled,
+  mcpAppToolCallLimiter,
+  appToolCall,
+);
+
+/**
+ * Serve the sandbox proxy HTML for MCP Apps
+ * @route GET /api/mcp/sandbox
+ */
+router.get('/sandbox', serveMCPSandbox);
+
+>>>>>>> upstream/main
 module.exports = router;

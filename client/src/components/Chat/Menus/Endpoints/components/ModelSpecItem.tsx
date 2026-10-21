@@ -51,7 +51,11 @@ export function ModelSpecItem({ spec, isSelected, posInSet, setSize }: ModelSpec
         )}
       >
         {showIconInMenu && (
+<<<<<<< HEAD
           <div className="flex-shrink-0">
+=======
+          <div className="shrink-0">
+>>>>>>> upstream/main
             <SpecIcon
               currentSpec={spec}
               endpointsConfig={endpointsConfig}
@@ -70,6 +74,7 @@ export function ModelSpecItem({ spec, isSelected, posInSet, setSize }: ModelSpec
         onClick={handleFavoriteClick}
         aria-label={isFavorite ? localize('com_ui_unpin') : localize('com_ui_pin')}
         className={cn(
+<<<<<<< HEAD
           'rounded-md p-1 hover:bg-surface-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring-primary',
           isFavorite
             ? 'visible'
@@ -82,11 +87,30 @@ export function ModelSpecItem({ spec, isSelected, posInSet, setSize }: ModelSpec
         )}
       >
         <MorphIcon icon={isFavorite ? PinOff : Pin} className="h-4 w-4 text-text-secondary" />
+=======
+          'hover:bg-surface-hover focus-visible:ring-ring-primary text-text-secondary rounded-md p-1 focus-visible:ring-2 focus-visible:outline-hidden focus-visible:ring-inset',
+          isFavorite
+            ? 'visible'
+            : // Visible by default so it's tappable on touch (no hover to
+              // reveal it); only hidden-until-hover where no pointer is coarse,
+              // so a 2-in-1's touchscreen keeps it beside its hovering trackpad.
+              // A hover-gated child would otherwise make the whole item
+              // hover-dependent, so the first tap only reveals it and a second
+              // tap is needed to select (the iOS double-tap).
+              'no-touch:invisible group-focus-within:visible group-hover:visible group-data-[active-item]:visible',
+        )}
+      >
+        <MorphIcon icon={isFavorite ? PinOff : Pin} className="h-4 w-4" />
+>>>>>>> upstream/main
       </button>
       {isSelected && (
         <>
           <CheckCircle2
+<<<<<<< HEAD
             className="size-4 shrink-0 self-center text-text-primary"
+=======
+            className="text-text-primary size-4 shrink-0 self-center"
+>>>>>>> upstream/main
             aria-hidden="true"
           />
           <VisuallyHidden>{localize('com_a11y_selected')}</VisuallyHidden>

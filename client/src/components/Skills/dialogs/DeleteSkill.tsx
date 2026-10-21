@@ -26,8 +26,17 @@ function DeleteSkill({ skillId, skillName, disabled, onDelete }: DeleteSkillProp
   const localize = useLocalize();
   const { showToast } = useToastContext();
   const deleteSkill = useDeleteSkillMutation({
+<<<<<<< HEAD
     onSuccess: () => {
       showToast({ status: 'success', message: localize('com_ui_skill_deleted') });
+=======
+    onSuccess: (response) => {
+      const cleanupComplete = response.cleanupComplete !== false;
+      showToast({
+        status: cleanupComplete ? 'success' : 'error',
+        message: localize(cleanupComplete ? 'com_ui_skill_deleted' : 'com_ui_skill_delete_partial'),
+      });
+>>>>>>> upstream/main
       onDelete?.();
     },
     onError: () => {
@@ -58,7 +67,11 @@ function DeleteSkill({ skillId, skillName, disabled, onDelete }: DeleteSkillProp
           side="bottom"
           render={
             <Button
+<<<<<<< HEAD
               variant="destructive"
+=======
+              variant="destructive-soft"
+>>>>>>> upstream/main
               size="icon"
               className="size-9"
               aria-label={localize('com_ui_delete')}
@@ -73,9 +86,15 @@ function DeleteSkill({ skillId, skillName, disabled, onDelete }: DeleteSkillProp
       <OGDialogTemplate
         showCloseButton={false}
         title={localize('com_ui_delete')}
+<<<<<<< HEAD
         className="max-w-[450px]"
         main={
           <p className="text-left text-sm text-text-primary">
+=======
+        className="max-w-[28.125rem]"
+        main={
+          <p className="text-text-primary text-left text-sm">
+>>>>>>> upstream/main
             {localize('com_ui_skill_delete_confirm', { 0: skillName })}
           </p>
         }

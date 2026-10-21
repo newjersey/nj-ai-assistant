@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+<<<<<<< HEAD
 import {
   Select,
   SelectItem,
@@ -7,6 +8,9 @@ import {
   SelectTrigger,
   useToastContext,
 } from '@librechat/client';
+=======
+import { Dropdown, useToastContext } from '@librechat/client';
+>>>>>>> upstream/main
 import {
   STATEFUL_CODE_ENVIRONMENTS,
   resolveAllowedStatefulCodeEnvironments,
@@ -59,6 +63,7 @@ export default function StatefulWorkspaceDefault() {
     mutation.mutate({ statefulCodeEnvironment });
   };
 
+<<<<<<< HEAD
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
       <div>
@@ -94,6 +99,38 @@ export default function StatefulWorkspaceDefault() {
           ))}
         </SelectContent>
       </Select>
+=======
+  const options = STATEFUL_CODE_ENVIRONMENTS.filter(
+    (candidate) => allowedEnvironments.includes(candidate) || candidate === savedEnvironment,
+  ).map((candidate) => ({
+    value: candidate,
+    label: localize(ENVIRONMENT_LABELS[candidate]),
+    disabled: !allowedEnvironments.includes(candidate),
+  }));
+
+  return (
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+      <div className="min-w-0">
+        <div id="default-stateful-workspace-label" className="text-text-primary text-sm">
+          {localize('com_ui_default_stateful_workspace')}
+        </div>
+        <p id="default-stateful-workspace-description" className="text-text-secondary mt-1 text-xs">
+          {localize('com_ui_default_stateful_workspace_description')}
+        </p>
+      </div>
+      <Dropdown
+        value={environment}
+        options={options}
+        onChange={handleChange}
+        disabled={mutation.isLoading}
+        testId="default-stateful-workspace"
+        aria-labelledby="default-stateful-workspace-label"
+        aria-describedby="default-stateful-workspace-description"
+        className="shrink-0"
+        sizeClasses="z-50 min-w-[18rem]"
+        triggerClassName="w-full sm:w-[16rem]"
+      />
+>>>>>>> upstream/main
     </div>
   );
 }

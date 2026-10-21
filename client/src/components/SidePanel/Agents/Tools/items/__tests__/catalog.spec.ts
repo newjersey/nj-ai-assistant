@@ -23,8 +23,13 @@ const askInputs: BuildCatalogInputs = {
 };
 
 describe('buildCatalog', () => {
+<<<<<<< HEAD
   test('returns empty when nothing is enabled', () => {
     expect(buildCatalog(emptyInputs)).toEqual([]);
+=======
+  test('offers handoffs without the subagents capability', () => {
+    expect(buildCatalog(emptyInputs).map((item) => item.id)).toEqual(['handoffs']);
+>>>>>>> upstream/main
   });
 
   test('emits built-in items only for capabilities the admin enabled', () => {
@@ -35,11 +40,27 @@ describe('buildCatalog', () => {
       },
     });
     expect(items.filter((i) => i.kind === 'builtin').map((i) => i.id)).toEqual([
+<<<<<<< HEAD
+=======
+      'handoffs',
+>>>>>>> upstream/main
       AgentCapabilities.execute_code,
       AgentCapabilities.web_search,
     ]);
   });
 
+<<<<<<< HEAD
+=======
+  test('offers two separate native tools when subagents are enabled', () => {
+    const items = buildCatalog({
+      ...emptyInputs,
+      agentsConfig: { capabilities: [AgentCapabilities.subagents] },
+    });
+    expect(items.map((item) => item.id)).toEqual(['subagents', 'handoffs']);
+    expect(items.map((item) => item.kind)).toEqual(['builtin', 'builtin']);
+  });
+
+>>>>>>> upstream/main
   test('emits the memory builtin only when showMemory is set', () => {
     const memoryId = (i: { kind: string; id: string }) =>
       i.kind === 'builtin' && i.id === AgentCapabilities.memory;
@@ -203,7 +224,13 @@ describe('buildCatalog', () => {
       agentsConfig: { capabilities: [AgentCapabilities.web_search] },
       builtinAuthMap: new Map([[AgentCapabilities.web_search, true]]),
     });
+<<<<<<< HEAD
     const builtin = items.find((i) => i.kind === 'builtin');
+=======
+    const builtin = items.find(
+      (i) => i.kind === 'builtin' && i.id === AgentCapabilities.web_search,
+    );
+>>>>>>> upstream/main
     expect(builtin?.status).toBe('needs_setup');
   });
 
@@ -297,6 +324,17 @@ describe('buildCatalog', () => {
         makeAction({ action_id: 'a1', metadata: { domain: 'd' }, settings: { paths: {} } }),
       ],
     });
+<<<<<<< HEAD
     expect(items.map((i) => i.kind)).toEqual(['builtin', 'mcp', 'tool', 'skill', 'action']);
+=======
+    expect(items.map((i) => i.kind)).toEqual([
+      'builtin',
+      'builtin',
+      'mcp',
+      'tool',
+      'skill',
+      'action',
+    ]);
+>>>>>>> upstream/main
   });
 });

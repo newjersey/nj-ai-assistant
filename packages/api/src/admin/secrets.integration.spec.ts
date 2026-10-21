@@ -260,7 +260,11 @@ beforeAll(async () => {
     tombstoneConfigField: methods.tombstoneConfigField,
     unsetConfigField: methods.unsetConfigField,
     deleteConfig: methods.deleteConfig,
+<<<<<<< HEAD
     toggleConfigActive: methods.toggleConfigActive,
+=======
+    toggleConfigActiveTracked: methods.toggleConfigActiveTracked,
+>>>>>>> upstream/main
     hasConfigCapability: async () => true,
     hasAnyConfigReadAccess: async () => true,
     hasCapability: async () => true,
@@ -716,7 +720,11 @@ describe('config secret registry — real handlers against a real Config collect
         tombstoneConfigField: async () => null,
         unsetConfigField: async () => null,
         deleteConfig: async () => null,
+<<<<<<< HEAD
         toggleConfigActive: async () => null,
+=======
+        toggleConfigActiveTracked: async () => null,
+>>>>>>> upstream/main
         hasConfigCapability: async () => true,
         hasAnyConfigReadAccess: async () => true,
         hasCapability: async () => true,
@@ -734,7 +742,11 @@ describe('config secret registry — real handlers against a real Config collect
       expect(getAtPath(config, 'speech.tts.openai.model')).toBe('tts-1');
       expect(getAtPath(config, 'speech.tts.openai.apiKey')).toBeUndefined();
       expect(getAtPath(config, 'speech.tts.openai.apiKeyPreview')).toBe(getSecretPreview(SECRET));
+<<<<<<< HEAD
       expect(getAtPath(config, 'langfuse.secretKeyPreview')).toBe('sk-...ret');
+=======
+      expect(getAtPath(config, 'langfuse.secretKeyPreview')).toBe('*********');
+>>>>>>> upstream/main
       expect(getAtPath(config, 'config.speech.tts.openai.apiKey')).toBeUndefined();
     });
   });

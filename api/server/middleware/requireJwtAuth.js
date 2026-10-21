@@ -3,13 +3,29 @@ const passport = require('passport');
 const { logger } = require('@librechat/data-schemas');
 const {
   isEnabled,
+<<<<<<< HEAD
+=======
+  isTokenRetired,
+  createRequiredTwoFactorGate,
+  clearCloudFrontCookies,
+>>>>>>> upstream/main
   tenantContextMiddleware,
   getAuthFailureReasonCategory,
   buildSafeAuthLogContext,
   maybeRefreshCloudFrontAuthCookiesMiddleware,
   recordRumProxyRequest,
   getValidOpenIdReuseUserId,
+<<<<<<< HEAD
 } = require('@librechat/api');
+=======
+  generateTwoFactorSetupToken,
+  afterTermsGate,
+  createTermsAcceptanceGate,
+  isTwoFactorEnrollmentRequired,
+} = require('@librechat/api');
+const { getAppConfig } = require('~/server/services/Config');
+const { getUserById } = require('~/models');
+>>>>>>> upstream/main
 
 const hasPassportStrategy = (strategy) =>
   typeof passport._strategy === 'function' && passport._strategy(strategy) != null;
@@ -65,6 +81,22 @@ const getRumProxyEndpoint = (req) => {
 const isOpenIdReuseUser = (strategy, user, openIdReuseUserId) =>
   strategy !== 'openidJwt' || getAuthenticatedUserId(user) === openIdReuseUserId;
 
+<<<<<<< HEAD
+=======
+const requiredTwoFactorGate = createRequiredTwoFactorGate({
+  clearCloudFrontCookies,
+  getUserById,
+  warn: (message) => logger.warn(message),
+  generateSetupToken: generateTwoFactorSetupToken,
+  enrollmentRequired: isTwoFactorEnrollmentRequired,
+  tokenRetired: isTokenRetired,
+});
+
+const requireJwtTermsAcceptance = createTermsAcceptanceGate({ getAppConfig });
+/** Remote agent and management boundaries answer in the nested error envelope. */
+const requireTermsAcceptance = createTermsAcceptanceGate({ getAppConfig }, { envelope: 'nested' });
+
+>>>>>>> upstream/main
 /**
  * Custom Middleware to handle JWT authentication, with support for OpenID token reuse.
  * Switches between JWT and OpenID authentication based on cookies and environment settings.
@@ -185,11 +217,21 @@ const requireJwtAuth = (req, res, next) => {
       req.user = user;
       req.authStrategy = strategy;
       logFallbackSuccess(strategy);
+<<<<<<< HEAD
       tenantContextMiddleware(req, res, (tenantErr) => {
         if (tenantErr) {
           return next(tenantErr);
         }
         refreshCloudFrontCookies(req, res, next);
+=======
+      return requiredTwoFactorGate(req, res, next, () => {
+        tenantContextMiddleware(req, res, (tenantErr) => {
+          if (tenantErr) {
+            return next(tenantErr);
+          }
+          afterTermsGate(requireJwtTermsAcceptance, refreshCloudFrontCookies)(req, res, next);
+        });
+>>>>>>> upstream/main
       });
     })(req, res, next);
   };
@@ -239,3 +281,7 @@ const requireRumProxyAuth = (req, res, next) => {
 
 module.exports = requireJwtAuth;
 module.exports.requireRumProxyAuth = requireRumProxyAuth;
+<<<<<<< HEAD
+=======
+module.exports.requireTermsAcceptance = requireTermsAcceptance;
+>>>>>>> upstream/main

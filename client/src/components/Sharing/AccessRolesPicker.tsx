@@ -65,8 +65,13 @@ export default function AccessRolesPicker({
       render: (props) => (
         <button {...props}>
           <div className="flex flex-col items-start gap-0.5 text-left">
+<<<<<<< HEAD
             <span className="font-medium text-text-primary">{localizedInfo.name}</span>
             <span className="text-xs text-text-secondary">{localizedInfo.description}</span>
+=======
+            <span className="text-text-primary font-medium">{localizedInfo.name}</span>
+            <span className="text-text-secondary text-xs">{localizedInfo.description}</span>
+>>>>>>> upstream/main
           </div>
         </button>
       ),
@@ -86,17 +91,29 @@ export default function AccessRolesPicker({
               ariaLabel || selectedRoleInfo?.description || localize('com_ui_role_select')
             }
             className={cn(
+<<<<<<< HEAD
               'flex items-center justify-between gap-2 rounded-xl border border-border-light bg-transparent px-3 py-2 text-sm transition-colors hover:bg-surface-tertiary',
+=======
+              'border-border-light hover:bg-surface-tertiary flex items-center justify-between gap-2 rounded-xl border bg-transparent px-3 py-2 text-sm transition-colors',
+>>>>>>> upstream/main
             )}
           >
             <span className="font-medium">
               {selectedRoleInfo?.name || localize('com_ui_select')}
             </span>
+<<<<<<< HEAD
             <ChevronDown className="h-4 w-4 text-text-secondary" aria-hidden="true" />
           </Ariakit.MenuButton>
         }
         items={dropdownItems}
         className="w-[280px]"
+=======
+            <ChevronDown className="text-text-secondary h-4 w-4" aria-hidden="true" />
+          </Ariakit.MenuButton>
+        }
+        items={dropdownItems}
+        className="w-[min(17.5rem,90vw)]"
+>>>>>>> upstream/main
       />
     </div>
   );

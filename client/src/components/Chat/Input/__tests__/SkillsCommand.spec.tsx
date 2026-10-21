@@ -29,9 +29,25 @@ jest.mock('jotai', () => ({
   useAtomValue: jest.fn((atom: unknown) =>
     atom === 'show-skills-popover' ? mockShowSkillsPopover.current : undefined,
   ),
+<<<<<<< HEAD
   useSetAtom: jest.fn((atom: unknown) =>
     atom === 'show-skills-popover' ? mockSetShowSkillsPopover : jest.fn(),
   ),
+=======
+  useSetAtom: jest.fn((atom: unknown) => {
+    if (atom === 'show-skills-popover') {
+      return mockSetShowSkillsPopover;
+    }
+    if (atom === 'pending-manual-skills') {
+      return mockSetPendingManualSkills;
+    }
+    return jest.fn();
+  }),
+}));
+
+jest.mock('~/components/Chat/Input/Composer/state', () => ({
+  pendingManualSkillsByConvoId: () => 'pending-manual-skills',
+>>>>>>> upstream/main
 }));
 
 jest.mock('../skillsState', () => ({
@@ -48,9 +64,12 @@ jest.mock('recoil', () => {
       if (atom === 'ephemeral-agent') {
         return mockSetEphemeralAgent;
       }
+<<<<<<< HEAD
       if (atom === 'pending-manual-skills') {
         return mockSetPendingManualSkills;
       }
+=======
+>>>>>>> upstream/main
       return jest.fn();
     }),
   };
@@ -58,11 +77,15 @@ jest.mock('recoil', () => {
 
 jest.mock('~/store', () => ({
   __esModule: true,
+<<<<<<< HEAD
   default: {
     pendingManualSkillsByConvoId: () => 'pending-manual-skills',
   },
   ephemeralAgentByConvoId: () => 'ephemeral-agent',
   pendingManualSkillsByConvoId: () => 'pending-manual-skills',
+=======
+  ephemeralAgentByConvoId: () => 'ephemeral-agent',
+>>>>>>> upstream/main
 }));
 
 const mockUseSkillsInfiniteQuery = jest.fn();

@@ -1,7 +1,11 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
+<<<<<<< HEAD
 import { Button, Label, SecretInput } from '@librechat/client';
+=======
+import { Button, SecretInput } from '@librechat/client';
+>>>>>>> upstream/main
 import { useLocalize } from '~/hooks';
 
 const fadeAnimation = {
@@ -23,11 +27,16 @@ export const QRPhase: React.FC<QRPhaseProps> = ({ secret, otpauthUrl, onNext }) 
   const localize = useLocalize();
 
   return (
+<<<<<<< HEAD
     <motion.div {...fadeAnimation} className="space-y-6">
+=======
+    <motion.div {...fadeAnimation} className="text-text-primary space-y-6">
+>>>>>>> upstream/main
       <div className="flex flex-col items-center space-y-6">
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
+<<<<<<< HEAD
           className="rounded-2xl bg-surface-fixed p-4 shadow-lg"
         >
           <QRCodeSVG value={otpauthUrl} size={240} />
@@ -36,6 +45,19 @@ export const QRPhase: React.FC<QRPhaseProps> = ({ secret, otpauthUrl, onNext }) 
           <Label className="text-sm font-medium text-text-secondary">
             {localize('com_ui_secret_key')}
           </Label>
+=======
+          className="bg-surface-fixed max-w-full min-w-0 rounded-2xl p-4 shadow-lg"
+        >
+          <QRCodeSVG
+            value={otpauthUrl}
+            size={240}
+            className="h-auto w-60 max-w-full"
+            title={localize('com_ui_2fa_scan_qr')}
+          />
+        </motion.div>
+        <div className="w-full space-y-3">
+          <p className="text-text-primary text-sm font-medium">{localize('com_ui_secret_key')}</p>
+>>>>>>> upstream/main
           <SecretInput
             value={secret}
             readOnly

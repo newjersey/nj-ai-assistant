@@ -74,6 +74,7 @@ export async function selectModelSpec(page: Page, label: string) {
   await expect(trigger).toContainText(label);
 }
 
+<<<<<<< HEAD
 /** Enable the ephemeral Skills capability from the composer tool menu. */
 export async function enableSkills(page: Page) {
   await page.getByRole('button', { name: 'Tools Options' }).click();
@@ -104,6 +105,46 @@ export async function enableFileSearch(page: Page) {
   await page.getByTestId('tools-menu-file-search').click();
   await page.keyboard.press('Escape');
   await expect(page.getByRole('checkbox', { name: 'File Search' })).toBeVisible();
+=======
+/** Toggle a built-in tool row on from the composer palette and wait for its chip. */
+async function enableBuiltinTool(page: Page, label: string) {
+  await page.getByRole('button', { name: 'Attach and tools' }).click();
+  const row = page
+    .getByRole('dialog', { name: 'Attach and tools' })
+    .getByRole('button', { name: label, exact: true });
+  await expect(row).toBeVisible();
+  await row.click();
+  await expect(row).toHaveAttribute('aria-pressed', 'true');
+  await page.keyboard.press('Escape');
+  await expect(
+    page.getByTestId('composer-active-builtin').filter({ hasText: label }),
+  ).toBeVisible();
+  /* Wait for the palette to finish closing. Reopening it during the leave
+     animation resumes the same popover rather than mounting a fresh one, so the
+     list keeps the scroll offset this click left it at, and the Attach rows at
+     the top sit outside the virtualized window a caller then queries. */
+  await expect(page.getByRole('dialog', { name: 'Attach and tools' })).toHaveCount(0);
+}
+
+/** Enable the ephemeral Skills capability from the composer palette. */
+export async function enableSkills(page: Page) {
+  await enableBuiltinTool(page, 'Skills');
+}
+
+/** Enable the ephemeral Memory capability from the composer palette. */
+export async function enableMemory(page: Page) {
+  await enableBuiltinTool(page, 'Memory');
+}
+
+/** Enable the ephemeral Code Interpreter (execute_code) capability from the palette. */
+export async function enableCodeInterpreter(page: Page) {
+  await enableBuiltinTool(page, 'Run Code');
+}
+
+/** Enable the ephemeral File Search capability from the composer palette. */
+export async function enableFileSearch(page: Page) {
+  await enableBuiltinTool(page, 'File Search');
+>>>>>>> upstream/main
 }
 
 /** The conversation messages container. */
@@ -401,6 +442,18 @@ export type CodeProvisionRecord = {
 };
 
 export type RagEmbedRecord = { file_id: string; filename: string; entity_id: string };
+<<<<<<< HEAD
+=======
+export type RagQueryRecord = { file_id: string; query: string };
+
+/** Every `/query` the fake RAG service received from file_search. */
+export async function getRagQueries(page: Page): Promise<RagQueryRecord[]> {
+  const response = await page.request.get(`${RAG_API_BASE}/__debug/embedded`);
+  expect(response.ok(), 'fake RAG server /__debug/embedded should respond').toBeTruthy();
+  const body = (await response.json()) as { queries: RagQueryRecord[] };
+  return body.queries;
+}
+>>>>>>> upstream/main
 
 /** Files the fake code server received via /upload (proof they reached the code env). */
 export async function getCodeProvisionedUploads(page: Page): Promise<CodeProvisionRecord[]> {
@@ -452,12 +505,67 @@ export function waitForUpload(page: Page) {
   });
 }
 
+<<<<<<< HEAD
 /** Attach a file via the unified single button (no tool resource). */
 export async function uploadViaUnifiedButton(page: Page, file: AttachFile) {
   const uploadResponse = waitForUpload(page);
   const [fileChooser] = await Promise.all([
     page.waitForEvent('filechooser'),
     page.locator('#attach-file-button').click(),
+=======
+/** Attach a file through the palette's implicit local/provider source row. */
+export async function uploadViaUnifiedButton(page: Page, file: AttachFile) {
+  const uploadResponse = waitForUpload(page);
+  await page.getByRole('button', { name: 'Attach and tools', exact: true }).click();
+  const palette = page.getByRole('dialog', { name: 'Attach and tools', exact: true });
+  const sourceRow = palette.getByRole('button', {
+    name: /^(From Local Computer|Upload to Provider)$/,
+  });
+  await expect(sourceRow).toBeVisible();
+  const [fileChooser] = await Promise.all([page.waitForEvent('filechooser'), sourceRow.click()]);
+  await fileChooser.setFiles({
+    name: file.name,
+    mimeType: file.mimeType,
+    buffer: Buffer.from(file.content, 'utf8'),
+  });
+  return uploadResponse;
+}
+
+const legacyDestinationRows: Record<string, { key: string; label: string }> = {
+  'Upload to Code Environment': {
+    key: 'local:execute_code',
+    label: 'Upload to Code Environment',
+  },
+  'Upload for File Search': {
+    key: 'local:file_search',
+    label: 'Upload for File Search',
+  },
+};
+
+/** Attach through a named legacy destination row in the composer palette. */
+export async function uploadViaLegacyOption(page: Page, optionName: string, file: AttachFile) {
+  const destination = legacyDestinationRows[optionName];
+  if (destination == null) {
+    throw new Error(`Unsupported legacy upload destination: ${optionName}`);
+  }
+
+  const uploadResponse = waitForUpload(page);
+  await page.getByRole('button', { name: 'Attach and tools', exact: true }).click();
+  const palette = page.getByRole('dialog', { name: 'Attach and tools', exact: true });
+  const moreOptions = palette.getByRole('button', { name: 'More upload options', exact: true });
+  await expect(moreOptions).toBeVisible();
+  await moreOptions.click();
+  const destinationRow = palette
+    .locator(`[data-row-key="${destination.key}"]`)
+    .getByRole('button', {
+      name: destination.label,
+      exact: true,
+    });
+  await expect(destinationRow).toBeVisible();
+  const [fileChooser] = await Promise.all([
+    page.waitForEvent('filechooser'),
+    destinationRow.click(),
+>>>>>>> upstream/main
   ]);
   await fileChooser.setFiles({
     name: file.name,
@@ -467,6 +575,7 @@ export async function uploadViaUnifiedButton(page: Page, file: AttachFile) {
   return uploadResponse;
 }
 
+<<<<<<< HEAD
 /** Attach a file via a named option in the legacy 3-way dropdown. */
 export async function uploadViaLegacyOption(page: Page, optionName: string, file: AttachFile) {
   const uploadResponse = waitForUpload(page);
@@ -482,3 +591,14 @@ export async function uploadViaLegacyOption(page: Page, optionName: string, file
   });
   return uploadResponse;
 }
+=======
+/** Identity stays stable when Running and Finished reorder the sidebar. */
+export const conversationRow = (page: Page, conversationUrl: string = page.url()) => {
+  const id = new URL(conversationUrl).pathname.split('/c/')[1];
+  expect(id).toMatch(/^[0-9a-f-]{36}$/i);
+  return page
+    .getByTestId('convo-item')
+    .and(page.locator(`[data-conversation-id="${id}"]`))
+    .first();
+};
+>>>>>>> upstream/main

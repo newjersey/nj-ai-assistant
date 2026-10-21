@@ -5,6 +5,21 @@ const mockGetFileStrategy = jest.fn();
 const mockGetStorageMetadata = jest.fn();
 const mockResolveRequestTenantId = jest.fn();
 const mockCreateDeploymentSkillMethods = jest.fn((methods) => methods);
+<<<<<<< HEAD
+=======
+const mockSaveSkillFileContent = jest.fn();
+const mockSaveSkillManagementFileContent = jest.fn();
+let mockSaverDeps;
+let mockManagementSaverDeps;
+const mockCreateSkillFileSaver = jest.fn((deps) => {
+  mockSaverDeps = deps;
+  return mockSaveSkillFileContent;
+});
+const mockCreateSkillManagementFileSaver = jest.fn((deps) => {
+  mockManagementSaverDeps = deps;
+  return mockSaveSkillManagementFileContent;
+});
+>>>>>>> upstream/main
 const mockReadWorkspaceFile = jest.fn();
 const mockSearchWorkspace = jest.fn();
 const mockListWorkspaceFiles = jest.fn();
@@ -36,6 +51,17 @@ jest.mock('~/server/services/Files/Code/process', () => ({
 jest.mock('@librechat/api', () => ({
   checkAccess: jest.fn(),
   createDeploymentSkillMethods: (...args) => mockCreateDeploymentSkillMethods(...args),
+<<<<<<< HEAD
+=======
+  createSkillFileSaver: (...args) => mockCreateSkillFileSaver(...args),
+  createSkillManagementFileSaver: (...args) => mockCreateSkillManagementFileSaver(...args),
+  createSkillStorageResolver:
+    ({ getFileStrategy, getStrategyFunctions }) =>
+    (config, { isImage }) => {
+      const source = getFileStrategy(config, { context: 'skill_file', isImage });
+      return { source, saveBuffer: getStrategyFunctions(source).saveBuffer };
+    },
+>>>>>>> upstream/main
   enrichWithSkillConfigurable: jest.fn(),
   getDeploymentSkillDownloadStream: jest.fn(),
   getStorageMetadata: (...args) => mockGetStorageMetadata(...args),
@@ -60,6 +86,13 @@ jest.mock('~/server/services/PermissionService', () => ({
   grantPermission: jest.fn(),
 }));
 
+<<<<<<< HEAD
+=======
+jest.mock('~/server/services/Skills/deletion', () => ({
+  deleteSkillForLegacy: jest.fn(),
+}));
+
+>>>>>>> upstream/main
 jest.mock('~/server/utils/getFileStrategy', () => ({
   getFileStrategy: (...args) => mockGetFileStrategy(...args),
 }));
@@ -71,7 +104,11 @@ const mockDb = {
 
 jest.mock('~/models', () => mockDb);
 
+<<<<<<< HEAD
 const { getSkillToolDeps } = require('./skillDeps');
+=======
+const { getSkillToolDeps, getSkillManagementFileSaver } = require('./skillDeps');
+>>>>>>> upstream/main
 
 describe('skillDeps saveSkillFileContent', () => {
   beforeEach(() => {
@@ -118,6 +155,7 @@ describe('skillDeps saveSkillFileContent', () => {
     expect(mockEditWorkspaceFile).toHaveBeenCalledWith({ path: 'src/app.ts' });
   });
 
+<<<<<<< HEAD
   it('cleans up the uploaded object when metadata upsert returns no row', async () => {
     mockDb.upsertSkillFile.mockResolvedValue(null);
 
@@ -142,5 +180,55 @@ describe('skillDeps saveSkillFileContent', () => {
         tenantId: 'tenant-1',
       },
     );
+=======
+  it('wires the typed saver to the existing database and storage strategies', async () => {
+    expect(mockSaverDeps.getSkillFileByPath).toBe(mockDb.getSkillFileByPath);
+    expect(mockSaverDeps.upsertSkillFile).toBe(mockDb.upsertSkillFile);
+    expect(mockSaverDeps.getStrategyFunctions).toBeDefined();
+    expect(mockManagementSaverDeps).toBe(mockSaverDeps);
+    const req = { user: { id: 'user-1' }, config: {} };
+    const storage = mockSaverDeps.resolveStorage(req, { isImage: false });
+    expect(storage).toEqual({ source: 's3', saveBuffer: mockSaveBuffer });
+    expect(mockGetFileStrategy).toHaveBeenCalledWith(req.config, {
+      context: 'skill_file',
+      isImage: false,
+    });
+
+    const params = {
+      req,
+      skillId: 'skill-1',
+      relativePath: 'references/template.html',
+      content: '<html></html>',
+      mimeType: 'text/html',
+      expectedFileId: 'revision-1',
+      createOnly: false,
+    };
+    mockSaveSkillFileContent.mockResolvedValue({ bytes: 13, relativePath: params.relativePath });
+    await expect(getSkillToolDeps().saveSkillFileContent(params)).resolves.toEqual({
+      bytes: 13,
+      relativePath: params.relativePath,
+    });
+    expect(mockSaveSkillFileContent).toHaveBeenCalledWith(params);
+  });
+
+  it('uses an independent management saver for existing content-only PUT requests', async () => {
+    const params = {
+      req: { user: { id: 'user-1' } },
+      skillId: 'skill-1',
+      relativePath: 'references/template.html',
+      content: '<html></html>',
+      mimeType: 'text/plain',
+    };
+    mockSaveSkillManagementFileContent.mockResolvedValue({
+      bytes: 13,
+      relativePath: params.relativePath,
+    });
+    await expect(getSkillManagementFileSaver()(params)).resolves.toEqual({
+      bytes: 13,
+      relativePath: params.relativePath,
+    });
+    expect(mockSaveSkillManagementFileContent).toHaveBeenCalledWith(params);
+    expect(mockSaveSkillFileContent).not.toHaveBeenCalled();
+>>>>>>> upstream/main
   });
 });

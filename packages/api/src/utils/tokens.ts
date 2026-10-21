@@ -1,5 +1,9 @@
 import z from 'zod';
+<<<<<<< HEAD
 import { EModelEndpoint, supportsContext1m } from 'librechat-data-provider';
+=======
+import { EModelEndpoint, supportsContext1m, gptPointReleaseFamily } from 'librechat-data-provider';
+>>>>>>> upstream/main
 import type { EndpointTokenConfig, TokenConfig } from '~/types';
 
 /**
@@ -65,6 +69,11 @@ const openAIModels = {
   'gpt-5.6-terra': 1050000,
   'gpt-5.6-luna': 1050000,
   'gpt-6-astra': 1050000, // >272K input prices at the long-context tier (2x input/cache, 1.5x output)
+<<<<<<< HEAD
+=======
+  'gpt-6-sol': 1050000, // >272K input prices at the long-context tier (2x input/cache, 1.5x output)
+  'gpt-6-luna': 1050000, // >272K input prices at the long-context tier (2x input/cache, 1.5x output)
+>>>>>>> upstream/main
   'chat-latest': 400000,
   'gpt-5-mini': 400000,
   'gpt-5-nano': 400000,
@@ -179,9 +188,19 @@ const anthropicModels = {
   'claude-sonnet-4-9': 1000000,
   'claude-sonnet-4.9': 1000000,
   'claude-sonnet-5': 1000000,
+<<<<<<< HEAD
   'claude-opus-4-6': 1000000,
   'claude-opus-4-7': 1000000,
   'claude-opus-4-8': 1000000,
+=======
+  'claude-sonnet-5-5': 1000000,
+  'claude-sonnet-5.5': 1000000,
+  'claude-opus-4-6': 1000000,
+  'claude-opus-4-7': 1000000,
+  'claude-opus-4-8': 1000000,
+  'claude-opus-5-5': 1000000,
+  'claude-opus-5.5': 1000000,
+>>>>>>> upstream/main
   'claude-opus-5': 1000000,
   'claude-fable-5': 1000000,
   'claude-mythos-5': 1000000,
@@ -190,9 +209,12 @@ const anthropicModels = {
 };
 
 const ANTHROPIC_CONTEXT_1M = 1000000;
+<<<<<<< HEAD
 const ANTHROPIC_SONNET_4_6_PLUS_OUTPUT = 128000;
 const ANTHROPIC_SONNET_4_6_PLUS_PATTERN =
   /(?:claude-sonnet[-.]?4[-.]?(?:[6-9]|\d{2})|claude[-.]?4[-.]?(?:[6-9]|\d{2})[-.]?sonnet)(?=$|[^0-9])/;
+=======
+>>>>>>> upstream/main
 
 function usesAnthropicContextMap(endpoint: EModelEndpoint): boolean {
   return (
@@ -211,6 +233,7 @@ function getAnthropicContext1m(modelName: string, endpoint: EModelEndpoint): num
   return ANTHROPIC_CONTEXT_1M;
 }
 
+<<<<<<< HEAD
 function getAnthropicSonnet46PlusOutput(
   modelName: string,
   endpoint: EModelEndpoint,
@@ -221,6 +244,8 @@ function getAnthropicSonnet46PlusOutput(
   return ANTHROPIC_SONNET_4_6_PLUS_OUTPUT;
 }
 
+=======
+>>>>>>> upstream/main
 const deepseekModels = {
   deepseek: 128000,
   'deepseek-chat': 128000,
@@ -407,9 +432,22 @@ const amazonModels = {
   'nova-2-pro': 995000, // -5000 from max
 };
 
+<<<<<<< HEAD
 const openAIBedrockModels = {
   'openai.gpt-oss-20b': 128000,
   'openai.gpt-oss-120b': 128000,
+=======
+/** Bedrock can reject near-limit GPT prompts before its published window is reached. */
+const bedrockOpenAIContext = 950000;
+
+const openAIBedrockModels = {
+  'openai.gpt-oss-20b': 128000,
+  'openai.gpt-oss-120b': 128000,
+  'openai.gpt-5.6': bedrockOpenAIContext,
+  'openai.gpt-6-astra': bedrockOpenAIContext,
+  'openai.gpt-6-sol': bedrockOpenAIContext,
+  'openai.gpt-6-luna': bedrockOpenAIContext,
+>>>>>>> upstream/main
 };
 
 const bedrockModels = {
@@ -446,6 +484,11 @@ const xAIModels = {
   'grok-4-5': 500000,
   'grok-4.6': 500000,
   'grok-4-6': 500000,
+<<<<<<< HEAD
+=======
+  'grok-4.7': 500000,
+  'grok-4-7': 500000,
+>>>>>>> upstream/main
 };
 
 const aggregateModels = {
@@ -492,6 +535,7 @@ export const maxTokensMap: Record<string, Record<string, number>> = {
   [EModelEndpoint.bedrock]: bedrockModels,
 };
 
+<<<<<<< HEAD
 export const modelMaxOutputs = {
   o1: 32268, // -500 from max: 32,768
   'o1-mini': 65136, // -500 from max: 65,536
@@ -569,6 +613,8 @@ export const maxOutputTokensMap: Record<string, Record<string, number>> = {
   [EModelEndpoint.custom]: { ...modelMaxOutputs, ...deepseekMaxOutputs },
 };
 
+=======
+>>>>>>> upstream/main
 /**
  * Any model-keyed map. Matching reads keys only and never inspects a value, so
  * the value type is deliberately open rather than a union that every caller has
@@ -605,8 +651,25 @@ function findLongestKey(lowerModelName: string, tokensMap: ModelKeyedMap): strin
  * A key that carries the vendor itself is already the most specific answer and
  * is kept. `EndpointTokenConfig` is an arbitrary record, and one built from
  * OpenRouter is keyed by `org/model`, so those must still beat a bare `model`.
+<<<<<<< HEAD
  */
 export function findMatchingPattern(modelName: string, tokensMap: ModelKeyedMap): string | null {
+=======
+ *
+ * A GPT point release with no key of its own (`gpt-6.1-sol`) resolves to its
+ * family's (`gpt-6-sol`), for context windows, output limits and pricing alike.
+ */
+export function findMatchingPattern(modelName: string, tokensMap: ModelKeyedMap): string | null {
+  const direct = findVendorAwarePattern(modelName, tokensMap);
+  if (direct != null) {
+    return direct;
+  }
+  const family = gptPointReleaseFamily(modelName);
+  return family == null ? null : findVendorAwarePattern(family, tokensMap);
+}
+
+function findVendorAwarePattern(modelName: string, tokensMap: ModelKeyedMap): string | null {
+>>>>>>> upstream/main
   const lowerModelName = modelName.toLowerCase();
   const slashIndex = lowerModelName.lastIndexOf('/');
   if (slashIndex === -1) {
@@ -698,6 +761,7 @@ export function getModelMaxTokens(
 }
 
 /**
+<<<<<<< HEAD
  * Retrieves the maximum output tokens for a given model name.
  *
  * @param modelName - The name of the model to look up.
@@ -729,6 +793,8 @@ export function getModelMaxOutputTokens(
 }
 
 /**
+=======
+>>>>>>> upstream/main
  * Retrieves the model name key for a given model name input. If the exact model name isn't found,
  * it searches for partial matches within the model name, checking keys in reverse order.
  *

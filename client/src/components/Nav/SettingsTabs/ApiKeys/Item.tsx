@@ -18,24 +18,41 @@ export default function Item({ apiKey }: ItemProps) {
   const status = getExpiryStatus(apiKey.expiresAt);
 
   return (
+<<<<<<< HEAD
     <li className="group flex items-start justify-between gap-3 px-4 py-3 transition-colors first:rounded-t-xl last:rounded-b-xl hover:bg-surface-secondary/50">
       <div className="min-w-0 flex-1 space-y-1">
         <div className="flex items-center gap-2">
           <span className="truncate font-medium text-text-primary">{apiKey.name}</span>
           {status?.state === 'expired' && (
             <span className="shrink-0 rounded-full border border-status-error-border bg-status-error-subtle px-2 py-0.5 text-xs font-medium text-status-error">
+=======
+    <li className="group hover:bg-surface-secondary/50 flex items-start justify-between gap-3 px-4 py-3 transition-colors first:rounded-t-xl last:rounded-b-xl">
+      <div className="min-w-0 flex-1 space-y-1">
+        <div className="flex items-center gap-2">
+          <span className="text-text-primary truncate font-medium">{apiKey.name}</span>
+          {status?.state === 'expired' && (
+            <span className="border-status-error-border bg-status-error-subtle text-status-error shrink-0 rounded-full border px-2 py-0.5 text-xs font-medium">
+>>>>>>> upstream/main
               {localize('com_ui_api_key_expired')}
             </span>
           )}
           {status?.state === 'expiring' && (
+<<<<<<< HEAD
             <span className="shrink-0 rounded-full border border-status-warning-border bg-status-warning-subtle px-2 py-0.5 text-xs font-medium text-status-warning">
+=======
+            <span className="border-status-warning-border bg-status-warning-subtle text-status-warning shrink-0 rounded-full border px-2 py-0.5 text-xs font-medium">
+>>>>>>> upstream/main
               {status.days === 1
                 ? localize('com_ui_api_key_expires_in_day')
                 : localize('com_ui_api_key_expires_in_days', { 0: status.days })}
             </span>
           )}
         </div>
+<<<<<<< HEAD
         <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-text-secondary">
+=======
+        <div className="text-text-secondary flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs">
+>>>>>>> upstream/main
           <code className="font-mono">{apiKey.keyPrefix}…</code>
           <span aria-hidden="true" className="text-text-tertiary">
             ·
@@ -57,7 +74,11 @@ export default function Item({ apiKey }: ItemProps) {
       </div>
       <Button
         ref={deleteButtonRef}
+<<<<<<< HEAD
         variant="destructive"
+=======
+        variant="destructive-soft"
+>>>>>>> upstream/main
         size="icon"
         onClick={() => setDeleteOpen(true)}
         aria-label={localize('com_ui_api_key_delete_name', { 0: apiKey.name })}

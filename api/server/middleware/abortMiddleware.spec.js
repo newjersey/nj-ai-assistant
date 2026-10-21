@@ -26,9 +26,18 @@ jest.mock('@librechat/data-schemas', () => ({
 }));
 
 jest.mock('@librechat/api', () => ({
+<<<<<<< HEAD
   /** Real implementation: these tests exist to verify abort classification
    *  itself, so mocking it would assert the mock rather than the behavior. */
   isAbortError: jest.requireActual('@librechat/api').isAbortError,
+=======
+  /** Real implementations: these tests exist to verify abort classification and the
+   *  readable-reply gate themselves, so mocking them would assert the mock rather than the
+   *  behavior. */
+  isAbortError: jest.requireActual('@librechat/api').isAbortError,
+  hasPersistableAbortContent: jest.requireActual('@librechat/api').hasPersistableAbortContent,
+  announceReply: jest.requireActual('@librechat/api').announceReply,
+>>>>>>> upstream/main
   countTokens: jest.fn().mockResolvedValue(100),
   isEnabled: jest.fn().mockReturnValue(false),
   sendEvent: jest.fn(),
@@ -64,6 +73,10 @@ const mockUpdateBalance = jest.fn().mockResolvedValue({});
 const mockBulkInsertTransactions = jest.fn().mockResolvedValue(undefined);
 jest.mock('~/models', () => ({
   saveMessage: jest.fn().mockResolvedValue(),
+<<<<<<< HEAD
+=======
+  stampConvoLastResponse: jest.fn().mockResolvedValue(),
+>>>>>>> upstream/main
   getConvo: jest.fn().mockResolvedValue({ title: 'Test Chat' }),
   updateBalance: mockUpdateBalance,
   bulkInsertTransactions: mockBulkInsertTransactions,
@@ -195,6 +208,71 @@ describe('abortMiddleware - handleAbort billing', () => {
     db.getConvo.mockResolvedValue({ title: 'Test Chat' });
   });
 
+<<<<<<< HEAD
+=======
+  it.each([null, undefined])(
+    'keeps read state unchanged when the abort save returns %s',
+    async (saved) => {
+      const conversation = {
+        title: 'Test Chat',
+        lastResponseAt: '2026-09-01T10:00:00.000Z',
+        lastSeenAt: '2026-09-01T10:01:00.000Z',
+      };
+      db.saveMessage.mockResolvedValueOnce(saved);
+      db.getConvo.mockResolvedValueOnce(conversation);
+      GenerationJobManager.abortJob.mockResolvedValue({
+        success: true,
+        jobData: buildJobData(),
+        content: [],
+        text: 'partial',
+        collectedUsage: [],
+      });
+      const res = buildRes();
+
+      await handleAbort()(buildReq(), res);
+
+      expect(db.stampConvoLastResponse).not.toHaveBeenCalled();
+      expect(JSON.parse(res.send.mock.calls[0][0]).conversation).toEqual(conversation);
+    },
+  );
+
+  it('announces a persisted stopped reply', async () => {
+    db.saveMessage.mockResolvedValueOnce({ messageId: 'msg-123' });
+    GenerationJobManager.abortJob.mockResolvedValue({
+      success: true,
+      jobData: buildJobData(),
+      content: [],
+      text: 'partial',
+      collectedUsage: [],
+    });
+    const res = buildRes();
+
+    await handleAbort()(buildReq(), res);
+
+    expect(db.stampConvoLastResponse).toHaveBeenCalledWith('user-123', 'convo-123', 'msg-123');
+    expect(JSON.parse(res.send.mock.calls[0][0]).final).toBe(true);
+  });
+
+  it('does not announce a stopped turn that produced nothing to read', async () => {
+    /* An interrupt before the model's first real token still persists the unfinished
+       assistant row; a dot raised for it names a reply the user can never open. */
+    db.saveMessage.mockResolvedValueOnce({ messageId: 'msg-empty' });
+    GenerationJobManager.abortJob.mockResolvedValue({
+      success: true,
+      jobData: buildJobData(),
+      content: [{ type: 'text', text: '   ' }],
+      text: '   ',
+      collectedUsage: [],
+    });
+    const res = buildRes();
+
+    await handleAbort()(buildReq(), res);
+
+    expect(db.stampConvoLastResponse).not.toHaveBeenCalled();
+    expect(JSON.parse(res.send.mock.calls[0][0]).final).toBe(true);
+  });
+
+>>>>>>> upstream/main
   it('leaves billing to the run even when the stopped job collected usage', async () => {
     const collectedUsage = [{ input_tokens: 100, output_tokens: 50, model: 'gpt-4' }];
     GenerationJobManager.abortJob.mockResolvedValue({

@@ -125,7 +125,10 @@ export {
   emitResponseCreated,
   emitResponseInProgress,
   emitResponseCompleted,
+<<<<<<< HEAD
   emitResponseFailed,
+=======
+>>>>>>> upstream/main
   // Message events
   emitMessageItemAdded,
   emitMessageItemDone,
@@ -152,9 +155,12 @@ export {
   emitAttachment,
   writeAttachmentEvent,
   type AttachmentData,
+<<<<<<< HEAD
   // Non-streaming
   buildResponsesNonStreamingResponse,
   updateTrackerUsage,
+=======
+>>>>>>> upstream/main
 } from './handlers';
 
 // Service
@@ -164,7 +170,10 @@ export {
   isValidationFailure,
   // Input conversion
   convertInputToMessages,
+<<<<<<< HEAD
   mergeMessagesWithInput,
+=======
+>>>>>>> upstream/main
   type InternalMessage,
   // Error response
   sendResponsesErrorResponse,
@@ -182,3 +191,9 @@ export {
   createAggregatorEventHandlers,
   type ResponseAggregator,
 } from './service';
+<<<<<<< HEAD
+=======
+
+// Client-side tool execution
+export { createClientToolHandoff, type ClientToolHandoff } from './clientTools';
+>>>>>>> upstream/main

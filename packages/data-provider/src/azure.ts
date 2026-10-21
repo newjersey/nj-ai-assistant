@@ -240,6 +240,7 @@ export function mapModelToAzureConfig({
 
   return result;
 }
+<<<<<<< HEAD
 
 export function mapGroupToAzureConfig({
   groupName,
@@ -326,3 +327,5 @@ export function mapGroupToAzureConfig({
 
   return result;
 }
+=======
+>>>>>>> upstream/main

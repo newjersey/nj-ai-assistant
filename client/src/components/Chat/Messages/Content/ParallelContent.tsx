@@ -8,7 +8,10 @@ import {
 } from '~/utils/activityLabels';
 import { MIN_PARALLEL_LANES, UNATTRIBUTED_LANE, isLaneMarkerPart } from '~/utils/lanes';
 import MemoryArtifacts from './MemoryArtifacts';
+<<<<<<< HEAD
 import Sources from '~/components/Web/Sources';
+=======
+>>>>>>> upstream/main
 import { cn, getPartKeyIndex } from '~/utils';
 import { SearchContext } from '~/Providers';
 import SiblingHeader from './SiblingHeader';
@@ -217,7 +220,12 @@ export const ParallelColumns = memo(function ParallelColumns({
         return (
           <div
             key={`column-${messageId}-${groupId}-${agentId || colIdx}`}
+<<<<<<< HEAD
             className="min-w-0 flex-1 rounded-lg border border-border-light p-3"
+=======
+            data-fold-column=""
+            className="border-border-light min-w-0 flex-1 rounded-lg border p-3"
+>>>>>>> upstream/main
           >
             <SiblingHeader
               agentId={agentId}
@@ -343,9 +351,12 @@ export const ParallelContentRenderer = memo(function ParallelContentRenderer({
   return (
     <SearchContext.Provider value={{ searchResults }}>
       {showDecorations && <MemoryArtifacts attachments={attachments} />}
+<<<<<<< HEAD
       {showDecorations && (
         <Sources messageId={messageId} conversationId={conversationId || undefined} />
       )}
+=======
+>>>>>>> upstream/main
 
       {/* Each section preceded by the sequential content that runs up to it */}
       {blocks.map(({ leading, section: { groupId, columns } }) => (

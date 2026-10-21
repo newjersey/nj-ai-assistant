@@ -21,6 +21,7 @@ export function getImageBasename(urlString: string): string {
     return '';
   }
 }
+<<<<<<< HEAD
 
 /**
  * Extracts the basename of a file from a given URL.
@@ -38,3 +39,5 @@ export function getFileBasename(urlString: string): string {
     return '';
   }
 }
+=======
+>>>>>>> upstream/main

@@ -57,6 +57,10 @@ jest.mock('~/server/services/Config', () => ({
 jest.mock('~/models', () => ({
   upsertSkillSyncCredential: jest.fn(),
   deleteSkillSyncCredential: jest.fn(),
+<<<<<<< HEAD
+=======
+  recordAuditEntry: jest.fn(),
+>>>>>>> upstream/main
 }));
 
 jest.mock('~/server/services/Skills/sync', () => ({

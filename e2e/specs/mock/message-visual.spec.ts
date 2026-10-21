@@ -78,6 +78,7 @@ async function expectMessageScreenshot(locator: Locator, name: string) {
 }
 
 async function selectEphemeralMCP(page: Page) {
+<<<<<<< HEAD
   await page.getByRole('button', { name: 'MCP Servers', exact: true }).click();
   const serverItem = page.getByRole('menuitemcheckbox', {
     name: new RegExp(MCP_SERVER_TITLE),
@@ -85,6 +86,15 @@ async function selectEphemeralMCP(page: Page) {
   await expect(serverItem).toBeVisible();
   await serverItem.click();
   await expect(serverItem).toHaveAttribute('aria-checked', 'true');
+=======
+  await page.getByRole('button', { name: 'Attach and tools' }).click();
+  const serverItem = page
+    .getByRole('dialog', { name: 'Attach and tools' })
+    .getByRole('button', { name: new RegExp(`^${MCP_SERVER_TITLE}\\b`) });
+  await expect(serverItem).toBeVisible();
+  await serverItem.click();
+  await expect(serverItem).toHaveAttribute('aria-pressed', 'true');
+>>>>>>> upstream/main
   await page.keyboard.press('Escape');
 }
 
@@ -162,6 +172,12 @@ for (const viewport of VIEWPORTS) {
 
       test(`captures an applied steer message`, async ({ page }) => {
         test.setTimeout(150000);
+<<<<<<< HEAD
+=======
+        await page.addInitScript(() => {
+          localStorage.setItem('duringRunDefaultAction', JSON.stringify('steer'));
+        });
+>>>>>>> upstream/main
         const setupLabel = `message-visual-steer-setup-${viewport.name}`;
         const runLabel = `message-visual-steer-${viewport.name}`;
         const steerText =

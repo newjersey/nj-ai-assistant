@@ -1,5 +1,14 @@
 const cookies = require('cookie');
+<<<<<<< HEAD
 const { isEnabled, math, clearCloudFrontCookies } = require('@librechat/api');
+=======
+const {
+  isEnabled,
+  math,
+  clearCloudFrontCookies,
+  clearSessionHintCookie,
+} = require('@librechat/api');
+>>>>>>> upstream/main
 const { logger, DEFAULT_REFRESH_TOKEN_EXPIRY } = require('@librechat/data-schemas');
 const { logoutUser } = require('~/server/services/AuthService');
 const { deleteAllRefreshTokenBridges } = require('~/server/services/RefreshTokenBridge');
@@ -88,6 +97,10 @@ const logoutController = async (req, res) => {
     res.clearCookie('openid_id_token');
     res.clearCookie('openid_user_id');
     res.clearCookie('token_provider');
+<<<<<<< HEAD
+=======
+    clearSessionHintCookie(res);
+>>>>>>> upstream/main
     clearCloudFrontCookies(res, {
       userId: req.user?.id ?? req.user?._id?.toString?.(),
       tenantId: req.user?.tenantId,
@@ -175,12 +188,16 @@ const logoutController = async (req, res) => {
           );
         }
       }
+<<<<<<< HEAD
     } else {
       // NJ: Due to our automatic login, we have to redirect users elsewhere (or else logging out
       // simply results in them being automatically logged in again!)
       response.redirect = 'https://innovation.nj.gov/';
     }
 
+=======
+    }
+>>>>>>> upstream/main
     return res.status(status).send(response);
   } catch (err) {
     logger.error('[logoutController]', err);

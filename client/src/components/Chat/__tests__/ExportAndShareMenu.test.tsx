@@ -1,4 +1,5 @@
 import React from 'react';
+<<<<<<< HEAD
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import ExportAndShareMenu from '../ExportAndShareMenu';
@@ -12,6 +13,15 @@ jest.mock('recoil', () => ({
 jest.mock('librechat-data-provider/react-query', () => ({
   useGetSharedLinkQuery: () => ({ data: { shareId: mockShareId } }),
 }));
+=======
+import { render, screen, act } from '@testing-library/react';
+import '@testing-library/jest-dom';
+import ExportAndShareMenu from '../ExportAndShareMenu';
+
+const mockOptions = { show: true, hasSharedLink: false };
+const mockUseChatOptions = jest.fn();
+const mockDropdown: { current?: { setIsOpen: (open: boolean) => void } } = {};
+>>>>>>> upstream/main
 
 jest.mock('@ariakit/react', () => ({
   MenuButton: ({ children, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement>) => (
@@ -20,12 +30,20 @@ jest.mock('@ariakit/react', () => ({
 }));
 
 jest.mock('@librechat/client', () => ({
+<<<<<<< HEAD
   DropdownPopup: ({ trigger }: { trigger: React.ReactNode }) => trigger,
+=======
+  DropdownPopup: (props: { trigger: React.ReactNode; setIsOpen: (open: boolean) => void }) => {
+    mockDropdown.current = props;
+    return props.trigger;
+  },
+>>>>>>> upstream/main
   TooltipAnchor: ({ render }: { render: React.ReactNode }) => render,
   useMediaQuery: () => false,
 }));
 
 jest.mock('~/hooks', () => ({
+<<<<<<< HEAD
   useHasAccess: () => true,
   useLocalize: () => (key: string) => key,
 }));
@@ -42,15 +60,36 @@ jest.mock('~/components/Conversations/ConvoOptions', () => ({
 jest.mock('~/store', () => ({
   __esModule: true,
   default: { conversationByIndex: () => ({}) },
+=======
+  useLocalize: () => (key: string) => key,
+}));
+
+jest.mock('~/hooks/Sharing/useChatOptions', () => ({
+  __esModule: true,
+  default: (args: unknown) => {
+    mockUseChatOptions(args);
+    return { ...mockOptions, items: [], dialogs: null };
+  },
+>>>>>>> upstream/main
 }));
 
 describe('ExportAndShareMenu link status', () => {
   beforeEach(() => {
+<<<<<<< HEAD
     mockShareId = null;
   });
 
   it('shows a blue circular indicator when the conversation has a link', () => {
     mockShareId = 'share-1';
+=======
+    mockOptions.show = true;
+    mockOptions.hasSharedLink = false;
+    mockUseChatOptions.mockClear();
+  });
+
+  it('shows a blue circular indicator when the conversation has a link', () => {
+    mockOptions.hasSharedLink = true;
+>>>>>>> upstream/main
 
     render(<ExportAndShareMenu isSharedButtonEnabled={true} />);
 
@@ -63,6 +102,7 @@ describe('ExportAndShareMenu link status', () => {
     );
     expect(screen.getByRole('button')).toHaveAttribute(
       'aria-label',
+<<<<<<< HEAD
       'com_ui_export_share_link_active',
     );
   });
@@ -72,5 +112,37 @@ describe('ExportAndShareMenu link status', () => {
 
     expect(screen.queryByTestId('header-shared-link-indicator')).not.toBeInTheDocument();
     expect(screen.getByRole('button')).toHaveAttribute('aria-label', 'com_endpoint_export_share');
+=======
+      'com_ui_chat_options_link_active',
+    );
+  });
+
+  it('uses the default options label when the conversation has no link', () => {
+    render(<ExportAndShareMenu isSharedButtonEnabled={true} />);
+
+    expect(screen.queryByTestId('header-shared-link-indicator')).not.toBeInTheDocument();
+    expect(screen.getByRole('button')).toHaveAttribute('aria-label', 'com_ui_chat_options');
+  });
+
+  it('tells the options hook when the menu is open so the project list can load', () => {
+    render(<ExportAndShareMenu isSharedButtonEnabled={true} />);
+    expect(mockUseChatOptions).toHaveBeenLastCalledWith(
+      expect.objectContaining({ isMenuOpen: false }),
+    );
+
+    act(() => mockDropdown.current?.setIsOpen(true));
+
+    expect(mockUseChatOptions).toHaveBeenLastCalledWith(
+      expect.objectContaining({ isMenuOpen: true }),
+    );
+  });
+
+  it('renders nothing for a conversation that has not been saved', () => {
+    mockOptions.show = false;
+
+    const { container } = render(<ExportAndShareMenu isSharedButtonEnabled={true} />);
+
+    expect(container).toBeEmptyDOMElement();
+>>>>>>> upstream/main
   });
 });

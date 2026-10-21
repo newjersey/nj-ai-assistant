@@ -1,6 +1,12 @@
+<<<<<<< HEAD
 import { useRecoilState } from 'recoil';
 import { EModelEndpoint, SettingsViews } from 'librechat-data-provider';
 import { Button, MessagesSquared, AssistantIcon, DataIcon } from '@librechat/client';
+=======
+import { useSetRecoilState } from 'recoil';
+import { Button, MessagesSquared } from '@librechat/client';
+import { EModelEndpoint, SettingsViews } from 'librechat-data-provider';
+>>>>>>> upstream/main
 import type { ReactNode } from 'react';
 import { useChatContext } from '~/Providers';
 import { useLocalize } from '~/hooks';
@@ -11,7 +17,10 @@ type TPopoverButton = {
   label: string;
   buttonClass: string;
   handler: () => void;
+<<<<<<< HEAD
   type?: 'alternative';
+=======
+>>>>>>> upstream/main
   icon: ReactNode;
 };
 
@@ -30,7 +39,11 @@ export default function PopoverButtons({
 }) {
   const localize = useLocalize();
   const { conversation, optionSettings, setOptionSettings } = useChatContext();
+<<<<<<< HEAD
   const [settingsView, setSettingsView] = useRecoilState(store.currentSettingsView);
+=======
+  const setSettingsView = useSetRecoilState(store.currentSettingsView);
+>>>>>>> upstream/main
 
   const { model: _model, endpoint: _endpoint, endpointType } = conversation ?? {};
   const overrideEndpoint = overrideEndpointType ?? _overrideEndpoint;
@@ -55,7 +68,11 @@ export default function PopoverButtons({
         label: localize(showExamples === true ? 'com_hide_examples' : 'com_show_examples'),
         buttonClass: isGenerativeModel === true || isTextModel ? 'disabled' : '',
         handler: triggerExamples,
+<<<<<<< HEAD
         icon: <MessagesSquared className={cn('mr-1 w-[14px]', iconClass)} />,
+=======
+        icon: <MessagesSquared className={cn('mr-1 w-[0.875rem]', iconClass)} />,
+>>>>>>> upstream/main
       },
     ],
   };
@@ -68,6 +85,7 @@ export default function PopoverButtons({
     return null;
   }
 
+<<<<<<< HEAD
   const additionalButtons: { [key: string]: TPopoverButton[] } = {
     [SettingsViews.default]: [
       {
@@ -93,6 +111,10 @@ export default function PopoverButtons({
 
   const disabled = true;
 
+=======
+  const endpointButtons = (endpointSpecificbuttons[endpoint] as TPopoverButton[] | null) ?? [];
+
+>>>>>>> upstream/main
   return (
     <div className="flex w-full justify-between">
       <div className="flex items-center justify-start">
@@ -102,8 +124,13 @@ export default function PopoverButtons({
             type="button"
             className={cn(
               button.buttonClass,
+<<<<<<< HEAD
               'border border-border-medium focus:ring-1 focus:ring-ring-primary',
               'ml-1 h-full bg-transparent px-2 py-1 text-xs font-normal text-text-primary hover:bg-surface-hover',
+=======
+              'border-border-medium focus:ring-ring-primary border focus:ring-1',
+              'text-text-primary hover:bg-surface-hover ml-1 h-full bg-transparent px-2 py-1 text-xs font-normal',
+>>>>>>> upstream/main
               buttonClass ?? '',
             )}
             onClick={button.handler}
@@ -113,6 +140,7 @@ export default function PopoverButtons({
           </Button>
         ))}
       </div>
+<<<<<<< HEAD
       {disabled ? null : (
         <div className="flex w-[150px] items-center justify-end">
           {additionalButtons[settingsView].map((button, index) => (
@@ -133,6 +161,8 @@ export default function PopoverButtons({
           ))}
         </div>
       )}
+=======
+>>>>>>> upstream/main
     </div>
   );
 }

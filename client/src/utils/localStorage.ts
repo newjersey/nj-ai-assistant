@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { LocalStorageKeys, TConversation, isUUID } from 'librechat-data-provider';
+=======
+import { LocalStorageKeys, TConversation } from 'librechat-data-provider';
+>>>>>>> upstream/main
 
 export function getLocalStorageItems() {
   const items = {
@@ -70,6 +74,7 @@ export function clearLocalStorage(skipFirst?: boolean) {
   });
 }
 
+<<<<<<< HEAD
 export function clearConversationStorage(conversationId?: string | null) {
   if (!conversationId) {
     return;
@@ -87,6 +92,8 @@ export function clearConversationStorage(conversationId?: string | null) {
     }
   });
 }
+=======
+>>>>>>> upstream/main
 export function clearAllConversationStorage() {
   const keys = Object.keys(localStorage);
   keys.forEach((key) => {
