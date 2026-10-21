@@ -56,9 +56,14 @@ export function createRoleMethods(
     permissionsUpdate: Record<string, Record<string, boolean>>,
     roleData?: IRole,
   ) => Promise<void>;
+<<<<<<< HEAD
   migrateRoleSchema: (roleName?: string) => Promise<number>;
   createRoleByName: (roleData: Partial<IRole>) => Promise<IRole>;
   deleteRoleByName: (roleName: string) => Promise<IRole | null>;
+=======
+  createRoleByName: (roleData: Partial<IRole>) => Promise<IRole>;
+  deleteRoleByName: (roleName: string, options?: { id?: string }) => Promise<IRole | null>;
+>>>>>>> upstream/main
   updateUsersByRole: (oldRole: string, newRole: string) => Promise<void>;
   findUserIdsByRole: (roleName: string) => Promise<string[]>;
   updateUsersRoleByIds: (userIds: string[], newRole: string) => Promise<void>;
@@ -446,6 +451,7 @@ export function createRoleMethods(
     }
   }
 
+<<<<<<< HEAD
   /**
    * Migrates roles from old schema to new schema structure.
    */
@@ -514,6 +520,8 @@ export function createRoleMethods(
     }
   }
 
+=======
+>>>>>>> upstream/main
   /** Rejects names that match system roles. */
   async function createRoleByName(roleData: Partial<IRole>): Promise<IRole> {
     const { name } = roleData;
@@ -569,16 +577,37 @@ export function createRoleMethods(
    * the delete call, which will succeed since the `updateMany` is a no-op on
    * the second pass.
    */
+<<<<<<< HEAD
   async function deleteRoleByName(roleName: string): Promise<IRole | null> {
+=======
+  async function deleteRoleByName(
+    roleName: string,
+    options?: { id?: string },
+  ): Promise<IRole | null> {
+>>>>>>> upstream/main
     if (isSystemRoleName(roleName)) {
       throw new Error(`Cannot delete system role: ${roleName}`);
     }
     const Role = mongoose.models.Role;
+<<<<<<< HEAD
+=======
+    /** A role recreated under this name has another `_id`: leave it and its members alone. */
+    if (options?.id && !(await Role.exists({ _id: options.id, name: roleName }))) {
+      return null;
+    }
+>>>>>>> upstream/main
     const User = mongoose.models.User as Model<IUser>;
     const affectedUserIds = await findUserIdsByRole(roleName);
     await User.updateMany({ role: roleName }, { $set: { role: SystemRoles.USER } });
     await invalidateAuthUserDocCache(affectedUserIds);
+<<<<<<< HEAD
     const deleted = await Role.findOneAndDelete({ name: roleName }).lean();
+=======
+    const deleted = await Role.findOneAndDelete({
+      name: roleName,
+      ...(options?.id ? { _id: options.id } : {}),
+    }).lean();
+>>>>>>> upstream/main
     try {
       const cache = deps.getCache?.(CacheKeys.ROLES);
       if (cache) {
@@ -670,7 +699,10 @@ export function createRoleMethods(
     findRolesByNames,
     updateRoleByName,
     updateAccessPermissions,
+<<<<<<< HEAD
     migrateRoleSchema,
+=======
+>>>>>>> upstream/main
     createRoleByName,
     deleteRoleByName,
     updateUsersByRole,

@@ -202,9 +202,13 @@ export const getDisplayValue = ({
 }) => {
   if (selectedValues.modelSpec) {
     const spec = modelSpecs.find((s) => s.name === selectedValues.modelSpec);
+<<<<<<< HEAD
     // NJ: We want to preserve the saved model spec name for existing chats when
     // the model is hidden from the selector (showInMenu: false).
     return spec?.label || spec?.name || selectedValues.modelSpec || localize('com_ui_select_model');
+=======
+    return spec?.label || spec?.name || localize('com_ui_select_model');
+>>>>>>> upstream/main
   }
 
   if (selectedValues.model && selectedValues.endpoint) {

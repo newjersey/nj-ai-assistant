@@ -1,4 +1,12 @@
+<<<<<<< HEAD
 import { WebSearchToolDefinition, CalculatorToolDefinition } from '@librechat/agents';
+=======
+import {
+  WebSearchToolDefinition,
+  CalculatorToolDefinition,
+  GitHubCompareToolDefinition,
+} from '@librechat/agents';
+>>>>>>> upstream/main
 import type { ExtendedJsonSchema } from './schema';
 import { AskUserQuestionToolDefinition } from '~/agents/hitl/askUserQuestionTool';
 import { geminiToolkit } from '~/tools/toolkits/gemini';
@@ -436,6 +444,18 @@ export const toolDefinitions: Record<string, ToolRegistryDefinition> = {
  * registers the tool pair on match.
  */
 const agentToolDefinitions: Record<string, ToolRegistryDefinition> = {
+<<<<<<< HEAD
+=======
+  github_compare: {
+    name: GitHubCompareToolDefinition.name,
+    description: GitHubCompareToolDefinition.description,
+    schema: {
+      ...GitHubCompareToolDefinition.parameters,
+      required: [...GitHubCompareToolDefinition.parameters.required],
+    },
+    toolType: 'builtin',
+  },
+>>>>>>> upstream/main
   [CalculatorToolDefinition.name]: {
     name: CalculatorToolDefinition.name,
     description: CalculatorToolDefinition.description,
@@ -459,6 +479,7 @@ const agentToolDefinitions: Record<string, ToolRegistryDefinition> = {
 export function getToolDefinition(toolName: string): ToolRegistryDefinition | undefined {
   return toolDefinitions[toolName] ?? agentToolDefinitions[toolName];
 }
+<<<<<<< HEAD
 
 export function getAllToolDefinitions(): ToolRegistryDefinition[] {
   return [...Object.values(toolDefinitions), ...Object.values(agentToolDefinitions)];
@@ -467,3 +488,5 @@ export function getAllToolDefinitions(): ToolRegistryDefinition[] {
 export function getToolSchema(toolName: string): ExtendedJsonSchema | undefined {
   return getToolDefinition(toolName)?.schema;
 }
+=======
+>>>>>>> upstream/main

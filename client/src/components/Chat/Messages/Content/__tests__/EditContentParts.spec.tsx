@@ -57,8 +57,14 @@ jest.mock('~/hooks', () => ({
   useLocalize: () => (key: string) => key,
 }));
 
+<<<<<<< HEAD
 jest.mock('~/hooks/Chat', () => ({
   useGetAddedConvo: () => () => null,
+=======
+jest.mock('~/hooks/Conversations/useGetAddedConvo', () => ({
+  __esModule: true,
+  default: () => () => null,
+>>>>>>> upstream/main
 }));
 
 const content = [
@@ -239,6 +245,37 @@ describe('EditContentParts', () => {
     ]);
   });
 
+<<<<<<< HEAD
+=======
+  it('keeps reasoning with an encrypted payload out of the editor', () => {
+    const encoded = Buffer.from(Array.from({ length: 900 }, (_, i) => (i * 37 + 3) % 256)).toString(
+      'base64',
+    );
+    const mixedContent = [
+      { type: ContentTypes.THINK, think: `Checking the manifest.\n${encoded}` },
+      { type: ContentTypes.TEXT, text: 'Original response' },
+    ] as TMessageContentParts[];
+    message.content = mixedContent;
+    const renderReadOnlyPart = jest.fn(() => null);
+
+    render(
+      <EditContentParts
+        content={mixedContent}
+        messageId={message.messageId}
+        isSubmitting={false}
+        enterEdit={jest.fn()}
+        siblingIdx={0}
+        setSiblingIdx={jest.fn()}
+        renderReadOnlyPart={renderReadOnlyPart}
+      />,
+    );
+
+    const editors = screen.getAllByRole('textbox') as HTMLTextAreaElement[];
+    expect(editors.map((editor) => editor.value)).toEqual(['Original response']);
+    expect(renderReadOnlyPart).toHaveBeenCalledWith(mixedContent[0], 0, false);
+  });
+
+>>>>>>> upstream/main
   it('reruns an assistant response with the edited content value', () => {
     const enterEdit = jest.fn();
     render(

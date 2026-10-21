@@ -25,6 +25,10 @@ const requireRemoteAgentAuth = createRemoteAgentAuth({
   updateUser: db.updateUser,
   isPrincipalActive: db.isAgentTriggerPrincipalActive,
   getAppConfig,
+<<<<<<< HEAD
+=======
+  recordAuditEntry: db.recordAuditEntry,
+>>>>>>> upstream/main
 });
 
 const requireAgentManagementAuth = createAgentManagementAuth({

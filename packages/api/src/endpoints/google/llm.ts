@@ -559,6 +559,7 @@ export function getGoogleConfig(
     }
   }
 
+<<<<<<< HEAD
   /*
   let legacyOptions = {};
   // Filter out any "examples" that are empty
@@ -579,6 +580,8 @@ export function getGoogleConfig(
   }
   */
 
+=======
+>>>>>>> upstream/main
   if (reverseProxyUrl) {
     (llmConfig as GoogleClientOptions).baseUrl = reverseProxyUrl;
   }

@@ -1,5 +1,8 @@
 import { EModelEndpoint, Providers } from './schemas';
+<<<<<<< HEAD
 import { KnownEndpoints } from './config';
+=======
+>>>>>>> upstream/main
 
 /** Canonical provider identity used for branding across client and server. */
 export enum ProviderId {
@@ -39,6 +42,7 @@ export const endpointToProvider: Partial<Record<EModelEndpoint, ProviderId>> = {
   [EModelEndpoint.bedrock]: ProviderId.bedrock,
 };
 
+<<<<<<< HEAD
 export const knownEndpointToProvider: Record<KnownEndpoints, ProviderId> = {
   [KnownEndpoints.anyscale]: ProviderId.anyscale,
   [KnownEndpoints.apipie]: ProviderId.apipie,
@@ -62,6 +66,8 @@ export const knownEndpointToProvider: Record<KnownEndpoints, ProviderId> = {
   [KnownEndpoints.xai]: ProviderId.xai,
 };
 
+=======
+>>>>>>> upstream/main
 const providerAliases: Record<string, ProviderId> = {
   chatgpt: ProviderId.openai,
   gpt: ProviderId.openai,

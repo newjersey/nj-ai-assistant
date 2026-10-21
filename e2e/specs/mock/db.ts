@@ -1,6 +1,10 @@
 import fs from 'fs';
 import path from 'path';
+<<<<<<< HEAD
 import { MongoClient } from 'mongodb';
+=======
+import { MongoClient, ObjectId } from 'mongodb';
+>>>>>>> upstream/main
 import type { Db } from 'mongodb';
 
 const DEFAULT_MONGO_URI = 'mongodb://127.0.0.1:27017/LibreChat-e2e';
@@ -16,7 +20,11 @@ function getRuntimeEnvPath(): string {
   );
 }
 
+<<<<<<< HEAD
 function getMongoUri(): string {
+=======
+export function getMongoUri(): string {
+>>>>>>> upstream/main
   try {
     const env = JSON.parse(fs.readFileSync(getRuntimeEnvPath(), 'utf8')) as { MONGO_URI?: string };
     if (env.MONGO_URI) {
@@ -81,6 +89,41 @@ export async function deleteConversations(conversationIds: string[]): Promise<vo
   });
 }
 
+<<<<<<< HEAD
+=======
+/** Seed sidebar projects and return their IDs for targeted cleanup. */
+export async function seedProjects(userEmail: string, names: string[]): Promise<string[]> {
+  return withMongo(async (db) => {
+    const user = await resolveUserId(db, userEmail);
+    const now = new Date();
+    const result = await db.collection('chatprojects').insertMany(
+      names.map((name) => ({
+        name,
+        user,
+        description: '',
+        instructions: '',
+        contextRevision: 0,
+        file_ids: [],
+        conversationCount: 0,
+        lastConversationAt: null,
+        lastConversationId: null,
+        createdAt: now,
+        updatedAt: now,
+      })),
+    );
+    return Object.values(result.insertedIds).map((id) => id.toHexString());
+  });
+}
+
+export async function deleteProjects(projectIds: string[]): Promise<void> {
+  await withMongo((db) =>
+    db
+      .collection('chatprojects')
+      .deleteMany({ _id: { $in: projectIds.map((id) => new ObjectId(id)) } }),
+  );
+}
+
+>>>>>>> upstream/main
 export interface SeedMessage {
   messageId: string;
   parentMessageId: string;
@@ -93,6 +136,11 @@ export interface SeedMessage {
   /** Why the turn stopped; the hover Continue is offered only for some values. */
   finish_reason?: string;
   model?: string;
+<<<<<<< HEAD
+=======
+  /** Attachments on the turn, as the client renders them (an image opens the lightbox). */
+  files?: Record<string, unknown>[];
+>>>>>>> upstream/main
 }
 
 /**
@@ -136,3 +184,69 @@ export async function clearUserConversations(userEmail: string): Promise<void> {
     await db.collection('conversations').deleteMany({ user: userId });
   });
 }
+<<<<<<< HEAD
+=======
+
+export async function seedPasskey(
+  userEmail: string,
+  credentialId: string,
+  name: string,
+): Promise<void> {
+  await withMongo(async (db) => {
+    const userId = new ObjectId(await resolveUserId(db, userEmail));
+    const now = new Date();
+    await db.collection('passkeys').insertOne({
+      user: userId,
+      credentialId,
+      publicKey: Buffer.from('e2e-passkey-public-key'),
+      counter: 0,
+      transports: ['internal'],
+      deviceType: 'singleDevice',
+      backedUp: false,
+      name,
+      lastUsedAt: null,
+      createdAt: now,
+      updatedAt: now,
+      __v: 0,
+    });
+  });
+}
+
+export async function clearUserPasskeys(userEmail: string): Promise<void> {
+  await withMongo(async (db) => {
+    const userId = new ObjectId(await resolveUserId(db, userEmail));
+    await db.collection('passkeys').deleteMany({ user: userId });
+  });
+}
+
+export async function countUserPasskeys(userId: string): Promise<number> {
+  return withMongo((db) =>
+    db.collection('passkeys').countDocuments({ user: new ObjectId(userId) }),
+  );
+}
+
+export async function enableTwoFactorFlag(userEmail: string): Promise<void> {
+  await withMongo(async (db) => {
+    await db
+      .collection('users')
+      .updateOne({ email: userEmail }, { $set: { twoFactorEnabled: true } });
+  });
+}
+
+/** Removes a throwaway user and the records the passkey scenarios create for it. */
+export async function deleteUserByEmail(userEmail: string): Promise<void> {
+  await withMongo(async (db) => {
+    const user = await db.collection('users').findOne({ email: userEmail });
+    if (!user) {
+      return;
+    }
+    await Promise.all([
+      db.collection('passkeys').deleteMany({ user: user._id }),
+      db.collection('sessions').deleteMany({ user: user._id }),
+      db.collection('balances').deleteMany({ user: user._id }),
+      db.collection('tokens').deleteMany({ userId: user._id }),
+    ]);
+    await db.collection('users').deleteOne({ _id: user._id });
+  });
+}
+>>>>>>> upstream/main

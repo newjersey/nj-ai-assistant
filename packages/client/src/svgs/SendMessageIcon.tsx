@@ -7,8 +7,13 @@ export default function SendMessageIcon(): JSX.Element {
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 16 16"
       fill="none"
+<<<<<<< HEAD
       className="icon-sm m-1 md:m-0"
       style={{ width: '1em', height: '1em', verticalAlign: 'middle' }}
+=======
+      className="icon-sm m-1 align-middle md:m-0"
+      style={{ width: '1em', height: '1em' }}
+>>>>>>> upstream/main
       aria-hidden="true"
     >
       <path

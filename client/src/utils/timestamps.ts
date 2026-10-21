@@ -28,6 +28,7 @@ export function setTimestamp(key: string): void {
 }
 
 /**
+<<<<<<< HEAD
  * Set a value in localStorage with an associated timestamp
  */
 export function setTimestampedValue(key: string, value: any): void {
@@ -36,6 +37,8 @@ export function setTimestampedValue(key: string, value: any): void {
 }
 
 /**
+=======
+>>>>>>> upstream/main
  * Get a value from localStorage, checking if it has a valid timestamp
  * Returns null if the value is too old or has no timestamp
  */
@@ -60,6 +63,7 @@ export function getTimestampedValue(key: string): string | null {
 }
 
 /**
+<<<<<<< HEAD
  * Remove a value and its timestamp from localStorage
  */
 export function removeTimestampedValue(key: string): void {
@@ -68,6 +72,8 @@ export function removeTimestampedValue(key: string): void {
 }
 
 /**
+=======
+>>>>>>> upstream/main
  * Clean up old localStorage entries based on timestamps
  * This should be called on app startup
  */
@@ -113,6 +119,7 @@ export function cleanupTimestampedStorage(): void {
     console.error('Error during cleanup of timestamped storage:', error);
   }
 }
+<<<<<<< HEAD
 
 /**
  * Migration function to add timestamps to existing entries
@@ -138,3 +145,5 @@ export function migrateExistingEntries(): void {
     }
   }
 }
+=======
+>>>>>>> upstream/main

@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
+<<<<<<< HEAD
 import { useSetAtom } from 'jotai';
 import { useQueryClient } from '@tanstack/react-query';
 import { Constants, QueryKeys, isAssistantsEndpoint } from 'librechat-data-provider';
@@ -14,16 +15,53 @@ import { siblingIdxFamily, siblingKey } from '~/components/Chat/Messages/Thread/
 import useChatFunctions from '~/hooks/Chat/useChatFunctions';
 import useSteerConvert from '~/hooks/Chat/useSteerConvert';
 import { logEvent } from '~/nj/analytics/logEvent';
+=======
+import { useRecoilValue } from 'recoil';
+import { useQueryClient } from '@tanstack/react-query';
+import { useAtom, useSetAtom, useStore, useAtomValue } from 'jotai';
+import { Constants, QueryKeys, isAssistantsEndpoint } from 'librechat-data-provider';
+import {
+  filesFamily,
+  presetFamily,
+  optionSettingsFamily,
+  activeGenerationCreatedAtByConvoId,
+  activeGenerationProtocolVersionByConvoId,
+  isSubmittingFamily,
+  useIsSubmitting,
+  abortScrollFamily,
+  submissionByIndex,
+  useClearSubmissions,
+} from '@librechat/chat/react';
+import type { TMessage } from 'librechat-data-provider';
+import type { ChatContract } from './contract';
+import { stopRequestedByConvoId, drainAfterAbortByIndex, runEndByIndex } from '~/hooks/Chat/queue';
+import { useLatestMessage, useLatestMessageId } from '~/hooks/Messages/useLatestMessage';
+import { useAbortStreamMutation, supportsGenerationProtocolV2 } from '~/data-provider';
+import { siblingIdxFamily, siblingKey } from '~/components/Chat/Messages/Thread/state';
+import { useChatSettings } from '~/Providers/ChatSettingsContext';
+import useChatFunctions from '~/hooks/Chat/useChatFunctions';
+import useSteerConvert from '~/hooks/Chat/useSteerConvert';
+>>>>>>> upstream/main
 import { resolveAbortSteerTarget } from '~/utils';
 import useNewConvo from '~/hooks/useNewConvo';
 import { getMessageCacheIds } from './cache';
 import { useAbortCleanup } from './abort';
 import store from '~/store';
 
+<<<<<<< HEAD
 // this to be set somewhere else
 export default function useChatHelpers(index = 0, paramId?: string) {
   const clearAllSubmissions = store.useClearSubmissionState();
   const [files, setFiles] = useRecoilState(store.filesByIndex(index));
+=======
+/** The live attachments map the stream and preview polling write. */
+const useLiveAttachments = () => useRecoilValue(store.messageAttachmentsMap);
+
+// this to be set somewhere else
+export default function useChatHelpers(index = 0, paramId?: string): ChatContract {
+  const clearAllSubmissions = useClearSubmissions();
+  const [files, setFiles] = useAtom(filesFamily(index));
+>>>>>>> upstream/main
   const [filesLoading, setFilesLoading] = useState(false);
 
   const queryClient = useQueryClient();
@@ -36,6 +74,7 @@ export default function useChatHelpers(index = 0, paramId?: string) {
   /** Async abort responses can settle after this pane has moved to another
    * conversation and armed its own interrupt. Clear only the intent owned by
    * the request that produced the response. */
+<<<<<<< HEAD
   const clearInterruptDrain = useRecoilCallback(
     ({ snapshot, set }) =>
       (convoId: string, generationCreatedAt: number) => {
@@ -82,24 +121,76 @@ export default function useChatHelpers(index = 0, paramId?: string) {
         });
       },
     [index],
+=======
+  const queueStore = useStore();
+  const clearInterruptDrain = useCallback(
+    (convoId: string, generationCreatedAt: number) => {
+      const armed = queueStore.get(drainAfterAbortByIndex(index));
+      if (
+        armed !== false &&
+        armed.conversationId === convoId &&
+        armed.generationCreatedAt === generationCreatedAt
+      ) {
+        queueStore.set(drainAfterAbortByIndex(index), false);
+      }
+    },
+    [index, queueStore],
+  );
+
+  /** A missing job cannot deliver FINAL, so release its armed interrupt queue. */
+  const signalInterruptDrain = useCallback(
+    (convoId: string, generationCreatedAt: number, armedConversationId = convoId) => {
+      const armed = queueStore.get(drainAfterAbortByIndex(index));
+      const runEnd = queueStore.get(runEndByIndex(index));
+      const matchesArm =
+        armed !== false &&
+        armed.conversationId === armedConversationId &&
+        armed.generationCreatedAt === generationCreatedAt;
+      const alreadySignaled =
+        runEnd?.conversationId === convoId && runEnd.generationCreatedAt === generationCreatedAt;
+      if (!matchesArm || alreadySignaled) {
+        return;
+      }
+      queueStore.set(runEndByIndex(index), {
+        conversationId: convoId,
+        outcome: 'aborted',
+        endedAt: Date.now(),
+        generationCreatedAt,
+      });
+    },
+    [index, queueStore],
+>>>>>>> upstream/main
   );
 
   const { newConversation } = useNewConvo(index);
   const { useCreateConversationAtom } = store;
   const { conversation, setConversation } = useCreateConversationAtom(index);
   const { conversationId, endpoint, endpointType } = conversation ?? {};
+<<<<<<< HEAD
   const activeGenerationCreatedAt = useRecoilValue(
     store.activeGenerationCreatedAtByConvoId(conversationId ?? Constants.NEW_CONVO),
   );
   const activeGenerationProtocolVersion = useRecoilValue(
     store.activeGenerationProtocolVersionByConvoId(conversationId ?? Constants.NEW_CONVO),
+=======
+  const activeGenerationCreatedAt = useAtomValue(
+    activeGenerationCreatedAtByConvoId(conversationId ?? Constants.NEW_CONVO),
+  );
+  const activeGenerationProtocolVersion = useAtomValue(
+    activeGenerationProtocolVersionByConvoId(conversationId ?? Constants.NEW_CONVO),
+>>>>>>> upstream/main
   );
 
   /** Use paramId (from URL) as primary source for query key - this must match what ChatView uses
   Falling back to conversationId (Recoil) only if paramId is not available */
   const queryParam = paramId === 'new' ? paramId : (paramId ?? conversationId ?? '');
 
+<<<<<<< HEAD
   const [isSubmitting, setIsSubmitting] = useRecoilState(store.isSubmittingFamily(index));
+=======
+  const isSubmitting = useIsSubmitting(index);
+  const setIsSubmitting = useSetAtom(isSubmittingFamily(index));
+>>>>>>> upstream/main
   const latestMessage = useLatestMessage(index, queryParam);
 
   const latestMessageId = useLatestMessageId(index, queryParam) ?? undefined;
@@ -110,6 +201,13 @@ export default function useChatHelpers(index = 0, paramId?: string) {
   const setSiblingIdx = useSetAtom(
     siblingIdxFamily(siblingKey(latestMessage?.parentMessageId ?? null)),
   );
+<<<<<<< HEAD
+=======
+  /** The setter is rebound whenever the tail's parent changes (every turn); the
+   *  ref keeps `handleContinue` referentially stable so rows do not re-render. */
+  const setSiblingIdxRef = useRef(setSiblingIdx);
+  setSiblingIdxRef.current = setSiblingIdx;
+>>>>>>> upstream/main
 
   const setMessages = useCallback(
     (messages: TMessage[]) => {
@@ -131,6 +229,7 @@ export default function useChatHelpers(index = 0, paramId?: string) {
     [queryParam, queryClient],
   );
 
+<<<<<<< HEAD
   /* Conversation */
   // const setActiveConvos = useSetRecoilState(store.activeConversations);
 
@@ -151,6 +250,9 @@ export default function useChatHelpers(index = 0, paramId?: string) {
   // );
 
   const setSubmission = useSetRecoilState(store.submissionByIndex(index));
+=======
+  const setSubmission = useSetAtom(submissionByIndex(index));
+>>>>>>> upstream/main
 
   const { ask: _ask, regenerate: _regenerate } = useChatFunctions({
     index,
@@ -162,6 +264,10 @@ export default function useChatHelpers(index = 0, paramId?: string) {
     conversation,
     latestMessage,
     setSubmission,
+<<<<<<< HEAD
+=======
+    setConversation,
+>>>>>>> upstream/main
   });
 
   const askRef = useRef(_ask);
@@ -189,7 +295,21 @@ export default function useChatHelpers(index = 0, paramId?: string) {
     );
 
     if (parentMessage && parentMessage.isCreatedByUser) {
+<<<<<<< HEAD
       ask({ ...parentMessage }, { isContinued: true, isRegenerate: true, isEdited: true });
+=======
+      ask(
+        { ...parentMessage },
+        {
+          isContinued: true,
+          isRegenerate: true,
+          isEdited: true,
+          overrideManualSkills: parentMessage.manualSkills,
+          overrideQuotes: parentMessage.quotes,
+          overrideReasoning: parentMessage.reasoningOverride ?? null,
+        },
+      );
+>>>>>>> upstream/main
     } else {
       console.error(
         'Failed to regenerate the message: parentMessage not found, or not created by user.',
@@ -214,8 +334,11 @@ export default function useChatHelpers(index = 0, paramId?: string) {
       isAssistants,
     });
 
+<<<<<<< HEAD
     logEvent('stop_generation');
 
+=======
+>>>>>>> upstream/main
     // For non-assistants endpoints (using resumable streams), call abort endpoint first
     if (conversationId && !isAssistants) {
       /** Stop is a generation-scoped mutation. `isSubmitting` becomes true
@@ -225,9 +348,18 @@ export default function useChatHelpers(index = 0, paramId?: string) {
         return;
       }
       // The aborted run's final SSE can land (and the interrupt drain can
+<<<<<<< HEAD
       // start the NEXT submission) while the abort response is in flight —
       // the fallback clear below must not tear down that new run.
       const submissionAtAbort = captureSubmission();
+=======
+      // start the NEXT submission) while the abort response is in flight;
+      // the fallback clear below must not tear down that new run.
+      const submissionAtAbort = captureSubmission();
+      const stoppedRun = { generationCreatedAt: activeGenerationCreatedAt };
+      const stopFamily = stopRequestedByConvoId(conversationId);
+      queueStore.set(stopFamily, stoppedRun);
+>>>>>>> upstream/main
       try {
         console.log('[useChatHelpers] Calling abort mutation for:', conversationId);
         const response = await abortStream({
@@ -246,14 +378,27 @@ export default function useChatHelpers(index = 0, paramId?: string) {
         if (canUseV2AbortResponse && response?.settled === true) {
           /** Natural completion/error won the terminal CAS, so this request did
            * not emit an abort FINAL and must not release the abort-drain queue.
+<<<<<<< HEAD
            * The winning terminal event/status owns reconciliation. */
           clearInterruptDrain(conversationId, activeGenerationCreatedAt);
+=======
+           * The winning terminal event/status owns reconciliation. A run that
+           * completed or failed was not stopped, so its persisted outcome may
+           * still drain; one another Stop already aborted stays stopped. */
+          clearInterruptDrain(conversationId, activeGenerationCreatedAt);
+          if (response.terminalStatus !== 'aborted' && queueStore.get(stopFamily) === stoppedRun) {
+            queueStore.set(stopFamily, null);
+          }
+>>>>>>> upstream/main
           queryClient.invalidateQueries({
             queryKey: [QueryKeys.messages, conversationId],
             refetchType: 'all',
           });
           queryClient.invalidateQueries({ queryKey: ['streamStatus', conversationId] });
+<<<<<<< HEAD
           clearSubmissionsUnlessReplaced(submissionAtAbort);
+=======
+>>>>>>> upstream/main
           return;
         }
         if (canUseV2AbortResponse && response?.persistenceFailed === true) {
@@ -271,7 +416,11 @@ export default function useChatHelpers(index = 0, paramId?: string) {
           });
           return;
         }
+<<<<<<< HEAD
         // The response's `aborted` field is the RESOLVED job id — authoritative
+=======
+        // The response's `aborted` field is the RESOLVED job id, authoritative
+>>>>>>> upstream/main
         // when this turn still holds the `new` placeholder. Chips and the drain
         // signal land where the mounted composer's queue machinery looks, while
         // the parked-copy claim uses the resolved id the server keyed it under.
@@ -279,11 +428,20 @@ export default function useChatHelpers(index = 0, paramId?: string) {
           conversationId,
           resolvedId: response?.aborted,
         });
+<<<<<<< HEAD
         // Steers the run never injected ride the abort response. Consume them
         // here as well as on the SSE final event — clearing submissions below
         // can close the stream before that event lands, and conversion
         // dedupes by steer id so double delivery is a no-op. `claimParked`
         // reconciles the replayable parked copy if the final raced this response.
+=======
+        /** Keep the submission attached until FINAL/status reconciles history.
+         * Clearing on the ACK can close SSE during terminal authorization and
+         * strand the preliminary response as an unsaved follow-up parent.
+         * Only terminal reconciliation may release the interrupt queue. */
+        // Restore uninjected steers from the ACK as well as FINAL. Conversion
+        // dedupes by steer id; `claimParked` reconciles the replayable copy.
+>>>>>>> upstream/main
         if (Array.isArray(response?.pendingSteers)) {
           convertSteersToQueued(chipConvoId, response.pendingSteers, {
             claimParked: true,
@@ -291,10 +449,13 @@ export default function useChatHelpers(index = 0, paramId?: string) {
             generationProtocolVersion: canUseV2AbortResponse ? 2 : 1,
           });
         }
+<<<<<<< HEAD
         signalInterruptDrain(chipConvoId, activeGenerationCreatedAt, conversationId);
         // The SSE will receive a `done` event with `aborted: true` and clean up
         // We still clear submissions as a fallback
         clearSubmissionsUnlessReplaced(submissionAtAbort);
+=======
+>>>>>>> upstream/main
       } catch (error) {
         console.error('[useChatHelpers] Abort failed:', error);
         const errorData = (
@@ -339,6 +500,10 @@ export default function useChatHelpers(index = 0, paramId?: string) {
     conversationId,
     endpoint,
     endpointType,
+<<<<<<< HEAD
+=======
+    queueStore,
+>>>>>>> upstream/main
     activeGenerationCreatedAt,
     activeGenerationProtocolVersion,
     abortStream,
@@ -376,6 +541,7 @@ export default function useChatHelpers(index = 0, paramId?: string) {
     (e: React.MouseEvent<HTMLButtonElement>) => {
       e.preventDefault();
       continueGeneration();
+<<<<<<< HEAD
       setSiblingIdx(0);
     },
     [continueGeneration, setSiblingIdx],
@@ -395,16 +561,41 @@ export default function useChatHelpers(index = 0, paramId?: string) {
 
   return useMemo(
     () => ({
+=======
+      setSiblingIdxRef.current(0);
+    },
+    [continueGeneration],
+  );
+
+  const [preset, setPreset] = useAtom(presetFamily(index));
+  const [abortScroll, setAbortScroll] = useAtom(abortScrollFamily(index));
+  const [optionSettings, setOptionSettings] = useAtom(optionSettingsFamily(index));
+
+  /** Read once per chat rather than per message row: message rows never unmount, so a
+   *  per-row settings read would accumulate for the length of the conversation. */
+  const { feedbackEnabled } = useChatSettings().config;
+
+  return useMemo(
+    (): ChatContract => ({
+>>>>>>> upstream/main
       newConversation,
       conversation,
       setConversation,
       isSubmitting,
       setIsSubmitting,
       getMessages,
+<<<<<<< HEAD
+=======
+      messagesKey: queryParam,
+>>>>>>> upstream/main
       setMessages,
       setSiblingIdx,
       latestMessageId,
       latestMessageDepth,
+<<<<<<< HEAD
+=======
+      useLiveAttachments,
+>>>>>>> upstream/main
       ask,
       index,
       regenerate,
@@ -412,8 +603,11 @@ export default function useChatHelpers(index = 0, paramId?: string) {
       handleStopGenerating,
       handleRegenerate,
       handleContinue,
+<<<<<<< HEAD
       showPopover,
       setShowPopover,
+=======
+>>>>>>> upstream/main
       abortScroll,
       setAbortScroll,
       preset,
@@ -433,6 +627,10 @@ export default function useChatHelpers(index = 0, paramId?: string) {
       isSubmitting,
       setIsSubmitting,
       getMessages,
+<<<<<<< HEAD
+=======
+      queryParam,
+>>>>>>> upstream/main
       setMessages,
       setSiblingIdx,
       latestMessageId,
@@ -444,8 +642,11 @@ export default function useChatHelpers(index = 0, paramId?: string) {
       handleStopGenerating,
       handleRegenerate,
       handleContinue,
+<<<<<<< HEAD
       showPopover,
       setShowPopover,
+=======
+>>>>>>> upstream/main
       abortScroll,
       setAbortScroll,
       preset,

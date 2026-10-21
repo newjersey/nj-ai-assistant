@@ -1,5 +1,9 @@
+<<<<<<< HEAD
 import type { AzureOptions, GenericClient } from '~/types';
 import { isEnabled } from './common';
+=======
+import type { AzureOptions } from '~/types';
+>>>>>>> upstream/main
 
 /**
  * Sanitizes the model name to be used in the URL by removing or replacing disallowed characters.
@@ -35,6 +39,7 @@ export const genAzureEndpoint = ({
 };
 
 /**
+<<<<<<< HEAD
  * Generates the Azure OpenAI API chat completion endpoint URL with the API version.
  * If both deploymentName and modelName are provided, modelName takes precedence.
  * @param azureConfig - The Azure configuration object.
@@ -81,6 +86,8 @@ export const genAzureChatCompletion = (
 };
 
 /**
+=======
+>>>>>>> upstream/main
  * Retrieves the Azure OpenAI API credentials from environment variables.
  * @returns An object containing the Azure OpenAI API credentials.
  */

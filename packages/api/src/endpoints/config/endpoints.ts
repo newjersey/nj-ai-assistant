@@ -1,6 +1,10 @@
 import {
   AuthType,
   CODE_APPROVAL_MODES,
+<<<<<<< HEAD
+=======
+  DEFAULT_AGENT_CODE_ENVIRONMENT_CHOICES,
+>>>>>>> upstream/main
   EModelEndpoint,
   isAgentsEndpoint,
   orderEndpointsConfig,
@@ -11,7 +15,13 @@ import type { AppConfig } from '@librechat/data-schemas';
 import type { ServerRequest, TCustomEndpointsConfig } from '~/types';
 import type { GetAppConfigOptions } from '~/app/service';
 import { loadCustomEndpointsConfig as defaultLoadCustomEndpoints } from '~/endpoints/custom';
+<<<<<<< HEAD
 import { getAppConfigOptionsFromUser } from '~/app/service';
+=======
+import { isCodeEnvironmentSelectionEnabled } from '~/code/protocol';
+import { getAppConfigOptionsFromUser } from '~/app/service';
+import { getResponsesApiRouting } from './responses';
+>>>>>>> upstream/main
 
 type PartialEndpointEntry = Partial<TConfig> & Record<string, unknown>;
 type DefaultEndpointsResult = Record<string, PartialEndpointEntry | false | null>;
@@ -47,6 +57,18 @@ export function createEndpointsConfigService(deps: EndpointsConfigDeps): {
       mergedConfig[EModelEndpoint.azureOpenAI] = { userProvide: false };
     }
 
+<<<<<<< HEAD
+=======
+    for (const endpoint of [EModelEndpoint.openAI, EModelEndpoint.azureOpenAI] as const) {
+      const entry = mergedConfig[endpoint];
+      if (entry)
+        mergedConfig[endpoint] = {
+          ...entry,
+          responsesApiRouting: getResponsesApiRouting(appConfig, endpoint),
+        };
+    }
+
+>>>>>>> upstream/main
     if (appConfig.endpoints?.[EModelEndpoint.anthropic]?.vertexConfig?.enabled) {
       mergedConfig[EModelEndpoint.anthropic] = { userProvide: false };
     }
@@ -92,6 +114,17 @@ export function createEndpointsConfigService(deps: EndpointsConfigDeps): {
       const clientStatefulCodeSessions = statefulCodeSessions
         ? {
             allowedEnvironments: statefulCodeSessions.allowedEnvironments,
+<<<<<<< HEAD
+=======
+            ...(isCodeEnvironmentSelectionEnabled(statefulCodeSessions.allowEnvironmentSelection)
+              ? {
+                  allowEnvironmentSelection: true,
+                  maxEnvironmentChoices:
+                    statefulCodeSessions.maxEnvironmentChoices ??
+                    DEFAULT_AGENT_CODE_ENVIRONMENT_CHOICES,
+                }
+              : {}),
+>>>>>>> upstream/main
             approvalsEnabled: toolApproval?.enabled !== false,
             approvalModes,
             environments: statefulCodeSessions.environments
@@ -121,6 +154,17 @@ export function createEndpointsConfigService(deps: EndpointsConfigDeps): {
         statefulCodeSessions: clientStatefulCodeSessions,
         maxSubagents,
         fileSharing,
+<<<<<<< HEAD
+=======
+        toolApproval: {
+          enabled: toolApproval?.enabled === true,
+          agentModes: toolApproval?.enabled === true && toolApproval.agentModes === true,
+          mode: toolApproval?.mode,
+          allow: toolApproval?.allow,
+          deny: toolApproval?.deny,
+          ask: toolApproval?.ask,
+        },
+>>>>>>> upstream/main
       };
     }
 

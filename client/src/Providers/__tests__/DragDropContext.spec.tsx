@@ -5,7 +5,25 @@ import type { TEndpointsConfig, Agent } from 'librechat-data-provider';
 import { DragDropProvider, useDragDropContext } from '../DragDropContext';
 
 const mockEndpointsConfig: TEndpointsConfig = {
+<<<<<<< HEAD
   [EModelEndpoint.openAI]: { userProvide: false, order: 0 },
+=======
+  [EModelEndpoint.openAI]: {
+    userProvide: false,
+    order: 0,
+    responsesApiRouting: {
+      'gpt-6-sol': { default: true, on: true, off: false },
+      'gpt-6-luna': { default: true, on: true, off: false },
+    },
+  },
+  [EModelEndpoint.azureOpenAI]: {
+    order: 2,
+    responsesApiRouting: {
+      'gpt-6-sol': { default: true, on: true, off: false },
+      'gpt-6-luna': { default: true, on: true, off: false },
+    },
+  },
+>>>>>>> upstream/main
   [EModelEndpoint.agents]: { userProvide: false, order: 1 },
   [EModelEndpoint.anthropic]: { userProvide: false, order: 6 },
   Moonshot: { type: EModelEndpoint.custom, userProvide: false, order: 9999 },
@@ -34,6 +52,67 @@ function wrapper({ children }: { children: React.ReactNode }) {
 }
 
 describe('DragDropContext endpointType resolution', () => {
+<<<<<<< HEAD
+=======
+  it('uses the environment Azure wildcard for a discovered snapshot and carries saved web search through a proxy', () => {
+    const entry = mockEndpointsConfig![EModelEndpoint.azureOpenAI]!;
+    const previous = entry.responsesApiRouting;
+    entry.responsesApiRouting = {
+      'gpt-6-sol-*': {
+        default: false,
+        on: true,
+        off: false,
+        withWebSearch: { default: true, on: true, off: true },
+      },
+    };
+    try {
+      mockConversation = { endpoint: EModelEndpoint.agents, agent_id: 'agent-1' };
+      mockAgentQueryData = {
+        provider: EModelEndpoint.azureOpenAI,
+        model: 'gpt-6-sol-2026-09-22',
+        model_parameters: { web_search: true },
+      } as Partial<Agent>;
+      const { result, rerender } = renderHook(() => useDragDropContext(), { wrapper });
+      expect(result.current.useResponsesApi).toBe(true);
+      mockAgentQueryData = {
+        ...mockAgentQueryData,
+        model_parameters: { web_search: false },
+      } as Partial<Agent>;
+      rerender();
+      expect(result.current.useResponsesApi).toBe(false);
+    } finally {
+      entry.responsesApiRouting = previous;
+    }
+  });
+
+  it.each([EModelEndpoint.openAI, EModelEndpoint.azureOpenAI])(
+    'honors server opt-outs on %s across direct and saved-agent uploads',
+    (endpoint) => {
+      const entry = mockEndpointsConfig![endpoint]!;
+      const previous = entry.responsesApiRouting;
+      entry.responsesApiRouting = { 'gpt-6-sol': { default: false, on: false, off: false } };
+      try {
+        mockConversation = { endpoint, model: 'gpt-6-sol', useResponsesApi: true };
+        const { result, rerender } = renderHook(() => useDragDropContext(), { wrapper });
+        expect(result.current.useResponsesApi).toBe(false);
+        mockConversation = { endpoint: EModelEndpoint.agents, agent_id: 'agent-1' };
+        mockAgentQueryData = {
+          provider: endpoint,
+          model: 'gpt-6-sol',
+          model_parameters: {},
+        } as Partial<Agent>;
+        rerender();
+        expect(result.current.useResponsesApi).toBe(false);
+        entry.responsesApiRouting = undefined;
+        rerender();
+        expect(result.current.useResponsesApi).not.toBe(true);
+      } finally {
+        entry.responsesApiRouting = previous;
+      }
+    },
+  );
+
+>>>>>>> upstream/main
   beforeEach(() => {
     mockConversation = null;
     mockAgentsMap = {};
@@ -47,6 +126,21 @@ describe('DragDropContext endpointType resolution', () => {
       expect(result.current.endpointType).toBe(EModelEndpoint.custom);
     });
 
+<<<<<<< HEAD
+=======
+    it.each([EModelEndpoint.openAI, EModelEndpoint.azureOpenAI])(
+      'derives Responses for a direct %s Sol conversation but preserves false',
+      (endpoint) => {
+        mockConversation = { endpoint, model: 'gpt-6-sol' };
+        const { result, rerender } = renderHook(() => useDragDropContext(), { wrapper });
+        expect(result.current.useResponsesApi).toBe(true);
+        mockConversation = { endpoint, model: 'gpt-6-sol', useResponsesApi: false };
+        rerender();
+        expect(result.current.useResponsesApi).toBe(false);
+      },
+    );
+
+>>>>>>> upstream/main
     it('resolves endpoint name for a standard endpoint', () => {
       mockConversation = { endpoint: EModelEndpoint.openAI };
       const { result } = renderHook(() => useDragDropContext(), { wrapper });
@@ -152,6 +246,35 @@ describe('DragDropContext endpointType resolution', () => {
       expect(result.current.useResponsesApi).toBe(true);
     });
 
+<<<<<<< HEAD
+=======
+    it.each(['gpt-6-sol', 'gpt-6-luna'])(
+      'derives Responses for an unset Azure %s agent without mutating its setting',
+      (model) => {
+        mockConversation = { endpoint: EModelEndpoint.agents, agent_id: 'agent-1' };
+        mockAgentQueryData = {
+          provider: EModelEndpoint.azureOpenAI,
+          model,
+          model_parameters: {},
+        } as Partial<Agent>;
+        const { result } = renderHook(() => useDragDropContext(), { wrapper });
+        expect(result.current.useResponsesApi).toBe(true);
+        expect(mockAgentQueryData.model_parameters?.useResponsesApi).toBeUndefined();
+      },
+    );
+
+    it('preserves an explicit false for an Azure Sol agent', () => {
+      mockConversation = { endpoint: EModelEndpoint.agents, agent_id: 'agent-1' };
+      mockAgentQueryData = {
+        provider: EModelEndpoint.azureOpenAI,
+        model: 'gpt-6-sol',
+        model_parameters: { useResponsesApi: false },
+      } as Partial<Agent>;
+      const { result } = renderHook(() => useDragDropContext(), { wrapper });
+      expect(result.current.useResponsesApi).toBe(false);
+    });
+
+>>>>>>> upstream/main
     it('keeps the conversation setting when the agent states none', () => {
       mockConversation = {
         endpoint: EModelEndpoint.agents,

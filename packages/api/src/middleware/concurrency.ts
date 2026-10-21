@@ -240,6 +240,7 @@ export function getViolationInfo(pendingRequests: number, limit: number): Violat
     score: CONCURRENT_VIOLATION_SCORE,
   };
 }
+<<<<<<< HEAD
 
 /**
  * Check if concurrent message limiting is enabled.
@@ -247,3 +248,5 @@ export function getViolationInfo(pendingRequests: number, limit: number): Violat
 export function isConcurrentLimitEnabled(): boolean {
   return isEnabled(LIMIT_CONCURRENT_MESSAGES);
 }
+=======
+>>>>>>> upstream/main

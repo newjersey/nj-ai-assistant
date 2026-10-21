@@ -56,6 +56,12 @@ export function trackSockets(httpServer: http.Server): () => Promise<void> {
 }
 
 export interface OAuthTestServerOptions {
+<<<<<<< HEAD
+=======
+  resourceFailure?: (
+    req: http.IncomingMessage,
+  ) => 401 | 403 | undefined | Promise<401 | 403 | undefined>;
+>>>>>>> upstream/main
   tokenTTLMs?: number;
   issueRefreshTokens?: boolean;
   refreshTokenTTLMs?: number;
@@ -72,8 +78,25 @@ export interface OAuthTestServerOptions {
   requireResourceParameter?: boolean;
   /** Number of refresh-grant access tokens the MCP resource should reject after issuance. */
   rejectRefreshTokens?: number;
+<<<<<<< HEAD
   /** Optional test hook for controlling echo-tool completion. */
   echoHandler?: (message: string) => string | Promise<string>;
+=======
+  /** Injects an endpoint failure before redemption; undefined resumes normal refresh behavior. */
+  refreshFailure?: () => { status: number; body: string } | undefined;
+  /**
+   * Awaited after a refresh grant is recorded but before it is redeemed, so a test can hold
+   * concurrent refreshes open and observe how many redemptions the callers actually attempt.
+   */
+  refreshGate?: () => Promise<void> | undefined;
+  /** Optional test hook for controlling echo-tool completion. */
+  echoHandler?: (message: string) => string | Promise<string>;
+  /** Observes MCP resource requests, including unauthenticated and cancellation POSTs. */
+  onResourceRequest?: (request: http.IncomingMessage) => void;
+  /** Observes parsed resource RPC methods without consuming the SDK's request body. */
+  onRPCRequest?: (method: string) => void;
+  appResourceUri?: string;
+>>>>>>> upstream/main
 }
 
 export interface OAuthTokenRequestRecord {
@@ -95,6 +118,10 @@ export interface OAuthTestServer {
   registeredClients: Map<string, { client_id: string; client_secret: string }>;
   tokenRequests: OAuthTokenRequestRecord[];
   getAuthCode: () => Promise<string>;
+<<<<<<< HEAD
+=======
+  notifyToolsChanged: () => Promise<void>;
+>>>>>>> upstream/main
 }
 
 async function readRequestBody(req: http.IncomingMessage): Promise<string> {
@@ -142,9 +169,19 @@ export async function createOAuthMCPServer(
     requireResourceParameter = false,
     rejectRefreshTokens = 0,
     echoHandler,
+<<<<<<< HEAD
   } = options;
 
   const sessions = new Map<string, StreamableHTTPServerTransport>();
+=======
+    onResourceRequest,
+    refreshFailure,
+    refreshGate,
+  } = options;
+
+  const sessions = new Map<string, StreamableHTTPServerTransport>();
+  const notifyToolsChanged = new Set<() => Promise<void>>();
+>>>>>>> upstream/main
   const issuedTokens = new Set<string>();
   const tokenIssueTimes = new Map<string, number>();
   const accessTokenScopes = new Map<string, string[]>();
@@ -397,6 +434,17 @@ export async function createOAuthMCPServer(
       }
 
       if (grantType === 'refresh_token' && issueRefreshTokens) {
+<<<<<<< HEAD
+=======
+        await refreshGate?.();
+        const failure = refreshFailure?.();
+        if (failure) {
+          res.writeHead(failure.status, { 'Content-Type': 'application/json' });
+          res.end(failure.body);
+          return;
+        }
+
+>>>>>>> upstream/main
         const refreshToken = params.get('refresh_token');
         if (!refreshToken || !issuedRefreshTokens.has(refreshToken)) {
           res.writeHead(400, { 'Content-Type': 'application/json' });
@@ -449,6 +497,15 @@ export async function createOAuthMCPServer(
     }
 
     // All other paths require Bearer token auth
+<<<<<<< HEAD
+=======
+    onResourceRequest?.(req);
+    const failure = await options.resourceFailure?.(req);
+    if (failure) {
+      writeBearerChallenge(res, failure, 'invalid_token', 'Rejected bearer');
+      return;
+    }
+>>>>>>> upstream/main
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       writeBearerChallenge(res, 401, 'invalid_token', 'Missing Authorization header');
@@ -486,6 +543,7 @@ export async function createOAuthMCPServer(
         sessionIdGenerator: () => randomUUID(),
       });
       const mcp = new McpServer({ name: 'oauth-test-server', version: '0.0.1' });
+<<<<<<< HEAD
       mcp.tool('echo', { message: z.string() }, async (args) => {
         const text = echoHandler ? await echoHandler(args.message) : `echo: ${args.message}`;
         return { content: [{ type: 'text' as const, text }] };
@@ -494,6 +552,41 @@ export async function createOAuthMCPServer(
     }
 
     await transport.handleRequest(req, res);
+=======
+      mcp.registerTool(
+        'echo',
+        {
+          inputSchema: { message: z.string() },
+          ...(options.appResourceUri && { _meta: { ui: { resourceUri: options.appResourceUri } } }),
+        },
+        async (args) => {
+          const text = echoHandler ? await echoHandler(args.message) : `echo: ${args.message}`;
+          return { content: [{ type: 'text' as const, text }] };
+        },
+      );
+      if (options.appResourceUri)
+        mcp.registerResource(
+          'app',
+          options.appResourceUri,
+          { mimeType: 'text/html;profile=mcp-app' },
+          async (uri) => ({
+            contents: [
+              { uri: uri.href, mimeType: 'text/html;profile=mcp-app', text: '<p>Read only</p>' },
+            ],
+          }),
+        );
+      await mcp.connect(transport);
+      notifyToolsChanged.add(() => mcp.server.sendToolListChanged());
+    }
+
+    const body: unknown =
+      options.onRPCRequest && req.method === 'POST'
+        ? JSON.parse(await readRequestBody(req))
+        : undefined;
+    if (body && typeof body === 'object' && 'method' in body && typeof body.method === 'string')
+      options.onRPCRequest?.(body.method);
+    await transport.handleRequest(req, res, body);
+>>>>>>> upstream/main
 
     if (transport.sessionId && !sessions.has(transport.sessionId)) {
       sessions.set(transport.sessionId, transport);
@@ -515,6 +608,12 @@ export async function createOAuthMCPServer(
     issuedRefreshTokens,
     registeredClients,
     tokenRequests,
+<<<<<<< HEAD
+=======
+    notifyToolsChanged: async () => {
+      await Promise.all([...notifyToolsChanged].map((notify) => notify()));
+    },
+>>>>>>> upstream/main
     getAuthCode: async () => {
       const authUrl = new URL(`${getBaseUrl()}/authorize`);
       authUrl.searchParams.set('redirect_uri', 'http://localhost');
@@ -634,7 +733,13 @@ export class InMemoryTokenStore {
       token: data.token ?? existing.token,
       expiresAt:
         data.expiresAt ??
+<<<<<<< HEAD
         (data.expiresIn ? new Date(Date.now() + expiresIn * 1000) : existing.expiresAt),
+=======
+        (data.expiresIn !== undefined
+          ? new Date(Date.now() + expiresIn * 1000)
+          : existing.expiresAt),
+>>>>>>> upstream/main
       metadata: data.metadata ?? existing.metadata,
     };
     this.tokens.set(existingKey, updated);

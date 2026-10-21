@@ -5,7 +5,10 @@ const {
   matchModelName,
   processModelData,
   getModelMaxTokens,
+<<<<<<< HEAD
   maxOutputTokensMap,
+=======
+>>>>>>> upstream/main
   findMatchingPattern,
 } = require('@librechat/api');
 
@@ -591,6 +594,7 @@ describe('getModelMaxTokens', () => {
       maxTokensMap[EModelEndpoint.openAI]['glm-4.5-air'],
     );
   });
+<<<<<<< HEAD
 
   test('should return correct max output tokens for GPT-5 models', () => {
     const { getModelMaxOutputTokens } = require('@librechat/api');
@@ -634,6 +638,8 @@ describe('getModelMaxTokens', () => {
       );
     });
   });
+=======
+>>>>>>> upstream/main
 });
 
 describe('findMatchingPattern - longest match wins', () => {
@@ -1060,6 +1066,7 @@ describe('Meta Models Tests', () => {
     });
   });
 
+<<<<<<< HEAD
   describe('DeepSeek Max Output Tokens', () => {
     const { getModelMaxOutputTokens } = require('@librechat/api');
 
@@ -1099,6 +1106,8 @@ describe('Meta Models Tests', () => {
     });
   });
 
+=======
+>>>>>>> upstream/main
   describe('processModelData with Meta models', () => {
     test('should process Meta model data correctly', () => {
       const input = {
@@ -1447,6 +1456,7 @@ describe('Claude Model Tests', () => {
     );
   });
 
+<<<<<<< HEAD
   it('should return correct max output tokens for Claude Opus 4.6 (128K)', () => {
     const { getModelMaxOutputTokens } = require('@librechat/api');
     expect(getModelMaxOutputTokens('claude-opus-4-6', EModelEndpoint.anthropic)).toBe(
@@ -1454,6 +1464,8 @@ describe('Claude Model Tests', () => {
     );
   });
 
+=======
+>>>>>>> upstream/main
   it('should handle Claude Opus 4.6 model name variations', () => {
     const modelVariations = [
       'claude-opus-4-6',
@@ -1497,6 +1509,7 @@ describe('Claude Model Tests', () => {
     );
   });
 
+<<<<<<< HEAD
   it('should return correct max output tokens for Claude Opus 4.7 (128K)', () => {
     const { getModelMaxOutputTokens } = require('@librechat/api');
     expect(getModelMaxOutputTokens('claude-opus-4-7', EModelEndpoint.anthropic)).toBe(
@@ -1504,6 +1517,8 @@ describe('Claude Model Tests', () => {
     );
   });
 
+=======
+>>>>>>> upstream/main
   it('should match model names correctly for Claude Opus 4.7', () => {
     const modelVariations = [
       'claude-opus-4-7',
@@ -1528,6 +1543,7 @@ describe('Claude Model Tests', () => {
     );
   });
 
+<<<<<<< HEAD
   it('should return correct max output tokens for Claude Opus 4.8 (128K)', () => {
     const { getModelMaxOutputTokens } = require('@librechat/api');
     expect(getModelMaxOutputTokens('claude-opus-4-8', EModelEndpoint.anthropic)).toBe(
@@ -1535,6 +1551,8 @@ describe('Claude Model Tests', () => {
     );
   });
 
+=======
+>>>>>>> upstream/main
   it('should match model names correctly for Claude Opus 4.8', () => {
     const modelVariations = [
       'claude-opus-4-8',
@@ -1559,6 +1577,7 @@ describe('Claude Model Tests', () => {
     );
   });
 
+<<<<<<< HEAD
   it('should return correct max output tokens for Claude Opus 5 (128K)', () => {
     const { getModelMaxOutputTokens } = require('@librechat/api');
     expect(getModelMaxOutputTokens('claude-opus-5', EModelEndpoint.anthropic)).toBe(
@@ -1566,6 +1585,8 @@ describe('Claude Model Tests', () => {
     );
   });
 
+=======
+>>>>>>> upstream/main
   it('should match model names correctly for Claude Opus 5', () => {
     const modelVariations = [
       'claude-opus-5',
@@ -1590,6 +1611,7 @@ describe('Claude Model Tests', () => {
     );
   });
 
+<<<<<<< HEAD
   it('should return correct max output tokens for Claude Fable 5 (128K)', () => {
     const { getModelMaxOutputTokens } = require('@librechat/api');
     expect(getModelMaxOutputTokens('claude-fable-5', EModelEndpoint.anthropic)).toBe(
@@ -1597,6 +1619,8 @@ describe('Claude Model Tests', () => {
     );
   });
 
+=======
+>>>>>>> upstream/main
   it('should match model names correctly for Claude Fable 5', () => {
     const modelVariations = [
       'claude-fable-5',
@@ -1621,6 +1645,7 @@ describe('Claude Model Tests', () => {
     );
   });
 
+<<<<<<< HEAD
   it('should return correct max output tokens for Claude Mythos 5 (128K)', () => {
     const { getModelMaxOutputTokens } = require('@librechat/api');
     expect(getModelMaxOutputTokens('claude-mythos-5', EModelEndpoint.anthropic)).toBe(
@@ -1628,6 +1653,8 @@ describe('Claude Model Tests', () => {
     );
   });
 
+=======
+>>>>>>> upstream/main
   it('should match model names correctly for Claude Mythos 5', () => {
     const modelVariations = [
       'claude-mythos-5',
@@ -1650,6 +1677,7 @@ describe('Claude Model Tests', () => {
     expect(getModelMaxTokens('claude-mythos-5-1', EModelEndpoint.anthropic)).toBe(1000000);
   });
 
+<<<<<<< HEAD
   it('should return correct max output tokens for Claude Fable 5.1 (128K)', () => {
     const { getModelMaxOutputTokens } = require('@librechat/api');
     expect(maxOutputTokensMap[EModelEndpoint.anthropic]['claude-fable-5-1']).toBe(128000);
@@ -1658,6 +1686,8 @@ describe('Claude Model Tests', () => {
     expect(getModelMaxOutputTokens('claude-mythos-5-1', EModelEndpoint.anthropic)).toBe(128000);
   });
 
+=======
+>>>>>>> upstream/main
   it('should match model names correctly for Claude Fable 5.1 without collapsing to Fable 5', () => {
     const modelVariations = [
       'claude-fable-5-1',
@@ -1692,6 +1722,7 @@ describe('Claude Model Tests', () => {
     );
   });
 
+<<<<<<< HEAD
   it('should return correct max output tokens for Claude Sonnet 4.6 (128K)', () => {
     const { getModelMaxOutputTokens } = require('@librechat/api');
     expect(getModelMaxOutputTokens('claude-sonnet-4-6', EModelEndpoint.anthropic)).toBe(
@@ -1702,6 +1733,8 @@ describe('Claude Model Tests', () => {
     );
   });
 
+=======
+>>>>>>> upstream/main
   it('should return correct context length for Claude Sonnet 4.7+ aliases (1M)', () => {
     [
       'claude-sonnet-4-7',
@@ -1721,6 +1754,7 @@ describe('Claude Model Tests', () => {
     expect(getModelMaxTokens('anthropic.claude-4-10-sonnet', EModelEndpoint.bedrock)).toBe(1000000);
   });
 
+<<<<<<< HEAD
   it('should return correct max output tokens for Claude Sonnet 4.7+ aliases (128K)', () => {
     const { getModelMaxOutputTokens } = require('@librechat/api');
     [
@@ -1752,6 +1786,8 @@ describe('Claude Model Tests', () => {
     );
   });
 
+=======
+>>>>>>> upstream/main
   it('should keep double-digit Claude Sonnet 4 minor names when matching models', () => {
     expect(matchModelName('claude-sonnet-4-10', EModelEndpoint.anthropic)).toBe(
       'claude-sonnet-4-10',
@@ -1808,6 +1844,7 @@ describe('Claude Model Tests', () => {
     );
   });
 
+<<<<<<< HEAD
   it('should return correct max output tokens for Claude Sonnet 5 (128K)', () => {
     const { getModelMaxOutputTokens } = require('@librechat/api');
     expect(getModelMaxOutputTokens('claude-sonnet-5', EModelEndpoint.anthropic)).toBe(
@@ -1818,6 +1855,8 @@ describe('Claude Model Tests', () => {
     );
   });
 
+=======
+>>>>>>> upstream/main
   it('should not match Claude Sonnet 5 against Claude Sonnet 4 keys', () => {
     const modelVariations = [
       'claude-sonnet-5',

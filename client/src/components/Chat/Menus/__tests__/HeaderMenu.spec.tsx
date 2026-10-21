@@ -3,7 +3,16 @@ import type { MenuItemProps } from '~/common';
 
 const mockAccess: Record<string, boolean> = {};
 const mockBookmarkArgs: { enabled?: boolean }[] = [];
+<<<<<<< HEAD
 const mockHookState = {
+=======
+const mockPullRequestArgs: string[] = [];
+const mockHookState = {
+  pullRequest: {
+    item: undefined as MenuItemProps | undefined,
+    dialog: null as React.ReactNode,
+  },
+>>>>>>> upstream/main
   multiConvo: { show: true, addConversation: jest.fn() },
   temporary: { show: true, isTemporary: false, toggle: jest.fn() },
   bookmarks: {
@@ -29,6 +38,7 @@ jest.mock('~/hooks', () => ({
     mockAccess[permissionType] ?? true,
 }));
 
+<<<<<<< HEAD
 jest.mock('~/hooks/Chat/useMultiConvo', () => ({
   __esModule: true,
   default: () => mockHookState.multiConvo,
@@ -38,13 +48,34 @@ jest.mock('~/hooks/Chat/useTemporaryChat', () => ({
   default: () => mockHookState.temporary,
 }));
 jest.mock('~/hooks/Chat/useBookmarkItems', () => ({
+=======
+jest.mock('~/components/Chat/PullRequest', () => ({
+  usePullRequestMenu: (conversationId: string) => {
+    mockPullRequestArgs.push(conversationId);
+    return mockHookState.pullRequest;
+  },
+}));
+jest.mock('~/hooks/Conversations/useMultiConvo', () => ({
+  __esModule: true,
+  default: () => mockHookState.multiConvo,
+}));
+jest.mock('~/hooks/Conversations/useTemporaryChat', () => ({
+  __esModule: true,
+  default: () => mockHookState.temporary,
+}));
+jest.mock('~/hooks/Sharing/useBookmarkItems', () => ({
+>>>>>>> upstream/main
   __esModule: true,
   default: (args: { enabled?: boolean } = {}) => {
     mockBookmarkArgs.push(args);
     return mockHookState.bookmarks;
   },
 }));
+<<<<<<< HEAD
 jest.mock('~/hooks/Chat/useExportShare', () => ({
+=======
+jest.mock('~/hooks/Sharing/useChatOptions', () => ({
+>>>>>>> upstream/main
   __esModule: true,
   default: () => mockHookState.exportShare,
 }));
@@ -101,6 +132,11 @@ const labels = () =>
 describe('HeaderMenu', () => {
   beforeEach(() => {
     mockBookmarkArgs.length = 0;
+<<<<<<< HEAD
+=======
+    mockPullRequestArgs.length = 0;
+    mockHookState.pullRequest = { item: undefined, dialog: null };
+>>>>>>> upstream/main
     for (const key of Object.keys(mockAccess)) {
       delete mockAccess[key];
     }
@@ -112,8 +148,12 @@ describe('HeaderMenu', () => {
     mockHookState.temporary.isTemporary = false;
   });
 
+<<<<<<< HEAD
   // NJ: Most are removed by us
   it.skip('collapses every secondary action behind one trigger', () => {
+=======
+  it('collapses every secondary action behind one trigger', () => {
+>>>>>>> upstream/main
     render(<HeaderMenu />);
 
     expect(screen.getByTestId('header-overflow-menu')).toBeInTheDocument();
@@ -126,8 +166,58 @@ describe('HeaderMenu', () => {
     ]);
   });
 
+<<<<<<< HEAD
   // NJ: Most actions are not reachable, we disable them
   it.skip('keeps every action reachable when groups are divided', () => {
+=======
+  it('offers the pull request in its own group, ahead of share and export', () => {
+    mockHookState.pullRequest = {
+      item: { label: 'PR #7' },
+      dialog: <div data-testid="pull-request-dialog" />,
+    };
+
+    render(<HeaderMenu pullRequestConversationId="convo-1" />);
+
+    expect(labels()).toEqual([
+      'com_ui_bookmarks',
+      'com_ui_add_multi_conversation',
+      'PR #7',
+      'share',
+      'export',
+      'com_ui_temporary',
+    ]);
+    expect(screen.getByTestId('pull-request-dialog')).toBeInTheDocument();
+    expect(mockPullRequestArgs).toContain('convo-1');
+  });
+
+  it('leaves the menu unchanged when the chat has no pull request', () => {
+    render(<HeaderMenu pullRequestConversationId="convo-1" />);
+
+    expect(labels()).not.toContain('PR #7');
+    expect(screen.queryByTestId('pull-request-dialog')).not.toBeInTheDocument();
+  });
+
+  it('asks for no pull request when the header names no conversation', () => {
+    render(<HeaderMenu />);
+
+    expect(mockPullRequestArgs.every((id) => id === '')).toBe(true);
+  });
+
+  it('shows the menu for a pull request alone', () => {
+    mockHookState.multiConvo.show = false;
+    mockHookState.temporary.show = false;
+    mockHookState.bookmarks.show = false;
+    mockHookState.exportShare.show = false;
+    mockHookState.pullRequest = { item: { label: 'PR #7' }, dialog: null };
+
+    render(<HeaderMenu pullRequestConversationId="convo-1" />);
+
+    expect(labels()).toEqual(['PR #7']);
+    expect(rows()[0]).toHaveAttribute('data-kind', 'item');
+  });
+
+  it('keeps every action reachable when groups are divided', () => {
+>>>>>>> upstream/main
     render(<HeaderMenu />);
 
     /** A divider is its own entry; flagging an action as one deletes it. */
@@ -153,8 +243,12 @@ describe('HeaderMenu', () => {
     expect(screen.queryByTestId('header-overflow-menu')).not.toBeInTheDocument();
   });
 
+<<<<<<< HEAD
   // NJ: Ignore, we mess with header actions too much
   it.skip('drops actions the user lacks permission for', () => {
+=======
+  it('drops actions the user lacks permission for', () => {
+>>>>>>> upstream/main
     mockAccess.BOOKMARKS = false;
     mockAccess.MULTI_CONVO = false;
 
@@ -163,8 +257,12 @@ describe('HeaderMenu', () => {
     expect(labels()).toEqual(['share', 'export', 'com_ui_temporary']);
   });
 
+<<<<<<< HEAD
   // NJ: Not valid for us
   it.skip('never opens with a leading divider when earlier groups are gated out', () => {
+=======
+  it('never opens with a leading divider when earlier groups are gated out', () => {
+>>>>>>> upstream/main
     mockAccess.BOOKMARKS = false;
     mockAccess.MULTI_CONVO = false;
 
@@ -190,7 +288,11 @@ describe('HeaderMenu', () => {
     expect(screen.getByTestId('header-menu-shared-link-indicator')).toBeInTheDocument();
     expect(screen.getByTestId('header-overflow-menu')).toHaveAttribute(
       'aria-label',
+<<<<<<< HEAD
       'com_ui_export_share_link_active',
+=======
+      'com_ui_chat_options_link_active',
+>>>>>>> upstream/main
     );
   });
 
@@ -200,13 +302,24 @@ describe('HeaderMenu', () => {
 
     rerender(<HeaderMenu trace={{ show: true, open: jest.fn() }} />);
 
+<<<<<<< HEAD
     // NJ: Share, export and temporary chat are disabled, so trace is the last group
+=======
+>>>>>>> upstream/main
     expect(labels()).toEqual([
       'com_ui_bookmarks',
       'com_ui_add_multi_conversation',
       'com_ui_trace_view',
+<<<<<<< HEAD
     ]);
     expect(rows().filter((node) => node.getAttribute('data-kind') === 'separator')).toHaveLength(1);
+=======
+      'share',
+      'export',
+      'com_ui_temporary',
+    ]);
+    expect(rows().filter((node) => node.getAttribute('data-kind') === 'separator')).toHaveLength(3);
+>>>>>>> upstream/main
   });
 
   it('keeps the trace reachable when it is the only action left', () => {
@@ -221,8 +334,12 @@ describe('HeaderMenu', () => {
     expect(rows()[0]).toHaveAttribute('data-kind', 'item');
   });
 
+<<<<<<< HEAD
   // NJ: Always skip temporary chat related functionality
   it.skip('shows temporary chat as active to sighted users, not just assistive tech', () => {
+=======
+  it('shows temporary chat as active to sighted users, not just assistive tech', () => {
+>>>>>>> upstream/main
     mockHookState.temporary.isTemporary = true;
 
     render(<HeaderMenu />);

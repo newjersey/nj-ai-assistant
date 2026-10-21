@@ -63,10 +63,14 @@ export default function PublicSharingToggle({
               <Globe className="size-5" />
             </div>
             <div className="flex items-center gap-2">
+<<<<<<< HEAD
               <Label
                 htmlFor="share-everyone-toggle"
                 className="cursor-pointer text-sm font-medium text-text-primary"
               >
+=======
+              <Label htmlFor="share-everyone-toggle" className="cursor-pointer text-sm font-medium">
+>>>>>>> upstream/main
                 {localize('com_ui_share_everyone')}
               </Label>
               <InfoHoverCard
@@ -95,7 +99,11 @@ export default function PublicSharingToggle({
               <Shield className="size-5" />
             </div>
             <div className="flex flex-col gap-0.5">
+<<<<<<< HEAD
               <Label htmlFor="permission-level" className="text-sm font-medium text-text-primary">
+=======
+              <Label htmlFor="permission-level" className="text-sm font-medium">
+>>>>>>> upstream/main
                 {localize('com_ui_everyone_permission_level')}
               </Label>
             </div>

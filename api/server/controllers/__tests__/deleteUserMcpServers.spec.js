@@ -4,7 +4,18 @@ const mockInvalidateCachedTools = jest.fn();
 jest.mock('~/config', () => ({
   getMCPManager: (...args) => mockGetMCPManager(...args),
   getFlowStateManager: jest.fn(),
+<<<<<<< HEAD
   getMCPServersRegistry: jest.fn(),
+=======
+  getMCPServersRegistry: () => ({
+    getServerConfig: jest.fn().mockResolvedValue(undefined),
+    resolveAllowlists: jest.fn().mockResolvedValue({}),
+  }),
+}));
+
+jest.mock('~/server/services/MCP/oauthCleanup', () => ({
+  maybeUninstallOAuthMCP: jest.fn().mockResolvedValue(undefined),
+>>>>>>> upstream/main
 }));
 
 jest.mock('~/server/services/Config/getCachedTools', () => ({

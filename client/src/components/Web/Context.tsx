@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { createContext, useContext } from 'react';
+=======
+import { createContext } from 'react';
+>>>>>>> upstream/main
 import type { SearchRefType, ValidSource, ResultReference } from 'librechat-data-provider';
 import type * as t from './types';
 import { useSearchContext } from '~/Providers';
@@ -13,11 +17,14 @@ export const CitationContext = createContext<CitationContextType>({
   setHoveredCitationId: () => {},
 });
 
+<<<<<<< HEAD
 export function useHighlightState(citationId: string | undefined) {
   const { hoveredCitationId } = useContext(CitationContext);
   return citationId && hoveredCitationId === citationId;
 }
 
+=======
+>>>>>>> upstream/main
 export type CitationSource = (ValidSource | ResultReference) & {
   turn: number;
   refType: string | SearchRefType;

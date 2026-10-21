@@ -61,6 +61,10 @@ if state ~= ARGV[2] then return -1 end
 if flow.status == 'COMPLETED' then return -1 end
 flow.status = 'FAILED'
 flow.error = ARGV[3]
+<<<<<<< HEAD
+=======
+flow.errorName = ARGV[6]
+>>>>>>> upstream/main
 flow.failedAt = tonumber(ARGV[4])
 data.expires = tonumber(ARGV[4]) + tonumber(ARGV[5])
 redis.call('SET', KEYS[1], cjson.encode(data), 'PX', ARGV[5])
@@ -457,6 +461,10 @@ export class FlowStateManager<T = unknown> {
   ): Promise<GuardedMutationResult> {
     const flowKey = this.getFlowKey(flowId, type);
     const message = error instanceof Error ? error.message : error;
+<<<<<<< HEAD
+=======
+    const errorName = error instanceof Error ? error.name : 'Error';
+>>>>>>> upstream/main
     const failedAt = Date.now();
     const redisKey = this.getRedisKey(flowKey);
     if (redisKey) {
@@ -466,6 +474,10 @@ export class FlowStateManager<T = unknown> {
         message,
         String(failedAt),
         String(this.ttl),
+<<<<<<< HEAD
+=======
+        errorName,
+>>>>>>> upstream/main
       ]);
       return FlowStateManager.guardedResult(result);
     }
@@ -483,6 +495,10 @@ export class FlowStateManager<T = unknown> {
         ...current,
         status: 'FAILED',
         error: message,
+<<<<<<< HEAD
+=======
+        errorName,
+>>>>>>> upstream/main
         failedAt,
       };
       memoryEntry.envelope.expires = failedAt + this.ttl;
@@ -504,6 +520,10 @@ export class FlowStateManager<T = unknown> {
       ...current,
       status: 'FAILED',
       error: message,
+<<<<<<< HEAD
+=======
+      errorName,
+>>>>>>> upstream/main
       failedAt,
     };
     await this.keyv.set(flowKey, updatedState, this.ttl);
@@ -798,7 +818,13 @@ export class FlowStateManager<T = unknown> {
               if (!this.retainedFailureTypes.has(type)) {
                 await this.keyv.delete(flowKey);
               }
+<<<<<<< HEAD
               reject(new Error(flowState.error ?? `${type} flow failed`));
+=======
+              const error = new Error(flowState.error ?? `${type} flow failed`);
+              error.name = flowState.errorName ?? 'Error';
+              reject(error);
+>>>>>>> upstream/main
             }
             return;
           }
@@ -949,6 +975,10 @@ export class FlowStateManager<T = unknown> {
       ...flowState,
       status: 'FAILED',
       error: error instanceof Error ? error.message : error,
+<<<<<<< HEAD
+=======
+      errorName: error instanceof Error ? error.name : 'Error',
+>>>>>>> upstream/main
       failedAt: Date.now(),
     };
 

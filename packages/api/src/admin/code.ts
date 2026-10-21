@@ -4,8 +4,15 @@ import type { AppConfig } from '@librechat/data-schemas';
 import type { Response } from 'express';
 import type { GetAppConfigOptions } from '~/app/service';
 import type { ServerRequest } from '~/types/http';
+<<<<<<< HEAD
 
 import { getCodeApiTenantId } from '~/auth/codeapi';
+=======
+import type { RecordAuditEntry } from './audit';
+
+import { getCodeApiTenantId } from '~/auth/codeapi';
+import { createAdminAuditEmitter } from './audit';
+>>>>>>> upstream/main
 
 const CODE_BRIDGE_REQUEST_TIMEOUT_MS = 10_000;
 
@@ -36,6 +43,12 @@ export interface AdminCodeEnvironmentDeps {
   resolveTenantId?: (req: ServerRequest) => string;
   readSecret?: (name: string) => string | undefined;
   fetchImpl?: FetchImpl;
+<<<<<<< HEAD
+=======
+  /** Optional audit emission for pairing and revocation; fail-open unless `auditFailClosed`. */
+  recordAuditEntry?: RecordAuditEntry;
+  auditFailClosed?: boolean;
+>>>>>>> upstream/main
 }
 
 function environmentId(req: ServerRequest): string {
@@ -95,6 +108,20 @@ export function createAdminCodeEnvironmentHandlers(deps: AdminCodeEnvironmentDep
 } {
   const fetchImpl = deps.fetchImpl ?? fetch;
   const resolveTenantId = deps.resolveTenantId ?? getCodeApiTenantId;
+<<<<<<< HEAD
+=======
+  const emitAudit = createAdminAuditEmitter({
+    recordAuditEntry: deps.recordAuditEntry,
+    failClosed: deps.auditFailClosed,
+    logPrefix: '[adminCode]',
+  });
+  /** Revoking a worker removes access, and terminal entries record an outcome that already
+   * happened, so an audit outage blocks neither. */
+  const emitRevocationAudit = createAdminAuditEmitter({
+    recordAuditEntry: deps.recordAuditEntry,
+    logPrefix: '[adminCode]',
+  });
+>>>>>>> upstream/main
   const readSecret =
     deps.readSecret ??
     ((name: string) =>
@@ -144,6 +171,31 @@ export function createAdminCodeEnvironmentHandlers(deps: AdminCodeEnvironmentDep
     } catch {
       return res.status(503).json({ error: 'Code environment tenant context is unavailable' });
     }
+<<<<<<< HEAD
+=======
+    /**
+     * Recorded as `pending` before the bridge mints the one-time code, so no audit latency
+     * sits between minting and delivering it and a rejected pairing is never counted as
+     * granted; `success` is appended once the bridge response validates and `failure`
+     * otherwise. Workers belong to the deployment's YAML environments, so entries go to
+     * the platform chain.
+     */
+    const pairingEvent = {
+      action: 'code_worker.paired' as const,
+      severity: 'warning' as const,
+      target: { type: 'code_worker', id: resolved.pairing.workerId, name: resolved.id },
+      tenantId: undefined,
+    };
+    const pairingMetadata = { environmentId: resolved.id, boundTenantId: tenantId };
+    await emitAudit(req, { ...pairingEvent, outcome: 'pending', metadata: pairingMetadata });
+    const pairingFailed = async (code: string) => {
+      await emitRevocationAudit(req, {
+        ...pairingEvent,
+        outcome: 'failure',
+        metadata: { ...pairingMetadata, code },
+      });
+    };
+>>>>>>> upstream/main
     try {
       const response = await fetchImpl(bridgeUrl(resolved.environment, '/bridge/pairings'), {
         method: 'POST',
@@ -162,6 +214,10 @@ export function createAdminCodeEnvironmentHandlers(deps: AdminCodeEnvironmentDep
         signal: AbortSignal.timeout(CODE_BRIDGE_REQUEST_TIMEOUT_MS),
       });
       if (!response.ok) {
+<<<<<<< HEAD
+=======
+        await pairingFailed('bridge_rejected');
+>>>>>>> upstream/main
         return res.status(502).json({
           error: 'Code API rejected the pairing request',
           upstreamStatus: response.status,
@@ -169,16 +225,32 @@ export function createAdminCodeEnvironmentHandlers(deps: AdminCodeEnvironmentDep
       }
       const payload = (await response.json()) as unknown;
       if (!validPairingResponse(payload, resolved.pairing.workerId)) {
+<<<<<<< HEAD
         return res.status(502).json({ error: 'Code API returned an invalid pairing response' });
       }
       return res.status(200).json({
+=======
+        await pairingFailed('invalid_response');
+        return res.status(502).json({ error: 'Code API returned an invalid pairing response' });
+      }
+      /** The code is delivered first: it expires, so audit latency must not sit in front of it. */
+      res.status(200).json({
+>>>>>>> upstream/main
         environmentId: resolved.id,
         workerId: payload.workerId,
         code: payload.code,
         expiresAt: payload.expiresAt,
       });
+<<<<<<< HEAD
     } catch (error) {
       const timedOut = error instanceof Error && error.name === 'TimeoutError';
+=======
+      await emitRevocationAudit(req, { ...pairingEvent, metadata: pairingMetadata });
+      return res;
+    } catch (error) {
+      const timedOut = error instanceof Error && error.name === 'TimeoutError';
+      await pairingFailed(timedOut ? 'timeout' : 'request_failed');
+>>>>>>> upstream/main
       return res.status(timedOut ? 504 : 502).json({
         error: timedOut ? 'Code API pairing request timed out' : 'Code API pairing request failed',
       });
@@ -188,6 +260,35 @@ export function createAdminCodeEnvironmentHandlers(deps: AdminCodeEnvironmentDep
   async function revokeWorker(req: ServerRequest, res: Response): Promise<Response> {
     const resolved = await resolve(req, res);
     if ('statusCode' in resolved) return resolved;
+<<<<<<< HEAD
+=======
+    /**
+     * Recorded as `pending` without being awaited, so audit latency never delays the
+     * revocation; later entries wait for it to keep the chain ordered. `success` is
+     * appended once the bridge acknowledges and `failure` otherwise.
+     */
+    const revokeEvent = {
+      action: 'code_worker.revoked' as const,
+      severity: 'warning' as const,
+      target: { type: 'code_worker', id: resolved.pairing.workerId, name: resolved.id },
+      tenantId: undefined,
+    };
+    const revokeMetadata = { environmentId: resolved.id };
+    const attempt = emitRevocationAudit(req, {
+      ...revokeEvent,
+      outcome: 'pending',
+      metadata: revokeMetadata,
+    });
+    const revokeSettled = async (outcome: 'success' | 'failure', code?: string) => {
+      await attempt;
+      await emitRevocationAudit(req, {
+        ...revokeEvent,
+        outcome,
+        metadata: code ? { ...revokeMetadata, code } : revokeMetadata,
+      });
+    };
+    const revokeFailed = (code: string) => revokeSettled('failure', code);
+>>>>>>> upstream/main
     try {
       const workerId = encodeURIComponent(resolved.pairing.workerId);
       const response = await fetchImpl(
@@ -204,6 +305,10 @@ export function createAdminCodeEnvironmentHandlers(deps: AdminCodeEnvironmentDep
         },
       );
       if (!response.ok) {
+<<<<<<< HEAD
+=======
+        await revokeFailed('bridge_rejected');
+>>>>>>> upstream/main
         return res.status(502).json({
           error: 'Code API rejected the revocation request',
           upstreamStatus: response.status,
@@ -211,15 +316,30 @@ export function createAdminCodeEnvironmentHandlers(deps: AdminCodeEnvironmentDep
       }
       const payload = (await response.json()) as unknown;
       if (!validRevocationResponse(payload)) {
+<<<<<<< HEAD
         return res.status(502).json({ error: 'Code API returned an invalid revocation response' });
       }
       return res.status(200).json({
+=======
+        await revokeFailed('invalid_response');
+        return res.status(502).json({ error: 'Code API returned an invalid revocation response' });
+      }
+      res.status(200).json({
+>>>>>>> upstream/main
         environmentId: resolved.id,
         workerId: resolved.pairing.workerId,
         revoked: true,
       });
+<<<<<<< HEAD
     } catch (error) {
       const timedOut = error instanceof Error && error.name === 'TimeoutError';
+=======
+      await revokeSettled('success');
+      return res;
+    } catch (error) {
+      const timedOut = error instanceof Error && error.name === 'TimeoutError';
+      await revokeFailed(timedOut ? 'timeout' : 'request_failed');
+>>>>>>> upstream/main
       return res.status(timedOut ? 504 : 502).json({
         error: timedOut
           ? 'Code API revocation request timed out'

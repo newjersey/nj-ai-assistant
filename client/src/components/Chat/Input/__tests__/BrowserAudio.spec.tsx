@@ -1,9 +1,18 @@
 import React from 'react';
 import { RecoilRoot } from 'recoil';
+<<<<<<< HEAD
 import { render, waitFor } from '@testing-library/react';
 import { Constants, QueryKeys } from 'librechat-data-provider';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+=======
+import { getDefaultStore } from 'jotai';
+import { render, waitFor } from '@testing-library/react';
+import { MemoryRouter, Routes, Route } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { isSubmittingFamily, resetSubmitting } from '@librechat/chat/react';
+import { Constants, QueryKeys, ContentTypes } from 'librechat-data-provider';
+>>>>>>> upstream/main
 import type { TMessage, TConversation } from 'librechat-data-provider';
 import BrowserAudio from '../BrowserAudio';
 import store from '~/store';
@@ -68,7 +77,11 @@ const renderBrowserAudio = ({
             set(store.conversationByIndex(0), { conversationId } as TConversation);
             set(store.activeRunFamily(0), activeRunId);
             set(store.audioRunFamily(0), audioRunId);
+<<<<<<< HEAD
             set(store.isSubmittingFamily(0), isSubmitting);
+=======
+            getDefaultStore().set(isSubmittingFamily(0), isSubmitting);
+>>>>>>> upstream/main
           }}
         >
           <Routes>
@@ -83,6 +96,13 @@ const renderBrowserAudio = ({
 /** Lets every effect settle so a missing utterance is a real absence, not a pending render */
 const settle = () => waitFor(() => expect(cancelCount).toBeGreaterThanOrEqual(0));
 
+<<<<<<< HEAD
+=======
+afterEach(() => {
+  resetSubmitting(getDefaultStore());
+});
+
+>>>>>>> upstream/main
 describe('BrowserAudio autoplay', () => {
   beforeAll(() => {
     Object.defineProperty(window, 'speechSynthesis', {
@@ -108,6 +128,26 @@ describe('BrowserAudio autoplay', () => {
     await waitFor(() => expect(spoken).toEqual([responseText]));
   });
 
+<<<<<<< HEAD
+=======
+  it('speaks the answer without the reasoning that preceded it', async () => {
+    renderBrowserAudio({
+      messages: [
+        {
+          ...assistantMessage,
+          text: '',
+          content: [
+            { type: ContentTypes.THINK, think: 'Recalling European capitals.' },
+            { type: ContentTypes.TEXT, text: responseText },
+          ],
+        },
+      ],
+    });
+
+    await waitFor(() => expect(spoken).toEqual([responseText]));
+  });
+
+>>>>>>> upstream/main
   it('does not speak while the run is still submitting', async () => {
     renderBrowserAudio({ isSubmitting: true });
     await settle();
@@ -130,6 +170,25 @@ describe('BrowserAudio autoplay', () => {
     expect(spoken).toEqual([]);
   });
 
+<<<<<<< HEAD
+=======
+  /** A turn stopped mid-reasoning persists its reasoning as `text` beside the parts. */
+  it('does not autoplay a stopped turn that only reasoned', async () => {
+    renderBrowserAudio({
+      messages: [
+        {
+          ...assistantMessage,
+          text: 'Recalling European capitals.',
+          content: [{ type: ContentTypes.THINK, think: 'Recalling European capitals.' }],
+        },
+      ],
+    });
+    await settle();
+
+    expect(spoken).toEqual([]);
+  });
+
+>>>>>>> upstream/main
   it('does not speak the user message back to them', async () => {
     const userMessage = { ...assistantMessage, isCreatedByUser: true } as TMessage;
     renderBrowserAudio({ messages: [userMessage] });

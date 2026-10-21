@@ -1,6 +1,10 @@
 import React from 'react';
 import { render, screen, waitFor, act } from '@testing-library/react';
+<<<<<<< HEAD
 import { SmartLoader, useHasData } from '../SmartLoader';
+=======
+import { SmartLoader } from '../SmartLoader';
+>>>>>>> upstream/main
 
 // Mock setTimeout and clearTimeout for testing
 jest.useFakeTimers();
@@ -296,6 +300,7 @@ describe('SmartLoader', () => {
     });
   });
 });
+<<<<<<< HEAD
 
 describe('useHasData', () => {
   const TestComponent: React.FC<{ data: any }> = ({ data }) => {
@@ -397,3 +402,5 @@ describe('useHasData', () => {
     expect(screen.getByTestId('result')).toHaveTextContent('no-data');
   });
 });
+=======
+>>>>>>> upstream/main

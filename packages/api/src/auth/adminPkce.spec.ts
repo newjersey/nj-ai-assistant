@@ -12,7 +12,11 @@ jest.mock(
   { virtual: true },
 );
 
+<<<<<<< HEAD
 import { stripCodeChallenge, storeAndStripChallenge, isAdminPanelRedirect } from './exchange';
+=======
+import { stripCodeChallenge, storeAndStripChallenge } from './exchange';
+>>>>>>> upstream/main
 import type { PkceStrippableRequest } from './exchange';
 
 function makeReq(overrides: Partial<PkceStrippableRequest> = {}): PkceStrippableRequest {
@@ -270,6 +274,7 @@ describe('storeAndStripChallenge', () => {
     expect(storedValue).toBe(challenge);
   });
 });
+<<<<<<< HEAD
 
 describe('isAdminPanelRedirect', () => {
   const crossOriginAdmin = 'http://localhost:3000';
@@ -333,3 +338,5 @@ describe('isAdminPanelRedirect', () => {
     });
   });
 });
+=======
+>>>>>>> upstream/main

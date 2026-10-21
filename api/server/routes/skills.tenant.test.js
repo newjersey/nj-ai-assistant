@@ -34,7 +34,12 @@ jest.mock('~/server/middleware/config/app', () => (req, _res, next) => {
 
 jest.mock('~/server/services/Files/strategies', () => ({
   getStrategyFunctions: jest.fn().mockReturnValue({
+<<<<<<< HEAD
     saveBuffer: jest.fn().mockResolvedValue('/uploads/test/file.txt'),
+=======
+    saveBuffer: jest.fn(async ({ userId, fileName }) => `/uploads/${userId}/${fileName}`),
+    deleteFile: jest.fn().mockResolvedValue(undefined),
+>>>>>>> upstream/main
     getDownloadStream: jest.fn().mockResolvedValue({
       pipe: jest.fn(),
       on: jest.fn(),

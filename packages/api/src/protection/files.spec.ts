@@ -2,9 +2,13 @@ import { EToolResources, mergeFileConfig } from 'librechat-data-provider';
 import type { FiltersConfig } from 'librechat-data-provider';
 import {
   canInspectUploadExtractedTextAfterProcessing,
+<<<<<<< HEAD
   canInspectUploadTranscriptAfterProcessing,
   getBlockedUploadTranscriptField,
   isFileFilterFieldEnabled,
+=======
+  getBlockedUploadTranscriptField,
+>>>>>>> upstream/main
   contentFilterUninspectableResponse,
   getBlockedOpaqueFileField,
   getBlockedUninspectableFileField,
@@ -153,6 +157,7 @@ describe('file content inspection policy', () => {
     ).toBe(true);
   });
 
+<<<<<<< HEAD
   it('defers transcript fail-close only to STT-supported non-assistant context uploads', () => {
     expect(
       canInspectUploadTranscriptAfterProcessing({
@@ -196,6 +201,8 @@ describe('file content inspection policy', () => {
     ).toBe(false);
   });
 
+=======
+>>>>>>> upstream/main
   it('treats a text-delivery audio file as carrying its own transcript', () => {
     const coverage = getCanonicalFileInspectionCoverage({
       type: 'audio/mpeg',
@@ -371,7 +378,10 @@ describe('file content inspection policy', () => {
       files: { pii: { uninspectable: 'block' } },
     } as FiltersConfig;
 
+<<<<<<< HEAD
     expect(isFileFilterFieldEnabled(filters, 'content')).toBe(true);
+=======
+>>>>>>> upstream/main
     expect(getBlockedUninspectableFileField(filters, ['content', 'extracted_text'])).toBe(
       'content',
     );
@@ -387,8 +397,11 @@ describe('file content inspection policy', () => {
       },
     } as FiltersConfig;
 
+<<<<<<< HEAD
     expect(isFileFilterFieldEnabled(filters, 'name')).toBe(true);
     expect(isFileFilterFieldEnabled(filters, 'content')).toBe(false);
+=======
+>>>>>>> upstream/main
     expect(getBlockedUninspectableFileField(filters, ['content', 'transcript'])).toBeNull();
     expect(
       getBlockedUninspectableFileField(

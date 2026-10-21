@@ -1,6 +1,7 @@
 const fs = require('fs');
 const LdapStrategy = require('passport-ldapauth');
 const { logger } = require('@librechat/data-schemas');
+<<<<<<< HEAD
 const { SystemRoles, ErrorTypes } = require('librechat-data-provider');
 const {
   isEnabled,
@@ -9,6 +10,24 @@ const {
   resolveAppConfigForUser,
 } = require('@librechat/api');
 const { createUser, findUser, updateUser, countUsers } = require('~/models');
+=======
+const { ErrorTypes } = require('librechat-data-provider');
+const {
+  isEnabled,
+  findLdapUser,
+  getBalanceConfig,
+  provisionLdapUser,
+  isEmailDomainAllowed,
+  resolveAppConfigForUser,
+} = require('@librechat/api');
+const {
+  findUser,
+  updateUser,
+  countUsers,
+  findBalanceByUser,
+  createUserIfAbsent,
+} = require('~/models');
+>>>>>>> upstream/main
 const { getAppConfig } = require('~/server/services/Config');
 
 const {
@@ -122,6 +141,7 @@ const ldapLogin = new LdapStrategy(ldapOptions, async (userinfo, done) => {
     // instead of AUTH_FAILED — both deny access.
     const baseConfig = await getAppConfig({ baseOnly: true });
     if (!isEmailDomainAllowed(mail, baseConfig?.registration?.allowedDomains)) {
+<<<<<<< HEAD
       logger.error(
         `[LDAP Strategy] Authentication blocked - email domain not allowed [Email: ${mail}]`,
       );
@@ -176,6 +196,45 @@ const ldapLogin = new LdapStrategy(ldapOptions, async (userinfo, done) => {
     }
 
     user = await updateUser(user._id, user);
+=======
+      logger.error(`[LDAP Strategy] Authentication blocked - email domain not allowed`);
+      return done(null, false, { message: 'Email domain not allowed' });
+    }
+
+    const found = await findLdapUser({ findUser, ldapId });
+    if (found.error) {
+      return done(null, false, { message: ErrorTypes.AUTH_FAILED });
+    }
+
+    const appConfig = found.user?.tenantId
+      ? await resolveAppConfigForUser(getAppConfig, found.user)
+      : baseConfig;
+
+    if (!isEmailDomainAllowed(mail, appConfig?.registration?.allowedDomains)) {
+      logger.error(`[LDAP Strategy] Authentication blocked - email domain not allowed`);
+      return done(null, false, { message: 'Email domain not allowed' });
+    }
+
+    const provisioned = await provisionLdapUser({
+      user: found.user,
+      ldapId,
+      email: mail,
+      username,
+      name: fullName,
+      appConfig,
+      getBalanceConfig,
+      getAppConfig,
+      findUser,
+      countUsers,
+      createUserIfAbsent,
+      findBalanceByUser,
+    });
+    if (provisioned.error) {
+      return done(null, false, { message: provisioned.error });
+    }
+
+    const user = await updateUser(provisioned.user._id, provisioned.user);
+>>>>>>> upstream/main
     done(null, user);
   } catch (err) {
     logger.error('[ldapStrategy]', err);

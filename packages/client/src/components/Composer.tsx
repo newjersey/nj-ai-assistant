@@ -138,7 +138,11 @@ const Composer: ForwardRefExoticComponent<
       data-testid="composer-send-button"
       className={cn(CONTROL_CLASS, offeredActions.length > 0 && 'ml-auto')}
     >
+<<<<<<< HEAD
       <SendIcon size={24} />
+=======
+      <SendIcon className="size-6" />
+>>>>>>> upstream/main
     </button>
   );
 
@@ -176,7 +180,11 @@ const Composer: ForwardRefExoticComponent<
   return (
     <div
       className={cn(
+<<<<<<< HEAD
         'flex w-full flex-col gap-1.5 rounded-3xl p-2.5',
+=======
+        'rounded-theme-surface-lg flex w-full flex-col gap-1.5 p-2.5',
+>>>>>>> upstream/main
         composerSurfaceClasses(),
         composerSurfaceShadow.within,
         className,
@@ -198,7 +206,11 @@ const Composer: ForwardRefExoticComponent<
         /** Main chat's own field metrics (`ChatForm`'s `baseClasses`), so the
          *  two composers stand the same height and their surfaces line up
          *  when this panel is open beside the thread. */
+<<<<<<< HEAD
         className="m-0 w-full resize-none bg-transparent px-3 py-[13px] text-text-primary placeholder:text-text-tertiary focus:outline-none disabled:cursor-not-allowed md:py-3.5"
+=======
+        className="text-text-primary placeholder:text-text-tertiary m-0 w-full resize-none bg-transparent px-3 py-[0.8125rem] focus:outline-hidden disabled:cursor-not-allowed md:py-3.5"
+>>>>>>> upstream/main
       />
       {/* The row holds its height whether or not it carries secondary actions,
           so the surface cannot resize as a run changes what it offers. */}
@@ -222,7 +234,11 @@ const Composer: ForwardRefExoticComponent<
                   viewBox="0 0 24 24"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
+<<<<<<< HEAD
                   className="icon-lg text-surface-primary"
+=======
+                  className="icon-lg"
+>>>>>>> upstream/main
                   aria-hidden="true"
                 >
                   <rect x="7" y="7" width="10" height="10" rx="1.25" fill="currentColor" />

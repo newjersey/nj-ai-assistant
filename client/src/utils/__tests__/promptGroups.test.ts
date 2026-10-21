@@ -11,7 +11,10 @@ import {
   updateGroupFieldsInPlace,
   updateGroupInAll,
   updatePromptGroup,
+<<<<<<< HEAD
   getSnippet,
+=======
+>>>>>>> upstream/main
   findPromptGroup,
 } from '../promptGroups';
 
@@ -326,6 +329,7 @@ describe('findPromptGroup', () => {
 });
 
 // ---------------------------------------------------------------------------
+<<<<<<< HEAD
 // getSnippet
 // ---------------------------------------------------------------------------
 
@@ -360,6 +364,8 @@ describe('getSnippet', () => {
 });
 
 // ---------------------------------------------------------------------------
+=======
+>>>>>>> upstream/main
 // addGroupToAll
 // ---------------------------------------------------------------------------
 

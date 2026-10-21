@@ -12,6 +12,7 @@ export interface SharePointFile {
   sharePointItem: any;
 }
 
+<<<<<<< HEAD
 export interface SharePointDownloadProgress {
   fileId: string;
   fileName: string;
@@ -20,6 +21,8 @@ export interface SharePointDownloadProgress {
   progress: number;
 }
 
+=======
+>>>>>>> upstream/main
 export interface SharePointBatchProgress {
   completed: number;
   total: number;
@@ -27,6 +30,7 @@ export interface SharePointBatchProgress {
   failed: string[];
 }
 
+<<<<<<< HEAD
 export const useSharePointFileDownload = (): UseMutationResult<
   File,
   unknown,
@@ -102,6 +106,8 @@ export const useSharePointFileDownload = (): UseMutationResult<
   });
 };
 
+=======
+>>>>>>> upstream/main
 export const useSharePointBatchDownload = (): UseMutationResult<
   File[],
   unknown,
@@ -160,7 +166,11 @@ export const useSharePointBatchDownload = (): UseMutationResult<
 
             return downloadedFile;
           } catch (error) {
+<<<<<<< HEAD
             console.error(`Failed to download ${file.name}:`, error);
+=======
+            console.error('SharePoint file download failed');
+>>>>>>> upstream/main
             failed.push(file.name);
             completed++;
             onProgress?.({
@@ -183,7 +193,11 @@ export const useSharePointBatchDownload = (): UseMutationResult<
       }
 
       if (failed.length > 0) {
+<<<<<<< HEAD
         console.warn(`Failed to download ${failed.length} files:`, failed);
+=======
+        console.warn(`Failed to download ${failed.length} files`);
+>>>>>>> upstream/main
       }
 
       return downloadedFiles;
@@ -229,5 +243,8 @@ function getMimeTypeFromFileName(fileName: string): string {
 
   return mimeTypes[extension || ''] || 'application/octet-stream';
 }
+<<<<<<< HEAD
 
 export { getMimeTypeFromFileName };
+=======
+>>>>>>> upstream/main

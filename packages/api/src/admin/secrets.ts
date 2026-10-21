@@ -109,11 +109,41 @@ const SECRET_SECTIONS: readonly string[] = [
   ]),
 ];
 
+<<<<<<< HEAD
 export function getSecretPreview(secret: string): string {
   if (secret.length <= 10) {
     return '*'.repeat(secret.length);
   }
   return secret.slice(0, 6) + '...' + secret.slice(-4);
+=======
+/** Shortest secret that earns a hint; below this, even four characters reveal too much. */
+const PREVIEW_MIN_LENGTH = 16;
+const PREVIEW_VISIBLE = 4;
+
+/** Masked hint for admin display: only the last four characters of a long secret, never a prefix. */
+export function getSecretPreview(secret: string): string {
+  if (secret.length < PREVIEW_MIN_LENGTH) {
+    return '*'.repeat(secret.length);
+  }
+  return '...' + secret.slice(-PREVIEW_VISIBLE);
+}
+
+/**
+ * Re-derives a stored preview under the current policy. Previews persisted by
+ * earlier releases carry a fixed-width leading prefix (`sk-lf-...cret`) whatever
+ * the secret length, so the original length cannot be established and they are
+ * fully masked until the secret is next written. Anything unrecognised is also
+ * fully masked.
+ */
+export function normalizeStoredPreview(preview: string): string {
+  if (preview === '' || /^\*+$/.test(preview)) {
+    return preview;
+  }
+  if (preview.startsWith('...') && preview.length <= 3 + PREVIEW_VISIBLE) {
+    return preview;
+  }
+  return '*'.repeat(preview.length);
+>>>>>>> upstream/main
 }
 
 /** Top-level config sections containing registered secret fields. */
@@ -443,7 +473,13 @@ function preserveArraySecrets(result: unknown, existing: unknown, basePath: stri
       if (isEncryptedConfigSecret(existingSecret)) {
         entry[field.secretKey] = existingSecret;
         if (typeof existingEntry[field.previewKey] === 'string') {
+<<<<<<< HEAD
           entry[field.previewKey] = existingEntry[field.previewKey];
+=======
+          entry[field.previewKey] = normalizeStoredPreview(
+            existingEntry[field.previewKey] as string,
+          );
+>>>>>>> upstream/main
         }
         continue;
       }
@@ -770,7 +806,11 @@ export function preserveConfigSecrets<T>(next: T, existing?: unknown, basePath =
       const legacyPreview = legacyPath ? existingSection[lastSegment(legacyPath)] : undefined;
       const existingPreview = existingSection[previewKey] ?? legacyPreview;
       if (typeof existingPreview === 'string') {
+<<<<<<< HEAD
         section[previewKey] = existingPreview;
+=======
+        section[previewKey] = normalizeStoredPreview(existingPreview);
+>>>>>>> upstream/main
       } else if (!isAlreadyEncrypted && !isPlaceholder) {
         section[previewKey] = getSecretPreview(existingSecret);
       }
@@ -869,6 +909,13 @@ export function redactConfigSecrets<T>(root: T): T {
       continue;
     }
     migrateLegacyPreviewKey(section, field);
+<<<<<<< HEAD
+=======
+    const previewKey = lastSegment(field.previewPath);
+    if (typeof section[previewKey] === 'string') {
+      section[previewKey] = normalizeStoredPreview(section[previewKey]);
+    }
+>>>>>>> upstream/main
     const key = segments[segments.length - 1];
     if (!(key in section)) {
       continue;
@@ -887,6 +934,12 @@ export function redactConfigSecrets<T>(root: T): T {
     }
     for (const item of entries) {
       const entry = getPlainRecord(item);
+<<<<<<< HEAD
+=======
+      if (entry && typeof entry[field.previewKey] === 'string') {
+        entry[field.previewKey] = normalizeStoredPreview(entry[field.previewKey] as string);
+      }
+>>>>>>> upstream/main
       if (entry && shouldRedactArraySecretValue(entry[field.secretKey], field)) {
         delete entry[field.secretKey];
       }

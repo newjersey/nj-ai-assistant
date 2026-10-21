@@ -40,6 +40,7 @@ export const forceResize = (element: HTMLTextAreaElement | null) => {
 };
 
 /**
+<<<<<<< HEAD
  * Necessary undo event helper for edge cases where undoing pasted content leaves newlines filling the previous container height.
  */
 export const trimUndoneRange = (textAreaRef: React.RefObject<HTMLTextAreaElement>) => {
@@ -58,6 +59,8 @@ export const trimUndoneRange = (textAreaRef: React.RefObject<HTMLTextAreaElement
 };
 
 /**
+=======
+>>>>>>> upstream/main
  * Remove the specified character from the end of the textarea's text if it's present.
  * This function ensures that the specified character is only removed if it's the last character.
  *

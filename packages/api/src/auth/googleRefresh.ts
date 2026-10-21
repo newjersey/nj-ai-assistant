@@ -218,7 +218,11 @@ async function resolveAdminUser(
   });
   if (matches.length > 1) {
     logger.error('[admin/oauth/refresh] ambiguous googleId match', {
+<<<<<<< HEAD
       googleId,
+=======
+      matchCount: matches.length,
+>>>>>>> upstream/main
       tenantId: options.tenantId,
     });
     throw new AdminRefreshError('USER_ID_MISMATCH', 401, 'Ambiguous identity');

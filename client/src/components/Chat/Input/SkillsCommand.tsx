@@ -1,12 +1,22 @@
 import { memo, useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { ScrollText } from 'lucide-react';
 import { useSetRecoilState } from 'recoil';
+<<<<<<< HEAD
 import { useAtomValue, useSetAtom } from 'jotai';
 import { AutoSizer, List } from 'react-virtualized';
 import { Input, Spinner, useCombobox } from '@librechat/client';
 import { SkillsScope, resolveAgentSkillsScope } from 'librechat-data-provider';
 import type { TSkillSummary } from 'librechat-data-provider';
 import type { MentionOption } from '~/common';
+=======
+import { useSetAtom, useAtomValue } from 'jotai';
+import { AutoSizer, List } from 'react-virtualized';
+import { Input, Spinner, useCombobox, useRemScale } from '@librechat/client';
+import { SkillsScope, resolveAgentSkillsScope } from 'librechat-data-provider';
+import type { TSkillSummary } from 'librechat-data-provider';
+import type { MentionOption } from '~/common';
+import { pendingManualSkillsByConvoId } from '~/components/Chat/Input/Composer/state';
+>>>>>>> upstream/main
 import useInitPopoverInput from '~/hooks/Input/useInitPopoverInput';
 import { useLocalize, useSkillActiveState } from '~/hooks';
 import { useSkillsInfiniteQuery } from '~/data-provider';
@@ -15,7 +25,10 @@ import { useAgentsMapContext } from '~/Providers';
 import { ephemeralAgentByConvoId } from '~/store';
 import { isEphemeralAgent } from '~/common';
 import MentionItem from './MentionItem';
+<<<<<<< HEAD
 import store from '~/store';
+=======
+>>>>>>> upstream/main
 
 const commandChar = '$';
 const ROW_HEIGHT = 44;
@@ -89,11 +102,18 @@ function SkillsCommandContent({
   agentId?: string | null;
 }) {
   const localize = useLocalize();
+<<<<<<< HEAD
   const setShowSkillsPopover = useSetAtom(showSkillsPopoverFamily(index));
   const setEphemeralAgent = useSetRecoilState(ephemeralAgentByConvoId(conversationId));
   const setPendingManualSkills = useSetRecoilState(
     store.pendingManualSkillsByConvoId(conversationId),
   );
+=======
+  const remScale = useRemScale();
+  const setShowSkillsPopover = useSetAtom(showSkillsPopoverFamily(index));
+  const setEphemeralAgent = useSetRecoilState(ephemeralAgentByConvoId(conversationId));
+  const setPendingManualSkills = useSetAtom(pendingManualSkillsByConvoId(conversationId));
+>>>>>>> upstream/main
 
   const agentsMap = useAgentsMapContext();
   const { isActive } = useSkillActiveState();
@@ -285,11 +305,20 @@ function SkillsCommandContent({
 
   return (
     <div className="absolute bottom-28 z-10 w-full space-y-2">
+<<<<<<< HEAD
       <div className="popover border-token-border-light rounded-2xl border bg-surface-tertiary-alt p-2 shadow-lg">
         <Input
           ref={initInputRef}
           placeholder={localize('com_ui_skills_command_placeholder')}
           className="mb-1 h-auto w-full rounded-none border-0 bg-surface-tertiary-alt p-2 text-sm text-text-primary focus:outline-none"
+=======
+      <div className="popover border-border-light bg-surface-tertiary-alt rounded-theme-popover border p-2 shadow-lg">
+        <Input
+          ref={initInputRef}
+          placeholder={localize('com_ui_skills_command_placeholder')}
+          variant="embedded"
+          className="mb-1"
+>>>>>>> upstream/main
           autoComplete="off"
           value={searchValue}
           onKeyDown={(e) => {
@@ -337,17 +366,29 @@ function SkillsCommandContent({
           }}
         />
         {open && (isLoading || isFetchingNextPage) && matches.length === 0 && (
+<<<<<<< HEAD
           <div className="flex h-32 items-center justify-center text-text-primary">
+=======
+          <div className="text-text-primary flex h-32 items-center justify-center">
+>>>>>>> upstream/main
             <Spinner />
           </div>
         )}
         {open && isError && (
+<<<<<<< HEAD
           <div className="p-4 text-center text-sm text-text-secondary">
+=======
+          <div className="text-text-secondary p-4 text-center text-sm">
+>>>>>>> upstream/main
             {localize('com_ui_skills_load_error')}
           </div>
         )}
         {open && !isLoading && !isFetchingNextPage && !isError && matches.length === 0 && (
+<<<<<<< HEAD
           <div className="p-4 text-center text-sm text-text-secondary">
+=======
+          <div className="text-text-secondary p-4 text-center text-sm">
+>>>>>>> upstream/main
             {localize(searchValue ? 'com_ui_no_skills_found' : 'com_ui_skills_empty')}
           </div>
         )}
@@ -358,11 +399,19 @@ function SkillsCommandContent({
                 <List
                   width={width}
                   overscanRowCount={5}
+<<<<<<< HEAD
                   rowHeight={ROW_HEIGHT}
                   rowCount={matches.length}
                   rowRenderer={rowRenderer}
                   scrollToIndex={activeIndex}
                   height={Math.min(matches.length * ROW_HEIGHT, 160)}
+=======
+                  rowHeight={ROW_HEIGHT * remScale}
+                  rowCount={matches.length}
+                  rowRenderer={rowRenderer}
+                  scrollToIndex={activeIndex}
+                  height={Math.min(matches.length * ROW_HEIGHT, 160) * remScale}
+>>>>>>> upstream/main
                 />
               )}
             </AutoSizer>

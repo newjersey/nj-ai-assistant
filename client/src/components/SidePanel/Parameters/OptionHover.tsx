@@ -29,7 +29,11 @@ function OptionHover({
     <HoverCardPortal>
       <HoverCardContent side={side} className={`z-[999] w-80 ${className}`} sideOffset={sideOffset}>
         <div className="space-y-2">
+<<<<<<< HEAD
           <p className="whitespace-pre-wrap text-sm text-text-secondary">{text}</p>
+=======
+          <p className="text-text-secondary text-sm whitespace-pre-wrap">{text}</p>
+>>>>>>> upstream/main
         </div>
       </HoverCardContent>
     </HoverCardPortal>

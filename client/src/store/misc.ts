@@ -1,7 +1,10 @@
 import { atom, selectorFamily } from 'recoil';
 import { TAttachment } from 'librechat-data-provider';
 import { atomWithLocalStorage } from './utils';
+<<<<<<< HEAD
 import { BadgeItem } from '~/common';
+=======
+>>>>>>> upstream/main
 
 const hideBannerHint = atomWithLocalStorage('hideBannerHint', [] as string[]);
 
@@ -52,11 +55,14 @@ const queriesEnabled = atom<boolean>({
   default: true,
 });
 
+<<<<<<< HEAD
 const isEditingBadges = atom<boolean>({
   key: 'isEditingBadges',
   default: false,
 });
 
+=======
+>>>>>>> upstream/main
 const showShortcutsDialog = atom<boolean>({
   key: 'showShortcutsDialog',
   default: false,
@@ -85,6 +91,7 @@ const customShortcuts = atomWithLocalStorage<Record<string, ShortcutOverride>>(
 /** When false, no keyboard shortcut fires and the UI stops advertising them. */
 const shortcutsEnabled = atomWithLocalStorage<boolean>('keyboardShortcutsEnabled', true);
 
+<<<<<<< HEAD
 const chatBadges = atomWithLocalStorage<Pick<BadgeItem, 'id'>[]>('chatBadges', [
   // When adding new badges, make sure to add them to useChatBadges.ts as well and add them as last item
   // DO NOT CHANGE THE ORDER OF THE BADGES ALREADY IN THE ARRAY
@@ -92,15 +99,23 @@ const chatBadges = atomWithLocalStorage<Pick<BadgeItem, 'id'>[]>('chatBadges', [
   // { id: '2' },
 ]);
 
+=======
+>>>>>>> upstream/main
 export default {
   hideBannerHint,
   messageAttachmentsMap,
   conversationAttachmentsSelector,
   queriesEnabled,
+<<<<<<< HEAD
   isEditingBadges,
+=======
+>>>>>>> upstream/main
   showShortcutsDialog,
   keyboardDeleteTarget,
   customShortcuts,
   shortcutsEnabled,
+<<<<<<< HEAD
   chatBadges,
+=======
+>>>>>>> upstream/main
 };

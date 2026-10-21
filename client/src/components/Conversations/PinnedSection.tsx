@@ -203,7 +203,11 @@ const DraggablePinnedRow = ({
   return (
     <div
       ref={ref}
+<<<<<<< HEAD
       style={{ opacity: isDragging ? 0 : 1 }}
+=======
+      className={isDragging ? 'opacity-0' : undefined}
+>>>>>>> upstream/main
       data-handler-id={handlerId}
       onKeyDown={handleKeyDown}
     >
@@ -279,6 +283,10 @@ const FavoriteRow = ({
         item={{ model: favorite.model, endpoint: favorite.endpoint }}
         type="model"
         onSelectEndpoint={onSelectEndpoint}
+<<<<<<< HEAD
+=======
+        endpointsConfig={endpointsConfig}
+>>>>>>> upstream/main
         onRemoveFocus={onRemoveFocus}
         keyShortcuts={keyShortcuts}
       />
@@ -704,7 +712,11 @@ const PinnedSection = ({
   return (
     <div
       ref={setSectionRef}
+<<<<<<< HEAD
       className="flex flex-col px-3 text-sm"
+=======
+      className="flex flex-col px-3 pt-3 text-sm"
+>>>>>>> upstream/main
       role="region"
       /** The focus handoff after an unpin must act only on rows in this list:
        *  `ConversationsSection` is also a labelled region and an ancestor of
@@ -714,8 +726,13 @@ const PinnedSection = ({
     >
       <div
         className={cn(
+<<<<<<< HEAD
           'flex h-8 w-full items-center pr-2',
           isPinOver && canPin && 'rounded-lg bg-surface-active-alt',
+=======
+          'flex h-8 w-full items-center pr-1',
+          isPinOver && canPin && 'bg-surface-nav-selected rounded-lg',
+>>>>>>> upstream/main
         )}
       >
         <button
@@ -724,7 +741,11 @@ const PinnedSection = ({
           type="button"
           aria-expanded={isExpanded}
         >
+<<<<<<< HEAD
           <span className="select-none truncate">{localize('com_ui_pinned')}</span>
+=======
+          <span className="truncate select-none">{localize('com_ui_pinned')}</span>
+>>>>>>> upstream/main
           <ChevronDown
             className={cn(
               'h-3 w-3 shrink-0 transition-transform duration-200',
@@ -741,9 +762,15 @@ const PinnedSection = ({
           {displayEntries.length === 0 && draggingConversation && (
             <div
               className={cn(
+<<<<<<< HEAD
                 'flex h-9 items-center justify-center rounded-lg border border-dashed text-xs text-text-secondary',
                 isPinOver && canPin
                   ? 'border-border-medium bg-surface-active-alt text-text-primary'
+=======
+                'text-text-secondary flex h-9 items-center justify-center rounded-lg border border-dashed text-xs',
+                isPinOver && canPin
+                  ? 'border-border-medium bg-surface-nav-selected text-text-primary'
+>>>>>>> upstream/main
                   : 'border-border-light',
               )}
               aria-hidden="true"

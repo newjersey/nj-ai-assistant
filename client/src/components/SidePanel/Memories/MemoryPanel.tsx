@@ -1,11 +1,20 @@
+<<<<<<< HEAD
 import { useMemo, useState, useEffect } from 'react';
 import { useRecoilState } from 'recoil';
 import { Plus, Check } from 'lucide-react';
+=======
+import { useMemo, useState, useEffect, useId } from 'react';
+import { Plus } from 'lucide-react';
+>>>>>>> upstream/main
 import { matchSorter } from 'match-sorter';
 import { SystemRoles, PermissionTypes, Permissions } from 'librechat-data-provider';
 import {
   Button,
+<<<<<<< HEAD
   Checkbox,
+=======
+  CheckboxGlyph,
+>>>>>>> upstream/main
   Dropdown,
   FilterInput,
   TooltipAnchor,
@@ -18,26 +27,40 @@ import {
   useMemoriesQuery,
   useGetUserQuery,
 } from '~/data-provider';
+<<<<<<< HEAD
 import MemoryPanelSplash from '~/nj/components/SidePanel/Memories/MemoryPanelSplash';
 import { useLocalize, useAuthContext, useHasAccess } from '~/hooks';
 import { PanelFooter, PanelContent } from '~/components/ui';
 import MemoryCardSkeleton from './MemoryCardSkeleton';
 import MemoryCreateDialog from './MemoryCreateDialog';
 import { atomWithLocalStorage } from '~/store/utils';
+=======
+import { PanelFooter, PanelContent, PanelHeader } from '~/components/ui';
+import { useLocalize, useAuthContext, useHasAccess } from '~/hooks';
+import MemoryCardSkeleton from './MemoryCardSkeleton';
+import MemoryCreateDialog from './MemoryCreateDialog';
+>>>>>>> upstream/main
 import MemoryUsageBadge from './MemoryUsageBadge';
 import AdminSettings from './AdminSettings';
 import MemoryList from './MemoryList';
 import { cn } from '~/utils';
 
+<<<<<<< HEAD
 // NJ: Show a one-time splash page introducing memories on first visit
 const showSplashPageState = atomWithLocalStorage('memoryPanelSplashPage', true);
 
+=======
+>>>>>>> upstream/main
 /** Partition filter sentinels; any other value is an agent id */
 const PARTITION_ALL = 'all';
 const PARTITION_PERSONAL = 'personal';
 
 export default function MemoryPanel() {
   const localize = useLocalize();
+<<<<<<< HEAD
+=======
+  const headingId = useId();
+>>>>>>> upstream/main
   const { user } = useAuthContext();
   const { data: userData } = useGetUserQuery();
   const { data: memData, isLoading } = useMemoriesQuery();
@@ -46,7 +69,10 @@ export default function MemoryPanel() {
   const [partitionFilter, setPartitionFilter] = useState(PARTITION_ALL);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [referenceSavedMemories, setReferenceSavedMemories] = useState(true);
+<<<<<<< HEAD
   const [showSplashPage, setShowSplashPage] = useRecoilState(showSplashPageState);
+=======
+>>>>>>> upstream/main
 
   const updateMemoryPreferencesMutation = useUpdateMemoryPreferencesMutation({
     onSuccess: () => {
@@ -140,16 +166,23 @@ export default function MemoryPanel() {
     });
   }, [memories, searchQuery, activePartition]);
 
+<<<<<<< HEAD
   // NJ: Show a splash page the first time a user accesses memories
   if (showSplashPage) {
     return <MemoryPanelSplash setShowSplashPage={setShowSplashPage} />;
   }
 
+=======
+>>>>>>> upstream/main
   if (!hasReadAccess) {
     return (
       <div className="flex h-full w-full items-center justify-center p-4">
         <div className="text-center">
+<<<<<<< HEAD
           <p className="text-sm text-text-secondary">{localize('com_ui_no_read_access')}</p>
+=======
+          <p className="text-text-secondary text-sm">{localize('com_ui_no_read_access')}</p>
+>>>>>>> upstream/main
         </div>
       </div>
     );
@@ -161,6 +194,7 @@ export default function MemoryPanel() {
   return (
     <div
       role="region"
+<<<<<<< HEAD
       aria-label={localize('com_ui_memories')}
       className="flex h-full w-full flex-col overflow-hidden pt-2"
     >
@@ -176,12 +210,24 @@ export default function MemoryPanel() {
             containerClassName="flex-1"
           />
           {hasCreateAccess && (
+=======
+      aria-labelledby={headingId}
+      className="flex h-full w-full flex-col overflow-hidden pt-2"
+    >
+      {/* Sticky header: title, create, filter, partition, usage + toggle */}
+      <PanelHeader
+        title={localize('com_ui_memories')}
+        titleId={headingId}
+        action={
+          hasCreateAccess && (
+>>>>>>> upstream/main
             <MemoryCreateDialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
               <OGDialogTrigger asChild>
                 <TooltipAnchor
                   description={localize('com_ui_create_memory')}
                   side="bottom"
                   render={
+<<<<<<< HEAD
                     // NJ: Customize the "Create Memory" button
                     <button
                       type="button"
@@ -191,13 +237,38 @@ export default function MemoryPanel() {
                     >
                       <Plus className="size-5" aria-hidden="true" />
                     </button>
+=======
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="size-8 shrink-0"
+                      aria-label={localize('com_ui_create_memory')}
+                      onClick={() => setCreateDialogOpen(true)}
+                    >
+                      <Plus className="size-4" aria-hidden="true" />
+                    </Button>
+>>>>>>> upstream/main
                   }
                 />
               </OGDialogTrigger>
             </MemoryCreateDialog>
+<<<<<<< HEAD
           )}
         </div>
 
+=======
+          )
+        }
+        search={
+          <FilterInput
+            inputId="memory-search"
+            label={localize('com_ui_memories_filter')}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        }
+      >
+>>>>>>> upstream/main
         {/* Partition filter (only when agent-scoped memories exist) */}
         {partitionOptions && (
           <Dropdown
@@ -225,6 +296,7 @@ export default function MemoryPanel() {
 
             {/* Memory Toggle */}
             {hasOptOutAccess && (
+<<<<<<< HEAD
               // NJ: Customize the memory toggle
               <button
                 type="button"
@@ -232,12 +304,21 @@ export default function MemoryPanel() {
                   'btn !rounded-lg text-text-primary ring-offset-surface-primary focus-visible:ring-2',
                   'ml-auto gap-2 !transition-none focus-visible:ring-text-primary focus-visible:ring-offset-2',
                   referenceSavedMemories ? 'bg-surface-tertiary' : '!border-border-medium',
+=======
+              <Button
+                size="sm"
+                variant="outline"
+                className={cn(
+                  showUsageBadge ? 'ml-auto' : 'w-full',
+                  referenceSavedMemories && 'bg-surface-hover hover:bg-surface-hover',
+>>>>>>> upstream/main
                 )}
                 onClick={() => handleMemoryToggle(!referenceSavedMemories)}
                 aria-label={localize('com_ui_use_memory')}
                 aria-pressed={referenceSavedMemories}
                 disabled={updateMemoryPreferencesMutation.isLoading}
               >
+<<<<<<< HEAD
                 <span
                   aria-hidden="true"
                   className={cn(
@@ -257,6 +338,17 @@ export default function MemoryPanel() {
           </div>
         )}
       </div>
+=======
+                {/* The button owns the state through `aria-pressed`; this is the
+                    mark, not a second control inside it. */}
+                <CheckboxGlyph checked={referenceSavedMemories} />
+                {localize('com_ui_use_memory')}
+              </Button>
+            )}
+          </div>
+        )}
+      </PanelHeader>
+>>>>>>> upstream/main
 
       {/* Only the list scrolls */}
       <PanelContent isLoading={isLoading} skeleton={<MemoryCardSkeleton />} className="px-3 pb-3">

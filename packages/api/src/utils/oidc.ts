@@ -303,6 +303,7 @@ export function processOpenIDPlaceholders(
 
   return processedValue;
 }
+<<<<<<< HEAD
 
 export function createBearerAuthHeader(tokenInfo: OpenIDTokenInfo | null): string {
   if (!tokenInfo || !tokenInfo.accessToken) {
@@ -319,3 +320,5 @@ export function isOpenIDAvailable(): boolean {
 
   return !!(openidClientId && openidClientSecret && openidIssuer);
 }
+=======
+>>>>>>> upstream/main

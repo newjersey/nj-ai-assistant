@@ -1,4 +1,5 @@
 import { ContentTypes } from 'librechat-data-provider';
+<<<<<<< HEAD
 import type { Agents, TMessage, TMessageContentParts } from 'librechat-data-provider';
 
 /**
@@ -9,6 +10,30 @@ import type { Agents, TMessage, TMessageContentParts } from 'librechat-data-prov
  * type or an extra field on `TMessage`.
  */
 export const ASK_USER_QUESTION = 'ask_user_question' as const;
+=======
+import {
+  ASK_USER_QUESTION,
+  isAskUserQuestionPart,
+  findLiveAskUserQuestion,
+  markAskUserQuestionAnswered,
+  isAnsweredAskUserQuestionPart,
+} from '@librechat/chat';
+import type { Agents, TMessage, TMessageContentParts } from 'librechat-data-provider';
+import type { AskUserQuestionPart } from '@librechat/chat';
+
+export {
+  ASK_USER_QUESTION,
+  isAskUserQuestionPart,
+  findLiveAskUserQuestion,
+  isAnsweredAskUserQuestionPart,
+};
+export {
+  applyPendingAction,
+  countTaggedApprovalParts,
+  findPendingActionMessageIndex,
+} from '@librechat/chat';
+export type { AskUserQuestionPart } from '@librechat/chat';
+>>>>>>> upstream/main
 
 /**
  * Answer sent when the user explicitly skips a question: the run must resume
@@ -20,6 +45,7 @@ const ASK_USER_QUESTION_ID_PATTERN = /^[A-Za-z][A-Za-z0-9_-]{0,63}$/;
 const MAX_ASK_USER_QUESTIONS = 4;
 const MAX_ASK_USER_QUESTION_HEADER_LENGTH = 80;
 
+<<<<<<< HEAD
 /** Shape of the synthetic content part carrying an ask-user pending action. */
 export interface AskUserQuestionPart {
   type: typeof ASK_USER_QUESTION;
@@ -200,6 +226,8 @@ function applyAskUserQuestion(
   return { ...message, content: [...content, askPart] };
 }
 
+=======
+>>>>>>> upstream/main
 /**
  * Parse an `ask_user_question` tool call's args into the question request shape.
  * Args arrive as a JSON string on persisted messages (or an object mid-stream);
@@ -343,6 +371,7 @@ export function removeAskUserQuestionPart(message: TMessage, actionId: string): 
  */
 const submittedAskAnswers = new Map<string, string>();
 
+<<<<<<< HEAD
 /**
  * Ask actions the user has answered this session. Same rationale as
  * {@link submittedAskAnswers}: the SSE step handler evolves its own cached copy
@@ -353,11 +382,14 @@ const submittedAskAnswers = new Map<string, string>();
  */
 const answeredAskActionIds = new Set<string>();
 
+=======
+>>>>>>> upstream/main
 /** The locally-submitted answer for an ask tool_call, if any. */
 export function getSubmittedAskAnswer(toolCallId: string | undefined): string | undefined {
   return toolCallId ? submittedAskAnswers.get(toolCallId) : undefined;
 }
 
+<<<<<<< HEAD
 /** Whether `part` is an ask card whose question the user already answered. */
 export const isAnsweredAskUserQuestionPart = (
   part: Partial<TMessageContentParts> | undefined,
@@ -365,6 +397,8 @@ export const isAnsweredAskUserQuestionPart = (
   isAskUserQuestionPart(part) &&
   answeredAskActionIds.has((part as unknown as AskUserQuestionPart)[ASK_USER_QUESTION].actionId);
 
+=======
+>>>>>>> upstream/main
 /**
  * Resolve an answered ask-user-question pause on the client, mirroring the
  * server's resume-time stamp so the durable Q&A card shows the answer the
@@ -391,7 +425,11 @@ export function resolveAskUserQuestionPart(
   if (!syntheticPart) {
     return message;
   }
+<<<<<<< HEAD
   answeredAskActionIds.add(actionId);
+=======
+  markAskUserQuestionAnswered(actionId);
+>>>>>>> upstream/main
   /** Exact-attribution target when the payload carried the interrupting call's
    *  id — several ask cards in one turn each resolve their own part. Absent
    *  (older server/SDK), the newest-unanswered fallback below applies. */
@@ -480,6 +518,7 @@ export function splitOtherOption(options: Agents.AskUserQuestionOption[] | undef
 }
 
 /**
+<<<<<<< HEAD
  * Finds the live (unanswered) ask-user-question pause across a conversation's
  * messages — the newest synthetic part wins. Drives the composer popover: the
  * part exists exactly while a pause is live (applied on `on_pending_action`,
@@ -522,6 +561,8 @@ export function findLiveAskUserQuestion(messages: TMessage[] | null | undefined)
 }
 
 /**
+=======
+>>>>>>> upstream/main
  * EVERY live (unanswered) ask pause across the conversation, as the set of
  * tool_call_ids their synthetic parts attribute, plus whether any live part
  * lacks attribution (older payloads). Unlike {@link findLiveAskUserQuestion}
@@ -558,6 +599,7 @@ export function collectLiveAskToolCallIds(messages: TMessage[] | null | undefine
   return { ids, hasUnattributed };
 }
 
+<<<<<<< HEAD
 /**
  * Applies a {@link Agents.PendingAction} onto the target response message,
  * dispatching on the interrupt type. Pure — returns a new message only when the
@@ -610,12 +652,15 @@ export function countTaggedApprovalParts(message: TMessage, actionId: string): n
   return countIn(content);
 }
 
+=======
+>>>>>>> upstream/main
 /** Returns the ask-user-question synthetic part when `part` is one, else undefined. */
 export function getAskUserQuestionPart(
   part: TMessageContentParts | undefined,
 ): AskUserQuestionPart | undefined {
   return isAskUserQuestionPart(part) ? (part as unknown as AskUserQuestionPart) : undefined;
 }
+<<<<<<< HEAD
 
 /**
  * Resolves the assistant response message a pending action targets within
@@ -653,3 +698,5 @@ export function findPendingActionMessageIndex(
   }
   return -1;
 }
+=======
+>>>>>>> upstream/main

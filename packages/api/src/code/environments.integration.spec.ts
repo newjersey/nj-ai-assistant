@@ -450,6 +450,7 @@ describe('code environment registry', () => {
     ).resolves.toBeNull();
   });
 
+<<<<<<< HEAD
   test('fences removal while an agent write is reserving the environment', async () => {
     const registry = createCodeEnvironmentRegistry(mongoose);
     const methods = createMethods(mongoose);
@@ -459,11 +460,27 @@ describe('code environment registry', () => {
       environment: {
         id: 'agent-write-race',
         name: 'Agent write race',
+=======
+  test('cancels expired removal when a surviving agent allows the machine', async () => {
+    const registry = createCodeEnvironmentRegistry(mongoose);
+    const ownerId = new Types.ObjectId();
+    await mongoose.models.User.create({
+      _id: ownerId,
+      email: 'additional-owner@example.com',
+      provider: 'local',
+    });
+    const environment = await registry.register({
+      actor: { userId: ownerId, role: 'USER', idOnTheSource: null },
+      environment: {
+        id: 'additional-reconcile',
+        name: 'Additional reconcile',
+>>>>>>> upstream/main
         type: 'attached',
         baseURL: 'https://code.example.com',
         controlPlaneId: 'shared-code-api',
       },
     });
+<<<<<<< HEAD
     const Agent = mongoose.models.Agent;
     const createAgent = Agent.create.bind(Agent);
     let enteredCreate!: () => void;
@@ -500,6 +517,95 @@ describe('code environment registry', () => {
     createSpy.mockRestore();
   });
 
+=======
+    await createMethods(mongoose).createAgent({
+      id: 'agent_additional_reconcile',
+      author: ownerId,
+      provider: 'test',
+      model: 'test',
+      code_environment_ids: [environment.id],
+    });
+    await mongoose.models.CodeEnvironment.updateOne(
+      { environmentId: environment.id },
+      {
+        $set: {
+          deletionStartedAt: new Date(),
+          deletionLeaseExpiresAt: new Date(Date.now() - 1_000),
+          deletionLeaseId: 'expired',
+        },
+      },
+    );
+    const fetchImpl = jest.fn();
+    await reconcileCodeEnvironmentLifecycle({ mongoose, fetchImpl });
+    expect(fetchImpl).not.toHaveBeenCalled();
+    const preserved = await mongoose.models.CodeEnvironment.findOne({
+      environmentId: environment.id,
+    }).lean<{ deletionStartedAt?: Date }>();
+    expect(preserved).not.toBeNull();
+    expect(preserved?.deletionStartedAt).toBeUndefined();
+  });
+
+  test.each(['code_environment_id', 'code_environment_ids'])(
+    'fences removal while an agent write is reserving %s',
+    async (field) => {
+      const registry = createCodeEnvironmentRegistry(mongoose);
+      const methods = createMethods(mongoose);
+      const ownerId = new Types.ObjectId();
+      await registry.register({
+        actor: { userId: ownerId, role: 'USER', idOnTheSource: null },
+        environment: {
+          id: 'agent-write-race',
+          name: 'Agent write race',
+          type: 'attached',
+          baseURL: 'https://code.example.com',
+          controlPlaneId: 'shared-code-api',
+        },
+      });
+      const Agent = mongoose.models.Agent;
+      const createAgent = Agent.create.bind(Agent);
+      let enteredCreate!: () => void;
+      let releaseCreate!: () => void;
+      const entered = new Promise<void>((resolve) => (enteredCreate = resolve));
+      const release = new Promise<void>((resolve) => (releaseCreate = resolve));
+      const createSpy = jest.spyOn(Agent, 'create').mockImplementationOnce(async (input) => {
+        enteredCreate();
+        await release;
+        return await createAgent(input);
+      });
+
+      const pendingAgent = methods.createAgent({
+        id: 'agent_write_race',
+        name: 'Agent write race',
+        author: ownerId,
+        model: 'test-model',
+        provider: 'test-provider',
+        [field]: field === 'code_environment_ids' ? ['agent-write-race'] : 'agent-write-race',
+      });
+      await entered;
+
+      await expect(
+        registry.remove({
+          actor: { userId: ownerId, role: 'USER', idOnTheSource: null },
+          environmentId: 'agent-write-race',
+        }),
+      ).rejects.toMatchObject({ name: 'CodeEnvironmentInUseError' });
+
+      releaseCreate();
+      await expect(pendingAgent).resolves.toMatchObject({
+        [field]: field === 'code_environment_ids' ? ['agent-write-race'] : 'agent-write-race',
+      });
+      createSpy.mockRestore();
+      // Once the reservation is released, the durable reference still fences removal.
+      await expect(
+        registry.remove({
+          actor: { userId: ownerId, role: 'USER', idOnTheSource: null },
+          environmentId: 'agent-write-race',
+        }),
+      ).rejects.toMatchObject({ name: 'CodeEnvironmentInUseError' });
+    },
+  );
+
+>>>>>>> upstream/main
   test('revokes every user-bound worker before account deletion', async () => {
     const ownerId = new Types.ObjectId();
     await createCodeEnvironmentRegistry(mongoose).register({
@@ -1096,6 +1202,7 @@ describe('code environment registry', () => {
     await expect(mongoose.models.CodeEnvironment.findById(environment._id)).resolves.toBeNull();
   });
 
+<<<<<<< HEAD
   test('preserves a creator-owned environment referenced by another surviving agent', async () => {
     const registry = createCodeEnvironmentRegistry(mongoose);
     const methods = createMethods(mongoose);
@@ -1129,6 +1236,44 @@ describe('code environment registry', () => {
       mongoose.models.AclEntry.countDocuments({ resourceId: environment.resourceId }),
     ).resolves.toBeGreaterThan(0);
   });
+=======
+  test.each(['code_environment_id', 'code_environment_ids'])(
+    'preserves a creator-owned environment referenced by another surviving agent via %s',
+    async (field) => {
+      const registry = createCodeEnvironmentRegistry(mongoose);
+      const methods = createMethods(mongoose);
+      const ownerId = new Types.ObjectId();
+      const teammateId = new Types.ObjectId();
+      const environment = await registry.register({
+        actor: { userId: ownerId, role: 'USER', idOnTheSource: null },
+        environment: {
+          id: 'shared-deployment-worker',
+          name: 'Shared deployment worker',
+          type: 'attached',
+          baseURL: 'https://code.example.com',
+          controlPlaneId: 'shared-code-api',
+          workerPrincipal: { type: 'deployment', id: 'shared-control-plane' },
+        },
+      });
+      await mongoose.models.Agent.create({
+        id: 'agent_survives_owner',
+        name: 'Surviving agent',
+        author: teammateId,
+        model: 'test-model',
+        provider: 'test-provider',
+        [field]: field === 'code_environment_ids' ? [environment.id] : environment.id,
+      });
+
+      await expect(methods.deleteUserCodeEnvironments(ownerId)).resolves.toBe(0);
+      await expect(
+        mongoose.models.CodeEnvironment.findOne({ environmentId: environment.id }),
+      ).resolves.not.toBeNull();
+      await expect(
+        mongoose.models.AclEntry.countDocuments({ resourceId: environment.resourceId }),
+      ).resolves.toBeGreaterThan(0);
+    },
+  );
+>>>>>>> upstream/main
 
   test('recovers expired agent reservations and removal leases', async () => {
     const methods = createMethods(mongoose);

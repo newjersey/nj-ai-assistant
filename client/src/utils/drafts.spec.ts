@@ -1,8 +1,14 @@
 import { Constants, LocalStorageKeys } from 'librechat-data-provider';
 import {
+<<<<<<< HEAD
   applyPendingPasteToDraft,
   applyPendingPastesToDraft,
   clearAllDrafts,
+=======
+  applyPendingPastesToDraft,
+  clearAllDrafts,
+  clearDraft,
+>>>>>>> upstream/main
   clearComposerDrafts,
   clearFilesDraft,
   decodeBase64,
@@ -79,6 +85,7 @@ describe('getNewConversationDraftId', () => {
   });
 });
 
+<<<<<<< HEAD
 describe('applyPendingPasteToDraft', () => {
   it('replaces a stale selected range when the original text is still present', () => {
     expect(
@@ -88,31 +95,65 @@ describe('applyPendingPasteToDraft', () => {
         selectionEnd: 15,
         replacedText: 'selected',
       }),
+=======
+describe('applyPendingPastesToDraft with a single paste', () => {
+  it('replaces a stale selected range when the original text is still present', () => {
+    expect(
+      applyPendingPastesToDraft('before selected after', [
+        {
+          text: 'pasted',
+          selectionStart: 7,
+          selectionEnd: 15,
+          replacedText: 'selected',
+        },
+      ]),
+>>>>>>> upstream/main
     ).toBe('before pasted after');
   });
 
   it('inserts at the caret when the selected range is already gone', () => {
     expect(
+<<<<<<< HEAD
       applyPendingPasteToDraft('before  after', {
         text: 'pasted',
         selectionStart: 7,
         selectionEnd: 15,
         replacedText: 'selected',
       }),
+=======
+      applyPendingPastesToDraft('before  after', [
+        {
+          text: 'pasted',
+          selectionStart: 7,
+          selectionEnd: 15,
+          replacedText: 'selected',
+        },
+      ]),
+>>>>>>> upstream/main
     ).toBe('before pasted after');
   });
 
   it('inserts at the caret when no replacement range was stored', () => {
     expect(
+<<<<<<< HEAD
       applyPendingPasteToDraft('before  after', {
         text: 'pasted',
         selectionStart: 7,
       }),
+=======
+      applyPendingPastesToDraft('before  after', [
+        {
+          text: 'pasted',
+          selectionStart: 7,
+        },
+      ]),
+>>>>>>> upstream/main
     ).toBe('before pasted after');
   });
 
   it('does not delete remaining identical text after a post-replacement snapshot', () => {
     expect(
+<<<<<<< HEAD
       applyPendingPasteToDraft('abc', {
         text: 'PASTE',
         selectionStart: 0,
@@ -121,6 +162,18 @@ describe('applyPendingPasteToDraft', () => {
         anchorBefore: '',
         anchorAfter: 'abc',
       }),
+=======
+      applyPendingPastesToDraft('abc', [
+        {
+          text: 'PASTE',
+          selectionStart: 0,
+          replacedText: 'abc',
+          replacedApplied: true,
+          anchorBefore: '',
+          anchorAfter: 'abc',
+        },
+      ]),
+>>>>>>> upstream/main
     ).toBe('PASTEabc');
   });
 });
@@ -150,6 +203,7 @@ describe('applyPendingPastesToDraft', () => {
 
   it('rebases an insert after the user edits text before the original caret', () => {
     expect(
+<<<<<<< HEAD
       applyPendingPasteToDraft('Xhello', {
         text: 'PASTE',
         selectionStart: 5,
@@ -157,11 +211,23 @@ describe('applyPendingPastesToDraft', () => {
         anchorBefore: 'hello',
         anchorAfter: '',
       }),
+=======
+      applyPendingPastesToDraft('Xhello', [
+        {
+          text: 'PASTE',
+          selectionStart: 5,
+          replacedApplied: true,
+          anchorBefore: 'hello',
+          anchorAfter: '',
+        },
+      ]),
+>>>>>>> upstream/main
     ).toBe('XhelloPASTE');
   });
 
   it('rebases an insert past a prefix the user duplicated', () => {
     expect(
+<<<<<<< HEAD
       applyPendingPasteToDraft('aabc', {
         text: 'PASTE',
         selectionStart: 1,
@@ -169,11 +235,23 @@ describe('applyPendingPastesToDraft', () => {
         anchorBefore: 'a',
         anchorAfter: 'bc',
       }),
+=======
+      applyPendingPastesToDraft('aabc', [
+        {
+          text: 'PASTE',
+          selectionStart: 1,
+          replacedApplied: true,
+          anchorBefore: 'a',
+          anchorAfter: 'bc',
+        },
+      ]),
+>>>>>>> upstream/main
     ).toBe('aaPASTEbc');
   });
 
   it('keeps a leading insert ahead of a suffix the user duplicated', () => {
     expect(
+<<<<<<< HEAD
       applyPendingPasteToDraft('abcabc', {
         text: 'PASTE',
         selectionStart: 0,
@@ -181,11 +259,23 @@ describe('applyPendingPastesToDraft', () => {
         anchorBefore: '',
         anchorAfter: 'abc',
       }),
+=======
+      applyPendingPastesToDraft('abcabc', [
+        {
+          text: 'PASTE',
+          selectionStart: 0,
+          replacedApplied: true,
+          anchorBefore: '',
+          anchorAfter: 'abc',
+        },
+      ]),
+>>>>>>> upstream/main
     ).toBe('PASTEabcabc');
   });
 
   it('rebases an insert when both sides of the original caret were edited', () => {
     expect(
+<<<<<<< HEAD
       applyPendingPasteToDraft('XhelloWORLDY', {
         text: 'PASTE',
         selectionStart: 5,
@@ -193,6 +283,17 @@ describe('applyPendingPastesToDraft', () => {
         anchorBefore: 'hello',
         anchorAfter: 'WORLD',
       }),
+=======
+      applyPendingPastesToDraft('XhelloWORLDY', [
+        {
+          text: 'PASTE',
+          selectionStart: 5,
+          replacedApplied: true,
+          anchorBefore: 'hello',
+          anchorAfter: 'WORLD',
+        },
+      ]),
+>>>>>>> upstream/main
     ).toBe('XhelloPASTEWORLDY');
   });
 
@@ -945,11 +1046,16 @@ describe('migrateTextDraft', () => {
   });
 });
 
+<<<<<<< HEAD
 describe('setDraft persistExact', () => {
+=======
+describe('setDraft', () => {
+>>>>>>> upstream/main
   beforeEach(() => {
     localStorage.clear();
   });
 
+<<<<<<< HEAD
   it('drops a one-character value by default', () => {
     setDraft({ id: 'convo-1', value: 'x' });
     expect(getDraft('convo-1')).toBe('');
@@ -958,20 +1064,42 @@ describe('setDraft persistExact', () => {
   it('keeps a one-character snapshot when persistExact is set', () => {
     setDraft({ id: 'convo-1', value: 'x', persistExact: true });
     expect(getDraft('convo-1')).toBe('x');
+=======
+  it.each(['x', '字', ' ', '\n', '🙂', 'line one\nline two'])(
+    'preserves the exact draft %j',
+    (value) => {
+      setDraft({ id: 'convo-1', value });
+      expect(getDraft('convo-1')).toBe(value);
+    },
+  );
+
+  it('clears a draft only when its value is empty', () => {
+    setDraft({ id: 'convo-1', value: 'x' });
+    setDraft({ id: 'convo-1', value: '' });
+    expect(getDraft('convo-1')).toBe('');
+>>>>>>> upstream/main
   });
 
   it('does not throw when localStorage.setItem fails', () => {
     const setItem = jest.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
       throw new Error('quota exceeded');
     });
+<<<<<<< HEAD
     expect(() =>
       setDraft({ id: 'convo-1', value: 'draft text', persistExact: true }),
     ).not.toThrow();
+=======
+    expect(() => setDraft({ id: 'convo-1', value: 'draft text' })).not.toThrow();
+>>>>>>> upstream/main
     setItem.mockRestore();
   });
 
   it('returns empty drafts when localStorage.getItem throws', () => {
+<<<<<<< HEAD
     setDraft({ id: 'convo-1', value: 'draft text', persistExact: true });
+=======
+    setDraft({ id: 'convo-1', value: 'draft text' });
+>>>>>>> upstream/main
     setFilesDraft('convo-1', {
       fileIds: ['file-1'],
       pendingPastes: { 'file-1': { text: 'paste', selectionStart: 0 } },
@@ -1088,3 +1216,35 @@ describe('resolvePendingPasteInsertStart', () => {
     ).toBe(0);
   });
 });
+<<<<<<< HEAD
+=======
+
+describe('clearDraft navigation ordering', () => {
+  beforeEach(() => {
+    localStorage.clear();
+    jest.useFakeTimers();
+  });
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  it('cannot delete text written after returning to a cleared conversation', () => {
+    setDraft({ id: 'chat-a', value: 'old draft' });
+    clearDraft('chat-a');
+    expect(getDraft('chat-a')).toBe('');
+    setDraft({ id: 'chat-a', value: 'replacement draft' });
+    jest.advanceTimersByTime(3000);
+    expect(getDraft('chat-a')).toBe('replacement draft');
+  });
+
+  it('clears two different conversations without cancelling either deletion', () => {
+    setDraft({ id: 'chat-a', value: 'alpha' });
+    setDraft({ id: 'chat-b', value: 'beta' });
+    clearDraft('chat-a');
+    clearDraft('chat-b');
+    jest.advanceTimersByTime(3000);
+    expect(getDraft('chat-a')).toBe('');
+    expect(getDraft('chat-b')).toBe('');
+  });
+});
+>>>>>>> upstream/main

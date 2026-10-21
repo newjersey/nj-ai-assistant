@@ -31,10 +31,15 @@ export default function SiblingSwitch({
   };
 
   const buttonStyle = cn(
+<<<<<<< HEAD
     'hover-button h-auto rounded-lg p-1.5 text-text-secondary-alt',
     'hover:text-text-primary hover:bg-surface-hover',
     'group-hover:visible group-focus-visible:visible group-has-[:focus-visible:not(:is(input,textarea,[contenteditable]))]:visible group-[.final-completion]:visible',
     'focus-visible:ring-2 focus-visible:ring-text-primary focus-visible:outline-none',
+=======
+    'hover-button',
+    'group-hover:visible group-focus-visible:visible group-has-[:focus-visible:not(:is(input,textarea,[contenteditable]))]:visible group-[.final-completion]:visible',
+>>>>>>> upstream/main
   );
 
   return siblingCount > 1 ? (
@@ -46,7 +51,11 @@ export default function SiblingSwitch({
       aria-label={localize('com_ui_sibling_navigation')}
     >
       <Button
+<<<<<<< HEAD
         variant="ghost"
+=======
+        variant="message-action"
+>>>>>>> upstream/main
         className={buttonStyle}
         onClick={previous}
         disabled={siblingIdx == 0}
@@ -56,7 +65,11 @@ export default function SiblingSwitch({
         <ChevronLeft size="19" aria-hidden="true" />
       </Button>
       <span
+<<<<<<< HEAD
         className="flex-shrink-0 flex-grow tabular-nums"
+=======
+        className="shrink-0 grow tabular-nums"
+>>>>>>> upstream/main
         aria-live="polite"
         aria-atomic="true"
         role="status"
@@ -64,7 +77,11 @@ export default function SiblingSwitch({
         {siblingIdx + 1} / {siblingCount}
       </span>
       <Button
+<<<<<<< HEAD
         variant="ghost"
+=======
+        variant="message-action"
+>>>>>>> upstream/main
         className={buttonStyle}
         onClick={next}
         disabled={siblingIdx == siblingCount - 1}

@@ -162,6 +162,7 @@ export function useToolToggle({
     [handleChange],
   );
 
+<<<<<<< HEAD
   return {
     toggleState: toolValue, // Return the actual value from ephemeralAgent
     handleChange,
@@ -175,4 +176,39 @@ export function useToolToggle({
     isPinned,
     setIsPinned,
   };
+=======
+  const setToggleState = useCallback((value: ToolValue) => handleChange({ value }), [handleChange]);
+
+  /* Memoized because `BadgeRowContext` puts six of these in a context value that
+     the composer palette derives its whole catalog from: a fresh object here on
+     every render made that value change on every keystroke, whatever the
+     provider did about it. */
+  return useMemo(
+    () => ({
+      toggleState: toolValue, // Return the actual value from ephemeralAgent
+      handleChange,
+      isToolEnabled,
+      toolValue,
+      setToggleState, // Adapter for direct setting
+      ephemeralAgent,
+      debouncedChange,
+      setEphemeralAgent,
+      authData: authQuery?.data,
+      isPinned,
+      setIsPinned,
+    }),
+    [
+      toolValue,
+      handleChange,
+      isToolEnabled,
+      setToggleState,
+      ephemeralAgent,
+      debouncedChange,
+      setEphemeralAgent,
+      authQuery?.data,
+      isPinned,
+      setIsPinned,
+    ],
+  );
+>>>>>>> upstream/main
 }

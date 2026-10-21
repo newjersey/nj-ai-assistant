@@ -29,10 +29,18 @@ export function ArchivedChatsModal({
   return (
     <OGDialog open={open} onOpenChange={onOpenChange} triggerRef={triggerRef}>
       <OGDialogContent
+<<<<<<< HEAD
         ref={contentRef}
         tabIndex={-1}
         onOpenAutoFocus={handleOpenAutoFocus}
         className="w-11/12 max-w-3xl shadow-2xl focus:outline-none"
+=======
+        focusOutline="hidden"
+        ref={contentRef}
+        tabIndex={-1}
+        onOpenAutoFocus={handleOpenAutoFocus}
+        className="w-11/12 max-w-3xl shadow-2xl"
+>>>>>>> upstream/main
       >
         <OGDialogHeader>
           <OGDialogTitle>{localize('com_nav_archived_chats')}</OGDialogTitle>

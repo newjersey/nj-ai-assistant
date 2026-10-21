@@ -6,16 +6,34 @@ jest.mock('@librechat/agents', () => ({
 }));
 
 jest.mock('@librechat/api', () => ({
+<<<<<<< HEAD
   unescapeLaTeX: jest.fn((value) => value),
   countTokens: jest.fn().mockResolvedValue(10),
+=======
+  prepareToolCallPreviews: jest.fn(() => (messages) => Promise.resolve(messages)),
+  createToolCallPartHandler: jest.fn(() => (_req, res) => res.status(404).end()),
+  rejectToolCallPreviewWrites: (_req, _res, next) => next(),
+  withMessageToolCallPreviews: (_req, message) => message,
+  unescapeLaTeX: jest.fn((value) => value),
+  countTokens: jest.fn().mockResolvedValue(10),
+  createPrivateTextView: jest.fn(() => (_req, _res, next) => next()),
+>>>>>>> upstream/main
   createContentFilter: jest.fn(() => (req, res, next) => next()),
   sendFeedbackScore: jest.fn().mockResolvedValue(undefined),
   traceIdForMessage: jest.fn((messageId) => `trace-${messageId}`),
   CHILD_THREAD_READ_ONLY_ERROR: 'Child thread is view-only.',
   isSubagentThreadWriteBlocked: jest.fn().mockResolvedValue(false),
   requireFeedbackEnabled: jest.fn((req, res, next) => next()),
+<<<<<<< HEAD
 }));
 
+=======
+  applyForcedRetention: jest.fn(),
+}));
+
+jest.mock('~/server/services/Config', () => ({ getAppConfig: jest.fn() }));
+
+>>>>>>> upstream/main
 jest.mock('~/server/services/Endpoints/agents/subagentThreadStore', () => ({}));
 
 jest.mock('@librechat/data-schemas', () => ({

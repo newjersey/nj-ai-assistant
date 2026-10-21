@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 const { maxWorkers } = require('../config/jest.workers.cjs');
+=======
+const { maxWorkers, workerIdleMemoryLimit } = require('../config/jest.workers.cjs');
+>>>>>>> upstream/main
 
 const esModules = [
   'openid-client',
@@ -8,6 +12,10 @@ const esModules = [
   '@langchain/langgraph-checkpoint',
   '@langchain/langgraph-sdk',
   '@mistralai/mistralai',
+<<<<<<< HEAD
+=======
+  '@modelcontextprotocol/ext-apps',
+>>>>>>> upstream/main
   'uuid',
   'sanitize-html',
   'htmlparser2',
@@ -24,6 +32,10 @@ module.exports = {
   roots: ['<rootDir>'],
   coverageDirectory: 'coverage',
   maxWorkers,
+<<<<<<< HEAD
+=======
+  workerIdleMemoryLimit,
+>>>>>>> upstream/main
   testTimeout: 30000, // 30 seconds timeout for all tests
   setupFiles: ['./test/jestSetup.js', './test/__mocks__/logger.js'],
   moduleNameMapper: {

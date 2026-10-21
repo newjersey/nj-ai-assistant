@@ -9,6 +9,7 @@ interface IToolCallData {
 
 export function createToolCallMethods(mongoose: typeof import('mongoose')): {
   createToolCall: (toolCallData: IToolCallData) => Promise<IToolCallData>;
+<<<<<<< HEAD
   updateToolCall: (
     id: string,
     updateData: Partial<IToolCallData>,
@@ -25,10 +26,13 @@ export function createToolCallMethods(mongoose: typeof import('mongoose')): {
       })
     | null
   >;
+=======
+>>>>>>> upstream/main
   deleteToolCalls: (
     userId: string,
     conversationId?: string,
   ) => Promise<import('mongodb').DeleteResult>;
+<<<<<<< HEAD
   getToolCallById: (id: string) => Promise<
     | (import('mongoose').FlattenMaps<{
         [x: string]: unknown;
@@ -42,6 +46,8 @@ export function createToolCallMethods(mongoose: typeof import('mongoose')): {
       })
     | null
   >;
+=======
+>>>>>>> upstream/main
   getToolCallsByConvo: (
     conversationId: string,
     userId: string,
@@ -57,6 +63,7 @@ export function createToolCallMethods(mongoose: typeof import('mongoose')): {
       __v: number;
     })[]
   >;
+<<<<<<< HEAD
   getToolCallsByMessage: (
     messageId: string,
     userId: string,
@@ -72,6 +79,8 @@ export function createToolCallMethods(mongoose: typeof import('mongoose')): {
       __v: number;
     })[]
   >;
+=======
+>>>>>>> upstream/main
 } {
   /**
    * Create a new tool call
@@ -86,6 +95,7 @@ export function createToolCallMethods(mongoose: typeof import('mongoose')): {
   }
 
   /**
+<<<<<<< HEAD
    * Get a tool call by ID
    */
   async function getToolCallById(id: string): Promise<
@@ -136,6 +146,8 @@ export function createToolCallMethods(mongoose: typeof import('mongoose')): {
   }
 
   /**
+=======
+>>>>>>> upstream/main
    * Get tool calls by conversation ID and user
    */
   async function getToolCallsByConvo(
@@ -162,6 +174,7 @@ export function createToolCallMethods(mongoose: typeof import('mongoose')): {
   }
 
   /**
+<<<<<<< HEAD
    * Update a tool call
    */
   async function updateToolCall(
@@ -189,6 +202,8 @@ export function createToolCallMethods(mongoose: typeof import('mongoose')): {
   }
 
   /**
+=======
+>>>>>>> upstream/main
    * Delete tool calls by user and optionally conversation
    */
   async function deleteToolCalls(
@@ -209,11 +224,16 @@ export function createToolCallMethods(mongoose: typeof import('mongoose')): {
 
   return {
     createToolCall,
+<<<<<<< HEAD
     updateToolCall,
     deleteToolCalls,
     getToolCallById,
     getToolCallsByConvo,
     getToolCallsByMessage,
+=======
+    deleteToolCalls,
+    getToolCallsByConvo,
+>>>>>>> upstream/main
   };
 }
 

@@ -4,14 +4,26 @@ import { DndProvider } from 'react-dnd';
 import { RouterProvider } from 'react-router-dom';
 import * as RadixToast from '@radix-ui/react-toast';
 import { HTML5Backend } from 'react-dnd-html5-backend';
+<<<<<<< HEAD
 import { QueryClient, QueryClientProvider, QueryCache } from '@tanstack/react-query';
 import { Toast, ThemeProvider, ToastProvider, useInputModality } from '@librechat/client';
+=======
+import { Toast, ToastViewport, ToastProvider, useInputModality } from '@librechat/client';
+import { QueryClient, QueryClientProvider, QueryCache, MutationCache } from '@tanstack/react-query';
+>>>>>>> upstream/main
 import { ScreenshotProvider, useApiErrorBoundary } from './hooks';
 import WakeLockManager from '~/components/System/WakeLockManager';
 import QueryDevtoolsGate from '~/components/QueryDevtoolsGate';
 import LanguageSync from '~/components/System/LanguageSync';
+<<<<<<< HEAD
 import { getThemeFromEnv } from './utils/getThemeFromEnv';
 import { initializeFontSize } from '~/store/fontSize';
+=======
+import DeploymentTheme from '~/Providers/DeploymentTheme';
+import UiScaleSync from '~/components/System/UiScaleSync';
+import { initializeFontSize } from '~/store/fontSize';
+import { reopenTermsOnRefusal } from '~/utils/terms';
+>>>>>>> upstream/main
 import { LiveAnnouncer } from '~/a11y';
 import { router } from './routes';
 
@@ -37,12 +49,21 @@ const App = () => {
         }
       },
     }),
+<<<<<<< HEAD
+=======
+    mutationCache: new MutationCache({
+      onError: (error) => {
+        reopenTermsOnRefusal(queryClient, error?.response?.data);
+      },
+    }),
+>>>>>>> upstream/main
   });
 
   useEffect(() => {
     initializeFontSize();
   }, []);
 
+<<<<<<< HEAD
   // Load theme from environment variables if available
   const envTheme = getThemeFromEnv();
 
@@ -71,6 +92,25 @@ const App = () => {
                       transcript on screen under the new URL for as long as the
                       next thread took to render.
 
+=======
+  return (
+    <QueryClientProvider client={queryClient}>
+      <RecoilRoot>
+        <LanguageSync />
+        <UiScaleSync />
+        <LiveAnnouncer>
+          <DeploymentTheme>
+            <RadixToast.Provider>
+              <ToastProvider>
+                <DndProvider backend={HTML5Backend}>
+                  {/* Location updates commit in the caller's own task instead
+                      of React's transition lane. A transition keeps the
+                      OUTGOING route painted until the incoming one finishes
+                      rendering, so switching conversations left the previous
+                      transcript on screen under the new URL for as long as the
+                      next thread took to render.
+
+>>>>>>> upstream/main
                       Set here rather than per navigation because the property
                       is route-shaped, not caller-shaped: fourteen call sites
                       across components, chat hooks and SSE handlers navigate
@@ -87,11 +127,19 @@ const App = () => {
                   <WakeLockManager />
                   <QueryDevtoolsGate />
                   <Toast />
+<<<<<<< HEAD
                   <RadixToast.Viewport className="pointer-events-none fixed inset-x-0 top-0 z-[1000] mx-auto my-2 flex max-w-[560px] flex-col items-stretch justify-start" />
                 </DndProvider>
               </ToastProvider>
             </RadixToast.Provider>
           </ThemeProvider>
+=======
+                  <ToastViewport />
+                </DndProvider>
+              </ToastProvider>
+            </RadixToast.Provider>
+          </DeploymentTheme>
+>>>>>>> upstream/main
         </LiveAnnouncer>
       </RecoilRoot>
     </QueryClientProvider>
@@ -106,9 +154,13 @@ export default () => (
       allow="autoplay"
       id="audio"
       title="audio-silence"
+<<<<<<< HEAD
       style={{
         display: 'none',
       }}
+=======
+      className="hidden"
+>>>>>>> upstream/main
     />
   </ScreenshotProvider>
 );

@@ -1,22 +1,38 @@
 import { useCallback } from 'react';
 import { useRecoilValue } from 'recoil';
 import {
+<<<<<<< HEAD
   Tools,
   Constants,
   mergeFileConfig,
   isAgentsEndpoint,
+=======
+  Constants,
+  mergeFileConfig,
+  isAgentsEndpoint,
+  isEphemeralAgentId,
+>>>>>>> upstream/main
   getEndpointFileConfig,
   defaultAgentCapabilities,
 } from 'librechat-data-provider';
 import type { EToolResources } from 'librechat-data-provider';
+<<<<<<< HEAD
 import useAgentToolPermissions from '~/hooks/Agents/useAgentToolPermissions';
 import useAgentCapabilities from '~/hooks/Agents/useAgentCapabilities';
 import { getViableUploadOptions, isUnifiedUploadMode } from '~/utils';
+=======
+import { getViableUploadOptions, getUploadToolAllowances, isUnifiedUploadMode } from '~/utils';
+import useAgentToolPermissions from '~/hooks/Agents/useAgentToolPermissions';
+import useAgentCapabilities from '~/hooks/Agents/useAgentCapabilities';
+>>>>>>> upstream/main
 import useGetAgentsConfig from '~/hooks/Agents/useGetAgentsConfig';
 import { useGetFileConfig } from '~/data-provider';
 import { ephemeralAgentByConvoId } from '~/store';
 import { useDragDropContext } from '~/Providers';
+<<<<<<< HEAD
 import { isEphemeralAgent } from '~/common';
+=======
+>>>>>>> upstream/main
 
 /**
  * Resolves which upload destinations a file set can be routed to, plus whether uploads are
@@ -42,6 +58,7 @@ export default function useUploadOptions() {
   /** Destination checks read this config, so callers can tell "not viable" from "not known yet". */
   const isConfigPending = !isFileConfigLoaded && !isFileConfigError && !isFileConfigPaused;
 
+<<<<<<< HEAD
   /**
    * Tools are offerable unless a saved agent omits them; in direct/ephemeral chats selecting
    * one enables the ephemeral capability, matching the original drag-and-drop behavior.
@@ -49,6 +66,12 @@ export default function useUploadOptions() {
   const isSavedAgent = agentId != null && agentId !== '' && !isEphemeralAgent(agentId);
   const fileSearchAllowedByAgent = !isSavedAgent || (tools?.includes(Tools.file_search) ?? false);
   const codeAllowedByAgent = !isSavedAgent || (tools?.includes(Tools.execute_code) ?? false);
+=======
+  const { fileSearchAllowedByAgent, codeAllowedByAgent } = getUploadToolAllowances(agentId, tools);
+  /* Same predicate `getUploadToolAllowances` applies internally: only a saved
+     agent has a provider to wait for below. */
+  const isSavedAgent = agentId != null && agentId !== '' && !isEphemeralAgentId(agentId);
+>>>>>>> upstream/main
 
   /* An agent conversation carries endpoint `agents`, but its file policy belongs to the
    * provider it runs on, which is the entry a named custom endpoint configures. Resolved

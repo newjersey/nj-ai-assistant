@@ -57,6 +57,7 @@ describe('AccessRole Model Tests', () => {
       expect(role.resourceType).toBe(ResourceType.CODE_ENVIRONMENT);
     });
 
+<<<<<<< HEAD
     test('should find a role by its ID', async () => {
       const createdRole = await methods.createRole(sampleRole);
       const foundRole = await methods.findRoleById(createdRole._id);
@@ -66,6 +67,8 @@ describe('AccessRole Model Tests', () => {
       expect(foundRole?.accessRoleId).toBe(sampleRole.accessRoleId);
     });
 
+=======
+>>>>>>> upstream/main
     test('should find a role by its identifier', async () => {
       await methods.createRole(sampleRole);
       const foundRole = await methods.findRoleByIdentifier(sampleRole.accessRoleId);
@@ -102,6 +105,7 @@ describe('AccessRole Model Tests', () => {
       const foundRole = await methods.findRoleByIdentifier(sampleRole.accessRoleId);
       expect(foundRole).toBeNull();
     });
+<<<<<<< HEAD
 
     test('should get all roles', async () => {
       const roles = [
@@ -123,6 +127,8 @@ describe('AccessRole Model Tests', () => {
         ['test_editor', 'test_viewer'].sort(),
       );
     });
+=======
+>>>>>>> upstream/main
   });
 
   describe('Resource and Permission Queries', () => {
@@ -175,6 +181,7 @@ describe('AccessRole Model Tests', () => {
         ['project_editor', 'project_viewer'].sort(),
       );
     });
+<<<<<<< HEAD
 
     test('should find role by permissions', async () => {
       const viewerRole = await methods.findRoleByPermissions('agent', RoleBits.VIEWER);
@@ -192,6 +199,8 @@ describe('AccessRole Model Tests', () => {
       const role = await methods.findRoleByPermissions('agent', customPerm);
       expect(role).toBeNull();
     });
+=======
+>>>>>>> upstream/main
   });
 
   describe('seedDefaultRoles', () => {
@@ -263,6 +272,7 @@ describe('AccessRole Model Tests', () => {
       expect(role?.description).toBe(customRole.description);
     });
   });
+<<<<<<< HEAD
 
   describe('getRoleForPermissions', () => {
     beforeEach(async () => {
@@ -342,4 +352,6 @@ describe('AccessRole Model Tests', () => {
       expect(projectRole?.accessRoleId).toBe('project_viewer');
     });
   });
+=======
+>>>>>>> upstream/main
 });

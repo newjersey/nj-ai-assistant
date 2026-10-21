@@ -161,6 +161,7 @@ export function getStatusTextKey(
 }
 
 /**
+<<<<<<< HEAD
  * Determines if a server requires user action to connect.
  * Used to show action buttons and amber status color.
  */
@@ -183,6 +184,8 @@ export function serverNeedsAction(
 }
 
 /**
+=======
+>>>>>>> upstream/main
  * Request-scoped servers are usable without an idle transport connection once
  * their authorization requirement is satisfied. Agent tooling uses this
  * readiness signal to attach the runtime wildcard instead of waiting for a

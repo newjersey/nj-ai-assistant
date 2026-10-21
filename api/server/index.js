@@ -27,6 +27,10 @@ const {
   createSecurityHeaders,
   performStartupChecks,
   handleJsonParseError,
+<<<<<<< HEAD
+=======
+  excludeRumBodyParser,
+>>>>>>> upstream/main
   GenerationJobManager,
   QUERY_DEVTOOLS_HEADER,
   createStreamServices,
@@ -44,10 +48,20 @@ const {
   loadToolApprovalHooks,
   maybeInjectQueryDevtoolsBootstrap,
   injectConfiguredFooterBootstrap,
+<<<<<<< HEAD
+=======
+  injectColorModeHandoff,
+  readBundledThemeBoot,
+  createDeploymentThemeShell,
+>>>>>>> upstream/main
   preAuthTenantMiddleware,
   requestContextMiddleware,
   registerShutdownTask,
   getRemainingShutdownMs,
+<<<<<<< HEAD
+=======
+  registerBackgroundTaskShutdown,
+>>>>>>> upstream/main
   configureServerTimeouts,
   setupGracefulShutdown,
   updateInterfacePermissions,
@@ -67,11 +81,19 @@ const {
   sweepOrphanedPreviews,
   getRoleByName,
   seedDatabase,
+<<<<<<< HEAD
+=======
+  recordAuditEntry,
+>>>>>>> upstream/main
 } = require('~/models');
 const initializeOAuthReconnectManager = require('./services/initializeOAuthReconnectManager');
 const { capabilityContextMiddleware } = require('./middleware/roles/capabilities');
 const createValidateImageRequest = require('./middleware/validateImageRequest');
 const { initializeGitHubSkillSync } = require('./services/Skills/sync');
+<<<<<<< HEAD
+=======
+const { startSkillDeletionSweep } = require('./services/Skills/deletion');
+>>>>>>> upstream/main
 const { initializeAgentTriggerService } = require('./services/Agents/triggers');
 const { resumeAgentEventDetachedAction } = require('./services/Agents/detachedActionResume');
 const { initializeScheduleEngine, recordExpiredScheduleApproval } = require('./services/Schedules');
@@ -86,16 +108,21 @@ const createSpaFallback = require('./utils/fallback');
 const { getAppConfig } = require('./services/Config');
 const staticCache = require('./utils/staticCache');
 const noIndex = require('./middleware/noIndex');
+<<<<<<< HEAD
 const routes = require('./routes');
 const agentEventMethods = require('~/models');
 const { njContentSecurityPolicy } = require('~/nj/nj-helmet');
 const { njCronJobs } = require('~/nj/nj-cron');
+=======
+const agentEventMethods = require('~/models');
+>>>>>>> upstream/main
 
 /** Route admin file-config MIME patterns through a linear-time engine (ReDoS-safe) on upload. */
 configureFileConfigRegexEngine();
 
 /** Reject messageFilter PII patterns the RE2 runtime engine cannot compile, at config load. */
 configureMessageFilterRegexValidator();
+<<<<<<< HEAD
 
 const { PORT, HOST, ALLOW_SOCIAL_LOGIN, DISABLE_COMPRESSION, TRUST_PROXY } = process.env ?? {};
 
@@ -141,6 +168,53 @@ const configureGenerationStreams = () => {
     createAgentEventTerminalHandler(agentEventMethods, {
       resumeDetachedAction: resumeAgentEventDetachedAction,
     }),
+=======
+
+const { PORT, HOST, ALLOW_SOCIAL_LOGIN, DISABLE_COMPRESSION, TRUST_PROXY } = process.env ?? {};
+
+// Allow PORT=0 to be used for automatic free port assignment
+const port = isNaN(Number(PORT)) ? 3080 : Number(PORT);
+const host = HOST || 'localhost';
+const trusted_proxy = Number(TRUST_PROXY) || 1; /* trust first proxy by default */
+
+const app = express();
+app.locals.codeApiUploadRegistry = createCodeApiUploadRegistry();
+let serverReady = false;
+/** @type {import('@librechat/api').ScheduleEngineState} */
+let scheduleEngineState = 'starting';
+
+const SERVER_NOT_READY_CODE = 'SERVER_NOT_READY';
+const CHAT_START_RETRY_AFTER_SECONDS = '1';
+
+const rejectChatStartsUntilReady = (req, res, next) => {
+  if (serverReady || req.method !== 'POST' || req.path === '/abort') {
+    return next();
+  }
+
+  res.set('Retry-After', CHAT_START_RETRY_AFTER_SECONDS);
+  return res.status(503).json({
+    code: SERVER_NOT_READY_CODE,
+    error: 'Server is still starting. Please retry shortly.',
+  });
+};
+
+const rejectScheduleWritesUntilReady = createScheduleWriteGate({
+  getState: () => scheduleEngineState,
+  retryAfterSeconds: CHAT_START_RETRY_AFTER_SECONDS,
+});
+
+const configureGenerationStreams = () => {
+  const streamServices = createStreamServices();
+  GenerationJobManager.configure({
+    ...streamServices,
+    cleanupOnComplete: !isEnabled(process.env.STREAM_KEEP_COMPLETED_JOBS),
+  });
+  GenerationJobManager.setApprovalExpiredHandler(recordExpiredScheduleApproval);
+  GenerationJobManager.setAdmissionGuard(agentEventMethods.isAgentTriggerPrincipalActive);
+  GenerationJobManager.setTerminalHostActionHandler(
+    createAgentEventTerminalHandler(agentEventMethods, {
+      resumeDetachedAction: resumeAgentEventDetachedAction,
+    }),
   );
   GenerationJobManager.initialize();
   // Stop active generations and close their SSE streams while the HTTP server drains.
@@ -167,6 +241,182 @@ const configureGenerationStreams = () => {
   registerShutdownTask('generation job manager', destroyGenerationJobManager, { priority: 100 });
 };
 
+/** Reserved for the shutdown tasks that run after the generation job manager. */
+const SHUTDOWN_TEARDOWN_RESERVE_MS = 10_000;
+
+const startServer = async () => {
+  await waitForKeyvRedisClient();
+  const { metricsMiddleware, metricsRouter } = createMetrics({
+    collectAgentEventActorStorageMetrics: () =>
+      runAsSystem(async () => {
+        const now = new Date();
+        const [receiptMetrics, reconciliationMetrics] = await Promise.all([
+          agentEventMethods.getAgentEventActorReceiptStorageMetrics(now),
+          agentEventMethods.getAgentEventActorReconciliationStorageMetrics(now),
+        ]);
+        return {
+          ...receiptMetrics,
+          pendingReconciliations: reconciliationMetrics.pending,
+          oldestPendingAgeSeconds: reconciliationMetrics.oldestPendingAgeSeconds,
+        };
+      }),
+  });
+  if (!process.env.METRICS_SECRET) {
+    logger.warn('[metrics] METRICS_SECRET is not set - /metrics will return 401 for all requests');
+  }
+
+  if (typeof Bun !== 'undefined') {
+    axios.defaults.headers.common['Accept-Encoding'] = 'gzip';
+  }
+  await connectDb();
+
+  logger.info('Connected to MongoDB');
+  startCodeEnvironmentLifecycleReconciler({ mongoose });
+  indexSync().catch((err) => {
+    logger.error('[indexSync] Background sync failed:', err);
+  });
+
+  app.disable('x-powered-by');
+  app.set('trust proxy', trusted_proxy);
+
+  /* Registered ahead of every route so health checks carry the headers too. */
+  const securityHeaders = createSecurityHeaders();
+  if (securityHeaders) {
+    app.use(securityHeaders);
+  }
+
+  if (isEnabled(process.env.TRUST_TENANT_HEADER)) {
+    logger.warn(
+      '[Security] TRUST_TENANT_HEADER is active. Ensure your reverse proxy strips and sets ' +
+        'X-Tenant-Id — untrusted clients must not be able to supply it directly.',
+    );
+  } else if (isEnabled(process.env.TENANT_ISOLATION_STRICT)) {
+    logger.warn(
+      '[Security] TENANT_ISOLATION_STRICT is active while TRUST_TENANT_HEADER is disabled. ' +
+        'Pre-authentication tenant headers will be ignored.',
+    );
+  }
+
+  await runAsSystem(seedDatabase);
+  /* Recover stuck `status: 'pending'` records from a crash mid-render.
+   * `runAsSystem` is required — `File` is tenant-isolated and strict
+   * mode rejects unscoped queries. Lazy sweep in the preview endpoint
+   * covers anything younger than the boot cutoff. */
+  runAsSystem(sweepOrphanedPreviews).catch((err) => {
+    logger.error('[sweepOrphanedPreviews] Background sweep failed:', err);
+  });
+  const appConfig = await getAppConfig({ baseOnly: true });
+  await configureSubagentTaskRouting(appConfig?.endpoints?.agents?.subagentActivity);
+  registerBackgroundTaskShutdown({
+    interruptGraceMs: appConfig?.endpoints?.agents?.backgroundTasks?.shutdownInterruptGraceMs,
+  });
+  configureAgentEventRuntime(appConfig?.endpoints?.agents?.eventDriven);
+  warnOnUnreachableDeliveryPaths(appConfig);
+  initializeFileStorage(appConfig);
+  const projectRoot = path.resolve(__dirname, '../..');
+  // Plugin hooks execute only when the operator opts in via DEPLOYMENT_PLUGIN_HOOKS;
+  // without it, declared hook documents load as parsed-but-inert with a warning.
+  await initializeDeploymentPlugins({
+    projectRoot,
+    hookCapabilities: getDeploymentPluginHookCapabilities(),
+  });
+  // Hand the run seam its plugin-hook source without a packages/api-internal
+  // agents -> plugins import (see agents/hooks/source.ts).
+  setPluginHookSource({
+    hasHooks: hasDeploymentPluginHooks,
+    hasToolApprovalHooks: hasDeploymentPluginToolApprovalHooks,
+    register: registerDeploymentPluginHooks,
+  });
+  await initializeDeploymentSkills({
+    projectRoot,
+    additionalSkills: getDeploymentPluginSkills(),
+  });
+  initializeGitHubSkillSync(appConfig);
+  startSkillDeletionSweep(appConfig.skillDeletion);
+  startExpiredFileSweep({ appConfig, loadAppConfig: getAppConfig });
+  // Register any programmatic tool-approval policy hooks declared in
+  // `endpoints.agents.toolApproval.hooks`. Honor the `enabled` kill switch: when tool
+  // approval is off we pass no hooks, so a disabled endpoint imports/runs nothing (and any
+  // previously loaded batch is unregistered). Hooks are read from the BASE config only —
+  // they register once, process-wide; per-user/tenant differences belong inside the hook
+  // (via its context), not in per-override module lists.
+  const toolApproval = appConfig?.endpoints?.agents?.toolApproval;
+  await loadToolApprovalHooks(toolApproval?.enabled ? toolApproval.hooks : undefined, {
+    basePath: path.resolve(__dirname, '../..'),
+  });
+  await runAsSystem(async () => {
+    await performStartupChecks(appConfig);
+    await updateInterfacePermissions({
+      appConfig,
+      getRoleByName,
+      updateAccessPermissions,
+      recordAuditEntry,
+    });
+  });
+
+  /* Route modules build their rate limiters as they load, so they load only after the
+   * startup checks have applied `rateLimits` from librechat.yaml. */
+  const routes = require('./routes');
+
+  const indexPath = path.join(appConfig.paths.dist, 'index.html');
+  let indexHTML = fs.readFileSync(indexPath, 'utf8');
+
+  // In order to provide support to serving the application in a sub-directory
+  // We need to update the base href if the DOMAIN_CLIENT is specified and not the root path
+  if (process.env.DOMAIN_CLIENT) {
+    const clientUrl = new URL(process.env.DOMAIN_CLIENT);
+    const baseHref = clientUrl.pathname.endsWith('/')
+      ? clientUrl.pathname
+      : `${clientUrl.pathname}/`;
+    if (baseHref !== '/') {
+      logger.info(`Setting base href to ${baseHref}`);
+      indexHTML = indexHTML.replace(/base href="\/"/, `base href="${baseHref}"`);
+    }
+  }
+
+  /* The composer lays out against whether a footer bar sits beneath it, and
+     `/api/config` answers that only after it has painted. One shell serves every
+     request, before there is a caller whose overrides could be resolved, so the
+     answer is the deployment's base configuration; `/api/config` resolves the
+     caller's and the client prefers it. */
+  indexHTML = injectConfiguredFooterBootstrap(indexHTML, {
+    customFooter: process.env.CUSTOM_FOOTER,
+    landingFooter: appConfig?.interfaceConfig?.landingFooter,
+  });
+
+  indexHTML = injectColorModeHandoff(indexHTML, appConfig.interfaceConfig?.colorModeFromUrl);
+  const indexShell = createDeploymentThemeShell(
+    indexHTML,
+    appConfig.interfaceConfig?.theme,
+    readBundledThemeBoot(appConfig.paths.dist),
+>>>>>>> upstream/main
+  );
+  GenerationJobManager.initialize();
+  // Stop active generations and close their SSE streams while the HTTP server drains.
+  registerShutdownTask(
+    'generation job manager prepare',
+    () => GenerationJobManager.prepareForShutdown(),
+    {
+      phase: 'pre-drain',
+      priority: 100,
+    },
+  );
+  /** Spend the shutdown budget that is actually left waiting for detached generations to
+   *  record their own provider drains, holding back a reserve for the tasks after this one.
+   *  Abandoning an unrecorded drain fences the next generation permanently. */
+  const destroyGenerationJobManager = () => {
+    const remaining = getRemainingShutdownMs();
+    return GenerationJobManager.destroy(
+      remaining == null
+        ? undefined
+        : { settlementBudgetMs: Math.max(0, remaining - SHUTDOWN_TEARDOWN_RESERVE_MS) },
+    );
+  };
+  // Tear down stream resources before shared caches and telemetry exporters shut down.
+  registerShutdownTask('generation job manager', destroyGenerationJobManager, { priority: 100 });
+};
+
+<<<<<<< HEAD
 /** Reserved for the shutdown tasks that run after the generation job manager. */
 const SHUTDOWN_TEARDOWN_RESERVE_MS = 10_000;
 
@@ -329,14 +579,56 @@ const startServer = async () => {
     return res.status(200).send('OK');
   });
 
+=======
+  const cspPolicy = createCspPolicy();
+  const shellCache = shellCacheHeaders(cspPolicy != null);
+
+  const sendIndexHtml = (req, res) => {
+    res.set(shellCache);
+    res.vary(QUERY_DEVTOOLS_HEADER);
+
+    const lang = req.cookies.lang || req.headers['accept-language']?.split(',')[0] || 'en-US';
+    const saneLang = escapeHtmlAttribute(lang);
+    let updatedIndexHtml = indexShell(req, res).replace(
+      /lang="en-US"/g,
+      () => `lang="${saneLang}"`,
+    );
+    updatedIndexHtml = maybeInjectQueryDevtoolsBootstrap(updatedIndexHtml, req);
+
+    /* Nonce last: every injected script above must be stamped too. */
+    if (cspPolicy) {
+      const csp = issueCsp(cspPolicy);
+      res.set(csp.headerName, csp.headerValue);
+      updatedIndexHtml = applyCspNonce(updatedIndexHtml, csp.nonce);
+    }
+
+    res.type('html');
+    res.send(updatedIndexHtml);
+  };
+
+  app.get('/health', (_req, res) => res.status(200).send('OK'));
+  app.get('/livez', (_req, res) => res.status(200).send('OK'));
+  app.get('/readyz', (_req, res) => {
+    if (!serverReady) {
+      return res.status(503).send('NOT_READY');
+    }
+    return res.status(200).send('OK');
+  });
+
+>>>>>>> upstream/main
   /* Middleware */
   app.use(requestContextMiddleware);
   app.use('/api/agents/chat', agentStartupIngressMiddleware);
   app.use(metricsMiddleware);
   app.use(noIndex);
+<<<<<<< HEAD
   app.use(express.json({ limit: '3mb' }));
   app.use(express.urlencoded({ extended: true, limit: '3mb' }));
   app.use(njContentSecurityPolicy());
+=======
+  app.use(excludeRumBodyParser(express.json({ limit: '3mb' })));
+  app.use(excludeRumBodyParser(express.urlencoded({ extended: true, limit: '3mb' })));
+>>>>>>> upstream/main
   app.use(handleJsonParseError);
 
   /**
@@ -417,6 +709,10 @@ const startServer = async () => {
   app.use('/api/search', routes.search);
   app.use('/api/messages', routes.messages);
   app.use('/api/convos', routes.convos);
+<<<<<<< HEAD
+=======
+  app.use('/api/pull-requests', preAuthTenantMiddleware, routes.pullRequests);
+>>>>>>> upstream/main
   app.use('/api/traces', routes.traces);
   app.use('/api/presets', routes.presets);
   app.use('/api/projects', routes.projects);
@@ -451,6 +747,11 @@ const startServer = async () => {
 
   app.use('/metrics', metricsRouter);
 
+<<<<<<< HEAD
+=======
+  app.use('/api', routes.openapi);
+
+>>>>>>> upstream/main
   /** 404 for unmatched API routes */
   app.use('/api', apiNotFound);
 
@@ -495,13 +796,28 @@ const startServer = async () => {
       });
       await checkMigrations();
 
+<<<<<<< HEAD
       njCronJobs();
 
+=======
+>>>>>>> upstream/main
       const inspectFlags = process.execArgv.some((arg) => arg.startsWith('--inspect'));
       if (inspectFlags || isEnabled(process.env.MEM_DIAG)) {
         memoryDiagnostics.start();
       }
+<<<<<<< HEAD
       await initializeAgentTriggerService({ address: server.address() });
+=======
+      await initializeAgentTriggerService({
+        address: server.address(),
+        completionResultBatchSize:
+          appConfig?.endpoints?.agents?.backgroundTasks?.completionResultBatchSize,
+        completionReceiptBatching:
+          appConfig?.endpoints?.agents?.backgroundTasks?.completionReceiptBatching,
+        deadLetterRetentionDays: appConfig?.endpoints?.agents?.eventDriven?.deadLetterRetentionDays,
+        idlePolling: appConfig?.endpoints?.agents?.eventDriven?.idlePolling,
+      });
+>>>>>>> upstream/main
       const scheduleEngineArmed = (await initializeScheduleEngine()) != null;
       scheduleEngineState = scheduleEngineArmed ? 'armed' : 'unavailable';
       if (!scheduleEngineArmed) {

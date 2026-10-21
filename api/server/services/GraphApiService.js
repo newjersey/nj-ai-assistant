@@ -498,6 +498,7 @@ const searchGroups = async (graphClient, query, limit = 10) => {
 };
 
 /**
+<<<<<<< HEAD
  * Test Graph API connectivity and permissions
  * @param {string} accessToken - OpenID Connect access token
  * @param {string} sub - Subject identifier
@@ -588,6 +589,8 @@ const testGraphApiAccess = async (accessToken, sub) => {
 };
 
 /**
+=======
+>>>>>>> upstream/main
  * Map Graph API user object to TPrincipalSearchResult format
  * @param {TGraphUser} user - Raw user object from Graph API
  * @returns {TPrincipalSearchResult} Mapped user result
@@ -649,7 +652,10 @@ module.exports = {
   getUserEntraGroups,
   getUserOwnedEntraGroups,
   getEntraGroupDetailsBatch,
+<<<<<<< HEAD
   testGraphApiAccess,
+=======
+>>>>>>> upstream/main
   searchEntraIdPrincipals,
   exchangeTokenForGraphAccess,
   entraIdPrincipalFeatureEnabled,

@@ -1,7 +1,10 @@
 import React from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { Slider, InputNumber } from '@librechat/client';
+<<<<<<< HEAD
 import { cn, defaultTextProps, optionText } from '~/utils';
+=======
+>>>>>>> upstream/main
 import { useLocalize } from '~/hooks';
 import store from '~/store';
 
@@ -15,7 +18,11 @@ export default function DecibelSelector() {
       <div className="flex items-center justify-between">
         <div id="playback-rate-label">{localize('com_nav_playback_rate')}</div>
         <div className="w-2" />
+<<<<<<< HEAD
         <small className="opacity-40 high-contrast:opacity-100">
+=======
+        <small className="high-contrast:opacity-100 opacity-40">
+>>>>>>> upstream/main
           ({localize('com_endpoint_default_with_num', { 0: '1' })})
         </small>
       </div>
@@ -39,6 +46,7 @@ export default function DecibelSelector() {
           min={0.1}
           max={2}
           aria-labelledby="playback-rate-label"
+<<<<<<< HEAD
           className={cn(
             defaultTextProps,
             cn(
@@ -46,6 +54,10 @@ export default function DecibelSelector() {
               'reset-rc-number-input reset-rc-number-input-text-right h-auto w-12 border-0 group-hover/temp:border-border-light',
             ),
           )}
+=======
+          variant="option"
+          className="w-12"
+>>>>>>> upstream/main
         />
       </div>
     </div>

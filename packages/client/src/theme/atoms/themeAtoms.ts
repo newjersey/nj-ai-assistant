@@ -4,12 +4,25 @@
 import { WritableAtom } from 'jotai';
 import { atomWithStorage, RESET } from 'jotai/utils';
 import { IThemeRGB } from '../types';
+<<<<<<< HEAD
 import { constAtom } from '~/nj/utils/constAtom';
+=======
+>>>>>>> upstream/main
 
 /**
  * @deprecated Use ThemeContext instead. This atom is no longer used internally.
  */
+<<<<<<< HEAD
 export const themeModeAtom: WritableAtom<string, [string], void> = constAtom<string>('light'); // NJ: Hardcode light theme
+=======
+export const themeModeAtom: WritableAtom<
+  string,
+  [string | typeof RESET | ((prev: string) => string | typeof RESET)],
+  void
+> = atomWithStorage<string>('color-theme', 'system', undefined, {
+  getOnInit: true,
+});
+>>>>>>> upstream/main
 
 /**
  * @deprecated Use ThemeContext instead. This atom is no longer used internally.

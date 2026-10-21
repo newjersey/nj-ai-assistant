@@ -5,6 +5,7 @@ import { Constants } from 'librechat-data-provider';
 import type { TMessage, TMessageContentParts } from 'librechat-data-provider';
 import type { TMessageProps, TMessageIcon, TMessageChatContext } from '~/common';
 import {
+<<<<<<< HEAD
   areMessageFieldsEqual,
   cn,
   getHeaderPrefixForScreenReader,
@@ -14,18 +15,46 @@ import { revealOnRowHoverClasses, messageFooterClasses } from '~/components/Chat
 import { useLocalize, useAttachments, useMessageActions, useContentMetadata } from '~/hooks';
 import ToolCallLimitNotice from '~/components/Chat/Messages/Content/ToolCallLimitNotice';
 import AuthorHeader from '~/components/Chat/Messages/Content/Parts/AuthorHeader';
+=======
+  cn,
+  isSameTailRelation,
+  getMessageAriaLabel,
+  areMessageFieldsEqual,
+  getHeaderPrefixForScreenReader,
+} from '~/utils';
+import { revealOnRowHoverClasses, messageFooterClasses } from '~/components/Chat/Messages/styles';
+import { useLocalize, useAttachments, useMessageActions, useContentMetadata } from '~/hooks';
+import ResumeAuthorHeader from '~/components/Chat/Messages/Content/Parts/ResumeAuthorHeader';
+import ToolCallLimitNotice from '~/components/Chat/Messages/Content/ToolCallLimitNotice';
+>>>>>>> upstream/main
 import { ErrorSourceProvider } from '~/components/Messages/Content/Error/source';
 import Elapsed, { shouldShowElapsed } from '~/components/Chat/Messages/Elapsed';
 import { getHeaderHoverLabel } from '~/components/Chat/Messages/ui/HeaderLabel';
 import ContentParts from '~/components/Chat/Messages/Content/ContentParts';
+<<<<<<< HEAD
+=======
+import { PrivateText } from '~/components/Chat/Messages/PrivateText';
+>>>>>>> upstream/main
 import SiblingSwitch from '~/components/Chat/Messages/SiblingSwitch';
 import HoverButtons from '~/components/Chat/Messages/HoverButtons';
 import MessageRow from '~/components/Chat/Messages/ui/MessageRow';
 import MessageIcon from '~/components/Chat/Messages/MessageIcon';
 import { showThinkingAtom } from '~/store/showThinking';
 import SubRow from '~/components/Chat/Messages/SubRow';
+<<<<<<< HEAD
 import store from '~/store';
 
+=======
+import { AuthorContext } from '~/Providers';
+import store from '~/store';
+
+/**
+ * The one header every assistant message hands its parts. It reads the author from
+ * `AuthorContext`, so the author resolving after paint cannot break the parts' memo.
+ */
+const RESUME_AUTHOR_HEADER = <ResumeAuthorHeader />;
+
+>>>>>>> upstream/main
 type ContentRenderProps = {
   message?: TMessage;
   /**
@@ -36,6 +65,12 @@ type ContentRenderProps = {
   isSubmitting?: boolean;
   /** Stable context object from wrapper — avoids ChatContext subscription inside memo */
   chatContext: TMessageChatContext;
+<<<<<<< HEAD
+=======
+  /** The thread's tail; the comparator re-renders only when this row's relation to it changes */
+  latestMessageId?: string;
+  latestMessageDepth?: number;
+>>>>>>> upstream/main
 } & Pick<
   TMessageProps,
   'currentEditId' | 'setCurrentEditId' | 'siblingIdx' | 'setSiblingIdx' | 'siblingCount'
@@ -68,7 +103,11 @@ function areContentRenderPropsEqual(prev: ContentRenderProps, next: ContentRende
     return false;
   }
 
+<<<<<<< HEAD
   return areMessageFieldsEqual(prev.message, next.message);
+=======
+  return areMessageFieldsEqual(prev.message, next.message) && isSameTailRelation(prev, next);
+>>>>>>> upstream/main
 }
 
 const ContentRender = memo(function ContentRender({
@@ -80,6 +119,11 @@ const ContentRender = memo(function ContentRender({
   setCurrentEditId,
   isSubmitting = false,
   chatContext,
+<<<<<<< HEAD
+=======
+  latestMessageId,
+  latestMessageDepth,
+>>>>>>> upstream/main
 }: ContentRenderProps) {
   const localize = useLocalize();
   const { attachments, searchResults } = useAttachments({
@@ -96,11 +140,17 @@ const ContentRender = memo(function ContentRender({
     messageLabel,
     handleContinue,
     handleFeedback,
+<<<<<<< HEAD
     latestMessageId,
     copyToClipboard,
     getCanCopy,
     regenerateMessage,
     latestMessageDepth,
+=======
+    copyToClipboard,
+    getCanCopy,
+    regenerateMessage,
+>>>>>>> upstream/main
     hasConfiguredSender,
   } = useMessageActions({
     message: msg,
@@ -110,9 +160,17 @@ const ContentRender = memo(function ContentRender({
     chatContext,
   });
   const maximizeChatSpace = useRecoilValue(store.maximizeChatSpace);
+<<<<<<< HEAD
   const showThinking = useAtomValue(showThinkingAtom);
 
   const handleRegenerateMessage = useCallback(() => regenerateMessage(), [regenerateMessage]);
+=======
+  const autoExpandTools = useRecoilValue(store.autoExpandTools);
+  const showThinking = useAtomValue(showThinkingAtom);
+
+  const handleRegenerateMessage = useCallback(() => regenerateMessage(), [regenerateMessage]);
+  const getLatestMessageId = useCallback(() => chatContext.latestMessageId, [chatContext]);
+>>>>>>> upstream/main
   const isLast = useMemo(
     () => !(msg?.children?.length ?? 0) && (msg?.depth === latestMessageDepth || msg?.depth === -1),
     [msg?.children, msg?.depth, latestMessageDepth],
@@ -138,6 +196,7 @@ const ContentRender = memo(function ContentRender({
     ],
   );
 
+<<<<<<< HEAD
   const authorHeader = useMemo(
     () =>
       msg?.isCreatedByUser === true ? undefined : (
@@ -147,6 +206,14 @@ const ContentRender = memo(function ContentRender({
         />
       ),
     [msg?.isCreatedByUser, iconData, assistant, agent, messageLabel],
+=======
+  const author = useMemo(
+    () => ({
+      icon: <MessageIcon iconData={iconData} assistant={assistant} agent={agent} />,
+      label: messageLabel ?? '',
+    }),
+    [iconData, assistant, agent, messageLabel],
+>>>>>>> upstream/main
   );
 
   const { hasParallelContent } = useContentMetadata(msg);
@@ -158,8 +225,13 @@ const ContentRender = memo(function ContentRender({
   return (
     <MessageRow
       id={msg.messageId}
+<<<<<<< HEAD
       icon={<MessageIcon iconData={iconData} assistant={assistant} agent={agent} />}
       label={messageLabel ?? ''}
+=======
+      icon={author.icon}
+      label={author.label}
+>>>>>>> upstream/main
       hoverLabel={getHeaderHoverLabel(
         hasConfiguredSender,
         agent?.model,
@@ -201,19 +273,27 @@ const ContentRender = memo(function ContentRender({
             message={msg}
             isEditing={edit}
             enterEdit={enterEdit}
+<<<<<<< HEAD
             isSubmitting={chatContext.isSubmitting}
+=======
+>>>>>>> upstream/main
             conversation={conversation ?? null}
             regenerate={handleRegenerateMessage}
             copyToClipboard={copyToClipboard}
             getCanCopy={getCanCopy}
             handleContinue={handleContinue}
             latestMessageId={latestMessageId}
+<<<<<<< HEAD
+=======
+            getLatestMessageId={getLatestMessageId}
+>>>>>>> upstream/main
             handleFeedback={handleFeedback}
             isLast={isLast}
           />
         </SubRow>
       }
     >
+<<<<<<< HEAD
       <ErrorSourceProvider message={msg}>
         <ContentParts
           edit={edit}
@@ -235,6 +315,36 @@ const ContentRender = memo(function ContentRender({
           content={msg.content as Array<TMessageContentParts | undefined>}
         />
       </ErrorSourceProvider>
+=======
+      <AuthorContext.Provider value={author}>
+        <ErrorSourceProvider message={msg}>
+          {!edit && msg.isCreatedByUser && msg.privacyRevision ? (
+            <PrivateText message={msg} />
+          ) : (
+            <ContentParts
+              edit={edit}
+              isLast={isLast}
+              enterEdit={enterEdit}
+              siblingIdx={siblingIdx}
+              messageId={msg.messageId}
+              attachments={attachments}
+              searchResults={searchResults}
+              manualSkills={msg.manualSkills}
+              authorHeader={msg.isCreatedByUser === true ? undefined : RESUME_AUTHOR_HEADER}
+              setSiblingIdx={setSiblingIdx}
+              isLatestMessage={isLatestMessage}
+              isSubmitting={isSubmitting}
+              isCreatedByUser={msg.isCreatedByUser}
+              createdAt={msg.createdAt ?? msg.clientTimestamp}
+              foldLiveActivity={!autoExpandTools}
+              showThinking={showThinking}
+              conversationId={conversation?.conversationId}
+              content={msg.content as Array<TMessageContentParts | undefined>}
+            />
+          )}
+        </ErrorSourceProvider>
+      </AuthorContext.Provider>
+>>>>>>> upstream/main
       {/** A turn that ran out of agent steps is incomplete, not broken. Rendered
        *   here rather than inside `ContentParts` because it is a message-level
        *   outcome, and `ContentParts` also serves surfaces (subagent panels,

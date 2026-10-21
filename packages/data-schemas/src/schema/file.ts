@@ -196,9 +196,12 @@ const file: Schema<IMongoFile> = new Schema(
       type: String,
       index: true,
     },
+<<<<<<< HEAD
     pinned: {
       type: Boolean,
     },
+=======
+>>>>>>> upstream/main
     expiredAt: {
       /* Retention deadline for persisted files. The file sweep deletes the
        * backing storage first, then removes this metadata record. */
@@ -223,6 +226,13 @@ const file: Schema<IMongoFile> = new Schema(
 );
 
 file.index({ expiredAt: 1 });
+<<<<<<< HEAD
+=======
+file.index(
+  { user: 1, tenantId: 1, context: 1, _id: -1 },
+  { name: 'project_file_picker', partialFilterExpression: { embedded: true } },
+);
+>>>>>>> upstream/main
 file.index({ createdAt: 1, updatedAt: 1 });
 file.index(
   { filename: 1, conversationId: 1, context: 1, tenantId: 1 },

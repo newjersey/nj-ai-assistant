@@ -1,15 +1,30 @@
 import { createAgentQueuedTurnModel, createAgentQueuedTurnSequenceModel } from './queuedTurn';
 import { createAgentTriggerLaneSequenceModel } from './triggerLaneSequence';
 import { createScheduleModel, createScheduleRunModel } from './schedule';
+<<<<<<< HEAD
+=======
+import { getTenantIndexMigrationHint } from '~/migrations/tenantIndexes';
+>>>>>>> upstream/main
 import { createSkillSyncCredentialModel } from './skillSyncCredential';
 import { createOpenIDRefreshFlightModel } from './openidRefreshFlight';
 import { createAgentTriggerUserPurgeModel } from './triggerUserPurge';
 import { createRefreshTokenBridgeModel } from './refreshTokenBridge';
 import { createAgentTriggerDeliveryModel } from './triggerDelivery';
+<<<<<<< HEAD
 import { createSkillSyncStatusModel } from './skillSyncStatus';
 import { createConversationTagModel } from './conversationTag';
 import { createCodeEnvironmentModel } from './codeEnvironment';
 import { createAgentCategoryModel } from './agentCategory';
+=======
+import { createToolApprovalGrantModel } from './toolApprovalGrant';
+import { createSkillUploadIntentModel } from './skillUploadIntent';
+import { createSkillSyncStatusModel } from './skillSyncStatus';
+import { createConversationTagModel } from './conversationTag';
+import { createCodeEnvironmentModel } from './codeEnvironment';
+import { createSkillDeletionModel } from './skillDeletion';
+import { createAgentCategoryModel } from './agentCategory';
+import { createResourceLockModel } from './resourceLock';
+>>>>>>> upstream/main
 import { createChatProjectModel } from './chatProject';
 import { createAgentApiKeyModel } from './agentApiKey';
 import { createTransactionModel } from './transaction';
@@ -27,6 +42,10 @@ import { createToolCallModel } from './toolCall';
 import { createAclEntryModel } from './aclEntry';
 import { createAuditLogModel } from './auditLog';
 import { createSessionModel } from './session';
+<<<<<<< HEAD
+=======
+import { createPasskeyModel } from './passkey';
+>>>>>>> upstream/main
 import { createBalanceModel } from './balance';
 import { createMessageModel } from './message';
 import { createActionModel } from './action';
@@ -50,8 +69,15 @@ import logger from '~/config/winston';
  */
 export function createModels(mongoose: typeof import('mongoose')): {
   User: ReturnType<typeof createUserModel>;
+<<<<<<< HEAD
   Token: ReturnType<typeof createTokenModel>;
   Session: ReturnType<typeof createSessionModel>;
+=======
+  ToolApprovalGrant: ReturnType<typeof createToolApprovalGrantModel>;
+  Token: ReturnType<typeof createTokenModel>;
+  Session: ReturnType<typeof createSessionModel>;
+  Passkey: ReturnType<typeof createPasskeyModel>;
+>>>>>>> upstream/main
   Balance: ReturnType<typeof createBalanceModel>;
   Conversation: ReturnType<typeof createConversationModel>;
   ChatProject: ReturnType<typeof createChatProjectModel>;
@@ -74,6 +100,11 @@ export function createModels(mongoose: typeof import('mongoose')): {
   PromptGroup: ReturnType<typeof createPromptGroupModel>;
   Skill: ReturnType<typeof createSkillModel>;
   SkillFile: ReturnType<typeof createSkillFileModel>;
+<<<<<<< HEAD
+=======
+  SkillDeletion: ReturnType<typeof createSkillDeletionModel>;
+  SkillUploadIntent: ReturnType<typeof createSkillUploadIntentModel>;
+>>>>>>> upstream/main
   SkillSyncCredential: ReturnType<typeof createSkillSyncCredentialModel>;
   SkillSyncStatus: ReturnType<typeof createSkillSyncStatusModel>;
   ConversationTag: ReturnType<typeof createConversationTagModel>;
@@ -96,11 +127,22 @@ export function createModels(mongoose: typeof import('mongoose')): {
   ScheduleRun: ReturnType<typeof createScheduleRunModel>;
   RefreshTokenBridge: ReturnType<typeof createRefreshTokenBridgeModel>;
   OpenIDRefreshFlight: ReturnType<typeof createOpenIDRefreshFlightModel>;
+<<<<<<< HEAD
 } {
   const models = {
     User: createUserModel(mongoose),
     Token: createTokenModel(mongoose),
     Session: createSessionModel(mongoose),
+=======
+  ResourceLock: ReturnType<typeof createResourceLockModel>;
+} {
+  const models = {
+    User: createUserModel(mongoose),
+    ToolApprovalGrant: createToolApprovalGrantModel(mongoose),
+    Token: createTokenModel(mongoose),
+    Session: createSessionModel(mongoose),
+    Passkey: createPasskeyModel(mongoose),
+>>>>>>> upstream/main
     Balance: createBalanceModel(mongoose),
     Conversation: createConversationModel(mongoose),
     ChatProject: createChatProjectModel(mongoose),
@@ -123,6 +165,11 @@ export function createModels(mongoose: typeof import('mongoose')): {
     PromptGroup: createPromptGroupModel(mongoose),
     Skill: createSkillModel(mongoose),
     SkillFile: createSkillFileModel(mongoose),
+<<<<<<< HEAD
+=======
+    SkillDeletion: createSkillDeletionModel(mongoose),
+    SkillUploadIntent: createSkillUploadIntentModel(mongoose),
+>>>>>>> upstream/main
     SkillSyncCredential: createSkillSyncCredentialModel(mongoose),
     SkillSyncStatus: createSkillSyncStatusModel(mongoose),
     ConversationTag: createConversationTagModel(mongoose),
@@ -145,6 +192,10 @@ export function createModels(mongoose: typeof import('mongoose')): {
     ScheduleRun: createScheduleRunModel(mongoose),
     RefreshTokenBridge: createRefreshTokenBridgeModel(mongoose),
     OpenIDRefreshFlight: createOpenIDRefreshFlightModel(mongoose),
+<<<<<<< HEAD
+=======
+    ResourceLock: createResourceLockModel(mongoose),
+>>>>>>> upstream/main
   };
   /**
    * Background index builds fail silently unless an 'index' listener is
@@ -156,6 +207,14 @@ export function createModels(mongoose: typeof import('mongoose')): {
       model.on('index', (error?: Error) => {
         if (error) {
           logger.error(`Index build failed for "${model.modelName}": ${error.message}`);
+<<<<<<< HEAD
+=======
+          // eslint-disable-next-line no-restricted-syntax -- Collection name metadata only, no raw driver operations.
+          const hint = getTenantIndexMigrationHint(model.collection.collectionName, error);
+          if (hint) {
+            logger.warn(hint);
+          }
+>>>>>>> upstream/main
         }
       });
     }

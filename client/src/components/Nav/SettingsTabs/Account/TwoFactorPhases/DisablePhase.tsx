@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+<<<<<<< HEAD
 import { REGEXP_ONLY_DIGITS, REGEXP_ONLY_DIGITS_AND_CHARS } from 'input-otp';
+=======
+import { REGEXP_ONLY_DIGITS } from 'input-otp';
+>>>>>>> upstream/main
 import {
   Button,
   InputOTP,
@@ -9,6 +13,10 @@ import {
   InputOTPSeparator,
   Spinner,
 } from '@librechat/client';
+<<<<<<< HEAD
+=======
+import BackupCodeInput, { isBackupCode } from '~/components/Auth/BackupCodeInput';
+>>>>>>> upstream/main
 import { useLocalize } from '~/hooks';
 
 const fadeAnimation = {
@@ -31,6 +39,7 @@ export const DisablePhase: React.FC<DisablePhaseProps> = ({ onDisable, isDisabli
   const [useBackup, setUseBackup] = useState(false);
 
   return (
+<<<<<<< HEAD
     <motion.div {...fadeAnimation} className="space-y-8">
       <div className="flex justify-center">
         <InputOTP
@@ -52,6 +61,20 @@ export const DisablePhase: React.FC<DisablePhaseProps> = ({ onDisable, isDisabli
               <InputOTPSlot index={7} />
             </InputOTPGroup>
           ) : (
+=======
+    <motion.div {...fadeAnimation} className="text-text-primary space-y-8">
+      <div className="flex justify-center">
+        {useBackup ? (
+          <BackupCodeInput value={token} onChange={setToken} />
+        ) : (
+          <InputOTP
+            aria-label={localize('com_ui_2fa_verification_required')}
+            value={token}
+            onChange={setToken}
+            maxLength={6}
+            pattern={REGEXP_ONLY_DIGITS}
+          >
+>>>>>>> upstream/main
             <>
               <InputOTPGroup>
                 <InputOTPSlot index={0} />
@@ -65,24 +88,38 @@ export const DisablePhase: React.FC<DisablePhaseProps> = ({ onDisable, isDisabli
                 <InputOTPSlot index={5} />
               </InputOTPGroup>
             </>
+<<<<<<< HEAD
           )}
         </InputOTP>
+=======
+          </InputOTP>
+        )}
+>>>>>>> upstream/main
       </div>
       <Button
         variant="destructive"
         onClick={() => onDisable(token, useBackup)}
+<<<<<<< HEAD
         disabled={isDisabling || token.length !== (useBackup ? 8 : 6)}
         className="w-full rounded-xl px-6 py-3 transition-all disabled:opacity-50"
+=======
+        disabled={isDisabling || !(useBackup ? isBackupCode(token) : token.length === 6)}
+        className="w-full rounded-xl px-6 py-3 transition-all"
+>>>>>>> upstream/main
       >
         {isDisabling && <Spinner className="mr-2" />}
         {isDisabling ? localize('com_ui_disabling') : localize('com_ui_2fa_disable')}
       </Button>
+<<<<<<< HEAD
       <Button
         type="button"
         variant="link"
         onClick={() => setUseBackup(!useBackup)}
         className="h-auto p-0 text-sm text-text-primary hover:underline"
       >
+=======
+      <Button type="button" variant="link" onClick={() => setUseBackup(!useBackup)} size="bare">
+>>>>>>> upstream/main
         {useBackup ? localize('com_ui_use_2fa_code') : localize('com_ui_use_backup_code')}
       </Button>
     </motion.div>

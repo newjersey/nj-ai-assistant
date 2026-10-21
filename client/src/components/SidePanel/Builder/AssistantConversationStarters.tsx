@@ -36,11 +36,14 @@ const AssistantConversationStarters: React.FC<AssistantConversationStartersProps
     const newValues = field.value.filter((_, i) => i !== index);
     field.onChange(newValues);
   };
+<<<<<<< HEAD
   const defaultStyle = {
     transition: 'opacity 200ms ease-in-out',
     opacity: 0,
   };
 
+=======
+>>>>>>> upstream/main
   const triggerShake = (element: HTMLElement) => {
     element.classList.remove('shake');
     void element.offsetWidth;
@@ -50,6 +53,7 @@ const AssistantConversationStarters: React.FC<AssistantConversationStartersProps
     }, 200);
   };
 
+<<<<<<< HEAD
   const transitionStyles = {
     entering: { opacity: 1 },
     entered: { opacity: 1 },
@@ -57,6 +61,8 @@ const AssistantConversationStarters: React.FC<AssistantConversationStartersProps
     exited: { opacity: 0 },
   };
 
+=======
+>>>>>>> upstream/main
   const hasReachedMax = field.value.length >= Constants.MAX_CONVO_STARTERS;
 
   const addConversationStarterLabel = hasReachedMax
@@ -103,18 +109,30 @@ const AssistantConversationStarters: React.FC<AssistantConversationStartersProps
             {(state: string) => (
               <div
                 ref={nodeRef}
+<<<<<<< HEAD
                 style={{
                   ...defaultStyle,
                   ...transitionStyles[state as keyof typeof transitionStyles],
                   transition: state === 'entering' ? 'none' : defaultStyle.transition,
                 }}
                 className="absolute right-1 top-1"
+=======
+                className={`absolute top-1 right-1 ${
+                  state === 'entering'
+                    ? 'transition-none'
+                    : 'transition-opacity duration-200 ease-in-out'
+                } ${state === 'entering' || state === 'entered' ? 'opacity-100' : 'opacity-0'}`}
+>>>>>>> upstream/main
               >
                 <TooltipAnchor
                   side="top"
                   description={addConversationStarterLabel}
                   aria-label={addConversationStarterLabel}
+<<<<<<< HEAD
                   className="flex size-7 items-center justify-center rounded-lg transition-colors duration-200 hover:bg-surface-hover"
+=======
+                  className="hover:bg-surface-hover flex size-7 items-center justify-center rounded-lg transition-colors duration-200"
+>>>>>>> upstream/main
                   onClick={handleAddStarter}
                   disabled={hasReachedMax}
                 >
@@ -142,7 +160,11 @@ const AssistantConversationStarters: React.FC<AssistantConversationStartersProps
               side="top"
               description={localize('com_ui_delete')}
               aria-label={localize('com_ui_delete')}
+<<<<<<< HEAD
               className="absolute right-1 top-1 flex size-7 items-center justify-center rounded-lg transition-colors duration-200 hover:bg-surface-hover"
+=======
+              className="hover:bg-surface-hover absolute top-1 right-1 flex size-7 items-center justify-center rounded-lg transition-colors duration-200"
+>>>>>>> upstream/main
               onClick={() => handleDeleteStarter(index)}
             >
               <X className="size-4" aria-hidden="true" />

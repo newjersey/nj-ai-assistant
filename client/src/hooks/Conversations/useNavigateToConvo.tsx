@@ -1,7 +1,14 @@
 import { useCallback } from 'react';
+<<<<<<< HEAD
 import { useSetRecoilState } from 'recoil';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
+=======
+import { useSetAtom } from 'jotai';
+import { useNavigate } from 'react-router-dom';
+import { submissionByIndex } from '@librechat/chat/react';
+import { useQueryClient, isCancelledError } from '@tanstack/react-query';
+>>>>>>> upstream/main
 import {
   QueryKeys,
   Constants,
@@ -95,7 +102,11 @@ const useNavigateToConvo = (index = 0) => {
   const queryClient = useQueryClient();
   const clearAllConversations = store.useClearConvoState();
   const applyModelSpecEffects = useApplyModelSpecEffects();
+<<<<<<< HEAD
   const setSubmission = useSetRecoilState(store.submissionByIndex(index));
+=======
+  const setSubmission = useSetAtom(submissionByIndex(index));
+>>>>>>> upstream/main
   const { hasSetConversation, setConversation: setConvo } = store.useSetConversationAtom(index);
 
   const setConversation = useCallback(
@@ -167,6 +178,12 @@ const useNavigateToConvo = (index = 0) => {
         spec: data.spec,
       }));
     } catch (error) {
+<<<<<<< HEAD
+=======
+      if (isCancelledError(error)) {
+        return;
+      }
+>>>>>>> upstream/main
       logger.error('conversation', 'Error refreshing conversation record on navigation', error);
       /** Only a conversation that is confirmed GONE invalidates what is on
        * screen. The messages query is already mounted by now, so dropping its
@@ -205,11 +222,30 @@ const useNavigateToConvo = (index = 0) => {
       record = await fetchConversationRecord(conversationId);
       logger.log('conversation', 'Fetched fresh conversation data', record);
     } catch (error) {
+<<<<<<< HEAD
       logger.error('conversation', 'Error fetching conversation data on navigation', error);
       /** Nothing is mounted for this conversation yet, so clearing a warm
        * cache here still predates the route change: the target mounts a fresh
        * query rather than rendering contents that may no longer exist. */
       queryClient.removeQueries([QueryKeys.messages, conversationId]);
+=======
+      if (isCancelledError(error)) {
+        const committed = queryClient.getQueryData<TConversation>([
+          QueryKeys.conversation,
+          conversationId,
+        ]);
+        if (!committed) {
+          return;
+        }
+        record = committed;
+      } else {
+        logger.error('conversation', 'Error fetching conversation data on navigation', error);
+        /** Nothing is mounted for this conversation yet, so clearing a warm
+         * cache here still predates the route change: the target mounts a fresh
+         * query rather than rendering contents that may no longer exist. */
+        queryClient.removeQueries([QueryKeys.messages, conversationId]);
+      }
+>>>>>>> upstream/main
     }
     if (generation !== navigationGeneration || currentRoute() !== routeAtStart) {
       logger.log('conversation', 'Discarding superseded navigation', conversationId);

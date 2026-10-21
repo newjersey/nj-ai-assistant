@@ -1,5 +1,6 @@
 import { useMemo, useState, useCallback, memo } from 'react';
 import type { TFile, TMessage } from 'librechat-data-provider';
+<<<<<<< HEAD
 import FileContainer from '~/components/Chat/Input/Files/FileContainer';
 import { usesImagePreview, hydrateFileDeliveryMetadata } from '~/utils';
 import { useFileMapContext, useShareContext } from '~/Providers';
@@ -8,6 +9,17 @@ import Image from './Image';
 
 const Files = ({ message }: { message?: TMessage }) => {
   const fileMap = useFileMapContext();
+=======
+import { useMessagePartsHost } from '~/Providers/MessagePartsHostContext';
+import FileContainer from '~/components/Chat/Input/Files/FileContainer';
+import { usesImagePreview, hydrateFileDeliveryMetadata } from '~/utils';
+import FilePreviewDialog from './FilePreviewDialog';
+import { useShareContext } from '~/Providers';
+import Image from './Image';
+
+const Files = ({ message }: { message?: TMessage }) => {
+  const fileMap = useMessagePartsHost().useFileMap();
+>>>>>>> upstream/main
   const { shareId } = useShareContext();
   const files = useMemo(
     () => hydrateFileDeliveryMetadata(message?.files, undefined, shareId ? undefined : fileMap),
@@ -43,6 +55,10 @@ const Files = ({ message }: { message?: TMessage }) => {
         imageFiles.map((file) => (
           <Image
             key={file.file_id}
+<<<<<<< HEAD
+=======
+            alignRight
+>>>>>>> upstream/main
             imagePath={file.preview ?? file.filepath ?? ''}
             height={file.height ?? 1920}
             width={file.width ?? 1080}

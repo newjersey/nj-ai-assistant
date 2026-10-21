@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+/** Installed packages need real module IDs when Jest reuses a resolver across suites. */
+>>>>>>> upstream/main
 jest.mock(
   '@librechat/data-schemas',
   () => ({
@@ -7,7 +11,11 @@ jest.mock(
     DEFAULT_SESSION_EXPIRY: 900000,
     DEFAULT_REFRESH_TOKEN_EXPIRY: 604800000,
   }),
+<<<<<<< HEAD
   { virtual: true },
+=======
+  { virtual: false },
+>>>>>>> upstream/main
 );
 jest.mock(
   'librechat-data-provider',
@@ -15,8 +23,14 @@ jest.mock(
     ErrorTypes: {},
     SystemRoles: { USER: 'USER', ADMIN: 'ADMIN' },
     errorsToString: jest.fn(),
+<<<<<<< HEAD
   }),
   { virtual: true },
+=======
+    SESSION_HINT_COOKIE: 'session_hint',
+  }),
+  { virtual: false },
+>>>>>>> upstream/main
 );
 jest.mock(
   '@librechat/api',
@@ -26,6 +40,10 @@ jest.mock(
       isEnabled: jest.fn((val) => val === 'true' || val === true),
       checkEmailConfig: jest.fn(),
       isEmailDomainAllowed: jest.fn(),
+<<<<<<< HEAD
+=======
+      getSafeErrorMetadata: jest.fn((error) => ({ type: error?.name ?? 'UnknownError' })),
+>>>>>>> upstream/main
       math: jest.fn((val, fallback) => (val ? Number(val) : fallback)),
       storeOpenIdSession: jest.fn(),
       shouldUseSecureCookie,
@@ -37,6 +55,10 @@ jest.mock(
           sameSite: 'strict',
         });
       }),
+<<<<<<< HEAD
+=======
+      setLocalSessionCookies: jest.fn(),
+>>>>>>> upstream/main
       setOpenIDMarkerCookies: jest.fn((res, { userId, expires }) => {
         res.cookie('token_provider', 'openid', {
           expires,
@@ -60,6 +82,10 @@ jest.mock(
           : undefined;
       },
       resolveAppConfigForUser: jest.fn(async (_getAppConfig, _user) => ({})),
+<<<<<<< HEAD
+=======
+      commitPasswordReset: jest.fn(),
+>>>>>>> upstream/main
       createOpenIDSessionIdentity: jest.fn(
         ({ user, userId, openidSubject, tenantId, openidIssuer }) => {
           const normalize = (value) => {
@@ -94,7 +120,11 @@ jest.mock(
       CLOUDFRONT_SCOPE_COOKIE: 'LibreChat-CloudFront-Scope',
     };
   },
+<<<<<<< HEAD
   { virtual: true },
+=======
+  { virtual: false },
+>>>>>>> upstream/main
 );
 jest.mock('~/models', () => ({
   findUser: jest.fn(),
@@ -135,17 +165,29 @@ let isEmailDomainAllowed;
 let resolveAppConfigForUser;
 let setRefreshTokenCookie;
 let setOpenIDMarkerCookies;
+<<<<<<< HEAD
+=======
+let setLocalSessionCookies;
+>>>>>>> upstream/main
 let setCloudFrontCookies;
 let getCloudFrontConfig;
 let parseCloudFrontCookieScope;
 let storeOpenIdSession;
 let jwt;
 let logger;
+<<<<<<< HEAD
+=======
+let registerSchema;
+>>>>>>> upstream/main
 let getTenantId;
 let findUser;
 let findToken;
 let createUser;
 let updateUser;
+<<<<<<< HEAD
+=======
+let deleteUserById;
+>>>>>>> upstream/main
 let countUsers;
 let getUserById;
 let generateToken;
@@ -167,26 +209,45 @@ let resendVerificationEmail;
 let setAuthTokens;
 let setCloudFrontAuthCookies;
 let verifyEmail;
+<<<<<<< HEAD
+=======
+let commitPasswordReset;
+>>>>>>> upstream/main
 
 jest.isolateModules(() => {
   ({
     checkEmailConfig,
     isEmailDomainAllowed,
     resolveAppConfigForUser,
+<<<<<<< HEAD
     setRefreshTokenCookie,
     setOpenIDMarkerCookies,
+=======
+    commitPasswordReset,
+    setRefreshTokenCookie,
+    setOpenIDMarkerCookies,
+    setLocalSessionCookies,
+>>>>>>> upstream/main
     setCloudFrontCookies,
     getCloudFrontConfig,
     parseCloudFrontCookieScope,
     storeOpenIdSession,
   } = require('@librechat/api'));
   jwt = require('jsonwebtoken');
+<<<<<<< HEAD
+=======
+  ({ registerSchema } = require('~/strategies/validators'));
+>>>>>>> upstream/main
   ({ logger, getTenantId } = require('@librechat/data-schemas'));
   ({
     findUser,
     findToken,
     createUser,
     updateUser,
+<<<<<<< HEAD
+=======
+    deleteUserById,
+>>>>>>> upstream/main
     countUsers,
     getUserById,
     generateToken,
@@ -685,6 +746,12 @@ describe('setOpenIDAuthTokens', () => {
   });
 });
 
+<<<<<<< HEAD
+=======
+const loggedText = () =>
+  JSON.stringify(['info', 'warn', 'error', 'debug'].map((level) => logger[level].mock.calls));
+
+>>>>>>> upstream/main
 describe('registerUser', () => {
   const registrationPayload = {
     name: 'Test User',
@@ -761,6 +828,65 @@ describe('registerUser', () => {
       }),
     );
   });
+<<<<<<< HEAD
+=======
+
+  it('contains a failed cleanup of the temporary user and logs safe metadata only', async () => {
+    checkEmailConfig.mockReturnValue(true);
+    sendEmail.mockRejectedValueOnce(new Error('smtp rejected leak@example.com'));
+    deleteUserById.mockRejectedValueOnce(new Error('db failure leak@example.com'));
+
+    const result = await registerUser(registrationPayload);
+
+    expect(result).toEqual({ status: 500, message: 'Something went wrong' });
+    expect(loggedText()).not.toContain('leak@example.com');
+  });
+
+  it('logs a duplicate registration by id without the body or existing user', async () => {
+    findUser.mockResolvedValue({ _id: 'existing-id', email: 'dup@example.com' });
+
+    const result = await registerUser({ ...registrationPayload, email: 'dup@example.com' });
+
+    expect(result.status).toBe(200);
+    expect(createUser).not.toHaveBeenCalled();
+    expect(logger.info.mock.calls).toEqual([
+      ['[registerUser] Email in use [User ID: existing-id]'],
+    ]);
+    const logged = loggedText();
+    for (const secret of [
+      'dup@example.com',
+      'testuser',
+      'Test User',
+      registrationPayload.password,
+    ]) {
+      expect(logged).not.toContain(secret);
+    }
+  });
+
+  it('does not log the registration body on validation failure', async () => {
+    registerSchema.safeParse.mockReturnValueOnce({
+      success: false,
+      error: { errors: [{ path: ['password'], message: 'Password too short' }] },
+    });
+
+    const result = await registerUser({
+      ...registrationPayload,
+      email: 'pii-leak@example.com',
+    });
+
+    expect(result.status).toBe(404);
+    expect(logger.info).toHaveBeenCalled();
+    const logged = loggedText();
+    for (const secret of [
+      'pii-leak@example.com',
+      'testuser',
+      'Test User',
+      registrationPayload.password,
+    ]) {
+      expect(logged).not.toContain(secret);
+    }
+  });
+>>>>>>> upstream/main
 });
 
 describe('verifyEmail public response handling', () => {
@@ -949,6 +1075,10 @@ describe('requestPasswordReset', () => {
     expect(createToken).toHaveBeenCalledWith(
       expect.objectContaining({
         userId: user._id,
+<<<<<<< HEAD
+=======
+        email: user.email,
+>>>>>>> upstream/main
         type: 'password_reset',
       }),
     );
@@ -956,6 +1086,7 @@ describe('requestPasswordReset', () => {
 });
 
 describe('resetPassword', () => {
+<<<<<<< HEAD
   beforeEach(() => {
     jest.clearAllMocks();
     checkEmailConfig.mockReturnValue(false);
@@ -1005,10 +1136,77 @@ describe('resetPassword', () => {
       type: 'password_reset',
     });
     updateUser.mockResolvedValue({ email: 'user@example.com' });
+=======
+  /** The reset policy itself (address binding, the compare-and-set, the email change
+   *  sweep) lives in `@librechat/api` and is covered by passwordReset.spec.ts. What
+   *  remains here is this file's wiring: which token lookup it injects, and which token
+   *  it deletes once the policy has committed. The double runs the injected lookup so
+   *  that wiring is still exercised, and decides nothing else. */
+  const resolvedUser = { email: 'user@example.com' };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    checkEmailConfig.mockReturnValue(false);
+    commitPasswordReset.mockImplementation(async (deps, { userId }) => {
+      const resetToken = await deps.findResetToken(userId);
+      return resetToken ? { ok: true, user: resolvedUser, resetToken } : { ok: false };
+    });
+  });
+
+  it('looks for a typed reset token before the untyped legacy shape', async () => {
+    findToken.mockResolvedValue(null);
+
+    const result = await resetPassword('user-reset', 'reset-token', 'new-password');
+
+    expect(result).toBeInstanceOf(Error);
+    expect(findToken).toHaveBeenNthCalledWith(
+      1,
+      { userId: 'user-reset', type: 'password_reset' },
+      { sort: { createdAt: -1 } },
+    );
+    expect(findToken).toHaveBeenNthCalledWith(
+      2,
+      { userId: 'user-reset', email: null, identifier: null, type: null },
+      { sort: { createdAt: -1 } },
+    );
+    expect(deleteTokens).not.toHaveBeenCalled();
+  });
+
+  it('hands the policy the database and password surfaces it needs', async () => {
+    findToken.mockResolvedValue({
+      token: 'reset-hash',
+      userId: 'user-reset',
+      type: 'password_reset',
+    });
+
+    await resetPassword('user-reset', 'reset-token', 'new-password');
+
+    expect(commitPasswordReset).toHaveBeenCalledWith(
+      expect.objectContaining({
+        findResetToken: expect.any(Function),
+        getUserById: expect.any(Function),
+        updateUser: expect.any(Function),
+        deleteTokens: expect.any(Function),
+        compareToken: expect.any(Function),
+        hashPassword: expect.any(Function),
+      }),
+      { userId: 'user-reset', token: 'reset-token', password: 'new-password' },
+    );
+  });
+
+  it('deletes only the typed reset token the policy consumed', async () => {
+    findToken.mockResolvedValue({
+      token: 'reset-hash',
+      userId: 'user-reset',
+      email: 'user@example.com',
+      type: 'password_reset',
+    });
+>>>>>>> upstream/main
 
     const result = await resetPassword('user-reset', 'reset-token', 'new-password');
 
     expect(result).toEqual({ message: 'Password reset was successful' });
+<<<<<<< HEAD
     expect(findToken).toHaveBeenCalledWith(
       {
         userId: 'user-reset',
@@ -1037,10 +1235,22 @@ describe('resetPassword', () => {
       return null;
     });
     updateUser.mockResolvedValue({ email: 'user@example.com' });
+=======
+    expect(deleteTokens).toHaveBeenCalledWith({ token: 'reset-hash', type: 'password_reset' });
+  });
+
+  it('deletes an untyped legacy token by its exact stored shape', async () => {
+    findToken.mockImplementation(async (query) =>
+      query.type === 'password_reset'
+        ? null
+        : { token: 'legacy-hash', userId: 'user-reset', email: null, identifier: null, type: null },
+    );
+>>>>>>> upstream/main
 
     const result = await resetPassword('user-reset', 'legacy-reset-token', 'new-password');
 
     expect(result).toEqual({ message: 'Password reset was successful' });
+<<<<<<< HEAD
     expect(findToken).toHaveBeenCalledWith(
       {
         userId: 'user-reset',
@@ -1059,11 +1269,46 @@ describe('resetPassword', () => {
     );
     expect(deleteTokens).toHaveBeenCalledWith({
       token: legacyResetHash,
+=======
+    expect(deleteTokens).toHaveBeenCalledWith({
+      token: 'legacy-hash',
+>>>>>>> upstream/main
       email: null,
       identifier: null,
       type: null,
     });
   });
+<<<<<<< HEAD
+=======
+
+  it('returns the generic error and touches nothing when the policy refuses', async () => {
+    findToken.mockResolvedValue(null);
+
+    const result = await resetPassword('user-reset', 'reset-token', 'new-password');
+
+    expect(result).toBeInstanceOf(Error);
+    expect(sendEmail).not.toHaveBeenCalled();
+    expect(deleteTokens).not.toHaveBeenCalled();
+  });
+
+  it('notifies the account once the reset has committed', async () => {
+    checkEmailConfig.mockReturnValue(true);
+    findToken.mockResolvedValue({
+      token: 'reset-hash',
+      userId: 'user-reset',
+      type: 'password_reset',
+    });
+
+    await resetPassword('user-reset', 'reset-token', 'new-password');
+
+    expect(sendEmail).toHaveBeenCalledWith(
+      expect.objectContaining({
+        email: 'user@example.com',
+        template: 'passwordReset.handlebars',
+      }),
+    );
+  });
+>>>>>>> upstream/main
 });
 
 describe('verifyEmail', () => {
@@ -1175,6 +1420,22 @@ describe('resendVerificationEmail', () => {
     jest.clearAllMocks();
   });
 
+<<<<<<< HEAD
+=======
+  it('logs a failed resend without the error message or address', async () => {
+    findUser.mockResolvedValue({ _id: 'user-fail', email: 'leak@example.com', name: 'Leaky' });
+    checkEmailConfig.mockReturnValue(true);
+    sendEmail.mockRejectedValueOnce(new Error('rejected leak@example.com'));
+
+    await resendVerificationEmail({ body: { email: 'leak@example.com' } });
+
+    expect(logger.error.mock.calls).toEqual([
+      ['[resendVerificationEmail] Error resending verification email:', { type: 'Error' }],
+    ]);
+    expect(loggedText()).not.toContain('leak@example.com');
+  });
+
+>>>>>>> upstream/main
   it('should not delete tokens when no user exists for the email', async () => {
     findUser.mockResolvedValue(null);
 
@@ -1244,7 +1505,12 @@ describe('resendVerificationEmail', () => {
       message: 'Please check your email to verify your email address.',
     });
     expect(logger.error).toHaveBeenCalledWith(
+<<<<<<< HEAD
       '[resendVerificationEmail] Error resending verification email: mail transport unavailable',
+=======
+      '[resendVerificationEmail] Error resending verification email:',
+      { type: 'Error' },
+>>>>>>> upstream/main
     );
   });
 });
@@ -1608,6 +1874,42 @@ describe('CloudFront cookie integration', () => {
       );
     });
 
+<<<<<<< HEAD
+=======
+    it('names the session owner and expiry in the readable cookie the theme replay checks', async () => {
+      const expiration = new Date(Date.now() + 604800000);
+      createSession.mockResolvedValueOnce({
+        session: { expiration },
+        refreshToken: 'mock-refresh-token',
+      });
+      const res = mockResponse();
+
+      await setAuthTokens('user-123', res);
+
+      expect(setLocalSessionCookies).toHaveBeenCalledWith(res, {
+        refreshToken: 'mock-refresh-token',
+        expires: expiration,
+        userId: 'user-123',
+        tenantId: 'tenantA',
+      });
+    });
+
+    it('re-stamps the expiry of the session a refresh keeps', async () => {
+      const expiration = new Date(Date.now() + 3600000);
+      const res = mockResponse();
+
+      await setAuthTokens('user-123', res, { _id: 'session-1', expiration });
+
+      expect(createSession).not.toHaveBeenCalled();
+      expect(setLocalSessionCookies).toHaveBeenCalledWith(res, {
+        refreshToken: 'mock-refresh-token',
+        expires: expiration,
+        userId: 'user-123',
+        tenantId: 'tenantA',
+      });
+    });
+
+>>>>>>> upstream/main
     it('succeeds even when setCloudFrontCookies returns false', async () => {
       setCloudFrontCookies.mockReturnValue(false);
 

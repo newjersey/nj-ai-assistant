@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 export { default as Advanced } from './Advanced';
+=======
+>>>>>>> upstream/main
 export { default as AssistantsSettings } from './Assistants';
 export { default as BedrockSettings } from './Bedrock';
 export { default as OpenAISettings } from './OpenAI';

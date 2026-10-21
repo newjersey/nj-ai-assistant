@@ -2,10 +2,16 @@ import React from 'react';
 import { RecoilRoot } from 'recoil';
 import { act, renderHook } from '@testing-library/react';
 import { Provider as JotaiProvider, createStore } from 'jotai';
+<<<<<<< HEAD
 import type { MutableSnapshot } from 'recoil';
 import ApprovalProvider, { useApprovalContext, useResumeSubmit } from '../ApprovalContext';
 import { ChatContext } from '~/Providers/ChatContext';
 import store from '~/store';
+=======
+import { activeGenerationCreatedAtByConvoId } from '@librechat/chat/react';
+import ApprovalProvider, { useApprovalContext, useResumeSubmit } from '../ApprovalContext';
+import { ChatContext } from '~/Providers/ChatContext';
+>>>>>>> upstream/main
 
 const mockApprovalMutate = jest.fn();
 const mockAskMutate = jest.fn();
@@ -29,6 +35,7 @@ const chatContextValue = {
 
 const createWrapper = (generationCreatedAt: number | null) =>
   function ResumeWrapper({ children }: { children: React.ReactNode }) {
+<<<<<<< HEAD
     const jotaiStore = React.useRef(createStore()).current;
     const initializeState = (snapshot: MutableSnapshot) => {
       if (generationCreatedAt != null) {
@@ -40,6 +47,17 @@ const createWrapper = (generationCreatedAt: number | null) =>
     };
     return (
       <RecoilRoot initializeState={initializeState}>
+=======
+    const [jotaiStore] = React.useState(() => {
+      const created = createStore();
+      if (generationCreatedAt != null) {
+        created.set(activeGenerationCreatedAtByConvoId('conversation-1'), generationCreatedAt);
+      }
+      return created;
+    });
+    return (
+      <RecoilRoot>
+>>>>>>> upstream/main
         <JotaiProvider store={jotaiStore}>
           <ChatContext.Provider value={chatContextValue}>
             <ApprovalProvider>{children}</ApprovalProvider>

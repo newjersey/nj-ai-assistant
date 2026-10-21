@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { ChevronDown } from 'lucide-react';
+<<<<<<< HEAD
 import { Tools } from 'librechat-data-provider';
 import type { TAttachment, UIResource } from 'librechat-data-provider';
 import UIResourceRenderer, { isSupportedUIResource } from '~/components/MCPUIResource/Renderer';
@@ -8,6 +9,12 @@ import { useLocalize, useExpandCollapse } from '~/hooks';
 import UIResourceCarousel from './UIResourceCarousel';
 import { OutputRenderer } from './ToolOutput';
 import { handleUIAction, cn } from '~/utils';
+=======
+import { useLocalize, useExpandCollapse } from '~/hooks';
+import { OutputRenderer } from './ToolOutput';
+import { hasToolParams } from './params';
+import { cn } from '~/utils';
+>>>>>>> upstream/main
 
 function isSimpleObject(obj: unknown): obj is Record<string, string | number | boolean | null> {
   if (typeof obj !== 'object' || obj === null || Array.isArray(obj)) {
@@ -28,8 +35,13 @@ function KeyValueInput({ data }: { data: Record<string, string | number | boolea
     <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-xs">
       {Object.entries(data).map(([key, value]) => (
         <div key={key} className="flex items-baseline gap-1.5">
+<<<<<<< HEAD
           <span className="font-medium text-text-secondary">{key}</span>
           <span className="rounded bg-surface-tertiary px-1.5 py-0.5 text-text-primary">
+=======
+          <span className="text-text-secondary font-medium">{key}</span>
+          <span className="bg-surface-tertiary text-text-primary rounded px-1.5 py-0.5">
+>>>>>>> upstream/main
             {String(value ?? 'null')}
           </span>
         </div>
@@ -57,8 +69,13 @@ function ComplexInput({ data }: { data: Record<string, unknown> }) {
     <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-xs">
       {Object.entries(data).map(([key, value]) => (
         <div key={key} className="flex items-baseline gap-1.5">
+<<<<<<< HEAD
           <span className="font-medium text-text-secondary">{key}</span>
           <span className="max-w-[300px] overflow-hidden truncate rounded bg-surface-tertiary px-1.5 py-0.5 font-mono text-text-primary">
+=======
+          <span className="text-text-secondary font-medium">{key}</span>
+          <span className="bg-surface-tertiary text-text-primary max-w-[18.75rem] truncate overflow-hidden rounded px-1.5 py-0.5 font-mono">
+>>>>>>> upstream/main
             {formatParamValue(value)}
           </span>
         </div>
@@ -82,12 +99,17 @@ function InputRenderer({ input }: { input: string }) {
     }
     // Valid JSON but not a plain object (array, string, number, boolean) — render formatted
     return (
+<<<<<<< HEAD
       <pre className="whitespace-pre-wrap text-xs text-text-primary">
+=======
+      <pre className="text-text-primary text-xs whitespace-pre-wrap">
+>>>>>>> upstream/main
         {typeof parsed === 'string' ? parsed : JSON.stringify(parsed, null, 2)}
       </pre>
     );
   } catch {
     // Not JSON — render as plain text
+<<<<<<< HEAD
     return <pre className="whitespace-pre-wrap text-xs text-text-primary">{input}</pre>;
   }
 }
@@ -128,18 +150,39 @@ export default function ToolCallInfo({
         return attachment[Tools.ui_resources] as UIResource[];
       })
       .filter(isSupportedUIResource) ?? [];
+=======
+    return <pre className="text-text-primary text-xs whitespace-pre-wrap">{input}</pre>;
+  }
+}
+
+export default function ToolCallInfo({ input, output }: { input: string; output?: string | null }) {
+  const localize = useLocalize();
+  const [showParams, setShowParams] = useState(false);
+  const { style: paramsExpandStyle, ref: paramsExpandRef } = useExpandCollapse(showParams);
+
+  const hasParams = useMemo(() => hasToolParams(input), [input]);
+>>>>>>> upstream/main
 
   return (
     <div className="w-full px-3 py-3.5">
       {output && <OutputRenderer text={output} />}
+<<<<<<< HEAD
       {output && hasParams && <div className="my-2 border-t border-border-light" />}
+=======
+      {output && hasParams && <div className="border-border-inset my-2 border-t" />}
+>>>>>>> upstream/main
       {hasParams && (
         <>
           <button
             type="button"
             className={cn(
+<<<<<<< HEAD
               'inline-flex items-center gap-1 text-xs text-text-secondary',
               'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-heavy',
+=======
+              'text-text-secondary inline-flex items-center gap-1 text-xs',
+              'focus-visible:ring-focus-subtle focus-visible:ring-2 focus-visible:outline-hidden',
+>>>>>>> upstream/main
             )}
             onClick={() => setShowParams((prev) => !prev)}
             aria-expanded={showParams}
@@ -160,6 +203,7 @@ export default function ToolCallInfo({
           </div>
         </>
       )}
+<<<<<<< HEAD
       {uiResources.length > 0 && (
         <>
           {(hasParams || output) && <div className="my-2 border-t border-border-light" />}
@@ -175,6 +219,8 @@ export default function ToolCallInfo({
           )}
         </>
       )}
+=======
+>>>>>>> upstream/main
     </div>
   );
 }

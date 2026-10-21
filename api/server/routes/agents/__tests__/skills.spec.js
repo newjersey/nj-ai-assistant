@@ -4,6 +4,10 @@ const request = require('supertest');
 const mockList = jest.fn((_req, res) => res.json({ object: 'list' }));
 const mockWrite = jest.fn((_req, res) => res.json({ saved: true }));
 const mockSync = jest.fn();
+<<<<<<< HEAD
+=======
+const mockManagementSaveFile = jest.fn();
+>>>>>>> upstream/main
 const mockIp = jest.fn((_req, _res, next) => next());
 const mockUser = jest.fn((_req, _res, next) => next());
 const mockAuth = jest.fn((_req, _res, next) => next());
@@ -13,11 +17,22 @@ jest.mock('@librechat/api', () => ({
     mockDeps = deps;
     return {
       list: mockList,
+<<<<<<< HEAD
       get: mockList,
       update: mockWrite,
       listFiles: mockList,
       getFile: mockList,
       updateFile: mockWrite,
+=======
+      create: mockWrite,
+      get: mockList,
+      update: mockWrite,
+      delete: mockWrite,
+      listFiles: mockList,
+      getFile: mockList,
+      updateFile: mockWrite,
+      deleteFile: mockWrite,
+>>>>>>> upstream/main
     };
   },
   mapAgentManagementError: () => ({ status: 404, body: { error: { code: 'not_found' } } }),
@@ -25,6 +40,10 @@ jest.mock('@librechat/api', () => ({
 jest.mock('../middleware', () => ({ requireAgentManagementAuth: (...args) => mockAuth(...args) }));
 jest.mock('~/server/middleware', () => ({
   checkBan: (_req, _res, next) => next(),
+<<<<<<< HEAD
+=======
+  requireTermsAcceptance: (_req, _res, next) => next(),
+>>>>>>> upstream/main
   configMiddleware: (req, _res, next) => {
     req.config = { tenantConfig: true };
     next();
@@ -38,7 +57,11 @@ jest.mock('~/server/services/Skills/sync', () => ({
 }));
 jest.mock('~/server/services/Endpoints/agents/skillDeps', () => ({
   getSkillDbMethods: () => ({}),
+<<<<<<< HEAD
   getSkillToolDeps: () => ({}),
+=======
+  getSkillManagementFileSaver: () => mockManagementSaveFile,
+>>>>>>> upstream/main
 }));
 jest.mock('~/models', () => ({}));
 jest.mock('~/server/middleware/limiters/uploadLimiters', () => ({
@@ -55,6 +78,10 @@ it('wires sync and both upload limiters into the authorized management handlers'
   await mockDeps.beforeList({ config: { tenantConfig: true } });
   expect(mockSync).toHaveBeenCalledWith({ config: { tenantConfig: true } });
   expect(mockDeps.fileWriteLimiters).toHaveLength(2);
+<<<<<<< HEAD
+=======
+  expect(mockDeps.saveFile).toBe(mockManagementSaveFile);
+>>>>>>> upstream/main
   const next = jest.fn();
   for (const limiter of mockDeps.fileWriteLimiters) limiter({}, {}, next);
   expect(mockIp).toHaveBeenCalledTimes(1);
@@ -65,3 +92,10 @@ it('keeps authentication ahead of management handlers', async () => {
   await request(app).get('/skills').expect(401);
   expect(mockList).not.toHaveBeenCalled();
 });
+<<<<<<< HEAD
+=======
+it('routes whole-Skill deletion through the authorized management handler', async () => {
+  await request(app).delete('/skills/507f1f77bcf86cd799439011').expect(200);
+  expect(mockWrite).toHaveBeenCalledTimes(1);
+});
+>>>>>>> upstream/main

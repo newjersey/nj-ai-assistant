@@ -1,9 +1,15 @@
 import React, { useCallback, useEffect, useRef, useMemo, useState } from 'react';
 import { v4 } from 'uuid';
 import debounce from 'lodash/debounce';
+<<<<<<< HEAD
 import { useToastContext } from '@librechat/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
+=======
+import { useSetRecoilState } from 'recoil';
+import { useToastContext } from '@librechat/client';
+import { useQueryClient } from '@tanstack/react-query';
+>>>>>>> upstream/main
 import {
   megabyte,
   QueryKeys,
@@ -37,9 +43,17 @@ import {
 import { useGetFileConfig, useUploadFileMutation } from '~/data-provider';
 import useAgentUploadTarget from '~/hooks/Agents/useAgentUploadTarget';
 import useLocalize, { TranslationKeys } from '~/hooks/useLocalize';
+<<<<<<< HEAD
 import { useDelayedUploadToast } from './useDelayedUploadToast';
 import { useChatContext } from '~/Providers/ChatContext';
 import store, { ephemeralAgentByConvoId } from '~/store';
+=======
+import { useChatSettings } from '~/Providers/ChatSettingsContext';
+import { useDelayedUploadToast } from './useDelayedUploadToast';
+import { useChatContext } from '~/Providers/ChatContext';
+import { importWithRecovery } from '~/lib/assets/lazy';
+import { ephemeralAgentByConvoId } from '~/store';
+>>>>>>> upstream/main
 import useClientResize from './useClientResize';
 import useUpdateFiles from './useUpdateFiles';
 
@@ -166,7 +180,11 @@ const useFileHandlingCore = (params: UseFileHandling | undefined, fileState: Fil
   const setEphemeralAgent = useSetRecoilState(
     ephemeralAgentByConvoId(conversation?.conversationId ?? Constants.NEW_CONVO),
   );
+<<<<<<< HEAD
   const isTemporary = useRecoilValue(store.isTemporary);
+=======
+  const { isTemporary } = useChatSettings();
+>>>>>>> upstream/main
   const setError = (error: string) => setErrors((prevErrors) => [...prevErrors, error]);
 
   /** Names the files left out of a batch that is otherwise still uploading. Callers report a batch
@@ -252,7 +270,11 @@ const useFileHandlingCore = (params: UseFileHandling | undefined, fileState: Fil
     setErrors([]);
   }, [errors, showToast, localize]);
 
+<<<<<<< HEAD
   const debouncedDisplayToast = debounce(displayToast, 250);
+=======
+  const debouncedDisplayToast = useMemo(() => debounce(displayToast, 250), [displayToast]);
+>>>>>>> upstream/main
 
   useEffect(() => {
     if (errors.length > 0) {
@@ -616,6 +638,7 @@ const useFileHandlingCore = (params: UseFileHandling | undefined, fileState: Fil
         }
 
         const heicProcessedFile = isHEIC
+<<<<<<< HEAD
           ? await import('~/utils/heicConverter').then(({ processFileForUpload }) =>
               processFileForUpload(originalFile, 0.9, (conversionProgress) => {
                 const adjustedProgress = 0.1 + conversionProgress * 0.4;
@@ -624,6 +647,17 @@ const useFileHandlingCore = (params: UseFileHandling | undefined, fileState: Fil
                   progress: adjustedProgress,
                 });
               }),
+=======
+          ? await importWithRecovery(() => import('~/utils/heicConverter')).then(
+              ({ processFileForUpload }) =>
+                processFileForUpload(originalFile, 0.9, (conversionProgress) => {
+                  const adjustedProgress = 0.1 + conversionProgress * 0.4;
+                  replaceFile({
+                    ...initialExtendedFile,
+                    progress: adjustedProgress,
+                  });
+                }),
+>>>>>>> upstream/main
             )
           : originalFile;
 

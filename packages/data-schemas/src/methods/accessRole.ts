@@ -1,6 +1,13 @@
+<<<<<<< HEAD
 import { AccessRoleIds, ResourceType, PermissionBits } from 'librechat-data-provider';
 import type { Model, Types, DeleteResult } from 'mongoose';
 import type { IAccessRole } from '~/types';
+=======
+import { AccessRoleIds, ResourceType } from 'librechat-data-provider';
+import type { Model, Types, DeleteResult } from 'mongoose';
+import type { IAccessRole } from '~/types';
+import { getTenantId, runAsSystem, SYSTEM_TENANT_ID } from '~/config/tenantContext';
+>>>>>>> upstream/main
 import { RoleBits } from '~/common';
 
 export function createAccessRoleMethods(mongoose: typeof import('mongoose')): {
@@ -10,6 +17,7 @@ export function createAccessRoleMethods(mongoose: typeof import('mongoose')): {
     updateData: Partial<IAccessRole>,
   ) => Promise<IAccessRole | null>;
   deleteRole: (accessRoleId: string | Types.ObjectId) => Promise<DeleteResult>;
+<<<<<<< HEAD
   getAllRoles: () => Promise<IAccessRole[]>;
   findRoleById: (roleId: string | Types.ObjectId) => Promise<IAccessRole | null>;
   seedDefaultRoles: () => Promise<Record<string, IAccessRole>>;
@@ -32,6 +40,58 @@ export function createAccessRoleMethods(mongoose: typeof import('mongoose')): {
   async function findRoleById(roleId: string | Types.ObjectId): Promise<IAccessRole | null> {
     const AccessRole = mongoose.models.AccessRole as Model<IAccessRole>;
     return await AccessRole.findById(roleId).lean<IAccessRole>();
+=======
+  seedDefaultRoles: () => Promise<Record<string, IAccessRole>>;
+  findRoleByIdentifier: (accessRoleId: string | Types.ObjectId) => Promise<IAccessRole | null>;
+  findRolesByResourceType: (resourceType: string) => Promise<IAccessRole[]>;
+} {
+  /** True inside a tenant's own context; false with no context or a system one. */
+  function inTenantScope(): boolean {
+    const tenantId = getTenantId();
+    return tenantId != null && tenantId !== SYSTEM_TENANT_ID;
+  }
+
+  /**
+   * Every access role visible inside the active tenant: the global defaults with the
+   * tenant's own copies substituted by `accessRoleId`.
+   *
+   * The default roles are seeded once, globally, with no `tenantId`. A request
+   * running inside a tenant context has its queries scoped to `{ tenantId: T }` by
+   * the isolation plugin, so those seeded roles never match and every caller that
+   * resolves a role by identifier — the owner grant on resource creation above all
+   * — fails with `Role <id> not found`.
+   *
+   * Unfiltered by design: the merge happens first and every selection is applied to
+   * its result. Substitution by identifier is only total that way — a tenant copy
+   * that changes a field the caller selects on, `resourceType` above all, still has
+   * to displace the global row it overrides, and a query that narrowed both sides
+   * first would miss the copy and leave that row visible under its old type. The
+   * read is bounded to one tenant's roles plus the global defaults, so this is a
+   * few dozen small documents rather than a collection scan.
+   *
+   * The unique index on `(accessRoleId, tenantId)` makes the substitution unambiguous.
+   */
+  async function visibleTenantRoles(): Promise<IAccessRole[]> {
+    const tenantId = getTenantId();
+    const AccessRole = mongoose.models.AccessRole as Model<IAccessRole>;
+
+    /** Capture the tenant before entering system context, and execute the bounded
+     * query inside it. MongoDB's null match includes absent tenantId fields. */
+    const roles = await runAsSystem(async () =>
+      AccessRole.find({ tenantId: { $in: [tenantId, null] } })
+        .lean<IAccessRole[]>()
+        .exec(),
+    );
+
+    const rolesById = new Map<string, IAccessRole>();
+    for (const role of roles) {
+      const id = String(role.accessRoleId);
+      if (role.tenantId === tenantId || !rolesById.has(id)) {
+        rolesById.set(id, role);
+      }
+    }
+    return [...rolesById.values()];
+>>>>>>> upstream/main
   }
 
   /**
@@ -43,16 +103,32 @@ export function createAccessRoleMethods(mongoose: typeof import('mongoose')): {
     accessRoleId: string | Types.ObjectId,
   ): Promise<IAccessRole | null> {
     const AccessRole = mongoose.models.AccessRole as Model<IAccessRole>;
+<<<<<<< HEAD
     return await AccessRole.findOne({ accessRoleId }).lean<IAccessRole>();
+=======
+    if (!inTenantScope()) {
+      return await AccessRole.findOne({ accessRoleId }).lean<IAccessRole>().exec();
+    }
+    const roles = await visibleTenantRoles();
+    return roles.find((role) => String(role.accessRoleId) === String(accessRoleId)) ?? null;
+>>>>>>> upstream/main
   }
 
   /**
    * Find all access roles for a specific resource type
+<<<<<<< HEAD
+=======
+   *
+   * The tenant's own copies are merged over the global default roles by
+   * `accessRoleId`, so a tenant that overrides one role still sees the rest.
+   *
+>>>>>>> upstream/main
    * @param resourceType - The type of resource ('agent', 'project', 'file')
    * @returns Array of role documents
    */
   async function findRolesByResourceType(resourceType: string): Promise<IAccessRole[]> {
     const AccessRole = mongoose.models.AccessRole as Model<IAccessRole>;
+<<<<<<< HEAD
     return await AccessRole.find({ resourceType }).lean<IAccessRole[]>();
   }
 
@@ -68,6 +144,17 @@ export function createAccessRoleMethods(mongoose: typeof import('mongoose')): {
   ): Promise<IAccessRole | null> {
     const AccessRole = mongoose.models.AccessRole as Model<IAccessRole>;
     return await AccessRole.findOne({ resourceType, permBits }).lean<IAccessRole>();
+=======
+    if (!inTenantScope()) {
+      return await AccessRole.find({ resourceType }).lean<IAccessRole[]>().exec();
+    }
+    /** Filtered after the merge, so a tenant copy that moves an identifier to another
+     * resource type withdraws the global row from this list instead of leaving it
+     * visible — and callers such as `bulkUpdatePermissions`, which key this result by
+     * `accessRoleId`, cannot grant bits the tenant has superseded. */
+    const roles = await visibleTenantRoles();
+    return roles.filter((role) => role.resourceType === resourceType);
+>>>>>>> upstream/main
   }
 
   /**
@@ -109,6 +196,7 @@ export function createAccessRoleMethods(mongoose: typeof import('mongoose')): {
   }
 
   /**
+<<<<<<< HEAD
    * Get all predefined roles
    * @returns Array of all role documents
    */
@@ -118,6 +206,8 @@ export function createAccessRoleMethods(mongoose: typeof import('mongoose')): {
   }
 
   /**
+=======
+>>>>>>> upstream/main
    * Seed default roles if they don't exist
    * @returns Object containing created roles
    */
@@ -283,6 +373,7 @@ export function createAccessRoleMethods(mongoose: typeof import('mongoose')): {
     return result;
   }
 
+<<<<<<< HEAD
   /**
    * Helper to get the appropriate role for a set of permissions
    * @param resourceType - The type of resource
@@ -307,16 +398,23 @@ export function createAccessRoleMethods(mongoose: typeof import('mongoose')): {
     return roles.find((role) => (role.permBits & permBits) === role.permBits) || null;
   }
 
+=======
+>>>>>>> upstream/main
   return {
     createRole,
     updateRole,
     deleteRole,
+<<<<<<< HEAD
     getAllRoles,
     findRoleById,
     seedDefaultRoles,
     findRoleByIdentifier,
     getRoleForPermissions,
     findRoleByPermissions,
+=======
+    seedDefaultRoles,
+    findRoleByIdentifier,
+>>>>>>> upstream/main
     findRolesByResourceType,
   };
 }

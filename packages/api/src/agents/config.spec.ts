@@ -1,5 +1,14 @@
 import type { TAgentsEndpoint } from 'librechat-data-provider';
+<<<<<<< HEAD
 import { resolveRecursionLimit, resolveStreamLimits, resolveSubagentMaxTurns } from './config';
+=======
+import {
+  resolveStreamLimits,
+  resolveRecursionLimit,
+  resolveSubagentMaxTurns,
+  resolveModelTransportTimeouts,
+} from './config';
+>>>>>>> upstream/main
 
 describe('resolveRecursionLimit', () => {
   it('returns default 50 when no config or agent provided', () => {
@@ -112,6 +121,24 @@ describe('resolveSubagentMaxTurns', () => {
   });
 });
 
+<<<<<<< HEAD
+=======
+describe('resolveModelTransportTimeouts', () => {
+  it('uses finite defaults and preserves explicit overrides including zero', () => {
+    expect(resolveModelTransportTimeouts(undefined)).toEqual({
+      bodyTimeout: 900_000,
+      headersTimeout: 300_000,
+    });
+    expect(
+      resolveModelTransportTimeouts({
+        modelResponseBodyTimeoutMs: 1_800_000,
+        modelResponseHeadersTimeoutMs: 0,
+      }),
+    ).toEqual({ bodyTimeout: 1_800_000, headersTimeout: 0 });
+  });
+});
+
+>>>>>>> upstream/main
 describe('resolveStreamLimits', () => {
   const CREATE_FILE_DEFAULT = { create_file: 131072 };
 

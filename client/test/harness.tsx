@@ -1,4 +1,8 @@
 import { useState } from 'react';
+<<<<<<< HEAD
+=======
+import { RecoilRoot } from 'recoil';
+>>>>>>> upstream/main
 import { createStore, Provider as JotaiProvider } from 'jotai';
 import type { ChatSurface } from '~/components/Chat/Subagents/surface';
 import type { ReactNode } from 'react';
@@ -6,6 +10,14 @@ import { ChatSurfaceProvider } from '~/components/Chat/Subagents/surface';
 
 export type JotaiStore = ReturnType<typeof createStore>;
 
+<<<<<<< HEAD
+=======
+/** The app's Recoil root, for renders that use the app's default hosts, which read it. */
+export function AppStores({ children }: { children: ReactNode }) {
+  return <RecoilRoot>{children}</RecoilRoot>;
+}
+
+>>>>>>> upstream/main
 /** The application's own defaults, so a test that does not care about a
  *  preference reads what a reader who never changed one would see. */
 export const testChatSurface = (overrides: Partial<ChatSurface> = {}): ChatSurface => ({

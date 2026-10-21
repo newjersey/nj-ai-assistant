@@ -25,7 +25,11 @@ interface CleanupConfig {
   mcpServers?: Record<string, MCPOptions>;
 }
 
+<<<<<<< HEAD
 interface OAuthAclSubject {
+=======
+export interface OAuthAclSubject {
+>>>>>>> upstream/main
   principalType: string;
   principalId?: { toString(): string } | string | null;
 }
@@ -51,7 +55,11 @@ export async function prepareMCPServerOAuthDeletion({
 interface CleanupDeletedUsersParams {
   ownerUserId: string;
   serverName: string;
+<<<<<<< HEAD
   serverConfig: MCPOptions;
+=======
+  serverConfig?: MCPOptions;
+>>>>>>> upstream/main
   snapshot: MCPServerOAuthDeletionSnapshot;
   getTokenUserIds: () => Promise<Array<{ toString(): string } | string>>;
   getUserPrincipals: (userId: string) => Promise<OAuthAclSubject[]>;
@@ -63,7 +71,11 @@ interface CleanupDeletedUsersParams {
     userId: string,
     pluginKey: string,
     appConfig: CleanupConfig,
+<<<<<<< HEAD
     serverConfig: MCPOptions,
+=======
+    serverConfig?: MCPOptions,
+>>>>>>> upstream/main
   ) => Promise<void>;
 }
 
@@ -230,6 +242,10 @@ export async function clearStoredMCPOAuthState({
   const baseFlowId = dependencies.oauthHandler.generateFlowId(userId, serverName);
   const flowDeletes = [
     [dependencies.oauthHandler.generateTokenFlowId(userId, serverName, tenantId), 'mcp_get_tokens'],
+<<<<<<< HEAD
+=======
+    [dependencies.oauthHandler.generateFlowId(userId, serverName, tenantId), 'mcp_get_tokens'],
+>>>>>>> upstream/main
     [baseFlowId, 'mcp_get_tokens'],
     ...(!skipOAuthFlows
       ? ([

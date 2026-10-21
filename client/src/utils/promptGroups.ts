@@ -78,10 +78,13 @@ export const updateGroupFieldsInPlace = (
   );
 };
 
+<<<<<<< HEAD
 export const getSnippet = (promptText: string, length = 56) => {
   return promptText.length > length ? `${promptText.slice(0, length - 3)}...` : promptText;
 };
 
+=======
+>>>>>>> upstream/main
 export const findPromptGroup = (
   data: InfiniteData<PromptGroupListResponse>,
   findProperty: (group: TPromptGroup) => boolean,

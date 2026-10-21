@@ -27,6 +27,37 @@ beforeEach(async () => {
   await mongoose.models.Config.deleteMany({});
 });
 
+<<<<<<< HEAD
+=======
+describe('restoreConfig', () => {
+  it('restores tombstones and the inactive flag, and never overwrites a newer document', async () => {
+    await methods.upsertConfig(PrincipalType.ROLE, 'admin', PrincipalModel.ROLE, {}, 10);
+    await methods.tombstoneConfigField(PrincipalType.ROLE, 'admin', PrincipalModel.ROLE, 'a.b', 10);
+    await methods.toggleConfigActive(PrincipalType.ROLE, 'admin', false);
+    const deleted = await methods.deleteConfig(PrincipalType.ROLE, 'admin');
+    const snapshot = deleted!.toObject() as Record<string, unknown>;
+
+    expect(await methods.restoreConfig(snapshot)).toBe(true);
+    const restored = await methods.findConfigByPrincipal(PrincipalType.ROLE, 'admin', {
+      includeInactive: true,
+    });
+    expect(restored!.isActive).toBe(false);
+    expect(restored!.tombstones).toContain('a.b');
+
+    await methods.upsertConfig(
+      PrincipalType.ROLE,
+      'admin',
+      PrincipalModel.ROLE,
+      { interface: { modelSelect: false } },
+      99,
+    );
+    expect(await methods.restoreConfig(snapshot)).toBe(false);
+    const kept = await methods.findConfigByPrincipal(PrincipalType.ROLE, 'admin');
+    expect(kept!.priority).toBe(99);
+  });
+});
+
+>>>>>>> upstream/main
 describe('upsertConfig tombstone preservation', () => {
   it('creates a new config document', async () => {
     const result = await methods.upsertConfig(
@@ -646,3 +677,20 @@ describe('expectEmpty atomic guard', () => {
     expect(Object.keys(doc!.overrides ?? {}).length).toBeGreaterThan(0);
   });
 });
+<<<<<<< HEAD
+=======
+
+describe('toggleConfigActiveTracked', () => {
+  it('reports a change once and returns the persisted document', async () => {
+    await methods.upsertConfig(PrincipalType.ROLE, 'admin', PrincipalModel.ROLE, {}, 10);
+
+    const first = await methods.toggleConfigActiveTracked(PrincipalType.ROLE, 'admin', false);
+    const second = await methods.toggleConfigActiveTracked(PrincipalType.ROLE, 'admin', false);
+    const missing = await methods.toggleConfigActiveTracked(PrincipalType.ROLE, 'none', false);
+
+    expect(first).toMatchObject({ changed: true, config: { isActive: false } });
+    expect(second).toMatchObject({ changed: false, config: { isActive: false } });
+    expect(missing).toBeNull();
+  });
+});
+>>>>>>> upstream/main

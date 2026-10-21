@@ -4,6 +4,10 @@ import type { ParsedServerConfig } from '../..';
 import { OAuthReconnectionManager } from './OAuthReconnectionManager';
 import { OAuthReconnectionTracker } from './OAuthReconnectionTracker';
 import { FlowStateManager, MCPConnection, MCPOptions } from '../..';
+<<<<<<< HEAD
+=======
+import { STANDARD_MCP_CAPABILITY_PROFILE } from '../capabilities';
+>>>>>>> upstream/main
 import { MCPManager } from '../MCPManager';
 
 jest.mock('@librechat/data-schemas', () => ({
@@ -216,6 +220,10 @@ describe('OAuthReconnectionManager', () => {
       expect(mockMCPManager.getUserConnection).toHaveBeenCalledWith({
         serverName: 'server3',
         user: { id: userId },
+<<<<<<< HEAD
+=======
+        capabilityProfile: STANDARD_MCP_CAPABILITY_PROFILE,
+>>>>>>> upstream/main
         serverConfig: { initTimeout: 5000 },
         flowManager,
         tokenMethods,
@@ -257,6 +265,10 @@ describe('OAuthReconnectionManager', () => {
       expect(reconnectionTracker.isActive(userId, 'server1')).toBe(false);
       expect(mockMCPManager.disconnectUserConnection).toHaveBeenCalledWith(userId, 'server1', {
         reason: 'lifecycle',
+<<<<<<< HEAD
+=======
+        capabilityProfile: STANDARD_MCP_CAPABILITY_PROFILE,
+>>>>>>> upstream/main
       });
     });
 
@@ -398,6 +410,10 @@ describe('OAuthReconnectionManager', () => {
       expect(reconnectionTracker.isActive(userId, 'server1')).toBe(false);
       expect(mockMCPManager.disconnectUserConnection).toHaveBeenCalledWith(userId, 'server1', {
         reason: 'lifecycle',
+<<<<<<< HEAD
+=======
+        capabilityProfile: STANDARD_MCP_CAPABILITY_PROFILE,
+>>>>>>> upstream/main
       });
     });
 
@@ -667,6 +683,10 @@ describe('OAuthReconnectionManager', () => {
       expect(reconnectionTracker.isFailed(userId, 'server1')).toBe(true);
       expect(mockMCPManager.disconnectUserConnection).toHaveBeenCalledWith(userId, 'server1', {
         reason: 'lifecycle',
+<<<<<<< HEAD
+=======
+        capabilityProfile: STANDARD_MCP_CAPABILITY_PROFILE,
+>>>>>>> upstream/main
       });
     });
   });

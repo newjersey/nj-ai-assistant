@@ -7,6 +7,10 @@ import {
   messagesView,
   requestJson,
   sendMessageAndWaitForCompletion,
+<<<<<<< HEAD
+=======
+  uploadViaLegacyOption,
+>>>>>>> upstream/main
 } from './helpers';
 
 /**
@@ -41,9 +45,19 @@ const TURN2_MARKER_NEEDLE = 'turn1-proof-42';
 const uniqueName = (prefix: string) => `${prefix} ${Date.now()}-${Math.floor(Math.random() * 1e4)}`;
 const modelTrigger = (page: Page) => page.getByRole('button', { name: 'Select a model' }).first();
 
+<<<<<<< HEAD
 async function startFresh(page: Page) {
   await page.goto(NEW_CHAT_PATH, { timeout: 10000 });
   await page.evaluate(() => localStorage.clear());
+=======
+/** Restores the Enter opt-in from global setup, since the send helpers press Enter. */
+async function startFresh(page: Page) {
+  await page.goto(NEW_CHAT_PATH, { timeout: 10000 });
+  await page.evaluate(() => {
+    localStorage.clear();
+    localStorage.setItem('enterToSend', 'true');
+  });
+>>>>>>> upstream/main
   await page.goto(NEW_CHAT_PATH, { timeout: 10000 });
 }
 
@@ -74,6 +88,7 @@ async function selectAgent(page: Page, agentName: string) {
   await expect(modelTrigger(page)).toContainText(agentName);
 }
 
+<<<<<<< HEAD
 /** Attaches a CSV through the real attach menu → Code Environment target,
  *  which uploads it to the live Code API before the message is ever sent. */
 async function attachCodeFile(page: Page) {
@@ -96,6 +111,16 @@ async function attachCodeFile(page: Page) {
       buffer: Buffer.from(FILE_CONTENT),
     }),
   ]);
+=======
+/** Attaches a CSV through the palette's Code Environment destination row,
+ *  which uploads it to the live Code API before the message is ever sent. */
+async function attachCodeFile(page: Page) {
+  const upload = await uploadViaLegacyOption(page, 'Upload to Code Environment', {
+    name: FILE_NAME,
+    mimeType: 'text/csv',
+    content: FILE_CONTENT,
+  });
+>>>>>>> upstream/main
   expect(upload.ok(), `code file upload returned ${upload.status()}`).toBeTruthy();
   await expect(page.getByText(FILE_NAME).first()).toBeVisible();
 }

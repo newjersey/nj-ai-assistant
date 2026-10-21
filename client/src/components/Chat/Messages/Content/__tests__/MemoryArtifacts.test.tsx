@@ -74,8 +74,12 @@ describe('MemoryArtifacts', () => {
       render(<MemoryArtifacts attachments={attachments} />);
 
       const button = screen.getByRole('button');
+<<<<<<< HEAD
       // NJ: Patch test for custom colors
       expect(button).toHaveClass('text-jersey-blue');
+=======
+      expect(button).toHaveClass('text-text-secondary');
+>>>>>>> upstream/main
       expect(button).not.toHaveClass('text-status-error');
     });
 
@@ -130,8 +134,15 @@ describe('MemoryArtifacts', () => {
       expect(screen.getByText('Memory Error')).toBeInTheDocument();
     });
 
+<<<<<<< HEAD
     // NJ: memory is background — no inline MemoryCall, so we don't dedup on toolCallId
     test.skip('ignores attachments already rendered as an inline memory tool card', () => {
+=======
+    test('ignores attachments already rendered as an inline memory tool card', () => {
+      /** A `set_memory`/`delete_memory` call routes to `MemoryCall`, which
+       *  shows the same key, value and outcome. Counting its attachment here
+       *  too rendered one mutation twice. `toolCallId` is the discriminator. */
+>>>>>>> upstream/main
       const linked = {
         ...createMemoryAttachment('update', 'memory1'),
         toolCallId: 'call_abc123',

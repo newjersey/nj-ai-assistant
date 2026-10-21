@@ -1,5 +1,9 @@
+<<<<<<< HEAD
 import { memo, useCallback, lazy, Suspense } from 'react';
 import { useRecoilValue } from 'recoil';
+=======
+import { memo, useCallback, Suspense } from 'react';
+>>>>>>> upstream/main
 import { SquarePen } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import { Skeleton, Sidebar, Button, TooltipAnchor } from '@librechat/client';
@@ -8,6 +12,7 @@ import { useShortcutAriaKey, useShortcutHint } from '~/hooks/useKeyboardShortcut
 import { useActivePanel, resolveActivePanel, DEFAULT_PANEL } from '~/Providers';
 import AgentMarketplaceButton from '~/components/Nav/AgentMarketplaceButton';
 import { CLOSE_SIDEBAR_ID } from '~/components/Chat/Menus/OpenSidebar';
+<<<<<<< HEAD
 import useNewChat from '~/hooks/Chat/useNewChat';
 import { useLocalize } from '~/hooks';
 import { cn } from '~/utils';
@@ -22,6 +27,22 @@ const NewChatButton = memo(function NewChatButton({
 }) {
   const localize = useLocalize();
   const switchToHistory = useRecoilValue(store.newChatSwitchToHistory);
+=======
+import useNewChat from '~/hooks/Conversations/useNewChat';
+import { lazyWithRecovery } from '~/lib/assets/lazy';
+import { useLocalize } from '~/hooks';
+
+const AccountSettings = lazyWithRecovery(() => import('~/components/Nav/AccountSettings'));
+
+const NewChatButton = memo(function NewChatButton({
+  setActive,
+  switchToHistory,
+}: {
+  setActive: (id: string) => void;
+  switchToHistory: boolean;
+}) {
+  const localize = useLocalize();
+>>>>>>> upstream/main
   const tooltipDescription = useShortcutHint('newChat', localize('com_ui_new_chat'));
   const ariaKey = useShortcutAriaKey('newChat');
 
@@ -43,10 +64,17 @@ const NewChatButton = memo(function NewChatButton({
           data-testid="new-chat-button"
           aria-label={localize('com_ui_new_chat')}
           aria-keyshortcuts={ariaKey}
+<<<<<<< HEAD
           className="flex h-9 w-9 items-center justify-center rounded-lg transition-colors hover:bg-surface-hover"
           onClick={handleNewChatClick}
         >
           <SquarePen className="h-5 w-5 text-text-primary" />
+=======
+          className="hover:bg-surface-nav-hover flex h-9 w-9 items-center justify-center rounded-lg transition-colors"
+          onClick={handleNewChatClick}
+        >
+          <SquarePen className="text-text-primary h-5 w-5" />
+>>>>>>> upstream/main
         </a>
       }
     />
@@ -104,15 +132,23 @@ const NavIconButton = memo(function NavIconButton({
       render={
         <Button
           size="icon"
+<<<<<<< HEAD
           variant="ghost"
+=======
+          variant="nav"
+>>>>>>> upstream/main
           aria-label={localize(link.title)}
           aria-pressed={isActive}
           disabled={link.disabled}
           data-testid={`nav-panel-${link.id}`}
+<<<<<<< HEAD
           className={cn(
             'h-9 w-9 rounded-lg',
             isActive ? 'bg-surface-active-alt text-text-primary' : 'text-text-secondary',
           )}
+=======
+          className="h-9 w-9 rounded-lg"
+>>>>>>> upstream/main
           onClick={handleClick}
         >
           <link.icon className="h-5 w-5" aria-hidden="true" />
@@ -129,6 +165,10 @@ function ExpandedPanel({
   onExpand,
   onNavigate,
   onLeaveInsights,
+<<<<<<< HEAD
+=======
+  switchToHistory,
+>>>>>>> upstream/main
 }: {
   links: NavLink[];
   expanded?: boolean;
@@ -136,6 +176,10 @@ function ExpandedPanel({
   onExpand?: () => void;
   onNavigate?: () => void;
   onLeaveInsights?: () => void;
+<<<<<<< HEAD
+=======
+  switchToHistory: boolean;
+>>>>>>> upstream/main
 }) {
   const localize = useLocalize();
   const location = useLocation();
@@ -149,7 +193,11 @@ function ExpandedPanel({
   const toggleSidebarAriaKey = useShortcutAriaKey('toggleSidebar');
 
   return (
+<<<<<<< HEAD
     <div className="flex h-full flex-shrink-0 flex-col gap-2 border-r border-border-light bg-surface-primary-alt px-2 py-2">
+=======
+    <div className="border-border-inset bg-surface-sidebar flex h-full shrink-0 flex-col gap-2 border-r px-2 py-2">
+>>>>>>> upstream/main
       <TooltipAnchor
         side="right"
         description={toggleSidebarHint}
@@ -158,6 +206,7 @@ function ExpandedPanel({
             id={expanded ? CLOSE_SIDEBAR_ID : undefined}
             data-testid={expanded ? 'close-sidebar-button' : 'open-sidebar-button'}
             size="icon"
+<<<<<<< HEAD
             variant="ghost"
             aria-label={localize(toggleLabel)}
             aria-expanded={expanded}
@@ -172,6 +221,22 @@ function ExpandedPanel({
       <NewChatButton setActive={setActive} />
       <AgentMarketplaceButton />
       <div className="mx-2 border-b border-border-light" />
+=======
+            variant="nav"
+            aria-label={localize(toggleLabel)}
+            aria-expanded={expanded}
+            aria-keyshortcuts={toggleSidebarAriaKey}
+            className="h-9 w-9"
+            onClick={toggleClick}
+          >
+            <Sidebar aria-hidden="true" className="text-text-primary h-5 w-5" />
+          </Button>
+        }
+      />
+      <NewChatButton setActive={setActive} switchToHistory={switchToHistory} />
+      <AgentMarketplaceButton />
+      <div className="border-border-inset mx-2 border-b" />
+>>>>>>> upstream/main
       <div className="flex flex-col gap-1 overflow-y-auto">
         {links.map((link) => (
           <NavIconButton

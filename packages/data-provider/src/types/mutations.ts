@@ -47,6 +47,11 @@ export type TGenTitleRequest = {
 
 export type TGenTitleResponse = {
   title: string;
+<<<<<<< HEAD
+=======
+  titleSetByUser?: boolean;
+  titleRevision?: number;
+>>>>>>> upstream/main
 };
 
 export type PresetDeleteResponse = {
@@ -208,16 +213,20 @@ export type ForkSharedConvoOptions = MutationOptions<
   types.TForkSharedConvoRequest
 >;
 
+<<<<<<< HEAD
 export type CreateSharedLinkOptions = MutationOptions<
   types.TSharedLink,
   Partial<types.TSharedLink>
 >;
 
+=======
+>>>>>>> upstream/main
 export type updateTagsInConvoOptions = MutationOptions<
   types.TTagConversationResponse,
   types.TTagConversationRequest
 >;
 
+<<<<<<< HEAD
 export type UpdateSharedLinkOptions = MutationOptions<
   types.TSharedLink,
   Partial<types.TSharedLink>
@@ -228,6 +237,8 @@ export type ArchiveConvoOptions = MutationOptions<
   types.TArchiveConversationRequest
 >;
 
+=======
+>>>>>>> upstream/main
 export type ArchiveAllConversationsOptions = MutationOptions<
   types.TArchiveAllConversationsResponse,
   void
@@ -307,8 +318,13 @@ export type UpdatePermResponse = r.TRole;
 
 /**
  * Cache entries that can appear under the `[QueryKeys.skills, ...]` key prefix.
+<<<<<<< HEAD
  * Flat responses come from `useListSkillsQuery`; infinite responses come from
  * `useSkillsInfiniteQuery`. The context carries both shapes for rollback.
+=======
+ * Infinite responses come from `useSkillsInfiniteQuery`; flat responses may also
+ * be cached under this prefix. The context carries both shapes for rollback.
+>>>>>>> upstream/main
  */
 export type TSkillCacheEntry = TSkillListResponse | InfiniteData<TSkillListResponse> | undefined;
 
@@ -508,11 +524,14 @@ export type TLogoutResponse = {
 
 export type LogoutOptions = MutationOptions<TLogoutResponse, undefined>;
 
+<<<<<<< HEAD
 export interface AssistantInitialize {
   message: string;
   error?: string;
 }
 
+=======
+>>>>>>> upstream/main
 export interface CancelMCPOAuthResponse {
   success: boolean;
   message: string;

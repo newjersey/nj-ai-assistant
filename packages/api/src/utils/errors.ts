@@ -41,7 +41,18 @@ export function getSafeErrorMetadata(error: unknown): SafeErrorMetadata {
 
 const MAX_SAFE_ERROR_TEXT = 2000;
 
+<<<<<<< HEAD
 function redactUrl(match: string): string {
+=======
+function redactUrl(match: string, scheme?: string): string {
+  if (scheme == null) {
+    return '[url]';
+  }
+  if (scheme.toLowerCase() === 'file') {
+    return match;
+  }
+
+>>>>>>> upstream/main
   try {
     const url = new URL(match);
     return `${url.protocol}//${url.host}/[redacted]`;
@@ -52,15 +63,29 @@ function redactUrl(match: string): string {
 
 function redactSecrets(value: string): string {
   return value
+<<<<<<< HEAD
     .replace(/\b(?!file:)[a-z][a-z0-9+.-]*:\/\/\S+/gi, redactUrl)
     .replace(/\b(bearer|basic)\s+\S+/gi, '$1 [redacted]');
+=======
+    .slice(0, MAX_SAFE_ERROR_TEXT)
+    .replace(/\b(?<![a-z0-9+.-])([a-z][a-z0-9+.-]{0,31}):\/\/\S+|:\/\/\S+/gi, redactUrl)
+    .replace(/\b(bearer|basic)\s+\S+/gi, '$1 [redacted]')
+    .slice(0, MAX_SAFE_ERROR_TEXT);
+>>>>>>> upstream/main
 }
 
 /**
  * The request-boundary counterpart to {@link getSafeErrorMetadata}: the error's own
+<<<<<<< HEAD
  * description and stack, with every URL reduced to its origin and bearer credentials
  * removed. A signed storage URL carries the object path and signature in the parts
  * that are dropped, while the origin is what an operator needs to place the failure.
+=======
+ * description and stack, with recognized URLs reduced to their origins, unrecognized
+ * URL tails removed, and bearer credentials removed. A signed storage URL carries its
+ * object path and signature in the parts that are dropped, while the origin is what
+ * an operator needs to place the failure.
+>>>>>>> upstream/main
  *
  * Returned as text because the caller must log it inside the message and pass no
  * winston metadata: metadata arms `format.splat()` and promotes an SDK error's own
@@ -73,7 +98,11 @@ function redactSecrets(value: string): string {
  */
 export function getSafeErrorText(error: unknown): string {
   if (typeof error === 'string') {
+<<<<<<< HEAD
     return redactSecrets(error).slice(0, MAX_SAFE_ERROR_TEXT);
+=======
+    return redactSecrets(error);
+>>>>>>> upstream/main
   }
 
   if (error == null || typeof error !== 'object') {
@@ -82,19 +111,36 @@ export function getSafeErrorText(error: unknown): string {
 
   const stack = readProperty(error, 'stack');
   if (typeof stack === 'string' && stack.length > 0) {
+<<<<<<< HEAD
     return redactSecrets(stack).slice(0, MAX_SAFE_ERROR_TEXT);
+=======
+    return redactSecrets(stack);
+>>>>>>> upstream/main
   }
 
   const name = readProperty(error, 'name');
   const message = readProperty(error, 'message');
   const described = [
+<<<<<<< HEAD
     typeof name === 'string' && name.length > 0 ? name : 'UnknownError',
     typeof message === 'string' && message.length > 0 ? message : undefined,
+=======
+    typeof name === 'string' && name.length > 0
+      ? name.slice(0, MAX_SAFE_ERROR_TEXT)
+      : 'UnknownError',
+    typeof message === 'string' && message.length > 0
+      ? message.slice(0, MAX_SAFE_ERROR_TEXT)
+      : undefined,
+>>>>>>> upstream/main
   ]
     .filter(Boolean)
     .join(': ');
 
+<<<<<<< HEAD
   return redactSecrets(described).slice(0, MAX_SAFE_ERROR_TEXT);
+=======
+  return redactSecrets(described);
+>>>>>>> upstream/main
 }
 
 /**
