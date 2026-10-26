@@ -1,6 +1,18 @@
 # Release notes
 
----
+
+## October 26, 2026
+Features released:
+
+* **Upgrading to Claude Sonnet 5.5** — All new chats will use this upgraded model.   
+  * If you continue an existing chat or use an existing agent, these will also use Sonnet 5.5. The older model (Sonnet 4.5) will be deprecated in Spring 2027, so we are migrating everyone’s chats and agents now. 
+
+Bugs & Improvements:
+
+* File uploads — The app stopped larger attachments from being uploaded into a chat, even though the context window still had space. We addressed this issue. You should be able to upload 10 files per chat, with an unlimited number of files in a conversation (until the context window limit is reached).   
+  * Please report any issues via [email](mailto:AI.Assistant@innovation.nj.gov) or the [contact form](https://forms.cloud.microsoft/pages/responsepage.aspx?id=0cN2UAI4n0uzauCkG9ZCp1twTiQNDpJJvmPRcdiEIL9UMEJaT0lJQUxJNVpBTlpXVUs3Ujk4M0pONy4u&route=shorturl). We would like to know if this continues. 
+
+
 
 ## July 22, 2026
 
