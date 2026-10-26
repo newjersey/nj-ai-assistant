@@ -1,6 +1,6 @@
 import { memo, useId, useMemo, useRef, useState } from 'react';
 import * as Ariakit from '@ariakit/react';
-import { Ellipsis, FolderInput, FolderX, Trash2 } from 'lucide-react';
+import { Ellipsis, FolderInput, FolderX } from 'lucide-react';
 import { DropdownPopup, Spinner, useToastContext } from '@librechat/client';
 import type { TConversation } from 'librechat-data-provider';
 import type { MenuItemProps } from '~/common';
@@ -79,6 +79,7 @@ function ProjectChatOptions({ conversation, isMenuOpen, setIsMenuOpen }: Project
           <FolderX className="size-4 text-text-secondary" aria-hidden="true" />
         ),
       },
+      /* NJ: Hide the delete option from the projects dropdown
       {
         label: localize('com_ui_delete'),
         onClick: () => setShowDeleteDialog(true),
@@ -86,6 +87,7 @@ function ProjectChatOptions({ conversation, isMenuOpen, setIsMenuOpen }: Project
         render: (props) => <button {...props} />,
         icon: <Trash2 className="size-4 text-text-secondary" aria-hidden="true" />,
       },
+      */
     ];
   }, [
     assignConversationToProject,
