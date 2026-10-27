@@ -90,7 +90,7 @@ There are three steps to setting it up:
 
 To go back to normal, run `npm run reinstall`, which resets `node_modules`.
 
-### Running E2E tests
+### Running E2E Tests
 
 Our E2E tests live in `./nj/e2e/\*` and can be run on their own with the following command:
 
@@ -217,12 +217,13 @@ configuration used for local development as well as the files for dev and prod a
 rendered dynamically based on merging the `.env*` files with our
 [`librechat.yaml.njk`](/nj/librechat-config/librechat.yaml.njk) template. The rendered output is written to the same
 directory as Kitchen Sink's file:
+
 - `nj/librechat-config/librechat.local.yaml`
 - `nj/librechat-config/librechat.dev.yaml`
 - `nj/librechat-config/librechat.prod.yaml`
 
 The dev and prod files are rendered by the [Dockerfile](/Dockerfile) while building the Docker image. The local file is
-rendered automatically as part of calling `npm run backend:dev`.  A developer can render these files with either the
+rendered automatically as part of calling `npm run backend:dev`. A developer can render these files with either the
 `npm run nj-render-configs` command or the `npm run nj-render-local-config` command, respectively, to spot-check their
 contents.
 
@@ -236,6 +237,7 @@ Feature flags allow us to deploy releases without having to reveal features that
 We use environment variables for feature flags (overlapping LibreChat's use of environment variables), which allows us
 to turn a feature on or off for an entire environment (local, dev, or prod). Feature flags (as well as unique
 environment variables) are defined in `.env*` files, with one file for each deployment target:
+
 - `.env` for local development
 - [`.env.nj-kitchensink`](/.env.nj-kitchensink)
 - [`.env.nj-dev`](/.env.nj-dev)
@@ -251,11 +253,13 @@ Some environment variables are only used to control the main application configu
 on feature flag configurations.
 
 Render the local configuration file with:
+
 ```shell
 npm run nj-render-local-config
 ```
 
 Render the dev and prod files with:
+
 ```shell
 npm run nj-render-configs
 ```
@@ -271,6 +275,7 @@ into the necessary `env` files, the variable must also be added to [`nj.env.temp
 environment variable files to be used in kitchensink, dev, and prod.
 
 If you have a feature flag which the code checks for with `process.env.FEATURE_FLAG`, then:
+
 - The `nj.env.template` file should contain a line like: `FEATURE_FLAG=$FEATURE_FLAG`
 - The respective `env` files should set that environment variable, e.g. `FEATURE_FLAG=true`
 
@@ -301,30 +306,31 @@ We just close any Dependabot updates as a result, and rely on upstream merges fo
 
 ## Releasing to Prod
 
-Prod release happens in two steps:
+### Pre-release Content Checklist
+
+Before creating a release, review the release notes and New Updates widget content. See the [Static Content Guide](client/src/nj/content/README.md) for editing instructions.
+
+- Confirm that `release-notes.md` is up to date.
+- Review `update-widget.md` and update it as needed.
+
+### Release Steps
 
 1. Create a [release](https://github.com/newjersey/nj-ai-assistant/releases) in GitHub, and wait for it to build and
    push
-2. [OPTIONAL] If environment variables have changed, run the [render-env workflow](/.github/workflows/nj-render-env.yml)
+2. If environment variables have changed, run the [render-env workflow](/.github/workflows/nj-render-env.yml)
 3. Run the [infra-deploy workflow](/.github/workflows/nj-infra-deploy.yml) on the prod environment.
 
-### Create a new release
+### Create a New Release
 
-Go to [releases](https://github.com/newjersey/nj-ai-assistant/releases) and click "Draft new release."
-
-In the Select Tag dropdown, press Create New Tag. Format the new tag like `release-YYYYMMDD.X`. (The `.X` is an optional
-increment in case multiple tags are cut per day.)
-
-Target the `newjersey` branch.
-
-The Release Title should be the same as the new tag.
-
-The auto-select previous tag is fairly reliable, but you can manually set to the last tag if needed. Click "generate
-release notes" to automatically generate some decent notes.
-
-Keep "Set as the latest release" selected.
-
-Then click "Publish release."
+1. Go to [releases](https://github.com/newjersey/nj-ai-assistant/releases) and click "Draft new release."
+2. In the Select Tag dropdown, press "Create New Tag". Format the new tag like `release-YYYYMMDD.X`. (The `.X` is an optional
+   increment if multiple tags are created on the same day.)
+3. Target the `newjersey` branch.
+4. Set the Release Title to match the new tag.
+5. Verify the previous tag. The auto-select previous tag is fairly reliable, but you can manually select the last tag if needed.
+6. Click "Generate release notes" to automatically generate some decent notes.
+7. Keep "Set as the latest release" selected.
+8. Click "Publish release."
 
 The new release & tag will initiate the tag build and update the `ai-assistant/prod-image-tag` SSM parameter.
 
@@ -349,15 +355,16 @@ In the event that we need to set prod to a specific release tag, we can run the 
 GitHub Actions. This takes a text input for the release tag, and includes a verification step to ensure we're not
 setting a non-existent tag. The infra-deploy workflow will still need to be run to deploy the new tag.
 
-### Run the infra-deploy workflow
+### Run the Infra-deploy Workflow
 
-- From the GitHub Actions tab, select the Deploy AI Assistant Infrastructure workflow
-- Select Run Workflow
-  - Branch: `newjersey`
-  - Environment: `prod`
-- Wait for the cdk-diff job to complete
-- REVIEW THE OUTPUT. When you approve the cdk-deploy job, you are responsible for the changes that roll out.
-- Approve and wait for the fireworks. You can watch the deployment from the CloudFormation console if so desired.
+1. From the GitHub Actions tab, select the "Deploy AI Assistant Infrastructure" workflow.
+2. Click "Run Workflow" and select:
+   - Branch: `newjersey`
+   - Environment: `prod`
+
+3. Wait for the `cdk-diff` job to complete.
+4. REVIEW THE OUTPUT. When you approve the `cdk-deploy` job, you are responsible for the changes that roll out.
+5. Approve and wait for the fireworks. You can watch the deployment from the CloudFormation console if so desired.
 
 ## ClickOps Components
 
