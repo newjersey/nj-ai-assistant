@@ -30,7 +30,7 @@ Use agents at conversation start, mid-conversation, or use multiple agents in on
 
 **Once you activate an agent, you can see its name** at the top of the screen, regardless of activation method.
 
-Note: Without an active agent, the selector shows the AI model (currently “Claude Sonnet 4.5”). With an active agent, it will show the agent name (like “Email Drafter”) with a feather icon.
+Note: Without an active agent, the selector shows the AI model. With an active agent, it will show the agent name (like “Email Drafter”) with a feather icon.
 
 **Choose an agent using the selector at the top of the screen**  
 Use the selector to activate an agent for new or existing conversations:
@@ -66,7 +66,7 @@ When you use multiple agents in a conversation, or want to start using one mid-c
 
 **The agent name appears in the selector at the top when active, providing an easy way to stop using an agent or switch agents.**
 
-Note: Without an agent, the selector shows the AI model (currently "Claude Sonnet 4.5"). With an agent, it shows the agent name (like "Email Drafter") with a feather icon.
+Note: Without an agent, the selector shows the AI model. With an agent, it shows the agent name (like "Email Drafter") with a feather icon.
 
 **Stop using agents**  
 Use the top selector to deactivate an agent, important for using an agent temporarily then continuing without it:

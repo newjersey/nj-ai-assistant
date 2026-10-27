@@ -128,7 +128,7 @@ Once you activate an agent, you can see its name at the top of the screen, regar
             question: 'How can I stop using an agent?',
             answer: `The agent name appears in the selector at the top when active, providing an easy way to stop using an agent (or switch to a different agent). 
 
-At the top of the page in the selector, you will see the agent name (e.g. “Email Drafter”). Click on that to see a menu. Within the menu you will see the name of the model (“Claude Sonnet 4.5”) or other agents (“Brainstorming Buddy”). Click on the one you want.
+At the top of the page in the selector, you will see the agent name (e.g. “Email Drafter”). Click on that to see a menu. Within the menu you will see the name of the AI model or other agents (“Brainstorming Buddy”). Click on the one you want.
 
 You will see the new name in the selector, which is how you know switching agents (or switching back to the base model) worked. See the ["How to Build & Use Agents" guide](https://ai-assistant.nj.gov/nj/agent-guide) to learn more.`,
           },
