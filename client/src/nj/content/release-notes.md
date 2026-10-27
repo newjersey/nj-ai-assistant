@@ -5,7 +5,7 @@
 Features released:
 
 * **Upgrading to Claude Sonnet 5.5** — All new chats will use this upgraded model.   
-  * If you continue an existing chat or use an existing agent, these will also use Sonnet 5.5. The older model (Sonnet 4.5) will be deprecated in Spring 2027, so we are migrating everyone’s chats and agents now. 
+  * Note: If you continue an existing chat or use an existing custom agent, these will continue to use Sonnet 4.5 automatically. The older model (Sonnet 4.5) will be deprecated in Spring 2027, so we are working on migrating everyone’s chats and agents.
 
 Bugs & Improvements:
 
