@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const { CacheKeys } = require('librechat-data-provider');
+<<<<<<< HEAD
 const { AppService, logger } = require('@librechat/data-schemas');
 const {
   createAppConfigService,
@@ -10,6 +11,23 @@ const {
   standardCache,
 } = require('@librechat/api');
 const { setCachedTools, invalidateCachedTools } = require('./getCachedTools');
+=======
+const { AppService } = require('@librechat/data-schemas');
+const {
+  isEnabled,
+  expandCustomEndpoint,
+  createAppConfigService,
+  clearMcpConfigCache,
+  createCodeEnvironmentRegistry,
+  createConfigCacheInvalidation,
+  createRedisConfigInvalidationPubSub,
+  mergeAccessibleCodeEnvironments,
+  ioredisClient,
+  cacheConfig,
+  standardCache,
+} = require('@librechat/api');
+const { setCachedTools } = require('./getCachedTools');
+>>>>>>> upstream/main
 const { loadAndFormatTools } = require('~/server/services/start/tools');
 const loadCustomConfig = require('./loadCustomConfig');
 const getLogStores = require('~/cache/getLogStores');
@@ -33,25 +51,43 @@ async function invalidateCodeEnvironmentConfigCache(tenantId) {
   await getCodeEnvironmentRegistry().invalidateAccessibleConfigurations(tenantId);
 }
 
+<<<<<<< HEAD
 const loadBaseConfig = async () => {
   /** @type {TCustomConfig} */
   const config = (await loadCustomConfig()) ?? {};
+=======
+const loadBaseConfig = async (mode) => {
+  /** @type {TCustomConfig} */
+  const config = (await loadCustomConfig(true, { mode })) ?? {};
+>>>>>>> upstream/main
   /** @type {Record<string, FunctionTool>} */
   const systemTools = loadAndFormatTools({
     adminFilter: config.filteredTools,
     adminIncluded: config.includedTools,
     directory: paths.structuredTools,
   });
+<<<<<<< HEAD
   return AppService({ config, paths, systemTools });
 };
 
 const { getAppConfig, clearAppConfigCache, clearOverrideCache } = createAppConfigService({
+=======
+  return AppService({ config, paths, systemTools, expandCustomEndpoint });
+};
+
+const appConfigService = createAppConfigService({
+>>>>>>> upstream/main
   loadBaseConfig,
   setCachedTools,
   getCache: getLogStores,
   cacheKeys: CacheKeys,
   getApplicableConfigs: db.getApplicableConfigs,
   getUserPrincipals: db.getUserPrincipals,
+<<<<<<< HEAD
+=======
+  overrideEnvAllowlist: process.env.CONFIG_OVERRIDE_ENV_ALLOWLIST,
+  rederiveEndpoints: isEnabled(process.env.CONFIG_REDERIVE_ENDPOINTS),
+>>>>>>> upstream/main
   augmentConfig: ({ appConfig, baseConfig, principals, options }) => {
     if (!options.userId) return appConfig;
     return mergeAccessibleCodeEnvironments({
@@ -67,6 +103,7 @@ const { getAppConfig, clearAppConfigCache, clearOverrideCache } = createAppConfi
     });
   },
 });
+<<<<<<< HEAD
 
 /**
  * Invalidate all config-related caches after an admin config mutation.
@@ -92,13 +129,74 @@ async function invalidateConfigCaches(tenantId) {
       logger.error(`[invalidateConfigCaches] ${labels[i]} failed:`, results[i].reason);
     }
   }
+=======
+const {
+  getAppConfig,
+  resolveConfigLayers,
+  clearAppConfigCache,
+  clearOverrideCache,
+  reloadBaseConfig,
+  overrideCacheTtl,
+  rederiveEndpoints,
+} = appConfigService;
+
+// Config owns the reader; models never import this module to obtain it.
+db.initializeMessageBudget(getAppConfig);
+
+/**
+ * Admin config writes clear the per-principal override caches, the MCP config-source servers
+ * and the YAML base config. Base-only sections such as `filters` and `messageFilter` exist only
+ * in librechat.yaml, and an admin write is how a running server picks up an edit to them: the
+ * next read reloads the YAML (keeping the last good config if it fails) and republishes the
+ * tools derived from it. With Redis, the clear is broadcast so every instance reloads its YAML
+ * and drops its in-process merged config.
+ */
+const configCacheInvalidation = createConfigCacheInvalidation({
+  clears: [
+    { label: 'clearAppConfigCache', clear: () => clearAppConfigCache() },
+    { label: 'clearOverrideCache', clear: clearOverrideCache },
+    { label: 'clearMcpConfigCache', clear: () => clearMcpConfigCache() },
+  ],
+  load: reloadBaseConfig,
+  pubsub: createRedisConfigInvalidationPubSub({
+    useRedis: cacheConfig.USE_REDIS,
+    client: ioredisClient,
+    namespace: cacheConfig.REDIS_KEY_PREFIX,
+  }),
+});
+
+/**
+ * Invalidate the config caches an admin config mutation affects, on every instance.
+ * @param {string} [tenantId] - Optional tenant ID to scope override cache clearing.
+ */
+function invalidateConfigCaches(tenantId) {
+  return configCacheInvalidation.invalidate(tenantId);
+}
+
+/**
+ * The same clear for the admin reload route, then librechat.yaml loaded again here and, when it
+ * loaded, the broadcast; resolves with what each step reached.
+ * @param {string} [tenantId] - Optional tenant ID to scope override cache clearing.
+ * @returns {Promise<import('@librechat/api').ConfigReloadReport>}
+ */
+function reloadConfigCaches(tenantId) {
+  return configCacheInvalidation.reload(tenantId);
+>>>>>>> upstream/main
 }
 
 module.exports = {
   getAppConfig,
+<<<<<<< HEAD
   clearAppConfigCache,
   clearOverrideCache,
   invalidateConfigCaches,
+=======
+  resolveConfigLayers,
+  overrideCacheTtl,
+  rederiveEndpoints,
+  invalidateConfigCaches,
+  reloadConfigCaches,
+>>>>>>> upstream/main
   getCodeEnvironmentRegistry,
   invalidateCodeEnvironmentConfigCache,
 };

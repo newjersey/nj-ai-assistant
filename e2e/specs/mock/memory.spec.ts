@@ -23,7 +23,13 @@ test.describe('memory badge', () => {
     await selectMockEndpoint(page, MOCK_ENDPOINTS[0]);
 
     await enableMemory(page);
+<<<<<<< HEAD
     await expect(page.getByRole('checkbox', { name: 'Memory' })).toBeChecked();
+=======
+    await expect(
+      page.getByTestId('composer-active-builtin').filter({ hasText: 'Memory' }),
+    ).toBeVisible();
+>>>>>>> upstream/main
 
     const memoryRequest = page.waitForRequest(
       (request) => request.url().includes('/api/agents/chat') && request.method() === 'POST',

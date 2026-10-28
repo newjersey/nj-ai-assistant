@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useQuery, useQueries, useQueryClient } from '@tanstack/react-query';
 import { apiBaseUrl, QueryKeys, request, dataService } from 'librechat-data-provider';
+<<<<<<< HEAD
 import type { Agents, TConversation, TPendingSteer } from 'librechat-data-provider';
 import { isNotFoundError, updateConvoInAllQueries, setDocumentTitle } from '~/utils';
 import { generationProtocolHeaders, withGenerationProtocolQuery } from './protocol';
@@ -29,6 +30,20 @@ export interface StreamStatusResponse {
    *  recovery turn persists or the user discards the item. */
   unrecoveredSteers?: TPendingSteer[];
 }
+=======
+import type { TConversation } from 'librechat-data-provider';
+import type { StreamStatusResponse } from '@librechat/chat';
+import {
+  isNotFoundError,
+  updateConvoInAllQueries,
+  setDocumentTitle,
+  findManualConvoTitleInAllQueries,
+} from '~/utils';
+import { generationProtocolHeaders, withGenerationProtocolQuery } from './protocol';
+import { useGetStartupConfig } from '../Endpoints';
+
+export type { StreamStatusResponse } from '@librechat/chat';
+>>>>>>> upstream/main
 
 export const streamStatusQueryKey = (conversationId: string) => ['streamStatus', conversationId];
 
@@ -74,12 +89,23 @@ const queueListeners = new Set<() => void>();
 
 /** Queue a conversation for title generation (call when starting new conversation) */
 export function queueTitleGeneration(conversationId: string) {
+<<<<<<< HEAD
   if (!processedTitles.has(conversationId)) {
+=======
+  if (!isTitleGenerationProcessed(conversationId)) {
+>>>>>>> upstream/main
     titleQueue.add(conversationId);
     queueListeners.forEach((listener) => listener());
   }
 }
 
+<<<<<<< HEAD
+=======
+export function isTitleGenerationProcessed(conversationId: string): boolean {
+  return processedTitles.has(conversationId);
+}
+
+>>>>>>> upstream/main
 export function markTitleGenerationProcessed(conversationId: string) {
   processedTitles.add(conversationId);
   titleQueue.delete(conversationId);
@@ -174,6 +200,7 @@ export function useTitleGeneration(enabled = true) {
       }
 
       if (titleQuery.isSuccess && titleQuery.data) {
+<<<<<<< HEAD
         const { title } = titleQuery.data;
         queryClient.setQueryData(
           [QueryKeys.conversation, conversationId],
@@ -183,6 +210,23 @@ export function useTitleGeneration(enabled = true) {
         // Only update document title if this conversation is currently active
         if (window.location.pathname.includes(conversationId)) {
           // setDocumentTitle(title); // NJ: Don't change title to match conversation
+=======
+        const incoming = titleQuery.data;
+        const titleState =
+          findManualConvoTitleInAllQueries(queryClient, conversationId, incoming) ?? incoming;
+        const applyTitle = (convo: TConversation): TConversation => ({ ...convo, ...titleState });
+        queryClient.setQueryData<TConversation>(
+          [QueryKeys.conversation, conversationId],
+          (convo) => (convo ? applyTitle(convo) : convo),
+        );
+        updateConvoInAllQueries(queryClient, conversationId, applyTitle);
+        const title =
+          queryClient.getQueryData<TConversation>([QueryKeys.conversation, conversationId])
+            ?.title ?? incoming.title;
+        // Only update document title if this conversation is currently active
+        if (window.location.pathname.includes(conversationId)) {
+          setDocumentTitle(title);
+>>>>>>> upstream/main
         }
         markTitleGenerationProcessed(conversationId);
         setReadyToFetch((prev) => prev.filter((id) => id !== conversationId));

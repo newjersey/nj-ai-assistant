@@ -15,6 +15,17 @@ import type { IConversation, IMessage } from '~/types';
 import { buildRetentionVisibilityFilter, legacyPermanentExpirationFilter } from '~/utils/retention';
 import logger from '~/config/meiliLogger';
 
+<<<<<<< HEAD
+=======
+/** Internal per-query bypass for writes to non-searchable bookkeeping fields. A WeakSet keeps
+ * this marker out of driver options and stored data. Other model middleware still runs. */
+const queriesWithoutMeiliIndexing = new WeakSet<object>();
+export function withoutMeiliIndexing<T extends object>(query: T): T {
+  queriesWithoutMeiliIndexing.add(query);
+  return query;
+}
+
+>>>>>>> upstream/main
 interface MongoMeiliOptions {
   host: string;
   apiKey: string;
@@ -186,7 +197,20 @@ const buildIndexableQuery = (
   };
 };
 
+<<<<<<< HEAD
 const buildExcludedIndexedQuery = (excludeFromIndexPath?: string): FilterQuery<unknown> | null => {
+=======
+/**
+ * Excluded documents that may still hold a Meili entry. The legacy branch matches a
+ * `_meiliCleanupVersion` that is absent or null, written as a null equality rather than
+ * `$exists: false` so `meili_excluded_legacy_cleanup_v4` can serve it: a partial index
+ * accepts null equality and rejects `$exists: false`, and the planner only reaches a
+ * partial index through a predicate that implies its filter.
+ */
+export const buildExcludedIndexedQuery = (
+  excludeFromIndexPath?: string,
+): FilterQuery<unknown> | null => {
+>>>>>>> upstream/main
   if (excludeFromIndexPath == null) {
     return null;
   }
@@ -196,7 +220,11 @@ const buildExcludedIndexedQuery = (excludeFromIndexPath?: string): FilterQuery<u
     $or: [
       { _meiliIndex: true },
       { _meiliIndexAttempted: true },
+<<<<<<< HEAD
       { _meiliIndex: false, _meiliCleanupVersion: { $exists: false } },
+=======
+      { _meiliIndex: false, _meiliCleanupVersion: null },
+>>>>>>> upstream/main
     ],
   };
 };
@@ -750,7 +778,11 @@ const createMeiliMongooseModel = ({
 
         const projection = Object.keys(this.schema.obj).reduce<Record<string, number>>(
           (results, key) => {
+<<<<<<< HEAD
             if (!key.startsWith('$')) {
+=======
+            if (!key.startsWith('$') && this.schema.path(key)?.options?.select !== false) {
+>>>>>>> upstream/main
               results[key] = 1;
             }
             return results;
@@ -988,6 +1020,7 @@ export default function mongoMeili(schema: Schema, options: MongoMeiliOptions): 
         },
       },
     );
+<<<<<<< HEAD
     schema.index(
       { _meiliIndex: 1, _meiliCleanupVersion: 1, [options.primaryKey]: 1 },
       {
@@ -996,6 +1029,23 @@ export default function mongoMeili(schema: Schema, options: MongoMeiliOptions): 
           [options.excludeFromIndexPath]: { $exists: true },
           _meiliIndex: { $eq: false },
           _meiliCleanupVersion: { $exists: false },
+=======
+    /* Serves the legacy branch of `buildExcludedIndexedQuery`. MongoDB rewrites
+     * `$exists: false` into `$not`, which no `partialFilterExpression` accepts, so the
+     * unstamped state is expressed as a null equality: it admits an absent or null
+     * `_meiliCleanupVersion` and keeps every already-stamped document out, which is what
+     * bounds this index to the shrinking legacy population rather than to every
+     * excluded document ever written. Cleanup stamps the version, and the document
+     * leaves the index. */
+    schema.index(
+      { _meiliIndex: 1, _meiliCleanupVersion: 1, [options.primaryKey]: 1 },
+      {
+        name: 'meili_excluded_legacy_cleanup_v4',
+        partialFilterExpression: {
+          [options.excludeFromIndexPath]: { $exists: true },
+          _meiliIndex: { $eq: false },
+          _meiliCleanupVersion: { $eq: null },
+>>>>>>> upstream/main
         },
       },
     );
@@ -1130,6 +1180,13 @@ export default function mongoMeili(schema: Schema, options: MongoMeiliOptions): 
   });
 
   schema.pre('findOneAndUpdate', function (next) {
+<<<<<<< HEAD
+=======
+    if (queriesWithoutMeiliIndexing.has(this)) {
+      next();
+      return;
+    }
+>>>>>>> upstream/main
     const query = this as Query<unknown, unknown>;
     if (meiliEnabled) {
       const version = new mongoose.Types.ObjectId().toString();

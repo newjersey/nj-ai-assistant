@@ -1,9 +1,14 @@
 const { logger } = require('@librechat/data-schemas');
+<<<<<<< HEAD
 const { getToolkitKey, checkPluginAuth, filterUniquePlugins } = require('@librechat/api');
+=======
+const { listAvailableTools } = require('@librechat/api');
+>>>>>>> upstream/main
 const { getCachedTools, setCachedTools } = require('~/server/services/Config');
 const { availableTools, toolkits } = require('~/app/clients/tools');
 const { getAppConfig } = require('~/server/services/Config');
 
+<<<<<<< HEAD
 const getAvailablePluginsController = async (req, res) => {
   try {
     const appConfig =
@@ -43,6 +48,8 @@ const getAvailablePluginsController = async (req, res) => {
   }
 };
 
+=======
+>>>>>>> upstream/main
 const getAvailableTools = async (req, res) => {
   try {
     const userId = req.user?.id;
@@ -67,10 +74,13 @@ const getAvailableTools = async (req, res) => {
       toolDefinitions = appConfig.availableTools;
     }
 
+<<<<<<< HEAD
     const uniquePlugins = filterUniquePlugins(availableTools);
     const toolDefKeysList = toolDefinitions ? Object.keys(toolDefinitions) : null;
     const toolDefKeys = toolDefKeysList ? new Set(toolDefKeysList) : null;
 
+=======
+>>>>>>> upstream/main
     /**
      * `getAvailableTools` serves BOTH tool dialogs — /api/agents/tools and
      * /api/assistants/tools. Tools flagged `agentsOnly` in the manifest (e.g.
@@ -79,6 +89,7 @@ const getAvailableTools = async (req, res) => {
      * run to pause and no resume surface, so attaching one there guarantees a
      * permanent tool error. Scope them out of the assistants listing by route.
      */
+<<<<<<< HEAD
     const isAssistantsRoute = req.baseUrl?.includes('/assistants') === true;
 
     const toolsOutput = [];
@@ -100,6 +111,15 @@ const getAvailableTools = async (req, res) => {
 
       toolsOutput.push(checkPluginAuth(plugin) ? { ...plugin, authenticated: true } : plugin);
     }
+=======
+    const toolsOutput = listAvailableTools({
+      manifest: availableTools,
+      toolkits,
+      toolDefinitions,
+      githubCompare: appConfig?.githubCompare,
+      forAssistants: req.baseUrl?.includes('/assistants') === true,
+    });
+>>>>>>> upstream/main
 
     res.status(200).json(toolsOutput);
   } catch (error) {
@@ -110,5 +130,8 @@ const getAvailableTools = async (req, res) => {
 
 module.exports = {
   getAvailableTools,
+<<<<<<< HEAD
   getAvailablePluginsController,
+=======
+>>>>>>> upstream/main
 };

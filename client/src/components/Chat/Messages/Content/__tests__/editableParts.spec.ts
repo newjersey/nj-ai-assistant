@@ -1,6 +1,11 @@
 import { ContentTypes } from 'librechat-data-provider';
+<<<<<<< HEAD
 import type { TMessage } from 'librechat-data-provider';
 import { hasEditablePart } from '../editableParts';
+=======
+import type { TMessage, TMessageContentParts } from 'librechat-data-provider';
+import { hasEditablePart, isEditablePart } from '../editableParts';
+>>>>>>> upstream/main
 
 const artifactText = ':::artifact{identifier="demo" type="text/html" title="Demo"}\n<div />\n:::';
 
@@ -52,3 +57,47 @@ describe('hasEditablePart', () => {
     expect(hasEditablePart({ content } as TMessage)).toBe(false);
   });
 });
+<<<<<<< HEAD
+=======
+
+describe('encrypted reasoning in the editor', () => {
+  /** Bedrock `redactedContent`, base64-encoded into THINK text by the SDK. */
+  const encoded = Buffer.from(Array.from({ length: 900 }, (_, i) => (i * 37 + 3) % 256)).toString(
+    'base64',
+  );
+
+  it('offers no field for reasoning that is only an encrypted payload', () => {
+    expect(
+      isEditablePart({ type: ContentTypes.THINK, think: encoded } as TMessageContentParts),
+    ).toBe(false);
+    expect(
+      hasEditablePart({
+        content: [{ type: ContentTypes.THINK, think: `<think>${encoded}</think>` }],
+      } as TMessage),
+    ).toBe(false);
+  });
+
+  it('keeps mixed reasoning read-only so an edit cannot drop its payload', () => {
+    const part = {
+      type: ContentTypes.THINK,
+      think: `Checking the manifest. ${encoded}`,
+    } as TMessageContentParts;
+    expect(isEditablePart(part)).toBe(false);
+  });
+
+  it('still edits readable reasoning and any text part', () => {
+    expect(
+      isEditablePart({
+        type: ContentTypes.THINK,
+        think: 'Checking the manifest.',
+      } as TMessageContentParts),
+    ).toBe(true);
+    expect(
+      isEditablePart({
+        type: ContentTypes.TEXT,
+        text: `Token: ${encoded}`,
+      } as TMessageContentParts),
+    ).toBe(true);
+  });
+});
+>>>>>>> upstream/main

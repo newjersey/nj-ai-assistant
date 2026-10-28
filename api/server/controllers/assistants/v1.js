@@ -8,13 +8,31 @@ const {
   contentFilterUninspectableResponse,
   getBlockedUninspectableFileField,
   resolveAssistantToolPermissions,
+<<<<<<< HEAD
+=======
+  getAssistantErrorStatus,
+  resolveAssistantAvatarIdentity,
+  commitAssistantAvatar,
+>>>>>>> upstream/main
 } = require('@librechat/api');
 const { FileContext } = require('librechat-data-provider');
 const {
   deleteFileByFilter,
   updateAssistantDoc,
+<<<<<<< HEAD
   getAssistants,
   getRoleByName,
+=======
+  updateAssistantAvatar,
+  getAssistants,
+  getAssistant,
+  getRoleByName,
+  getUserById,
+  getFiles,
+  acquireResourceLock,
+  renewResourceLock,
+  releaseResourceLock,
+>>>>>>> upstream/main
 } = require('~/models');
 const { uploadImageBuffer, filterFile } = require('~/server/services/Files/process');
 const validateAuthor = require('~/server/middleware/assistants/validateAuthor');
@@ -402,12 +420,16 @@ const uploadAssistantAvatar = async (req, res) => {
     }
 
     const { assistant_id } = req.params;
+<<<<<<< HEAD
     const endpoint = req.body?.endpoint ?? req.query?.endpoint;
+=======
+>>>>>>> upstream/main
     if (!assistant_id) {
       return res.status(400).json({ message: 'Assistant ID is required' });
     }
 
     const { openai } = await getOpenAIClient({ req, res });
+<<<<<<< HEAD
     await validateAuthor({ req, openai });
 
     const buffer = await fs.readFile(req.file.path);
@@ -471,6 +493,61 @@ const uploadAssistantAvatar = async (req, res) => {
     const message = 'An error occurred while updating the Assistant Avatar';
     logger.error(message, error);
     res.status(500).json({ message });
+=======
+    const assistantQuery = await validateAuthor({
+      req,
+      openai,
+      overrideAssistantId: assistant_id,
+    });
+
+    const assistant = await openai.beta.assistants.retrieve(assistant_id);
+    const _metadata = assistant.metadata ?? {};
+    const avatarIdentity = await resolveAssistantAvatarIdentity({
+      query: assistantQuery,
+      user: req.user,
+      endpoint: req.body?.endpoint ?? req.query?.endpoint,
+      author: _metadata.author,
+      privateAssistants:
+        req.config.endpoints?.[req.body?.endpoint ?? req.query?.endpoint]?.privateAssistants,
+      getAssistant,
+      getUserById,
+    });
+
+    const updatedAssistant = await commitAssistantAvatar(
+      {
+        req,
+        query: assistantQuery,
+        identity: avatarIdentity,
+        uploadAvatar: async () => {
+          const buffer = await fs.readFile(req.file.path);
+          const image = await uploadImageBuffer({
+            req,
+            context: FileContext.avatar,
+            metadata: { buffer },
+          });
+          return { filepath: image.filepath, source: image.source ?? appConfig.fileStrategy };
+        },
+        metadata: _metadata,
+        leaseOptions: {
+          ttlMs: req.config.config?.permissions?.leaseTtlMs,
+          waitMs: req.config.config?.permissions?.leaseWaitMs,
+        },
+      },
+      {
+        lease: { acquireResourceLock, renewResourceLock, releaseResourceLock },
+        updateAssistantAvatar,
+        updateProvider: (id, body) => openai.beta.assistants.update(id, body),
+        getFiles,
+        deleteFileByFilter,
+        getStrategyFunctions,
+      },
+    );
+    res.status(201).json(updatedAssistant);
+  } catch (error) {
+    const message = 'An error occurred while updating the Assistant Avatar';
+    logger.error(message, error);
+    res.status(getAssistantErrorStatus(error)).json({ message });
+>>>>>>> upstream/main
   } finally {
     try {
       await fs.unlink(req.file.path);

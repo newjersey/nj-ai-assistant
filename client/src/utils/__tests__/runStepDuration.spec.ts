@@ -24,11 +24,23 @@ describe('getRunStepDurationLabels', () => {
       expect(getRunStepDurationLabels(1400, 'not a tag').values).toEqual({ 0: '1.4' });
     });
 
+<<<<<<< HEAD
     it('announces the singular form only for exactly one second', () => {
       expect(getRunStepDurationLabels(1000).announcedKey).toBe(
         'com_ui_duration_announced_seconds_one',
       );
       expect(getRunStepDurationLabels(1400).announcedKey).toBe('com_ui_duration_announced_seconds');
+=======
+    it('announces through the base key with a numeric count for plural selection', () => {
+      expect(getRunStepDurationLabels(1000, 'en')).toMatchObject({
+        announcedKey: 'com_ui_duration_announced_seconds',
+        announcedValues: { count: 1, value: '1' },
+      });
+      expect(getRunStepDurationLabels(1400, 'de')).toMatchObject({
+        announcedKey: 'com_ui_duration_announced_seconds',
+        announcedValues: { count: 1.4, value: '1,4' },
+      });
+>>>>>>> upstream/main
     });
   });
 
@@ -65,12 +77,21 @@ describe('getRunStepDurationLabels', () => {
 
     it('announces whole minutes, leaving the precise value on the button', () => {
       expect(getRunStepDurationLabels(65_000, 'en')).toMatchObject({
+<<<<<<< HEAD
         announcedKey: 'com_ui_duration_announced_minutes_one',
         announcedValues: { count: '1' },
       });
       expect(getRunStepDurationLabels(150_000, 'en')).toMatchObject({
         announcedKey: 'com_ui_duration_announced_minutes',
         announcedValues: { count: '3' },
+=======
+        announcedKey: 'com_ui_duration_announced_minutes',
+        announcedValues: { count: 1, value: '1' },
+      });
+      expect(getRunStepDurationLabels(150_000, 'en')).toMatchObject({
+        announcedKey: 'com_ui_duration_announced_minutes',
+        announcedValues: { count: 3, value: '3' },
+>>>>>>> upstream/main
       });
     });
 
@@ -89,6 +110,7 @@ describe('getElapsedDurationLabels', () => {
       key: 'com_ui_duration_seconds',
       values: { 0: '5' },
       announcedKey: 'com_ui_elapsed_announced_seconds',
+<<<<<<< HEAD
       announcedValues: { count: '5' },
     });
   });
@@ -100,6 +122,18 @@ describe('getElapsedDurationLabels', () => {
     expect(getElapsedDurationLabels(60_000).announcedKey).toBe(
       'com_ui_elapsed_announced_minutes_one',
     );
+=======
+      announcedValues: { count: 5, value: '5' },
+    });
+  });
+
+  it('passes a numeric count so a single unit resolves the singular form', () => {
+    expect(getElapsedDurationLabels(1_000).announcedValues.count).toBe(1);
+    expect(getElapsedDurationLabels(60_000)).toMatchObject({
+      announcedKey: 'com_ui_elapsed_announced_minutes',
+      announcedValues: { count: 1 },
+    });
+>>>>>>> upstream/main
   });
 
   it('rounds the spoken form to whole minutes past a minute', () => {
@@ -107,14 +141,22 @@ describe('getElapsedDurationLabels', () => {
       key: 'com_ui_duration_minutes',
       values: { 0: '1', 1: '30' },
       announcedKey: 'com_ui_elapsed_announced_minutes',
+<<<<<<< HEAD
       announcedValues: { count: '2' },
+=======
+      announcedValues: { count: 2, value: '2' },
+>>>>>>> upstream/main
     });
   });
 
   it('formats every interpolated number for the active locale', () => {
     expect(getElapsedDurationLabels(65_000, 'ar-EG')).toMatchObject({
       values: { 0: '١', 1: '٥' },
+<<<<<<< HEAD
       announcedValues: { count: '١' },
+=======
+      announcedValues: { count: 1, value: '١' },
+>>>>>>> upstream/main
     });
   });
 });

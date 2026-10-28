@@ -25,10 +25,17 @@ const GoogleConfig = ({ userKey, setUserKey }: Pick<TConfigProps, 'userKey' | 's
   return (
     <>
       <div className="flex flex-row">
+<<<<<<< HEAD
         <Label htmlFor={AuthKeys.GOOGLE_SERVICE_KEY} className="text-left text-sm font-medium">
           {localize('com_endpoint_config_google_service_key')}
         </Label>
         <Label className="mx-1 text-right text-sm text-text-secondary">
+=======
+        <Label htmlFor={AuthKeys.GOOGLE_SERVICE_KEY} className="text-start text-sm font-medium">
+          {localize('com_endpoint_config_google_service_key')}
+        </Label>
+        <Label variant="secondary" className="mx-1 text-end text-sm">
+>>>>>>> upstream/main
           {localize('com_endpoint_config_google_cloud_platform')}
         </Label>
         <br />

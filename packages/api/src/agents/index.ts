@@ -25,20 +25,41 @@ export * from './handlers';
 export * from './guard';
 export * from './harvest';
 export * from './backgroundCompletion';
+<<<<<<< HEAD
 export * from './backgroundCompletionWakeup';
 export * from './initialize';
 export * from './legacy';
+=======
+export * from './backgroundClaims';
+export * from './backgroundCompletionWakeup';
+export * from './initialize';
+export * from './instructions';
+export * from './legacy';
+export * from './listing';
+export * from './listingAvatars';
+>>>>>>> upstream/main
 export * from './lazySubagents';
 export * from './lazyHistory';
 export * from './memory';
 export * from './management';
 export * from './failures';
+<<<<<<< HEAD
+=======
+export * from './marketplace';
+>>>>>>> upstream/main
 export * from './reads';
 export * from './updates';
 export * from './mcpIdentity';
 export * from './orphans';
+<<<<<<< HEAD
 export * from './migration';
 export * from './parameters';
+=======
+export * from './ownerContact';
+export * from './migration';
+export * from './parameters';
+export * from './input';
+>>>>>>> upstream/main
 export * from './plan';
 export * from './prewarm';
 export * from './ptc';
@@ -54,6 +75,11 @@ export * from './stepBudget';
 export * from './startup';
 export * from './subagentThreads';
 export * from './subagentActivity';
+<<<<<<< HEAD
+=======
+export * from './aggregation';
+export * from './subagentContent';
+>>>>>>> upstream/main
 export * from './subagentIdentity';
 export * from './subagentCompletionWakeup';
 export * from './subagentTaskRouting';
@@ -64,6 +90,10 @@ export * from './run';
 export * from './fading';
 export * from './publication';
 export * from './runtime';
+<<<<<<< HEAD
+=======
+export * from './convoPersistence';
+>>>>>>> upstream/main
 export * from './testHook';
 export * from './tools';
 export * from './validation';
@@ -78,10 +108,19 @@ export * from './activityLabels';
 export * from './activityPhases';
 export * from './subagentDelivery';
 export * from './view';
+<<<<<<< HEAD
+=======
+export * from './tasks';
+export { backgroundTaskRegistry, registerBackgroundTaskShutdown } from './background';
+>>>>>>> upstream/main
 export * from './workspace';
 export * from './reasoningLabels';
 export * from './refusal';
 export * from './toolValidation';
+<<<<<<< HEAD
+=======
+export * from './toolTiming';
+>>>>>>> upstream/main
 export * from './remote';
 export * from './queuedTurns';
 export * from './queuedTurnHttp';

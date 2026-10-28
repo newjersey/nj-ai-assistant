@@ -1,9 +1,17 @@
 import { useMemo } from 'react';
+<<<<<<< HEAD
 import { useRecoilValue } from 'recoil';
 import { Tools } from 'librechat-data-provider';
 import type { TAttachment, UIResource } from 'librechat-data-provider';
 import { useOptionalMessagesOperations } from '~/Providers';
 import store from '~/store';
+=======
+import { useAtomValue } from 'jotai';
+import { Tools } from 'librechat-data-provider';
+import type { TAttachment, UIResource } from 'librechat-data-provider';
+import { conversationAttachmentsFamily } from '~/hooks/SSE/atoms';
+import { useOptionalMessagesOperations } from '~/Providers';
+>>>>>>> upstream/main
 
 /**
  * Hook to collect all UI resources in a conversation, indexed by resource ID.
@@ -18,9 +26,13 @@ export function useConversationUIResources(
 ): Map<string, UIResource> {
   const { getMessages } = useOptionalMessagesOperations();
 
+<<<<<<< HEAD
   const conversationAttachmentsMap = useRecoilValue(
     store.conversationAttachmentsSelector(conversationId),
   );
+=======
+  const conversationAttachmentsMap = useAtomValue(conversationAttachmentsFamily(conversationId));
+>>>>>>> upstream/main
 
   return useMemo(() => {
     const map = new Map<string, UIResource>();

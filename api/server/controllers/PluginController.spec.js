@@ -22,7 +22,11 @@ jest.mock('~/app/clients/tools', () => ({
   toolkits: [],
 }));
 
+<<<<<<< HEAD
 const { getAvailableTools, getAvailablePluginsController } = require('./PluginController');
+=======
+const { getAvailableTools } = require('./PluginController');
+>>>>>>> upstream/main
 
 describe('PluginController', () => {
   let mockReq, mockRes;
@@ -50,6 +54,7 @@ describe('PluginController', () => {
     });
   });
 
+<<<<<<< HEAD
   describe('getAvailablePluginsController', () => {
     it('should use filterUniquePlugins to remove duplicate plugins', async () => {
       const mockPlugins = [
@@ -165,6 +170,45 @@ describe('PluginController', () => {
   });
 
   describe('getAvailableTools', () => {
+=======
+  describe('getAvailableTools', () => {
+    it.each([undefined, false, true])(
+      'gates the comparison entry on request policy (%p)',
+      async (enabled) => {
+        require('~/app/clients/tools').availableTools.push({
+          name: 'GitHub Compare',
+          pluginKey: 'github_compare',
+          description: 'compare',
+          agentsOnly: true,
+        });
+        mockReq.baseUrl = '/agents';
+        mockReq.config.githubCompare = { enabled };
+        getCachedTools.mockResolvedValue({
+          github_compare: { type: 'function', function: { name: 'github_compare' } },
+        });
+        await getAvailableTools(mockReq, mockRes);
+        expect(mockRes.json.mock.calls[0][0].map(({ pluginKey }) => pluginKey)).toEqual(
+          enabled === true ? ['github_compare'] : [],
+        );
+      },
+    );
+    it('keeps enabled comparison out of the assistants catalog', async () => {
+      require('~/app/clients/tools').availableTools.push({
+        name: 'GitHub Compare',
+        pluginKey: 'github_compare',
+        description: 'compare',
+        agentsOnly: true,
+      });
+      mockReq.baseUrl = '/assistants';
+      mockReq.config.githubCompare = { enabled: true };
+      getCachedTools.mockResolvedValue({
+        github_compare: { type: 'function', function: { name: 'github_compare' } },
+      });
+      await getAvailableTools(mockReq, mockRes);
+      expect(mockRes.json.mock.calls[0][0]).toEqual([]);
+    });
+
+>>>>>>> upstream/main
     it('scopes agentsOnly plugins out of the ASSISTANTS listing but keeps them for agents', async () => {
       const cached = {
         ask_user_question: {
@@ -354,6 +398,7 @@ describe('PluginController', () => {
       expect(mockRes.json).toHaveBeenCalledWith([]);
     });
 
+<<<<<<< HEAD
     it('should handle undefined filteredTools and includedTools', async () => {
       mockReq.config = {};
 
@@ -365,6 +410,8 @@ describe('PluginController', () => {
       expect(mockRes.json).toHaveBeenCalledWith([]);
     });
 
+=======
+>>>>>>> upstream/main
     it('should handle toolkit with undefined toolDefinitions keys', async () => {
       const mockToolkit = {
         name: 'Toolkit1',

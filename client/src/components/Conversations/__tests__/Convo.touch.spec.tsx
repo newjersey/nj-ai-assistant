@@ -4,11 +4,26 @@ import { render, screen, fireEvent, act } from '@testing-library/react';
 import type { TConversation } from 'librechat-data-provider';
 
 let mockIsSmallScreen = true;
+<<<<<<< HEAD
+=======
+let mockRouteConversationId = 'other-convo';
+let mockActiveConversationId: string | null = null;
+const mockNavigate = jest.fn();
+const mockToggleNav = jest.fn();
+const mockSetDocumentTitle = jest.fn();
+let mockOwnershipEnabled = true;
+let mockOwnershipVersion: number | undefined = 1;
+const mockRename = jest.fn().mockResolvedValue({});
+>>>>>>> upstream/main
 const mockConvoOptionsProps: { isPopoverActive: boolean }[] = [];
 let mockCloseMenu: () => void = () => undefined;
 
 jest.mock('@librechat/client', () => ({
   useMediaQuery: () => mockIsSmallScreen,
+<<<<<<< HEAD
+=======
+  useRemScale: () => 1,
+>>>>>>> upstream/main
   useToastContext: () => ({ showToast: jest.fn() }),
   Spinner: () => <div data-testid="spinner" />,
   Button: ({ children, ...props }: React.ComponentProps<'button'>) => (
@@ -18,32 +33,60 @@ jest.mock('@librechat/client', () => ({
 
 jest.mock('~/hooks', () => ({
   useLocalize: () => (key: string) => key,
+<<<<<<< HEAD
   useNavigateToConvo: () => ({ navigateToConvo: jest.fn() }),
+=======
+  useNavigateToConvo: () => ({ navigateToConvo: mockNavigate }),
+>>>>>>> upstream/main
   useShiftKey: () => false,
 }));
 
 jest.mock('~/data-provider', () => ({
+<<<<<<< HEAD
   useGetStartupConfig: () => ({ data: { sharedLinksEnabled: false } }),
   useUpdateConversationMutation: () => ({ mutateAsync: jest.fn() }),
+=======
+  useGetStartupConfig: () => ({
+    data: {
+      sharedLinksEnabled: false,
+      interface: { runningChatRename: mockOwnershipEnabled },
+      conversationTitleOwnershipVersion: mockOwnershipVersion,
+    },
+  }),
+  useUpdateConversationMutation: () => ({ mutateAsync: mockRename }),
+>>>>>>> upstream/main
   usePinConversationMutation: () => ({ mutate: jest.fn() }),
 }));
 
 jest.mock('react-router-dom', () => ({
+<<<<<<< HEAD
   useParams: () => ({ conversationId: 'other-convo' }),
 }));
 
 jest.mock('recoil', () => ({
   useRecoilValue: () => [],
+=======
+  useParams: () => ({ conversationId: mockRouteConversationId }),
+}));
+
+jest.mock('recoil', () => ({
+  useRecoilValue: () => mockActiveConversationId,
+>>>>>>> upstream/main
 }));
 
 jest.mock('~/store', () => ({
   __esModule: true,
+<<<<<<< HEAD
   default: { allConversationsSelector: 'allConversationsSelector' },
+=======
+  default: { conversationIdByIndex: () => 'conversationIdByIndex' },
+>>>>>>> upstream/main
 }));
 
 jest.mock('~/utils', () => ({
   cn: (...classes: unknown[]) => classes.filter(Boolean).join(' '),
   logger: { error: jest.fn() },
+<<<<<<< HEAD
 }));
 
 jest.mock('../ConvoOptions', () => ({
@@ -51,6 +94,29 @@ jest.mock('../ConvoOptions', () => ({
     mockConvoOptionsProps.push(props);
     mockCloseMenu = () => props.setIsPopoverActive(false);
     return <div data-testid="convo-options" data-open={props.isPopoverActive} />;
+=======
+  isConversationUnseen: () => false,
+  setDocumentTitle: (...args: unknown[]) => mockSetDocumentTitle(...args),
+  hasRealTitle: (title: string) => !!title && title !== 'New Chat',
+}));
+
+jest.mock('../ConvoOptions', () => ({
+  ConvoOptions: (props: {
+    isPopoverActive: boolean;
+    canRename: boolean;
+    renameHandler: () => void;
+    setIsPopoverActive: (o: boolean) => void;
+  }) => {
+    mockConvoOptionsProps.push(props);
+    mockCloseMenu = () => props.setIsPopoverActive(false);
+    return (
+      <div data-testid="convo-options" data-open={props.isPopoverActive}>
+        <button disabled={!props.canRename} onClick={props.renameHandler}>
+          {'Rename'}
+        </button>
+      </div>
+    );
+>>>>>>> upstream/main
   },
 }));
 
@@ -66,7 +132,21 @@ jest.mock('../ConvoLink', () => ({
 
 jest.mock('../RenameForm', () => ({
   __esModule: true,
+<<<<<<< HEAD
   default: () => <form data-testid="rename-form" />,
+=======
+  default: ({
+    titleInput,
+    onSubmit,
+  }: {
+    titleInput: string;
+    onSubmit: (title: string) => void;
+  }) => (
+    <button data-testid="rename-form" onClick={() => onSubmit(titleInput)}>
+      {'Save'}
+    </button>
+  ),
+>>>>>>> upstream/main
 }));
 
 import Conversation from '../Convo';
@@ -76,10 +156,22 @@ const conversation = {
   title: 'Mobile UI redesign',
 } as TConversation;
 
+<<<<<<< HEAD
 const renderRow = () =>
   render(
     <DndProvider backend={HTML5Backend}>
       <Conversation conversation={conversation} retainView={jest.fn()} toggleNav={jest.fn()} />
+=======
+const renderRow = (isGenerating = false, row = conversation) =>
+  render(
+    <DndProvider backend={HTML5Backend}>
+      <Conversation
+        conversation={row}
+        isGenerating={isGenerating}
+        retainView={jest.fn()}
+        toggleNav={mockToggleNav}
+      />
+>>>>>>> upstream/main
     </DndProvider>,
   );
 
@@ -156,3 +248,177 @@ describe('Conversation row on touch', () => {
     expect(screen.queryByTestId('convo-options-trigger')).not.toBeInTheDocument();
   });
 });
+<<<<<<< HEAD
+=======
+
+describe('Conversation context menu', () => {
+  beforeEach(() => {
+    mockConvoOptionsProps.length = 0;
+    mockIsSmallScreen = false;
+  });
+
+  it.each([false, true])('opens on right-click (generating: %s)', (isGenerating) => {
+    renderRow(isGenerating);
+    fireEvent.contextMenu(screen.getByTestId('convo-item'), { clientX: 120, clientY: 80 });
+    expect(screen.getByTestId('convo-options')).toHaveAttribute('data-open', 'true');
+    expect(mockConvoOptionsProps.at(-1)).toEqual(
+      expect.objectContaining({
+        isGenerating,
+        contextMenuPosition: { x: 120, y: 80 },
+      }),
+    );
+    act(() => mockCloseMenu());
+    expect(screen.getByTestId('convo-options')).toHaveAttribute('data-open', 'false');
+    expect(mockConvoOptionsProps.at(-1)).toEqual(
+      expect.objectContaining({ contextMenuPosition: undefined }),
+    );
+  });
+
+  it('offers a clickable running menu before hover', () => {
+    renderRow(true);
+    const trigger = screen.getByRole('button', { name: 'com_nav_convo_menu_options' });
+    expect(trigger).toBeVisible();
+    fireEvent.click(trigger);
+    expect(screen.getByTestId('convo-options')).toHaveAttribute('data-open', 'true');
+  });
+});
+
+describe('Conversation context menu on small screens', () => {
+  it('keeps the real trigger mounted after an externally opened menu closes', () => {
+    mockIsSmallScreen = true;
+    renderRow(true);
+    fireEvent.contextMenu(screen.getByTestId('convo-item'), { clientX: 120, clientY: 80 });
+    expect(screen.getByTestId('convo-options')).toHaveAttribute('data-open', 'true');
+    act(() => mockCloseMenu());
+    expect(screen.getByTestId('convo-options')).toBeInTheDocument();
+    expect(screen.queryByTestId('convo-options-trigger')).not.toBeInTheDocument();
+  });
+});
+
+describe('Conversation title ownership rollout', () => {
+  beforeEach(() => {
+    mockRename.mockClear();
+    mockOwnershipEnabled = true;
+    mockOwnershipVersion = 1;
+  });
+  afterEach(() => {
+    mockOwnershipEnabled = true;
+    mockOwnershipVersion = 1;
+  });
+
+  it.each([
+    [false, 1],
+    [true, undefined],
+  ])('disables rename on unsafe running rows (enabled %s, protocol %s)', (enabled, version) => {
+    mockOwnershipEnabled = enabled;
+    mockOwnershipVersion = version;
+    renderRow(true);
+    fireEvent.contextMenu(screen.getByTestId('convo-item'));
+    expect(screen.getByRole('button', { name: 'Rename' })).toBeDisabled();
+  });
+  it('also fences an unowned placeholder after a final-timing stream ends', () => {
+    mockOwnershipEnabled = false;
+    renderRow(false, { ...conversation, title: 'New Chat' });
+    fireEvent.contextMenu(screen.getByTestId('convo-item'));
+    expect(screen.getByRole('button', { name: 'Rename' })).toBeDisabled();
+  });
+  it.each([false, true])(
+    'claims an unchanged unowned title (generating %s)',
+    async (generating) => {
+      renderRow(generating, { ...conversation, title: 'New Chat' });
+      fireEvent.contextMenu(screen.getByTestId('convo-item'));
+      fireEvent.click(screen.getByRole('button', { name: 'Rename' }));
+      await act(async () => fireEvent.click(screen.getByTestId('rename-form')));
+      expect(mockRename).toHaveBeenCalledWith({ conversationId: 'convo-1', title: 'New Chat' });
+    },
+  );
+  it('keeps unchanged owned titles as a no-op', async () => {
+    renderRow(false, { ...conversation, titleSetByUser: true });
+    fireEvent.contextMenu(screen.getByTestId('convo-item'));
+    fireEvent.click(screen.getByRole('button', { name: 'Rename' }));
+    await act(async () => fireEvent.click(screen.getByTestId('rename-form')));
+    expect(mockRename).not.toHaveBeenCalled();
+  });
+});
+
+describe('Conversation row activation', () => {
+  beforeEach(() => {
+    mockIsSmallScreen = true;
+    mockRouteConversationId = 'convo-1';
+    mockActiveConversationId = 'convo-1';
+    mockToggleNav.mockReset();
+    mockNavigate.mockReset();
+    mockSetDocumentTitle.mockReset();
+  });
+
+  afterEach(() => {
+    mockRouteConversationId = 'other-convo';
+    mockActiveConversationId = null;
+  });
+
+  it.each([false, true])(
+    'dismisses the current mobile chat without navigating (running=%s)',
+    (running) => {
+      renderRow(running);
+      fireEvent.click(screen.getByText(conversation.title!));
+
+      expect(mockToggleNav).toHaveBeenCalledTimes(1);
+      expect(mockToggleNav).toHaveBeenCalledWith();
+      expect(mockNavigate).not.toHaveBeenCalled();
+      expect(mockSetDocumentTitle).not.toHaveBeenCalled();
+    },
+  );
+
+  it('dismisses the current chat while its new-chat route still has the draft ID', () => {
+    mockRouteConversationId = 'new';
+    renderRow(true);
+    fireEvent.click(screen.getByText(conversation.title!));
+
+    expect(mockToggleNav).toHaveBeenCalledWith();
+    expect(mockNavigate).not.toHaveBeenCalled();
+  });
+
+  it('leaves the desktop sidebar open for the current chat', () => {
+    mockIsSmallScreen = false;
+    renderRow();
+    fireEvent.click(screen.getByText(conversation.title!));
+
+    expect(mockToggleNav).not.toHaveBeenCalled();
+    expect(mockNavigate).not.toHaveBeenCalled();
+  });
+
+  it('does not dismiss the drawer from the current chat overflow menu', () => {
+    renderRow();
+    fireEvent.contextMenu(screen.getByTestId('convo-item'));
+    expect(screen.getByTestId('convo-options')).toHaveAttribute('data-open', 'true');
+    fireEvent.click(screen.getByText(conversation.title!));
+
+    expect(mockToggleNav).not.toHaveBeenCalled();
+    expect(mockNavigate).not.toHaveBeenCalled();
+  });
+
+  it('keeps navigation to another chat deferred until the drawer slide', () => {
+    mockRouteConversationId = 'other-convo';
+    renderRow();
+    fireEvent.click(screen.getByText(conversation.title!));
+
+    expect(mockToggleNav).toHaveBeenCalledWith(expect.any(Function));
+    expect(mockNavigate).not.toHaveBeenCalled();
+    mockToggleNav.mock.calls[0][0]();
+    expect(mockNavigate).toHaveBeenCalledWith(conversation, { currentConvoId: 'other-convo' });
+  });
+
+  it.each(['ctrlKey', 'metaKey'])(
+    'preserves opening the current chat in a new tab with %s',
+    (modifier) => {
+      const open = jest.spyOn(window, 'open').mockImplementation(() => null);
+      renderRow();
+      fireEvent.click(screen.getByText(conversation.title!), { [modifier]: true });
+
+      expect(open).toHaveBeenCalledWith(`${window.location.origin}/c/convo-1`, '_blank');
+      expect(mockToggleNav).toHaveBeenCalledWith();
+      expect(mockNavigate).not.toHaveBeenCalled();
+    },
+  );
+});
+>>>>>>> upstream/main

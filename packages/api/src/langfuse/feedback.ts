@@ -1,6 +1,10 @@
 import { logger } from '@librechat/data-schemas';
 import type { AppConfig } from '@librechat/data-schemas';
 import { getScoreDestinations, type LangfuseScoreDestination } from './destinations';
+<<<<<<< HEAD
+=======
+import { isLangfuseTraceAllowed } from './policy';
+>>>>>>> upstream/main
 import { mergeHeaders } from '~/utils/headers';
 import { redirectPolicyFor } from './utils';
 
@@ -27,6 +31,14 @@ export type SendFeedbackScoreParams = {
    * whose project identity is unknown.
    */
   centralTraceExportEnabled?: boolean;
+<<<<<<< HEAD
+=======
+  /**
+   * Whether the message belongs to a temporary chat. Checked on its own because
+   * a resumed turn's response stores no trace record to carry the decision.
+   */
+  isTemporary?: boolean | null;
+>>>>>>> upstream/main
 };
 
 const ENVIRONMENT = process.env.LANGFUSE_TRACING_ENVIRONMENT;
@@ -125,8 +137,14 @@ export async function sendFeedbackScore({
   observationId,
   appConfig,
   centralTraceExportEnabled,
+<<<<<<< HEAD
 }: SendFeedbackScoreParams): Promise<void> {
   if (!traceId) {
+=======
+  isTemporary,
+}: SendFeedbackScoreParams): Promise<void> {
+  if (!traceId || !isLangfuseTraceAllowed(appConfig, isTemporary)) {
+>>>>>>> upstream/main
     return;
   }
 

@@ -1,6 +1,12 @@
 import { useRecoilState } from 'recoil';
+<<<<<<< HEAD
 import { Button, Checkbox } from '@librechat/client';
 import { useLocalize } from '~/hooks';
+=======
+import { Button, CheckboxGlyph } from '@librechat/client';
+import { useLocalize } from '~/hooks';
+import { cn } from '~/utils';
+>>>>>>> upstream/main
 import store from '~/store';
 
 export default function AutoSendPrompt({
@@ -25,6 +31,7 @@ export default function AutoSendPrompt({
       onClick={() => handleCheckedChange(!autoSendPrompts)}
       aria-label={localize('com_nav_auto_send_prompts')}
       aria-pressed={autoSendPrompts}
+<<<<<<< HEAD
       className={`relative h-9 w-full gap-2 rounded-lg border-border-light font-medium ${autoSendPrompts ? 'bg-surface-hover hover:bg-surface-hover' : ''}`}
     >
       <Checkbox
@@ -34,6 +41,16 @@ export default function AutoSendPrompt({
         aria-label={localize('com_nav_auto_send_prompts')}
         className="pointer-events-none"
       />
+=======
+      className={cn(
+        'relative h-9 w-full font-medium',
+        autoSendPrompts && 'bg-surface-hover hover:bg-surface-hover',
+      )}
+    >
+      {/* The button owns the state through `aria-pressed`; this is the mark, not a
+          second control inside it. */}
+      <CheckboxGlyph checked={autoSendPrompts} />
+>>>>>>> upstream/main
       {localize('com_nav_auto_send_prompts')}
     </Button>
   );

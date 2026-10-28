@@ -1,31 +1,61 @@
 import { useCallback, useContext, useEffect, useMemo, useReducer, useRef } from 'react';
 import { useSetAtom } from 'jotai';
 import { ChevronRight, Users } from 'lucide-react';
+<<<<<<< HEAD
 import { EModelEndpoint } from 'librechat-data-provider';
+=======
+import { ContentTypes, EModelEndpoint } from 'librechat-data-provider';
+>>>>>>> upstream/main
 import type {
   PartMetadata,
   TAttachment,
   TMessage,
   TMessageContentParts,
 } from 'librechat-data-provider';
+<<<<<<< HEAD
+=======
+import type { SubagentContentPreview } from '~/components/Chat/Subagents/state';
+>>>>>>> upstream/main
 import type { SubagentTickerLine } from '~/utils/subagentContent';
 import {
   activeSubagentPanel,
   subagentProgressKey,
   useSubagentProgress,
 } from '~/components/Chat/Subagents/state';
+<<<<<<< HEAD
 import { adaptLivePersistedActivity } from '~/components/Chat/Subagents/adapters';
 import { resolveSubagentAgentId } from '~/components/Chat/Subagents/identity';
 import { useOpenSubagentPanel } from '~/components/Chat/Subagents/surface';
+=======
+import { useParentSubagents } from '~/components/Chat/Subagents/ParentSubagentsProvider';
+import { isSelfSpawn as isSelfSpawnType } from '~/components/Chat/Subagents/author';
+import { resolveSubagentAgentId } from '~/components/Chat/Subagents/identity';
+import { subagentStatusLabelKey } from '~/components/Chat/Subagents/status';
+import { useOpenSubagentPanel } from '~/components/Chat/Subagents/surface';
+import { getSubagentPrompt } from '~/components/Chat/Subagents/prompt';
+import { tailOverflowDirection } from '~/utils/subagentContent';
+>>>>>>> upstream/main
 import { MessageContext } from '~/Providers/MessageContext';
 import { useShareContext } from '~/Providers/ShareContext';
 import MessageIcon from '~/components/Share/MessageIcon';
 import { parseSubagentBackgroundHandle } from './handle';
+<<<<<<< HEAD
+=======
+import { MCPAppViews } from '~/components/MCPUIResource';
+import { isError } from '../ToolOutput/OutputRenderer';
+import { useToolPreparation } from '../preparation';
+>>>>>>> upstream/main
 import { useAgentsMapContext } from '~/Providers';
 import { useMCPServerNames } from '~/hooks/MCP';
 import { AttachmentGroup } from './Attachment';
 import { useToolCallIntent } from './intent';
+<<<<<<< HEAD
 import { cn, parseToolName } from '~/utils';
+=======
+import { useFailedReveal } from '../reveal';
+import { cn, parseToolName } from '~/utils';
+import { FOLD_GLYPH_CLASS } from '../rows';
+>>>>>>> upstream/main
 import { useLocalize } from '~/hooks';
 
 interface SubagentCallProps {
@@ -47,6 +77,11 @@ interface SubagentCallProps {
    *  runs recorded before the persistence path landed will not have this
    *  field; those fall back to the atom (or the raw `output` string). */
   persistedContent?: TMessageContentParts[];
+<<<<<<< HEAD
+=======
+  /** The server sent this call as a preview; the panel loads the stored part when opened. */
+  contentPreview?: SubagentContentPreview;
+>>>>>>> upstream/main
   subagentIdentity?: PartMetadata['subagentIdentity'];
   hideAttachments?: boolean;
 }
@@ -168,6 +203,10 @@ export default function SubagentCall({
   output,
   attachments,
   persistedContent,
+<<<<<<< HEAD
+=======
+  contentPreview,
+>>>>>>> upstream/main
   subagentIdentity,
   hideAttachments = false,
 }: SubagentCallProps) {
@@ -189,7 +228,14 @@ export default function SubagentCall({
     isSharedConvo !== true && backgroundHandle != null && parentConversationId !== '';
 
   const subagentType = progress?.subagentType ?? extractSubagentType(args);
+<<<<<<< HEAD
   const isSelfSpawn = subagentType === 'self';
+=======
+  const isSelfSpawn = isSelfSpawnType(
+    subagentType,
+    progress?.subagentKind ?? subagentIdentity?.subagentKind,
+  );
+>>>>>>> upstream/main
   const subagentAgentId = resolveSubagentAgentId(progress, subagentIdentity);
   const subagentAgent = subagentAgentId ? agentsMap?.[subagentAgentId] : undefined;
   /**
@@ -218,7 +264,14 @@ export default function SubagentCall({
    * status is the authority on why it stopped.
    */
   const hasError =
+<<<<<<< HEAD
     (progress?.status === 'error' || runStepStatus === 'failed') && runStepStatus !== 'cancelled';
+=======
+    runStepStatus !== 'cancelled' &&
+    (progress?.status === 'error' ||
+      runStepStatus === 'failed' ||
+      (typeof output === 'string' && isError(output)));
+>>>>>>> upstream/main
   const finished = isClosed
     ? runStepStatus !== 'cancelled'
     : initialProgress >= 1 || progress?.status === 'stop' || hasError;
@@ -254,7 +307,11 @@ export default function SubagentCall({
     shouldThrottleTicker,
   );
 
+<<<<<<< HEAD
   const prompt = typeof args === 'string' ? tryPrompt(args) : extractPrompt(args);
+=======
+  const prompt = getSubagentPrompt(args);
+>>>>>>> upstream/main
 
   /** Base verb-only label ("Running agent" / "Ran agent"). The agent name
    *  is rendered separately as a muted sub-label so "agent" stays a
@@ -262,15 +319,24 @@ export default function SubagentCall({
   /** Model-authored live label (subagent carries `intent` natively); wins
    *  over the generic verb, never over error/cancellation framing. */
   const intent = useToolCallIntent(args);
+<<<<<<< HEAD
+=======
+  const preparationText = useToolPreparation();
+>>>>>>> upstream/main
   const getHeaderText = () => {
     if (hasError) return localize('com_ui_subagent_errored');
     if (cancelled) return localize('com_ui_subagent_cancelled');
     if (detachedStatusUnknown) return localize('com_ui_subagent_activity');
+<<<<<<< HEAD
+=======
+    if (running && preparationText != null) return preparationText;
+>>>>>>> upstream/main
     if (intent != null) return intent;
     if (running) return localize('com_ui_subagent_running');
     return localize('com_ui_subagent_complete');
   };
   const headerText = getHeaderText();
+<<<<<<< HEAD
   /** Muted sub-label shown to the right of the base label: the
    *  configured agent name for named subagents. Self-spawns omit it
    *  (redundant — the header already says "agent") as do cases where
@@ -301,18 +367,48 @@ export default function SubagentCall({
       openPanel != null &&
       hasParentContext &&
       (canOpenDurablePanel || canOpenLiveForeground || hasRenderableFallback)
+=======
+  /** A named subagent leads with its own name and face, the way its turns read
+   *  in main chat, and the verb or status follows it muted. Self-spawns keep
+   *  the verb alone — the name would be the agent this card already sits
+   *  under — as do agents the map cannot resolve. */
+  const subagentNameLabel = !isSelfSpawn && subagentAgent?.name ? subagentAgent.name : '';
+
+  const cardLabel = subagentNameLabel ? `${subagentNameLabel}: ${headerText}` : headerText;
+
+  const canOpenDetails = useMemo(() => {
+    const hasParentContext = parentConversationId !== '' && parentMessageId !== '';
+    if (openPanel == null || !hasParentContext) return false;
+    if (canOpenDurablePanel || (isSharedConvo !== true && backgroundHandle == null)) return true;
+    return (
+      persistedContent?.some((part) => {
+        if (part == null) return false;
+        if (part.type === ContentTypes.ACTIVITY_LABEL) return Boolean(part.activity_label?.trim());
+        if (part.type === ContentTypes.TEXT) {
+          return typeof part.text === 'string' ? part.text.length > 0 : Boolean(part.text?.value);
+        }
+        return true;
+      }) === true ||
+      (backgroundHandle == null && output != null && output !== '')
+>>>>>>> upstream/main
     );
   }, [
     backgroundHandle,
     openPanel,
     canOpenDurablePanel,
+<<<<<<< HEAD
     initialProgress,
+=======
+>>>>>>> upstream/main
     isSharedConvo,
     output,
     parentConversationId,
     parentMessageId,
     persistedContent,
+<<<<<<< HEAD
     runStepStatus,
+=======
+>>>>>>> upstream/main
   ]);
 
   const panelSelection = useMemo(
@@ -328,6 +424,11 @@ export default function SubagentCall({
       ...(prompt == null ? {} : { prompt }),
       ...(backgroundHandle == null ? { legacyOutput: output } : {}),
       ...(persistedContent == null ? {} : { persistedContent }),
+<<<<<<< HEAD
+=======
+      ...(attachments == null ? {} : { attachments }),
+      ...(contentPreview == null ? {} : { contentPreview }),
+>>>>>>> upstream/main
       initialProgress,
       isSubmitting,
       ...(runStepStatus == null ? {} : { runStepStatus }),
@@ -341,8 +442,15 @@ export default function SubagentCall({
         : {}),
     }),
     [
+<<<<<<< HEAD
       backgroundHandle,
       canOpenDurablePanel,
+=======
+      attachments,
+      backgroundHandle,
+      canOpenDurablePanel,
+      contentPreview,
+>>>>>>> upstream/main
       initialProgress,
       isSharedConvo,
       isSubmitting,
@@ -362,6 +470,7 @@ export default function SubagentCall({
 
   useEffect(() => {
     setSelectedSubagent((current) =>
+<<<<<<< HEAD
       current?.parentMessageId === parentMessageId &&
       current.toolCallId === toolCallId &&
       current.partIndex === partIndex
@@ -369,11 +478,45 @@ export default function SubagentCall({
         : current,
     );
   }, [panelSelection, parentMessageId, partIndex, setSelectedSubagent, toolCallId]);
+=======
+      current?.host === panelSelection.host &&
+      current.shareId === panelSelection.shareId &&
+      current.parentConversationId === parentConversationId &&
+      current.parentMessageId === parentMessageId &&
+      current.toolCallId === toolCallId &&
+      current.partIndex === partIndex &&
+      (current.durable == null ||
+        (current.durable.threadId === panelSelection.durable?.threadId &&
+          current.durable.taskId === panelSelection.durable?.taskId))
+        ? panelSelection
+        : current,
+    );
+  }, [
+    panelSelection,
+    parentConversationId,
+    parentMessageId,
+    partIndex,
+    setSelectedSubagent,
+    toolCallId,
+  ]);
+>>>>>>> upstream/main
 
   const openDetails = useCallback(() => {
     if (!canOpenDetails || openPanel == null) return;
     openPanel(panelSelection);
   }, [canOpenDetails, openPanel, panelSelection]);
+<<<<<<< HEAD
+=======
+  const revealFailure = useCallback(
+    (claimFocus: () => boolean) => {
+      if (claimFocus()) {
+        openDetails();
+      }
+    },
+    [openDetails],
+  );
+  useFailedReveal(hasError && canOpenDetails, revealFailure);
+>>>>>>> upstream/main
 
   return (
     <>
@@ -388,6 +531,7 @@ export default function SubagentCall({
         data-subagent-parent-message={parentMessageId}
         data-subagent-part-index={partIndex}
         className={cn(
+<<<<<<< HEAD
           'my-2 flex w-full flex-col gap-1 rounded-lg border border-border-light bg-surface-secondary px-3 py-2 text-left transition',
           canOpenDetails ? 'group hover:bg-surface-tertiary' : 'cursor-default opacity-80',
           running && !detachedStatusUnknown && 'animate-pulse-slow',
@@ -399,6 +543,20 @@ export default function SubagentCall({
             className={cn(
               'flex h-5 w-5 shrink-0 items-center justify-center overflow-hidden rounded-full',
               running && !subagentAgent && 'animate-pulse text-text-primary',
+=======
+          'border-border-light bg-surface-secondary my-2 flex w-full flex-col gap-1 rounded-lg border px-3 py-2 text-start transition',
+          canOpenDetails ? 'group' : 'cursor-default opacity-80',
+          running && !detachedStatusUnknown && 'animate-pulse-slow',
+        )}
+        aria-label={detachedStatusUnknown ? undefined : cardLabel}
+      >
+        <div className="text-text-primary flex w-full min-w-0 items-center gap-2 text-sm font-medium">
+          <div
+            className={cn(
+              FOLD_GLYPH_CLASS,
+              'flex h-5 w-5 shrink-0 items-center justify-center overflow-hidden rounded-full',
+              running && !subagentAgent && 'text-text-primary animate-pulse',
+>>>>>>> upstream/main
             )}
             aria-hidden="true"
           >
@@ -416,6 +574,7 @@ export default function SubagentCall({
               <Users size={14} />
             )}
           </div>
+<<<<<<< HEAD
           <span className="min-w-0 truncate" title={headerText}>
             {headerText}
           </span>
@@ -428,17 +587,68 @@ export default function SubagentCall({
             </span>
           ) : (
             <span className="flex-1" />
+=======
+          {subagentNameLabel ? (
+            <>
+              <span
+                className="max-w-[50%] min-w-0 shrink truncate font-semibold"
+                title={subagentNameLabel}
+              >
+                {subagentNameLabel}
+              </span>
+              <span
+                className="text-text-secondary min-w-0 flex-1 truncate font-normal"
+                title={detachedStatusUnknown ? undefined : headerText}
+              >
+                {detachedStatusUnknown && backgroundHandle != null ? (
+                  <DetachedTaskStatus
+                    threadId={backgroundHandle.subagent_thread_id}
+                    taskId={backgroundHandle.background_task_id}
+                    fallback={headerText}
+                  />
+                ) : (
+                  headerText
+                )}
+              </span>
+            </>
+          ) : (
+            <>
+              <span
+                className="min-w-0 truncate"
+                title={detachedStatusUnknown ? undefined : headerText}
+              >
+                {detachedStatusUnknown && backgroundHandle != null ? (
+                  <DetachedTaskStatus
+                    threadId={backgroundHandle.subagent_thread_id}
+                    taskId={backgroundHandle.background_task_id}
+                    fallback={headerText}
+                  />
+                ) : (
+                  headerText
+                )}
+              </span>
+              <span className="flex-1" />
+            </>
+>>>>>>> upstream/main
           )}
           {canOpenDetails && (
             <ChevronRight
               size={14}
+<<<<<<< HEAD
               className="shrink-0 text-text-secondary transition group-hover:translate-x-0.5"
+=======
+              className="text-text-secondary shrink-0 transition group-hover:translate-x-0.5 rtl:-scale-x-100 rtl:group-hover:-translate-x-0.5"
+>>>>>>> upstream/main
               aria-hidden="true"
             />
           )}
         </div>
 
+<<<<<<< HEAD
         <ul className="w-full space-y-0.5 pl-5 font-mono text-xs text-text-secondary">
+=======
+        <ul className="text-text-secondary w-full space-y-0.5 ps-5 font-mono text-xs">
+>>>>>>> upstream/main
           {displayedTickerLines.length === 0 && running ? (
             <li className="truncate opacity-70">{localize('com_ui_subagent_waiting')}</li>
           ) : null}
@@ -449,12 +659,46 @@ export default function SubagentCall({
       </button>
 
       {!hideAttachments && attachments && attachments.length > 0 && (
+<<<<<<< HEAD
         <AttachmentGroup attachments={attachments} />
+=======
+        <>
+          <AttachmentGroup attachments={attachments} />
+          <MCPAppViews attachments={attachments} />
+        </>
+>>>>>>> upstream/main
       )}
     </>
   );
 }
 
+<<<<<<< HEAD
+=======
+/**
+ * A detached child's status as the parent's subagent index last reported it.
+ * Its own leaf so an index refresh re-renders this text alone, never the card
+ * or the message around it; with no indexed answer the card keeps its neutral
+ * label rather than guessing.
+ */
+function DetachedTaskStatus({
+  threadId,
+  taskId,
+  fallback,
+}: {
+  threadId: string;
+  taskId: string;
+  fallback: string;
+}) {
+  const localize = useLocalize();
+  const { byThreadId } = useParentSubagents();
+  const child = byThreadId.get(threadId);
+  const status =
+    child?.tasks.find((task) => task.taskId === taskId)?.status ??
+    (child?.latestTaskId === taskId ? child.status : undefined);
+  return <>{status == null ? fallback : localize(subagentStatusLabelKey(status))}</>;
+}
+
+>>>>>>> upstream/main
 function extractSubagentType(args: SubagentCallProps['args']): string {
   if (typeof args === 'string') {
     try {
@@ -468,6 +712,7 @@ function extractSubagentType(args: SubagentCallProps['args']): string {
   return a?.subagent_type ?? 'agent';
 }
 
+<<<<<<< HEAD
 function extractPrompt(args: Record<string, unknown> | undefined): string | undefined {
   if (!args) return undefined;
   for (const key of ['prompt', 'description', 'task', 'instructions']) {
@@ -485,6 +730,8 @@ function tryPrompt(args: string): string | undefined {
   }
 }
 
+=======
+>>>>>>> upstream/main
 /** Stable key for a ticker line — helps React reuse the DOM node across
  *  in-place updates to the same live `writing` / `reasoning` line, and
  *  gives tool-call lines a stable identity by tool name. */
@@ -507,7 +754,11 @@ function tickerLineKey(line: SubagentTickerLine): string {
  *  reads as a "code" token rather than plain prose. */
 function ToolNameBadge({ name }: { name: string }): JSX.Element {
   return (
+<<<<<<< HEAD
     <code className="shrink-0 rounded bg-surface-tertiary px-1 text-text-primary">{name}</code>
+=======
+    <code className="bg-surface-tertiary text-text-primary shrink-0 rounded px-1">{name}</code>
+>>>>>>> upstream/main
   );
 }
 
@@ -529,7 +780,11 @@ function ToolIdentifier({
     return (
       <span className="inline-flex min-w-0 shrink items-baseline gap-1">
         <span className="truncate">{parsed.mcpServer}</span>
+<<<<<<< HEAD
         <span className="shrink-0 text-text-tertiary">·</span>
+=======
+        <span className="text-text-tertiary shrink-0">·</span>
+>>>>>>> upstream/main
         <ToolNameBadge name={parsed.toolName} />
       </span>
     );
@@ -543,21 +798,45 @@ function ToolIdentifier({
 /**
  * Renderer for one ticker line. Writing is the default visible activity, so
  * it renders without a redundant prefix. Reasoning retains its semantic label.
+<<<<<<< HEAD
  * Streaming bodies use `dir="rtl"` + `text-align: left` to push tail-side
  * ellipsis behavior (newest characters stay flush-right, oldest clip off the
  * left). The rtl trick is scoped to the body span so trailing punctuation on
  * non-streaming lines can't get flipped by bidi.
+=======
+ * Streaming bodies run the outer box opposite to the text direction so the
+ * oldest characters clip and the newest stay visible; `text-end` of that box is
+ * the text's own start, so a line that fits stays where it reads from. The text
+ * sits in an isolated `dir="auto"` span so its punctuation is never reordered.
+>>>>>>> upstream/main
  *
  * Tool lines (`using_tool`, `tool_complete`) go through `ToolIdentifier`
  * so MCP-hosted tools render as `<server> · <tool>` badges and native
  * tools use their friendly names — matching the delimiter-aware
  * rendering the main tool UI already uses.
  */
+<<<<<<< HEAD
+=======
+function TailText({ text }: { text: string }): JSX.Element {
+  return (
+    <span
+      dir={tailOverflowDirection(text)}
+      className="min-w-0 flex-1 overflow-hidden text-end text-ellipsis whitespace-nowrap"
+    >
+      <bdi dir="auto" className="[unicode-bidi:isolate]">
+        {text}
+      </bdi>
+    </span>
+  );
+}
+
+>>>>>>> upstream/main
 function TickerLineView({ line }: { line: SubagentTickerLine }): JSX.Element {
   const localize = useLocalize();
   const mcpServerNames = useMCPServerNames();
   if (line.kind === 'writing') {
     return (
+<<<<<<< HEAD
       <li className="flex w-full items-baseline overflow-hidden text-text-primary">
         <span
           dir="rtl"
@@ -565,11 +844,16 @@ function TickerLineView({ line }: { line: SubagentTickerLine }): JSX.Element {
         >
           {line.body}
         </span>
+=======
+      <li className="text-text-primary flex w-full items-baseline overflow-hidden">
+        <TailText text={line.body} />
+>>>>>>> upstream/main
       </li>
     );
   }
   if (line.kind === 'reasoning') {
     return (
+<<<<<<< HEAD
       <li className="flex w-full items-baseline gap-1 overflow-hidden text-text-primary">
         <span className="shrink-0">{localize('com_ui_subagent_ticker_reasoning')}:</span>
         <span
@@ -578,6 +862,11 @@ function TickerLineView({ line }: { line: SubagentTickerLine }): JSX.Element {
         >
           {line.body}
         </span>
+=======
+      <li className="text-text-primary flex w-full items-baseline gap-1 overflow-hidden">
+        <span className="shrink-0">{localize('com_ui_subagent_ticker_reasoning')}:</span>
+        <TailText text={line.body} />
+>>>>>>> upstream/main
       </li>
     );
   }
@@ -589,12 +878,20 @@ function TickerLineView({ line }: { line: SubagentTickerLine }): JSX.Element {
         <span className="flex min-w-0 flex-1 items-baseline gap-1 overflow-hidden">
           {line.toolNames.map((name, i) => (
             <span key={`${i}-${name}`} className="flex min-w-0 items-baseline gap-1">
+<<<<<<< HEAD
               {i > 0 && <span className="shrink-0 text-text-tertiary">,</span>}
+=======
+              {i > 0 && <span className="text-text-tertiary shrink-0">,</span>}
+>>>>>>> upstream/main
               <ToolIdentifier rawName={name} localize={localize} mcpServerNames={mcpServerNames} />
             </span>
           ))}
           {line.argsSnippet && (
+<<<<<<< HEAD
             <span className="min-w-0 truncate text-text-tertiary">({line.argsSnippet})</span>
+=======
+            <span className="text-text-tertiary min-w-0 truncate">({line.argsSnippet})</span>
+>>>>>>> upstream/main
           )}
         </span>
       </li>
@@ -608,6 +905,7 @@ function TickerLineView({ line }: { line: SubagentTickerLine }): JSX.Element {
           localize={localize}
           mcpServerNames={mcpServerNames}
         />
+<<<<<<< HEAD
         <span className="shrink-0 text-text-tertiary">→</span>
         <span
           dir="rtl"
@@ -615,13 +913,21 @@ function TickerLineView({ line }: { line: SubagentTickerLine }): JSX.Element {
         >
           {line.outputSnippet ?? localize('com_ui_subagent_ticker_tool_done')}
         </span>
+=======
+        <span className="text-text-tertiary shrink-0">→</span>
+        <TailText text={line.outputSnippet ?? localize('com_ui_subagent_ticker_tool_done')} />
+>>>>>>> upstream/main
       </li>
     );
   }
   /* error */
   const errorPrefix = localize('com_ui_subagent_ticker_error');
   return (
+<<<<<<< HEAD
     <li className="flex w-full items-baseline gap-1 overflow-hidden text-text-warning">
+=======
+    <li className="text-text-warning flex w-full items-baseline gap-1 overflow-hidden">
+>>>>>>> upstream/main
       <span className="shrink-0">{errorPrefix}:</span>
       <span className="min-w-0 flex-1 truncate">{line.message ?? ''}</span>
     </li>

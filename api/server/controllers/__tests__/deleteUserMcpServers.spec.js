@@ -1,10 +1,25 @@
 const mockGetMCPManager = jest.fn();
 const mockInvalidateCachedTools = jest.fn();
+<<<<<<< HEAD
+=======
+const mockGetServerConfig = jest.fn();
+>>>>>>> upstream/main
 
 jest.mock('~/config', () => ({
   getMCPManager: (...args) => mockGetMCPManager(...args),
   getFlowStateManager: jest.fn(),
+<<<<<<< HEAD
   getMCPServersRegistry: jest.fn(),
+=======
+  getMCPServersRegistry: () => ({
+    getServerConfig: (...args) => mockGetServerConfig(...args),
+    resolveAllowlists: jest.fn().mockResolvedValue({}),
+  }),
+}));
+
+jest.mock('~/server/services/MCP/oauthCleanup', () => ({
+  maybeUninstallOAuthMCP: jest.fn().mockResolvedValue(undefined),
+>>>>>>> upstream/main
 }));
 
 jest.mock('~/server/services/Config/getCachedTools', () => ({
@@ -65,6 +80,10 @@ describe('deleteUserMcpServers', () => {
     await MCPServer.deleteMany({});
     await AclEntry.deleteMany({});
     jest.clearAllMocks();
+<<<<<<< HEAD
+=======
+    mockGetServerConfig.mockResolvedValue(undefined);
+>>>>>>> upstream/main
   });
 
   test('should delete solely-owned MCP servers and their ACL entries', async () => {
@@ -98,6 +117,17 @@ describe('deleteUserMcpServers', () => {
       resourceId: server._id,
     });
     expect(aclEntries).toHaveLength(0);
+<<<<<<< HEAD
+=======
+    /** Credential cleanup must reach a server even when a profile hides it from the account. */
+    expect(mockGetServerConfig).toHaveBeenCalledWith(
+      'sole-owned-server',
+      userId.toString(),
+      undefined,
+      undefined,
+      { includeHidden: true },
+    );
+>>>>>>> upstream/main
   });
 
   test('should disconnect MCP sessions and invalidate tool cache before deletion', async () => {

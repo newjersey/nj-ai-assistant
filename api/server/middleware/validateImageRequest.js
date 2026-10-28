@@ -30,6 +30,7 @@ const getAssistantEndpointConfigs = (appConfig) =>
 
 /**
  * Thin Express adapter for the typed image-authorization service in `@librechat/api`.
+<<<<<<< HEAD
  * @param {boolean | {secureImageLinks?: boolean, assistantEndpoints?: object[]}} [config]
  */
 function createValidateImageRequest(config = {}) {
@@ -41,6 +42,15 @@ function createValidateImageRequest(config = {}) {
           secureImageLinks: config.secureImageLinks,
           assistantEndpoints: config.assistantEndpoints,
         };
+=======
+ * @param {{secureImageLinks?: boolean, assistantEndpoints?: object[]}} [config]
+ */
+function createValidateImageRequest(config = {}) {
+  const options = {
+    secureImageLinks: config.secureImageLinks,
+    assistantEndpoints: config.assistantEndpoints,
+  };
+>>>>>>> upstream/main
 
   const deps = {
     parseCookies: cookie.parse,
@@ -53,9 +63,13 @@ function createValidateImageRequest(config = {}) {
     getUserPrincipals,
     hasCapabilityForPrincipals,
     hasPermission,
+<<<<<<< HEAD
   };
   if (resolveDynamicConfig) {
     deps.getImageConfig = async ({ userId, user }) => {
+=======
+    getImageConfig: async ({ userId, user }) => {
+>>>>>>> upstream/main
       const appConfig = await getAppConfig(
         getAppConfigOptionsFromUser({ ...user, id: userId }, user.tenantId),
       );
@@ -63,8 +77,13 @@ function createValidateImageRequest(config = {}) {
         secureImageLinks: appConfig.secureImageLinks,
         assistantEndpoints: getAssistantEndpointConfigs(appConfig),
       };
+<<<<<<< HEAD
     };
   }
+=======
+    },
+  };
+>>>>>>> upstream/main
 
   return createImageAuthorizationMiddleware(options, deps);
 }

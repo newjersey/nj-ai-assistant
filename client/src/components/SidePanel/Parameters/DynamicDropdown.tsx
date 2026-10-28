@@ -1,6 +1,12 @@
+<<<<<<< HEAD
 import { useMemo, useState } from 'react';
 import { OptionTypes } from 'librechat-data-provider';
 import { Label, HoverCard, HoverCardTrigger, SelectDropDown } from '@librechat/client';
+=======
+import { useId, useMemo, useState } from 'react';
+import { OptionTypes } from 'librechat-data-provider';
+import { Label, Dropdown, HoverCard, HoverCardTrigger } from '@librechat/client';
+>>>>>>> upstream/main
 import type { DynamicSettingProps } from 'librechat-data-provider';
 import { TranslationKeys, useLocalize, useParameterEffects } from '~/hooks';
 import { useChatContext } from '~/Providers';
@@ -28,6 +34,10 @@ function DynamicDropdown({
   conversation,
 }: DynamicSettingProps) {
   const localize = useLocalize();
+<<<<<<< HEAD
+=======
+  const labelId = useId();
+>>>>>>> upstream/main
   const { preset } = useChatContext();
   const [inputValue, setInputValue] = useState<string | null>(null);
 
@@ -63,6 +73,11 @@ function DynamicDropdown({
     return null;
   }
 
+<<<<<<< HEAD
+=======
+  const labelText = labelCode ? (localize(label as TranslationKeys) ?? label) : label || settingKey;
+
+>>>>>>> upstream/main
   return (
     <div
       className={cn(
@@ -71,6 +86,7 @@ function DynamicDropdown({
       )}
     >
       <HoverCard openDelay={300}>
+<<<<<<< HEAD
         <HoverCardTrigger className="grid w-full items-center gap-2">
           {showLabel === true && (
             <div className="flex w-full justify-between">
@@ -81,12 +97,22 @@ function DynamicDropdown({
                 {labelCode ? (localize(label as TranslationKeys) ?? label) : label || settingKey}
                 {showDefault && (
                   <small className="opacity-40 high-contrast:opacity-100">
+=======
+        <HoverCardTrigger className="grid h-full w-full content-between items-center gap-2">
+          {showLabel === true && (
+            <div className="flex w-full justify-between">
+              <Label id={labelId} className="text-start text-xs font-medium">
+                {labelText}
+                {showDefault && (
+                  <small className="high-contrast:opacity-100 opacity-40">
+>>>>>>> upstream/main
                     ({localize('com_endpoint_default')}: {defaultValue})
                   </small>
                 )}
               </Label>
             </div>
           )}
+<<<<<<< HEAD
           <SelectDropDown
             showLabel={false}
             emptyTitle={true}
@@ -97,6 +123,20 @@ function DynamicDropdown({
             containerClassName="w-full"
             className="py-1.5"
             id={`${settingKey}-dynamic-dropdown`}
+=======
+          <Dropdown
+            variant="field"
+            testId="select-dropdown-button"
+            aria-labelledby={showLabel === true ? labelId : undefined}
+            ariaLabel={showLabel === true ? undefined : labelText}
+            disabled={readonly}
+            value={selectedValue ?? ''}
+            onChange={handleChange}
+            options={options}
+            searchable={options.length > 10}
+            searchPlaceholder={localize('com_ui_search')}
+            searchEmptyText={localize('com_ui_no_results_found')}
+>>>>>>> upstream/main
             placeholder={
               placeholderCode
                 ? (localize(placeholder as TranslationKeys) ?? placeholder)

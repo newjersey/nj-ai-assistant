@@ -12,6 +12,7 @@ interface IPreset {
 }
 
 export function createPresetMethods(mongoose: typeof import('mongoose')): {
+<<<<<<< HEAD
   getPreset: (
     user: string,
     presetId: string,
@@ -41,6 +42,8 @@ export function createPresetMethods(mongoose: typeof import('mongoose')): {
       }
     | null
   >;
+=======
+>>>>>>> upstream/main
   getPresets: (
     user: string,
     filter?: Record<string, unknown>,
@@ -94,6 +97,7 @@ export function createPresetMethods(mongoose: typeof import('mongoose')): {
   ) => Promise<import('mongodb').DeleteResult>;
 } {
   /**
+<<<<<<< HEAD
    * Retrieves a single preset by user and presetId.
    */
   async function getPreset(
@@ -135,6 +139,8 @@ export function createPresetMethods(mongoose: typeof import('mongoose')): {
   }
 
   /**
+=======
+>>>>>>> upstream/main
    * Retrieves all presets for a user, sorted by order then updatedAt.
    */
   async function getPresets(
@@ -266,7 +272,10 @@ export function createPresetMethods(mongoose: typeof import('mongoose')): {
   }
 
   return {
+<<<<<<< HEAD
     getPreset,
+=======
+>>>>>>> upstream/main
     getPresets,
     savePreset,
     deletePresets,

@@ -1,7 +1,15 @@
+<<<<<<< HEAD
 import { useRecoilValue } from 'recoil';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { dataService, QueryKeys } from 'librechat-data-provider';
 import type { UseMutationResult } from '@tanstack/react-query';
+=======
+import { useCallback } from 'react';
+import { useRecoilValue } from 'recoil';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { dataService, QueryKeys, ResourceType } from 'librechat-data-provider';
+import type { QueryObserverResult, UseMutationResult } from '@tanstack/react-query';
+>>>>>>> upstream/main
 import type t from 'librechat-data-provider';
 import {
   /* Prompts */
@@ -126,6 +134,15 @@ export const useCreatePrompt = (
         );
 
         addGroupToAll(queryClient, group);
+<<<<<<< HEAD
+=======
+        /** The sidebar reads row permissions from the batch map, which lacks the new group */
+        queryClient.invalidateQueries([
+          QueryKeys.effectivePermissions,
+          'all',
+          ResourceType.PROMPTGROUP,
+        ]);
+>>>>>>> upstream/main
       }
 
       if (onSuccess) {
@@ -258,6 +275,7 @@ export const useDeletePromptGroup = (
   });
 };
 
+<<<<<<< HEAD
 export const useUpdatePromptLabels = (
   options?: t.UpdatePromptLabelOptions,
 ): UseMutationResult<
@@ -279,6 +297,8 @@ export const useUpdatePromptLabels = (
   });
 };
 
+=======
+>>>>>>> upstream/main
 export const useMakePromptProduction = (options?: t.MakePromptProductionOptions) => {
   const queryClient = useQueryClient();
   const { onSuccess, onError, onMutate } = options || {};
@@ -380,3 +400,44 @@ export const useRecordPromptUsage = (): UseMutationResult<
     },
   });
 };
+<<<<<<< HEAD
+=======
+
+/**
+ * Resolves a prompt group's content: `/api/prompts/groups/:groupId/resolve`.
+ * No cache and no retry, since a Langfuse group's content can change between
+ * requests and a stale read should not linger or be retried silently.
+ */
+export const useResolvePromptGroup = (
+  id: string,
+  config?: { enabled?: boolean },
+): QueryObserverResult<t.TResolvedPromptResponse> => {
+  return useQuery<t.TResolvedPromptResponse>(
+    [QueryKeys.promptGroupContent, id],
+    () => dataService.resolvePromptGroup(id),
+    {
+      enabled: config?.enabled,
+      retry: false,
+      staleTime: 0,
+      cacheTime: 0,
+      refetchOnWindowFocus: false,
+    },
+  );
+};
+
+/** Imperative counterpart to `useResolvePromptGroup`, for callers (for example a
+ *  slash-command submit) that need a single resolved read rather than a hook
+ *  bound to render. */
+export const useResolvePromptGroupFn = (): ((id: string) => Promise<t.TResolvedPromptResponse>) => {
+  const queryClient = useQueryClient();
+  return useCallback(
+    (id: string) =>
+      queryClient.fetchQuery<t.TResolvedPromptResponse>(
+        [QueryKeys.promptGroupContent, id],
+        () => dataService.resolvePromptGroup(id),
+        { retry: false, staleTime: 0, cacheTime: 0 },
+      ),
+    [queryClient],
+  );
+};
+>>>>>>> upstream/main

@@ -25,11 +25,14 @@ const BookmarkItem: FC<MenuItemProps> = ({ tag, selected, handleSubmit, icon, ..
     setIsLoading(false);
   };
 
+<<<<<<< HEAD
   const breakWordStyle: React.CSSProperties = {
     wordBreak: 'break-word',
     overflowWrap: 'anywhere',
   };
 
+=======
+>>>>>>> upstream/main
   const renderIcon = () => {
     if (icon != null) {
       return icon;
@@ -49,7 +52,11 @@ const BookmarkItem: FC<MenuItemProps> = ({ tag, selected, handleSubmit, icon, ..
   return (
     <MenuItem
       aria-label={tag as string}
+<<<<<<< HEAD
       className="group flex w-full gap-2 rounded-lg p-2.5 text-sm text-text-primary transition-colors duration-200 focus:outline-none data-[focus]:bg-surface-hover data-[focus-visible]:ring-2 data-[focus-visible]:ring-text-primary"
+=======
+      className="group text-text-primary data-[focus]:bg-surface-hover data-[focus-visible]:ring-text-primary flex w-full gap-2 rounded-lg p-2.5 text-sm transition-colors duration-200 focus:outline-hidden data-[focus-visible]:ring-2"
+>>>>>>> upstream/main
       {...rest}
       as="button"
       onClick={clickHandler}
@@ -57,7 +64,11 @@ const BookmarkItem: FC<MenuItemProps> = ({ tag, selected, handleSubmit, icon, ..
       <div className="flex grow items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           {renderIcon()}
+<<<<<<< HEAD
           <div style={breakWordStyle}>{tag}</div>
+=======
+          <div className="wrap-anywhere">{tag}</div>
+>>>>>>> upstream/main
         </div>
       </div>
     </MenuItem>

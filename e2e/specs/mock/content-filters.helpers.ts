@@ -14,9 +14,13 @@ import { getPrimaryE2EUser } from '../../setup/users.mock';
 
 const PROJECT_ROOT = path.resolve(__dirname, '../../..');
 const GENERATED_CONFIG_ROOT = path.join(PROJECT_ROOT, 'e2e/.generated');
+<<<<<<< HEAD
 const RELOAD_SENTINEL = `e2e-content-filter-reload-${process.pid}-${randomUUID()}`;
 const RELOAD_SENTINEL_PATH = `/api/admin/config/user/${encodeURIComponent(RELOAD_SENTINEL)}`;
 const RELOAD_PRIORITY = 10;
+=======
+const RELOAD_PATH = '/api/admin/config/reload';
+>>>>>>> upstream/main
 
 type RequestFetchOptions = NonNullable<Parameters<APIRequestContext['fetch']>[1]>;
 
@@ -179,6 +183,7 @@ function getConfigFromResult(result: RequestResult): RuntimeConfig {
   return result.body.config as RuntimeConfig;
 }
 
+<<<<<<< HEAD
 async function triggerConfigReload(request: APIRequestContext, token: string): Promise<void> {
   const result = await requestResult(request, {
     path: RELOAD_SENTINEL_PATH,
@@ -193,6 +198,24 @@ async function triggerConfigReload(request: APIRequestContext, token: string): P
       config: expect.objectContaining({ principalId: RELOAD_SENTINEL }),
     }),
   );
+=======
+/**
+ * Makes the server load librechat.yaml again: the admin config reload route clears the cached
+ * file and merged configs (on every instance, with Redis) without writing a config profile, and
+ * loads the file before it answers. It answers 200 only once the file loaded and every instance
+ * it could reach has been told (`broadcast` is false without Redis), 422 when the file fails to
+ * load, and 503 when the other instances could not be told.
+ */
+async function triggerConfigReload(request: APIRequestContext, token: string): Promise<void> {
+  const result = await requestResult(request, {
+    path: RELOAD_PATH,
+    token,
+    method: 'POST',
+  });
+
+  expect(result.ok, `Expected config reload to succeed: ${result.text}`).toBe(true);
+  expect(result.body, result.text).toEqual({ success: true, broadcast: expect.any(Boolean) });
+>>>>>>> upstream/main
 }
 
 async function getLoadedConfig(
@@ -227,6 +250,7 @@ async function getLoadedProtectionState(
   };
 }
 
+<<<<<<< HEAD
 async function deleteReloadSentinel(request: APIRequestContext, token: string): Promise<void> {
   const result = await requestResult(request, {
     path: RELOAD_SENTINEL_PATH,
@@ -238,6 +262,8 @@ async function deleteReloadSentinel(request: APIRequestContext, token: string): 
   );
 }
 
+=======
+>>>>>>> upstream/main
 export async function loginAdmin(request: APIRequestContext): Promise<string> {
   const { email, password } = getPrimaryE2EUser();
   const response = await request.post('/api/auth/login', {
@@ -347,6 +373,7 @@ export async function restoreRuntimeFilters(
   const baselineConfig = parseRuntimeConfig(baseline.contents);
   atomicWrite(baseline, baseline.contents);
 
+<<<<<<< HEAD
   try {
     await triggerConfigReload(request, token);
     await expect
@@ -367,6 +394,24 @@ export async function restoreRuntimeFilters(
   } finally {
     await deleteReloadSentinel(request, token);
   }
+=======
+  await triggerConfigReload(request, token);
+  await expect
+    .poll(async () => getLoadedProtectionState(request, token), {
+      timeout: 30000,
+      intervals: [100, 250, 500, 1000],
+    })
+    .toEqual({
+      base: {
+        filters: baselineConfig.filters,
+        messageFilter: baselineConfig.messageFilter,
+      },
+      effective: {
+        filters: baselineConfig.filters,
+        messageFilter: baselineConfig.messageFilter,
+      },
+    });
+>>>>>>> upstream/main
 
   baselineState = undefined;
 }

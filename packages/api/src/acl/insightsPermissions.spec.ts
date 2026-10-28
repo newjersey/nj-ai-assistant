@@ -1,10 +1,14 @@
 import { PermissionBits, PrincipalType, ResourceType, SystemRoles } from 'librechat-data-provider';
+<<<<<<< HEAD
 import type { ServerRequest } from '~/types';
 import {
   auditInsightsPermissionChanges,
   maskAgentInsightsBit,
   validateInsightsPermissionUpdates,
 } from './insightsPermissions';
+=======
+import { maskAgentInsightsBit, validateInsightsPermissionUpdates } from './insightsPermissions';
+>>>>>>> upstream/main
 
 describe('Insights permissions', () => {
   test('allows only admins to assign a boolean agent Insights grant', () => {
@@ -33,6 +37,7 @@ describe('Insights permissions', () => {
       }),
     ).toBe(PermissionBits.VIEW);
   });
+<<<<<<< HEAD
 
   test('restores unaudited changes when fail-closed audit persistence fails', async () => {
     const restore = jest.fn().mockResolvedValue(undefined);
@@ -70,4 +75,6 @@ describe('Insights permissions', () => {
     ).rejects.toMatchObject({ statusCode: 500 });
     expect(restore).toHaveBeenCalledWith([change]);
   });
+=======
+>>>>>>> upstream/main
 });

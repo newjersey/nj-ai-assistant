@@ -2,16 +2,30 @@ import { useEffect } from 'react';
 import { RecoilRoot } from 'recoil';
 import { DndProvider } from 'react-dnd';
 import { RouterProvider } from 'react-router-dom';
+<<<<<<< HEAD
 import * as RadixToast from '@radix-ui/react-toast';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { QueryClient, QueryClientProvider, QueryCache } from '@tanstack/react-query';
 import { Toast, ThemeProvider, ToastProvider, useInputModality } from '@librechat/client';
+=======
+import { HTML5Backend } from 'react-dnd-html5-backend';
+import { Toast, ToastViewport, ToastProvider, useInputModality } from '@librechat/client';
+import { QueryClient, QueryClientProvider, QueryCache, MutationCache } from '@tanstack/react-query';
+import Direction, { ToastSwipeProvider } from '~/Providers/Direction';
+>>>>>>> upstream/main
 import { ScreenshotProvider, useApiErrorBoundary } from './hooks';
 import WakeLockManager from '~/components/System/WakeLockManager';
 import QueryDevtoolsGate from '~/components/QueryDevtoolsGate';
 import LanguageSync from '~/components/System/LanguageSync';
+<<<<<<< HEAD
 import { getThemeFromEnv } from './utils/getThemeFromEnv';
 import { initializeFontSize } from '~/store/fontSize';
+=======
+import DeploymentTheme from '~/Providers/DeploymentTheme';
+import UiScaleSync from '~/components/System/UiScaleSync';
+import { initializeFontSize } from '~/store/fontSize';
+import { reopenTermsOnRefusal } from '~/utils/terms';
+>>>>>>> upstream/main
 import { LiveAnnouncer } from '~/a11y';
 import { router } from './routes';
 
@@ -37,12 +51,21 @@ const App = () => {
         }
       },
     }),
+<<<<<<< HEAD
+=======
+    mutationCache: new MutationCache({
+      onError: (error) => {
+        reopenTermsOnRefusal(queryClient, error?.response?.data);
+      },
+    }),
+>>>>>>> upstream/main
   });
 
   useEffect(() => {
     initializeFontSize();
   }, []);
 
+<<<<<<< HEAD
   // Load theme from environment variables if available
   const envTheme = getThemeFromEnv();
 
@@ -71,6 +94,26 @@ const App = () => {
                       transcript on screen under the new URL for as long as the
                       next thread took to render.
 
+=======
+  return (
+    <QueryClientProvider client={queryClient}>
+      <RecoilRoot>
+        <LanguageSync />
+        <UiScaleSync />
+        <Direction>
+          <LiveAnnouncer>
+            <DeploymentTheme>
+              <ToastSwipeProvider>
+                <ToastProvider>
+                  <DndProvider backend={HTML5Backend}>
+                    {/* Location updates commit in the caller's own task instead
+                      of React's transition lane. A transition keeps the
+                      OUTGOING route painted until the incoming one finishes
+                      rendering, so switching conversations left the previous
+                      transcript on screen under the new URL for as long as the
+                      next thread took to render.
+
+>>>>>>> upstream/main
                       Set here rather than per navigation because the property
                       is route-shaped, not caller-shaped: fourteen call sites
                       across components, chat hooks and SSE handlers navigate
@@ -83,6 +126,7 @@ const App = () => {
                       transition-safe reads are gated behind
                       `_TRANSITION_SUPPORT_UNSTABLE` hooks this app does not use.
                       Worth revisiting once that state has moved to Jotai. */}
+<<<<<<< HEAD
                   <RouterProvider router={router} useTransitions={false} />
                   <WakeLockManager />
                   <QueryDevtoolsGate />
@@ -93,6 +137,19 @@ const App = () => {
             </RadixToast.Provider>
           </ThemeProvider>
         </LiveAnnouncer>
+=======
+                    <RouterProvider router={router} useTransitions={false} />
+                    <WakeLockManager />
+                    <QueryDevtoolsGate />
+                    <Toast />
+                    <ToastViewport />
+                  </DndProvider>
+                </ToastProvider>
+              </ToastSwipeProvider>
+            </DeploymentTheme>
+          </LiveAnnouncer>
+        </Direction>
+>>>>>>> upstream/main
       </RecoilRoot>
     </QueryClientProvider>
   );
@@ -106,9 +163,13 @@ export default () => (
       allow="autoplay"
       id="audio"
       title="audio-silence"
+<<<<<<< HEAD
       style={{
         display: 'none',
       }}
+=======
+      className="hidden"
+>>>>>>> upstream/main
     />
   </ScreenshotProvider>
 );

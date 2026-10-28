@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+/** Installed packages need real module IDs when Jest reuses a resolver across suites. */
+>>>>>>> upstream/main
 jest.mock(
   '@librechat/data-schemas',
   () => ({
@@ -7,7 +11,11 @@ jest.mock(
     DEFAULT_SESSION_EXPIRY: 900000,
     DEFAULT_REFRESH_TOKEN_EXPIRY: 604800000,
   }),
+<<<<<<< HEAD
   { virtual: true },
+=======
+  { virtual: false },
+>>>>>>> upstream/main
 );
 jest.mock(
   'librechat-data-provider',
@@ -15,8 +23,14 @@ jest.mock(
     ErrorTypes: {},
     SystemRoles: { USER: 'USER', ADMIN: 'ADMIN' },
     errorsToString: jest.fn(),
+<<<<<<< HEAD
   }),
   { virtual: true },
+=======
+    SESSION_HINT_COOKIE: 'session_hint',
+  }),
+  { virtual: false },
+>>>>>>> upstream/main
 );
 jest.mock(
   '@librechat/api',
@@ -24,8 +38,17 @@ jest.mock(
     const shouldUseSecureCookie = jest.fn(() => false);
     return {
       isEnabled: jest.fn((val) => val === 'true' || val === true),
+<<<<<<< HEAD
       checkEmailConfig: jest.fn(),
       isEmailDomainAllowed: jest.fn(),
+=======
+      /** Real bcrypt on the test thread; the worker pool has its own spec in packages/api. */
+      hashSecret: jest.fn((plain) => require('bcryptjs').hash(plain, 4)),
+      compareSecret: jest.fn((plain, hash) => require('bcryptjs').compare(plain, hash)),
+      checkEmailConfig: jest.fn(),
+      isEmailDomainAllowed: jest.fn(),
+      getSafeErrorMetadata: jest.fn((error) => ({ type: error?.name ?? 'UnknownError' })),
+>>>>>>> upstream/main
       math: jest.fn((val, fallback) => (val ? Number(val) : fallback)),
       storeOpenIdSession: jest.fn(),
       shouldUseSecureCookie,
@@ -37,6 +60,10 @@ jest.mock(
           sameSite: 'strict',
         });
       }),
+<<<<<<< HEAD
+=======
+      setLocalSessionCookies: jest.fn(),
+>>>>>>> upstream/main
       setOpenIDMarkerCookies: jest.fn((res, { userId, expires }) => {
         res.cookie('token_provider', 'openid', {
           expires,
@@ -60,6 +87,14 @@ jest.mock(
           : undefined;
       },
       resolveAppConfigForUser: jest.fn(async (_getAppConfig, _user) => ({})),
+<<<<<<< HEAD
+=======
+      /** Mirrors the real resolver's options so `getAppConfig` mocks still decide the result. */
+      resolvePreAuthAppConfig: jest.fn((getAppConfig) =>
+        getAppConfig({ skipRuntimeAugmentation: true, failClosed: true }),
+      ),
+      commitPasswordReset: jest.fn(),
+>>>>>>> upstream/main
       createOpenIDSessionIdentity: jest.fn(
         ({ user, userId, openidSubject, tenantId, openidIssuer }) => {
           const normalize = (value) => {
@@ -94,7 +129,11 @@ jest.mock(
       CLOUDFRONT_SCOPE_COOKIE: 'LibreChat-CloudFront-Scope',
     };
   },
+<<<<<<< HEAD
   { virtual: true },
+=======
+  { virtual: false },
+>>>>>>> upstream/main
 );
 jest.mock('~/models', () => ({
   findUser: jest.fn(),
@@ -133,19 +172,34 @@ jest.mock('~/server/utils', () => ({ sendEmail: jest.fn() }));
 let checkEmailConfig;
 let isEmailDomainAllowed;
 let resolveAppConfigForUser;
+<<<<<<< HEAD
 let setRefreshTokenCookie;
 let setOpenIDMarkerCookies;
+=======
+let resolvePreAuthAppConfig;
+let setRefreshTokenCookie;
+let setOpenIDMarkerCookies;
+let setLocalSessionCookies;
+>>>>>>> upstream/main
 let setCloudFrontCookies;
 let getCloudFrontConfig;
 let parseCloudFrontCookieScope;
 let storeOpenIdSession;
 let jwt;
 let logger;
+<<<<<<< HEAD
+=======
+let registerSchema;
+>>>>>>> upstream/main
 let getTenantId;
 let findUser;
 let findToken;
 let createUser;
 let updateUser;
+<<<<<<< HEAD
+=======
+let deleteUserById;
+>>>>>>> upstream/main
 let countUsers;
 let getUserById;
 let generateToken;
@@ -167,26 +221,46 @@ let resendVerificationEmail;
 let setAuthTokens;
 let setCloudFrontAuthCookies;
 let verifyEmail;
+<<<<<<< HEAD
+=======
+let commitPasswordReset;
+>>>>>>> upstream/main
 
 jest.isolateModules(() => {
   ({
     checkEmailConfig,
     isEmailDomainAllowed,
     resolveAppConfigForUser,
+<<<<<<< HEAD
     setRefreshTokenCookie,
     setOpenIDMarkerCookies,
+=======
+    resolvePreAuthAppConfig,
+    commitPasswordReset,
+    setRefreshTokenCookie,
+    setOpenIDMarkerCookies,
+    setLocalSessionCookies,
+>>>>>>> upstream/main
     setCloudFrontCookies,
     getCloudFrontConfig,
     parseCloudFrontCookieScope,
     storeOpenIdSession,
   } = require('@librechat/api'));
   jwt = require('jsonwebtoken');
+<<<<<<< HEAD
+=======
+  ({ registerSchema } = require('~/strategies/validators'));
+>>>>>>> upstream/main
   ({ logger, getTenantId } = require('@librechat/data-schemas'));
   ({
     findUser,
     findToken,
     createUser,
     updateUser,
+<<<<<<< HEAD
+=======
+    deleteUserById,
+>>>>>>> upstream/main
     countUsers,
     getUserById,
     generateToken,
@@ -685,6 +759,12 @@ describe('setOpenIDAuthTokens', () => {
   });
 });
 
+<<<<<<< HEAD
+=======
+const loggedText = () =>
+  JSON.stringify(['info', 'warn', 'error', 'debug'].map((level) => logger[level].mock.calls));
+
+>>>>>>> upstream/main
 describe('registerUser', () => {
   const registrationPayload = {
     name: 'Test User',
@@ -761,6 +841,65 @@ describe('registerUser', () => {
       }),
     );
   });
+<<<<<<< HEAD
+=======
+
+  it('contains a failed cleanup of the temporary user and logs safe metadata only', async () => {
+    checkEmailConfig.mockReturnValue(true);
+    sendEmail.mockRejectedValueOnce(new Error('smtp rejected leak@example.com'));
+    deleteUserById.mockRejectedValueOnce(new Error('db failure leak@example.com'));
+
+    const result = await registerUser(registrationPayload);
+
+    expect(result).toEqual({ status: 500, message: 'Something went wrong' });
+    expect(loggedText()).not.toContain('leak@example.com');
+  });
+
+  it('logs a duplicate registration by id without the body or existing user', async () => {
+    findUser.mockResolvedValue({ _id: 'existing-id', email: 'dup@example.com' });
+
+    const result = await registerUser({ ...registrationPayload, email: 'dup@example.com' });
+
+    expect(result.status).toBe(200);
+    expect(createUser).not.toHaveBeenCalled();
+    expect(logger.info.mock.calls).toEqual([
+      ['[registerUser] Email in use [User ID: existing-id]'],
+    ]);
+    const logged = loggedText();
+    for (const secret of [
+      'dup@example.com',
+      'testuser',
+      'Test User',
+      registrationPayload.password,
+    ]) {
+      expect(logged).not.toContain(secret);
+    }
+  });
+
+  it('does not log the registration body on validation failure', async () => {
+    registerSchema.safeParse.mockReturnValueOnce({
+      success: false,
+      error: { errors: [{ path: ['password'], message: 'Password too short' }] },
+    });
+
+    const result = await registerUser({
+      ...registrationPayload,
+      email: 'pii-leak@example.com',
+    });
+
+    expect(result.status).toBe(404);
+    expect(logger.info).toHaveBeenCalled();
+    const logged = loggedText();
+    for (const secret of [
+      'pii-leak@example.com',
+      'testuser',
+      'Test User',
+      registrationPayload.password,
+    ]) {
+      expect(logged).not.toContain(secret);
+    }
+  });
+>>>>>>> upstream/main
 });
 
 describe('verifyEmail public response handling', () => {
@@ -877,17 +1016,39 @@ describe('requestPasswordReset', () => {
     });
   });
 
+<<<<<<< HEAD
   it('should fast-fail with base config before DB lookup for blocked domains', async () => {
+=======
+  it('should fast-fail with the pre-auth config before DB lookup for blocked domains', async () => {
+>>>>>>> upstream/main
     isEmailDomainAllowed.mockReturnValue(false);
 
     const req = { body: { email: 'blocked@evil.com' }, ip: '127.0.0.1' };
     const result = await requestPasswordReset(req);
 
+<<<<<<< HEAD
     expect(getAppConfig).toHaveBeenCalledWith({ baseOnly: true });
+=======
+    expect(resolvePreAuthAppConfig).toHaveBeenCalledWith(getAppConfig);
+    expect(getAppConfig).not.toHaveBeenCalledWith({ baseOnly: true });
+>>>>>>> upstream/main
     expect(findUser).not.toHaveBeenCalled();
     expect(result).toBeInstanceOf(Error);
   });
 
+<<<<<<< HEAD
+=======
+  it('should propagate a pre-auth config read failure before the user lookup', async () => {
+    getAppConfig.mockRejectedValue(new Error('override read failed'));
+
+    const req = { body: { email: 'user@example.com' }, ip: '127.0.0.1' };
+
+    await expect(requestPasswordReset(req)).rejects.toThrow('override read failed');
+    expect(findUser).not.toHaveBeenCalled();
+    expect(createToken).not.toHaveBeenCalled();
+  });
+
+>>>>>>> upstream/main
   it('should call resolveAppConfigForUser for tenant user', async () => {
     const user = {
       _id: 'user-tenant',
@@ -903,13 +1064,67 @@ describe('requestPasswordReset', () => {
     expect(resolveAppConfigForUser).toHaveBeenCalledWith(getAppConfig, user);
   });
 
+<<<<<<< HEAD
   it('should reuse baseConfig for non-tenant user without calling resolveAppConfigForUser', async () => {
     findUser.mockResolvedValue({ _id: 'user-no-tenant', email: 'user@example.com' });
+=======
+  it('should resolve the account config for a user without a tenant', async () => {
+    const user = { _id: 'user-no-tenant', email: 'user@example.com', role: 'USER' };
+    findUser.mockResolvedValue(user);
+>>>>>>> upstream/main
 
     const req = { body: { email: 'user@example.com' }, ip: '127.0.0.1' };
     await requestPasswordReset(req);
 
+<<<<<<< HEAD
     expect(resolveAppConfigForUser).not.toHaveBeenCalled();
+=======
+    expect(resolveAppConfigForUser).toHaveBeenCalledWith(getAppConfig, user);
+  });
+
+  it('should keep the pre-auth config when no account exists', async () => {
+    findUser.mockResolvedValue(null);
+
+    const req = { body: { email: 'nobody@example.com' }, ip: '127.0.0.1' };
+    const result = await requestPasswordReset(req);
+
+    expect(resolveAppConfigForUser).not.toHaveBeenCalled();
+    expect(result.message).toContain('If an account with that email exists');
+  });
+
+  it("should return the generic response when a role's config blocks the domain", async () => {
+    const user = { _id: 'user-no-tenant', email: 'user@example.com', role: 'USER' };
+    findUser.mockResolvedValue(user);
+    isEmailDomainAllowed.mockReturnValueOnce(true).mockReturnValueOnce(false);
+
+    const req = { body: { email: 'user@example.com' }, ip: '127.0.0.1' };
+    const result = await requestPasswordReset(req);
+
+    expect(result).not.toBeInstanceOf(Error);
+    expect(result.message).toContain('If an account with that email exists');
+    expect(createToken).not.toHaveBeenCalled();
+  });
+
+  it("issues no link, with the generic answer, when the account's config cannot be read", async () => {
+    const user = { _id: 'user-no-tenant', email: 'user@example.com', role: 'USER' };
+    findUser.mockResolvedValue(user);
+    getAppConfig.mockResolvedValue({ registration: { allowedDomains: ['example.com'] } });
+    resolveAppConfigForUser.mockRejectedValue(new Error('role read failed user@example.com'));
+
+    const req = { body: { email: 'user@example.com' }, ip: '127.0.0.1' };
+    const result = await requestPasswordReset(req);
+
+    expect(result).toEqual({
+      message: 'If an account with that email exists, a password reset link has been sent to it.',
+    });
+    expect(deleteTokens).not.toHaveBeenCalled();
+    expect(createToken).not.toHaveBeenCalled();
+    expect(logger.error).toHaveBeenCalledWith(
+      "[requestPasswordReset] Failed to resolve the account's config; no link issued:",
+      { type: 'Error' },
+    );
+    expect(loggedText()).not.toContain('user@example.com');
+>>>>>>> upstream/main
   });
 
   it('should return generic response when tenant config blocks the domain (non-enumerable)', async () => {
@@ -949,6 +1164,10 @@ describe('requestPasswordReset', () => {
     expect(createToken).toHaveBeenCalledWith(
       expect.objectContaining({
         userId: user._id,
+<<<<<<< HEAD
+=======
+        email: user.email,
+>>>>>>> upstream/main
         type: 'password_reset',
       }),
     );
@@ -956,6 +1175,7 @@ describe('requestPasswordReset', () => {
 });
 
 describe('resetPassword', () => {
+<<<<<<< HEAD
   beforeEach(() => {
     jest.clearAllMocks();
     checkEmailConfig.mockReturnValue(false);
@@ -1005,10 +1225,77 @@ describe('resetPassword', () => {
       type: 'password_reset',
     });
     updateUser.mockResolvedValue({ email: 'user@example.com' });
+=======
+  /** The reset policy itself (address binding, the compare-and-set, the email change
+   *  sweep) lives in `@librechat/api` and is covered by passwordReset.spec.ts. What
+   *  remains here is this file's wiring: which token lookup it injects, and which token
+   *  it deletes once the policy has committed. The double runs the injected lookup so
+   *  that wiring is still exercised, and decides nothing else. */
+  const resolvedUser = { email: 'user@example.com' };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    checkEmailConfig.mockReturnValue(false);
+    commitPasswordReset.mockImplementation(async (deps, { userId }) => {
+      const resetToken = await deps.findResetToken(userId);
+      return resetToken ? { ok: true, user: resolvedUser, resetToken } : { ok: false };
+    });
+  });
+
+  it('looks for a typed reset token before the untyped legacy shape', async () => {
+    findToken.mockResolvedValue(null);
+
+    const result = await resetPassword('user-reset', 'reset-token', 'new-password');
+
+    expect(result).toBeInstanceOf(Error);
+    expect(findToken).toHaveBeenNthCalledWith(
+      1,
+      { userId: 'user-reset', type: 'password_reset' },
+      { sort: { createdAt: -1 } },
+    );
+    expect(findToken).toHaveBeenNthCalledWith(
+      2,
+      { userId: 'user-reset', email: null, identifier: null, type: null },
+      { sort: { createdAt: -1 } },
+    );
+    expect(deleteTokens).not.toHaveBeenCalled();
+  });
+
+  it('hands the policy the database and password surfaces it needs', async () => {
+    findToken.mockResolvedValue({
+      token: 'reset-hash',
+      userId: 'user-reset',
+      type: 'password_reset',
+    });
+
+    await resetPassword('user-reset', 'reset-token', 'new-password');
+
+    expect(commitPasswordReset).toHaveBeenCalledWith(
+      expect.objectContaining({
+        findResetToken: expect.any(Function),
+        getUserById: expect.any(Function),
+        updateUser: expect.any(Function),
+        deleteTokens: expect.any(Function),
+        compareToken: expect.any(Function),
+        hashPassword: expect.any(Function),
+      }),
+      { userId: 'user-reset', token: 'reset-token', password: 'new-password' },
+    );
+  });
+
+  it('deletes only the typed reset token the policy consumed', async () => {
+    findToken.mockResolvedValue({
+      token: 'reset-hash',
+      userId: 'user-reset',
+      email: 'user@example.com',
+      type: 'password_reset',
+    });
+>>>>>>> upstream/main
 
     const result = await resetPassword('user-reset', 'reset-token', 'new-password');
 
     expect(result).toEqual({ message: 'Password reset was successful' });
+<<<<<<< HEAD
     expect(findToken).toHaveBeenCalledWith(
       {
         userId: 'user-reset',
@@ -1037,10 +1324,22 @@ describe('resetPassword', () => {
       return null;
     });
     updateUser.mockResolvedValue({ email: 'user@example.com' });
+=======
+    expect(deleteTokens).toHaveBeenCalledWith({ token: 'reset-hash', type: 'password_reset' });
+  });
+
+  it('deletes an untyped legacy token by its exact stored shape', async () => {
+    findToken.mockImplementation(async (query) =>
+      query.type === 'password_reset'
+        ? null
+        : { token: 'legacy-hash', userId: 'user-reset', email: null, identifier: null, type: null },
+    );
+>>>>>>> upstream/main
 
     const result = await resetPassword('user-reset', 'legacy-reset-token', 'new-password');
 
     expect(result).toEqual({ message: 'Password reset was successful' });
+<<<<<<< HEAD
     expect(findToken).toHaveBeenCalledWith(
       {
         userId: 'user-reset',
@@ -1059,11 +1358,46 @@ describe('resetPassword', () => {
     );
     expect(deleteTokens).toHaveBeenCalledWith({
       token: legacyResetHash,
+=======
+    expect(deleteTokens).toHaveBeenCalledWith({
+      token: 'legacy-hash',
+>>>>>>> upstream/main
       email: null,
       identifier: null,
       type: null,
     });
   });
+<<<<<<< HEAD
+=======
+
+  it('returns the generic error and touches nothing when the policy refuses', async () => {
+    findToken.mockResolvedValue(null);
+
+    const result = await resetPassword('user-reset', 'reset-token', 'new-password');
+
+    expect(result).toBeInstanceOf(Error);
+    expect(sendEmail).not.toHaveBeenCalled();
+    expect(deleteTokens).not.toHaveBeenCalled();
+  });
+
+  it('notifies the account once the reset has committed', async () => {
+    checkEmailConfig.mockReturnValue(true);
+    findToken.mockResolvedValue({
+      token: 'reset-hash',
+      userId: 'user-reset',
+      type: 'password_reset',
+    });
+
+    await resetPassword('user-reset', 'reset-token', 'new-password');
+
+    expect(sendEmail).toHaveBeenCalledWith(
+      expect.objectContaining({
+        email: 'user@example.com',
+        template: 'passwordReset.handlebars',
+      }),
+    );
+  });
+>>>>>>> upstream/main
 });
 
 describe('verifyEmail', () => {
@@ -1175,6 +1509,22 @@ describe('resendVerificationEmail', () => {
     jest.clearAllMocks();
   });
 
+<<<<<<< HEAD
+=======
+  it('logs a failed resend without the error message or address', async () => {
+    findUser.mockResolvedValue({ _id: 'user-fail', email: 'leak@example.com', name: 'Leaky' });
+    checkEmailConfig.mockReturnValue(true);
+    sendEmail.mockRejectedValueOnce(new Error('rejected leak@example.com'));
+
+    await resendVerificationEmail({ body: { email: 'leak@example.com' } });
+
+    expect(logger.error.mock.calls).toEqual([
+      ['[resendVerificationEmail] Error resending verification email:', { type: 'Error' }],
+    ]);
+    expect(loggedText()).not.toContain('leak@example.com');
+  });
+
+>>>>>>> upstream/main
   it('should not delete tokens when no user exists for the email', async () => {
     findUser.mockResolvedValue(null);
 
@@ -1244,7 +1594,12 @@ describe('resendVerificationEmail', () => {
       message: 'Please check your email to verify your email address.',
     });
     expect(logger.error).toHaveBeenCalledWith(
+<<<<<<< HEAD
       '[resendVerificationEmail] Error resending verification email: mail transport unavailable',
+=======
+      '[resendVerificationEmail] Error resending verification email:',
+      { type: 'Error' },
+>>>>>>> upstream/main
     );
   });
 });
@@ -1608,6 +1963,42 @@ describe('CloudFront cookie integration', () => {
       );
     });
 
+<<<<<<< HEAD
+=======
+    it('names the session owner and expiry in the readable cookie the theme replay checks', async () => {
+      const expiration = new Date(Date.now() + 604800000);
+      createSession.mockResolvedValueOnce({
+        session: { expiration },
+        refreshToken: 'mock-refresh-token',
+      });
+      const res = mockResponse();
+
+      await setAuthTokens('user-123', res);
+
+      expect(setLocalSessionCookies).toHaveBeenCalledWith(res, {
+        refreshToken: 'mock-refresh-token',
+        expires: expiration,
+        userId: 'user-123',
+        tenantId: 'tenantA',
+      });
+    });
+
+    it('re-stamps the expiry of the session a refresh keeps', async () => {
+      const expiration = new Date(Date.now() + 3600000);
+      const res = mockResponse();
+
+      await setAuthTokens('user-123', res, { _id: 'session-1', expiration });
+
+      expect(createSession).not.toHaveBeenCalled();
+      expect(setLocalSessionCookies).toHaveBeenCalledWith(res, {
+        refreshToken: 'mock-refresh-token',
+        expires: expiration,
+        userId: 'user-123',
+        tenantId: 'tenantA',
+      });
+    });
+
+>>>>>>> upstream/main
     it('succeeds even when setCloudFrontCookies returns false', async () => {
       setCloudFrontCookies.mockReturnValue(false);
 
@@ -1640,6 +2031,7 @@ describe('registerUser - allowedDomains admin-panel override', () => {
     countUsers.mockResolvedValue(0);
   });
 
+<<<<<<< HEAD
   it('should resolve the full app config so admin-panel overrides on the __base__ principal apply', async () => {
     // Regression guard for getAppConfig({ baseOnly: true }): that option short-circuits
     // before the DB override merge, which silently ignores any admin-panel edits to
@@ -1665,6 +2057,30 @@ describe('registerUser - allowedDomains admin-panel override', () => {
     await registerUser(validUser);
 
     expect(getAppConfig).toHaveBeenCalledWith({ tenantId: 'tenant-x' });
+=======
+  it('should resolve the pre-auth config so admin-panel overrides on the __base__ principal apply', async () => {
+    // Regression guard for getAppConfig({ baseOnly: true }): that option short-circuits
+    // before the DB override merge, which silently ignores any admin-panel edits to
+    // registration.allowedDomains (the admin panel writes overrides to the __base__
+    // principal in the configs collection). registerUser uses the same pre-auth config
+    // as the SSO, LDAP and password-reset checks. The tenant comes from ALS
+    // (preAuthTenantMiddleware), which scopes both the query and the cache key.
+    await registerUser(validUser);
+
+    expect(resolvePreAuthAppConfig).toHaveBeenCalledWith(getAppConfig);
+    expect(getAppConfig).toHaveBeenCalledTimes(1);
+    expect(getAppConfig).not.toHaveBeenCalledWith(expect.objectContaining({ baseOnly: true }));
+  });
+
+  it('should fail closed when the pre-auth config cannot be read', async () => {
+    getAppConfig.mockRejectedValue(new Error('override read failed'));
+
+    const result = await registerUser(validUser);
+
+    expect(result).toEqual({ status: 500, message: 'Something went wrong' });
+    expect(findUser).not.toHaveBeenCalled();
+    expect(createUser).not.toHaveBeenCalled();
+>>>>>>> upstream/main
   });
 
   it('does not bootstrap a tenant-scoped registrant as an administrator', async () => {
@@ -1698,6 +2114,91 @@ describe('registerUser - allowedDomains admin-panel override', () => {
     );
   });
 
+<<<<<<< HEAD
+=======
+  describe('the config of the role the account is created with', () => {
+    const roleConfigs = {
+      USER: { registration: { allowedDomains: ['corp.example'] } },
+      ADMIN: {
+        registration: { allowedDomains: ['example.com'] },
+        balance: { enabled: true, startBalance: 100 },
+      },
+    };
+
+    beforeEach(() => {
+      countUsers.mockResolvedValue(1);
+      resolveAppConfigForUser.mockImplementation(
+        async (_getAppConfig, { role }) => roleConfigs[role],
+      );
+    });
+
+    afterEach(() => {
+      resolveAppConfigForUser.mockImplementation(async () => ({}));
+    });
+
+    it("refuses a domain the USER role's list excludes, creating nothing", async () => {
+      isEmailDomainAllowed.mockReturnValueOnce(true).mockReturnValueOnce(false);
+
+      const result = await registerUser(validUser);
+
+      expect(result).toEqual({ status: 403, message: expect.stringMatching(/cannot be used/i) });
+      expect(resolveAppConfigForUser).toHaveBeenCalledWith(getAppConfig, { role: 'USER' });
+      expect(isEmailDomainAllowed).toHaveBeenLastCalledWith(validUser.email, ['corp.example']);
+      expect(createUser).not.toHaveBeenCalled();
+    });
+
+    it('gives a registered email the same refusal, so it reveals no account', async () => {
+      isEmailDomainAllowed.mockReturnValueOnce(true).mockReturnValueOnce(false);
+      findUser.mockResolvedValue({ _id: 'existing-id', email: validUser.email });
+
+      const result = await registerUser(validUser);
+
+      expect(result.status).toBe(403);
+      expect(createUser).not.toHaveBeenCalled();
+    });
+
+    it("creates the deployment's first account under the ADMIN role's config", async () => {
+      countUsers.mockResolvedValue(0);
+      createUser.mockResolvedValue({ _id: 'new-user', emailVerified: true });
+
+      const result = await registerUser(validUser);
+
+      expect(result.status).toBe(200);
+      expect(resolveAppConfigForUser).toHaveBeenCalledWith(getAppConfig, { role: 'ADMIN' });
+      expect(createUser).toHaveBeenCalledWith(
+        expect.objectContaining({ role: 'ADMIN' }),
+        roleConfigs.ADMIN.balance,
+        expect.any(Boolean),
+        true,
+      );
+    });
+
+    it('checks the role a trusted caller creates the account with', async () => {
+      createUser.mockResolvedValue({ _id: 'new-user', emailVerified: true });
+
+      const result = await registerUser(validUser, { role: 'ADMIN' });
+
+      expect(result.status).toBe(200);
+      expect(resolveAppConfigForUser).toHaveBeenCalledWith(getAppConfig, { role: 'ADMIN' });
+      expect(createUser).toHaveBeenCalledWith(
+        expect.objectContaining({ role: 'ADMIN' }),
+        roleConfigs.ADMIN.balance,
+        expect.any(Boolean),
+        true,
+      );
+    });
+
+    it("fails closed when the role's config cannot be read", async () => {
+      resolveAppConfigForUser.mockRejectedValue(new Error('role read failed'));
+
+      const result = await registerUser(validUser);
+
+      expect(result).toEqual({ status: 500, message: 'Something went wrong' });
+      expect(createUser).not.toHaveBeenCalled();
+    });
+  });
+
+>>>>>>> upstream/main
   it('should block registration when the resolved allowedDomains rejects the email', async () => {
     isEmailDomainAllowed.mockReturnValue(false);
 

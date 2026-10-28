@@ -1,7 +1,19 @@
+<<<<<<< HEAD
 import { render, screen, fireEvent } from '@testing-library/react';
 import { BarChart3, MessagesSquare, NotebookPen } from 'lucide-react';
 import type { NavLink } from '~/common';
 import { ActivePanelProvider } from '~/Providers/ActivePanelContext';
+=======
+import { getDefaultStore } from 'jotai';
+import { render, screen, fireEvent } from '@testing-library/react';
+import { BarChart3, MessagesSquare, NotebookPen } from 'lucide-react';
+import type { NavLink } from '~/common';
+import {
+  DEFAULT_PANEL,
+  activePanelAtom,
+  ActivePanelProvider,
+} from '~/Providers/ActivePanelContext';
+>>>>>>> upstream/main
 import ShortcutTargets from '../ShortcutTargets';
 
 const links = [
@@ -29,7 +41,11 @@ const renderTargets = ({
   );
 
 describe('ShortcutTargets', () => {
+<<<<<<< HEAD
   beforeEach(() => localStorage.clear());
+=======
+  beforeEach(() => getDefaultStore().set(activePanelAtom, DEFAULT_PANEL));
+>>>>>>> upstream/main
 
   /**
    * `useKeyboardShortcuts` locates panels by these ids, reads `aria-pressed`,
@@ -56,7 +72,11 @@ describe('ShortcutTargets', () => {
     fireEvent.click(screen.getByTestId('nav-panel-prompts'));
 
     expect(screen.getByTestId('nav-panel-prompts')).toHaveAttribute('aria-pressed', 'true');
+<<<<<<< HEAD
     expect(localStorage.getItem('side:active-panel')).toBe('prompts');
+=======
+    expect(getDefaultStore().get(activePanelAtom)).toBe('prompts');
+>>>>>>> upstream/main
   });
 
   it('uses a route link callback without changing the active panel', () => {
@@ -75,7 +95,11 @@ describe('ShortcutTargets', () => {
     fireEvent.click(screen.getByTestId('nav-panel-insights'));
 
     expect(onClick).toHaveBeenCalledTimes(1);
+<<<<<<< HEAD
     expect(localStorage.getItem('side:active-panel')).toBeNull();
+=======
+    expect(getDefaultStore().get(activePanelAtom)).toBe(DEFAULT_PANEL);
+>>>>>>> upstream/main
   });
 
   it('leaves a route when a panel target is selected', () => {
@@ -85,7 +109,11 @@ describe('ShortcutTargets', () => {
     fireEvent.click(screen.getByTestId('nav-panel-prompts'));
 
     expect(onLeaveInsights).toHaveBeenCalledTimes(1);
+<<<<<<< HEAD
     expect(localStorage.getItem('side:active-panel')).toBe('prompts');
+=======
+    expect(getDefaultStore().get(activePanelAtom)).toBe('prompts');
+>>>>>>> upstream/main
   });
 
   it('offers no target for a panel this endpoint does not have', () => {

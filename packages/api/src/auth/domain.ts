@@ -9,6 +9,12 @@ import { isPrivateIP } from './ip';
 /** Re-exported here for backward compatibility; canonical location is `./ip`. */
 export { isPrivateIP };
 
+<<<<<<< HEAD
+=======
+/** The failure message login strategies report when the email-domain policy rejects a login. */
+export const EMAIL_DOMAIN_NOT_ALLOWED = 'Email domain not allowed';
+
+>>>>>>> upstream/main
 /**
  * @param email
  * @param allowedDomains

@@ -35,6 +35,7 @@ const categoryIconMap: Record<string, React.ElementType> = {
 };
 
 const categoryColorMap: Record<string, string> = {
+<<<<<<< HEAD
   code: 'text-series-5',
   misc: 'text-series-1',
   shop: 'text-series-6',
@@ -50,6 +51,23 @@ const categoryColorMap: Record<string, string> = {
   it: 'text-series-5',
   sales: 'text-series-2',
   aftersales: 'text-series-4',
+=======
+  code: 'text-category-icon-5',
+  misc: 'text-category-icon-1',
+  shop: 'text-category-icon-6',
+  idea: 'text-category-icon-4',
+  write: 'text-category-icon-6',
+  travel: 'text-category-icon-4',
+  finance: 'text-category-icon-2',
+  roleplay: 'text-category-icon-2',
+  teach_or_explain: 'text-category-icon-1',
+  general: 'text-category-icon-1',
+  hr: 'text-category-icon-7',
+  rd: 'text-category-icon-6',
+  it: 'text-category-icon-5',
+  sales: 'text-category-icon-2',
+  aftersales: 'text-category-icon-4',
+>>>>>>> upstream/main
 };
 
 export default function CategoryIcon({

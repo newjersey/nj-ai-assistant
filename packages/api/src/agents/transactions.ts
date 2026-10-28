@@ -14,7 +14,12 @@ interface GetMultiplierParams {
 }
 
 interface GetCacheMultiplierParams {
+<<<<<<< HEAD
   cacheType: 'write' | 'read';
+=======
+  /** `write1h` is Anthropic's 1-hour cache write; `write` is the 5-minute rate */
+  cacheType: 'write' | 'read' | 'write1h';
+>>>>>>> upstream/main
   model?: string;
   endpointTokenConfig?: EndpointTokenConfig;
   inputTokenCount?: number;
@@ -47,6 +52,11 @@ interface StructuredTxData extends BaseTxData {
   tokenType: TokenType;
   inputTokens?: number;
   writeTokens?: number;
+<<<<<<< HEAD
+=======
+  /** Subset of `writeTokens` written to the 1-hour cache */
+  write1hTokens?: number;
+>>>>>>> upstream/main
   readTokens?: number;
   inputTokenCount?: number;
   rawAmount?: number;
@@ -66,6 +76,11 @@ export interface TokenUsage {
 export interface StructuredPromptTokens {
   input?: number;
   write?: number;
+<<<<<<< HEAD
+=======
+  /** Subset of `write` written to the 1-hour cache, billed at its own rate */
+  write1h?: number;
+>>>>>>> upstream/main
   read?: number;
 }
 
@@ -141,6 +156,7 @@ function calculateStructuredTokenValue(
 
     const inputAbs = Math.abs(txData.inputTokens ?? 0);
     const writeAbs = Math.abs(txData.writeTokens ?? 0);
+<<<<<<< HEAD
     const readAbs = Math.abs(txData.readTokens ?? 0);
     const totalPromptTokens = inputAbs + writeAbs + readAbs;
 
@@ -155,6 +171,33 @@ function calculateStructuredTokenValue(
     const tokenValue = -(
       inputAbs * inputMultiplier +
       writeAbs * writeMultiplier +
+=======
+    const write1hAbs = Math.min(Math.abs(txData.write1hTokens ?? 0), writeAbs);
+    const readAbs = Math.abs(txData.readTokens ?? 0);
+    const totalPromptTokens = inputAbs + writeAbs + readAbs;
+    const write1hMultiplier =
+      write1hAbs > 0
+        ? (pricing.getCacheMultiplier({
+            cacheType: 'write1h',
+            model,
+            endpointTokenConfig,
+            inputTokenCount,
+          }) ?? writeMultiplier)
+        : writeMultiplier;
+
+    const promptValue =
+      inputAbs * Math.abs(inputMultiplier) +
+      (writeAbs - write1hAbs) * Math.abs(writeMultiplier) +
+      write1hAbs * Math.abs(write1hMultiplier) +
+      readAbs * Math.abs(readMultiplier);
+    const rate =
+      totalPromptTokens > 0 ? promptValue / totalPromptTokens : Math.abs(inputMultiplier);
+
+    const tokenValue = -(
+      inputAbs * inputMultiplier +
+      (writeAbs - write1hAbs) * writeMultiplier +
+      write1hAbs * write1hMultiplier +
+>>>>>>> upstream/main
       readAbs * readMultiplier
     );
 
@@ -162,7 +205,16 @@ function calculateStructuredTokenValue(
       tokenValue,
       rate,
       rawAmount: -totalPromptTokens,
+<<<<<<< HEAD
       rateDetail: { input: inputMultiplier, write: writeMultiplier, read: readMultiplier },
+=======
+      rateDetail: {
+        input: inputMultiplier,
+        write: writeMultiplier,
+        read: readMultiplier,
+        ...(write1hAbs > 0 && { write1h: write1hMultiplier }),
+      },
+>>>>>>> upstream/main
     };
   }
 
@@ -289,6 +341,10 @@ export function prepareStructuredTokenSpend(
   if (promptTokens) {
     const input = Math.max(promptTokens.input ?? 0, 0);
     const write = Math.max(promptTokens.write ?? 0, 0);
+<<<<<<< HEAD
+=======
+    const write1h = Math.min(Math.max(promptTokens.write1h ?? 0, 0), write);
+>>>>>>> upstream/main
     const read = Math.max(promptTokens.read ?? 0, 0);
     const totalInputTokens = input + write + read;
     const entry = prepareStructuredTx(
@@ -297,6 +353,10 @@ export function prepareStructuredTokenSpend(
         tokenType: 'prompt',
         inputTokens: -input,
         writeTokens: -write,
+<<<<<<< HEAD
+=======
+        ...(write1h > 0 && { write1hTokens: -write1h }),
+>>>>>>> upstream/main
         readTokens: -read,
         inputTokenCount: totalInputTokens,
       },

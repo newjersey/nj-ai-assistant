@@ -33,6 +33,7 @@ const getCurrentVersion = async (req, endpoint) => {
 };
 
 /**
+<<<<<<< HEAD
  * Asynchronously lists assistants based on provided query parameters.
  *
  * Initializes the client with the current request and response objects and lists assistants
@@ -53,6 +54,8 @@ const _listAssistants = async ({ req, res, version, query }) => {
 };
 
 /**
+=======
+>>>>>>> upstream/main
  * Fetches all assistants based on provided query params, until `has_more` is `false`.
  *
  * @async
@@ -285,5 +288,8 @@ function filterAssistants({ assistants, userId, assistantsConfig }) {
 module.exports = {
   getOpenAIClient,
   fetchAssistants,
+<<<<<<< HEAD
   getCurrentVersion,
+=======
+>>>>>>> upstream/main
 };

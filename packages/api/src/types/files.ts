@@ -1,6 +1,10 @@
 import type { BedrockDocumentFormat } from 'librechat-data-provider';
 import type { IMongoFile } from '@librechat/data-schemas';
 import type { Readable } from 'stream';
+<<<<<<< HEAD
+=======
+import type { FileStorageDeletionObserver } from '~/files/dispatch';
+>>>>>>> upstream/main
 import type { DownloadURLParams } from '~/storage/types';
 import type { ServerRequest } from './http';
 export interface STTService {
@@ -91,6 +95,15 @@ export interface OpenAIFileBlock {
   };
 }
 
+<<<<<<< HEAD
+=======
+/** OpenAI-compatible text part carrying a textual document's decoded contents */
+export interface OpenAITextDocumentBlock {
+  type: 'text';
+  text: string;
+}
+
+>>>>>>> upstream/main
 /** OpenAI Responses API file format */
 export interface OpenAIInputFileBlock {
   type: 'input_file';
@@ -114,6 +127,10 @@ export type DocumentBlock =
   | AnthropicDocumentBlock
   | GoogleDocumentBlock
   | OpenAIFileBlock
+<<<<<<< HEAD
+=======
+  | OpenAITextDocumentBlock
+>>>>>>> upstream/main
   | OpenAIInputFileBlock
   | BedrockDocumentBlock;
 
@@ -185,5 +202,10 @@ export interface StrategyFunctions {
       user?: string;
       tenantId?: string | null;
     },
+<<<<<<< HEAD
+=======
+    client?: unknown,
+    onDelete?: FileStorageDeletionObserver,
+>>>>>>> upstream/main
   ) => Promise<void>;
 }

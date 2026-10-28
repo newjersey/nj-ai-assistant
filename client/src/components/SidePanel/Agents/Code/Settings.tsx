@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { useCallback, useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
 import {
@@ -14,13 +15,33 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+=======
+import { useCallback, useEffect, useId } from 'react';
+import { useFormContext } from 'react-hook-form';
+import {
+  Switch,
+  Dropdown,
+>>>>>>> upstream/main
   HoverCard,
   HoverCardPortal,
   HoverCardContent,
   HoverCardTrigger,
   CircleHelpIcon,
   Input,
+<<<<<<< HEAD
 } from '@librechat/client';
+=======
+  Checkbox,
+} from '@librechat/client';
+import {
+  AgentCapabilities,
+  DEFAULT_AGENT_CODE_ENVIRONMENT_CHOICES,
+  agentGitIdentitySchema,
+  STATEFUL_CODE_ENVIRONMENTS,
+  resolveStatefulCodeEnvironment,
+  resolveAllowedStatefulCodeEnvironments,
+} from 'librechat-data-provider';
+>>>>>>> upstream/main
 import type { StatefulCodeEnvironment } from 'librechat-data-provider';
 import type { AgentForm } from '~/common';
 import { useAuthContext, useGetAgentsConfig, useLocalize } from '~/hooks';
@@ -41,6 +62,10 @@ const WORKSPACE_STATUS_LABELS = {
 } as const;
 
 export default function CodeSettings() {
+<<<<<<< HEAD
+=======
+  const labelId = useId();
+>>>>>>> upstream/main
   const localize = useLocalize();
   const { user } = useAuthContext();
   const { agentsConfig } = useGetAgentsConfig();
@@ -58,6 +83,13 @@ export default function CodeSettings() {
   const codeEnabled = watch(AgentCapabilities.execute_code);
   const environment = watch('stateful_code_environment') ?? 'user';
   const codeEnvironmentId = watch('code_environment_id');
+<<<<<<< HEAD
+=======
+  const additionalMachines = watch('code_environment_ids') ?? [];
+  const machineChoiceLimit =
+    agentsConfig?.statefulCodeSessions?.maxEnvironmentChoices ??
+    DEFAULT_AGENT_CODE_ENVIRONMENT_CHOICES;
+>>>>>>> upstream/main
   const workspaceId = watch('code_workspace_id') ?? '';
   const configuredEnvironments = agentsConfig?.statefulCodeSessions?.allowedEnvironments;
   const executionEnvironments = agentsConfig?.statefulCodeSessions?.environments ?? [];
@@ -142,17 +174,31 @@ export default function CodeSettings() {
       <HoverCard openDelay={50}>
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
+<<<<<<< HEAD
             <div className={codeEnabled ? 'text-sm' : 'text-sm text-text-tertiary'}>
               {localize('com_ui_stateful_sessions')}
             </div>
             <HoverCardTrigger>
               <CircleHelpIcon className="h-4 w-4 text-text-tertiary" />
+=======
+            <div className={codeEnabled ? 'text-sm' : 'text-text-tertiary text-sm'}>
+              {localize('com_ui_stateful_sessions')}
+            </div>
+            <HoverCardTrigger>
+              <span className="text-text-tertiary">
+                <CircleHelpIcon className="h-4 w-4" />
+              </span>
+>>>>>>> upstream/main
             </HoverCardTrigger>
           </div>
           <HoverCardPortal>
             <HoverCardContent side={ESide.Top} className="w-80">
               <div className="space-y-2">
+<<<<<<< HEAD
                 <p className="text-sm text-text-secondary">
+=======
+                <p className="text-text-secondary text-sm">
+>>>>>>> upstream/main
                   {localize('com_nav_info_stateful_sessions')}
                 </p>
               </div>
@@ -162,13 +208,18 @@ export default function CodeSettings() {
             id="stateful-code-sessions"
             checked={enabled && codeEnabled === true}
             onCheckedChange={handleChange}
+<<<<<<< HEAD
             className="ml-4"
+=======
+            className="ms-4"
+>>>>>>> upstream/main
             data-testid="stateful-code-sessions"
             disabled={codeEnabled !== true}
             aria-label={localize('com_ui_stateful_sessions')}
           />
         </div>
       </HoverCard>
+<<<<<<< HEAD
       {enabled && codeEnabled === true && (
         <div className="space-y-2 pl-1">
           {executionEnvironments.length > 0 && (
@@ -182,6 +233,48 @@ export default function CodeSettings() {
               <Select
                 value={codeEnvironmentId ?? DEPLOYMENT_DEFAULT_ENVIRONMENT}
                 onValueChange={(value) => {
+=======
+      {additionalMachines
+        .filter((id) => !executionEnvironments.some((candidate) => candidate.id === id))
+        .map((machineId) => (
+          <div key={machineId} className="flex items-center gap-2">
+            <Checkbox
+              id={`unavailable-code-machine-${machineId}`}
+              checked={true}
+              aria-label={localize('com_ui_code_environment_unavailable_choice', { 0: machineId })}
+              onCheckedChange={() =>
+                setValue(
+                  'code_environment_ids',
+                  additionalMachines.filter((id) => id !== machineId),
+                  { shouldDirty: true },
+                )
+              }
+            />
+            <label
+              htmlFor={`unavailable-code-machine-${machineId}`}
+              className="text-text-secondary text-sm"
+            >
+              {localize('com_ui_code_environment_unavailable_choice', { 0: machineId })}
+            </label>
+          </div>
+        ))}
+      {enabled && codeEnabled === true && (
+        <div className="space-y-2 ps-1">
+          {executionEnvironments.length > 0 && (
+            <>
+              <span
+                id={`${labelId}-code-environment`}
+                className="text-text-secondary text-xs font-medium"
+              >
+                {localize('com_ui_code_environment')}
+              </span>
+              <Dropdown
+                variant="field"
+                testId="code-environment-id"
+                aria-labelledby={`${labelId}-code-environment`}
+                value={codeEnvironmentId ?? DEPLOYMENT_DEFAULT_ENVIRONMENT}
+                onChange={(value) => {
+>>>>>>> upstream/main
                   setValue('code_workspace_id', '', { shouldDirty: true });
                   setValue(
                     'code_environment_id',
@@ -189,6 +282,7 @@ export default function CodeSettings() {
                     { shouldDirty: true },
                   );
                 }}
+<<<<<<< HEAD
               >
                 <SelectTrigger id="code-environment-id" data-testid="code-environment-id">
                   <SelectValue />
@@ -221,11 +315,94 @@ export default function CodeSettings() {
           <Select
             value={environment}
             onValueChange={(value) => {
+=======
+                options={[
+                  {
+                    value: DEPLOYMENT_DEFAULT_ENVIRONMENT,
+                    label: localize('com_ui_code_environment_deployment_default'),
+                  },
+                  ...executionEnvironments.map((candidate) => ({
+                    value: candidate.id,
+                    label:
+                      candidate.type === 'attached'
+                        ? `${candidate.name} (${localize('com_ui_code_environment_attached')})`
+                        : candidate.name,
+                  })),
+                ]}
+              />
+              <p className="text-text-tertiary text-xs">
+                {localize('com_nav_info_code_environment')}
+              </p>
+              {agentsConfig?.statefulCodeSessions?.allowEnvironmentSelection === true &&
+                effectiveExecutionEnvironment?.type === 'attached' && (
+                  <div className="space-y-1">
+                    <p className="text-text-secondary text-sm font-medium">
+                      {localize('com_ui_code_environment_per_chat')}
+                    </p>
+                    <p className="text-text-tertiary text-xs">
+                      {localize('com_ui_code_environment_per_chat_info')}
+                    </p>
+                    <p className="text-text-tertiary text-xs">
+                      {localize('com_ui_code_environment_choice_limit', { 0: machineChoiceLimit })}
+                    </p>
+                    {executionEnvironments
+                      .filter(({ type }) => type === 'attached')
+                      .map((candidate) => {
+                        const isDefault = candidate.id === effectiveExecutionEnvironment.id;
+                        const id = `code-machine-${candidate.id}`;
+                        return (
+                          <div key={candidate.id} className="flex items-center gap-2">
+                            <Checkbox
+                              id={id}
+                              aria-label={candidate.name}
+                              checked={isDefault || additionalMachines.includes(candidate.id)}
+                              disabled={
+                                isDefault ||
+                                (!additionalMachines.includes(candidate.id) &&
+                                  additionalMachines.length >= machineChoiceLimit)
+                              }
+                              onCheckedChange={(checked) =>
+                                setValue(
+                                  'code_environment_ids',
+                                  checked === true
+                                    ? [...new Set([...additionalMachines, candidate.id])]
+                                    : additionalMachines.filter((value) => value !== candidate.id),
+                                  { shouldDirty: true },
+                                )
+                              }
+                            />
+                            <label htmlFor={id} className="text-text-secondary text-sm">
+                              {candidate.name}
+                              {isDefault
+                                ? ` (${localize('com_ui_code_environment_default_machine')})`
+                                : ''}
+                            </label>
+                          </div>
+                        );
+                      })}
+                  </div>
+                )}
+            </>
+          )}
+          <span
+            id={`${labelId}-stateful-code-environment`}
+            className="text-text-secondary text-xs font-medium"
+          >
+            {localize('com_ui_stateful_code_environment')}
+          </span>
+          <Dropdown
+            variant="field"
+            testId="stateful-code-environment"
+            aria-labelledby={`${labelId}-stateful-code-environment`}
+            value={environment}
+            onChange={(value) => {
+>>>>>>> upstream/main
               const nextEnvironment = value as StatefulCodeEnvironment;
               if (allowedEnvironments.includes(nextEnvironment)) {
                 setValue('stateful_code_environment', nextEnvironment, { shouldDirty: true });
               }
             }}
+<<<<<<< HEAD
           >
             <SelectTrigger id="stateful-code-environment" data-testid="stateful-code-environment">
               <SelectValue />
@@ -245,10 +422,22 @@ export default function CodeSettings() {
             </SelectContent>
           </Select>
           <p className="text-xs text-text-tertiary">
+=======
+            options={STATEFUL_CODE_ENVIRONMENTS.filter(
+              (candidate) => allowedEnvironments.includes(candidate) || candidate === environment,
+            ).map((candidate) => ({
+              value: candidate,
+              label: localize(ENVIRONMENT_LABELS[candidate]),
+              disabled: !allowedEnvironments.includes(candidate),
+            }))}
+          />
+          <p className="text-text-tertiary text-xs">
+>>>>>>> upstream/main
             {localize('com_nav_info_stateful_code_environment')}
           </p>
           {showGitIdentity && (
             <div className="space-y-2">
+<<<<<<< HEAD
               <label
                 htmlFor="code-workspace-default"
                 className="text-xs font-medium text-text-secondary"
@@ -258,6 +447,20 @@ export default function CodeSettings() {
               <Select
                 value={workspaceId || '__automatic__'}
                 onValueChange={(value) => {
+=======
+              <span
+                id={`${labelId}-code-workspace-default`}
+                className="text-text-secondary text-xs font-medium"
+              >
+                {localize('com_ui_code_workspace_default')}
+              </span>
+              <Dropdown
+                variant="field"
+                testId="code-workspace-default"
+                aria-labelledby={`${labelId}-code-workspace-default`}
+                value={workspaceId || '__automatic__'}
+                onChange={(value) => {
+>>>>>>> upstream/main
                   if (value !== '__automatic__' && !workspaces.some(({ id }) => id === value))
                     return;
                   setValue('code_workspace_id', value === '__automatic__' ? '' : value, {
@@ -269,6 +472,7 @@ export default function CodeSettings() {
                     });
                   }
                 }}
+<<<<<<< HEAD
               >
                 <SelectTrigger id="code-workspace-default">
                   <SelectValue />
@@ -302,13 +506,70 @@ export default function CodeSettings() {
                 </p>
               )}
               <p className="text-xs text-text-tertiary">
+=======
+                options={[
+                  { value: '__automatic__', label: localize('com_ui_code_workspace_last_used') },
+                  ...(workspaceId &&
+                  (workspaceDiscoveryState !== 'ready' ||
+                    !workspaces.some(({ id }) => id === workspaceId))
+                    ? [
+                        {
+                          value: workspaceId,
+                          label: `${workspaceId} (${localize(
+                            workspaceDiscoveryState === 'ready'
+                              ? 'com_ui_code_workspace_missing'
+                              : WORKSPACE_STATUS_LABELS[workspaceDiscoveryState],
+                          )})`,
+                          disabled: true,
+                        },
+                      ]
+                    : []),
+                  ...workspaces.map(({ id, name }) => ({ value: id, label: name ?? id })),
+                ]}
+              />
+              {workspaceDiscoveryState !== 'ready' && (
+                <p className="text-text-tertiary text-xs" role="status">
+                  {localize(WORKSPACE_STATUS_LABELS[workspaceDiscoveryState])}
+                </p>
+              )}
+              <p className="text-text-tertiary text-xs">
+>>>>>>> upstream/main
                 {localize('com_ui_code_workspace_default_description')}
               </p>
             </div>
           )}
           {showGitIdentity && (
+<<<<<<< HEAD
             <div className="space-y-2 border-t border-border-light pt-3">
               <div className="text-xs font-medium text-text-secondary">
+=======
+            <div className="border-border-light space-y-2 border-t pt-3">
+              <span
+                id={`${labelId}-repository-instructions`}
+                className="text-text-secondary text-xs font-medium"
+              >
+                {localize('com_ui_repository_instructions')}
+              </span>
+              <Dropdown
+                variant="field"
+                testId="repository-instructions"
+                aria-labelledby={`${labelId}-repository-instructions`}
+                value={watch('repositoryInstructions') ?? 'prefer'}
+                onChange={(value) => {
+                  if (value === 'prefer' || value === 'defer' || value === 'off')
+                    setValue('repositoryInstructions', value, { shouldDirty: true });
+                }}
+                options={[
+                  { value: 'prefer', label: localize('com_ui_repository_instructions_prefer') },
+                  { value: 'defer', label: localize('com_ui_repository_instructions_defer') },
+                  { value: 'off', label: localize('com_ui_repository_instructions_off') },
+                ]}
+              />
+              <p className="text-text-tertiary text-xs">
+                {localize('com_ui_repository_instructions_description')}
+              </p>
+              <div className="text-text-secondary text-xs font-medium">
+>>>>>>> upstream/main
                 {localize('com_ui_agent_git_identity')}
               </div>
               <Input
@@ -325,17 +586,30 @@ export default function CodeSettings() {
                   validate: validateGitIdentity,
                   deps: ['git_identity.name'],
                 })}
+<<<<<<< HEAD
                 type="email"
+=======
+                type="text"
+                inputMode="email"
+>>>>>>> upstream/main
                 maxLength={254}
                 placeholder={localize('com_ui_agent_git_email')}
                 aria-label={localize('com_ui_agent_git_email')}
               />
               {(errors.git_identity?.name || errors.git_identity?.email) && (
+<<<<<<< HEAD
                 <p className="text-xs text-text-destructive" role="alert">
                   {localize('com_ui_agent_git_identity_both_required')}
                 </p>
               )}
               <p className="text-xs text-text-tertiary">
+=======
+                <p className="text-text-destructive text-xs" role="alert">
+                  {localize('com_ui_agent_git_identity_both_required')}
+                </p>
+              )}
+              <p className="text-text-tertiary text-xs">
+>>>>>>> upstream/main
                 {localize('com_nav_info_agent_git_identity')}
               </p>
             </div>

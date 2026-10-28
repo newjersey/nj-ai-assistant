@@ -1,8 +1,14 @@
 import { logger } from '@librechat/data-schemas';
 import { AccessRoleIds, ResourceType, PrincipalType } from 'librechat-data-provider';
+<<<<<<< HEAD
 import { ensureRequiredCollectionsExist } from '../db/utils';
 import type { AccessRoleMethods, IPromptGroupDocument } from '@librechat/data-schemas';
 import type { Model, Mongoose } from 'mongoose';
+=======
+import type { AccessRoleMethods, IPromptGroupDocument } from '@librechat/data-schemas';
+import type { Model, Mongoose } from 'mongoose';
+import { ensureRequiredCollectionsExist } from '../db/utils';
+>>>>>>> upstream/main
 
 const GLOBAL_PROJECT_NAME = 'instance';
 
@@ -85,6 +91,10 @@ export async function checkPromptPermissionsMigration({
     const promptGroupsToMigrate = (await PromptGroupModel.find({
       _id: { $nin: migratedGroupIds },
       author: { $exists: true, $ne: null },
+<<<<<<< HEAD
+=======
+      source: { $in: [null, 'native'] },
+>>>>>>> upstream/main
     })
       .select('_id name author authorName category')
       .lean()) as unknown as PromptGroupMigrationData[];

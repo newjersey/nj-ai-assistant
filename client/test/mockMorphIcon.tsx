@@ -39,6 +39,7 @@ export function createCopyCheckMorphIconMock() {
   ]);
 }
 
+<<<<<<< HEAD
 /** Pin favorite morph sites. */
 export function createPinMorphIconMock() {
   const { Pin, PinOff } = jest.requireActual('lucide') as Record<string, unknown>;
@@ -63,6 +64,8 @@ export function createSteerMorphIconMock() {
   ]);
 }
 
+=======
+>>>>>>> upstream/main
 /** Mermaid header: exclusive code/preview view toggle. */
 export function createMermaidViewMorphIconMock() {
   const { Eye, Code2 } = jest.requireActual('lucide') as Record<string, unknown>;
@@ -71,6 +74,7 @@ export function createMermaidViewMorphIconMock() {
     [Code2, 'code-2'],
   ]);
 }
+<<<<<<< HEAD
 
 /** Subagent expand/collapse. */
 export function createSubagentMorphIconMock() {
@@ -80,3 +84,5 @@ export function createSubagentMorphIconMock() {
     [Maximize2, 'maximize-2'],
   ]);
 }
+=======
+>>>>>>> upstream/main

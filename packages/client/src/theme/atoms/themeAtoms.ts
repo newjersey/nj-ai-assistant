@@ -2,14 +2,29 @@
 // Theme state is now managed via React useState + localStorage in ThemeProvider.
 
 import { WritableAtom } from 'jotai';
+<<<<<<< HEAD
 import { atomWithStorage, RESET } from 'jotai/utils';
 import { IThemeRGB } from '../types';
 import { constAtom } from '~/nj/utils/constAtom';
+=======
+import { IThemeRGB } from 'librechat-data-provider';
+import { atomWithStorage, RESET } from 'jotai/utils';
+>>>>>>> upstream/main
 
 /**
  * @deprecated Use ThemeContext instead. This atom is no longer used internally.
  */
+<<<<<<< HEAD
 export const themeModeAtom: WritableAtom<string, [string], void> = constAtom<string>('light'); // NJ: Hardcode light theme
+=======
+export const themeModeAtom: WritableAtom<
+  string,
+  [string | typeof RESET | ((prev: string) => string | typeof RESET)],
+  void
+> = atomWithStorage<string>('color-theme', 'system', undefined, {
+  getOnInit: true,
+});
+>>>>>>> upstream/main
 
 /**
  * @deprecated Use ThemeContext instead. This atom is no longer used internally.

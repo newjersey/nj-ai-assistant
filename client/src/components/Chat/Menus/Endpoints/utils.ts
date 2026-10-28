@@ -9,6 +9,11 @@ import type {
 } from 'librechat-data-provider';
 import type { useLocalize } from '~/hooks';
 import SpecIcon from '~/components/Chat/Menus/Endpoints/components/SpecIcon';
+<<<<<<< HEAD
+=======
+import { resolveProviderIcon } from '~/hooks/Endpoint/useProviderIcon';
+import { createEndpointIcon } from '~/hooks/Endpoint/useEndpoints';
+>>>>>>> upstream/main
 import { Endpoint, SelectedValues } from '~/common';
 import { getSpecAgentAvatarURL } from '~/utils';
 
@@ -170,6 +175,7 @@ export function getSelectedIcon({
       );
     }
 
+<<<<<<< HEAD
     return (
       selectedEndpoint.icon ||
       React.createElement(Bot, {
@@ -177,6 +183,20 @@ export function getSelectedIcon({
         className: 'icon-md shrink-0 text-text-primary',
       })
     );
+=======
+    if (selectedEndpoint.icon) {
+      return createEndpointIcon(
+        endpoint,
+        resolveProviderIcon({ endpoint, endpointsConfig }),
+        model,
+      );
+    }
+
+    return React.createElement(Bot, {
+      size: 20,
+      className: 'icon-md shrink-0 text-text-primary',
+    });
+>>>>>>> upstream/main
   }
 
   if (endpoint) {
@@ -202,9 +222,13 @@ export const getDisplayValue = ({
 }) => {
   if (selectedValues.modelSpec) {
     const spec = modelSpecs.find((s) => s.name === selectedValues.modelSpec);
+<<<<<<< HEAD
     // NJ: We want to preserve the saved model spec name for existing chats when
     // the model is hidden from the selector (showInMenu: false).
     return spec?.label || spec?.name || selectedValues.modelSpec || localize('com_ui_select_model');
+=======
+    return spec?.label || spec?.name || localize('com_ui_select_model');
+>>>>>>> upstream/main
   }
 
   if (selectedValues.model && selectedValues.endpoint) {

@@ -1,16 +1,30 @@
 import React from 'react';
+<<<<<<< HEAD
 import { Constants, ContentTypes } from 'librechat-data-provider';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import type { FileCitation, TMessage, TMessageContentParts } from 'librechat-data-provider';
+=======
+import { getDefaultStore } from 'jotai';
+import { Constants, ContentTypes } from 'librechat-data-provider';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import type { FileCitation, TMessage, TMessageContentParts } from 'librechat-data-provider';
+import { chatDirectionAtom } from '~/store/chatDirection';
+>>>>>>> upstream/main
 import EditContentParts from '../EditContentParts';
 
 const mockMutateAsync = jest.fn();
 const mockSetMessages = jest.fn();
 const mockAsk = jest.fn();
+<<<<<<< HEAD
 let mockChatDirection = 'LTR';
 
 jest.mock('recoil', () => ({
   useRecoilValue: () => mockChatDirection,
+=======
+
+jest.mock('recoil', () => ({
+  useRecoilValue: () => undefined,
+>>>>>>> upstream/main
 }));
 
 jest.mock('~/store', () => ({
@@ -57,8 +71,14 @@ jest.mock('~/hooks', () => ({
   useLocalize: () => (key: string) => key,
 }));
 
+<<<<<<< HEAD
 jest.mock('~/hooks/Chat', () => ({
   useGetAddedConvo: () => () => null,
+=======
+jest.mock('~/hooks/Conversations/useGetAddedConvo', () => ({
+  __esModule: true,
+  default: () => () => null,
+>>>>>>> upstream/main
 }));
 
 const content = [
@@ -76,7 +96,11 @@ describe('EditContentParts', () => {
     mockMutateAsync.mockReset();
     mockAsk.mockReset();
     mockMutateAsync.mockResolvedValue({});
+<<<<<<< HEAD
     mockChatDirection = 'LTR';
+=======
+    getDefaultStore().set(chatDirectionAtom, 'auto');
+>>>>>>> upstream/main
     message.content = undefined;
     mockThread = [parentMessage, message];
   });
@@ -239,6 +263,37 @@ describe('EditContentParts', () => {
     ]);
   });
 
+<<<<<<< HEAD
+=======
+  it('keeps reasoning with an encrypted payload out of the editor', () => {
+    const encoded = Buffer.from(Array.from({ length: 900 }, (_, i) => (i * 37 + 3) % 256)).toString(
+      'base64',
+    );
+    const mixedContent = [
+      { type: ContentTypes.THINK, think: `Checking the manifest.\n${encoded}` },
+      { type: ContentTypes.TEXT, text: 'Original response' },
+    ] as TMessageContentParts[];
+    message.content = mixedContent;
+    const renderReadOnlyPart = jest.fn(() => null);
+
+    render(
+      <EditContentParts
+        content={mixedContent}
+        messageId={message.messageId}
+        isSubmitting={false}
+        enterEdit={jest.fn()}
+        siblingIdx={0}
+        setSiblingIdx={jest.fn()}
+        renderReadOnlyPart={renderReadOnlyPart}
+      />,
+    );
+
+    const editors = screen.getAllByRole('textbox') as HTMLTextAreaElement[];
+    expect(editors.map((editor) => editor.value)).toEqual(['Original response']);
+    expect(renderReadOnlyPart).toHaveBeenCalledWith(mixedContent[0], 0, false);
+  });
+
+>>>>>>> upstream/main
   it('reruns an assistant response with the edited content value', () => {
     const enterEdit = jest.fn();
     render(
@@ -624,7 +679,11 @@ describe('EditContentParts', () => {
   });
 
   it('turns the editor around for a right-to-left chat direction', () => {
+<<<<<<< HEAD
     mockChatDirection = 'RTL';
+=======
+    getDefaultStore().set(chatDirectionAtom, 'rtl');
+>>>>>>> upstream/main
     render(
       <EditContentParts
         content={content}
@@ -639,10 +698,17 @@ describe('EditContentParts', () => {
 
     const editor = screen.getByRole('textbox');
     expect(editor).toHaveAttribute('dir', 'rtl');
+<<<<<<< HEAD
     expect(editor).toHaveClass('text-right');
   });
 
   it('leaves the editor left-to-right by default', () => {
+=======
+    expect(editor).toHaveClass('text-start');
+  });
+
+  it('lets the editor resolve its direction from the text by default', () => {
+>>>>>>> upstream/main
     render(
       <EditContentParts
         content={content}
@@ -656,8 +722,13 @@ describe('EditContentParts', () => {
     );
 
     const editor = screen.getByRole('textbox');
+<<<<<<< HEAD
     expect(editor).toHaveAttribute('dir', 'ltr');
     expect(editor).toHaveClass('text-left');
+=======
+    expect(editor).toHaveAttribute('dir', 'auto');
+    expect(editor).toHaveClass('text-start');
+>>>>>>> upstream/main
   });
 
   it('sizes the editor from the configured message font rather than pinning it', () => {

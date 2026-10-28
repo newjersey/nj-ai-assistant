@@ -117,16 +117,30 @@ describe('userGroup methods', () => {
       expect(results[0].name).toBe('Design');
     });
 
+<<<<<<< HEAD
     it('matches on description field', async () => {
       const results = await methods.findGroupsByNamePattern('Eng team');
       expect(results).toHaveLength(1);
       expect(results[0].name).toBe('Engineering');
+=======
+    it('does not match on the description field (search covers name and email)', async () => {
+      const results = await methods.findGroupsByNamePattern('Eng team');
+      expect(results).toEqual([]);
+>>>>>>> upstream/main
     });
 
     it('treats regex metacharacters as literal text', async () => {
       const results = await methods.findGroupsByNamePattern('.*');
+<<<<<<< HEAD
       expect(results).toHaveLength(1);
       expect(results[0].name).toBe('Literal .* Group');
+=======
+      expect(results).toEqual([]);
+
+      const literal = await methods.findGroupsByNamePattern('literal');
+      expect(literal).toHaveLength(1);
+      expect(literal[0].name).toBe('Literal .* Group');
+>>>>>>> upstream/main
     });
 
     it('filters by source when provided', async () => {
@@ -144,6 +158,7 @@ describe('userGroup methods', () => {
     });
   });
 
+<<<<<<< HEAD
   describe('findGroupsByMemberId', () => {
     it('returns groups the user is a member of via idOnTheSource', async () => {
       const user = await createTestUser({ idOnTheSource: 'user-ext-1' });
@@ -177,6 +192,8 @@ describe('userGroup methods', () => {
     });
   });
 
+=======
+>>>>>>> upstream/main
   describe('createGroup', () => {
     it('creates a group and returns the document', async () => {
       const group = await methods.createGroup({ name: 'New Group', source: 'local' });
@@ -300,6 +317,7 @@ describe('userGroup methods', () => {
     });
   });
 
+<<<<<<< HEAD
   describe('getUserGroups', () => {
     it('delegates to findGroupsByMemberId', async () => {
       const user = await createTestUser({ idOnTheSource: 'user-ext-1' });
@@ -311,6 +329,8 @@ describe('userGroup methods', () => {
     });
   });
 
+=======
+>>>>>>> upstream/main
   describe('getUserPrincipals', () => {
     it('returns USER, ROLE, and PUBLIC principals', async () => {
       const user = await createTestUser({ role: SystemRoles.ADMIN });
@@ -484,11 +504,22 @@ describe('userGroup methods', () => {
   });
 
   describe('getUserPrincipals caching', () => {
+<<<<<<< HEAD
     function createFakeCache() {
       const store = new Map<string, unknown>();
       return {
         store,
         get: jest.fn(async (key: string) => store.get(key)),
+=======
+    function createFakeCache({ onRead }: { onRead?: () => Promise<void> } = {}) {
+      const store = new Map<string, unknown>();
+      return {
+        store,
+        get: jest.fn(async (key: string) => {
+          await onRead?.();
+          return store.get(key);
+        }),
+>>>>>>> upstream/main
         set: jest.fn(async (key: string, value: unknown) => {
           store.set(key, value);
         }),
@@ -497,6 +528,32 @@ describe('userGroup methods', () => {
       };
     }
 
+<<<<<<< HEAD
+=======
+    /**
+     * Holds each cache read until `callers` of them are inside the miss window together, so a
+     * test about deduplicating concurrent builds actually gets concurrent builds. Delaying
+     * every read by a fixed few milliseconds instead leaves the overlap up to the scheduler:
+     * under load the first build can finish before a later caller reads, and that caller then
+     * takes the miss path on its own, which is correct behaviour but not what such a test is
+     * asserting. Reads after the barrier opens pass straight through, so a caller that reads
+     * again mid-build (after taking the lock, say) cannot deadlock.
+     */
+    function arrivalBarrier(callers: number) {
+      let arrived = 0;
+      let open!: () => void;
+      const allArrived = new Promise<void>((resolve) => {
+        open = resolve;
+      });
+      return async () => {
+        if (++arrived >= callers) {
+          open();
+        }
+        await allArrived;
+      };
+    }
+
+>>>>>>> upstream/main
     function createCachedMethods(cache: ReturnType<typeof createFakeCache>) {
       return createUserGroupMethods(mongoose, { getCache: jest.fn(() => cache) });
     }
@@ -758,6 +815,7 @@ describe('userGroup methods', () => {
 
     it('deduplicates concurrent cache builds for the same member key', async () => {
       const user = await createTestUser({ idOnTheSource: 'dedup-ext-1' });
+<<<<<<< HEAD
       const cache = {
         get: jest.fn(async () => {
           await new Promise((resolve) => setTimeout(resolve, 10));
@@ -766,6 +824,10 @@ describe('userGroup methods', () => {
         set: jest.fn(async () => undefined),
       };
       const cachedMethods = createUserGroupMethods(mongoose, { getCache: jest.fn(() => cache) });
+=======
+      const cache = createFakeCache({ onRead: arrivalBarrier(3) });
+      const cachedMethods = createCachedMethods(cache);
+>>>>>>> upstream/main
       const params = {
         userId: user._id.toString(),
         role: SystemRoles.USER,
@@ -787,11 +849,15 @@ describe('userGroup methods', () => {
     it('shares one lock and DB build across concurrent same-process callers', async () => {
       const user = await createTestUser({ idOnTheSource: 'lock-ext-1' });
       const cache = {
+<<<<<<< HEAD
         get: jest.fn(async () => {
           await new Promise((resolve) => setTimeout(resolve, 10));
           return undefined;
         }),
         set: jest.fn(async () => undefined),
+=======
+        ...createFakeCache({ onRead: arrivalBarrier(3) }),
+>>>>>>> upstream/main
         acquireLock: jest.fn(async () => 'lock-token'),
         releaseLock: jest.fn(async () => undefined),
         lockWaitMs: 5000,
@@ -1248,6 +1314,7 @@ describe('userGroup methods', () => {
     });
   });
 
+<<<<<<< HEAD
   describe('syncUserEntraGroups', () => {
     it('creates new groups and adds user as member', async () => {
       const user = await createTestUser({ idOnTheSource: 'user-ext-1' });
@@ -1371,6 +1438,8 @@ describe('userGroup methods', () => {
     });
   });
 
+=======
+>>>>>>> upstream/main
   describe('calculateRelevanceScore', () => {
     it('returns 100 for exact match', () => {
       const score = methods.calculateRelevanceScore(
@@ -1396,6 +1465,17 @@ describe('userGroup methods', () => {
       expect(score).toBe(50);
     });
 
+<<<<<<< HEAD
+=======
+    it('scores accent-folded matches like their plain spelling', () => {
+      const score = methods.calculateRelevanceScore(
+        { type: PrincipalType.USER, name: 'Zoë', source: 'local' },
+        'zoe',
+      );
+      expect(score).toBe(100);
+    });
+
+>>>>>>> upstream/main
     it('returns 10 (default) when no substring or exact match', () => {
       const score = methods.calculateRelevanceScore(
         { type: PrincipalType.USER, name: 'bob', source: 'local' },
@@ -1418,6 +1498,7 @@ describe('userGroup methods', () => {
       expect(score).toBe(100);
     });
 
+<<<<<<< HEAD
     it('checks description for GROUP type', () => {
       const score = methods.calculateRelevanceScore(
         {
@@ -1429,6 +1510,53 @@ describe('userGroup methods', () => {
         'alice',
       );
       expect(score).toBe(80);
+=======
+    it('ignores description for GROUP type, which search no longer matches', () => {
+      const weak = methods.calculateRelevanceScore(
+        {
+          type: PrincipalType.GROUP,
+          name: 'Corporate Platform',
+          description: 'plat',
+          source: 'local',
+        },
+        'plat',
+      );
+      const strong = methods.calculateRelevanceScore(
+        { type: PrincipalType.GROUP, name: 'Platform Team', source: 'local' },
+        'plat',
+      );
+      expect(weak).toBe(50);
+      expect(strong).toBeGreaterThan(weak);
+    });
+
+    it('scores a name equal to the query up to separators as an exact match', () => {
+      const score = methods.calculateRelevanceScore(
+        { type: PrincipalType.USER, name: 'Mary-Jane', source: 'local' },
+        'mary jane',
+      );
+      expect(score).toBe(100);
+    });
+
+    it('scores a reordered full-name query as exact, above a longer prefix match', () => {
+      const exact = methods.calculateRelevanceScore(
+        { type: PrincipalType.USER, name: 'John Smith', source: 'local' },
+        'smith john',
+      );
+      const prefix = methods.calculateRelevanceScore(
+        { type: PrincipalType.USER, name: 'Smith Johnson', source: 'local' },
+        'smith john',
+      );
+      expect(exact).toBe(100);
+      expect(prefix).toBe(80);
+    });
+
+    it('scores query words matched across fields like a contains match', () => {
+      const score = methods.calculateRelevanceScore(
+        { type: PrincipalType.USER, name: 'John Doe', email: 'jd@gmail.com', source: 'local' },
+        'john gmail',
+      );
+      expect(score).toBe(50);
+>>>>>>> upstream/main
     });
 
     it('picks the highest score across multiple fields', () => {
@@ -1553,9 +1681,17 @@ describe('userGroup methods', () => {
       });
 
       const results = await methods.searchPrincipals('.*', 10, [PrincipalType.USER]);
+<<<<<<< HEAD
 
       expect(results).toHaveLength(1);
       expect(results[0].name).toBe('Literal .* User');
+=======
+      expect(results).toEqual([]);
+
+      const literal = await methods.searchPrincipals('literal', 10, [PrincipalType.USER]);
+      expect(literal).toHaveLength(1);
+      expect(literal[0].name).toBe('Literal .* User');
+>>>>>>> upstream/main
     });
 
     it('handles invalid regex syntax as literal search text', async () => {

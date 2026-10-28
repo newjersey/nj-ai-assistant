@@ -2,7 +2,12 @@ import React, { useState, useMemo, useCallback, memo } from 'react';
 import { Copy, Check } from 'lucide';
 import { useAtomValue } from 'jotai';
 import { useRecoilState } from 'recoil';
+<<<<<<< HEAD
 import { findMessageById, isUserInitiatedCompaction } from 'librechat-data-provider';
+=======
+import { revealedQueuedTurnFamily } from '@librechat/chat/react';
+import { getSpeechText, findMessageById, isUserInitiatedCompaction } from 'librechat-data-provider';
+>>>>>>> upstream/main
 import {
   Button,
   EditIcon,
@@ -12,11 +17,17 @@ import {
   RegenerateIcon,
 } from '@librechat/client';
 import type { TConversation, TMessage, TFeedback } from 'librechat-data-provider';
+<<<<<<< HEAD
 import { useGenerationsByLatest, useLocalize } from '~/hooks';
 import { useOptionalMessagesOperations } from '~/Providers';
 import { hasEditablePart } from './Content/editableParts';
 import { logCopyEvent } from '~/nj/analytics/logHelpers';
 import { revealedQueuedTurnFamily } from '~/store/steer';
+=======
+import { useMessagesIsSubmitting, useOptionalMessagesOperations } from '~/Providers';
+import { useGenerationsByLatest, useLocalize } from '~/hooks';
+import { hasEditablePart } from './Content/editableParts';
+>>>>>>> upstream/main
 import { Fork } from '~/components/Conversations';
 import { hoverButtonClasses } from './styles';
 import MessageAudio from './MessageAudio';
@@ -30,11 +41,22 @@ type THoverButtons = {
   copyToClipboard: (setIsCopied: React.Dispatch<React.SetStateAction<boolean>>) => void;
   getCanCopy: () => boolean;
   conversation: TConversation | null;
+<<<<<<< HEAD
   isSubmitting: boolean;
   message: TMessage;
   regenerate: () => void;
   handleContinue: (e: React.MouseEvent<HTMLButtonElement>) => void;
   latestMessageId?: string;
+=======
+  message: TMessage;
+  regenerate: () => void;
+  handleContinue: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  /** The tail as of the row's last render, which the row re-renders on whenever
+   *  this message enters or leaves it; compared against, never sent anywhere. */
+  latestMessageId?: string;
+  /** The tail at call time, for actions that send it (forking at a split target). */
+  getLatestMessageId?: () => string | undefined;
+>>>>>>> upstream/main
   isLast: boolean;
   index: number;
   handleFeedback?: ({ feedback }: { feedback: TFeedback | undefined }) => void;
@@ -53,6 +75,7 @@ type HoverButtonProps = {
   disabled?: boolean;
 };
 
+<<<<<<< HEAD
 const extractMessageContent = (message: TMessage): string => {
   if (typeof message.content === 'string') {
     return message.content;
@@ -87,6 +110,8 @@ const extractMessageContent = (message: TMessage): string => {
   return message.text || '';
 };
 
+=======
+>>>>>>> upstream/main
 const HoverButton = memo(
   ({
     id,
@@ -132,15 +157,28 @@ const HoverButtons = ({
   copyToClipboard,
   getCanCopy,
   conversation,
+<<<<<<< HEAD
   isSubmitting,
+=======
+>>>>>>> upstream/main
   message,
   regenerate,
   handleContinue,
   latestMessageId,
+<<<<<<< HEAD
+=======
+  getLatestMessageId,
+>>>>>>> upstream/main
   isLast,
   handleFeedback,
 }: THoverButtons) => {
   const localize = useLocalize();
+<<<<<<< HEAD
+=======
+  /** Subscribed here rather than passed down: a send toggles the rerun controls on
+   *  every row, and only this toolbar has to re-render for it. */
+  const isSubmitting = useMessagesIsSubmitting();
+>>>>>>> upstream/main
   const [isCopied, setIsCopied] = useState(false);
   const [TextToSpeech] = useRecoilState<boolean>(store.textToSpeech);
   const { getMessages } = useOptionalMessagesOperations();
@@ -222,6 +260,7 @@ const HoverButtons = ({
     enterEdit();
   };
 
+<<<<<<< HEAD
   const handleCopy = () => {
     logCopyEvent(isCreatedByUser);
     copyToClipboard(setIsCopied);
@@ -231,11 +270,24 @@ const HoverButtons = ({
     <div className="group visible flex justify-center gap-0.5 self-end focus-within:outline-none lg:justify-start">
       {/* Text to Speech */}
       {TextToSpeech && !error && !isActiveStreamingMessage && (
+=======
+  const handleCopy = () => copyToClipboard(setIsCopied);
+  const speechText = getSpeechText(message);
+
+  return (
+    <div className="group visible flex justify-center gap-0.5 self-end focus-within:outline-hidden lg:justify-start">
+      {/* Text to Speech */}
+      {TextToSpeech && !error && !isActiveStreamingMessage && speechText.length > 0 && (
+>>>>>>> upstream/main
         <MessageAudio
           index={index}
           isLast={isLast}
           messageId={message.messageId}
+<<<<<<< HEAD
           content={extractMessageContent(message)}
+=======
+          content={speechText}
+>>>>>>> upstream/main
           renderButton={(props) => (
             <HoverButton
               onClick={props.onClick}
@@ -256,6 +308,7 @@ const HoverButtons = ({
           title={
             isCopied ? localize('com_ui_copied_to_clipboard') : localize('com_ui_copy_to_clipboard')
           }
+<<<<<<< HEAD
           icon={<MorphIcon icon={isCopied ? Check : Copy} size={19} />}
           isLast={isLast}
           disabled={!canCopy}
@@ -264,6 +317,14 @@ const HoverButtons = ({
             isSubmitting && isCreatedByUser
               ? 'group-hover:opacity-100 [@media(hover:hover)]:opacity-0'
               : '',
+=======
+          icon={<MorphIcon icon={isCopied ? Check : Copy} size="1.1875rem" />}
+          isLast={isLast}
+          disabled={!canCopy}
+          className={cn(
+            'ms-0 flex items-center gap-1.5 text-xs',
+            isSubmitting && isCreatedByUser ? 'no-touch:opacity-0 group-hover:opacity-100' : '',
+>>>>>>> upstream/main
           )}
           dataTestId={!isCreatedByUser ? 'copy-response-button' : undefined}
         />
@@ -282,13 +343,19 @@ const HoverButtons = ({
         />
       )}
 
+<<<<<<< HEAD
       {/* Fork Button */}
       {/* NJ: Disable forking (makes no sense w/o chat history, maybe too advanced)
+=======
+      {/* Fork Button: withheld on a failed turn, whose copy would carry the provider's error as an
+          ordinary answer. The error card's "Branch without files" copies up to the turn before. */}
+>>>>>>> upstream/main
       {!error && !isActiveStreamingMessage && (
         <Fork
           messageId={message.messageId}
           conversationId={conversation.conversationId}
           forkingSupported={forkingSupported}
+<<<<<<< HEAD
           latestMessageId={latestMessageId}
           isLast={isLast}
         />
@@ -301,6 +368,17 @@ const HoverButtons = ({
         <Feedback handleFeedback={handleFeedback} feedback={message.feedback} isLast={isLast} />
       )}
       */}
+=======
+          getLatestMessageId={getLatestMessageId ?? (() => latestMessageId)}
+          isLast={isLast}
+        />
+      )}
+
+      {/* Feedback Buttons */}
+      {!error && !isActiveStreamingMessage && !isCreatedByUser && handleFeedback != null && (
+        <Feedback handleFeedback={handleFeedback} feedback={message.feedback} isLast={isLast} />
+      )}
+>>>>>>> upstream/main
 
       {/* Regenerate Button */}
       {!isSubagentThreadReadOnly && regenerateEnabled && (
@@ -319,7 +397,11 @@ const HoverButtons = ({
         <HoverButton
           onClick={(e) => e && handleContinue(e)}
           title={localize('com_ui_continue')}
+<<<<<<< HEAD
           icon={<ContinueIcon className="w-19 h-19 -rotate-180" />}
+=======
+          icon={<ContinueIcon className="size-4.75" />}
+>>>>>>> upstream/main
           isLast={isLast}
           dataTestId={isLast ? 'continue-generation-button' : undefined}
           className="active"

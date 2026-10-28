@@ -5,7 +5,11 @@ describe('composerSurfaceClasses', () => {
     const classes = composerSurfaceClasses();
 
     expect(classes).toContain('border-border-light');
+<<<<<<< HEAD
     expect(classes).toContain('bg-surface-chat');
+=======
+    expect(classes).toContain('bg-surface-composer');
+>>>>>>> upstream/main
     expect(classes).toContain('text-text-primary');
   });
 });
@@ -15,7 +19,11 @@ describe('composerSubmitClasses', () => {
     const classes = composerSubmitClasses();
 
     expect(classes).toContain('size-theme-control');
+<<<<<<< HEAD
     expect(classes).toContain('rounded-theme-control-round');
+=======
+    expect(classes).toContain('rounded-theme-composer-action');
+>>>>>>> upstream/main
     expect(classes).toContain('p-theme-compact');
   });
 
@@ -30,7 +38,13 @@ describe('composerSubmitClasses', () => {
   it('draws its fill and disabled state from semantic roles', () => {
     const classes = composerSubmitClasses();
 
+<<<<<<< HEAD
     expect(classes).toContain('bg-text-primary');
+=======
+    expect(classes).toContain('bg-surface-inverted');
+    expect(classes).toContain('text-text-inverted');
+    expect(classes).not.toContain('bg-text-primary');
+>>>>>>> upstream/main
     expect(classes).toContain('disabled:text-text-secondary');
     expect(classes).not.toMatch(/#[0-9a-f]{3,6}|rgb\(|hsl\(/i);
   });
@@ -42,7 +56,11 @@ describe('composerControlClasses', () => {
 
     expect(classes).toContain('h-theme-control');
     expect(classes).toContain('rounded-theme-control-round');
+<<<<<<< HEAD
     expect(classes).toContain('gap-theme-compact');
+=======
+    expect(classes).toContain('gap-theme-control-gap');
+>>>>>>> upstream/main
   });
 
   it('draws its border and fills from semantic roles', () => {

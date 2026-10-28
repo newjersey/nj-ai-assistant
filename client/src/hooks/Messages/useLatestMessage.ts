@@ -66,7 +66,12 @@ function useLatestMessageSiblingIndexes(
   rootSiblingKey: string | null,
 ) {
   const selectParentIds = useCallback(
+<<<<<<< HEAD
     (messages: TMessage[]) => getMessageBranchSiblingParentIds(messages, rootSiblingKey),
+=======
+    (messages: TMessage[]) =>
+      getMessageBranchSiblingParentIds(messages, messages[0]?.conversationId ?? rootSiblingKey),
+>>>>>>> upstream/main
     [rootSiblingKey],
   );
   const parentIds = useMessagesCacheSelect(messagesQueryId, selectParentIds) ?? EMPTY_PARENT_IDS;
@@ -85,7 +90,11 @@ export function useLatestMessage(
     (messages: TMessage[]) =>
       selectActiveBranchTail(
         messages,
+<<<<<<< HEAD
         conversationId,
+=======
+        messages[0]?.conversationId ?? conversationId,
+>>>>>>> upstream/main
         (parentId) => siblingIndexes[getParentLookupKey(parentId)] ?? 0,
       ),
     [conversationId, siblingIndexes],
@@ -105,7 +114,11 @@ export function useLatestMessageId(
     (messages: TMessage[]) =>
       selectActiveBranchTail(
         messages,
+<<<<<<< HEAD
         conversationId,
+=======
+        messages[0]?.conversationId ?? conversationId,
+>>>>>>> upstream/main
         (parentId) => siblingIndexes[getParentLookupKey(parentId)] ?? 0,
       )?.messageId ?? null,
     [conversationId, siblingIndexes],
@@ -133,7 +146,11 @@ export function useLatestMessageMeta(
     (messages: TMessage[]): TLatestMessageMeta | null => {
       const tail = selectActiveBranchTail(
         messages,
+<<<<<<< HEAD
         conversationId,
+=======
+        messages[0]?.conversationId ?? conversationId,
+>>>>>>> upstream/main
         (parentId) => siblingIndexes[getParentLookupKey(parentId)] ?? 0,
       );
       if (!tail) {
@@ -171,8 +188,15 @@ export function useGetLatestMessage(
     }
     const messages =
       queryClient.getQueryData<TMessage[]>([QueryKeys.messages, messagesQueryId]) ?? [];
+<<<<<<< HEAD
     return selectActiveBranchTail(messages, conversationId, (parentId) =>
       jotaiStore.get(siblingIdxFamily(siblingKey(parentId))),
+=======
+    return selectActiveBranchTail(
+      messages,
+      messages[0]?.conversationId ?? conversationId,
+      (parentId) => jotaiStore.get(siblingIdxFamily(siblingKey(parentId))),
+>>>>>>> upstream/main
     );
   }, [queryClient, jotaiStore, conversationId, messagesQueryId]);
 }

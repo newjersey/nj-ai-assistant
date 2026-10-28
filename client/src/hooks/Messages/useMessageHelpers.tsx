@@ -7,9 +7,19 @@ import {
 } from 'librechat-data-provider';
 import type { SearchResultData } from 'librechat-data-provider';
 import type { TMessageProps } from '~/common';
+<<<<<<< HEAD
 import { useMessagesViewContext, useAssistantsMapContext, useAgentsMapContext } from '~/Providers';
 import { useCopyMessageToClipboard, hasCopyableText } from './useCopyToClipboard';
 import { useGetAddedConvo } from '~/hooks/Chat';
+=======
+import {
+  useCopyMessageToClipboard,
+  getMessageClipboardSource,
+  hasCopyableText,
+} from './useCopyToClipboard';
+import { useMessagesViewContext, useAssistantsMapContext, useAgentsMapContext } from '~/Providers';
+import useGetAddedConvo from '~/hooks/Conversations/useGetAddedConvo';
+>>>>>>> upstream/main
 import { logger } from '~/utils';
 
 export default function useMessageHelpers(
@@ -33,7 +43,11 @@ export default function useMessageHelpers(
 
   const getAddedConvo = useGetAddedConvo();
 
+<<<<<<< HEAD
   const { text, content, children, messageId = null, isCreatedByUser } = message ?? {};
+=======
+  const { children, messageId = null, isCreatedByUser } = message ?? {};
+>>>>>>> upstream/main
   const edit = messageId === currentEditId;
   const isLast = children?.length === 0 || children?.length === undefined;
 
@@ -89,6 +103,7 @@ export default function useMessageHelpers(
     regenerate(message, { addedConvo: getAddedConvo() });
   };
 
+<<<<<<< HEAD
   const copyToClipboard = useCopyMessageToClipboard({
     text,
     content,
@@ -100,6 +115,17 @@ export default function useMessageHelpers(
   const getCanCopy = useCallback(
     () => hasCopyableText({ text, content, searchResults }),
     [text, content, searchResults],
+=======
+  const clipboardSource = useMemo(() => getMessageClipboardSource(message), [message]);
+  const copyToClipboard = useCopyMessageToClipboard({
+    ...clipboardSource,
+    searchResults,
+  });
+
+  const getCanCopy = useCallback(
+    () => hasCopyableText({ ...clipboardSource, searchResults }),
+    [clipboardSource, searchResults],
+>>>>>>> upstream/main
   );
 
   return {

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import {
   QueryKeys,
   Constants,
@@ -20,6 +21,36 @@ import type { LocalizeFunction, TMessageProps } from '~/common';
 
 export const TEXT_KEY_DIVIDER = '|||';
 export const STREAM_START_FAILED_METADATA_KEY = 'streamStartFailed';
+=======
+import { QueryKeys, Constants, buildTree, ContentTypes } from 'librechat-data-provider';
+import {
+  hasStreamStartFailed,
+  stripStreamedIndexStamps,
+  createDualMessageContent,
+  STREAM_START_FAILED_METADATA_KEY,
+} from '@librechat/chat';
+import type { Agents, TMessage, TMessageContentParts } from 'librechat-data-provider';
+import type { QueryClient } from '@tanstack/react-query';
+import type { LocalizeFunction, TMessageProps } from '~/common';
+
+export {
+  hasStreamStartFailed,
+  stripStreamedIndexStamps,
+  createDualMessageContent,
+  STREAM_START_FAILED_METADATA_KEY,
+};
+export const TEXT_KEY_DIVIDER = '|||';
+
+/** A locally submitted user row is not canonical until the server acknowledges it. */
+export function isUnacknowledgedUserMessage(message: TMessage): boolean {
+  return (
+    message.isCreatedByUser === true &&
+    message.clientTimestamp != null &&
+    message.createdAt == null &&
+    !message.privacyRevision
+  );
+}
+>>>>>>> upstream/main
 
 type SiblingIndexLookup = (parentMessageId: string | null | undefined) => number;
 
@@ -69,6 +100,7 @@ export const getMessageBranchSiblingParentIds = (
   }
 
   const parentIds = new Set<string | null>();
+<<<<<<< HEAD
   const collectBranchParents = (
     siblings: TMessage[] | undefined,
     parentMessageId: string | null | undefined,
@@ -87,6 +119,23 @@ export const getMessageBranchSiblingParentIds = (
   };
 
   collectBranchParents(messagesTree, rootSiblingKey);
+=======
+  const stack = [{ siblings: messagesTree, parentMessageId: rootSiblingKey, index: 0 }];
+  while (stack.length > 0) {
+    const frame = stack[stack.length - 1];
+    if (frame.index === 0 && frame.siblings.length > 1) {
+      parentIds.add(frame.parentMessageId ?? null);
+    }
+    const message = frame.siblings[frame.index++];
+    if (!message) {
+      stack.pop();
+      continue;
+    }
+    if (message.children?.length) {
+      stack.push({ siblings: message.children, parentMessageId: message.messageId, index: 0 });
+    }
+  }
+>>>>>>> upstream/main
   return Array.from(parentIds);
 };
 
@@ -105,6 +154,7 @@ export const getBranchSiblingIndexesForTarget = (
   }
 
   const branchIndexes: BranchSiblingIndex[] = [];
+<<<<<<< HEAD
   const findTargetPath = (
     siblings: TMessage[] | undefined,
     parentMessageId: string | null | undefined,
@@ -137,6 +187,39 @@ export const getBranchSiblingIndexesForTarget = (
 
   findTargetPath(messagesTree, rootSiblingKey);
   return branchIndexes;
+=======
+  const stack = [
+    { siblings: messagesTree, parentMessageId: rootSiblingKey, index: 0, branchCount: 0 },
+  ];
+  while (stack.length > 0) {
+    const frame = stack[stack.length - 1];
+    const index = frame.index++;
+    const message = frame.siblings[index];
+    if (!message) {
+      stack.pop();
+      continue;
+    }
+    branchIndexes.length = frame.branchCount;
+    if (frame.siblings.length > 1) {
+      branchIndexes.push({
+        parentMessageId: frame.parentMessageId,
+        siblingIdx: frame.siblings.length - index - 1,
+      });
+    }
+    if (message.messageId === targetMessageId) {
+      return branchIndexes;
+    }
+    if (message.children?.length) {
+      stack.push({
+        siblings: message.children,
+        parentMessageId: message.messageId,
+        index: 0,
+        branchCount: branchIndexes.length,
+      });
+    }
+  }
+  return [];
+>>>>>>> upstream/main
 };
 
 export const getLatestText = (message?: TMessage | null, includeIndex?: boolean): string => {
@@ -358,6 +441,7 @@ export const preserveStreamedContentIdentity = (
   return stamped ?? finalContent;
 };
 
+<<<<<<< HEAD
 /**
  * Drops the client-only `streamedIndex` stamps from a content array. An
  * edited resubmission retains the settled prefix and appends the rerun's
@@ -384,6 +468,8 @@ export function stripStreamedIndexStamps(content: TMessage['content']): TMessage
   return changed ? next : content;
 }
 
+=======
+>>>>>>> upstream/main
 /** Render-identity index for content-part keys: the streamed position stamped
  * by the final handler survives the sparse→compact swap; everything else keys
  * by the live index. Coordinate logic (edit indexes, phase bounds, cursor)
@@ -399,9 +485,12 @@ export const getPartKeyIndex = (part: TMessageContentParts | undefined, idx: num
 export const isSubmittableMessage = (text?: string | null, fileCount = 0): boolean =>
   (text ?? '').trim() !== '' || fileCount > 0;
 
+<<<<<<< HEAD
 export const hasStreamStartFailed = (message?: Pick<TMessage, 'metadata'> | null): boolean =>
   message?.metadata?.[STREAM_START_FAILED_METADATA_KEY] === true;
 
+=======
+>>>>>>> upstream/main
 export const markStreamStartFailedMetadata = (
   metadata?: TMessage['metadata'],
 ): TMessage['metadata'] => ({
@@ -409,6 +498,7 @@ export const markStreamStartFailedMetadata = (
   [STREAM_START_FAILED_METADATA_KEY]: true,
 });
 
+<<<<<<< HEAD
 const getLatestContentForKey = (message: TMessage): string => {
   const formatText = (str: string, index: number): string => {
     if (str.length === 0) {
@@ -489,6 +579,8 @@ export const getTextKey = (message?: TMessage | null, convoId?: string | null) =
   return `${(message.messageId as string | null) ?? ''}${TEXT_KEY_DIVIDER}${contentKey}${TEXT_KEY_DIVIDER}${message.conversationId ?? convoId}`;
 };
 
+=======
+>>>>>>> upstream/main
 export const scrollToEnd = (callback?: () => void) => {
   const messagesEndElement = document.getElementById('messages-end');
   if (messagesEndElement) {
@@ -639,11 +731,23 @@ const RELATIVE_TIME_DIVISIONS: { amount: number; unit: Intl.RelativeTimeFormatUn
   { amount: Number.POSITIVE_INFINITY, unit: 'year' },
 ];
 
+<<<<<<< HEAD
+=======
+/**
+ * Intl formatters are expensive to construct and every message row formats its
+ * timestamp on each render, so they are built once per locale (and clock format).
+ */
+const resolvedLocales = new Map<string, string | undefined>();
+const relativeFormatters = new Map<string, Intl.RelativeTimeFormat>();
+const absoluteFormatters = new Map<string, Intl.DateTimeFormat>();
+
+>>>>>>> upstream/main
 /** Returns the locale only when it is a syntactically valid BCP-47 tag, else undefined. */
 const resolveLocale = (locale?: string): string | undefined => {
   if (!locale) {
     return undefined;
   }
+<<<<<<< HEAD
   try {
     Intl.DateTimeFormat.supportedLocalesOf(locale);
     return locale;
@@ -654,6 +758,48 @@ const resolveLocale = (locale?: string): string | undefined => {
 
 const formatRelativeTime = (from: Date, to: Date, locale?: string): string => {
   const formatter = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' });
+=======
+  if (resolvedLocales.has(locale)) {
+    return resolvedLocales.get(locale);
+  }
+  let resolved: string | undefined;
+  try {
+    Intl.DateTimeFormat.supportedLocalesOf(locale);
+    resolved = locale;
+  } catch {
+    resolved = undefined;
+  }
+  resolvedLocales.set(locale, resolved);
+  return resolved;
+};
+
+const getRelativeFormatter = (locale?: string): Intl.RelativeTimeFormat => {
+  const key = locale ?? '';
+  let formatter = relativeFormatters.get(key);
+  if (!formatter) {
+    formatter = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' });
+    relativeFormatters.set(key, formatter);
+  }
+  return formatter;
+};
+
+const getAbsoluteFormatter = (locale?: string, hour12?: boolean): Intl.DateTimeFormat => {
+  const key = `${locale ?? ''}|${String(hour12)}`;
+  let formatter = absoluteFormatters.get(key);
+  if (!formatter) {
+    formatter = new Intl.DateTimeFormat(locale, {
+      dateStyle: 'medium',
+      timeStyle: 'short',
+      hour12,
+    });
+    absoluteFormatters.set(key, formatter);
+  }
+  return formatter;
+};
+
+const formatRelativeTime = (from: Date, to: Date, locale?: string): string => {
+  const formatter = getRelativeFormatter(locale);
+>>>>>>> upstream/main
   let duration = (from.getTime() - to.getTime()) / 1000;
   for (const division of RELATIVE_TIME_DIVISIONS) {
     if (Math.abs(duration) < division.amount) {
@@ -685,15 +831,20 @@ export const getMessageTimestamp = (
   return {
     iso: date.toISOString(),
     relative: formatRelativeTime(date, now, safeLocale),
+<<<<<<< HEAD
     absolute: new Intl.DateTimeFormat(safeLocale, {
       dateStyle: 'medium',
       timeStyle: 'short',
       hour12,
     }).format(date),
+=======
+    absolute: getAbsoluteFormatter(safeLocale, hour12).format(date),
+>>>>>>> upstream/main
     isRecent: Math.abs(now.getTime() - date.getTime()) < RECENT_THRESHOLD_MS,
   };
 };
 
+<<<<<<< HEAD
 /**
  * Creates initial content parts for dual message display with agent-based grouping.
  * Sets up primary and added agent content parts with agentId for column rendering.
@@ -790,6 +941,8 @@ export const createDualMessageContent = (
   return [primaryContent, addedContent] as unknown as TMessageContentParts[];
 };
 
+=======
+>>>>>>> upstream/main
 export function areMessageFilesEqual(prevFiles?: TMessage['files'], nextFiles?: TMessage['files']) {
   if (prevFiles === nextFiles) {
     return true;
@@ -824,6 +977,10 @@ export function areMessageFieldsEqual(
   return (
     prevMsg.messageId === nextMsg.messageId &&
     prevMsg.text === nextMsg.text &&
+<<<<<<< HEAD
+=======
+    prevMsg.privacyRevision === nextMsg.privacyRevision &&
+>>>>>>> upstream/main
     prevMsg.error === nextMsg.error &&
     prevMsg.unfinished === nextMsg.unfinished &&
     /** Read by the row: `useGenerationsByLatest` gates the Continue button on it and
@@ -832,6 +989,10 @@ export function areMessageFieldsEqual(
     prevMsg.createdAt === nextMsg.createdAt &&
     prevMsg.depth === nextMsg.depth &&
     prevMsg.isCreatedByUser === nextMsg.isCreatedByUser &&
+<<<<<<< HEAD
+=======
+    prevMsg.isUserSubmitted === nextMsg.isUserSubmitted &&
+>>>>>>> upstream/main
     (prevMsg.children?.length ?? 0) === (nextMsg.children?.length ?? 0) &&
     prevMsg.content === nextMsg.content &&
     prevMsg.model === nextMsg.model &&
@@ -846,6 +1007,31 @@ export function areMessageFieldsEqual(
   );
 }
 
+<<<<<<< HEAD
+=======
+type TailRelationProps = {
+  message?: TMessage | null;
+  latestMessageId?: string;
+  latestMessageDepth?: number;
+};
+
+/**
+ * True when moving the thread's tail leaves a row's rendering unchanged. Rows read
+ * `latestMessageId` and `latestMessageDepth` only by comparing them to their own id
+ * and depth, and for whether a tail is known at all, so a submission or a server id
+ * hydration re-renders just the rows entering or leaving the tail.
+ */
+export function isSameTailRelation(prev: TailRelationProps, next: TailRelationProps): boolean {
+  return (
+    (prev.latestMessageId == null) === (next.latestMessageId == null) &&
+    (prev.latestMessageId === prev.message?.messageId) ===
+      (next.latestMessageId === next.message?.messageId) &&
+    (prev.latestMessageDepth === prev.message?.depth) ===
+      (next.latestMessageDepth === next.message?.depth)
+  );
+}
+
+>>>>>>> upstream/main
 /**
  * Comparator for the memoized message-row wrappers (Message / MessageContent /
  * MessageParts): identity-compare the scalar props, field-compare the message.

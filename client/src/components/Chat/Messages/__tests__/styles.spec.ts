@@ -1,6 +1,12 @@
+<<<<<<< HEAD
 import { hoverButtonClasses, messageFooterClasses, revealOnRowHoverClasses } from '../styles';
 
 const FADE = '[@media(hover:hover)]:opacity-0';
+=======
+import { hoverButtonClasses, revealOnRowHoverClasses } from '../styles';
+
+const FADE = 'no-touch:opacity-0';
+>>>>>>> upstream/main
 
 /** The row-wide keyboard-focus condition, as two variants. It cannot be one
  *  `group-[&:is(...)]`: that form makes Tailwind emit a bare `.group$` rule
@@ -92,6 +98,7 @@ describe('hoverButtonClasses', () => {
     expect(hoverButtonClasses({ className: 'ml-0' })).toContain('ml-0');
   });
 });
+<<<<<<< HEAD
 
 describe('messageFooterClasses', () => {
   /** A hover button is a 19px icon with p-1.5 either side, so the row it forms is
@@ -100,3 +107,5 @@ describe('messageFooterClasses', () => {
     expect(messageFooterClasses).toContain('min-h-[31px]');
   });
 });
+=======
+>>>>>>> upstream/main

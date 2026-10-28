@@ -28,7 +28,11 @@ export default function SaveDraft({
         id="showThinking"
         checked={showThinking}
         onCheckedChange={handleCheckedChange}
+<<<<<<< HEAD
         className="ml-4"
+=======
+        className="ms-4"
+>>>>>>> upstream/main
         data-testid="showThinking"
         aria-label={localize('com_nav_show_thinking')}
       />

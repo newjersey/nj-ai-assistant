@@ -1,6 +1,10 @@
 const fs = require('fs');
 const path = require('path');
 const sharp = require('sharp');
+<<<<<<< HEAD
+=======
+const { convertImageBuffer } = require('@librechat/api');
+>>>>>>> upstream/main
 const { logger } = require('@librechat/data-schemas');
 const { resizeImageBuffer } = require('../images/resize');
 const { updateUser, updateFile } = require('~/models');
@@ -37,6 +41,7 @@ async function uploadImageToAzure({
       buffer: resizedBuffer,
       width,
       height,
+<<<<<<< HEAD
     } = await resizeImageBuffer(inputBuffer, resolution, endpoint);
     const extension = path.extname(inputFilePath);
     const userId = req.user.id;
@@ -54,6 +59,18 @@ async function uploadImageToAzure({
         fileName += targetExtension;
       }
     }
+=======
+      type,
+    } = await resizeImageBuffer(inputBuffer, resolution, endpoint);
+    const userId = req.user.id;
+    const { buffer: webPBuffer, fileName } = await convertImageBuffer({
+      buffer: resizedBuffer,
+      type,
+      fileName: `${file_id}__${path.basename(inputFilePath)}`,
+      outputType: appConfig.imageOutputType,
+    });
+
+>>>>>>> upstream/main
     const downloadURL = await saveBufferToAzure({
       userId,
       buffer: webPBuffer,

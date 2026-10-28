@@ -14,6 +14,15 @@ const REDACTED_VALUE = '[REDACTED]';
 const REDACTION_TRUNCATED_KEY = '__redaction_truncated__';
 const MAX_REDACTION_DEPTH = 8;
 const MAX_REDACTION_ENTRIES = 50;
+<<<<<<< HEAD
+=======
+/**
+ * Objects one log record may visit while redacting, so a broad payload cannot stall the event loop.
+ * Env-only like CONSOLE_JSON_STRING_LENGTH: the logger is built at import, before librechat.yaml loads.
+ */
+const MAX_REDACTION_NODES: number = parseInt(process.env.LOG_REDACTION_MAX_NODES || '', 10) || 5000;
+let redactionNodeBudget = Number.POSITIVE_INFINITY;
+>>>>>>> upstream/main
 const DEFAULT_REDACTION_STRING_LENGTH = 8192;
 const MAX_REDACTION_STRING_LENGTH = Math.max(
   CONSOLE_JSON_STRING_LENGTH,
@@ -44,6 +53,7 @@ const sensitiveKeys: RegExp[] = [
   /\b(api-key:? )[^\s"']+/gi, // Header: API key pattern
   /\b(api_key=)[^\s"'&]+/gi, // URL query param: API key pattern
   /\b(key=)[^\s"'&]+/g, // URL query param: sensitive key pattern
+<<<<<<< HEAD
   /(\b(?:access_token|assertion|client_assertion|client_secret|code|code_verifier|credential|id_token|refresh_token|sig|signature|x-amz-security-token|x-amz-signature|x-goog-signature)\b"?\s*:\s*")(?:\\.|[^"\\])*/gi,
   /\b((?:access_token|assertion|client_assertion|client_secret|code|code_verifier|credential|id_token|refresh_token|sig|signature|x-amz-security-token|x-amz-signature|x-goog-signature)=)[^\s"'&]+/gi,
   /(\b)eyJ[a-zA-Z0-9_-]{5,}\.[a-zA-Z0-9_-]{5,}\.[a-zA-Z0-9_-]+/g,
@@ -54,6 +64,32 @@ const sensitiveKeys: RegExp[] = [
 
 const sensitiveMetadataKey =
   /^(authorization|proxy-authorization|cookie|set-cookie|x-api-key|api[-_]?key|access[-_]?token|refresh[-_]?token|id[-_]?token|token|secret|password|assertion|client[-_]?assertion|client[-_]?secret|code[-_]?verifier|credential|signature|connection[-_]?string)$/i;
+=======
+  /(\b(?:access_token|appid|assertion|client_assertion|client_secret|code|code_verifier|credential|id_token|refresh_token|sig|signature|x-amz-security-token|x-amz-signature|x-goog-signature)\b"?\s*:\s*")(?:\\.|[^"\\])*/gi,
+  /\b((?:access_token|appid|assertion|client_assertion|client_secret|code|code_verifier|credential|id_token|refresh_token|sig|signature|x-amz-security-token|x-amz-signature|x-goog-signature)=)[^\s"'&]+/gi,
+  /(\b)eyJ[a-zA-Z0-9_-]{5,}\.[a-zA-Z0-9_-]{5,}\.[a-zA-Z0-9_-]+/g,
+  /\b((?:Proxy-)?Authorization:\s*)[^\r\n]+/gi,
+  /\b((?:Cookie|Set-Cookie):\s*)[^\r\n]+/gi,
+  /(:\/\/)[^/\s:@]*:[^/\s@]+(?=@)/g,
+];
+
+/**
+ * Matches a whole delimiter-bounded token that holds an address. The lookbehind lets the scan start
+ * only at a token boundary, so long non-email text is scanned once instead of once per character.
+ */
+const EMAIL_PATTERN =
+  /(?:(?<!\\)\\"(?:[^"\\\r\n]|\\{3}"|\\{4}|\\{2}(?!\\)|\\[bfnrt/]|\\u[0-9a-fA-F]{4})*\\"|(?<!\\)"(?:[^"\\\r\n]|\\.)*"|(?<![^\s<>[\],;"])[^\s<>[\],;"]+)@(?:\[[^\]\s@]+\]|[^\s<>[\],;"@]+\.[^\s<>[\],;"@]+)/gu;
+/** Set while redacting splat arguments at levels whose later format strips heavy error fields. */
+let skipHeavyErrorFields = false;
+/** URL-encoded addresses (`user%40host.tld`), anchored at a token start so scans stay linear. */
+const ENCODED_EMAIL_PATTERN =
+  /(?<![^\s<>"&=?/#])(?:(?!%(?:25)*40)[^\s<>"&=?/#])+%(?:25)*40[^\s<>"&=?/#]+(?:\.|%(?:25)*2e)[^\s<>"&=?/#]+/giu;
+const REDACTION_WINDOW_SLACK = 1024;
+const REDACTED_EMAIL_VALUE = '[REDACTED_EMAIL]';
+
+const sensitiveMetadataKey =
+  /^(authorization|proxy-authorization|cookie|set-cookie|x-api-key|api[-_]?key|appid|access[-_]?token|refresh[-_]?token|id[-_]?token|token|secret|password|assertion|client[-_]?assertion|client[-_]?secret|code[-_]?verifier|credential|signature|connection[-_]?string)$/i;
+>>>>>>> upstream/main
 const errorStringProperties = new Set(['name', 'message', 'stack']);
 
 /**
@@ -67,10 +103,17 @@ function redactMessage(str: string, trimLength?: number): string {
     return '';
   }
 
+<<<<<<< HEAD
   const redacted = sensitiveKeys.reduce(
     (currentMessage, pattern) => currentMessage.replace(pattern, '$1[REDACTED]'),
     str,
   );
+=======
+  const redacted = sensitiveKeys
+    .reduce((currentMessage, pattern) => currentMessage.replace(pattern, '$1[REDACTED]'), str)
+    .replace(EMAIL_PATTERN, REDACTED_EMAIL_VALUE)
+    .replace(ENCODED_EMAIL_PATTERN, REDACTED_EMAIL_VALUE);
+>>>>>>> upstream/main
 
   if (trimLength !== undefined && redacted.length > trimLength) {
     return `${redacted.substring(0, trimLength)}...`;
@@ -79,13 +122,66 @@ function redactMessage(str: string, trimLength?: number): string {
   return redacted;
 }
 
+<<<<<<< HEAD
 function redactLogString(str: string): string {
+=======
+/** Whitespace and angle brackets only: commas, quotes and brackets can sit inside one token. */
+const EMAIL_TOKEN_DELIMITER = /[\s<>]/u;
+/** Completed addresses and escaped (serialized) quotes are skipped; only a lone plain quote is counted. */
+const QUOTE_OR_ADDRESS =
+  /\\"(?:[^"\\\r\n]|\\{3}"|\\{4}|\\{2}(?!\\)|\\[bfnrt/]|\\u[0-9a-fA-F]{4})*\\"@|\\"|"(?:[^"\\\r\n]|\\.)*"@|"/gu;
+
+/** Drops a token cut by the window edge: its terminator is unseen, so no pattern could match it. */
+function trimUnfinishedToken(full: string, window: string): string {
+  if (window.length === full.length) {
+    return window;
+  }
+  let end = window.length;
+  if (!EMAIL_TOKEN_DELIMITER.test(full[end])) {
+    while (end > 0 && !EMAIL_TOKEN_DELIMITER.test(window[end - 1])) {
+      end--;
+    }
+  }
+  const trimmed = window.substring(0, end);
+  let quotes = 0;
+  let lastOpen = -1;
+  for (const match of trimmed.matchAll(QUOTE_OR_ADDRESS)) {
+    if (match[0] === '"') {
+      quotes++;
+      lastOpen = match.index;
+    }
+  }
+  /** An odd count of quotes outside completed addresses means the cut fell inside a quoted local. */
+  return quotes % 2 === 1 ? trimmed.substring(0, lastOpen) : trimmed;
+}
+
+function redactLogString(str: string): string {
+  /** A string costs one node plus one per 512 scanned characters, so wide payloads stay bounded. */
+  redactionNodeBudget -= 1 + Math.floor(Math.min(str.length, MAX_REDACTION_STRING_LENGTH) / 512);
+  if (redactionNodeBudget < 0) {
+    return REDACTED_VALUE;
+  }
+>>>>>>> upstream/main
   if (str.length <= MAX_REDACTION_STRING_LENGTH) {
     return redactMessage(str);
   }
 
+<<<<<<< HEAD
   const redacted = redactMessage(str.substring(0, MAX_REDACTION_STRING_LENGTH));
   return `${redacted}... [truncated ${str.length - MAX_REDACTION_STRING_LENGTH} chars]`;
+=======
+  /**
+   * Redacts a bounded window past the cutoff before cutting, so an address that straddles the limit
+   * is matched whole. The unfinished token at the window edge is dropped rather than kept unmatched.
+   */
+  const window = trimUnfinishedToken(
+    str,
+    str.substring(0, MAX_REDACTION_STRING_LENGTH + REDACTION_WINDOW_SLACK),
+  );
+  const redacted = redactMessage(window);
+  const kept = redacted.substring(0, MAX_REDACTION_STRING_LENGTH);
+  return `${kept}... [truncated ${str.length - kept.length} chars]`;
+>>>>>>> upstream/main
 }
 
 function isPlainRecord(value: object): value is Record<string, unknown> {
@@ -93,6 +189,28 @@ function isPlainRecord(value: object): value is Record<string, unknown> {
   return prototype === Object.prototype || prototype === null;
 }
 
+<<<<<<< HEAD
+=======
+/** `cursors` remembers the next free suffix per base so many colliding keys stay linear. */
+function redactLogKey(
+  key: string,
+  isUsed: (candidate: string) => boolean,
+  cursors: Map<string, number>,
+): string {
+  const base = /@|%(?:25)*40/i.test(key) ? redactLogString(key) : key;
+  let candidate = base;
+  let suffix = cursors.get(base) ?? 2;
+  while (isUsed(candidate)) {
+    candidate = `${base}#${suffix}`;
+    suffix++;
+  }
+  if (candidate !== base) {
+    cursors.set(base, suffix);
+  }
+  return candidate;
+}
+
+>>>>>>> upstream/main
 function isSensitiveMetadataKey(key: string): boolean {
   return sensitiveMetadataKey.test(key);
 }
@@ -129,6 +247,7 @@ function defineRedactedDescriptor(
   descriptor: PropertyDescriptor,
   seen: WeakMap<object, unknown>,
   depth: number,
+<<<<<<< HEAD
 ): void {
   if (!('value' in descriptor)) {
     Object.defineProperty(target, key, descriptor);
@@ -136,6 +255,16 @@ function defineRedactedDescriptor(
   }
 
   Object.defineProperty(target, key, {
+=======
+  targetKey: string | symbol = key,
+): void {
+  if (!('value' in descriptor)) {
+    Object.defineProperty(target, targetKey, descriptor);
+    return;
+  }
+
+  Object.defineProperty(target, targetKey, {
+>>>>>>> upstream/main
     ...descriptor,
     value:
       typeof key === 'string'
@@ -147,12 +276,18 @@ function defineRedactedDescriptor(
 function redactErrorValue(error: Error, seen: WeakMap<object, unknown>, depth: number): Error {
   const redacted = Object.create(Object.getPrototypeOf(error)) as Error & Record<string, unknown>;
   seen.set(error, redacted);
+<<<<<<< HEAD
+=======
+  const cursors = new Map<string, number>();
+  neutralizeSerializer(redacted);
+>>>>>>> upstream/main
 
   defineRedactedErrorProperty(redacted, 'name', error.name);
   defineRedactedErrorProperty(redacted, 'message', error.message);
   defineRedactedErrorProperty(redacted, 'stack', error.stack);
 
   Reflect.ownKeys(error).forEach((key) => {
+<<<<<<< HEAD
     if (typeof key === 'string' && errorStringProperties.has(key)) {
       return;
     }
@@ -161,6 +296,52 @@ function redactErrorValue(error: Error, seen: WeakMap<object, unknown>, depth: n
       return;
     }
     defineRedactedDescriptor(redacted, key, descriptor, seen, depth + 1);
+=======
+    if (typeof key === 'string' && (errorStringProperties.has(key) || key === 'toJSON')) {
+      return;
+    }
+    let descriptor = Object.getOwnPropertyDescriptor(error, key);
+    if (descriptor === undefined) {
+      return;
+    }
+    if (descriptor.enumerable && descriptor.get !== undefined) {
+      /** An enumerable getter is serialized by value, so it is materialized and redacted like data. */
+      try {
+        descriptor = {
+          value: descriptor.get.call(error),
+          writable: true,
+          enumerable: true,
+          configurable: true,
+        };
+      } catch {
+        return;
+      }
+    }
+    if (skipHeavyErrorFields && typeof key === 'string') {
+      const isAxios = readsTrue(error as unknown as Record<string, unknown>, 'isAxiosError');
+      if (isAxios && key === 'config') {
+        const compact = safelyCompact(descriptor.value);
+        if (compact !== undefined) {
+          defineRedactedDescriptor(
+            redacted,
+            key,
+            { ...descriptor, value: compact },
+            seen,
+            depth + 1,
+          );
+        }
+        return;
+      }
+      if (HEAVY_ERROR_KEYS.has(key) || (isAxios && AXIOS_ONLY_HEAVY_KEYS.has(key))) {
+        return;
+      }
+    }
+    const targetKey =
+      typeof key === 'string'
+        ? redactLogKey(key, (c) => Object.prototype.hasOwnProperty.call(redacted, c), cursors)
+        : key;
+    defineRedactedDescriptor(redacted, key, descriptor, seen, depth + 1, targetKey);
+>>>>>>> upstream/main
   });
   return redacted;
 }
@@ -170,12 +351,21 @@ function isBufferValue(value: object): value is Buffer {
 }
 
 function getJsonValue(value: object): unknown {
+<<<<<<< HEAD
   const toJSON = (value as { toJSON?: unknown }).toJSON;
   if (typeof toJSON !== 'function') {
     return undefined;
   }
 
   try {
+=======
+  try {
+    const toJSON = (value as { toJSON?: unknown }).toJSON;
+    if (typeof toJSON !== 'function') {
+      return undefined;
+    }
+
+>>>>>>> upstream/main
     const jsonValue = toJSON.call(value);
     return jsonValue === value ? undefined : jsonValue;
   } catch {
@@ -203,6 +393,10 @@ function redactMapValue(
   depth: number,
 ): Map<unknown, unknown> {
   const redacted = new Map<unknown, unknown>();
+<<<<<<< HEAD
+=======
+  const cursors = new Map<string, number>();
+>>>>>>> upstream/main
   seen.set(value, redacted);
   let count = 0;
   for (const [mapKey, mapValue] of value) {
@@ -210,8 +404,17 @@ function redactMapValue(
       redacted.set(REDACTION_TRUNCATED_KEY, 'Additional map entries omitted');
       break;
     }
+<<<<<<< HEAD
     redacted.set(
       mapKey,
+=======
+    const safeKey =
+      typeof mapKey === 'string'
+        ? redactLogKey(mapKey, (candidate) => redacted.has(candidate), cursors)
+        : redactLogValue(mapKey, seen, depth + 1);
+    redacted.set(
+      safeKey,
+>>>>>>> upstream/main
       typeof mapKey === 'string'
         ? redactRecordValue(mapKey, mapValue, seen, depth + 1)
         : redactLogValue(mapValue, seen, depth + 1),
@@ -240,6 +443,60 @@ function redactSetValue(
   return redacted;
 }
 
+<<<<<<< HEAD
+=======
+/** Shadows an inherited `toJSON` with an inert own property so no hook runs after redaction. */
+function neutralizeSerializer(target: object): boolean {
+  let hooked = true;
+  try {
+    hooked = typeof (target as { toJSON?: unknown }).toJSON === 'function';
+  } catch {
+    /* a throwing getter is treated as a hook and shadowed below */
+  }
+  if (!hooked) {
+    return true;
+  }
+  try {
+    Object.defineProperty(target, 'toJSON', {
+      value: undefined,
+      enumerable: false,
+      configurable: true,
+    });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function safely(read: () => boolean): boolean {
+  try {
+    return read();
+  } catch {
+    return false;
+  }
+}
+
+function safelyCompact(config: unknown): Record<string, unknown> | undefined {
+  try {
+    return compactRequestInfo(config);
+  } catch {
+    return undefined;
+  }
+}
+
+function readsTrue(record: Record<string | symbol, unknown>, key: string): boolean {
+  return safely(() => record[key] === true);
+}
+
+function readField(record: Record<string, unknown>, key: string): unknown {
+  try {
+    return record[key];
+  } catch {
+    return '[Unreadable]';
+  }
+}
+
+>>>>>>> upstream/main
 function redactObjectEntries(
   value: object,
   seen: WeakMap<object, unknown>,
@@ -247,6 +504,10 @@ function redactObjectEntries(
 ): Record<string, unknown> | undefined {
   const record = value as Record<string, unknown>;
   let redacted: Record<string, unknown> | undefined;
+<<<<<<< HEAD
+=======
+  const cursors = new Map<string, number>();
+>>>>>>> upstream/main
   let count = 0;
 
   for (const key in record) {
@@ -257,11 +518,28 @@ function redactObjectEntries(
       redacted = {};
       seen.set(value, redacted);
     }
+<<<<<<< HEAD
+=======
+    /** A serialization hook would run after redaction and could re-emit the raw values. */
+    if (key === 'toJSON') {
+      continue;
+    }
+>>>>>>> upstream/main
     if (count >= MAX_REDACTION_ENTRIES) {
       redacted[REDACTION_TRUNCATED_KEY] = 'Additional object properties omitted';
       break;
     }
+<<<<<<< HEAD
     redacted[key] = redactRecordValue(key, record[key], seen, depth + 1);
+=======
+    redacted[
+      redactLogKey(
+        key,
+        (candidate) => Object.prototype.hasOwnProperty.call(redacted, candidate),
+        cursors,
+      )
+    ] = redactRecordValue(key, readField(record, key), seen, depth + 1);
+>>>>>>> upstream/main
     count += 1;
   }
 
@@ -310,6 +588,14 @@ function redactLogValue(value: unknown, seen = new WeakMap<object, unknown>(), d
     return redactLogString(value);
   }
 
+<<<<<<< HEAD
+=======
+  /** A function's `toString`/`toJSON` would run after redaction, so only a marker is kept. */
+  if (typeof value === 'function') {
+    return '[Function]';
+  }
+
+>>>>>>> upstream/main
   if (value === null || typeof value !== 'object') {
     return value;
   }
@@ -319,10 +605,26 @@ function redactLogValue(value: unknown, seen = new WeakMap<object, unknown>(), d
     return cached;
   }
 
+<<<<<<< HEAD
   if (depth >= MAX_REDACTION_DEPTH) {
     return REDACTED_VALUE;
   }
 
+=======
+  if (depth >= MAX_REDACTION_DEPTH || redactionNodeBudget-- <= 0) {
+    return REDACTED_VALUE;
+  }
+
+  try {
+    return redactObjectValue(value, seen, depth);
+  } catch {
+    /* revoked proxies and throwing traps must not abort the log call */
+    return '[Unreadable]';
+  }
+}
+
+function redactObjectValue(value: object, seen: WeakMap<object, unknown>, depth: number): unknown {
+>>>>>>> upstream/main
   if (Array.isArray(value)) {
     const redacted: unknown[] = [];
     seen.set(value, redacted);
@@ -347,6 +649,52 @@ function redactLogValue(value: unknown, seen = new WeakMap<object, unknown>(), d
   return redactObjectEntries(value, seen, depth) ?? {};
 }
 
+<<<<<<< HEAD
+=======
+/** Writes a redacted field back; returns false when a read-only property refuses the write. */
+function setLogField(
+  target: Record<string, unknown>,
+  key: string,
+  safeKey: string,
+  value: unknown,
+): boolean {
+  let removed = true;
+  try {
+    if (safeKey !== key) {
+      removed = Reflect.deleteProperty(target, key);
+    }
+    target[safeKey] = value;
+    return removed;
+  } catch {
+    try {
+      Object.defineProperty(target, safeKey, { value, configurable: true, writable: true });
+    } catch {
+      /* handled by the caller through the false return */
+    }
+    return false;
+  }
+}
+
+/** Rebuilds the record as a plain writable copy when some field could not be replaced in place. */
+function sanitizedCopy(
+  info: Record<string | symbol, unknown>,
+  fields: Record<string, unknown>,
+  stack: string | undefined,
+  message: unknown,
+): winston.Logform.TransformableInfo {
+  const copy: Record<string | symbol, unknown> = {};
+  for (const symbol of Object.getOwnPropertySymbols(info)) {
+    copy[symbol] = info[symbol];
+  }
+  copy.level = info.level;
+  copy.message = message;
+  if (stack !== undefined) {
+    copy.stack = stack;
+  }
+  return Object.assign(copy, fields) as winston.Logform.TransformableInfo;
+}
+
+>>>>>>> upstream/main
 /**
  * Redacts sensitive information from log messages at every level.
  * Note: Intentionally mutates the object.
@@ -356,9 +704,58 @@ function redactLogValue(value: unknown, seen = new WeakMap<object, unknown>(), d
 const redactFormat: winston.Logform.FormatWrap = winston.format(
   (info: winston.Logform.TransformableInfo) => {
     const infoRecord = info as Record<string | symbol, unknown>;
+<<<<<<< HEAD
 
     if (info.message !== undefined) {
       info.message = redactLogValue(info.message);
+=======
+    const stripsHeavyFields = info.level === 'error' || info.level === 'warn';
+    const outerBudget = redactionNodeBudget;
+    redactionNodeBudget = MAX_REDACTION_NODES;
+    const topSeen = new WeakMap<object, unknown>();
+    const skipsHeavyTopLevel = stripsHeavyFields && safely(() => isErrorLike(info));
+
+    let redactedMessage: unknown;
+    let replaceFailed = false;
+    let rawMessage: unknown;
+    try {
+      rawMessage = info.message;
+    } catch {
+      rawMessage = '[Unreadable]';
+      replaceFailed = true;
+    }
+    if (rawMessage !== undefined) {
+      redactedMessage = redactLogValue(rawMessage);
+      if (Object.getOwnPropertyDescriptor(info, 'message')?.get !== undefined) {
+        replaceFailed = true;
+      }
+      try {
+        info.message = redactedMessage as string;
+      } catch {
+        replaceFailed = true;
+      }
+    }
+
+    /** A direct `logger.error(error)` makes `info` the Error, whose stack is non-enumerable. */
+    let redactedStack: string | undefined;
+    let rawStack: unknown;
+    try {
+      rawStack = infoRecord.stack;
+    } catch {
+      rawStack = undefined;
+      replaceFailed = true;
+    }
+    if (typeof rawStack === 'string') {
+      redactedStack = redactLogString(rawStack);
+      if (Object.getOwnPropertyDescriptor(info, 'stack')?.get !== undefined) {
+        replaceFailed = true;
+      }
+      try {
+        infoRecord.stack = redactedStack;
+      } catch {
+        replaceFailed = true;
+      }
+>>>>>>> upstream/main
     }
 
     const symbolValue = infoRecord[MESSAGE_SYMBOL];
@@ -367,9 +764,87 @@ const redactFormat: winston.Logform.FormatWrap = winston.format(
     }
 
     if (infoRecord[SPLAT_SYMBOL] !== undefined) {
+<<<<<<< HEAD
       infoRecord[SPLAT_SYMBOL] = redactLogValue(infoRecord[SPLAT_SYMBOL]);
     }
     return info;
+=======
+      skipHeavyErrorFields = stripsHeavyFields;
+      try {
+        infoRecord[SPLAT_SYMBOL] = redactLogValue(infoRecord[SPLAT_SYMBOL]);
+      } finally {
+        skipHeavyErrorFields = false;
+      }
+    }
+
+    const cursors = new Map<string, number>();
+    const fields: Record<string, unknown> = {};
+    const isAxios = readsTrue(infoRecord, 'isAxiosError');
+    for (const key of Object.keys(info)) {
+      if (key === 'message' || key === 'level') {
+        continue;
+      }
+      if (key === 'toJSON') {
+        if (!Reflect.deleteProperty(info, key)) {
+          replaceFailed = true;
+        }
+        continue;
+      }
+      /** Past the budget, further top-level fields are dropped rather than scanned. */
+      if (redactionNodeBudget-- <= 0) {
+        if (!Reflect.deleteProperty(info, key)) {
+          replaceFailed = true;
+        }
+        continue;
+      }
+      /**
+       * `stripHeavyErrorFields` drops these later. Cloning the graph here would only burn time, and
+       * leaving the raw value would depend on that later pass succeeding, so the field is replaced
+       * by its redacted compact form (or removed) now.
+       */
+      if (
+        skipsHeavyTopLevel &&
+        (HEAVY_ERROR_KEYS.has(key) || (isAxios && AXIOS_ONLY_HEAVY_KEYS.has(key)))
+      ) {
+        const compact =
+          isAxios && key === 'config' ? safelyCompact(readField(infoRecord, key)) : undefined;
+        if (compact !== undefined) {
+          fields[key] = compact;
+          if (!setLogField(infoRecord, key, key, compact)) {
+            replaceFailed = true;
+          }
+        } else if (!Reflect.deleteProperty(info, key)) {
+          replaceFailed = true;
+        }
+        continue;
+      }
+      /** An accessor keeps serving its original value after assignment, so the record is rebuilt. */
+      if (Object.getOwnPropertyDescriptor(info, key)?.get !== undefined) {
+        replaceFailed = true;
+      }
+      let raw: unknown;
+      try {
+        raw = infoRecord[key];
+      } catch {
+        raw = '[Unreadable]';
+      }
+      const value = redactRecordValue(key, raw, topSeen, 0);
+      const safeKey = redactLogKey(
+        key,
+        (candidate) => candidate !== key && Object.prototype.hasOwnProperty.call(info, candidate),
+        cursors,
+      );
+      fields[safeKey] = value;
+      if (!setLogField(infoRecord, key, safeKey, value)) {
+        replaceFailed = true;
+      }
+    }
+    redactionNodeBudget = outerBudget;
+    if (!neutralizeSerializer(info)) {
+      replaceFailed = true;
+    }
+    return replaceFailed ? sanitizedCopy(infoRecord, fields, redactedStack, redactedMessage) : info;
+>>>>>>> upstream/main
   },
 );
 
@@ -531,7 +1006,11 @@ const compactRequestInfo = (config: unknown): { method?: unknown; url?: unknown 
   if (method === undefined && url === undefined) {
     return undefined;
   }
+<<<<<<< HEAD
   return { method, url };
+=======
+  return { method: redactLogValue(method), url: redactLogValue(url) };
+>>>>>>> upstream/main
 };
 
 const compactResponse = (response: unknown): Record<string, unknown> | undefined => {
@@ -683,16 +1162,36 @@ const jsonTruncateFormat: winston.Logform.FormatWrap = winston.format(
         return obj.map((item) => truncateObject(item));
       }
 
+<<<<<<< HEAD
       // We know this is an object at this point
       const objectRecord = obj as Record<string, unknown>;
       const newObj: Record<string, unknown> = {};
       Object.entries(objectRecord).forEach(([key, value]) => {
+=======
+      const objectRecord = obj as Record<string | symbol, unknown>;
+      const newObj: Record<string | symbol, unknown> = {};
+      // Only the log record carries transport symbols; nested values stay JSON-shaped.
+      const keys = obj === info ? Reflect.ownKeys(objectRecord) : Object.keys(objectRecord);
+      for (const key of keys) {
+        if (typeof key === 'symbol') {
+          newObj[key] = objectRecord[key];
+          continue;
+        }
+        if (!Object.prototype.propertyIsEnumerable.call(objectRecord, key)) {
+          continue;
+        }
+        const value = objectRecord[key];
+>>>>>>> upstream/main
         if (typeof value === 'string') {
           newObj[key] = truncateLongStrings(value, CONSOLE_JSON_STRING_LENGTH);
         } else {
           newObj[key] = truncateObject(value);
         }
+<<<<<<< HEAD
       });
+=======
+      }
+>>>>>>> upstream/main
       return newObj;
     };
 
@@ -700,4 +1199,15 @@ const jsonTruncateFormat: winston.Logform.FormatWrap = winston.format(
   },
 );
 
+<<<<<<< HEAD
 export { redactFormat, redactMessage, debugTraverse, jsonTruncateFormat, stripHeavyErrorFields };
+=======
+export {
+  redactFormat,
+  redactMessage,
+  redactLogString,
+  debugTraverse,
+  jsonTruncateFormat,
+  stripHeavyErrorFields,
+};
+>>>>>>> upstream/main

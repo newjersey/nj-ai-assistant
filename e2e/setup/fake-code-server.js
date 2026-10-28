@@ -226,6 +226,15 @@ async function handleExec(req, res) {
   sendJson(res, 200, { stdout: 'E2E code exec ok\n', stderr: '', files: [] });
 }
 
+<<<<<<< HEAD
+=======
+/** File ids set through `POST /__debug/slow-downloads` download as a long trickle, so a spec can
+ *  disconnect mid-stream. `GET /__debug/downloads?fileId=` reports how many of those bodies were
+ *  cut off by LibreChat closing the upstream. Keyed by file id so parallel projects stay apart. */
+const slowDownloadFiles = new Set();
+const closedSlowDownloads = new Map();
+
+>>>>>>> upstream/main
 const server = http.createServer((req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
   const { pathname } = url;
@@ -242,7 +251,27 @@ const server = http.createServer((req, res) => {
       return;
     }
 
+<<<<<<< HEAD
     if (pathname === '/__debug/reset' && req.method === 'POST') {
+=======
+    if (pathname === '/__debug/slow-downloads' && req.method === 'POST') {
+      const { fileId, slow } = await readJson(req);
+      if (slow === true) slowDownloadFiles.add(fileId);
+      else slowDownloadFiles.delete(fileId);
+      sendJson(res, 200, { ok: true });
+      return;
+    }
+
+    if (pathname === '/__debug/downloads' && req.method === 'GET') {
+      const fileId = url.searchParams.get('fileId');
+      sendJson(res, 200, { closed: closedSlowDownloads.get(fileId) ?? 0 });
+      return;
+    }
+
+    if (pathname === '/__debug/reset' && req.method === 'POST') {
+      slowDownloadFiles.clear();
+      closedSlowDownloads.clear();
+>>>>>>> upstream/main
       sessions.clear();
       generated.clear();
       uploads.length = 0;
@@ -267,6 +296,28 @@ const server = http.createServer((req, res) => {
     }
 
     const downloadMatch = pathname.match(/^\/v1\/download\/([^/]+)\/([^/]+)$/);
+<<<<<<< HEAD
+=======
+    const slowFileId = downloadMatch ? decodeURIComponent(downloadMatch[2]) : '';
+    if (downloadMatch && req.method === 'GET' && slowDownloadFiles.has(slowFileId)) {
+      res.writeHead(200, { 'Content-Type': 'text/csv' });
+      let sent = 0;
+      const timer = setInterval(() => {
+        res.write(Buffer.alloc(16 * 1024, 'a'));
+        if (++sent >= 600) {
+          clearInterval(timer);
+          res.end();
+        }
+      }, 50);
+      res.on('close', () => {
+        clearInterval(timer);
+        if (!res.writableFinished) {
+          closedSlowDownloads.set(slowFileId, (closedSlowDownloads.get(slowFileId) ?? 0) + 1);
+        }
+      });
+      return;
+    }
+>>>>>>> upstream/main
     if (downloadMatch && req.method === 'GET') {
       const key = `${decodeURIComponent(downloadMatch[1])}/${decodeURIComponent(downloadMatch[2])}`;
       const file = generated.get(key);

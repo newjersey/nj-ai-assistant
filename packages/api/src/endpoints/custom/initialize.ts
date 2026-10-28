@@ -15,10 +15,20 @@ import type {
   ProviderInitializeParams,
 } from '~/types';
 import { getLLMConfig as getAnthropicLLMConfig } from '~/endpoints/anthropic/llm';
+<<<<<<< HEAD
 import { extractDefaultParams } from '~/endpoints/openai/llm';
 import { isUserProvided, checkUserKeyExpiry } from '~/utils';
 import { getOpenAIConfig } from '~/endpoints/openai/config';
 import { getScopedTokenConfigKey } from '~/endpoints/keys';
+=======
+import { resolveModelTransportTimeouts } from '~/agents/config';
+import { extractDefaultParams } from '~/endpoints/openai/llm';
+import { isUserProvided, checkUserKeyExpiry } from '~/utils';
+import { withSupportedEffort } from '~/endpoints/reasoning';
+import { getOpenAIConfig } from '~/endpoints/openai/config';
+import { getScopedTokenConfigKey } from '~/endpoints/keys';
+import { resolveCustomEndpointParameters } from './config';
+>>>>>>> upstream/main
 import { getCustomEndpointConfig } from '~/app/config';
 import { resolveEndpointRuntime } from '~/types';
 import { fetchModels } from '~/endpoints/models';
@@ -67,7 +77,12 @@ export function getTokenConfigKey(
 
 /**
  * Maps an admin-facing static `tokenConfig` to the billing shape: the UI uses
+<<<<<<< HEAD
  * `cacheWrite`/`cacheRead`, but `getCacheMultiplier` indexes `write`/`read`.
+=======
+ * `cacheWrite`/`cacheWrite1h`/`cacheRead`, but `getCacheMultiplier` indexes
+ * `write`/`write1h`/`read`.
+>>>>>>> upstream/main
  * Adds those keys (preserving the originals) so cache tokens bill at the
  * configured rate instead of the prompt-rate fallback.
  */
@@ -80,6 +95,12 @@ function toBillingTokenConfig(
     if (rates.cacheWrite != null) {
       mapped.write = rates.cacheWrite;
     }
+<<<<<<< HEAD
+=======
+    if (rates.cacheWrite1h != null) {
+      mapped.write1h = rates.cacheWrite1h;
+    }
+>>>>>>> upstream/main
     if (rates.cacheRead != null) {
       mapped.read = rates.cacheRead;
     }
@@ -134,6 +155,10 @@ function buildAnthropicCustomConfig({
   apiKey,
   baseURL,
   modelOptions,
+<<<<<<< HEAD
+=======
+  inferenceParameters,
+>>>>>>> upstream/main
   endpointConfig,
   userProvidesURL,
   allowedAddresses,
@@ -141,12 +166,20 @@ function buildAnthropicCustomConfig({
   apiKey: string;
   baseURL: string;
   modelOptions: AnthropicModelOptions;
+<<<<<<< HEAD
+=======
+  inferenceParameters?: Record<string, unknown>;
+>>>>>>> upstream/main
   endpointConfig: Partial<TEndpoint>;
   userProvidesURL: boolean;
   allowedAddresses?: string[] | null;
 }): InitializeResultBase {
   const result = getAnthropicLLMConfig(apiKey, {
     modelOptions,
+<<<<<<< HEAD
+=======
+    inferenceParameters,
+>>>>>>> upstream/main
     proxy: PROXY ?? undefined,
     reverseProxyUrl: baseURL,
     baseURLIsUserProvided: userProvidesURL,
@@ -177,21 +210,38 @@ function buildAnthropicCustomConfig({
 export async function initializeCustom(
   params: ProviderInitializeParams,
 ): Promise<InitializeResultBase> {
+<<<<<<< HEAD
   const { endpoint, model_parameters, db } = params;
   const { appConfig, user, requestBody } = resolveEndpointRuntime(params);
   const { key: expiresAt } = requestBody;
 
   const endpointConfig = getCustomEndpointConfig({
+=======
+  const { endpoint, model_parameters, inferenceParameters, db } = params;
+  const { appConfig, user, requestBody } = resolveEndpointRuntime(params);
+  const { key: expiresAt } = requestBody;
+
+  const configuredEndpoint = getCustomEndpointConfig({
+>>>>>>> upstream/main
     endpoint,
     appConfig,
   });
 
+<<<<<<< HEAD
   if (!endpointConfig) {
     throw new Error(`Config not found for the ${endpoint} custom endpoint.`);
   }
 
   const CUSTOM_API_KEY = extractEnvVariable(endpointConfig.apiKey ?? '');
   const CUSTOM_BASE_URL = extractEnvVariable(endpointConfig.baseURL ?? '');
+=======
+  if (!configuredEndpoint) {
+    throw new Error(`Config not found for the ${endpoint} custom endpoint.`);
+  }
+
+  const CUSTOM_API_KEY = extractEnvVariable(configuredEndpoint.apiKey ?? '');
+  const CUSTOM_BASE_URL = extractEnvVariable(configuredEndpoint.baseURL ?? '');
+>>>>>>> upstream/main
 
   if (CUSTOM_API_KEY.match(envVarRegex)) {
     throw new Error(`Missing API Key for ${endpoint}.`);
@@ -201,6 +251,13 @@ export async function initializeCustom(
     throw new Error(`Missing Base URL for ${endpoint}.`);
   }
 
+<<<<<<< HEAD
+=======
+  const endpointConfig = {
+    ...configuredEndpoint,
+    customParams: resolveCustomEndpointParameters(configuredEndpoint, CUSTOM_BASE_URL),
+  };
+>>>>>>> upstream/main
   const userProvidesKey = isUserProvided(CUSTOM_API_KEY);
   const userProvidesURL = isUserProvided(CUSTOM_BASE_URL);
 
@@ -252,6 +309,23 @@ export async function initializeCustom(
   const userId = user?.id ?? '';
   const tenantId = user?.tenantId;
 
+<<<<<<< HEAD
+=======
+  /** The stored effort is checked against the provider's catalog, an independent read: it starts
+   *  here and is awaited where the model options are built, so it overlaps token discovery below
+   *  instead of following it. The no-op catch keeps an early failure from going unhandled. */
+  const requestedOptions = { ...(model_parameters ?? {}), user: userId };
+  const effortCheck =
+    params.reasoningCapabilityDeps == null
+      ? undefined
+      : withSupportedEffort(
+          requestedOptions,
+          endpointConfig as TEndpoint,
+          params.reasoningCapabilityDeps,
+        );
+  effortCheck?.catch(() => undefined);
+
+>>>>>>> upstream/main
   const cache = tokenConfigCache();
   const hasTokenConfig = endpointConfig.tokenConfig != null;
   const tokenKey = getTokenConfigKey(endpointConfig, endpoint, userId, tenantId);
@@ -311,11 +385,19 @@ export async function initializeCustom(
     reverseProxyUrl: baseURL ?? null,
     baseURLIsUserProvided: userProvidesURL,
     allowedAddresses: appConfig?.endpoints?.allowedAddresses,
+<<<<<<< HEAD
+=======
+    transportTimeouts: resolveModelTransportTimeouts(appConfig?.endpoints?.agents),
+>>>>>>> upstream/main
     proxy: PROXY ?? null,
     ...customOptions,
   };
 
+<<<<<<< HEAD
   const modelOptions = { ...(model_parameters ?? {}), user: userId };
+=======
+  const modelOptions = effortCheck == null ? requestedOptions : await effortCheck;
+>>>>>>> upstream/main
 
   let options: InitializeResultBase;
   if (endpointConfig.provider === EModelEndpoint.anthropic) {
@@ -326,6 +408,10 @@ export async function initializeCustom(
       apiKey,
       baseURL,
       modelOptions: modelOptions as AnthropicModelOptions,
+<<<<<<< HEAD
+=======
+      inferenceParameters,
+>>>>>>> upstream/main
       endpointConfig,
       userProvidesURL,
       allowedAddresses: appConfig?.endpoints?.allowedAddresses,
@@ -333,8 +419,14 @@ export async function initializeCustom(
     options.endpointTokenConfig = endpointTokenConfig;
   } else {
     const finalClientOptions = {
+<<<<<<< HEAD
       modelOptions,
       ...clientOptions,
+=======
+      ...clientOptions,
+      modelOptions,
+      inferenceParameters,
+>>>>>>> upstream/main
     };
     options = getOpenAIConfig(apiKey, finalClientOptions, endpoint);
     if (options != null) {

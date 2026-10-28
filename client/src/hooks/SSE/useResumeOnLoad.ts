@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useStore } from 'jotai';
 import { useQueryClient } from '@tanstack/react-query';
@@ -243,6 +244,42 @@ function buildSubmissionFromResumeState(
     resumeGenerationProtocolVersion: GenerationProtocolVersion;
   };
 }
+=======
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { useStore, useSetAtom, useAtomValue } from 'jotai';
+import {
+  Constants,
+  isAssistantsEndpoint,
+  isForcedTemporaryRetention,
+} from 'librechat-data-provider';
+import {
+  activeGenerationCreatedAtByConvoId,
+  useIsSubmitting,
+  submissionStartFamily,
+  submissionByIndex,
+  useSubmission,
+} from '@librechat/chat/react';
+import {
+  hasSubmissionUserMessage,
+  getGenerationProtocolVersion,
+  supportsGenerationProtocolV2,
+  buildMinimalResumeSubmission,
+  resumeStateMatchesSubmission,
+  getResumeBranchTargetMessageId,
+  buildSubmissionFromResumeState,
+} from '@librechat/chat';
+import type { TMessage, Agents } from 'librechat-data-provider';
+import { siblingIdxFamily, siblingKey } from '~/components/Chat/Messages/Thread/state';
+import { pendingApprovalActionFamily } from '~/components/Chat/approval/state';
+import { useChatSettings } from '~/Providers/ChatSettingsContext';
+import { getBranchSiblingIndexesForTarget } from '~/utils';
+import useResumeAnnouncements from './announcements';
+import { useStreamStatus } from '~/data-provider';
+import { settleFinishedRun } from './finished';
+import useOwedSuccessor from './successor';
+import useSteerState from './steer';
+>>>>>>> upstream/main
 
 /**
  * Hook to resume streaming if navigating to a conversation with active generation.
@@ -261,6 +298,7 @@ export default function useResumeOnLoad(
   runIndex = 0,
   messagesLoaded = true,
 ) {
+<<<<<<< HEAD
   const fileMap = useFileMapContext();
   const jotaiStore = useStore();
   const queryClient = useQueryClient();
@@ -272,10 +310,28 @@ export default function useResumeOnLoad(
     store.activeGenerationCreatedAtByConvoId(conversationId ?? ''),
   );
   const currentConversation = useRecoilValue(store.conversationByIndex(runIndex));
+=======
+  const jotaiStore = useStore();
+  const queryClient = useQueryClient();
+  const setSubmission = useSetAtom(submissionByIndex(runIndex));
+  const setSubmissionStart = useSetAtom(submissionStartFamily(runIndex));
+  const currentSubmission = useSubmission(runIndex);
+  const isSubmitting = useIsSubmitting(runIndex);
+  const attachedGenerationCreatedAt = useAtomValue(
+    activeGenerationCreatedAtByConvoId(conversationId ?? ''),
+  );
+  const { config, usePaneConversation } = useChatSettings();
+  const currentConversation = usePaneConversation(runIndex);
+>>>>>>> upstream/main
   const endpoint = currentConversation?.endpoint;
   const endpointType = currentConversation?.endpointType;
   const actualEndpoint = endpointType ?? endpoint;
   const resumableEnabled = !isAssistantsEndpoint(actualEndpoint);
+<<<<<<< HEAD
+=======
+  const startupConfigSettled = config.loaded !== false;
+  const isRetentionForced = isForcedTemporaryRetention(config.retentionMode);
+>>>>>>> upstream/main
   // Track conversations we've already processed (either resumed or skipped)
   const processedConvoRef = useRef<string | null>(null);
   /**
@@ -287,9 +343,12 @@ export default function useResumeOnLoad(
    * repeatable, and still one status read per interval at worst.
    */
   const answeredActiveJobRef = useRef<{ conversationId: string; at: number } | null>(null);
+<<<<<<< HEAD
   /** Receipt state at the last arm, so history is refetched on a transition
    *  rather than on every heartbeat of an unchanged queued turn. */
   const lastArmedReceiptSignatureRef = useRef<string | null>(null);
+=======
+>>>>>>> upstream/main
   /**
    * Bumped when an announcement is answered. Clearing `processedConvoRef` alone
    * cannot restart the check below: a ref mutation neither schedules a render
@@ -318,6 +377,7 @@ export default function useResumeOnLoad(
     [jotaiStore],
   );
 
+<<<<<<< HEAD
   /** Restore pending-steer chips for steers the server still has queued
    *  (injected ones already live inside the resumed aggregatedContent). */
   const convertSteersToQueued = useSteerConvert();
@@ -441,6 +501,12 @@ export default function useResumeOnLoad(
       },
     [],
   );
+=======
+  /** Pending-steer chips for steers the server still has queued (injected ones
+   *  already live inside the resumed aggregatedContent). */
+  const steerState = useSteerState();
+  const { seedSteerChips, settleAppliedSteerParts, updateActiveGenerationCreatedAt } = steerState;
+>>>>>>> upstream/main
 
   // Check for active stream when conversation changes
   const submissionConvoId = currentSubmission?.conversation?.conversationId;
@@ -471,6 +537,7 @@ export default function useResumeOnLoad(
   const hasLiveSubmissionForThisConvo =
     hasActiveSubmissionForThisConvo && (isSubmitting || attachedGenerationCreatedAt != null);
 
+<<<<<<< HEAD
   /**
    * A run this pane did not start — another tab, another device, a scheduled
    * trigger — announces itself only through the user-scoped active-job list,
@@ -797,10 +864,23 @@ export default function useResumeOnLoad(
       }
     };
   }, [owedSuccessors, owedIsReporting, conversationId, queryClient, jotaiStore]);
+=======
+  const owed = useOwedSuccessor({
+    conversationId,
+    resumableEnabled,
+    attachedGenerationCreatedAt,
+    hasLiveSubmissionForThisConvo,
+  });
+  const { queuedTurnReceipts } = owed;
+>>>>>>> upstream/main
 
   const shouldCheck =
     resumableEnabled &&
     messagesLoaded && // Wait for messages to load before checking
+<<<<<<< HEAD
+=======
+    startupConfigSettled && // The forced retention mode decides the rebuilt submission's temporary state
+>>>>>>> upstream/main
     !hasActiveSubmissionForThisConvo && // Allow if no submission or a confirmed stale submission
     !!conversationId &&
     conversationId !== Constants.NEW_CONVO &&
@@ -838,6 +918,13 @@ export default function useResumeOnLoad(
       return;
     }
 
+<<<<<<< HEAD
+=======
+    if (!startupConfigSettled) {
+      return;
+    }
+
+>>>>>>> upstream/main
     // Don't resume if we already have an active submission FOR THIS CONVERSATION
     // A stale submission with undefined/different conversationId should not block us
     if (hasActiveSubmissionForThisConvo) {
@@ -918,6 +1005,7 @@ export default function useResumeOnLoad(
 
     if (!streamStatus.active || !streamStatus.streamId) {
       console.log('[ResumeOnLoad] No active job to resume for:', conversationId);
+<<<<<<< HEAD
       const revealFamily = revealedQueuedTurnFamily(conversationId);
       const pendingReveal = jotaiStore.get(revealFamily);
       /** A remounted pane may have missed attachment and the quiet-window
@@ -962,18 +1050,44 @@ export default function useResumeOnLoad(
       // `unrecoveredSteers` above — same empty-list reconcile as the resume path.
       settleAppliedSteerParts(conversationId, getMessages());
       restoreSteerChips(conversationId, undefined);
+=======
+      settleFinishedRun({
+        jotaiStore,
+        queryClient,
+        steers: steerState,
+        conversationId,
+        streamStatus,
+        streamStatusUpdatedAt,
+        queuedTurnReceipts,
+        getMessages,
+        generationProtocolVersion,
+      });
+>>>>>>> upstream/main
       processedConvoRef.current = conversationId;
       return;
     }
 
+<<<<<<< HEAD
+=======
+    /** Still generating: a marker left for this run stays until the resume's stream delivers its
+     *  end or its recovery reads it from history, and the resume's start retires a marker left
+     *  for any other run, so the job deleted between this read and the attach is not lost. */
+>>>>>>> upstream/main
     processedConvoRef.current = conversationId;
     if (handoffGenerationKey != null) {
       consumedHandoffGenerationRef.current = handoffGenerationKey;
     }
     if (streamStatus.createdAt != null) {
+<<<<<<< HEAD
       setActiveGenerationCreatedAt(
         conversationId,
         streamStatus.createdAt,
+=======
+      updateActiveGenerationCreatedAt(
+        conversationId,
+        streamStatus.createdAt,
+        undefined,
+>>>>>>> upstream/main
         generationProtocolVersion,
       );
     }
@@ -1008,9 +1122,15 @@ export default function useResumeOnLoad(
     // Build submission from resume state if available
     if (streamStatus.resumeState) {
       restoreResumeBranch(streamStatus.resumeState, messages, conversationId);
+<<<<<<< HEAD
       restoreSteerChips(
         conversationId,
         streamStatus.resumeState.pendingSteers,
+=======
+      seedSteerChips(
+        conversationId,
+        streamStatus.resumeState.pendingSteers ?? [],
+>>>>>>> upstream/main
         streamStatus.createdAt,
         generationProtocolVersion,
       );
@@ -1028,6 +1148,7 @@ export default function useResumeOnLoad(
         conversationId,
         streamStatus.createdAt,
         generationProtocolVersion,
+<<<<<<< HEAD
       );
       setSubmission(submission);
     } else {
@@ -1059,6 +1180,23 @@ export default function useResumeOnLoad(
         resumeGenerationProtocolVersion: GenerationProtocolVersion;
       };
       setSubmission(submission);
+=======
+        streamStatus.isTemporary === true || isRetentionForced,
+      );
+      setSubmission(submission);
+    } else {
+      setSubmission(
+        buildMinimalResumeSubmission({
+          messages,
+          conversationId,
+          streamId: streamStatus.streamId,
+          createdAt: streamStatus.createdAt,
+          aggregatedContent: streamStatus.aggregatedContent,
+          isTemporary: streamStatus.isTemporary === true || isRetentionForced,
+          generationProtocolVersion,
+        }),
+      );
+>>>>>>> upstream/main
     }
   }, [
     conversationId,
@@ -1078,12 +1216,23 @@ export default function useResumeOnLoad(
     setSubmission,
     setSubmissionStart,
     restoreResumeBranch,
+<<<<<<< HEAD
     restoreSteerChips,
     settleAppliedSteerParts,
     convertSteersToQueued,
     setActiveGenerationCreatedAt,
     jotaiStore,
     externalRunArm,
+=======
+    steerState,
+    seedSteerChips,
+    settleAppliedSteerParts,
+    updateActiveGenerationCreatedAt,
+    jotaiStore,
+    externalRunArm,
+    isRetentionForced,
+    startupConfigSettled,
+>>>>>>> upstream/main
   ]);
 
   // Reset processedConvoRef when conversation changes to allow re-checking
@@ -1100,6 +1249,7 @@ export default function useResumeOnLoad(
     }
   }, [conversationId]);
 
+<<<<<<< HEAD
   /**
    * Answer an active-job announcement for the conversation on screen.
    *
@@ -1189,4 +1339,21 @@ export default function useResumeOnLoad(
     setSubmission,
     queryClient,
   ]);
+=======
+  /** The route can name a conversation before this pane has loaded it; until then the endpoint
+   *  that decides resumability is the previous conversation's, so the request waits. */
+  useResumeAnnouncements({
+    conversationId,
+    resumableEnabled,
+    owed,
+    processedConvoRef,
+    answeredActiveJobRef,
+    setExternalRunArm,
+    setSubmission,
+    routeConversationLoaded: currentConversation?.conversationId === conversationId,
+    hasActiveSubmissionForThisConvo,
+    hasLiveSubmissionForThisConvo,
+    attachedGenerationCreatedAt,
+  });
+>>>>>>> upstream/main
 }

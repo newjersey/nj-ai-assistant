@@ -8,8 +8,12 @@ import { BaseRegistryCache } from './BaseRegistryCache';
 /**
  * Redis-backed MCP server configs cache that stores all entries under a single aggregate key.
  *
+<<<<<<< HEAD
  * Unlike {@link ServerConfigsCacheRedis} which uses SCAN + batch-GET for `getAll()`, this
  * implementation stores the entire config map as a single JSON value in Redis. This makes
+=======
+ * This implementation stores the entire config map as a single JSON value in Redis. This makes
+>>>>>>> upstream/main
  * `getAll()` a single O(1) GET regardless of keyspace size, eliminating the 60s+ stalls
  * caused by SCAN under concurrent load in large deployments (see GitHub #11624, #12408).
  *

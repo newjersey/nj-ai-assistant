@@ -32,7 +32,11 @@ const VersionBadge = ({
         >
           {isProduction ? (
             <>
+<<<<<<< HEAD
               <span className="slow-pulse size-1.5 rounded-full bg-status-success" />
+=======
+              <span className="slow-pulse bg-status-success size-1.5 rounded-full" />
+>>>>>>> upstream/main
               <span>{label}</span>
             </>
           ) : (
@@ -84,7 +88,11 @@ const VersionCard = ({
       <div className="relative flex w-6 shrink-0 justify-center">
         {/* Vertical line - extends through mb-2 gap + mt-3 to reach next circle */}
         {index < totalVersions - 1 && (
+<<<<<<< HEAD
           <div className="absolute -bottom-5 top-0 w-0.5 bg-border-light" />
+=======
+          <div className="bg-border-light absolute top-0 -bottom-5 w-0.5" />
+>>>>>>> upstream/main
         )}
         {/* Circle marker - mt-3 aligns with card title (card has p-3) */}
         <div
@@ -105,10 +113,17 @@ const VersionCard = ({
       <button
         type="button"
         className={cn(
+<<<<<<< HEAD
           'group mb-2 ml-2 flex flex-1 flex-col rounded-lg border p-3 text-left',
           isSelected
             ? 'border-status-success-border bg-status-success-subtle'
             : 'border-border-medium bg-transparent hover:border-border-heavy hover:bg-surface-hover',
+=======
+          'group ms-2 mb-2 flex flex-1 flex-col rounded-lg border p-3 text-start',
+          isSelected
+            ? 'border-status-success-border bg-status-success-subtle'
+            : 'border-border-medium hover:border-border-heavy hover:bg-surface-hover bg-transparent',
+>>>>>>> upstream/main
         )}
         onClick={onClick}
         aria-label={localize('com_ui_version_var', { 0: `${versionNumber}` })}
@@ -141,7 +156,11 @@ const VersionCard = ({
         </div>
 
         <time
+<<<<<<< HEAD
           className="mt-1 text-xs text-text-secondary"
+=======
+          className="text-text-secondary mt-1 text-xs"
+>>>>>>> upstream/main
           dateTime={prompt.createdAt}
           title={new Date(prompt.createdAt).toLocaleString(undefined, { hour12 })}
         >

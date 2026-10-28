@@ -20,12 +20,28 @@ jest.mock('@librechat/data-schemas', () => ({
 jest.mock('librechat-data-provider', () => ({
   ...jest.requireActual('librechat-data-provider'),
   Tools: {},
+<<<<<<< HEAD
   Constants: { mcp_delimiter: '_mcp_', mcp_prefix: 'mcp_' },
+=======
+  Constants: {
+    ...jest.requireActual('librechat-data-provider').Constants,
+    mcp_delimiter: '_mcp_',
+    mcp_prefix: 'mcp_',
+  },
+>>>>>>> upstream/main
   FileSources: {},
 }));
 
 jest.mock('@librechat/api', () => ({
   ...jest.requireActual('@librechat/api'),
+<<<<<<< HEAD
+=======
+  createEmailChangeService: jest.fn(() => ({
+    requestEmailChange: jest.fn(),
+    confirmEmailChange: jest.fn(),
+  })),
+  createEmailChangeDeps: jest.fn(() => ({})),
+>>>>>>> upstream/main
   MCPOAuthHandler: {
     generateFlowId: jest.fn((userId, serverName, tenantId) => {
       const flowId = `${userId}:${serverName}`;

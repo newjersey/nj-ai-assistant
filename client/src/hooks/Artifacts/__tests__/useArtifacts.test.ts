@@ -1,6 +1,18 @@
+<<<<<<< HEAD
 import { Constants } from 'librechat-data-provider';
 import { renderHook, act } from '@testing-library/react';
 import type { Artifact } from '~/common';
+=======
+import { getDefaultStore } from 'jotai';
+import { Constants } from 'librechat-data-provider';
+import { renderHook, act } from '@testing-library/react';
+import type { Artifact } from '~/common';
+import { artifactsActiveTab } from '~/components/Artifacts/state';
+
+/* Referenced only when `useCodeState` is called, so the mock factory running
+ * before these initialize is fine. */
+const mockEndCodeSession = jest.fn();
+>>>>>>> upstream/main
 
 /** Mock dependencies */
 jest.mock('~/Providers', () => ({
@@ -13,6 +25,13 @@ jest.mock('~/utils', () => ({
   },
 }));
 
+<<<<<<< HEAD
+=======
+jest.mock('~/Providers/EditorContext', () => ({
+  useCodeState: () => ({ endCodeSession: mockEndCodeSession }),
+}));
+
+>>>>>>> upstream/main
 /** Mock store before importing */
 jest.mock('~/store', () => ({
   __esModule: true,
@@ -30,12 +49,20 @@ jest.mock('recoil', () => {
     useRecoilValue: jest.fn(),
     useRecoilState: jest.fn(),
     useResetRecoilState: jest.fn(),
+<<<<<<< HEAD
+=======
+    useRecoilCallback: jest.fn(),
+>>>>>>> upstream/main
   };
 });
 
 /** Import mocked functions after mocking */
 import { useArtifactsContext } from '~/Providers';
+<<<<<<< HEAD
 import { useRecoilValue, useRecoilState, useResetRecoilState } from 'recoil';
+=======
+import { useRecoilValue, useRecoilState, useRecoilCallback, useResetRecoilState } from 'recoil';
+>>>>>>> upstream/main
 import { logger } from '~/utils';
 import useArtifacts from '../useArtifacts';
 
@@ -60,6 +87,18 @@ describe('useArtifacts', () => {
     latestMessageText: '',
     conversationId: 'conv-1',
   };
+<<<<<<< HEAD
+=======
+  /** What a fresh snapshot reports while the hook's cleanup runs. */
+  const paneSnapshot: Record<string, unknown> = {
+    artifactsVisibility: false,
+    currentArtifactId: null,
+  };
+  /** `useRecoilCallback` hands back one stable callback; a mock that returned a
+   *  new function per render would re-run every effect that depends on it. */
+  let builtPaneCallback: () => unknown = () => undefined;
+  const stablePaneCallback = () => builtPaneCallback();
+>>>>>>> upstream/main
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -77,6 +116,26 @@ describe('useArtifacts', () => {
       }
       return jest.fn();
     });
+<<<<<<< HEAD
+=======
+    paneSnapshot.artifactsVisibility = false;
+    paneSnapshot.currentArtifactId = null;
+    (useRecoilCallback as jest.Mock).mockImplementation(
+      (build: (iface: unknown) => () => unknown) => {
+        builtPaneCallback = build({
+          snapshot: {
+            getLoadable: (atom: { key: string }) => ({
+              valueMaybe: () => paneSnapshot[atom.key],
+            }),
+          },
+        });
+        return stablePaneCallback;
+      },
+    );
+    /* The tab is pane state in a module-global store now, so one test's switch
+     * would otherwise be the next test's starting point. */
+    getDefaultStore().set(artifactsActiveTab, 'preview');
+>>>>>>> upstream/main
   });
 
   afterEach(() => {
@@ -506,6 +565,37 @@ describe('useArtifacts', () => {
       expect(mockSetCurrentArtifactId).toHaveBeenCalledWith('artifact-2');
     });
 
+<<<<<<< HEAD
+=======
+    it('does not select a historical sibling artifact when regeneration begins', () => {
+      const selected = createArtifact({
+        id: 'selected',
+        messageId: 'original-response',
+        lastUpdateTime: 1000,
+      });
+      const historical = createArtifact({
+        id: 'historical',
+        messageId: 'previous-sibling',
+        lastUpdateTime: 2000,
+        content: 'old preview',
+      });
+      (useRecoilValue as jest.Mock).mockReturnValue({ selected });
+      (useRecoilState as jest.Mock).mockReturnValue(['selected', mockSetCurrentArtifactId]);
+      const { rerender } = renderHook(() => useArtifacts());
+      mockSetCurrentArtifactId.mockClear();
+
+      (useArtifactsContext as jest.Mock).mockReturnValue({
+        ...defaultContext,
+        isSubmitting: true,
+        latestMessageId: 'original-response_',
+      });
+      (useRecoilValue as jest.Mock).mockReturnValue({ selected, historical });
+      rerender();
+
+      expect(mockSetCurrentArtifactId).not.toHaveBeenCalled();
+    });
+
+>>>>>>> upstream/main
     it('should not advance to a new CODE artifact during streaming', () => {
       const artifact1 = createArtifact({ id: 'artifact-1', lastUpdateTime: 1000, content: 'c1' });
 
@@ -575,17 +665,52 @@ describe('useArtifacts', () => {
   });
 
   describe('cleanup on unmount', () => {
+<<<<<<< HEAD
     it('should reset artifacts when unmounting', () => {
       (useRecoilValue as jest.Mock).mockReturnValue({});
 
       const { unmount } = renderHook(() => useArtifacts());
+=======
+    it('should reset artifacts and the tab when the pane closed', () => {
+      (useRecoilValue as jest.Mock).mockReturnValue({});
+
+      const { result, unmount } = renderHook(() => useArtifacts());
+      act(() => result.current.setActiveTab('code'));
+>>>>>>> upstream/main
 
       unmount();
 
       expect(mockResetArtifacts).toHaveBeenCalled();
       expect(mockResetCurrentArtifactId).toHaveBeenCalled();
+<<<<<<< HEAD
       expect(logger.log).toHaveBeenCalledWith('artifacts_visibility', 'Unmounting artifacts');
     });
+=======
+      expect(getDefaultStore().get(artifactsActiveTab)).toBe('preview');
+      /* A buffer kept past the close would come back on the next open and be
+       * submitted by the drain, so closing has to discard it. */
+      expect(mockEndCodeSession).toHaveBeenCalled();
+      expect(logger.log).toHaveBeenCalledWith('artifacts_visibility', 'Unmounting artifacts');
+    });
+
+    /* Moving the pane to another host — mobile sheet, undocked window —
+     * unmounts one instance and mounts another while the pane stays open;
+     * wiping the registry or the tab then would undo the move the user made. */
+    it('keeps the artifacts and the tab when the pane is only changing hosts', () => {
+      (useRecoilValue as jest.Mock).mockReturnValue({});
+      paneSnapshot.artifactsVisibility = true;
+      paneSnapshot.currentArtifactId = 'artifact-1';
+
+      const { result, unmount } = renderHook(() => useArtifacts());
+      act(() => result.current.setActiveTab('code'));
+      unmount();
+
+      expect(mockResetArtifacts).not.toHaveBeenCalled();
+      expect(mockResetCurrentArtifactId).not.toHaveBeenCalled();
+      expect(mockEndCodeSession).not.toHaveBeenCalled();
+      expect(getDefaultStore().get(artifactsActiveTab)).toBe('code');
+    });
+>>>>>>> upstream/main
   });
 
   describe('manual tab switching', () => {

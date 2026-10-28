@@ -302,7 +302,11 @@ export async function applyAdminRefresh(
 
   const responseUser = serializeUserForExchange(user);
 
+<<<<<<< HEAD
   logger.debug(`[adminRefresh] Refreshed tokens for user: ${responseUser.email}`);
+=======
+  logger.debug(`[adminRefresh] Refreshed tokens for user: ${responseUser.id}`);
+>>>>>>> upstream/main
 
   return {
     token: minted.token,

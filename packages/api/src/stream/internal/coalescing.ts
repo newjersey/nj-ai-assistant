@@ -2,6 +2,11 @@
 const MAX_COALESCE_WINDOW_MS = 1000;
 /** Coalesced-batch safety caps: a full buffer flushes immediately, ahead of the window. */
 export const MAX_COALESCED_EVENTS = 64;
+<<<<<<< HEAD
+=======
+/** Shared raw-event JSON string-length budget, excluding transport envelopes.
+ * Keep both coalescers on the same accounting basis, including for non-ASCII JSON. */
+>>>>>>> upstream/main
 export const MAX_COALESCED_BYTES = 128 * 1024;
 
 /**
@@ -14,10 +19,17 @@ export const MAX_COALESCED_BYTES = 128 * 1024;
  * resume frontier assumes an event is never visible in the durable chunk log
  * meaningfully earlier than its sequence lands on the shared counter, so
  * batching one side without the other reopens that race for the full window
+<<<<<<< HEAD
  * instead of a same-tick skew. 0 (the default) disables coalescing.
  */
 export function resolveCoalesceWindowMs(): number {
   const raw = Number(process.env.STREAM_DELTA_COALESCE_MS ?? 0);
+=======
+ * instead of a same-tick skew. Unset uses 25ms; explicit 0 disables coalescing.
+ */
+export function resolveCoalesceWindowMs(): number {
+  const raw = Number(process.env.STREAM_DELTA_COALESCE_MS ?? 25);
+>>>>>>> upstream/main
   if (!Number.isFinite(raw) || raw <= 0) {
     return 0;
   }

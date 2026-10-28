@@ -90,7 +90,14 @@ async function canViewAgent(
   });
 }
 
+<<<<<<< HEAD
 async function hasManageAgentsCapability(user: IUser, deps: AgentManagementReadDeps) {
+=======
+export async function hasManageAgentsCapability(
+  user: IUser,
+  deps: Pick<AgentManagementReadDeps, 'hasCapability'>,
+): Promise<boolean> {
+>>>>>>> upstream/main
   const capability = ResourceCapabilityMap[ResourceType.AGENT];
   try {
     if (capability != null && (await deps.hasCapability(user, capability))) {

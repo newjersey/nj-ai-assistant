@@ -1,6 +1,10 @@
 import { memo, useState, useMemo, useCallback } from 'react';
 import { FixedSizeTree } from 'react-vtree';
 import { useNavigate } from 'react-router-dom';
+<<<<<<< HEAD
+=======
+import { useRemScale } from '@librechat/client';
+>>>>>>> upstream/main
 import { ScrollText, ChevronDown, ChevronRight, Folder, Pin } from 'lucide-react';
 import type { FixedSizeNodeData, TreeWalkerValue, TreeWalker } from 'react-vtree';
 import type { TSkillSummary, TSkillFile } from 'librechat-data-provider';
@@ -139,12 +143,20 @@ function FileTreeNode({
 }) {
   const isFolder = data.nodeType === 'folder';
   const isFileActive = !isFolder && treeData?.activeFile === data.path;
+<<<<<<< HEAD
   const indent = data.depth * 16 + (isFolder ? 8 : 24);
+=======
+  const indentRem = (data.depth * 16 + (isFolder ? 8 : 24)) / 16;
+>>>>>>> upstream/main
 
   return (
     <button
       type="button"
+<<<<<<< HEAD
       style={{ ...style, paddingLeft: `${indent}px` }}
+=======
+      style={{ ...style, '--skill-indent': `${indentRem}rem` } as React.CSSProperties}
+>>>>>>> upstream/main
       onClick={(e) => {
         e.stopPropagation();
         if (isFolder) {
@@ -156,10 +168,17 @@ function FileTreeNode({
         }
       }}
       className={cn(
+<<<<<<< HEAD
         'flex w-full select-none items-center gap-1.5 rounded-lg text-sm transition-colors',
         isFileActive
           ? 'bg-surface-active font-medium text-text-primary'
           : 'text-text-secondary hover:bg-surface-hover hover:text-text-primary',
+=======
+        'flex w-full items-center gap-1.5 rounded-lg ps-(--skill-indent) text-sm select-none',
+        isFileActive
+          ? 'bg-surface-active text-text-primary font-medium'
+          : 'text-text-secondary hover:bg-surface-nav-hover hover:text-text-primary',
+>>>>>>> upstream/main
       )}
       aria-expanded={isFolder ? isOpen : undefined}
     >
@@ -168,7 +187,11 @@ function FileTreeNode({
           <ChevronRight
             className={cn(
               'size-3 shrink-0 transition-transform duration-150',
+<<<<<<< HEAD
               isOpen && 'rotate-90',
+=======
+              isOpen ? 'rotate-90' : 'rtl:rotate-180',
+>>>>>>> upstream/main
             )}
             aria-hidden="true"
           />
@@ -198,7 +221,12 @@ function InlineFileTree({
 
   const visibleCount = useMemo(() => countVisible(treeEntries, openIds), [treeEntries, openIds]);
 
+<<<<<<< HEAD
   const height = Math.min(visibleCount * ITEM_SIZE, MAX_HEIGHT);
+=======
+  const remScale = useRemScale();
+  const height = Math.min(visibleCount * ITEM_SIZE, MAX_HEIGHT) * remScale;
+>>>>>>> upstream/main
 
   const handleToggle = useCallback((id: string, isOpen: boolean) => {
     setOpenIds((prev) => {
@@ -241,7 +269,11 @@ function InlineFileTree({
   return (
     <FixedSizeTree<FileNodeData>
       treeWalker={treeWalker}
+<<<<<<< HEAD
       itemSize={ITEM_SIZE}
+=======
+      itemSize={ITEM_SIZE * remScale}
+>>>>>>> upstream/main
       height={height}
       width="100%"
       itemData={callbacks}
@@ -299,6 +331,7 @@ function SkillListItem({
   return (
     <div className="flex flex-col gap-px">
       {/* Skill row */}
+<<<<<<< HEAD
       <div
         role="button"
         tabIndex={0}
@@ -332,14 +365,54 @@ function SkillListItem({
             />
           )}
         </span>
+=======
+      {/* The row and its expander are siblings, not one inside the other: a control
+          nested in another control is unreachable for a keyboard and ambiguous for a
+          screen reader, which announces one name for two different actions. */}
+      <div
+        className={cn(
+          'text-text-primary flex w-full items-center gap-1 rounded-lg pe-1 text-sm select-none',
+          isActive && !activeFile && 'bg-surface-active',
+          !isActive && 'hover:bg-surface-nav-hover',
+        )}
+      >
+        <button
+          type="button"
+          onClick={handleSkillClick}
+          className="focus-visible:ring-text-primary flex min-w-0 flex-1 cursor-pointer items-center gap-3 rounded-lg py-1.5 ps-3 text-start outline-hidden focus-visible:ring-2 focus-visible:ring-inset"
+          aria-current={isActive ? 'true' : undefined}
+        >
+          <span className="flex size-6 shrink-0 items-center justify-center">
+            <span className="bg-surface-tertiary flex size-6 items-center justify-center rounded-md">
+              <ScrollText className="text-text-secondary size-3.5" aria-hidden="true" />
+            </span>
+          </span>
+
+          <span className="flex min-w-0 flex-1 items-center gap-1.5">
+            <span className="truncate">{skill.name}</span>
+            {skill.alwaysApply === true && (
+              <Pin
+                className="text-status-info size-3 shrink-0"
+                aria-label={localize('com_ui_skills_always_apply_pin_title')}
+              />
+            )}
+          </span>
+        </button>
+>>>>>>> upstream/main
 
         {hasFiles && (
           <button
             type="button"
             onClick={handleChevronClick}
+<<<<<<< HEAD
             className="-mr-1 inline-flex size-6 shrink-0 items-center justify-center rounded-md text-text-secondary hover:text-text-primary"
             aria-label="Toggle files"
             tabIndex={-1}
+=======
+            className="text-text-secondary hover:text-text-primary focus-visible:ring-text-primary inline-flex size-6 shrink-0 items-center justify-center rounded-md outline-hidden focus-visible:ring-2 focus-visible:ring-inset"
+            aria-label={localize('com_ui_skills_toggle_files', { 0: skill.name })}
+            aria-expanded={expanded}
+>>>>>>> upstream/main
           >
             <ChevronDown
               className={cn(
@@ -352,7 +425,11 @@ function SkillListItem({
       </div>
 
       {/* Inline file tree */}
+<<<<<<< HEAD
       <Collapse open={expanded && hasFiles} className="ml-5">
+=======
+      <Collapse open={expanded && hasFiles} className="ms-5">
+>>>>>>> upstream/main
         <InlineFileTree files={files} activeFile={activeFile} onFileClick={handleFileClick} />
       </Collapse>
     </div>

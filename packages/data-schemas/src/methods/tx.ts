@@ -151,6 +151,11 @@ export const tokenValues: Record<string, { prompt: number; completion: number }>
     'gpt-5.6-terra': { prompt: 2, completion: 12 },
     'gpt-5.6-luna': { prompt: 0.2, completion: 1.2 },
     'gpt-6-astra': { prompt: 10, completion: 50 },
+<<<<<<< HEAD
+=======
+    'gpt-6-sol': { prompt: 2, completion: 10 },
+    'gpt-6-luna': { prompt: 0.1, completion: 0.5 },
+>>>>>>> upstream/main
     'chat-latest': { prompt: 5, completion: 30 },
     'gpt-5-chat-latest': { prompt: 1.25, completion: 10 },
     'gpt-5.1-chat-latest': { prompt: 1.25, completion: 10 },
@@ -179,12 +184,23 @@ export const tokenValues: Record<string, { prompt: number; completion: number }>
     'claude-3-7-sonnet': { prompt: 3, completion: 15 },
     'claude-3.7-sonnet': { prompt: 3, completion: 15 },
     'claude-haiku-4-5': { prompt: 1, completion: 5 },
+<<<<<<< HEAD
+=======
+    /* Rates up to a 100K prompt; the higher tier lives in `premiumTokenValues`. */
+    'claude-haiku-5-5': { prompt: 0.1, completion: 0.5 },
+    'claude-haiku-5.5': { prompt: 0.1, completion: 0.5 },
+>>>>>>> upstream/main
     'claude-opus-4': { prompt: 15, completion: 75 },
     'claude-opus-4-5': { prompt: 5, completion: 25 },
     'claude-opus-4-6': { prompt: 5, completion: 25 },
     'claude-opus-4-7': { prompt: 5, completion: 25 },
     'claude-opus-4-8': { prompt: 5, completion: 25 },
     'claude-opus-5': { prompt: 5, completion: 25 },
+<<<<<<< HEAD
+=======
+    'claude-opus-5-5': { prompt: 4, completion: 20 },
+    'claude-opus-5.5': { prompt: 4, completion: 20 },
+>>>>>>> upstream/main
     'claude-fable-5': { prompt: 10, completion: 50 },
     'claude-mythos-5': { prompt: 10, completion: 50 },
     'claude-fable-5-1': { prompt: 10, completion: 50 },
@@ -192,8 +208,14 @@ export const tokenValues: Record<string, { prompt: number; completion: number }>
     'claude-sonnet-4': { prompt: 3, completion: 15 },
     'claude-sonnet-4-5': { prompt: 3, completion: 15 },
     'claude-sonnet-4-6': { prompt: 3, completion: 15 },
+<<<<<<< HEAD
     // Sonnet 5 introductory pricing through 2026-08-31; revert to { prompt: 3, completion: 15 } after.
     'claude-sonnet-5': { prompt: 2, completion: 10 },
+=======
+    'claude-sonnet-5': { prompt: 2, completion: 10 },
+    'claude-sonnet-5-5': { prompt: 2, completion: 10 },
+    'claude-sonnet-5.5': { prompt: 2, completion: 10 },
+>>>>>>> upstream/main
     'command-r': { prompt: 0.5, completion: 1.5 },
     'command-r-plus': { prompt: 3, completion: 15 },
     'command-text': { prompt: 1.5, completion: 2.0 },
@@ -228,6 +250,11 @@ export const tokenValues: Record<string, { prompt: number; completion: number }>
     'gemini-3.6-flash': { prompt: 0.75, completion: 3.75 },
     'gemini-3.7-flash': { prompt: 0.75, completion: 3.75 },
     'gemini-3.8-flash': { prompt: 0.75, completion: 3.75 },
+<<<<<<< HEAD
+=======
+    // Gemini 4 Argon introductory pricing through 2026-11-30; revert to { prompt: 4, completion: 20 } on 2026-12-01.
+    'gemini-4-argon': { prompt: 2, completion: 10 },
+>>>>>>> upstream/main
     'gemini-pro-vision': { prompt: 0.5, completion: 1.5 },
     grok: { prompt: 2.0, completion: 10.0 },
     'grok-beta': { prompt: 5.0, completion: 15.0 },
@@ -251,6 +278,11 @@ export const tokenValues: Record<string, { prompt: number; completion: number }>
     'grok-4-5': { prompt: 2.0, completion: 6.0 },
     'grok-4.6': { prompt: 2.0, completion: 6.0 },
     'grok-4-6': { prompt: 2.0, completion: 6.0 },
+<<<<<<< HEAD
+=======
+    'grok-4.7': { prompt: 2.0, completion: 6.0 },
+    'grok-4-7': { prompt: 2.0, completion: 6.0 },
+>>>>>>> upstream/main
     'grok-code-fast': { prompt: 0.2, completion: 1.5 },
     codestral: { prompt: 0.3, completion: 0.9 },
     devstral: { prompt: 0.4, completion: 2.0 },
@@ -264,7 +296,14 @@ export const tokenValues: Record<string, { prompt: number; completion: number }>
     'mistral-nemo': { prompt: 0.15, completion: 0.15 },
     'mistral-saba': { prompt: 0.2, completion: 0.6 },
     'pixtral-large': { prompt: 2.0, completion: 6.0 },
+<<<<<<< HEAD
     'mistral-large': { prompt: 2.0, completion: 6.0 },
+=======
+    'mistral-large': { prompt: 0.5, completion: 1.5 },
+    'mistral-large-2411': { prompt: 2.0, completion: 6.0 },
+    'mistral-large-2512': { prompt: 0.5, completion: 1.5 },
+    'mistral-large-3': { prompt: 0.5, completion: 1.5 },
+>>>>>>> upstream/main
     'mixtral-8x22b': { prompt: 0.65, completion: 0.65 },
     kimi: { prompt: 0.6, completion: 2.5 },
     moonshot: { prompt: 2.0, completion: 5.0 },
@@ -358,17 +397,33 @@ export const cacheTokenValues: Record<string, { write: number; read: number }> =
   'claude-3-5-haiku': { write: 1, read: 0.08 },
   'claude-3-haiku': { write: 0.3, read: 0.03 },
   'claude-haiku-4-5': { write: 1.25, read: 0.1 },
+<<<<<<< HEAD
   'claude-sonnet-4': { write: 3.75, read: 0.3 },
   'claude-sonnet-4-5': { write: 3.75, read: 0.3 },
   'claude-sonnet-4-6': { write: 3.75, read: 0.3 },
   // Sonnet 5 introductory pricing through 2026-08-31; revert to { write: 3.75, read: 0.3 } after.
   'claude-sonnet-5': { write: 2.5, read: 0.2 },
+=======
+  'claude-haiku-5-5': { write: 0.125, read: 0.01 },
+  'claude-haiku-5.5': { write: 0.125, read: 0.01 },
+  'claude-sonnet-4': { write: 3.75, read: 0.3 },
+  'claude-sonnet-4-5': { write: 3.75, read: 0.3 },
+  'claude-sonnet-4-6': { write: 3.75, read: 0.3 },
+  'claude-sonnet-5': { write: 2.5, read: 0.2 },
+  'claude-sonnet-5-5': { write: 2.5, read: 0.2 },
+  'claude-sonnet-5.5': { write: 2.5, read: 0.2 },
+>>>>>>> upstream/main
   'claude-opus-4': { write: 18.75, read: 1.5 },
   'claude-opus-4-5': { write: 6.25, read: 0.5 },
   'claude-opus-4-6': { write: 6.25, read: 0.5 },
   'claude-opus-4-7': { write: 6.25, read: 0.5 },
   'claude-opus-4-8': { write: 6.25, read: 0.5 },
   'claude-opus-5': { write: 6.25, read: 0.5 },
+<<<<<<< HEAD
+=======
+  'claude-opus-5-5': { write: 5, read: 0.2 },
+  'claude-opus-5.5': { write: 5, read: 0.2 },
+>>>>>>> upstream/main
   'claude-fable-5': { write: 12.5, read: 1 },
   'claude-mythos-5': { write: 12.5, read: 1 },
   // Fable/Mythos 5.1 cache reads are 0.025x base input, not the usual 0.1x.
@@ -391,6 +446,11 @@ export const cacheTokenValues: Record<string, { write: number; read: number }> =
   'gpt-5.6-terra': { write: 2.5, read: 0.2 },
   'gpt-5.6-luna': { write: 0.25, read: 0.02 },
   'gpt-6-astra': { write: 12.5, read: 1 },
+<<<<<<< HEAD
+=======
+  'gpt-6-sol': { write: 2.5, read: 0.2 },
+  'gpt-6-luna': { write: 0.125, read: 0.01 },
+>>>>>>> upstream/main
   'chat-latest': { write: 5, read: 0.5 },
   'gpt-5-chat-latest': { write: 1.25, read: 0.125 },
   'gpt-5.1-chat-latest': { write: 1.25, read: 0.125 },
@@ -404,6 +464,11 @@ export const cacheTokenValues: Record<string, { write: number; read: number }> =
   o3: { write: 2, read: 0.5 },
   'o3-mini': { write: 1.1, read: 0.275 },
   'o4-mini': { write: 1.1, read: 0.275 },
+<<<<<<< HEAD
+=======
+  'grok-4.7': { write: 2, read: 0.5 },
+  'grok-4-7': { write: 2, read: 0.5 },
+>>>>>>> upstream/main
   deepseek: { write: 0.28, read: 0.028 },
   'deepseek-chat': { write: 0.28, read: 0.028 },
   'deepseek-reasoner': { write: 0.28, read: 0.028 },
@@ -430,6 +495,11 @@ export const cacheTokenValues: Record<string, { write: number; read: number }> =
   'gemini-3.6-flash': { write: 0.75, read: 0.075 },
   'gemini-3.7-flash': { write: 0.75, read: 0.075 },
   'gemini-3.8-flash': { write: 0.75, read: 0.075 },
+<<<<<<< HEAD
+=======
+  // Gemini 4 Argon (implicit caching only) introductory pricing through 2026-11-30; revert to { write: 4, read: 0.2 } on 2026-12-01.
+  'gemini-4-argon': { write: 2, read: 0.1 },
+>>>>>>> upstream/main
 };
 
 /**
@@ -439,6 +509,11 @@ export const premiumTokenValues: Record<
   string,
   { threshold: number; prompt: number; completion: number }
 > = {
+<<<<<<< HEAD
+=======
+  'claude-haiku-5-5': { threshold: 100000, prompt: 0.5, completion: 2.5 },
+  'claude-haiku-5.5': { threshold: 100000, prompt: 0.5, completion: 2.5 },
+>>>>>>> upstream/main
   'gemini-3.1': { threshold: 200000, prompt: 4, completion: 18 },
   'gpt-5.4': { threshold: 272000, prompt: 5, completion: 22.5 },
   'gpt-5.4-pro': { threshold: 272000, prompt: 60, completion: 270 },
@@ -448,10 +523,21 @@ export const premiumTokenValues: Record<
   'gpt-5.6-terra': { threshold: 272000, prompt: 4, completion: 18 },
   'gpt-5.6-luna': { threshold: 272000, prompt: 0.4, completion: 1.8 },
   'gpt-6-astra': { threshold: 272000, prompt: 20, completion: 75 },
+<<<<<<< HEAD
+=======
+  'gpt-6-sol': { threshold: 272000, prompt: 4, completion: 15 },
+  'gpt-6-luna': { threshold: 272000, prompt: 0.2, completion: 0.75 },
+>>>>>>> upstream/main
   'grok-4.5': { threshold: 200000, prompt: 4, completion: 12 },
   'grok-4-5': { threshold: 200000, prompt: 4, completion: 12 },
   'grok-4.6': { threshold: 200000, prompt: 4, completion: 12 },
   'grok-4-6': { threshold: 200000, prompt: 4, completion: 12 },
+<<<<<<< HEAD
+=======
+  /** xAI bills >=200K at the long-context rate; this table uses exclusive thresholds. */
+  'grok-4.7': { threshold: 199999, prompt: 4, completion: 12 },
+  'grok-4-7': { threshold: 199999, prompt: 4, completion: 12 },
+>>>>>>> upstream/main
 };
 
 /**
@@ -464,14 +550,34 @@ export const premiumCacheTokenValues: Record<
   string,
   { threshold: number; write: number; read: number }
 > = {
+<<<<<<< HEAD
+=======
+  'claude-haiku-5-5': { threshold: 100000, write: 0.625, read: 0.05 },
+  'claude-haiku-5.5': { threshold: 100000, write: 0.625, read: 0.05 },
+>>>>>>> upstream/main
   'gpt-5.4': { threshold: 272000, write: 5, read: 0.5 },
   'gpt-5.5': { threshold: 272000, write: 10, read: 1 },
   'gpt-5.6': { threshold: 272000, write: 10, read: 0.8 },
   'gpt-5.6-terra': { threshold: 272000, write: 5, read: 0.4 },
   'gpt-5.6-luna': { threshold: 272000, write: 0.5, read: 0.04 },
   'gpt-6-astra': { threshold: 272000, write: 25, read: 2 },
+<<<<<<< HEAD
 };
 
+=======
+  'gpt-6-sol': { threshold: 272000, write: 5, read: 0.4 },
+  'gpt-6-luna': { threshold: 272000, write: 0.25, read: 0.02 },
+  'grok-4.7': { threshold: 199999, write: 4, read: 1 },
+  'grok-4-7': { threshold: 199999, write: 4, read: 1 },
+};
+
+/** `write1h` prices Anthropic's 1-hour prompt cache writes; `write` is the 5-minute rate */
+type CacheType = 'write' | 'read' | 'write1h';
+
+/** Anthropic bills 1-hour cache writes at 2x the input rate on every model and tier */
+export const ONE_HOUR_CACHE_WRITE_FACTOR = 2;
+
+>>>>>>> upstream/main
 export function createTxMethods(
   _mongoose: typeof import('mongoose'),
   txDeps: TxDeps,
@@ -521,7 +627,11 @@ export function createTxMethods(
     inputTokenCount,
   }: {
     valueKey?: string;
+<<<<<<< HEAD
     cacheType?: 'write' | 'read';
+=======
+    cacheType?: CacheType;
+>>>>>>> upstream/main
     model?: string;
     endpoint?: string;
     endpointTokenConfig?: Record<string, Record<string, number>>;
@@ -669,7 +779,13 @@ export function createTxMethods(
   /**
    * Retrieves the cache multiplier for a given value key and token type.
    * When `inputTokenCount` crosses a model's long-context threshold, the
+<<<<<<< HEAD
    * premium cache rate applies instead of the standard one.
+=======
+   * premium cache rate applies instead of the standard one. A `write1h`
+   * rate comes from an explicit endpoint override, otherwise it is the
+   * prompt rate of the same tier times {@link ONE_HOUR_CACHE_WRITE_FACTOR}.
+>>>>>>> upstream/main
    */
   function getCacheMultiplier({
     valueKey,
@@ -680,12 +796,35 @@ export function createTxMethods(
     inputTokenCount,
   }: {
     valueKey?: string;
+<<<<<<< HEAD
     cacheType?: 'write' | 'read';
+=======
+    cacheType?: CacheType;
+>>>>>>> upstream/main
     model?: string;
     endpoint?: string;
     endpointTokenConfig?: Record<string, Record<string, number>>;
     inputTokenCount?: number | null;
   }): number | null {
+<<<<<<< HEAD
+=======
+    if (cacheType === 'write1h') {
+      const override = model ? endpointTokenConfig?.[model]?.write1h : undefined;
+      if (override != null) {
+        return override;
+      }
+      const promptRate = getMultiplier({
+        model,
+        valueKey,
+        endpoint,
+        tokenType: 'prompt',
+        inputTokenCount: inputTokenCount ?? undefined,
+        endpointTokenConfig,
+      });
+      return promptRate * ONE_HOUR_CACHE_WRITE_FACTOR;
+    }
+
+>>>>>>> upstream/main
     if (endpointTokenConfig && model) {
       const modelConfig = endpointTokenConfig[model];
       /** Models absent from a partial override fall through to standard

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # v0.8.8-rc3
 
 # NJ: Render the librechat.(dev|prod).yaml files, to be copied into the LC image
@@ -12,10 +13,24 @@ FROM node:24.16.0-alpine AS node
 
 RUN apk upgrade --no-cache
 RUN apk add --no-cache jemalloc
+=======
+# v0.8.9-rc1
+
+# Base node image
+FROM node:24.22.1-alpine AS node
+
+RUN apk upgrade --no-cache
+RUN apk add --no-cache bash jemalloc
+>>>>>>> upstream/main
 RUN apk add --no-cache python3 py3-pip uv
 
 # Set environment variable to use jemalloc
 ENV LD_PRELOAD=/usr/lib/libjemalloc.so.2
+<<<<<<< HEAD
+=======
+# Disable dependency installation analytics before any npm lifecycle scripts run.
+ENV SCARF_ANALYTICS=false
+>>>>>>> upstream/main
 
 # Add `uv` for extended MCP support
 COPY --from=ghcr.io/astral-sh/uv:0.9.5-python3.12-alpine /usr/local/bin/uv /usr/local/bin/uvx /bin/
@@ -37,6 +52,11 @@ COPY --chown=node:node client/package.json ./client/package.json
 COPY --chown=node:node packages/data-provider/package.json ./packages/data-provider/package.json
 COPY --chown=node:node packages/data-schemas/package.json ./packages/data-schemas/package.json
 COPY --chown=node:node packages/api/package.json ./packages/api/package.json
+<<<<<<< HEAD
+=======
+COPY --chown=node:node vendor/code ./vendor/code
+COPY --chown=node:node packages/chat/package.json ./packages/chat/package.json
+>>>>>>> upstream/main
 
 RUN \
     # Allow mounting of these files, which have no default
@@ -61,6 +81,7 @@ RUN \
 
 COPY --chown=node:node . .
 
+<<<<<<< HEAD
 # NJ: Now copy the dev and prod librechat.yaml files in
 COPY --chown=node:node --from=config-render /app/nj/librechat-config/librechat.dev.yaml /app/nj/librechat-config/librechat.prod.yaml /app/nj/librechat-config/
 
@@ -73,6 +94,15 @@ RUN \
 RUN \
     wget https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem;
 
+=======
+ARG VITE_MCP_SANDBOX_URL=
+RUN \
+    # React client build with configurable memory
+    NODE_OPTIONS="--max-old-space-size=${NODE_MAX_OLD_SPACE_SIZE}" npm run frontend && \
+    npm prune --production && \
+    npm cache clean --force
+
+>>>>>>> upstream/main
 # Optional build metadata surfaced in Settings -> About for support triage.
 # Declared here (after the heavy install/build steps) so that commit/date
 # changing on every CI run does not bust the cache for dependency install

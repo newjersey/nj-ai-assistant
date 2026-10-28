@@ -1,5 +1,6 @@
 import { EModelEndpoint, isAgentsEndpoint, isAssistantsEndpoint } from 'librechat-data-provider';
 
+<<<<<<< HEAD
 const EXCLUDED_ENDPOINTS = new Set([
   EModelEndpoint.azureOpenAI,
   EModelEndpoint.openAI,
@@ -9,6 +10,8 @@ const EXCLUDED_ENDPOINTS = new Set([
   EModelEndpoint.bedrock,
 ]);
 
+=======
+>>>>>>> upstream/main
 export function filterMentionEndpoints({
   endpoints,
   includedEndpoints,
@@ -31,11 +34,14 @@ export function filterMentionEndpoints({
       return false;
     }
 
+<<<<<<< HEAD
     // NJ: We want to exclude endpoints from our mentions, only allowing agents & model specs
     if (EXCLUDED_ENDPOINTS.has(endpoint as EModelEndpoint)) {
       return false;
     }
 
+=======
+>>>>>>> upstream/main
     if (hasEndpointAllowList && !includedEndpoints.has(endpoint)) {
       return false;
     }

@@ -17,7 +17,11 @@ export default function TraceButton({ onClick }: { onClick: () => void }) {
           aria-label={label}
           onClick={onClick}
           data-testid="header-trace-button"
+<<<<<<< HEAD
           className="size-9 flex-shrink-0 rounded-xl bg-presentation hover:bg-surface-tertiary"
+=======
+          className="bg-presentation hover:bg-surface-tertiary size-9 shrink-0 rounded-xl"
+>>>>>>> upstream/main
         >
           <ChartNoAxesGantt className="icon-md" aria-hidden="true" />
         </Button>

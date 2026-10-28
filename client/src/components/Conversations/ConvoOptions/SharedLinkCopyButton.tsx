@@ -23,6 +23,7 @@ export default function SharedLinkCopyButton({ sharedLink }: { sharedLink: strin
   };
 
   return (
+<<<<<<< HEAD
     <div className="relative">
       <Input
         type="text"
@@ -32,6 +33,17 @@ export default function SharedLinkCopyButton({ sharedLink }: { sharedLink: strin
         aria-label={localize('com_ui_shared_link')}
         onFocus={(event) => event.currentTarget.select()}
         className="h-11 rounded-xl bg-surface-secondary pr-12 text-right text-sm text-text-primary"
+=======
+    /** The URL is an LTR island in either direction, and the copy button sits at its end. */
+    <div className="relative" dir="ltr">
+      <Input
+        type="text"
+        readOnly
+        value={sharedLink}
+        aria-label={localize('com_ui_shared_link')}
+        onFocus={(event) => event.currentTarget.select()}
+        className="bg-surface-secondary text-text-primary h-11 rounded-xl pr-12 text-end text-sm"
+>>>>>>> upstream/main
         data-testid="shared-link-url"
       />
       <CopyButton
@@ -40,7 +52,11 @@ export default function SharedLinkCopyButton({ sharedLink }: { sharedLink: strin
         label={localize('com_ui_copy_link')}
         copiedLabel={localize('com_ui_copied')}
         onClick={handleCopy}
+<<<<<<< HEAD
         className="absolute right-1.5 top-1/2 size-8 -translate-y-1/2"
+=======
+        className="absolute inset-e-1.5 top-1/2 size-8 -translate-y-1/2"
+>>>>>>> upstream/main
       />
     </div>
   );

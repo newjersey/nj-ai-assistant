@@ -26,8 +26,11 @@ jest.mock('~/Providers/AgentPanelContext', () => ({
 }));
 jest.mock('./AgentPanel', () => () => null);
 jest.mock('./Version/VersionPanel', () => () => null);
+<<<<<<< HEAD
 // NJ: Our splash gate renders a Link, which needs a Router this test does not provide
 jest.mock('~/nj/components/Agents/AgentPanelSplash', () => () => null);
+=======
+>>>>>>> upstream/main
 
 import AgentPanelSwitch from './AgentPanelSwitch';
 

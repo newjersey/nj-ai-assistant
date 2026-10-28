@@ -1,5 +1,10 @@
 import { Schema } from 'mongoose';
 import type { IGroup } from '~/types';
+<<<<<<< HEAD
+=======
+import { applySearchTokens } from '~/models/plugins/searchTokens';
+import { GROUP_SEARCH_TOKEN_FIELDS } from '~/utils/search';
+>>>>>>> upstream/main
 
 const groupSchema: Schema<IGroup> = new Schema<IGroup>(
   {
@@ -57,5 +62,9 @@ groupSchema.index(
   },
 );
 groupSchema.index({ memberIds: 1, tenantId: 1 });
+<<<<<<< HEAD
+=======
+applySearchTokens(groupSchema, GROUP_SEARCH_TOKEN_FIELDS);
+>>>>>>> upstream/main
 
 export default groupSchema;

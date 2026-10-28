@@ -5,8 +5,15 @@ const {
   mergeQuotedText,
   getBoundedAskUserAnswerValues,
   serializeAskUserAnswerVariants,
+<<<<<<< HEAD
 } = require('@librechat/api');
 const { logger } = require('@librechat/data-schemas');
+=======
+  getOutboundTimeoutMs,
+  outboundRequestBudget,
+  logAxiosError,
+} = require('@librechat/api');
+>>>>>>> upstream/main
 const { ErrorTypes } = require('librechat-data-provider');
 const denyRequest = require('./denyRequest');
 
@@ -96,6 +103,10 @@ async function moderateText(req, res, next) {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${process.env.OPENAI_MODERATION_API_KEY}`,
         },
+<<<<<<< HEAD
+=======
+        ...outboundRequestBudget(getOutboundTimeoutMs(req.config, 'moderationMs'), 'moderationMs'),
+>>>>>>> upstream/main
       },
     );
 
@@ -108,7 +119,11 @@ async function moderateText(req, res, next) {
       return await denyRequest(req, res, errorMessage);
     }
   } catch (error) {
+<<<<<<< HEAD
     logger.error('Error in moderateText:', error);
+=======
+    logAxiosError({ message: 'Error in moderateText:', error });
+>>>>>>> upstream/main
     const errorMessage = 'error in moderation check';
     return await denyRequest(req, res, errorMessage);
   }

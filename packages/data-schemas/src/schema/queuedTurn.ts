@@ -1,4 +1,8 @@
 import { Schema } from 'mongoose';
+<<<<<<< HEAD
+=======
+import { Constants, CODE_APPROVAL_MODES } from 'librechat-data-provider';
+>>>>>>> upstream/main
 import type { IAgentQueuedTurnDocument } from '~/types/queuedTurn';
 
 const fileRefSchema = new Schema(
@@ -23,6 +27,21 @@ const failureSchema = new Schema(
   { _id: false },
 );
 
+<<<<<<< HEAD
+=======
+const reasoningOverrideSchema = new Schema(
+  {
+    key: {
+      type: String,
+      enum: ['reasoning_effort', 'effort', 'thinkingLevel', 'thinkingBudget'],
+      required: true,
+    },
+    value: { type: Schema.Types.Mixed, required: true },
+  },
+  { _id: false },
+);
+
+>>>>>>> upstream/main
 const terminalReceiptSchema = new Schema(
   {
     outcome: {
@@ -54,7 +73,15 @@ const queuedTurnSchema: Schema<IAgentQueuedTurnDocument> = new Schema(
     tenantId: { type: String, index: true },
     conversationId: { type: String, required: true, maxlength: 256 },
     agentId: { type: String, required: true, maxlength: 256 },
+<<<<<<< HEAD
     parentMessageId: { type: String, required: true, maxlength: 256 },
+=======
+    parentMessageId: {
+      type: String,
+      required: true,
+      maxlength: Number(Constants.MAX_RESPONSE_MESSAGE_ID_LENGTH),
+    },
+>>>>>>> upstream/main
     clientRequestId: { type: String, required: true, maxlength: 128 },
     fingerprint: { type: String, required: true, minlength: 43, maxlength: 64 },
     laneId: { type: String, required: true, maxlength: 128 },
@@ -73,6 +100,11 @@ const queuedTurnSchema: Schema<IAgentQueuedTurnDocument> = new Schema(
     files: { type: [fileRefSchema], default: undefined },
     quotes: { type: [String], default: undefined },
     manualSkills: { type: [String], default: undefined },
+<<<<<<< HEAD
+=======
+    codeApprovalMode: { type: String, enum: [...CODE_APPROVAL_MODES] },
+    reasoningOverride: { type: reasoningOverrideSchema },
+>>>>>>> upstream/main
     expectedPredecessorCreatedAt: { type: Number, min: 0 },
     attempts: { type: Number, required: true, default: 0, min: 0 },
     availableAt: { type: Date, required: true },

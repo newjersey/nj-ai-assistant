@@ -1,11 +1,29 @@
+<<<<<<< HEAD
 import { isAgentFadingTier, isAgentFadingTierEntries, isAgentFadingTierEntry } from './fading';
 
 const tier = { v: 1, budgetTokens: 20_000, masked: true };
+=======
+import {
+  isAgentFadingTier,
+  isCurrentAgentFadingTier,
+  isAgentFadingTierEntries,
+  isAgentFadingTierEntry,
+} from './fading';
+
+const tier = { v: 2, budgetTokens: 20_000, masked: true };
+>>>>>>> upstream/main
 
 describe('isAgentFadingTier', () => {
   it('accepts the compact shape and rejects anything else', () => {
     expect(isAgentFadingTier(tier)).toBe(true);
+<<<<<<< HEAD
     expect(isAgentFadingTier({ ...tier, v: 2 })).toBe(false);
+=======
+    expect(isAgentFadingTier({ ...tier, v: 1 })).toBe(true);
+    expect(isCurrentAgentFadingTier(tier)).toBe(true);
+    expect(isCurrentAgentFadingTier({ ...tier, v: 1 })).toBe(false);
+    expect(isAgentFadingTier({ ...tier, v: 3 })).toBe(false);
+>>>>>>> upstream/main
     expect(isAgentFadingTier({ ...tier, budgetTokens: 0 })).toBe(false);
     expect(isAgentFadingTier({ ...tier, masked: 'yes' })).toBe(false);
     expect(isAgentFadingTier(null)).toBe(false);

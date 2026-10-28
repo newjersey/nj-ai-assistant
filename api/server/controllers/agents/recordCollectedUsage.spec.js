@@ -19,6 +19,10 @@ const mockRecordCollectedUsage = jest
   .mockResolvedValue({ input_tokens: 100, output_tokens: 50 });
 
 jest.mock('~/models', () => ({
+<<<<<<< HEAD
+=======
+  initializeMessageBudget: jest.fn(),
+>>>>>>> upstream/main
   spendTokens: (...args) => mockSpendTokens(...args),
   spendStructuredTokens: (...args) => mockSpendStructuredTokens(...args),
   getMultiplier: mockGetMultiplier,

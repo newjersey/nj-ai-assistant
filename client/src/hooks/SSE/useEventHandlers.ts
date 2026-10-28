@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react';
+<<<<<<< HEAD
 import { v4 } from 'uuid';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSetRecoilState, useRecoilCallback } from 'recoil';
@@ -49,11 +50,31 @@ import {
   markTitleGenerationProcessed,
 } from '~/data-provider';
 import useFocusRegeneratedResponse from '~/hooks/Chat/useFocusRegeneratedResponse';
+=======
+import { useStore, useSetAtom } from 'jotai';
+import { QueryKeys } from 'librechat-data-provider';
+import { buildRecoveryPreset } from '@librechat/chat';
+import { useQueryClient } from '@tanstack/react-query';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import {
+  submissionStartFamily,
+  getReasoningStateKey,
+  pendingQuotesByConvoId,
+  pendingReasoningOverrideFamily,
+} from '@librechat/chat/react';
+import type { TMessage, TConversation, EventSubmission } from 'librechat-data-provider';
+import type { EventHandlerContext } from './handlers';
+import type { ConvoGenerator } from '~/common';
+import useFocusRegeneratedResponse from '~/hooks/Chat/useFocusRegeneratedResponse';
+import { useReconcileConversationCodeEnvironmentMutation } from '~/data-provider';
+import { getFailedCodeDecisionRequest } from '~/hooks/Agents/codeDecision';
+>>>>>>> upstream/main
 import { shouldResetSubagentAtomsOnConversationChange } from './cleanup';
 import useAttachmentHandler from '~/hooks/SSE/useAttachmentHandler';
 import useContentHandler from '~/hooks/SSE/useContentHandler';
 import useStepHandler from '~/hooks/SSE/useStepHandler';
 import { useApplyAgentTemplate } from '~/hooks/Agents';
+<<<<<<< HEAD
 import { useAuthContext } from '~/hooks/AuthContext';
 import { MESSAGE_UPDATE_INTERVAL } from '~/common';
 import { useLiveAnnouncer } from '~/Providers';
@@ -75,6 +96,12 @@ type TTitleEvent = {
     title?: string;
   };
 };
+=======
+import { useLiveAnnouncer } from '~/Providers';
+import useTurnHandlers from './opening';
+import useAbortHandlers from './abort';
+import useFinalHandler from './final';
+>>>>>>> upstream/main
 
 /** Skill caches refreshed when a chat turn authors a skill via `create_file`/`edit_file`. */
 const SKILL_QUERY_KEYS = [
@@ -86,6 +113,7 @@ const SKILL_QUERY_KEYS = [
   QueryKeys.skillNodeContent,
 ] as const;
 
+<<<<<<< HEAD
 export const buildCreatedInitialResponse = ({
   initialResponse,
   userMessage,
@@ -220,12 +248,15 @@ export const mergeErrorMessages = ({
   return [...messages, userMessage, errorMessage];
 };
 
+=======
+>>>>>>> upstream/main
 export type EventHandlerParams = {
   isAddedRequest?: boolean;
   runIndex?: number;
   setCompleted: React.Dispatch<React.SetStateAction<Set<unknown>>>;
   setMessages: (messages: TMessage[]) => void;
   getMessages: () => TMessage[] | undefined;
+<<<<<<< HEAD
   setIsSubmitting: SetterOrUpdater<boolean>;
   setConversation?: SetterOrUpdater<TConversation | null>;
   newConversation?: ConvoGenerator;
@@ -466,6 +497,12 @@ export const getConvoTitle = ({
     return cachedConvo?.title ?? currentConvo?.title ?? null;
   }
   return currentTitle;
+=======
+  setIsSubmitting: React.Dispatch<React.SetStateAction<boolean>>;
+  setConversation?: React.Dispatch<React.SetStateAction<TConversation | null>>;
+  newConversation?: ConvoGenerator;
+  setShowStopButton: React.Dispatch<React.SetStateAction<boolean>>;
+>>>>>>> upstream/main
 };
 
 export default function useEventHandlers({
@@ -480,6 +517,7 @@ export default function useEventHandlers({
   setShowStopButton,
 }: EventHandlerParams) {
   const queryClient = useQueryClient();
+<<<<<<< HEAD
   const { announcePolite } = useLiveAnnouncer();
   const applyAgentTemplate = useApplyAgentTemplate();
   const setAbortScroll = useSetRecoilState(store.abortScroll);
@@ -488,6 +526,27 @@ export default function useEventHandlers({
    *  would inherit a stale baseline. Navigation teardown deliberately does not
    *  clear it — a reattach to a still-live run keeps its original start. */
   const setSubmissionStart = useSetRecoilState(store.submissionStartFamily(runIndex));
+=======
+  const reasoningStore = useStore();
+  const { announcePolite } = useLiveAnnouncer();
+  const applyAgentTemplate = useApplyAgentTemplate();
+  /** Cleared on every terminal path below: the elapsed anchor must not outlive
+   *  its generation, or a later externally-started run attached at this index
+   *  would inherit a stale baseline. Navigation teardown deliberately does not
+   *  clear it: a reattach to a still-live run keeps its original start. */
+  const setSubmissionStart = useSetAtom(submissionStartFamily(runIndex));
+  const { mutate: reconcileCodeDecision } =
+    useReconcileConversationCodeEnvironmentMutation(setConversation);
+  const reconcileFailedCodeDecision = useCallback(
+    (submission: EventSubmission, conversationId?: string) => {
+      if (isAddedRequest) return;
+      const request = getFailedCodeDecisionRequest(submission, conversationId);
+      if (request != null) reconcileCodeDecision(request);
+    },
+    [isAddedRequest, reconcileCodeDecision],
+  );
+
+>>>>>>> upstream/main
   const recoverConversation = useCallback(
     (conversationId: string, submission: EventSubmission) => {
       if (!newConversation) {
@@ -497,9 +556,27 @@ export default function useEventHandlers({
         QueryKeys.conversation,
         conversationId,
       ]);
+<<<<<<< HEAD
       newConversation({
         template: { conversationId },
         preset: buildRecoveryPreset(submission.conversation, cachedConvo, conversationId),
+=======
+      const preset = buildRecoveryPreset(
+        submission.conversation,
+        cachedConvo,
+        conversationId,
+        submission,
+      );
+      newConversation({
+        // Endpoint preset parsing omits code decisions. Carry them on the conversation template
+        // too, so rebuilding after a first-turn stream failure cannot discard the implicit pick.
+        template: {
+          conversationId,
+          codeEnvironmentMode: preset.codeEnvironmentMode,
+          codeWorkspaces: preset.codeWorkspaces,
+        },
+        preset,
+>>>>>>> upstream/main
       });
     },
     [newConversation, queryClient],
@@ -507,6 +584,7 @@ export default function useEventHandlers({
   const navigate = useNavigate();
   const location = useLocation();
 
+<<<<<<< HEAD
   /** Re-queue the turn's quoted excerpts when an early abort restores the draft,
    *  so retrying the restored message still sends the references — the pending
    *  queue was already drained on submit. */
@@ -518,14 +596,38 @@ export default function useEventHandlers({
         }
       },
     [],
+=======
+  /** Re-stage request context when an early abort restores the draft, so a
+   *  retry keeps the references and one-shot reasoning selection already
+   *  drained from the composer on submit. */
+  const restorePendingContext = useCallback(
+    (convoId: string, quotes?: string[], reasoningOverride?: TMessage['reasoningOverride']) => {
+      if (Array.isArray(quotes) && quotes.length > 0) {
+        reasoningStore.set(pendingQuotesByConvoId(convoId), quotes);
+      }
+      if (reasoningOverride != null) {
+        const reasoningAtom = pendingReasoningOverrideFamily(
+          getReasoningStateKey(convoId, runIndex),
+        );
+        reasoningStore.set(reasoningAtom, (current) => current ?? reasoningOverride);
+      }
+    },
+    [reasoningStore, runIndex],
+>>>>>>> upstream/main
   );
 
   const lastAnnouncementTimeRef = useRef(Date.now());
   const { conversationId: paramId } = useParams();
+<<<<<<< HEAD
   const { token } = useAuthContext();
 
   const { contentHandler, resetContentHandler } = useContentHandler({ setMessages, getMessages });
   /** `refetchType: 'all'` so cached-but-unmounted skill queries refresh too —
+=======
+
+  const { contentHandler, resetContentHandler } = useContentHandler({ setMessages, getMessages });
+  /** `refetchType: 'all'` so cached-but-unmounted skill queries refresh too:
+>>>>>>> upstream/main
    *  they opt out of `refetchOnMount`, so a plain invalidation would leave
    *  the Skills panel stale until a manual refresh. */
   const onSkillAuthoringComplete = useCallback(() => {
@@ -533,6 +635,15 @@ export default function useEventHandlers({
       queryClient.invalidateQueries({ queryKey: [key], refetchType: 'all' });
     }
   }, [queryClient]);
+<<<<<<< HEAD
+=======
+  const onSubagentIndexChange = useCallback(
+    (conversationId: string) => {
+      void queryClient.invalidateQueries([QueryKeys.parentSubagents, conversationId]);
+    },
+    [queryClient],
+  );
+>>>>>>> upstream/main
   const {
     stepHandler,
     clearStepMaps,
@@ -546,9 +657,15 @@ export default function useEventHandlers({
     setMessages,
     getMessages,
     announcePolite,
+<<<<<<< HEAD
     setIsSubmitting,
     lastAnnouncementTimeRef,
     onSkillAuthoringComplete,
+=======
+    lastAnnouncementTimeRef,
+    onSkillAuthoringComplete,
+    onSubagentIndexChange,
+>>>>>>> upstream/main
   });
   const attachmentHandler = useAttachmentHandler(queryClient);
 
@@ -556,7 +673,11 @@ export default function useEventHandlers({
    *  Historical subagent dialogs rehydrate from the persisted
    *  `subagent_content` on each `tool_call` (written by the backend
    *  at message-save time), so clearing live atoms on switch
+<<<<<<< HEAD
    *  doesn't lose any viewable history — it just keeps `atomFamily`
+=======
+   *  doesn't lose any viewable history; it just keeps `atomFamily`
+>>>>>>> upstream/main
    *  bounded across multi-conversation sessions.
    *
    *  Rule: reset on real conversation switches, but preserve atoms for
@@ -583,7 +704,11 @@ export default function useEventHandlers({
     if (
       shouldResetSubagentAtomsOnConversationChange(previous, paramId, preserveNewConversationId)
     ) {
+<<<<<<< HEAD
       resetSubagentAtoms();
+=======
+      resetSubagentAtoms({ preserveSelectedTask: true });
+>>>>>>> upstream/main
       /** PTC traces are live-only for the same reason and share the boundary:
        *  keep them through a run so a finished program stays auditable, drop
        *  them when the conversation changes. */
@@ -605,6 +730,7 @@ export default function useEventHandlers({
     [resetSubagentAtoms, resetPtcAtoms],
   );
 
+<<<<<<< HEAD
   const messageHandler = useCallback(
     (data: string | undefined, submission: EventSubmission) => {
       const { messages, userMessage, initialResponse, isRegenerate = false } = submission;
@@ -1303,6 +1429,37 @@ export default function useEventHandlers({
       recoverConversation,
     ],
   );
+=======
+  const focusRegeneratedResponse = useFocusRegeneratedResponse();
+
+  const ctx: EventHandlerContext = {
+    queryClient,
+    setMessages,
+    getMessages,
+    setCompleted,
+    isAddedRequest,
+    runIndex,
+    setConversation,
+    setIsSubmitting,
+    setShowStopButton,
+    setSubmissionStart,
+    announcePolite,
+    lastAnnouncementTimeRef,
+    applyAgentTemplate,
+    focusRegeneratedResponse,
+    location,
+    navigate,
+    paramId,
+    restorePendingContext,
+    reconcileFailedCodeDecision,
+    recoverConversation,
+    attachmentHandler,
+    preserveSubagentAtomsForNewConvoIdRef,
+  };
+  const { messageHandler, syncHandler, createdHandler, titleHandler } = useTurnHandlers(ctx);
+  const finalHandler = useFinalHandler(ctx);
+  const { errorHandler, abortConversation } = useAbortHandlers(ctx, finalHandler);
+>>>>>>> upstream/main
 
   return {
     stepHandler,

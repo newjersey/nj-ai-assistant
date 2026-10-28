@@ -5,7 +5,10 @@ import {
   deleteData,
   updateFields,
   updateFieldsInPlace,
+<<<<<<< HEAD
   normalizeData,
+=======
+>>>>>>> upstream/main
   getRecordByProperty,
 } from '../collection';
 
@@ -341,6 +344,7 @@ describe('deleteData', () => {
     expect(result.pages[0].items).toHaveLength(1);
   });
 });
+<<<<<<< HEAD
 
 // ---------------------------------------------------------------------------
 // normalizeData
@@ -384,3 +388,5 @@ describe('normalizeData', () => {
     expect(result.pages).toHaveLength(0);
   });
 });
+=======
+>>>>>>> upstream/main

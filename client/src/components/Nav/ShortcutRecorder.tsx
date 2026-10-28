@@ -182,13 +182,22 @@ export function RecorderPill({
       onKeyDown={onKeyDown}
       onKeyUp={onKeyUp}
       className={cn(
+<<<<<<< HEAD
         'flex h-[30px] items-center gap-1.5 rounded-md border bg-surface-primary px-2 outline-none transition-colors',
         'focus-visible:ring-2 focus-visible:ring-text-primary focus-visible:ring-offset-1 focus-visible:ring-offset-surface-primary-alt',
+=======
+        'bg-surface-primary flex h-[1.875rem] items-center gap-1.5 rounded-md border px-2 outline-hidden transition-colors',
+        'focus-visible:ring-text-primary focus-visible:ring-offset-surface-primary-alt focus-visible:ring-2 focus-visible:ring-offset-1',
+>>>>>>> upstream/main
         stateBorder,
       )}
     >
       {showHint ? (
+<<<<<<< HEAD
         <span className="text-[11.5px] text-text-secondary">
+=======
+        <span className="text-text-secondary text-[11.5px]">
+>>>>>>> upstream/main
           {localize('com_shortcut_recorder_placeholder')}
         </span>
       ) : (
@@ -216,24 +225,40 @@ export function RecorderInfo({
     return (
       <div
         id={`${ownerId}-recorder-hint`}
+<<<<<<< HEAD
         className="flex flex-wrap items-center justify-end gap-x-2 gap-y-1 pl-1 text-[11.5px]"
       >
         <span className="text-text-secondary">
           {localize('com_shortcut_recorder_conflict_prefix')}{' '}
           <span className="font-medium text-text-primary">{conflict.conflictLabel}</span>
+=======
+        className="flex flex-wrap items-center justify-end gap-x-2 gap-y-1 ps-1 text-[11.5px]"
+      >
+        <span className="text-text-secondary">
+          {localize('com_shortcut_recorder_conflict_prefix')}{' '}
+          <span className="text-text-primary font-medium">{conflict.conflictLabel}</span>
+>>>>>>> upstream/main
         </span>
         <div className="flex shrink-0 items-center gap-1">
           <button
             type="button"
             onClick={onTryAgain}
+<<<<<<< HEAD
             className="whitespace-nowrap rounded-md px-1.5 py-0.5 text-text-secondary transition-colors hover:text-text-primary"
+=======
+            className="text-text-secondary hover:text-text-primary rounded-md px-1.5 py-0.5 whitespace-nowrap transition-colors"
+>>>>>>> upstream/main
           >
             {localize('com_shortcut_recorder_try_again')}
           </button>
           <button
             type="button"
             onClick={() => onSaveReplacing(conflict.binding, conflict.conflictId)}
+<<<<<<< HEAD
             className="whitespace-nowrap rounded-md bg-surface-tertiary px-2 py-0.5 font-medium text-text-primary transition-colors hover:bg-surface-active-alt"
+=======
+            className="bg-surface-tertiary text-text-primary hover:bg-surface-active-alt rounded-md px-2 py-0.5 font-medium whitespace-nowrap transition-colors"
+>>>>>>> upstream/main
           >
             {localize('com_shortcut_recorder_replace')}
           </button>
@@ -243,7 +268,11 @@ export function RecorderInfo({
   }
 
   return (
+<<<<<<< HEAD
     <div id={`${ownerId}-recorder-hint`} className="flex items-center justify-end gap-2 pl-1">
+=======
+    <div id={`${ownerId}-recorder-hint`} className="flex items-center justify-end gap-2 ps-1">
+>>>>>>> upstream/main
       <span
         className={cn(
           'text-[11.5px]',
@@ -258,7 +287,11 @@ export function RecorderInfo({
         type="button"
         onClick={onCancel}
         aria-label={localize('com_ui_cancel')}
+<<<<<<< HEAD
         className="inline-flex h-5 w-5 items-center justify-center rounded text-text-secondary transition-colors hover:bg-surface-active-alt hover:text-text-primary"
+=======
+        className="text-text-secondary hover:bg-surface-active-alt hover:text-text-primary inline-flex h-5 w-5 items-center justify-center rounded transition-colors"
+>>>>>>> upstream/main
       >
         <X className="h-3 w-3" />
       </button>

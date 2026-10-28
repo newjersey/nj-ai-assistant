@@ -6,11 +6,24 @@ import useDrawerSwipe, {
   setDrawerSlideListener,
 } from '../useDrawerSwipe';
 import {
+<<<<<<< HEAD
   MOBILE_DRAWER_ID,
   MOBILE_PANE_SHIFT,
   MOBILE_SCRIM_ID,
 } from '~/components/UnifiedSidebar/constants';
 
+=======
+  DRAWER_UNPAINTED,
+  MOBILE_DRAWER_ID,
+  MOBILE_SCRIM_ID,
+  TRANSITION_MS,
+} from '~/components/UnifiedSidebar/constants';
+
+/** Mirrors the hook's own settle buffer: the window between React writing the
+ *  resting value and the release handing the inline styles back. */
+const SETTLE_BUFFER_MS = 80;
+
+>>>>>>> upstream/main
 const DRAWER_WIDTH = 375;
 
 const createTouch = (x: number, y: number, identifier = 0) =>
@@ -115,6 +128,42 @@ afterEach(() => {
   document.getElementById(MOBILE_SCRIM_ID)?.remove();
 });
 
+<<<<<<< HEAD
+=======
+describe('useDrawerSwipe: stationary transcript', () => {
+  it.each([false, true])('never promotes or transforms the chat (reduced motion=%s)', (reduced) => {
+    jest.useFakeTimers();
+    const harness = setup(false, reduced);
+    const transcript = document.createElement('div');
+    const row = document.createElement('button');
+    row.textContent = 'Existing message';
+    transcript.append(row);
+    transcript.scrollTop = 2400;
+    harness.pane.append(transcript);
+
+    kickDrawerAnimation(true, jest.fn());
+    expect(harness.pane.style.transform).toBe('');
+    expect(harness.pane.style.willChange).toBe('');
+    jest.runAllTimers();
+    harness.rerender({ open: true, enabled: true });
+    harness.swipe(harness.drawer, [
+      { x: 350, y: 100, t: 0 },
+      { x: 120, y: 100, t: 100 },
+    ]);
+    jest.runAllTimers();
+    harness.rerender({ open: false, enabled: true });
+
+    expect(harness.pane.style.transform).toBe('');
+    expect(harness.pane.style.willChange).toBe('');
+    expect(harness.pane.firstElementChild).toBe(transcript);
+    expect(transcript.firstElementChild).toBe(row);
+    expect(transcript.scrollTop).toBe(2400);
+    jest.useRealTimers();
+    harness.unmount();
+  });
+});
+
+>>>>>>> upstream/main
 describe('useDrawerSwipe — opening from the chat pane', () => {
   it('follows the finger and commits past the distance threshold', () => {
     const harness = setup(false);
@@ -130,14 +179,22 @@ describe('useDrawerSwipe — opening from the chat pane', () => {
 
     expect(events[1].defaultPrevented).toBe(true);
     expect(harness.drawer.style.transform).toBe(`translate3d(${200 - DRAWER_WIDTH}px, 0, 0)`);
+<<<<<<< HEAD
     expect(harness.pane.style.transform).toBe('translate3d(200px, 0, 0)');
+=======
+    expect(harness.pane.style.transform).toBe('');
+>>>>>>> upstream/main
     expect(harness.drawer.style.transition).toBe('none');
 
     harness.pane.dispatchEvent(touchEvent('touchend', [], 120));
 
     expect(harness.onOpenChange).toHaveBeenCalledWith(true);
     expect(harness.drawer.style.transform).toBe('translate3d(0, 0, 0)');
+<<<<<<< HEAD
     expect(harness.pane.style.transform).toBe(MOBILE_PANE_SHIFT);
+=======
+    expect(harness.pane.style.transform).toBe('');
+>>>>>>> upstream/main
     harness.unmount();
   });
 
@@ -151,7 +208,11 @@ describe('useDrawerSwipe — opening from the chat pane', () => {
 
     expect(harness.onOpenChange).not.toHaveBeenCalled();
     expect(harness.drawer.style.transform).toBe('translate3d(-100%, 0, 0)');
+<<<<<<< HEAD
     expect(harness.pane.style.transform).toBe('translate3d(0, 0, 0)');
+=======
+    expect(harness.pane.style.transform).toBe('');
+>>>>>>> upstream/main
     harness.unmount();
   });
 
@@ -247,7 +308,11 @@ describe('useDrawerSwipe — opening from the chat pane', () => {
     expect(harness.onOpenChange).toHaveBeenCalledWith(true);
     /** The snap must suppress the shared 300ms transition for the flip. */
     expect(harness.drawer.style.transition).toBe('none');
+<<<<<<< HEAD
     expect(harness.pane.style.transition).toBe('none');
+=======
+    expect(harness.pane.style.transition).toBe('');
+>>>>>>> upstream/main
     harness.unmount();
   });
 
@@ -267,7 +332,11 @@ describe('useDrawerSwipe — opening from the chat pane', () => {
     jest.runAllTimers();
 
     expect(harness.drawer.style.transition).toBe('none');
+<<<<<<< HEAD
     expect(harness.pane.style.transition).toBe('none');
+=======
+    expect(harness.pane.style.transition).toBe('');
+>>>>>>> upstream/main
     jest.useRealTimers();
     harness.unmount();
   });
@@ -301,7 +370,11 @@ describe('useDrawerSwipe — closing from the drawer', () => {
 
     expect(harness.onOpenChange).toHaveBeenCalledWith(false);
     expect(harness.drawer.style.transform).toBe('translate3d(-100%, 0, 0)');
+<<<<<<< HEAD
     expect(harness.pane.style.transform).toBe('translate3d(0, 0, 0)');
+=======
+    expect(harness.pane.style.transform).toBe('');
+>>>>>>> upstream/main
     harness.unmount();
   });
 
@@ -340,7 +413,11 @@ describe('useDrawerSwipe — interruptions and re-arming', () => {
       { x: 220, y: 100, t: 50 },
     ]);
     expect(harness.onOpenChange).toHaveBeenCalledWith(true);
+<<<<<<< HEAD
     expect(harness.pane.style.transform).toBe(MOBILE_PANE_SHIFT);
+=======
+    expect(harness.pane.style.transform).toBe('');
+>>>>>>> upstream/main
 
     harness.rerender({ open: true, enabled: true });
     harness.rerender({ open: false, enabled: true });
@@ -365,7 +442,11 @@ describe('useDrawerSwipe — interruptions and re-arming', () => {
     expect(harness.drawer.style.transform).toBe('translate3d(0, 0, 0)');
 
     jest.runAllTimers();
+<<<<<<< HEAD
     expect(harness.pane.style.transform).toBe(MOBILE_PANE_SHIFT);
+=======
+    expect(harness.pane.style.transform).toBe('');
+>>>>>>> upstream/main
     expect(harness.drawer.style.transform).toBe('');
     jest.useRealTimers();
     harness.unmount();
@@ -386,7 +467,11 @@ describe('useDrawerSwipe — interruptions and re-arming', () => {
       touchEvent('touchend', [createTouch(220, 100, 0)], 80, [createTouch(80, 200, 1)]),
     );
     expect(harness.onOpenChange).not.toHaveBeenCalled();
+<<<<<<< HEAD
     expect(harness.pane.style.transform).toBe('translate3d(200px, 0, 0)');
+=======
+    expect(harness.pane.style.transform).toBe('');
+>>>>>>> upstream/main
 
     harness.pane.dispatchEvent(touchEvent('touchend', [], 100));
     expect(harness.onOpenChange).toHaveBeenCalledWith(true);
@@ -410,7 +495,11 @@ describe('useDrawerSwipe — interruptions and re-arming', () => {
     expect(harness.drawer.style.transition).not.toBe('none');
     /** React committed the open pane transform before this cleanup and will
      * not re-assert it — the release must restore it, not clear it. */
+<<<<<<< HEAD
     expect(harness.pane.style.transform).toBe(MOBILE_PANE_SHIFT);
+=======
+    expect(harness.pane.style.transform).toBe('');
+>>>>>>> upstream/main
     harness.unmount();
   });
 
@@ -489,7 +578,11 @@ describe('useDrawerSwipe — interruptions and re-arming', () => {
 });
 
 describe('useDrawerSwipe — kickDrawerAnimation (button toggles)', () => {
+<<<<<<< HEAD
   it('slides both elements before the state flip runs, then hands off to classes', () => {
+=======
+  it('slides only the drawer before the state flip, then hands off to classes', () => {
+>>>>>>> upstream/main
     jest.useFakeTimers();
     const harness = setup(false);
     /** The sync rAF mock collapses the two-frame deferral, so capturing the
@@ -500,8 +593,14 @@ describe('useDrawerSwipe — kickDrawerAnimation (button toggles)', () => {
     });
 
     expect(transformAtApply).toEqual(['translate3d(0, 0, 0)']);
+<<<<<<< HEAD
     expect(harness.pane.style.transform).toBe(MOBILE_PANE_SHIFT);
     expect(harness.drawer.style.willChange).toBe('transform');
+=======
+    expect(harness.pane.style.transform).toBe('');
+    expect(harness.drawer.style.willChange).toBe('transform');
+    expect(harness.pane.style.willChange).toBe('');
+>>>>>>> upstream/main
     expect(harness.onOpenChange).not.toHaveBeenCalled();
 
     harness.rerender({ open: true, enabled: true });
@@ -510,7 +609,11 @@ describe('useDrawerSwipe — kickDrawerAnimation (button toggles)', () => {
     jest.runAllTimers();
     expect(harness.drawer.style.transform).toBe('');
     expect(harness.drawer.style.willChange).toBe('');
+<<<<<<< HEAD
     expect(harness.pane.style.transform).toBe(MOBILE_PANE_SHIFT);
+=======
+    expect(harness.pane.style.transform).toBe('');
+>>>>>>> upstream/main
     jest.useRealTimers();
     harness.unmount();
   });
@@ -547,7 +650,11 @@ describe('useDrawerSwipe — kickDrawerAnimation (button toggles)', () => {
 
     expect(harness.drawer.style.transform).toBe('translate3d(-100%, 0, 0)');
     /** Retargeting to a close takes the reveal, since this drawer covers. */
+<<<<<<< HEAD
     expect(harness.pane.style.transform).toBe('none');
+=======
+    expect(harness.pane.style.transform).toBe('');
+>>>>>>> upstream/main
 
     harness.rerender({ open: false, enabled: true });
     jest.runAllTimers();
@@ -584,7 +691,11 @@ describe('useDrawerSwipe — kickDrawerAnimation (button toggles)', () => {
     const applyState = jest.fn();
     kickDrawerAnimation(true, applyState);
 
+<<<<<<< HEAD
     expect(harness.pane.style.transform).toBe('translate3d(100px, 0, 0)');
+=======
+    expect(harness.pane.style.transform).toBe('');
+>>>>>>> upstream/main
     expect(applyState).toHaveBeenCalledTimes(1);
     harness.pane.dispatchEvent(touchEvent('touchend', [], 400));
     harness.unmount();
@@ -608,7 +719,11 @@ describe('useDrawerSwipe — kickDrawerAnimation (button toggles)', () => {
     harness.rerender({ open: true, enabled: true });
     jest.runAllTimers();
     expect(harness.drawer.style.transition).toBe('none');
+<<<<<<< HEAD
     expect(harness.pane.style.transition).toBe('none');
+=======
+    expect(harness.pane.style.transition).toBe('');
+>>>>>>> upstream/main
     jest.useRealTimers();
     harness.unmount();
   });
@@ -623,7 +738,11 @@ describe('useDrawerSwipe — kickDrawerAnimation (button toggles)', () => {
     jest.runAllTimers();
 
     expect(harness.drawer.style.transition).toContain('transform');
+<<<<<<< HEAD
     expect(harness.pane.style.transition).toContain('transform');
+=======
+    expect(harness.pane.style.transition).toBe('');
+>>>>>>> upstream/main
     jest.useRealTimers();
     harness.unmount();
   });
@@ -679,22 +798,34 @@ describe('useDrawerSwipe — kickDrawerAnimation (button toggles)', () => {
     queued.shift()?.(0);
 
     expect(harness.drawer.style.transform).toBe('translate3d(0, 0, 0)');
+<<<<<<< HEAD
     expect(harness.pane.style.transform).toBe(MOBILE_PANE_SHIFT);
+=======
+    expect(harness.pane.style.transform).toBe('');
+>>>>>>> upstream/main
 
     harness.rerender({ open: true, enabled: true });
     jest.advanceTimersByTime(400);
     expect(harness.drawer.style.transform).toBe('');
+<<<<<<< HEAD
     expect(harness.pane.style.transform).toBe(MOBILE_PANE_SHIFT);
+=======
+    expect(harness.pane.style.transform).toBe('');
+>>>>>>> upstream/main
     jest.useRealTimers();
     harness.unmount();
   });
 
+<<<<<<< HEAD
   /**
    * A reveal while the drawer covers the pane: repositioning instantly under an
    * opaque full-width layer is invisible, and animating the pane in from the
    * right instead makes every tap-to-navigate close visibly shift the chat
    * while the new conversation commits into the moving layer.
    */
+=======
+  /** Closing reveals the chat already in place underneath the drawer. */
+>>>>>>> upstream/main
   it('reveals rather than animating when the drawer covers the pane', () => {
     jest.useFakeTimers();
     const harness = setup(true);
@@ -703,8 +834,13 @@ describe('useDrawerSwipe — kickDrawerAnimation (button toggles)', () => {
 
     expect(harness.drawer.style.transform).toBe('translate3d(-100%, 0, 0)');
     expect(harness.drawer.style.transition).not.toBe('none');
+<<<<<<< HEAD
     expect(harness.pane.style.transform).toBe('none');
     expect(harness.pane.style.transition).toBe('none');
+=======
+    expect(harness.pane.style.transform).toBe('');
+    expect(harness.pane.style.transition).toBe('');
+>>>>>>> upstream/main
 
     harness.rerender({ open: false, enabled: true });
     jest.runAllTimers();
@@ -718,11 +854,14 @@ describe('useDrawerSwipe — kickDrawerAnimation (button toggles)', () => {
    * reposition would land in the visible slice. Both surfaces animate together
    * instead, matching what a finger drag already produces.
    */
+<<<<<<< HEAD
   /**
    * The pane tracks the drawer's width through its own transform, so a runtime
    * width change has to move on the same curve or the newly exposed slice has
    * no conversation under it for the length of the transition.
    */
+=======
+>>>>>>> upstream/main
   it('transitions the drawer width alongside its transform', () => {
     jest.useFakeTimers();
     const harness = setup(true, false, Math.round(DRAWER_WIDTH / 0.8));
@@ -732,13 +871,21 @@ describe('useDrawerSwipe — kickDrawerAnimation (button toggles)', () => {
     expect(harness.drawer.style.transition).toContain('width');
     expect(harness.drawer.style.transition).toContain('transform');
     /** Flex-driven, and animating it would reach the desktop collapse too. */
+<<<<<<< HEAD
     expect(harness.pane.style.transition).toContain('transform');
+=======
+    expect(harness.pane.style.transition).toBe('');
+>>>>>>> upstream/main
     expect(harness.pane.style.transition).not.toContain('width');
     jest.useRealTimers();
     harness.unmount();
   });
 
+<<<<<<< HEAD
   it('animates both surfaces when a strip of chat is left visible', () => {
+=======
+  it('overlays the stationary chat when a strip is left visible', () => {
+>>>>>>> upstream/main
     jest.useFakeTimers();
     const harness = setup(true, false, Math.round(DRAWER_WIDTH / 0.8));
 
@@ -746,12 +893,21 @@ describe('useDrawerSwipe — kickDrawerAnimation (button toggles)', () => {
 
     expect(harness.drawer.style.transform).toBe('translate3d(-100%, 0, 0)');
     expect(harness.drawer.style.transition).not.toBe('none');
+<<<<<<< HEAD
     expect(harness.pane.style.transform).toBe('translate3d(0, 0, 0)');
     expect(harness.pane.style.transition).not.toBe('none');
 
     harness.rerender({ open: false, enabled: true });
     jest.runAllTimers();
     expect(harness.pane.style.transition).not.toBe('none');
+=======
+    expect(harness.pane.style.transform).toBe('');
+    expect(harness.pane.style.transition).toBe('');
+
+    harness.rerender({ open: false, enabled: true });
+    jest.runAllTimers();
+    expect(harness.pane.style.transition).toBe('');
+>>>>>>> upstream/main
     expect(harness.drawer.style.transform).toBe('');
     jest.useRealTimers();
     harness.unmount();
@@ -970,7 +1126,152 @@ describe('useDrawerSwipe — kickDrawerAnimation (button toggles)', () => {
     harness.pane.dispatchEvent(touchEvent('touchmove', [createTouch(60, 0)], 32));
 
     expect(harness.drawer.style.transform).toBe('translate3d(-240px, 0, 0)');
+<<<<<<< HEAD
     expect(harness.pane.style.transform).toBe('translate3d(60px, 0, 0)');
+=======
+    expect(harness.pane.style.transform).toBe('');
+    harness.unmount();
+  });
+});
+
+/**
+ * A closed drawer is not painted at all (see UnifiedSidebar), so every path
+ * that moves it has to claim painting for the travel and hand it back once the
+ * slide is over: claimed too late the opening frames are invisible, released
+ * too late — or never — and the settled drawer keeps the off-screen layer whose
+ * stale tiles this is all here to avoid.
+ */
+describe('useDrawerSwipe — painting through the travel', () => {
+  it('paints the drawer for a drag that opens it out of a closed state', () => {
+    jest.useFakeTimers();
+    const harness = setup(false);
+    harness.swipe(
+      harness.pane,
+      [
+        { x: 20, y: 100, t: 0 },
+        { x: 120, y: 104, t: 50 },
+      ],
+      false,
+    );
+
+    expect(harness.drawer.style.visibility).toBe('visible');
+
+    harness.pane.dispatchEvent(touchEvent('touchend', [], 120));
+    jest.runAllTimers();
+
+    expect(harness.onOpenChange).toHaveBeenCalledWith(true);
+    expect(harness.drawer.style.visibility).toBe('');
+    jest.useRealTimers();
+    harness.unmount();
+  });
+
+  /** The drawer never commits open here, so nothing else would ever resolve the
+   *  inline override: the settle has to land on the closed value itself. */
+  it('settles a drag that snaps back on the unpainted value', () => {
+    jest.useFakeTimers();
+    const harness = setup(false);
+    harness.swipe(harness.pane, [
+      { x: 20, y: 100, t: 0 },
+      { x: 60, y: 100, t: 200 },
+      { x: 80, y: 100, t: 400 },
+    ]);
+    jest.runAllTimers();
+
+    expect(harness.onOpenChange).not.toHaveBeenCalled();
+    expect(harness.drawer.style.visibility).toBe(DRAWER_UNPAINTED);
+    jest.useRealTimers();
+    harness.unmount();
+  });
+
+  it.each([
+    ['open', false, true, ''],
+    ['close', true, false, DRAWER_UNPAINTED],
+  ])(
+    'paints a kicked %s slide before its state flip commits, then settles',
+    (_name, open, next, settled) => {
+      jest.useFakeTimers();
+      const harness = setup(open);
+      const visibilityAtApply: string[] = [];
+      kickDrawerAnimation(next, () => {
+        visibilityAtApply.push(harness.drawer.style.visibility);
+      });
+
+      expect(visibilityAtApply).toEqual(['visible']);
+
+      jest.advanceTimersByTime(400);
+
+      expect(harness.drawer.style.visibility).toBe(settled);
+      jest.useRealTimers();
+      harness.unmount();
+    },
+  );
+
+  /**
+   * The regression that made the first pass of this change a no-op for every
+   * button and keyboard close. React owns the resting value and writes
+   * `hidden` when the travel window closes at TRANSITION_MS; the release runs a
+   * buffer later, and clearing the property there dropped that value while
+   * React still believed its unchanged prop was applied — so React never wrote
+   * it again and the settled, closed drawer was painted for the rest of the
+   * session. Modelled the way the pane's transform already is: the declarative
+   * value is in the DOM before the release, and the release must respect it.
+   */
+  it('leaves a settled close on the value React rendered, not cleared', () => {
+    jest.useFakeTimers();
+    const harness = setup(true);
+    kickDrawerAnimation(false, () => undefined);
+    /** What React writes once `isSliding` expires, mid-way through the buffer
+     *  the release waits out. */
+    jest.advanceTimersByTime(TRANSITION_MS);
+    harness.drawer.style.visibility = DRAWER_UNPAINTED;
+
+    jest.advanceTimersByTime(SETTLE_BUFFER_MS + 20);
+
+    expect(harness.drawer.style.visibility).toBe(DRAWER_UNPAINTED);
+    jest.useRealTimers();
+    harness.unmount();
+  });
+
+  /** A gesture surviving into a new effect run was interrupted, and the run that
+   *  inherits it resolves the drag styles to the state it finds rather than to
+   *  the gesture's own target. That is the other path that can strand the
+   *  claim — here an external close commits while a close drag is still held. */
+  it('resolves an interrupted drag to the state that superseded it', () => {
+    jest.useFakeTimers();
+    const harness = setup(true);
+    harness.swipe(
+      harness.drawer,
+      [
+        { x: 350, y: 100, t: 0 },
+        { x: 250, y: 100, t: 50 },
+      ],
+      false,
+    );
+
+    expect(harness.drawer.style.visibility).toBe('visible');
+
+    harness.rerender({ open: false, enabled: true });
+
+    expect(harness.drawer.style.visibility).toBe(DRAWER_UNPAINTED);
+    jest.useRealTimers();
+    harness.unmount();
+  });
+
+  /** Reduced motion has no travel to paint: the state flip is the whole
+   *  transition, so nothing claims painting and React's value stands alone. */
+  it('never claims painting under reduced motion', () => {
+    jest.useFakeTimers();
+    const harness = setup(false, true);
+    harness.swipe(harness.pane, [
+      { x: 20, y: 100, t: 0 },
+      { x: 240, y: 100, t: 50 },
+    ]);
+    kickDrawerAnimation(false, jest.fn());
+    jest.runAllTimers();
+
+    expect(harness.drawer.style.visibility).not.toBe('visible');
+    jest.useRealTimers();
+>>>>>>> upstream/main
     harness.unmount();
   });
 });
@@ -1030,3 +1331,153 @@ describe('findHorizontalScrollBlocker', () => {
     expect(findHorizontalScrollBlocker(child, boundary, 1)).toBeNull();
   });
 });
+<<<<<<< HEAD
+=======
+
+/** In RTL the drawer is anchored to the right edge, so "toward open" is a
+ *  leftward finger and every transform carries the opposite sign. */
+describe('useDrawerSwipe: right-to-left layouts', () => {
+  const setupRtl = (open: boolean, viewportWidth = DRAWER_WIDTH) => {
+    const harness = setup(open, false, viewportWidth);
+    harness.drawer.style.direction = 'rtl';
+    return harness;
+  };
+
+  const rtlScroller = (scrollLeft: number) => {
+    const el = document.createElement('div');
+    el.style.overflowX = 'auto';
+    el.style.direction = 'rtl';
+    Object.defineProperty(el, 'scrollWidth', { value: 600, configurable: true });
+    Object.defineProperty(el, 'clientWidth', { value: 300, configurable: true });
+    el.scrollLeft = scrollLeft;
+    return el;
+  };
+
+  it('opens on a leftward swipe without translating the chat', () => {
+    const harness = setupRtl(false);
+    const events = harness.swipe(
+      harness.pane,
+      [
+        { x: 355, y: 100, t: 0 },
+        { x: 255, y: 104, t: 50 },
+        { x: 155, y: 108, t: 100 },
+      ],
+      false,
+    );
+
+    expect(events[1].defaultPrevented).toBe(true);
+    expect(harness.drawer.style.transform).toBe(`translate3d(${DRAWER_WIDTH - 200}px, 0, 0)`);
+    expect(harness.pane.style.transform).toBe('');
+
+    harness.pane.dispatchEvent(touchEvent('touchend', [], 120));
+
+    expect(harness.onOpenChange).toHaveBeenCalledWith(true);
+    expect(harness.drawer.style.transform).toBe('translate3d(0, 0, 0)');
+    expect(harness.pane.style.transform).toBe('');
+    harness.unmount();
+  });
+
+  it('ignores a rightward swipe while closed', () => {
+    const harness = setupRtl(false);
+    harness.swipe(harness.pane, [
+      { x: 20, y: 100, t: 0 },
+      { x: 220, y: 100, t: 50 },
+    ]);
+
+    expect(harness.onOpenChange).not.toHaveBeenCalled();
+    expect(harness.drawer.style.transform).toBe('');
+    harness.unmount();
+  });
+
+  it('reverts a slow swipe to the right-hand offscreen position', () => {
+    const harness = setupRtl(false);
+    harness.swipe(harness.pane, [
+      { x: 355, y: 100, t: 0 },
+      { x: 315, y: 100, t: 200 },
+      { x: 295, y: 100, t: 400 },
+    ]);
+
+    expect(harness.onOpenChange).not.toHaveBeenCalled();
+    expect(harness.drawer.style.transform).toBe('translate3d(100%, 0, 0)');
+    expect(harness.pane.style.transform).toBe('');
+    harness.unmount();
+  });
+
+  it('commits a fast leftward flick short of the distance threshold', () => {
+    const harness = setupRtl(false);
+    harness.swipe(harness.pane, [
+      { x: 355, y: 100, t: 0 },
+      { x: 325, y: 100, t: 20 },
+      { x: 295, y: 100, t: 40 },
+    ]);
+
+    expect(harness.onOpenChange).toHaveBeenCalledWith(true);
+    harness.unmount();
+  });
+
+  it('closes on a committed rightward swipe and ignores a leftward one', () => {
+    const ignored = setupRtl(true);
+    ignored.swipe(ignored.drawer, [
+      { x: 350, y: 100, t: 0 },
+      { x: 150, y: 100, t: 50 },
+    ]);
+    expect(ignored.onOpenChange).not.toHaveBeenCalled();
+    ignored.unmount();
+
+    const harness = setupRtl(true);
+    harness.swipe(harness.drawer, [
+      { x: 50, y: 100, t: 0 },
+      { x: 150, y: 100, t: 50 },
+      { x: 250, y: 100, t: 100 },
+    ]);
+
+    expect(harness.onOpenChange).toHaveBeenCalledWith(false);
+    expect(harness.drawer.style.transform).toBe('translate3d(100%, 0, 0)');
+    expect(harness.pane.style.transform).toBe('');
+    harness.unmount();
+  });
+
+  it('defers to an RTL scroller that can still pan toward the drawer', () => {
+    const harness = setupRtl(false);
+    const scroller = rtlScroller(-120);
+    harness.pane.append(scroller);
+
+    harness.swipe(harness.pane, [
+      { x: 355, y: 100, t: 0, target: scroller },
+      { x: 155, y: 100, t: 50, target: scroller },
+    ]);
+
+    expect(harness.onOpenChange).not.toHaveBeenCalled();
+    harness.unmount();
+  });
+
+  it('claims the drag when that RTL scroller is parked at its start', () => {
+    const harness = setupRtl(false);
+    const scroller = rtlScroller(0);
+    harness.pane.append(scroller);
+
+    harness.swipe(harness.pane, [
+      { x: 355, y: 100, t: 0, target: scroller },
+      { x: 155, y: 100, t: 50, target: scroller },
+    ]);
+
+    expect(harness.onOpenChange).toHaveBeenCalledWith(true);
+    harness.unmount();
+  });
+
+  it('slides a button close off the right edge', () => {
+    jest.useFakeTimers();
+    const harness = setupRtl(true, Math.round(DRAWER_WIDTH / 0.8));
+
+    kickDrawerAnimation(false, jest.fn());
+
+    expect(harness.drawer.style.transform).toBe('translate3d(100%, 0, 0)');
+    expect(harness.pane.style.transform).toBe('');
+
+    harness.rerender({ open: false, enabled: true });
+    jest.runAllTimers();
+    jest.useRealTimers();
+    harness.unmount();
+  });
+});
+>>>>>>> upstream/main

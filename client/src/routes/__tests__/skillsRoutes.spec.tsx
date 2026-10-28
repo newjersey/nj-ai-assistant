@@ -5,6 +5,7 @@ jest.mock('~/components/Auth', () => ({
   VerifyEmail: () => null,
   Registration: () => null,
   ResetPassword: () => null,
+<<<<<<< HEAD
   ApiErrorWatcher: () => null,
   TwoFactorScreen: () => null,
   RequestPasswordReset: () => null,
@@ -15,6 +16,14 @@ jest.mock('~/components/Agents/MarketplaceContext', () => ({
 }));
 
 jest.mock('~/components/Agents/Marketplace', () => () => null);
+=======
+  TwoFactorScreen: () => null,
+  TwoFactorSetupScreen: () => null,
+  RequestPasswordReset: () => null,
+}));
+
+jest.mock('../Marketplace', () => () => null);
+>>>>>>> upstream/main
 jest.mock('~/components/OAuth', () => ({
   OAuthSuccess: () => null,
   OAuthError: () => null,

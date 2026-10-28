@@ -1,5 +1,9 @@
 import fs from 'fs';
+<<<<<<< HEAD
 import { Readable } from 'stream';
+=======
+import { Readable, pipeline } from 'stream';
+>>>>>>> upstream/main
 import { logger } from '@librechat/data-schemas';
 import { FileSources } from 'librechat-data-provider';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
@@ -31,6 +35,10 @@ import type {
   UrlBuilder,
   S3FileRef,
 } from '~/storage/types';
+<<<<<<< HEAD
+=======
+import type { FileStorageDeletionObserver } from '~/files/dispatch';
+>>>>>>> upstream/main
 import type { StoredFileRef } from '~/storage/path';
 import type { ServerRequest } from '~/types';
 import {
@@ -51,6 +59,10 @@ import {
   assertPathSegment,
   sanitizeContentDispositionFilename,
 } from '~/storage/validation';
+<<<<<<< HEAD
+=======
+import { dispatchFileDeletion } from '~/files/dispatch';
+>>>>>>> upstream/main
 import { getSafeErrorMetadata } from '~/utils/errors';
 import { initializeS3 } from '~/cdn/s3';
 import { deleteRagFile } from '~/files';
@@ -569,9 +581,20 @@ export async function saveURLToS3WithMetadata({
 
     const contentType = response.headers.get('content-type') ?? '';
     if (response.body) {
+<<<<<<< HEAD
       const source = Readable.fromWeb(
         response.body as unknown as Parameters<typeof Readable.fromWeb>[0],
       ).pipe(createRemoteFileByteLimitTransform(maxBytes));
+=======
+      const source = createRemoteFileByteLimitTransform(maxBytes);
+      pipeline(
+        Readable.fromWeb(response.body as unknown as Parameters<typeof Readable.fromWeb>[0]),
+        source,
+        () => {
+          /** Pipeline forwards failures to the returned stream and closes both ends. */
+        },
+      );
+>>>>>>> upstream/main
       const result = await saveReadableToS3({
         userId,
         body: source,
@@ -712,7 +735,16 @@ export function extractKeyFromS3Url(fileUrlOrKey: string): string {
   }
 }
 
+<<<<<<< HEAD
 export async function deleteFileFromS3(req: ServerRequest, file: TFile): Promise<void> {
+=======
+export async function deleteFileFromS3(
+  req: ServerRequest,
+  file: TFile,
+  _client?: unknown,
+  onDelete?: FileStorageDeletionObserver,
+): Promise<void> {
+>>>>>>> upstream/main
   if (!req.user) {
     throw new Error('[deleteFileFromS3] User not authenticated');
   }
@@ -745,6 +777,14 @@ export async function deleteFileFromS3(req: ServerRequest, file: TFile): Promise
   }
 
   const params = { Bucket: bucketName, Key: key };
+<<<<<<< HEAD
+=======
+  const ragParams = {
+    userId: ownerId,
+    file,
+    ...(req.config?.fileConfig ? { fileConfig: req.config.fileConfig } : {}),
+  };
+>>>>>>> upstream/main
 
   try {
     try {
@@ -754,21 +794,42 @@ export async function deleteFileFromS3(req: ServerRequest, file: TFile): Promise
     } catch (headErr) {
       if ((headErr as { name?: string }).name === 'NotFound') {
         logger.warn(`[deleteFileFromS3] File does not exist: ${key}`);
+<<<<<<< HEAD
         await deleteRagFile({ userId: ownerId, file });
+=======
+        onDelete?.('confirmed');
+        if ((await deleteRagFile(ragParams)) === false) {
+          throw new Error('Vector deletion was not confirmed');
+        }
+>>>>>>> upstream/main
         return;
       }
       throw headErr;
     }
 
+<<<<<<< HEAD
     await s3.send(new DeleteObjectCommand(params));
     await deleteRagFile({ userId: ownerId, file });
+=======
+    if ((await deleteRagFile(ragParams)) === false) {
+      throw new Error('Vector deletion was not confirmed');
+    }
+    await dispatchFileDeletion(onDelete, () => s3.send(new DeleteObjectCommand(params)));
+>>>>>>> upstream/main
     logger.debug('[deleteFileFromS3] S3 File deletion completed');
   } catch (error) {
     logger.error(`[deleteFileFromS3] Error deleting file from S3: ${(error as Error).message}`);
     logger.error((error as Error).stack);
 
     if ((error as { name?: string }).name === 'NoSuchKey') {
+<<<<<<< HEAD
       await deleteRagFile({ userId: ownerId, file });
+=======
+      onDelete?.('confirmed');
+      if ((await deleteRagFile(ragParams)) === false) {
+        throw new Error('Vector deletion was not confirmed');
+      }
+>>>>>>> upstream/main
       return;
     }
     throw error;

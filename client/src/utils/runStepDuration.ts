@@ -68,6 +68,7 @@ export function getRunStepDurationLabels(
     return {
       key: 'com_ui_duration_seconds',
       values: { 0: formatted },
+<<<<<<< HEAD
       /** The caller picks the plural form explicitly, matching the
        *  `com_ui_tools_count` / `_one` convention already used across the
        *  locale files, rather than relying on i18next's plural resolution. */
@@ -76,6 +77,12 @@ export function getRunStepDurationLabels(
           ? 'com_ui_duration_announced_seconds_one'
           : 'com_ui_duration_announced_seconds',
       announcedValues: { count: formatted },
+=======
+      /** The base key with a numeric `count` lets i18next pick each locale's
+       *  plural form; `value` carries the locale-formatted number. */
+      announcedKey: 'com_ui_duration_announced_seconds',
+      announcedValues: { count: seconds, value: formatted },
+>>>>>>> upstream/main
     };
   }
 
@@ -89,11 +96,19 @@ export function getRunStepDurationLabels(
       0: formatDurationValue(minutes, language),
       1: formatDurationValue(seconds, language),
     },
+<<<<<<< HEAD
     announcedKey:
       announcedMinutes === 1
         ? 'com_ui_duration_announced_minutes_one'
         : 'com_ui_duration_announced_minutes',
     announcedValues: { count: formatDurationValue(announcedMinutes, language) },
+=======
+    announcedKey: 'com_ui_duration_announced_minutes',
+    announcedValues: {
+      count: announcedMinutes,
+      value: formatDurationValue(announcedMinutes, language),
+    },
+>>>>>>> upstream/main
   };
 }
 
@@ -116,9 +131,14 @@ export function getElapsedDurationLabels(
     return {
       key,
       values,
+<<<<<<< HEAD
       announcedKey:
         seconds === 1 ? 'com_ui_elapsed_announced_seconds_one' : 'com_ui_elapsed_announced_seconds',
       announcedValues: { count: formatDurationValue(seconds, language) },
+=======
+      announcedKey: 'com_ui_elapsed_announced_seconds',
+      announcedValues: { count: seconds, value: formatDurationValue(seconds, language) },
+>>>>>>> upstream/main
     };
   }
 
@@ -126,10 +146,18 @@ export function getElapsedDurationLabels(
   return {
     key,
     values,
+<<<<<<< HEAD
     announcedKey:
       announcedMinutes === 1
         ? 'com_ui_elapsed_announced_minutes_one'
         : 'com_ui_elapsed_announced_minutes',
     announcedValues: { count: formatDurationValue(announcedMinutes, language) },
+=======
+    announcedKey: 'com_ui_elapsed_announced_minutes',
+    announcedValues: {
+      count: announcedMinutes,
+      value: formatDurationValue(announcedMinutes, language),
+    },
+>>>>>>> upstream/main
   };
 }

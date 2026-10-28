@@ -16,6 +16,10 @@ import {
   isAnsweredAskUserQuestionPart,
   splitOtherOption,
 } from './approval';
+<<<<<<< HEAD
+=======
+import { hasPendingApprovalInPart } from './groupToolCalls';
+>>>>>>> upstream/main
 
 const toolCallPart = (id: string, extra: Record<string, unknown> = {}): TMessageContentParts =>
   ({
@@ -230,6 +234,34 @@ describe('applyPendingAction — subagent-nested tool calls', () => {
     expect(countTaggedApprovalParts(result, 'a1')).toBe(1);
   });
 
+<<<<<<< HEAD
+=======
+  it('still tags the nested pause in a message whose settled calls arrived as previews', () => {
+    /** The shape a preview-aware conversation load returns: a settled sibling shortened, and
+     *  the running subagent's transcript kept because it holds an unresolved approval. */
+    const message = msg({
+      content: [
+        toolCallPart('done-call', {
+          output: 'head…tail',
+          outputTruncated: true,
+          outputLength: 40_000,
+        }),
+        ...(subagentMsg('child-tc1').content as TMessageContentParts[]),
+      ],
+    });
+    const result = applyPendingAction(message, childAction());
+    const parentToolCall = getToolCall(result.content?.[1] as TMessageContentParts) as
+      | { subagent_content?: TMessageContentParts[] }
+      | undefined;
+    expect(getToolCall(parentToolCall?.subagent_content?.[0])?.approval).toMatchObject({
+      actionId: 'a1',
+    });
+    expect(hasPendingApprovalInPart(result.content?.[1] as TMessageContentParts)).toBe(true);
+    expect(hasPendingApprovalInPart(result.content?.[0] as TMessageContentParts)).toBe(false);
+    expect(countTaggedApprovalParts(result, 'a1')).toBe(1);
+  });
+
+>>>>>>> upstream/main
   it('returns the same message when no nested tool call matches', () => {
     const message = subagentMsg('child-other');
     expect(applyPendingAction(message, childAction())).toBe(message);

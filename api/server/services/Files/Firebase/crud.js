@@ -5,6 +5,11 @@ const fetch = require('node-fetch');
 const { logger } = require('@librechat/data-schemas');
 const {
   deleteRagFile,
+<<<<<<< HEAD
+=======
+  createOwnedBlobFileDeleter,
+  extractFirebaseBlobPath,
+>>>>>>> upstream/main
   getFirebaseStorage,
   assertRemoteFileURL,
   getSafeErrorMetadata,
@@ -153,6 +158,7 @@ async function saveBufferToFirebase({ userId, buffer, fileName, basePath = 'imag
  * @param {string} urlString - The Firebase Storage URL.
  * @returns {string} The decoded file path.
  */
+<<<<<<< HEAD
 function extractFirebaseFilePath(urlString) {
   try {
     const url = new URL(urlString);
@@ -173,6 +179,8 @@ function extractFirebaseFilePath(urlString) {
   }
 }
 
+=======
+>>>>>>> upstream/main
 /**
  * Deletes a file from Firebase storage. This function determines the filepath from the
  * Firebase storage URL via regex for deletion. Validated by the user's ID.
@@ -185,6 +193,7 @@ function extractFirebaseFilePath(urlString) {
  *          A promise that resolves when the file has been successfully deleted from Firebase storage.
  *          Throws an error if there is an issue with deletion.
  */
+<<<<<<< HEAD
 const deleteFirebaseFile = async (req, file) => {
   await deleteRagFile({ userId: req.user.id, file });
 
@@ -202,6 +211,15 @@ const deleteFirebaseFile = async (req, file) => {
     throw error;
   }
 };
+=======
+const deleteFirebaseFile = (req, file) =>
+  createOwnedBlobFileDeleter({
+    extractPath: extractFirebaseBlobPath,
+    deleteBlob: (filepath) => deleteFile('', filepath),
+    isMissing: (error) => error?.code === 'storage/object-not-found',
+    deleteRagFile,
+  })(req, file);
+>>>>>>> upstream/main
 
 /**
  * Uploads a file to Firebase Storage.

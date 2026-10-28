@@ -29,7 +29,11 @@ jobs:
       - name: Set Up Node.js
         uses: actions/setup-node@v5
         with:
+<<<<<<< HEAD
           node-version: '24.16.0'
+=======
+          node-version: '24.22.1'
+>>>>>>> upstream/main
 
       - name: Install locize CLI
         run: npm install -g locize-cli@12.2.0 --ignore-scripts --no-audit --no-fund

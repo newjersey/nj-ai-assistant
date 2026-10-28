@@ -32,5 +32,10 @@ const keySchema: Schema<IKey> = new Schema({
 });
 
 keySchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+<<<<<<< HEAD
+=======
+/** Not unique: legacy databases can hold duplicate rows for one user and key name. */
+keySchema.index({ userId: 1, name: 1, tenantId: 1 });
+>>>>>>> upstream/main
 
 export default keySchema;

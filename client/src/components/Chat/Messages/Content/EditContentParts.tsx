@@ -1,5 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+<<<<<<< HEAD
 import { useRecoilValue } from 'recoil';
+=======
+>>>>>>> upstream/main
 import { Alert, Button, TextareaAutosize } from '@librechat/client';
 import { useUpdateMessageContentMutation } from 'librechat-data-provider/react-query';
 import {
@@ -9,6 +12,7 @@ import {
 } from 'librechat-data-provider';
 import type { TMessageContentParts } from 'librechat-data-provider';
 import type { ReactNode } from 'react';
+<<<<<<< HEAD
 import { useMessagesConversation, useMessagesOperations } from '~/Providers';
 import { getPartText, isEditablePart, withPartText } from './editableParts';
 import { findRerunParent } from './rerunParent';
@@ -16,6 +20,14 @@ import { useGetAddedConvo } from '~/hooks/Chat';
 import { useLocalize } from '~/hooks';
 import { cn } from '~/utils';
 import store from '~/store';
+=======
+import { getPartText, isEditablePart, withPartText } from './editableParts';
+import { useMessagePartsHost } from '~/Providers/MessagePartsHostContext';
+import useGetAddedConvo from '~/hooks/Conversations/useGetAddedConvo';
+import { findRerunParent } from './rerunParent';
+import { useLocalize } from '~/hooks';
+import { cn } from '~/utils';
+>>>>>>> upstream/main
 
 type EditableType = ContentTypes.TEXT | ContentTypes.THINK;
 
@@ -48,9 +60,15 @@ export default function EditContentParts({
   renderReadOnlyPart,
 }: EditContentPartsProps) {
   const localize = useLocalize();
+<<<<<<< HEAD
   const isRTL = useRecoilValue(store.chatDirection).toLowerCase() === 'rtl';
   const { conversation } = useMessagesConversation();
   const { ask, getMessages, setMessages } = useMessagesOperations();
+=======
+  const { useChatDirection, useMessagesEditing } = useMessagePartsHost();
+  const chatDirection = useChatDirection();
+  const { conversation, ask, getMessages, setMessages } = useMessagesEditing();
+>>>>>>> upstream/main
   const getAddedConvo = useGetAddedConvo();
   const firstEditorRef = useRef<HTMLTextAreaElement | null>(null);
   const [saveError, setSaveError] = useState(false);
@@ -245,6 +263,10 @@ export default function EditContentParts({
             overrideFiles: editedMessage.files,
             overrideManualSkills: editedMessage.manualSkills,
             overrideQuotes: editedMessage.quotes,
+<<<<<<< HEAD
+=======
+            overrideReasoning: editedMessage.reasoningOverride ?? null,
+>>>>>>> upstream/main
             addedConvo: getAddedConvo() || undefined,
           },
         ) === false;
@@ -269,6 +291,10 @@ export default function EditContentParts({
               targetResponseMessageId: messageId,
               overrideManualSkills: parentMessage.manualSkills,
               overrideQuotes: parentMessage.quotes,
+<<<<<<< HEAD
+=======
+              overrideReasoning: parentMessage.reasoningOverride ?? null,
+>>>>>>> upstream/main
               addedConvo: getAddedConvo() || undefined,
             },
           ) === false;
@@ -295,6 +321,10 @@ export default function EditContentParts({
               isEdited: true,
               overrideManualSkills: parentMessage.manualSkills,
               overrideQuotes: parentMessage.quotes,
+<<<<<<< HEAD
+=======
+              overrideReasoning: parentMessage.reasoningOverride ?? null,
+>>>>>>> upstream/main
               addedConvo: getAddedConvo() || undefined,
             },
           ) === false;
@@ -394,11 +424,20 @@ export default function EditContentParts({
           return (
             <label
               key={`editor-${messageId}-${absoluteIndex}`}
+<<<<<<< HEAD
               dir={isRTL ? 'rtl' : 'ltr'}
               className="flex min-w-0 flex-col gap-1.5 text-xs font-medium text-text-secondary"
             >
               {label}
               <TextareaAutosize
+=======
+              dir={chatDirection === 'auto' ? undefined : chatDirection}
+              className="text-text-secondary flex min-w-0 flex-col gap-1.5 text-xs font-medium"
+            >
+              {label}
+              <TextareaAutosize
+                focusOutline="hidden"
+>>>>>>> upstream/main
                 ref={editablePart === editableParts[0] ? firstEditorRef : undefined}
                 value={drafts[absoluteIndex]}
                 onChange={(event) =>
@@ -416,6 +455,7 @@ export default function EditContentParts({
                 }
                 disabled={isBusy}
                 minRows={3}
+<<<<<<< HEAD
                 dir={isRTL ? 'rtl' : 'ltr'}
                 className={cn(
                   'message-editor-text max-h-[65vh] min-h-24 w-full resize-y rounded-lg',
@@ -423,6 +463,13 @@ export default function EditContentParts({
                   'font-normal text-text-primary',
                   'focus-visible:outline-none',
                   isRTL ? 'text-right' : 'text-left',
+=======
+                dir={chatDirection}
+                className={cn(
+                  'message-editor-text max-h-[65vh] min-h-24 w-full resize-y rounded-lg',
+                  'border-border-medium bg-surface-tertiary-alt border px-3 py-2',
+                  'text-text-primary text-start font-normal',
+>>>>>>> upstream/main
                   'disabled:opacity-50 md:max-h-[75vh]',
                 )}
               />
@@ -436,7 +483,11 @@ export default function EditContentParts({
           English labels need, and a translated label needs more still. */}
       <footer className="flex flex-wrap items-center justify-between gap-2">
         <span
+<<<<<<< HEAD
           className="line-clamp-2 min-w-0 flex-1 text-xs text-text-secondary"
+=======
+          className="text-text-secondary line-clamp-2 min-w-0 flex-1 text-xs"
+>>>>>>> upstream/main
           aria-live="polite"
         >
           {getStatusMessage()}

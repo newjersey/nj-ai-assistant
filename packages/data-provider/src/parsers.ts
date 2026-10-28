@@ -15,7 +15,10 @@ import {
   Providers,
   anthropicSchema,
   assistantSchema,
+<<<<<<< HEAD
   // agentsSchema,
+=======
+>>>>>>> upstream/main
   compactAgentsSchema,
   compactGoogleSchema,
   compactAssistantSchema,
@@ -70,10 +73,13 @@ const getFallbackEndpointSchema = <TSchema>(
   return overrideSchema ?? schemas[endpointType];
 };
 
+<<<<<<< HEAD
 // const schemaCreators: Record<EModelEndpoint, (customSchema: DefaultSchemaValues) => EndpointSchema> = {
 //   [EModelEndpoint.google]: createGoogleSchema,
 // };
 
+=======
+>>>>>>> upstream/main
 /** Get the enabled endpoints from the `ENDPOINTS` environment variable */
 export function getEnabledEndpoints() {
   const defaultEndpoints: string[] = [
@@ -416,6 +422,43 @@ export function parseTextParts(
   return result;
 }
 
+<<<<<<< HEAD
+=======
+const thinkingBlockPattern = /:::thinking([\s\S]*?):::/;
+
+/**
+ * Splits legacy plain-text reasoning from the answer exactly as the message view renders it:
+ * the first `:::thinking ... :::` block becomes the collapsible Thoughts, the rest is the answer.
+ */
+export function parseThinkingContent(text: string): {
+  thinkingContent: string;
+  regularContent: string;
+} {
+  const thinkingMatch = text.match(thinkingBlockPattern);
+  return {
+    thinkingContent: thinkingMatch ? thinkingMatch[1].trim() : '',
+    regularContent: thinkingMatch ? text.replace(thinkingBlockPattern, '').trim() : text,
+  };
+}
+
+/**
+ * The text Read Aloud speaks for a message: the answer the message view shows, never its
+ * reasoning. Covers both reasoning shapes the UI collapses into Thoughts: `think` content parts
+ * and the legacy `:::thinking ... :::` block in plain text.
+ */
+export function getSpeechText(message: {
+  content?: Array<a.TMessageContentParts | undefined> | string | null;
+  text?: string | null;
+}): string {
+  if (Array.isArray(message.content) && message.content.length > 0) {
+    return parseTextParts(message.content, true).trim();
+  }
+  const text =
+    typeof message.content === 'string' && message.content ? message.content : message.text;
+  return parseThinkingContent(text ?? '').regularContent.trim();
+}
+
+>>>>>>> upstream/main
 export const SEPARATORS = ['.', '?', '!', '۔', '。', '‥', ';', '¡', '¿', '\n', '```'];
 
 export function findLastSeparatorIndex(text: string, separators = SEPARATORS): number {
@@ -683,9 +726,13 @@ export function isEphemeralAgentId(agentId: string | null | undefined): boolean 
  * stripAgentIdSuffix('openAI__gpt-4o___GPT-4o____1') // => 'openAI__gpt-4o___GPT-4o'
  * stripAgentIdSuffix('agent_abc123') // => 'agent_abc123' (unchanged)
  */
+<<<<<<< HEAD
 export function stripAgentIdSuffix(agentId: string): string {
   return agentId.replace(/____\d+$/, '');
 }
+=======
+export { stripAgentIdSuffix } from './agents/identity';
+>>>>>>> upstream/main
 
 /**
  * Appends an index suffix (____N) to an agent ID.
@@ -695,6 +742,10 @@ export function stripAgentIdSuffix(agentId: string): string {
  * appendAgentIdSuffix('agent_abc123', 1) // => 'agent_abc123____1'
  * appendAgentIdSuffix('openAI__gpt-4o___GPT-4o', 1) // => 'openAI__gpt-4o___GPT-4o____1'
  */
+<<<<<<< HEAD
 export function appendAgentIdSuffix(agentId: string, index: number): string {
   return `${agentId}____${index}`;
 }
+=======
+export { appendAgentIdSuffix } from './agents/identity';
+>>>>>>> upstream/main

@@ -1,7 +1,14 @@
+<<<<<<< HEAD
 import { createReadStream } from 'fs';
 import { readFile, stat } from 'fs/promises';
 import { Readable } from 'stream';
 import { readFileAsString, readFileAsBuffer, readJsonFile } from '../files';
+=======
+import { Readable } from 'stream';
+import { createReadStream } from 'fs';
+import { readFile, stat } from 'fs/promises';
+import { readFileAsString, readFileAsBuffer } from '../files';
+>>>>>>> upstream/main
 
 jest.mock('fs');
 jest.mock('fs/promises');
@@ -280,6 +287,7 @@ describe('File utilities', () => {
       await expect(readFileAsBuffer(mockFilePath)).rejects.toThrow('Access denied');
     });
   });
+<<<<<<< HEAD
 
   describe('readJsonFile', () => {
     const validJson = { name: 'test', value: 123, nested: { key: 'value' } };
@@ -411,4 +419,6 @@ describe('File utilities', () => {
       expect(result.name).toBe('test');
     });
   });
+=======
+>>>>>>> upstream/main
 });

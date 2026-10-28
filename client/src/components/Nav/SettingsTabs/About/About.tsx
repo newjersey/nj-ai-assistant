@@ -40,7 +40,11 @@ function Row({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between gap-4 py-2.5 first:pt-0 last:pb-0">
       <dt className="text-text-secondary">{label}</dt>
+<<<<<<< HEAD
       <dd className="break-all text-right font-mono text-xs text-text-primary">{value}</dd>
+=======
+      <dd className="text-text-primary text-end font-mono text-xs break-all">{value}</dd>
+>>>>>>> upstream/main
     </div>
   );
 }
@@ -81,8 +85,13 @@ function About() {
   }, [diagnosticsBlob]);
 
   return (
+<<<<<<< HEAD
     <div className="flex flex-col text-sm text-text-primary">
       <dl className="flex flex-col divide-y divide-border-light">
+=======
+    <div className="text-text-primary flex flex-col text-sm">
+      <dl className="divide-border-light flex flex-col divide-y">
+>>>>>>> upstream/main
         <Row label={localize('com_nav_about_version')} value={version} />
         <Row
           label={localize('com_nav_about_commit')}
@@ -98,15 +107,24 @@ function About() {
         />
       </dl>
 
+<<<<<<< HEAD
       <div className="mt-4 flex flex-col items-start gap-3 border-t border-border-light pt-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
         <p className="min-w-0 flex-1 text-xs text-text-secondary">
+=======
+      <div className="border-border-light mt-4 flex flex-col items-start gap-3 border-t pt-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+        <p className="text-text-secondary min-w-0 flex-1 text-xs">
+>>>>>>> upstream/main
           {localize('com_nav_about_diagnostics_description')}
         </p>
         <CopyButton
           isCopied={isCopied}
           onClick={handleCopy}
           label={localize('com_nav_about_diagnostics_copy')}
+<<<<<<< HEAD
           className="ml-0 shrink-0 gap-2 self-start rounded-lg border border-border-light bg-surface-secondary px-3 py-1.5 text-xs font-medium text-text-primary hover:bg-surface-tertiary sm:self-auto"
+=======
+          className="border-border-light bg-surface-secondary text-text-primary hover:bg-surface-tertiary ms-0 shrink-0 gap-2 self-start rounded-lg border px-3 py-1.5 text-xs font-medium sm:self-auto"
+>>>>>>> upstream/main
         />
         <span className="sr-only" role="status" aria-live="polite" aria-atomic="true">
           {isCopied ? localize('com_ui_copied') : ''}

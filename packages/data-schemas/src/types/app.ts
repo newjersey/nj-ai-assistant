@@ -4,6 +4,11 @@ import type {
   TFileConfig,
   TAzureConfig,
   TCustomConfig,
+<<<<<<< HEAD
+=======
+  TCredentialsConfig,
+  TChatProjectsConfig,
+>>>>>>> upstream/main
   TMemoryConfig,
   EModelEndpoint,
   TVertexAIConfig,
@@ -13,6 +18,11 @@ import type {
   TAssistantEndpoint,
   TAnthropicEndpoint,
   SummarizationConfig,
+<<<<<<< HEAD
+=======
+  TConversationListConfig,
+  TToolCallPreviewsConfig,
+>>>>>>> upstream/main
   SkillSyncConfig,
   FiltersConfig,
 } from 'librechat-data-provider';
@@ -64,6 +74,19 @@ export interface AppConfig {
   summarization?: SummarizationConfig;
   /** Web search configuration */
   webSearch?: TCustomConfig['webSearch'];
+<<<<<<< HEAD
+=======
+  githubCompare?: TCustomConfig['githubCompare'];
+  /** Outbound call budgets; unset keys fall back to the server defaults */
+  timeouts?: TCustomConfig['timeouts'];
+  skillDeletion?: {
+    finalizationEnabled?: boolean;
+    sweepIntervalMs?: number;
+    claimLeaseMs?: number;
+    batchSize?: number;
+    recheckIntervalMs?: number;
+  };
+>>>>>>> upstream/main
   /** Source-scoped content filter configuration */
   filters?: FiltersConfig;
   /** Message filter configuration (PII and future filter types) */
@@ -78,8 +101,19 @@ export interface AppConfig {
   fileStrategies?: TCustomConfig['fileStrategies'];
   /** CloudFront CDN configuration */
   cloudfront?: CloudFrontConfig;
+<<<<<<< HEAD
   /** Registration configurations */
   registration?: TCustomConfig['registration'];
+=======
+  /** Chat Projects limits resolved from the deployment configuration */
+  projects?: TChatProjectsConfig;
+  /** Registration configurations */
+  registration?: TCustomConfig['registration'];
+  /** Changing the registered email address */
+  emailChange?: TCustomConfig['emailChange'];
+  /** Passkey enrollment configuration */
+  passkeys?: TCustomConfig['passkeys'];
+>>>>>>> upstream/main
   /** Actions configurations */
   actions?: TCustomConfig['actions'];
   /** Admin-filtered tools */
@@ -102,10 +136,24 @@ export interface AppConfig {
   mcpConfig?: TCustomConfig['mcpServers'] | null;
   /** MCP settings (domain allowlist, etc.) */
   mcpSettings?: TCustomConfig['mcpSettings'] | null;
+<<<<<<< HEAD
+=======
+  /** Deployment-owned MCP App sandbox transport limits. */
+  mcpAppSandbox?: TCustomConfig['mcpAppSandbox'];
+>>>>>>> upstream/main
   /** File configuration */
   fileConfig?: TFileConfig;
   /** Secure image links configuration, enabled unless explicitly disabled */
   secureImageLinks?: TCustomConfig['secureImageLinks'];
+<<<<<<< HEAD
+=======
+  /** Stored user credential write format, `v3` unless configured */
+  credentials?: TCredentialsConfig;
+  /** Validation limits for the conversation list's filter facets */
+  conversationList?: TConversationListConfig;
+  /** Bounds for the tool-call previews sent on conversation loads */
+  toolCallPreviews?: TToolCallPreviewsConfig;
+>>>>>>> upstream/main
   /** Processed model specifications */
   modelSpecs?: TCustomConfig['modelSpecs'];
   /** Available tools */
@@ -113,12 +161,21 @@ export interface AppConfig {
   endpoints?: {
     /** Admin exemption list of host:port pairs that bypass the SSRF private-IP block */
     allowedAddresses?: string[];
+<<<<<<< HEAD
+=======
+    /** How long the admin config catalog reuses a scope's model lists, in milliseconds */
+    catalogModelsTtlMs?: number;
+>>>>>>> upstream/main
     /** OpenAI endpoint configuration */
     openAI?: Partial<TEndpoint>;
     /** Google endpoint configuration */
     google?: Partial<TEndpoint>;
     /** Bedrock endpoint configuration */
+<<<<<<< HEAD
     bedrock?: Partial<TEndpoint>;
+=======
+    bedrock?: Partial<TEndpoint> & { availableRegions?: string[] };
+>>>>>>> upstream/main
     /** Anthropic endpoint configuration with optional Vertex AI support */
     anthropic?: Partial<TAnthropicEndpoint> & {
       /** Validated Vertex AI configuration */

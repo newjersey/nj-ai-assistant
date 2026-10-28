@@ -4,9 +4,16 @@ import {
   createAgentEventDetachedResumeHandler,
 } from '~/agents/triggers/detachedAction';
 import { InMemoryEventTransport } from '~/stream/implementations/InMemoryEventTransport';
+<<<<<<< HEAD
 import { buildPendingAction, buildToolApprovalPayload } from '~/agents/hitl/policy';
 import { InMemoryJobStore } from '~/stream/implementations/InMemoryJobStore';
 import { GenerationJobManagerClass } from '~/stream/GenerationJobManager';
+=======
+import { buildToolApprovalPayload } from '~/agents/hitl/__fixtures__/approval';
+import { InMemoryJobStore } from '~/stream/implementations/InMemoryJobStore';
+import { GenerationJobManagerClass } from '~/stream/GenerationJobManager';
+import { buildPendingAction } from '~/agents/hitl/policy';
+>>>>>>> upstream/main
 
 describe('GenerationJobManager terminal host actions', () => {
   let manager: GenerationJobManagerClass;

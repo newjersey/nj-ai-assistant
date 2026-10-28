@@ -1,11 +1,20 @@
 const {
   handleError,
   applyModelSpecPreset,
+<<<<<<< HEAD
+=======
+  restoreAgentTriggerModelSpec,
+>>>>>>> upstream/main
   resolveModelSpecForEndpoint,
   resolveModelSpecPromptPrefixVariables,
   inspectContent,
   extractChatContent,
   contentFilterBlockResponse,
+<<<<<<< HEAD
+=======
+  getReasoningCapabilities,
+  applyRequestReasoningOverride,
+>>>>>>> upstream/main
 } = require('@librechat/api');
 const { logger } = require('@librechat/data-schemas');
 const {
@@ -56,6 +65,10 @@ function inspectResolvedCurrentUser(req, promptPrefixTemplate) {
 }
 
 async function buildEndpointOption(req, res, next) {
+<<<<<<< HEAD
+=======
+  restoreAgentTriggerModelSpec(req);
+>>>>>>> upstream/main
   const { endpoint, endpointType } = req.body;
   const isAgents =
     isAgentsEndpoint(endpoint) || req.baseUrl.startsWith(EndpointURLs[EModelEndpoint.agents]);
@@ -84,6 +97,10 @@ async function buildEndpointOption(req, res, next) {
 
   const appConfig = req.config;
   let appliedModelSpecPrivateFields = new Set();
+<<<<<<< HEAD
+=======
+  let enforcedModelSpecFields = new Set();
+>>>>>>> upstream/main
   if (appConfig.modelSpecs?.list?.length && appConfig.modelSpecs?.enforce) {
     /** @type {{ list: TModelSpec[] }}*/
     const { list } = appConfig.modelSpecs;
@@ -126,6 +143,10 @@ async function buildEndpointOption(req, res, next) {
       });
       parsedBody = result.parsedBody;
       appliedModelSpecPrivateFields = result.appliedPrivateFields;
+<<<<<<< HEAD
+=======
+      enforcedModelSpecFields = result.enforcedFields;
+>>>>>>> upstream/main
     } catch (error) {
       logger.error('Error parsing model spec', error);
       return handleError(res, { text: 'Error parsing model spec' });
@@ -180,6 +201,26 @@ async function buildEndpointOption(req, res, next) {
     req.body = req.body || {}; // Express 5: ensure req.body exists
     req.body.endpointOption = await builder(endpoint, parsedBody, endpointType);
 
+<<<<<<< HEAD
+=======
+    const reasoningApplied = await applyRequestReasoningOverride(req, {
+      reasoningOverride: req.body.reasoningOverride,
+      endpoint,
+      endpointType,
+      parsedModel: parsedBody.model,
+      isAgent: isAgents,
+      endpointsConfig,
+      defaultParamsEndpoint,
+      appliedModelSpecPrivateFields,
+      enforcedModelSpecFields,
+      loadReasoningCapabilities: (endpointName) =>
+        getReasoningCapabilities(appConfig, endpointName),
+    });
+    if (!reasoningApplied) {
+      return handleError(res, { text: 'Invalid reasoning override' });
+    }
+
+>>>>>>> upstream/main
     if (req.body.files && !isAgents) {
       req.body.endpointOption.attachments = updateFilesUsage(req.body.files, undefined, {
         user: req.user.id,

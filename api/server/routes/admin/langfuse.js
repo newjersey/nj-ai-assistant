@@ -5,6 +5,10 @@ const {
   hasConfigCapability,
   requireCapability,
 } = require('~/server/middleware/roles/capabilities');
+<<<<<<< HEAD
+=======
+const { syncLangfusePromptCatalog } = require('~/server/services/LangfusePromptSync');
+>>>>>>> upstream/main
 const { invalidateConfigCaches } = require('~/server/services/Config');
 const configMiddleware = require('~/server/middleware/config/app');
 const { requireJwtAuth } = require('~/server/middleware');
@@ -13,6 +17,10 @@ const db = require('~/models');
 const router = express.Router();
 
 const requireAdminAccess = requireCapability(SystemCapabilities.ACCESS_ADMIN);
+<<<<<<< HEAD
+=======
+const requireManagePrompts = requireCapability(SystemCapabilities.MANAGE_PROMPTS);
+>>>>>>> upstream/main
 
 async function requireLangfuseManage(req, res, next) {
   try {
@@ -40,7 +48,13 @@ const handlers = createAdminLangfuseHandlers({
   patchConfigFields: db.patchConfigFields,
   toggleConfigActive: db.toggleConfigActive,
   getMessages: db.getMessages,
+<<<<<<< HEAD
   invalidateConfigCaches,
+=======
+  syncPromptCatalog: syncLangfusePromptCatalog,
+  invalidateConfigCaches,
+  recordAuditEntry: db.recordAuditEntry,
+>>>>>>> upstream/main
 });
 
 // `configMiddleware` runs last so unauthorized callers are rejected before the
@@ -52,5 +66,12 @@ router.get('/connection', handlers.getConnection);
 router.get('/connection/session/:conversationId', handlers.getSessionLink);
 router.put('/connection', handlers.updateConnection);
 router.post('/connection/test', handlers.testConnection);
+<<<<<<< HEAD
+=======
+router.put('/prompt-sync', handlers.updatePromptSync);
+router.get('/prompts', handlers.listPrompts);
+router.post('/prompts/sync', requireManagePrompts, handlers.syncPrompts);
+router.get('/prompts/:name', handlers.getPrompt);
+>>>>>>> upstream/main
 
 module.exports = router;

@@ -47,18 +47,34 @@ export default function useThreadRows(
   );
   const siblingIndexes = useSiblingIndexes(branchKeys);
 
+<<<<<<< HEAD
   const previousRowsRef = useRef<ThreadRow[] | null>(null);
   const rows = useMemo(() => {
     if (!index) {
       return null;
     }
+=======
+  const previousRowsRef = useRef<{ rootKey: string; rows: ThreadRow[] } | null>(null);
+  const rows = useMemo(() => {
+    if (!index) {
+      previousRowsRef.current = null;
+      return null;
+    }
+    const previous = previousRowsRef.current;
+>>>>>>> upstream/main
     const next = resolveThreadRows(
       index,
       rootSiblingKey,
       (key) => siblingIndexes[key] ?? 0,
+<<<<<<< HEAD
       previousRowsRef.current,
     );
     previousRowsRef.current = next;
+=======
+      previous?.rootKey === rootSiblingKey ? previous.rows : null,
+    );
+    previousRowsRef.current = { rootKey: rootSiblingKey, rows: next };
+>>>>>>> upstream/main
     return next;
   }, [index, rootSiblingKey, siblingIndexes]);
 

@@ -20,12 +20,22 @@ export interface CodeFilesAgent {
   id?: string;
   codeEnvAvailable?: boolean;
   codeExecutionContext?: CodeExecutionContext;
+<<<<<<< HEAD
+=======
+  /** Routes a parent may place this subagent on per call; each is primed like the default. */
+  codeExecutionChoices?: CodeExecutionContext[];
+>>>>>>> upstream/main
   codeSessionKey?: string;
   primedCodeFiles?: CodeEnvFile[];
   statefulCodeSessions?: boolean;
   statefulCodeEnvironment?: StatefulCodeEnvironment;
   subagentAgentConfigs?: CodeFilesAgent[];
   lazySubagentConfigs?: CodeFilesAgent[];
+<<<<<<< HEAD
+=======
+  /** Graph members a lazy child initializes only when it is selected. */
+  subagentGraphMemberMetadata?: CodeFilesAgent[];
+>>>>>>> upstream/main
   subagentGraphConfigs?: Array<{ memberConfigs: CodeFilesAgent[] }>;
 }
 
@@ -42,6 +52,10 @@ function enqueueCodeFilesChildren(
   for (const child of [
     ...(agent.subagentAgentConfigs ?? []),
     ...(agent.lazySubagentConfigs ?? []),
+<<<<<<< HEAD
+=======
+    ...(agent.subagentGraphMemberMetadata ?? []),
+>>>>>>> upstream/main
   ]) {
     if (child && !visited.has(child)) queue.push(child);
   }
@@ -83,6 +97,7 @@ export function collectCodeExecutionProfileRoutes(
             conversationId: scope.conversationId,
           })
         : undefined);
+<<<<<<< HEAD
     if (agent.codeEnvAvailable === true && context) {
       const routeKey = getCodeExecutionRouteKey(context);
       const route = routes.get(routeKey) ?? {
@@ -91,6 +106,22 @@ export function collectCodeExecutionProfileRoutes(
       };
       route.codeSessionKeys.add(agent.codeSessionKey ?? context.codeSessionKey);
       routes.set(routeKey, route);
+=======
+    const addRoute = (routeContext: CodeExecutionContext, codeSessionKey: string): void => {
+      const routeKey = getCodeExecutionRouteKey(routeContext);
+      const route = routes.get(routeKey) ?? {
+        codeExecutionContext: routeContext,
+        codeSessionKeys: new Set<string>(),
+      };
+      route.codeSessionKeys.add(codeSessionKey);
+      routes.set(routeKey, route);
+    };
+    if (agent.codeEnvAvailable === true && context) {
+      addRoute(context, agent.codeSessionKey ?? context.codeSessionKey);
+    }
+    for (const choice of agent.codeExecutionChoices ?? []) {
+      addRoute(choice, choice.codeSessionKey);
+>>>>>>> upstream/main
     }
     enqueueCodeFilesChildren(agent, queue, visited);
   }

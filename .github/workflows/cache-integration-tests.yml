@@ -2,6 +2,14 @@ name: Cache Integration Tests
 
 on:
   pull_request:
+<<<<<<< HEAD
+=======
+    branches:
+      - main
+      - dev
+      - dev-staging
+      - release/*
+>>>>>>> upstream/main
     # The tested modules import across packages/api (e.g. mcp/oauth pulls in
     # flow/manager) and consume built data-provider and data-schemas, so the
     # whole src trees must trigger — subdirectory filters silently skip
@@ -34,10 +42,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
 
+<<<<<<< HEAD
       - name: Use Node.js 24.16.0
         uses: actions/setup-node@v5
         with:
           node-version: '24.16.0'
+=======
+      - name: Use Node.js 24.22.1
+        uses: actions/setup-node@v5
+        with:
+          node-version: '24.22.1'
+>>>>>>> upstream/main
 
       - name: Install Redis tools
         timeout-minutes: 10
@@ -92,7 +107,11 @@ jobs:
             packages/api/node_modules
             packages/data-provider/node_modules
             packages/data-schemas/node_modules
+<<<<<<< HEAD
           key: node-modules-backend-${{ runner.os }}-24.16.0-${{ hashFiles('package-lock.json') }}
+=======
+          key: node-modules-backend-${{ runner.os }}-24.22.1-${{ hashFiles('package-lock.json') }}
+>>>>>>> upstream/main
 
       - name: Install dependencies
         if: steps.cache-node-modules.outputs.cache-hit != 'true'

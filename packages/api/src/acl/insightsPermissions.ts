@@ -1,4 +1,5 @@
 import { PermissionBits, PrincipalType, ResourceType, SystemRoles } from 'librechat-data-provider';
+<<<<<<< HEAD
 import type {
   IAclEntry,
   IUser,
@@ -47,6 +48,14 @@ type AuditDeps = {
   };
 };
 
+=======
+import type { TPrincipal } from 'librechat-data-provider';
+
+export type { PermissionChange, PermissionSnapshot } from './types';
+
+type ValidationResult = { status: 400 | 403; error: string } | null;
+
+>>>>>>> upstream/main
 const hasOwn = (value: unknown, key: string): boolean =>
   value != null && typeof value === 'object' && Object.prototype.hasOwnProperty.call(value, key);
 
@@ -138,6 +147,7 @@ export function getInsightsPrincipalState({
       : {}),
   };
 }
+<<<<<<< HEAD
 
 function statusError(message: string): Error & { statusCode: number } {
   return Object.assign(new Error(message), { statusCode: 500 });
@@ -227,3 +237,5 @@ export async function auditInsightsPermissionChanges({
     }
   }
 }
+=======
+>>>>>>> upstream/main

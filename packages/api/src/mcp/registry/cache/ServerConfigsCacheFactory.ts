@@ -1,5 +1,6 @@
 import { ServerConfigsCacheRedisAggregateKey } from './ServerConfigsCacheRedisAggregateKey';
 import { ServerConfigsCacheInMemory } from './ServerConfigsCacheInMemory';
+<<<<<<< HEAD
 import { ServerConfigsCacheRedis } from './ServerConfigsCacheRedis';
 import { cacheConfig } from '~/cache';
 
@@ -7,18 +8,29 @@ export type ServerConfigsCache =
   | ServerConfigsCacheInMemory
   | ServerConfigsCacheRedis
   | ServerConfigsCacheRedisAggregateKey;
+=======
+import { cacheConfig } from '~/cache';
+
+export type ServerConfigsCache = ServerConfigsCacheInMemory | ServerConfigsCacheRedisAggregateKey;
+>>>>>>> upstream/main
 
 /**
  * Namespace for YAML-loaded app-level MCP configs. When Redis is enabled, uses a single
  * aggregate key instead of per-server keys to avoid the costly SCAN + batch-GET pattern
+<<<<<<< HEAD
  * in {@link ServerConfigsCacheRedis.getAll} that caused 60s+ stalls under concurrent
  * load (see GitHub #11624, #12408). When Redis is disabled, uses in-memory storage.
+=======
+ * that caused 60s+ stalls under concurrent load (see GitHub #11624, #12408). When Redis is
+ * disabled, uses in-memory storage.
+>>>>>>> upstream/main
  */
 export const APP_CACHE_NAMESPACE = 'App' as const;
 
 /** Namespace for admin-defined config-override MCP server inspection results. */
 export const CONFIG_CACHE_NAMESPACE = 'Config' as const;
 
+<<<<<<< HEAD
 /** Namespaces that use the aggregate-key optimization to avoid SCAN+N-GETs stalls. */
 const AGGREGATE_KEY_NAMESPACES = new Set<string>([APP_CACHE_NAMESPACE, CONFIG_CACHE_NAMESPACE]);
 
@@ -33,13 +45,28 @@ const AGGREGATE_KEY_NAMESPACES = new Set<string>([APP_CACHE_NAMESPACE, CONFIG_CA
  *
  * Other namespaces use the standard {@link ServerConfigsCacheRedis} (per-key storage with
  * SCAN-based enumeration) when Redis is enabled.
+=======
+/**
+ * Factory for creating the appropriate ServerConfigsCache implementation based on
+ * deployment mode.
+ *
+ * When Redis is enabled, all configs of a namespace are stored under a single key via
+ * {@link ServerConfigsCacheRedisAggregateKey}, so `getAll()` is one GET instead of
+ * SCAN + N GETs. Cross-instance visibility is preserved: reinspection results
+ * propagate through Redis automatically.
+>>>>>>> upstream/main
  */
 export class ServerConfigsCacheFactory {
   /**
    * Create a ServerConfigsCache instance.
    *
+<<<<<<< HEAD
    * @param namespace - The namespace for the cache. Namespaces in {@link AGGREGATE_KEY_NAMESPACES}
    *   use aggregate-key Redis storage (or in-memory when Redis is disabled).
+=======
+   * @param namespace - The namespace for the cache (aggregate-key Redis storage, or
+   *   in-memory when Redis is disabled).
+>>>>>>> upstream/main
    * @param leaderOnly - Whether write operations should only be performed by the leader.
    * @returns ServerConfigsCache instance
    */
@@ -48,10 +75,14 @@ export class ServerConfigsCacheFactory {
       return new ServerConfigsCacheInMemory();
     }
 
+<<<<<<< HEAD
     if (AGGREGATE_KEY_NAMESPACES.has(namespace)) {
       return new ServerConfigsCacheRedisAggregateKey(namespace, leaderOnly);
     }
 
     return new ServerConfigsCacheRedis(namespace, leaderOnly);
+=======
+    return new ServerConfigsCacheRedisAggregateKey(namespace, leaderOnly);
+>>>>>>> upstream/main
   }
 }

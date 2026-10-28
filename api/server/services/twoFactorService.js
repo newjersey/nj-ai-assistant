@@ -1,4 +1,5 @@
 const { webcrypto, timingSafeEqual } = require('node:crypto');
+<<<<<<< HEAD
 const { hashBackupCode, decryptV3, decryptV2 } = require('@librechat/data-schemas');
 const { updateUser } = require('~/models');
 
@@ -27,6 +28,20 @@ const encodeBase32 = (buffer) => {
   }
   return output;
 };
+=======
+const { decryptV3, decryptV2 } = require('@librechat/data-schemas');
+const {
+  generateTwoFactorLoginChallengeToken,
+  generateTOTPSecret,
+  createBackupCodeGenerator,
+  createBackupCodeVerifier,
+} = require('@librechat/api');
+const { consumeBackupCode } = require('~/models');
+
+const BASE32_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+const verifyBackupCode = createBackupCodeVerifier(consumeBackupCode);
+const generateBackupCodes = createBackupCodeGenerator(process.env.TWO_FACTOR_BACKUP_CODE_FORMAT);
+>>>>>>> upstream/main
 
 /**
  * Decodes a Base32 string into a Buffer.
@@ -54,6 +69,7 @@ const decodeBase32 = (base32Str) => {
 };
 
 /**
+<<<<<<< HEAD
  * Generates a new TOTP secret (Base32 encoded).
  * @returns {string}
  */
@@ -64,6 +80,8 @@ const generateTOTPSecret = () => {
 };
 
 /**
+=======
+>>>>>>> upstream/main
  * Generates a TOTP code based on the secret and time.
  * Uses a 30-second time step and produces a 6-digit code.
  * @param {string} secret
@@ -146,6 +164,7 @@ const verifyTOTP = async (secret, token) => {
 };
 
 /**
+<<<<<<< HEAD
  * Generates backup codes (default count: 10).
  * Each code is an 8-character hexadecimal string and stored with its SHA-256 hash.
  * @param {number} [count=10]
@@ -208,11 +227,17 @@ const verifyBackupCode = async ({ user, backupCode, persist = true }) => {
 };
 
 /**
+=======
+>>>>>>> upstream/main
  * Verifies a user's identity via TOTP token or backup code.
  * @param {Object} params
  * @param {Object} params.user - The user document (must include totpSecret and backupCodes).
  * @param {string} [params.token] - A 6-digit TOTP token.
+<<<<<<< HEAD
  * @param {string} [params.backupCode] - An 8-character backup code.
+=======
+ * @param {string} [params.backupCode] - A recovery code (legacy or current format).
+>>>>>>> upstream/main
  * @param {boolean} [params.persistBackupUse=true] - Whether to mark the backup code as used in the DB.
  * @returns {Promise<{ verified: boolean, status?: number, message?: string }>}
  */
@@ -268,8 +293,12 @@ const getTOTPSecret = async (storedSecret) => {
  * @returns {string}
  */
 const generate2FATempToken = (userId) => {
+<<<<<<< HEAD
   const { sign } = require('jsonwebtoken');
   return sign({ userId, twoFAPending: true }, process.env.JWT_SECRET, { expiresIn: '5m' });
+=======
+  return generateTwoFactorLoginChallengeToken(userId, process.env.JWT_SECRET);
+>>>>>>> upstream/main
 };
 
 module.exports = {

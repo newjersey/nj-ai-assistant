@@ -27,7 +27,11 @@ export function createSpendTokensMethods(
   spendStructuredTokens: (
     txData: SpendTxData,
     tokenUsage: {
+<<<<<<< HEAD
       promptTokens?: { input?: number; write?: number; read?: number };
+=======
+      promptTokens?: { input?: number; write?: number; write1h?: number; read?: number };
+>>>>>>> upstream/main
       completionTokens?: number;
     },
   ) => Promise<{
@@ -93,7 +97,11 @@ export function createSpendTokensMethods(
   async function spendStructuredTokens(
     txData: SpendTxData,
     tokenUsage: {
+<<<<<<< HEAD
       promptTokens?: { input?: number; write?: number; read?: number };
+=======
+      promptTokens?: { input?: number; write?: number; write1h?: number; read?: number };
+>>>>>>> upstream/main
       completionTokens?: number;
     },
   ): Promise<{
@@ -112,6 +120,10 @@ export function createSpendTokensMethods(
       if (promptTokens) {
         const input = Math.max(promptTokens.input ?? 0, 0);
         const write = Math.max(promptTokens.write ?? 0, 0);
+<<<<<<< HEAD
+=======
+        const write1h = Math.min(Math.max(promptTokens.write1h ?? 0, 0), write);
+>>>>>>> upstream/main
         const read = Math.max(promptTokens.read ?? 0, 0);
         const totalInputTokens = input + write + read;
         prompt = await transactionMethods.createStructuredTransaction({
@@ -119,6 +131,10 @@ export function createSpendTokensMethods(
           tokenType: 'prompt',
           inputTokens: -input,
           writeTokens: -write,
+<<<<<<< HEAD
+=======
+          ...(write1h > 0 && { write1hTokens: -write1h }),
+>>>>>>> upstream/main
           readTokens: -read,
           inputTokenCount: totalInputTokens,
         });
