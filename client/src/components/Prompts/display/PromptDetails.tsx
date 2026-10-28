@@ -2,16 +2,25 @@ import { useMemo } from 'react';
 import { SquareSlash } from 'lucide-react';
 import { replaceSpecialVars } from 'librechat-data-provider';
 import type { TPromptGroup } from 'librechat-data-provider';
+<<<<<<< HEAD
 import { useLocalize, useAuthContext } from '~/hooks';
 import PromptDetailHeader from './PromptDetailHeader';
 import PromptVariables from './PromptVariables';
 import PromptTextCard from './PromptTextCard';
+=======
+import { useLocalize, useAuthContext, usePromptContent } from '~/hooks';
+import LangfusePromptMeta from './LangfusePromptMeta';
+import PromptDetailHeader from './PromptDetailHeader';
+import PromptResolvedBody from './PromptResolvedBody';
+import PromptVariables from './PromptVariables';
+>>>>>>> upstream/main
 import PromptActions from './PromptActions';
 
 interface PromptDetailsProps {
   group?: TPromptGroup;
   showActions?: boolean;
   onUsePrompt?: () => void;
+<<<<<<< HEAD
 }
 
 const PromptDetails = ({ group, showActions = true, onUsePrompt }: PromptDetailsProps) => {
@@ -22,6 +31,28 @@ const PromptDetails = ({ group, showActions = true, onUsePrompt }: PromptDetails
     const initialText = group?.productionPrompt?.prompt ?? '';
     return replaceSpecialVars({ text: initialText, user });
   }, [group?.productionPrompt?.prompt, user]);
+=======
+  /** The chat composer's index, forwarded to `PromptActions` so its Use
+   *  button can close a variable dialog opened from this view on a chat
+   *  change; undefined where there is no associated chat (`PromptForm`'s
+   *  `showActions={false}` read-only view). */
+  chatIndex?: number;
+}
+
+const PromptDetails = ({
+  group,
+  showActions = true,
+  onUsePrompt,
+  chatIndex,
+}: PromptDetailsProps) => {
+  const localize = useLocalize();
+  const { user } = useAuthContext();
+
+  const { text, resolved, isLoading, error, refetch } = usePromptContent(group);
+  const hasError = Boolean(error);
+
+  const mainText = useMemo(() => replaceSpecialVars({ text, user }), [text, user]);
+>>>>>>> upstream/main
 
   if (!group) {
     return null;
@@ -36,6 +67,7 @@ const PromptDetails = ({ group, showActions = true, onUsePrompt }: PromptDetails
       <PromptDetailHeader group={group} />
 
       <div className="min-h-0 flex-1">
+<<<<<<< HEAD
         <PromptTextCard mainText={mainText} />
       </div>
 
@@ -49,6 +81,37 @@ const PromptDetails = ({ group, showActions = true, onUsePrompt }: PromptDetails
       )}
 
       {showActions && <PromptActions group={group} mainText={mainText} onUsePrompt={onUsePrompt} />}
+=======
+        <PromptResolvedBody
+          mainText={mainText}
+          isLoading={isLoading}
+          error={error}
+          onRetry={refetch}
+        />
+      </div>
+
+      {!isLoading && !hasError && <PromptVariables promptText={mainText} />}
+
+      {resolved?.source === 'langfuse' && <LangfusePromptMeta resolved={resolved} />}
+
+      {group.command && (
+        <div className="border-border-medium flex items-center gap-2 rounded-xl border bg-transparent p-3">
+          <SquareSlash className="text-text-secondary h-4 w-4" aria-hidden="true" />
+          <span className="text-text-primary font-mono text-sm">/{group.command}</span>
+        </div>
+      )}
+
+      {showActions && (
+        <PromptActions
+          group={group}
+          promptText={mainText}
+          isLoading={isLoading}
+          hasError={hasError}
+          onUsePrompt={onUsePrompt}
+          chatIndex={chatIndex}
+        />
+      )}
+>>>>>>> upstream/main
     </article>
   );
 };

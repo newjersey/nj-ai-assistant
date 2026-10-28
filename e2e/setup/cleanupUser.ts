@@ -2,6 +2,10 @@ import path from 'path';
 import { applyRuntimeEnv } from './runtimeEnv';
 
 type TUser = { email: string; password: string };
+<<<<<<< HEAD
+=======
+type DatabaseConnection = { connection: { close: () => Promise<void> } };
+>>>>>>> upstream/main
 
 /**
  * Registers the backend's `~` alias in this process. Playwright's require hook only
@@ -37,9 +41,16 @@ export default async function cleanupUser(user: TUser) {
   /* eslint-enable @typescript-eslint/no-require-imports */
 
   const { email } = user;
+<<<<<<< HEAD
   try {
     console.log('🤖: global teardown has been started');
     const db = await connectDb();
+=======
+  let db: DatabaseConnection | undefined;
+  try {
+    console.log('🤖: global teardown has been started');
+    db = await connectDb();
+>>>>>>> upstream/main
     console.log('🤖:  ✅  Connected to Database');
 
     const foundUser = await findUser({ email });
@@ -84,10 +95,21 @@ export default async function cleanupUser(user: TUser) {
     await User.deleteMany({ _id: userId });
 
     console.log('🤖:  ✅  Deleted user from Database');
+<<<<<<< HEAD
 
     await db.connection.close();
   } catch (error) {
     console.error('Error:', error);
+=======
+  } catch (error) {
+    console.error('Error:', error);
+  } finally {
+    try {
+      await db?.connection.close();
+    } catch (error) {
+      console.error('Error closing database connection:', error);
+    }
+>>>>>>> upstream/main
   }
 }
 

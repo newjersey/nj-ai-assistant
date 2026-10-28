@@ -19,8 +19,15 @@ export { default as presetSchema } from './preset';
 export { default as promptSchema } from './prompt';
 export { default as promptGroupSchema } from './promptGroup';
 export { default as openidRefreshFlightSchema } from './openidRefreshFlight';
+<<<<<<< HEAD
 export { default as refreshTokenBridgeSchema } from './refreshTokenBridge';
 export { default as roleSchema } from './role';
+=======
+export { default as resourceLockSchema } from './resourceLock';
+export { default as refreshTokenBridgeSchema } from './refreshTokenBridge';
+export { default as roleSchema } from './role';
+export { default as passkeySchema } from './passkey';
+>>>>>>> upstream/main
 export { default as sessionSchema } from './session';
 export { default as shareSchema } from './share';
 export { default as skillSyncCredentialSchema } from './skillSyncCredential';

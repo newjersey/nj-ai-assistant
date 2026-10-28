@@ -27,7 +27,12 @@ function getService() {
     getAppConfig,
     findUserById: (userId) =>
       mongoose.models.User.findById(userId).select('_id tenantId role').lean(),
+<<<<<<< HEAD
     findBalance: (userId) => methods.findBalanceByUser(userId, { includeReservedCredits: true }),
+=======
+    findBalance: (userId, options) =>
+      methods.findBalanceByUser(userId, { includeReservedCredits: true, ...options }),
+>>>>>>> upstream/main
     upsertBalance: (userId, { set, setOnInsert }) =>
       methods.upsertBalanceFields(userId, set ?? {}, setOnInsert ?? {}),
     // Compare-and-set: only initialize an existing record while its credit is still null.
@@ -84,6 +89,16 @@ module.exports = {
   getLimits: invoke('getLimits'),
   fireScheduleNow: invoke('fireScheduleNow'),
   recordScheduleOutcome: invoke('recordScheduleOutcome'),
+<<<<<<< HEAD
+=======
+  registerMCPSettlement: invoke('registerMCPSettlement'),
+  recordMCPToolAuthFailure: (input) =>
+    require('@librechat/api').recordScheduledMCPToolAuthFailure(
+      input,
+      () => getService().recordMCPToolAuthFailure,
+      () => getService().getMCPReceiptRetryPolicy(input),
+    ),
+>>>>>>> upstream/main
   beginScheduledStop: invoke('beginScheduledStop'),
   acknowledgeScheduledStopPersistence: invoke('acknowledgeScheduledStopPersistence'),
   claimScheduleResume: invoke('claimScheduleResume'),
@@ -101,7 +116,10 @@ module.exports = {
     const methods = require('~/models');
     return !(await methods.isAgentTriggerPrincipalActive(userId));
   },
+<<<<<<< HEAD
   // Identity-fenced delete for a retained job whose run has since been settled
   // inline; reconciliation only reaches jobs whose run is still active.
   clearScheduledJob: (...args) => getService().engineDeps.clearReconciledJob(...args),
+=======
+>>>>>>> upstream/main
 };

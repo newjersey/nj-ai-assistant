@@ -1,6 +1,11 @@
 import type { BedrockRuntimeClient } from '@aws-sdk/client-bedrock-runtime';
+<<<<<<< HEAD
 import type { AwsCredentialIdentity } from '@aws-sdk/types';
 import type { BedrockConverseInput } from 'librechat-data-provider';
+=======
+import type { BedrockConverseInput } from 'librechat-data-provider';
+import type { AwsCredentialIdentity } from '@aws-sdk/types';
+>>>>>>> upstream/main
 
 /**
  * AWS credentials for Bedrock
@@ -9,6 +14,7 @@ import type { BedrockConverseInput } from 'librechat-data-provider';
 export type BedrockCredentials = Partial<AwsCredentialIdentity>;
 
 /**
+<<<<<<< HEAD
  * User-provided Bedrock credentials can be either AWS credentials or an API key.
  */
 export type BedrockUserCredentials = BedrockCredentials & {
@@ -16,6 +22,8 @@ export type BedrockUserCredentials = BedrockCredentials & {
 };
 
 /**
+=======
+>>>>>>> upstream/main
  * AWS Bedrock Guardrail configuration
  * @see https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_GuardrailConfiguration.html
  */
@@ -38,6 +46,7 @@ export interface GuardrailConfiguration {
 export type InferenceProfileConfig = Record<string, string>;
 
 /**
+<<<<<<< HEAD
  * Configuration options for Bedrock LLM
  */
 export interface BedrockConfigOptions {
@@ -59,6 +68,8 @@ export interface BedrockConfigOptions {
 }
 
 /**
+=======
+>>>>>>> upstream/main
  * Return type for Bedrock getOptions function
  */
 export interface BedrockLLMConfigResult {

@@ -6,6 +6,10 @@ const {
   createSubagentCompletionWakeupResolver,
   SUBAGENT_COMPLETION_SOURCE,
   createBackgroundToolCompletionWakeupResolver,
+<<<<<<< HEAD
+=======
+  createBackgroundToolDeadClaimRecovery,
+>>>>>>> upstream/main
   BACKGROUND_TOOL_COMPLETION_SOURCE,
   createAgentQueuedTurnLifecycle,
   AGENT_QUEUED_TURN_SOURCE,
@@ -24,10 +28,37 @@ const getGenerationAdmissionEvidence = (userId, clientRequestId, streamId, conve
 const subagentCompletionAdapter = createSubagentCompletionWakeupResolver({
   methods,
   getGenerationJob: (conversationId) => GenerationJobManager.getJob(conversationId),
+<<<<<<< HEAD
+=======
+  getScheduleMCPCompletionState: methods.getScheduleMCPCompletionState,
+  getWaitMaxIntervalMs: () => service.getCompletionWaitMaxIntervalMs(),
+>>>>>>> upstream/main
 });
 const backgroundToolCompletionAdapter = createBackgroundToolCompletionWakeupResolver({
   methods,
   getGenerationJob: (conversationId) => GenerationJobManager.getJob(conversationId),
+<<<<<<< HEAD
+=======
+  getScheduleMCPCompletionState: methods.getScheduleMCPCompletionState,
+  getResultBatchSize: () => service.getBackgroundCompletionResultBatchSize(),
+  getGenerationAdmissionEvidence,
+  recoverDeadClaim: createBackgroundToolDeadClaimRecovery(
+    (...args) => service.retire(...args),
+    methods.releaseBackgroundToolResultClaims,
+    (conversationId) => GenerationJobManager.getJob(conversationId),
+    ({ userId, conversationId, claimId }) =>
+      GenerationJobManager.fenceGenerationClaimForRecovery(
+        userId,
+        claimId,
+        conversationId,
+        conversationId,
+      ),
+    methods.releaseAgentBackgroundToolResultClaims,
+    methods,
+    getGenerationAdmissionEvidence,
+  ),
+  getWaitMaxIntervalMs: () => service.getCompletionWaitMaxIntervalMs(),
+>>>>>>> upstream/main
 });
 const eventActorAdapter = createAgentEventContinueResolver({
   methods,
@@ -50,6 +81,10 @@ service = createAgentTriggerService({
   ),
   isPrincipalActive: methods.isAgentTriggerPrincipalActive,
   supportsDetachedActionCompletion: () => GenerationJobManager.supportsDetachedAgentEventActions,
+<<<<<<< HEAD
+=======
+  subscribeGenerationSettled: (listener) => GenerationJobManager.onGenerationSettled(listener),
+>>>>>>> upstream/main
   settleSourceBeforeDeadLetter: queuedTurnLifecycle.settleBeforeDeadLetter,
   prepareContinue: createAgentContinuationResolver({
     eventActor: eventActorAdapter,
@@ -63,7 +98,13 @@ service = createAgentTriggerService({
 
 const initializeAgentTriggerService = async (options) => {
   await service.initialize(options);
+<<<<<<< HEAD
   await queuedTurnLifecycle.initialize();
+=======
+  await queuedTurnLifecycle.initialize({
+    maxIdleIntervalMs: options?.idlePolling?.queuedTurnMaxIntervalMs,
+  });
+>>>>>>> upstream/main
 };
 
 const stopAgentTriggerService = async () => {
@@ -86,6 +127,14 @@ module.exports = {
   requeueAgentTrigger: service.requeue,
   retireAgentTrigger: service.retire,
   renewAgentTriggerProducerLease: service.renewProducerLease,
+<<<<<<< HEAD
+=======
+  persistAgentBackgroundToolResult: service.persistBackgroundToolResult,
+  expediteCompletionWakeups: service.expediteCompletionWakeups,
+  getAgentBackgroundToolResultClaim: service.getBackgroundToolResultClaim,
+  getBackgroundCompletionReceiptBatching: service.getBackgroundCompletionReceiptBatching,
+  releaseAgentBackgroundToolResultClaims: service.releaseBackgroundToolResultClaims,
+>>>>>>> upstream/main
   drainAgentTriggerDeliveriesForUser: service.drainUser,
   prepareAgentTriggerUserPurge: service.prepareUserPurge,
   cancelAgentTriggerUserPurge: service.cancelUserPurge,

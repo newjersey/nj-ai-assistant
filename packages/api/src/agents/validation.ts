@@ -1,6 +1,13 @@
 import { z } from 'zod';
+<<<<<<< HEAD
 import {
   CODE_WORKSPACE_ID_PATTERN,
+=======
+import { isValidObjectIdString } from '@librechat/data-schemas';
+import {
+  CODE_WORKSPACE_ID_PATTERN,
+  MAX_AGENT_CODE_ENVIRONMENT_CHOICES,
+>>>>>>> upstream/main
   MemoryScope,
   SkillsScope,
   getMaxSubagents,
@@ -16,8 +23,15 @@ import type {
   AgentGitIdentity,
   TModelsConfig,
   AgentSubagentsConfig,
+<<<<<<< HEAD
 } from 'librechat-data-provider';
 import type { Request, Response } from 'express';
+=======
+  AgentInstructionsPrompt,
+} from 'librechat-data-provider';
+import type { Request, Response } from 'express';
+import { getToolOptionsLimitError } from './options';
+>>>>>>> upstream/main
 
 /**
  * Permissive Request alias used by {@link validateAgentModel}. Accepts either
@@ -26,12 +40,25 @@ import type { Request, Response } from 'express';
  */
 type LooseRequest = Request<unknown, unknown, unknown>;
 
+<<<<<<< HEAD
 const agentCodeWorkspaceIdSchema: z.ZodUnion<[z.ZodLiteral<''>, z.ZodString]> = z.union([
+=======
+/** A string enum schema over the literal union `T`. */
+type EnumOf<T extends string> = z.ZodEnum<{ [K in T]: K }>;
+
+/** An optional field whose empty string parses as `undefined`. */
+type BlankAsUndefined<T extends z.ZodType> = z.ZodOptional<
+  z.ZodPipe<z.ZodOptional<T>, z.ZodTransform<z.output<T> | undefined, z.output<T> | undefined>>
+>;
+
+const agentCodeWorkspaceIdSchema: z.ZodUnion<readonly [z.ZodLiteral<''>, z.ZodString]> = z.union([
+>>>>>>> upstream/main
   z.literal(''),
   z.string().regex(CODE_WORKSPACE_ID_PATTERN),
 ]);
 
 /** Avatar schema shared between create and update */
+<<<<<<< HEAD
 export const agentAvatarSchema: z.ZodObject<
   {
     filepath: z.ZodString;
@@ -39,21 +66,34 @@ export const agentAvatarSchema: z.ZodObject<
   },
   'strip'
 > = z.object({
+=======
+export const agentAvatarSchema: z.ZodObject<{
+  filepath: z.ZodString;
+  source: z.ZodString;
+}> = z.object({
+>>>>>>> upstream/main
   filepath: z.string(),
   source: z.string(),
 });
 
 /** Persisted resource schema. Full file records are populated only after database authorization. */
+<<<<<<< HEAD
 export const agentBaseResourceSchema: z.ZodObject<
   {
     file_ids: z.ZodOptional<z.ZodArray<z.ZodString, 'many'>>;
   },
   'strip'
 > = z.object({
+=======
+export const agentBaseResourceSchema: z.ZodObject<{
+  file_ids: z.ZodOptional<z.ZodArray<z.ZodString>>;
+}> = z.object({
+>>>>>>> upstream/main
   file_ids: z.array(z.string()).optional(),
 });
 
 /** File resource schema extends base with vector_store_ids. */
+<<<<<<< HEAD
 export const agentFileResourceSchema: z.ZodObject<
   {
     file_ids: z.ZodOptional<z.ZodArray<z.ZodString, 'many'>>;
@@ -61,11 +101,18 @@ export const agentFileResourceSchema: z.ZodObject<
   },
   'strip'
 > = agentBaseResourceSchema.extend({
+=======
+export const agentFileResourceSchema: z.ZodObject<{
+  file_ids: z.ZodOptional<z.ZodArray<z.ZodString>>;
+  vector_store_ids: z.ZodOptional<z.ZodArray<z.ZodString>>;
+}> = agentBaseResourceSchema.extend({
+>>>>>>> upstream/main
   vector_store_ids: z.array(z.string()).optional(),
 });
 
 /** Persisted tool resources accepted by Agent create and update APIs. */
 export const agentToolResourcesSchema: z.ZodOptional<
+<<<<<<< HEAD
   z.ZodObject<
     {
       image_edit: z.ZodOptional<typeof agentBaseResourceSchema>;
@@ -76,6 +123,15 @@ export const agentToolResourcesSchema: z.ZodOptional<
     },
     'strip'
   >
+=======
+  z.ZodObject<{
+    image_edit: z.ZodOptional<typeof agentBaseResourceSchema>;
+    execute_code: z.ZodOptional<typeof agentBaseResourceSchema>;
+    file_search: z.ZodOptional<typeof agentFileResourceSchema>;
+    context: z.ZodOptional<typeof agentBaseResourceSchema>;
+    ocr: z.ZodOptional<typeof agentBaseResourceSchema>;
+  }>
+>>>>>>> upstream/main
 > = z
   .object({
     image_edit: agentBaseResourceSchema.optional(),
@@ -89,6 +145,7 @@ export const agentToolResourcesSchema: z.ZodOptional<
 
 /** Support contact schema for agent */
 export const agentSupportContactSchema: z.ZodOptional<
+<<<<<<< HEAD
   z.ZodObject<
     {
       name: z.ZodOptional<z.ZodString>;
@@ -105,6 +162,12 @@ export const agentSupportContactSchema: z.ZodOptional<
       email?: string | undefined;
     }
   >
+=======
+  z.ZodObject<{
+    name: z.ZodOptional<z.ZodString>;
+    email: z.ZodOptional<z.ZodUnion<readonly [z.ZodLiteral<''>, z.ZodString]>>;
+  }>
+>>>>>>> upstream/main
 > = z
   .object({
     name: z.string().optional(),
@@ -113,6 +176,7 @@ export const agentSupportContactSchema: z.ZodOptional<
   .optional();
 
 /** Graph edge schema for agent handoffs */
+<<<<<<< HEAD
 export const graphEdgeSchema: z.ZodObject<
   {
     from: z.ZodUnion<[z.ZodString, z.ZodArray<z.ZodString, 'many'>]>;
@@ -131,21 +195,43 @@ export const graphEdgeSchema: z.ZodObject<
   },
   'strip'
 > = z.object({
+=======
+export const graphEdgeSchema: z.ZodObject<{
+  from: z.ZodUnion<readonly [z.ZodString, z.ZodArray<z.ZodString>]>;
+  to: z.ZodUnion<readonly [z.ZodString, z.ZodArray<z.ZodString>]>;
+  description: BlankAsUndefined<z.ZodString>;
+  edgeType: z.ZodOptional<EnumOf<'handoff' | 'direct'>>;
+  prompt: BlankAsUndefined<z.ZodUnion<readonly [z.ZodString, z.ZodFunction]>>;
+  excludeResults: z.ZodOptional<z.ZodBoolean>;
+  promptKey: BlankAsUndefined<z.ZodString>;
+}> = z.object({
+>>>>>>> upstream/main
   from: z.union([z.string(), z.array(z.string())]),
   to: z.union([z.string(), z.array(z.string())]),
   description: z
     .string()
     .optional()
+<<<<<<< HEAD
     .transform((v) => (v === '' ? undefined : v)),
+=======
+    .transform((v) => (v === '' ? undefined : v))
+    .optional(),
+>>>>>>> upstream/main
   edgeType: z.enum(['handoff', 'direct']).optional(),
   prompt: z
     .union([z.string(), z.function()])
     .optional()
+<<<<<<< HEAD
     .transform((v) => (v === '' ? undefined : v)),
+=======
+    .transform((v) => (v === '' ? undefined : v))
+    .optional(),
+>>>>>>> upstream/main
   excludeResults: z.boolean().optional(),
   promptKey: z
     .string()
     .optional()
+<<<<<<< HEAD
     .transform((v) => (v === '' ? undefined : v)),
 });
 
@@ -159,14 +245,35 @@ export const toolOptionsSchema: z.ZodObject<
   },
   'strip'
 > = z.object({
+=======
+    .transform((v) => (v === '' ? undefined : v))
+    .optional(),
+});
+
+/** Per-tool options schema (defer_loading, allowed_callers, run_in_background, describe_intent) */
+export const toolOptionsSchema: z.ZodObject<{
+  defer_loading: z.ZodOptional<z.ZodBoolean>;
+  allowed_callers: z.ZodOptional<z.ZodArray<EnumOf<'direct' | 'code_execution'>>>;
+  run_in_background: z.ZodOptional<z.ZodBoolean>;
+  describe_intent: z.ZodOptional<z.ZodBoolean>;
+  approval_mode: z.ZodOptional<EnumOf<'ask' | 'allow' | 'chat' | 'always'>>;
+  approval_revision: z.ZodOptional<z.ZodString>;
+}> = z.object({
+>>>>>>> upstream/main
   defer_loading: z.boolean().optional(),
   allowed_callers: z.array(z.enum(['direct', 'code_execution'])).optional(),
   run_in_background: z.boolean().optional(),
   describe_intent: z.boolean().optional(),
+<<<<<<< HEAD
+=======
+  approval_mode: z.enum(['ask', 'allow', 'chat', 'always']).optional(),
+  approval_revision: z.string().uuid().optional(),
+>>>>>>> upstream/main
 });
 
 /** Agent tool options - map of tool_id to tool options */
 export const agentToolOptionsSchema: z.ZodOptional<
+<<<<<<< HEAD
   z.ZodRecord<
     z.ZodString,
     z.ZodObject<
@@ -193,6 +300,16 @@ export const agentToolOptionsSchema: z.ZodOptional<
     >
   >
 > = z.record(z.string(), toolOptionsSchema).optional();
+=======
+  z.ZodRecord<z.ZodString, typeof toolOptionsSchema>
+> = z
+  .record(z.string(), toolOptionsSchema)
+  .superRefine((options, ctx) => {
+    const message = getToolOptionsLimitError(options);
+    if (message) ctx.addIssue({ code: z.ZodIssueCode.custom, message });
+  })
+  .optional();
+>>>>>>> upstream/main
 
 /**
  * Subagent spawning configuration for an agent. `agent_ids` and `graphs` are
@@ -415,6 +532,7 @@ export const agentSubagentsSchema: z.ZodOptional<z.ZodType<AgentSubagentsConfig>
 
 /** Base agent schema with all common fields */
 const agentCodeEnvironmentIdSchema = z.string().regex(/^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$/);
+<<<<<<< HEAD
 const agentGitIdentityUpdateSchema: z.ZodType<AgentGitIdentity | null | undefined> =
   agentGitIdentitySchema.nullable();
 
@@ -570,6 +688,80 @@ export const agentBaseSchema: z.ZodObject<
   instructions: z.string().nullable().optional(),
   avatar: agentAvatarSchema.nullable().optional(),
   model_parameters: z.record(z.unknown()).optional(),
+=======
+const agentCodeEnvironmentIdsSchema: z.ZodArray<z.ZodString> = z
+  .array(agentCodeEnvironmentIdSchema)
+  .max(MAX_AGENT_CODE_ENVIRONMENT_CHOICES);
+const agentGitIdentityUpdateSchema: z.ZodType<AgentGitIdentity | null | undefined> =
+  agentGitIdentitySchema.nullable();
+
+/** A 24-character hexadecimal Mongo ObjectId string. */
+const objectIdStringSchema = z.string().refine(isValidObjectIdString);
+
+/** Selects which revision of a linked prompt group an agent's instructions follow. */
+const instructionsPromptSelectionSchema = z.discriminatedUnion('type', [
+  z.object({ type: z.literal('production') }).strict(),
+  z.object({ type: z.literal('exact'), promptId: objectIdStringSchema }).strict(),
+]);
+
+/** Links an agent's instructions to a native LibreChat prompt group revision. */
+export const agentInstructionsPromptSchema: z.ZodType<AgentInstructionsPrompt> = z
+  .object({
+    source: z.literal('native'),
+    groupId: objectIdStringSchema,
+    selection: instructionsPromptSelectionSchema,
+  })
+  .strict();
+
+/** Shared field schema: `.nullable().optional()` per contract, `null` removes the link. */
+const agentInstructionsPromptFieldSchema: z.ZodOptional<
+  z.ZodNullable<typeof agentInstructionsPromptSchema>
+> = agentInstructionsPromptSchema.nullable().optional();
+
+/** Fields shared by the agent create and update schemas. */
+type AgentBaseShape = {
+  name: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+  description: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+  instructions: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+  instructionsPrompt: typeof agentInstructionsPromptFieldSchema;
+  avatar: z.ZodOptional<z.ZodNullable<typeof agentAvatarSchema>>;
+  model_parameters: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodUnknown>>;
+  tools: z.ZodOptional<z.ZodArray<z.ZodString>>;
+  skills: z.ZodOptional<z.ZodArray<z.ZodString>>;
+  skills_enabled: z.ZodOptional<z.ZodBoolean>;
+  skill_authoring_enabled: z.ZodOptional<z.ZodBoolean>;
+  skills_scope: z.ZodOptional<z.ZodEnum<typeof SkillsScope>>;
+  memory_scope: z.ZodOptional<z.ZodEnum<typeof MemoryScope>>;
+  /** @deprecated Use edges instead */
+  agent_ids: z.ZodOptional<z.ZodArray<z.ZodString>>;
+  edges: z.ZodOptional<z.ZodArray<typeof graphEdgeSchema>>;
+  end_after_tools: z.ZodOptional<z.ZodBoolean>;
+  hide_sequential_outputs: z.ZodOptional<z.ZodBoolean>;
+  stateful_code_sessions: z.ZodOptional<z.ZodBoolean>;
+  stateful_code_environment: z.ZodOptional<EnumOf<'user' | 'agent-user' | 'conversation'>>;
+  code_environment_id: z.ZodOptional<z.ZodString>;
+  code_environment_ids: z.ZodOptional<typeof agentCodeEnvironmentIdsSchema>;
+  code_workspace_id: z.ZodOptional<typeof agentCodeWorkspaceIdSchema>;
+  repositoryInstructions: z.ZodOptional<EnumOf<'prefer' | 'defer' | 'off'>>;
+  git_identity: typeof agentGitIdentitySchema;
+  artifacts: z.ZodOptional<z.ZodString>;
+  recursion_limit: z.ZodOptional<z.ZodNumber>;
+  conversation_starters: z.ZodOptional<z.ZodArray<z.ZodString>>;
+  tool_resources: typeof agentToolResourcesSchema;
+  tool_options: typeof agentToolOptionsSchema;
+  subagents: typeof agentSubagentsSchema;
+  support_contact: typeof agentSupportContactSchema;
+  category: z.ZodOptional<z.ZodString>;
+};
+
+export const agentBaseSchema: z.ZodObject<AgentBaseShape> = z.object({
+  name: z.string().nullable().optional(),
+  description: z.string().nullable().optional(),
+  instructions: z.string().nullable().optional(),
+  instructionsPrompt: agentInstructionsPromptFieldSchema,
+  avatar: agentAvatarSchema.nullable().optional(),
+  model_parameters: z.record(z.string(), z.unknown()).optional(),
+>>>>>>> upstream/main
   tools: z.array(z.string()).optional(),
   skills: z.array(z.string()).optional(),
   skills_enabled: z.boolean().optional(),
@@ -584,7 +776,13 @@ export const agentBaseSchema: z.ZodObject<
   stateful_code_sessions: z.boolean().optional(),
   stateful_code_environment: z.enum(['user', 'agent-user', 'conversation']).optional(),
   code_environment_id: agentCodeEnvironmentIdSchema.optional(),
+<<<<<<< HEAD
   code_workspace_id: agentCodeWorkspaceIdSchema.optional(),
+=======
+  code_environment_ids: agentCodeEnvironmentIdsSchema.optional(),
+  code_workspace_id: agentCodeWorkspaceIdSchema.optional(),
+  repositoryInstructions: z.enum(['prefer', 'defer', 'off']).optional(),
+>>>>>>> upstream/main
   git_identity: agentGitIdentitySchema,
   artifacts: z.string().optional(),
   recursion_limit: z.number().optional(),
@@ -598,6 +796,7 @@ export const agentBaseSchema: z.ZodObject<
 
 /** Create schema extends base with required fields for creation */
 export const agentCreateSchema: z.ZodObject<
+<<<<<<< HEAD
   {
     name: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     description: z.ZodOptional<z.ZodNullable<z.ZodString>>;
@@ -745,6 +944,13 @@ export const agentCreateSchema: z.ZodObject<
     tools: z.ZodDefault<z.ZodOptional<z.ZodArray<z.ZodString, 'many'>>>;
   },
   'strip'
+=======
+  Omit<AgentBaseShape, 'tools'> & {
+    provider: z.ZodString;
+    model: z.ZodNullable<z.ZodString>;
+    tools: z.ZodDefault<z.ZodOptional<z.ZodArray<z.ZodString>>>;
+  }
+>>>>>>> upstream/main
 > = agentBaseSchema.extend({
   provider: z.string(),
   model: z.string().nullable(),
@@ -753,6 +959,7 @@ export const agentCreateSchema: z.ZodObject<
 
 /** Update schema extends base with all fields optional and additional update-only fields */
 export const agentUpdateSchema: z.ZodObject<
+<<<<<<< HEAD
   {
     name: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     description: z.ZodOptional<z.ZodNullable<z.ZodString>>;
@@ -903,10 +1110,23 @@ export const agentUpdateSchema: z.ZodObject<
     model: z.ZodOptional<z.ZodNullable<z.ZodString>>;
   },
   'strip'
+=======
+  Omit<AgentBaseShape, 'avatar' | 'code_environment_id' | 'git_identity'> & {
+    avatar: z.ZodOptional<z.ZodUnion<readonly [typeof agentAvatarSchema, z.ZodNull]>>;
+    code_environment_id: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    git_identity: typeof agentGitIdentityUpdateSchema;
+    provider: z.ZodOptional<z.ZodString>;
+    model: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+  }
+>>>>>>> upstream/main
 > = agentBaseSchema.extend({
   avatar: z.union([agentAvatarSchema, z.null()]).optional(),
   code_environment_id: agentCodeEnvironmentIdSchema.nullable().optional(),
   code_workspace_id: agentCodeWorkspaceIdSchema.optional(),
+<<<<<<< HEAD
+=======
+  repositoryInstructions: z.enum(['prefer', 'defer', 'off']).optional(),
+>>>>>>> upstream/main
   git_identity: agentGitIdentityUpdateSchema,
   provider: z.string().optional(),
   model: z.string().nullable().optional(),

@@ -1,7 +1,11 @@
 import mongoose from 'mongoose';
 import { EventEmitter } from 'events';
 import { GridFSBucket } from 'mongodb';
+<<<<<<< HEAD
 import { logger } from '@librechat/data-schemas';
+=======
+import { buildIndexWithRetry, logger } from '@librechat/data-schemas';
+>>>>>>> upstream/main
 import type { Db, ReadPreference, Collection } from 'mongodb';
 
 interface KeyvMongoOptions {
@@ -76,6 +80,19 @@ class KeyvMongoCustom extends EventEmitter {
         const collection = this.opts.collection || 'keyv';
         const store = db.collection(collection);
         client = { store, db };
+<<<<<<< HEAD
+=======
+        /** Every read and upsert filters on `key`; unindexed, each one scans the collection.
+         *  Built in the background, and skipped when the deployment disables auto indexing. */
+        if (mongoose.connection.config?.autoIndex !== false) {
+          buildIndexWithRetry(
+            () => store.createIndex({ key: 1 }),
+            `KeyvMongo "${collection}" key index`,
+          ).catch((error: unknown) => {
+            logger.warn(`[KeyvMongo] Could not index "${collection}" by key`, error);
+          });
+        }
+>>>>>>> upstream/main
       }
 
       storeMap.set(storeKey, client);

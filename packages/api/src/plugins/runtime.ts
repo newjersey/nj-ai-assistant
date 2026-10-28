@@ -13,6 +13,10 @@ import type { LoadedPlugin } from './types';
 import {
   commandExecutorCapabilities,
   createCommandExecutor,
+<<<<<<< HEAD
+=======
+  getCommandShellIssue,
+>>>>>>> upstream/main
   registerPluginHooks,
 } from '~/agents/hooks';
 import { getDeploymentPluginRegistry } from './deployment';
@@ -101,7 +105,18 @@ function withOnceDedup(
 export function getDeploymentPluginHookCapabilities(
   env: NodeJS.ProcessEnv = process.env,
 ): PluginHookCapabilities | undefined {
+<<<<<<< HEAD
   return isEnabled(env[DEPLOYMENT_PLUGIN_HOOKS_ENV]) ? commandExecutorCapabilities : undefined;
+=======
+  if (!isEnabled(env[DEPLOYMENT_PLUGIN_HOOKS_ENV])) {
+    return undefined;
+  }
+  const shellIssue = getCommandShellIssue(env);
+  if (shellIssue !== undefined) {
+    logger.error(`[pluginHooks] ${DEPLOYMENT_PLUGIN_HOOKS_ENV} is enabled: ${shellIssue}`);
+  }
+  return commandExecutorCapabilities;
+>>>>>>> upstream/main
 }
 
 function getExecutableHookPlugins(): LoadedPlugin[] {

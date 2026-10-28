@@ -1,7 +1,11 @@
 import { defineConfig } from '@playwright/test';
 import mockConfig from './playwright.config.mock';
 
+<<<<<<< HEAD
 /** Browser scenarios whose behavior crosses the generation stream-store boundary. */
+=======
+/** Scenarios that exercise Redis-backed streams or shared cache invalidation. */
+>>>>>>> upstream/main
 export default defineConfig({
   ...mockConfig,
   /**
@@ -25,5 +29,10 @@ export default defineConfig({
     /thread-fold\.spec\.ts/,
     /tool-approvals\.spec\.ts/,
     /usage\.spec\.ts/,
+<<<<<<< HEAD
+=======
+    /scenarios\/redis-stream\.spec\.ts/,
+    /scenarios\/reset-password\.spec\.ts/,
+>>>>>>> upstream/main
   ],
 });

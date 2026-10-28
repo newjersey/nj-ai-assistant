@@ -1,6 +1,10 @@
 import { useState } from 'react';
 import userEvent from '@testing-library/user-event';
+<<<<<<< HEAD
 import { render, screen, within } from '@testing-library/react';
+=======
+import { fireEvent, render, screen, within } from '@testing-library/react';
+>>>>>>> upstream/main
 import TimePicker, { MinutePicker } from './TimePicker';
 
 const LABELS = { hour: 'Hour', minute: 'Minute', meridiem: 'AM or PM', am: 'AM', pm: 'PM' };
@@ -37,6 +41,17 @@ describe('TimePicker', () => {
     expect(screen.getByRole('radiogroup', { name: 'AM or PM' })).toBeInTheDocument();
   });
 
+<<<<<<< HEAD
+=======
+  it('inks its value in the field role like every other field', () => {
+    render(<Harness />);
+
+    const trigger = screen.getByRole('button', { name: 'Time 9:00 AM' });
+    expect(trigger).toHaveClass('text-field-text');
+    expect(trigger).not.toHaveClass('text-text-primary');
+  });
+
+>>>>>>> upstream/main
   it('announces the selected time, not just the field label', () => {
     // `aria-labelledby` REPLACES a button's child text, so pointing it at the field
     // label alone announced "Time" and left the selected value unreadable without
@@ -164,4 +179,25 @@ describe('MinutePicker', () => {
     await user.click(within(minutes).getByRole('radio', { name: '30' }));
     expect(screen.getByTestId('minute')).toHaveTextContent('30');
   });
+<<<<<<< HEAD
+=======
+
+  it('keeps ArrowRight advancing like ArrowDown in an RTL document, since the column is vertical', async () => {
+    const user = userEvent.setup();
+    document.documentElement.setAttribute('dir', 'rtl');
+    try {
+      render(<MinuteHarness />);
+      await user.click(screen.getByRole('button', { name: 'Minutes past the hour 00' }));
+      const minutes = screen.getByRole('radiogroup', { name: 'Minute' });
+      const options = within(minutes).getAllByRole('radio');
+
+      fireEvent.keyDown(options[0], { key: 'ArrowRight' });
+      expect(screen.getByTestId('minute')).toHaveTextContent(
+        options[1].getAttribute('data-value') ?? '',
+      );
+    } finally {
+      document.documentElement.removeAttribute('dir');
+    }
+  });
+>>>>>>> upstream/main
 });

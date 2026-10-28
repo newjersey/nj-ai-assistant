@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { maxWorkers } from '../../config/jest.workers.cjs';
+=======
+import { maxWorkers, workerIdleMemoryLimit } from '../../config/jest.workers.cjs';
+>>>>>>> upstream/main
 
 export default {
   collectCoverageFrom: ['src/**/*.{js,jsx,ts,tsx}', '!<rootDir>/node_modules/'],
@@ -26,6 +30,10 @@ export default {
   globalSetup: '<rootDir>/jest.globalSetup.mjs',
   setupFiles: ['<rootDir>/../../config/jest.setup.logging.cjs'],
   maxWorkers,
+<<<<<<< HEAD
+=======
+  workerIdleMemoryLimit,
+>>>>>>> upstream/main
   restoreMocks: true,
   testTimeout: 15000,
 };

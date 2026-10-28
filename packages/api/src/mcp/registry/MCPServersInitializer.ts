@@ -80,6 +80,11 @@ export class MCPServersInitializer {
   }
 
   public static async initialize(rawConfigs: t.MCPServers): Promise<void> {
+<<<<<<< HEAD
+=======
+    /** Every process keeps its own raw snapshot, including followers that skip inspection. */
+    MCPServersRegistry.getInstance().setYamlServerOptions(rawConfigs);
+>>>>>>> upstream/main
     const configHash = MCPServersInitializer.configHash(rawConfigs);
     // On first call in this process, always reset and re-initialize
     // This ensures we don't use stale Redis data from previous runs

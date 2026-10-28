@@ -1,6 +1,7 @@
 .popover-ui {
   display: flex;
   max-height: min(var(--popover-available-height, 1700px), 1700px);
+<<<<<<< HEAD
   flex-direction: column;
   overflow: auto;
   overscroll-behavior: contain;
@@ -14,6 +15,25 @@
   box-shadow:
     0 10px 15px -3px rgb(0 0 0 / 0.1),
     0 4px 6px -4px rgb(0 0 0 / 0.1);
+=======
+  max-width: min(calc(100vw - 1rem), var(--popover-available-width, 100vw));
+  flex-direction: column;
+  overflow: auto;
+  overscroll-behavior: contain;
+  border-radius: var(--theme-menu-radius, 0.7rem);
+  border-width: 1px;
+  border-style: solid;
+  border-color: rgb(var(--border-menu) / var(--border-menu-alpha, var(--border-light-alpha, 1)));
+  background-color: rgb(var(--surface-popover));
+  padding: 0.5rem;
+  color: rgb(var(--text-primary));
+  /* The `menuShadow` role, whose light default is this literal. */
+  box-shadow: var(
+    --theme-menu-shadow,
+    0 10px 15px -3px rgb(var(--black) / 0.1),
+    0 4px 6px -4px rgb(var(--black) / 0.1)
+  );
+>>>>>>> upstream/main
   transform-origin: var(--popover-transform-origin, top);
   opacity: 0;
   transition-property: opacity, scale;
@@ -21,12 +41,33 @@
   transition-duration: 150ms;
   scale: 0.95;
   margin-top: 4px;
+<<<<<<< HEAD
   margin-right: -2px;
+=======
+  margin-inline-end: -2px;
+>>>>>>> upstream/main
 }
 
 /* Elevation here is a black shadow, which carries no separation at all against
  * a pure black surface. Lives with the primitive rather than in the app
  * stylesheet, which the published package does not include. */
+<<<<<<< HEAD
+=======
+/* A form-field list takes the theme's list roles: `listMinWidth` (0 sizes it by its
+ * trigger) and `listMaxHeight`, never past the room the popover leaves below or above it. */
+.popover-ui[data-variant='field'] {
+  min-width: var(--theme-list-min-width, 8rem);
+  max-height: min(var(--theme-list-max-height, 24rem), var(--popover-available-height, 100dvh));
+}
+
+/* ...and is never narrower than its trigger. The floor sits on Ariakit's wrapper, where the
+ * anchor width is set and which the list fills, because a role of `0` (unitless) cannot be
+ * combined with a length in `max()`. */
+.popover-field-wrapper {
+  min-width: var(--popover-anchor-width, 0px);
+}
+
+>>>>>>> upstream/main
 html.high-contrast .popover-ui {
   border: 1px solid rgb(var(--border-medium));
   box-shadow: none;
@@ -46,16 +87,30 @@ html.high-contrast .popover-ui {
 
 .popover-ui:focus-visible,
 .popover-ui[data-focus-visible] {
+<<<<<<< HEAD
   outline: 2px solid rgb(var(--text-primary));
+=======
+  outline: 2px solid rgb(var(--focus-control));
+>>>>>>> upstream/main
   outline-offset: -1px;
 }
 
 .popover-ui:where(.dark, .dark *) {
+<<<<<<< HEAD
   background-color: rgb(var(--surface-secondary));
   color: rgb(var(--text-secondary));
   box-shadow:
     0 10px 15px -3px rgb(0 0 0 / 0.25),
     0 4px 6px -4px rgb(0 0 0 / 0.1);
+=======
+  background-color: rgb(var(--surface-popover));
+  color: rgb(var(--text-secondary));
+  box-shadow: var(
+    --theme-menu-shadow,
+    0 10px 15px -3px rgb(var(--black) / 0.25),
+    0 4px 6px -4px rgb(var(--black) / 0.1)
+  );
+>>>>>>> upstream/main
 }
 
 .select-item {
@@ -64,7 +119,11 @@ html.high-contrast .popover-ui {
   scroll-margin: 0.5rem;
   align-items: center;
   gap: 0.5rem;
+<<<<<<< HEAD
   border-radius: 0.5rem;
+=======
+  border-radius: var(--theme-radius-lg, 0.5rem);
+>>>>>>> upstream/main
   padding: 0.5rem;
   outline: none !important;
 }

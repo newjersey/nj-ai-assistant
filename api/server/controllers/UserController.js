@@ -1,14 +1,27 @@
 const mongoose = require('mongoose');
+<<<<<<< HEAD
 const { logger } = require('@librechat/data-schemas');
 const {
   getNewS3URL,
   needsRefresh,
+=======
+const { logger, runAsSystem, tenantStorage } = require('@librechat/data-schemas');
+const {
+  getNewS3URL,
+  needsRefresh,
+  comparePassword,
+  checkEmailConfig,
+  createEmailChangeService,
+  createEmailChangeDeps,
+  resolveEmailChangeSettings,
+>>>>>>> upstream/main
   GenerationJobManager,
   getAppConfigOptionsFromUser,
   normalizeHttpError,
   getWebSearchInstallEntries,
   getWebSearchUninstallFields,
   openCheckpointDeletion,
+<<<<<<< HEAD
   isStopConfirmed,
   waitForGenerationPersistence,
   deleteAllSharedLinksWithCleanup,
@@ -20,6 +33,22 @@ const { updateUserPluginAuth, deleteUserPluginAuth } = require('~/server/service
 const { verifyOTPOrBackupCode } = require('~/server/services/twoFactorService');
 const { verifyEmail, resendVerificationEmail } = require('~/server/services/AuthService');
 const { getMCPManager } = require('~/config');
+=======
+  stopUserGenerations,
+  deleteAllSharedLinksWithCleanup,
+  eraseUserData,
+  deleteUserMCPServers,
+  revokeUserCodeEnvironmentWorkers,
+  finalizeMCPAuthorizationMutation,
+  clearSessionHintCookie,
+  compareSecret,
+} = require('@librechat/api');
+const { Tools, Constants, FileSources } = require('librechat-data-provider');
+const { updateUserPluginAuth, deleteUserPluginAuth } = require('~/server/services/PluginService');
+const { verifyOTPOrBackupCode } = require('~/server/services/twoFactorService');
+const { verifyEmail, resendVerificationEmail } = require('~/server/services/AuthService');
+const { getMCPManager, getMCPServersRegistry } = require('~/config');
+>>>>>>> upstream/main
 const { maybeUninstallOAuthMCP } = require('~/server/services/MCP/oauthCleanup');
 const { invalidateCachedTools } = require('~/server/services/Config/getCachedTools');
 const {
@@ -40,8 +69,35 @@ const {
   quiesceUserSchedules,
   restoreUserSchedulesFromDeletion,
 } = require('~/server/services/Schedules');
+<<<<<<< HEAD
 const db = require('~/models');
 
+=======
+const { sendEmail } = require('~/server/utils');
+const db = require('~/models');
+
+const emailChangeService = createEmailChangeService(
+  createEmailChangeDeps({
+    store: {
+      findUser: db.findUser,
+      getUserById: db.getUserById,
+      updateUser: db.updateUser,
+      findToken: db.findToken,
+      replaceTokenIfCurrent: db.replaceTokenIfCurrent,
+      deleteTokens: db.deleteTokens,
+    },
+    withTenant: (tenantId, operation) =>
+      tenantId ? tenantStorage.run({ tenantId }, operation) : runAsSystem(operation),
+    comparePassword: (user, password) =>
+      comparePassword(user, password, { compare: compareSecret }),
+    sendEmail,
+    getAppConfig,
+    clientDomain: process.env.DOMAIN_CLIENT ?? 'http://localhost:3080',
+    appName: process.env.APP_TITLE || 'LibreChat',
+  }),
+);
+
+>>>>>>> upstream/main
 const PUBLIC_USER_RESPONSE_FIELDS = [
   '_id',
   'id',
@@ -126,6 +182,7 @@ const acceptTermsController = async (req, res) => {
   }
 };
 
+<<<<<<< HEAD
 const deleteUserFiles = async (req) => {
   try {
     const userFiles = await db.getFiles({ user: req.user.id });
@@ -220,6 +277,36 @@ const deleteUserMcpServers = async (userId) => {
     logger.error('[deleteUserMcpServers] General error:', error);
   }
 };
+=======
+/** Runtime hooks for MCP servers removed with a deleted account. */
+const createMCPServerCleanup = (userId) => ({
+  findUserErasableMCPServers: db.findUserErasableMCPServers,
+  deleteMCPServersWithAcl: db.deleteMCPServersWithAcl,
+  invalidateMCPServerTools: (serverName) => invalidateCachedTools({ userId, serverName }),
+  disconnectMCPServer: async (serverName) => {
+    await getMCPManager()?.disconnectUserConnection(userId, serverName);
+  },
+  findMCPServerOAuthTokenUserIds: db.findMCPServerOAuthTokenUserIds,
+  findMCPServerViewerEntries: db.findMCPServerViewerEntries,
+  mcpOAuth: {
+    getServerConfig: (serverName) =>
+      getMCPServersRegistry().getServerConfig(serverName, userId, undefined, undefined, {
+        includeHidden: true,
+      }),
+    getUserPrincipals: (candidateId) => db.getUserPrincipals({ userId: candidateId }),
+    resolveAllowlists: (candidateId) =>
+      getMCPServersRegistry().resolveAllowlists({ userId: candidateId }),
+    invalidateUserTools: (candidateId, serverName) =>
+      invalidateCachedTools({ userId: candidateId, serverName }),
+    disconnectUser: (candidateId, serverName) =>
+      getMCPManager()?.disconnectUserConnection(candidateId, serverName),
+    uninstallOAuthMCP: maybeUninstallOAuthMCP,
+  },
+});
+
+const deleteUserMcpServers = (userId) =>
+  deleteUserMCPServers(userId, createMCPServerCleanup(userId));
+>>>>>>> upstream/main
 
 const updateUserPluginsController = async (req, res) => {
   const appConfig = req.config ?? (await getAppConfig(getAppConfigOptionsFromUser(req.user)));
@@ -284,7 +371,17 @@ const updateUserPluginsController = async (req, res) => {
         authService =
           pluginKey === Tools.web_search && value === ''
             ? await deleteUserPluginAuth(user.id, field)
+<<<<<<< HEAD
             : await updateUserPluginAuth(user.id, field, pluginKey, value);
+=======
+            : await updateUserPluginAuth(
+                user.id,
+                field,
+                pluginKey,
+                value,
+                appConfig?.credentials?.writeFormat,
+              );
+>>>>>>> upstream/main
         if (authService instanceof Error) {
           logger.error('[authService]', authService);
           ({ status, message } = normalizeHttpError(authService));
@@ -442,6 +539,7 @@ const deleteUserController = async (req, res) => {
     if (!(await quiesceUserSchedules(user.id, scheduleSuspensionToken))) {
       throw new Error('Scheduled executions could not be confirmed stopped');
     }
+<<<<<<< HEAD
     const activeAgentRuns = await GenerationJobManager.getAccountCleanupJobIdsForUser(
       user.id,
       tenantId,
@@ -475,6 +573,9 @@ const deleteUserController = async (req, res) => {
         ),
       ),
     );
+=======
+    await stopUserGenerations(user.id, tenantId, GenerationJobManager);
+>>>>>>> upstream/main
 
     const appConfig =
       req.config ??
@@ -483,6 +584,7 @@ const deleteUserController = async (req, res) => {
         userId: user.id,
         tenantId,
       }));
+<<<<<<< HEAD
     const checkpointer = appConfig?.endpoints?.agents?.checkpointer;
     const checkpointDeletion = await openCheckpointDeletion(
       user.id,
@@ -525,6 +627,25 @@ const deleteUserController = async (req, res) => {
     await db.removeUserFromAllGroups(user.id);
     await db.deleteAclEntries({ principalId: user._id });
     await db.deleteSchedulesByUser(user.id);
+=======
+    await eraseUserData(
+      {
+        userId: user.id,
+        tenantId,
+        checkpointer: appConfig?.endpoints?.agents?.checkpointer,
+      },
+      {
+        ...db,
+        openCheckpointDeletion,
+        deleteSharedLinks: (id) => deleteAllSharedLinksWithCleanup(id, { awaitCleanup: true }),
+        /** The DELETE carries no body without 2FA, and account erasure targets no assistant. */
+        deleteStoredFiles: (files) =>
+          processDeleteRequest({ req: Object.assign(Object.create(req), { body: {} }), files }),
+        ...createMCPServerCleanup(user.id),
+        onSessionsDeleted: () => clearSessionHintCookie(res),
+      },
+    );
+>>>>>>> upstream/main
     const deleteResult = await db.deleteUserById(user.id);
     if (deleteResult.deletedCount !== 1) {
       throw new Error('User disappeared before account deletion could commit');
@@ -552,7 +673,11 @@ const deleteUserController = async (req, res) => {
       logger.error('[deleteUserController] code environment cache invalidation failed:', error);
     });
     await purgeAgentTriggerDeliveriesForUser(user.id);
+<<<<<<< HEAD
     logger.info(`User deleted account. Email: ${user.email} ID: ${user.id}`);
+=======
+    logger.info(`User deleted account. ID: ${user.id} Tenant: ${tenantId ?? 'none'}`);
+>>>>>>> upstream/main
     res.status(200).send({ message: 'User deleted' });
   } catch (err) {
     // The account survives this failed attempt, so its schedules must too: restore the
@@ -630,12 +755,52 @@ const resendVerificationController = async (req, res) => {
   }
 };
 
+<<<<<<< HEAD
+=======
+const requestEmailChangeController = async (req, res) => {
+  try {
+    const userId = req.user?._id?.toString?.() ?? req.user?.id?.toString?.();
+    if (!userId) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+    const result = await emailChangeService.requestEmailChange({
+      body: req.body,
+      userId,
+      tenantId: req.user?.tenantId,
+      allowedDomains: req.config?.registration?.allowedDomains,
+      settings: resolveEmailChangeSettings(req.config?.emailChange),
+      emailEnabled: checkEmailConfig(),
+      ip: req.ip,
+    });
+    return res.status(result.status).json({ message: result.message, code: result.code });
+  } catch (error) {
+    logger.error('[requestEmailChangeController]', error);
+    return res.status(500).json({ message: 'Something went wrong.' });
+  }
+};
+
+const confirmEmailChangeController = async (req, res) => {
+  try {
+    const result = await emailChangeService.confirmEmailChange({ body: req.body, ip: req.ip });
+    return res.status(result.status).json({ message: result.message, code: result.code });
+  } catch (error) {
+    logger.error('[confirmEmailChangeController]', error);
+    return res.status(500).json({ message: 'Something went wrong.' });
+  }
+};
+
+>>>>>>> upstream/main
 module.exports = {
   getUserController,
   getTermsStatusController,
   acceptTermsController,
   deleteUserController,
   verifyEmailController,
+<<<<<<< HEAD
+=======
+  requestEmailChangeController,
+  confirmEmailChangeController,
+>>>>>>> upstream/main
   updateUserPluginsController,
   resendVerificationController,
   deleteUserMcpServers,

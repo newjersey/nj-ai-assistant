@@ -2,20 +2,28 @@
  * Regression tests for image tool agent mode — verifies that invoke() returns
  * a ToolMessage with base64 in artifact.content rather than serialized into content.
  *
+<<<<<<< HEAD
  * Root cause: DALLE3/FluxAPI/StableDiffusion extend LangChain's Tool but did not
+=======
+ * Root cause: FluxAPI/StableDiffusion extend LangChain's Tool but did not
+>>>>>>> upstream/main
  * set responseFormat = 'content_and_artifact'. LangChain's invoke() would then
  * JSON.stringify the entire [content, artifact] tuple into ToolMessage.content,
  * dumping base64 into token counting and causing context exhaustion.
  */
 
 const axios = require('axios');
+<<<<<<< HEAD
 const OpenAI = require('openai');
 const undici = require('undici');
+=======
+>>>>>>> upstream/main
 const fetch = require('node-fetch');
 const { ContentTypes } = require('librechat-data-provider');
 const { ToolMessage } = require('@librechat/agents/langchain/messages');
 const StableDiffusionAPI = require('../StableDiffusion');
 const FluxAPI = require('../FluxAPI');
+<<<<<<< HEAD
 const DALLE3 = require('../DALLE3');
 
 jest.mock('axios');
@@ -25,6 +33,11 @@ jest.mock('undici', () => ({
   ProxyAgent: jest.fn(),
   fetch: jest.fn(),
 }));
+=======
+
+jest.mock('axios');
+jest.mock('node-fetch');
+>>>>>>> upstream/main
 jest.mock('@librechat/data-schemas', () => ({
   logger: { info: jest.fn(), warn: jest.fn(), debug: jest.fn(), error: jest.fn() },
 }));
@@ -50,7 +63,11 @@ const makeToolCall = (name, args) => ({
 });
 
 describe('image tools - agent mode ToolMessage format', () => {
+<<<<<<< HEAD
   const ENV_KEYS = ['DALLE_API_KEY', 'FLUX_API_KEY', 'SD_WEBUI_URL', 'PROXY'];
+=======
+  const ENV_KEYS = ['FLUX_API_KEY', 'SD_WEBUI_URL', 'PROXY'];
+>>>>>>> upstream/main
   let savedEnv = {};
 
   beforeEach(() => {
@@ -58,7 +75,10 @@ describe('image tools - agent mode ToolMessage format', () => {
     for (const key of ENV_KEYS) {
       savedEnv[key] = process.env[key];
     }
+<<<<<<< HEAD
     process.env.DALLE_API_KEY = 'test-dalle-key';
+=======
+>>>>>>> upstream/main
     process.env.FLUX_API_KEY = 'test-flux-key';
     process.env.SD_WEBUI_URL = 'http://localhost:7860';
     delete process.env.PROXY;
@@ -75,6 +95,7 @@ describe('image tools - agent mode ToolMessage format', () => {
     savedEnv = {};
   });
 
+<<<<<<< HEAD
   describe('DALLE3', () => {
     beforeEach(() => {
       OpenAI.mockImplementation(() => ({
@@ -164,6 +185,8 @@ describe('image tools - agent mode ToolMessage format', () => {
     });
   });
 
+=======
+>>>>>>> upstream/main
   describe('FluxAPI', () => {
     beforeEach(() => {
       jest.useFakeTimers();

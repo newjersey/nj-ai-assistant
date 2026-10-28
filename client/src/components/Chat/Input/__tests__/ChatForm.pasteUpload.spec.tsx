@@ -1,8 +1,17 @@
 import React, { useMemo, useState } from 'react';
+<<<<<<< HEAD
 import '@testing-library/jest-dom';
 import { DndProvider } from 'react-dnd';
 import { useForm } from 'react-hook-form';
 import { RecoilRoot, useRecoilState } from 'recoil';
+=======
+import { getDefaultStore, useAtom } from 'jotai';
+import { filesFamily, isSubmittingFamily } from '@librechat/chat/react';
+import '@testing-library/jest-dom';
+import { RecoilRoot } from 'recoil';
+import { DndProvider } from 'react-dnd';
+import { useForm } from 'react-hook-form';
+>>>>>>> upstream/main
 import userEvent from '@testing-library/user-event';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { BrowserRouter as Router } from 'react-router-dom';
@@ -14,8 +23,13 @@ import type { ChatFormValues } from '~/common';
 import { ChatContext, ChatFormProvider } from '~/Providers';
 import { AuthContextProvider } from '~/hooks/AuthContext';
 import DragDropWrapper from '../Files/DragDropWrapper';
+<<<<<<< HEAD
 import ChatForm from '../ChatForm';
 import store from '~/store';
+=======
+import { SteerHostTestProvider } from 'test/steerHost';
+import ChatForm from '../ChatForm';
+>>>>>>> upstream/main
 
 const mockUpload = jest.fn();
 const mockAsk = jest.fn();
@@ -65,8 +79,13 @@ class StubImage {
 }
 
 function Harness() {
+<<<<<<< HEAD
   const [files, setFiles] = useRecoilState(store.filesByIndex(0));
   const [isSubmitting] = useRecoilState(store.isSubmittingFamily(0));
+=======
+  const [files, setFiles] = useAtom(filesFamily(0));
+  const [isSubmitting] = useAtom(isSubmittingFamily(0));
+>>>>>>> upstream/main
   const [, setFilesLoading] = useState(false);
   const methods = useForm<ChatFormValues>({ defaultValues: { text: '' } });
 
@@ -90,8 +109,11 @@ function Harness() {
         ask: mockAsk,
         regenerate: () => undefined,
         setSiblingIdx: () => undefined,
+<<<<<<< HEAD
         showPopover: false,
         setShowPopover: () => undefined,
+=======
+>>>>>>> upstream/main
         abortScroll: false,
         setAbortScroll: () => undefined,
         preset: null,
@@ -134,6 +156,7 @@ function renderComposer({ legacyUploadUX = false }: { legacyUploadUX?: boolean }
   return render(
     <QueryClientProvider client={queryClient}>
       <RecoilRoot>
+<<<<<<< HEAD
         <Router>
           <AuthContextProvider authConfig={{ loginRedirect: '', test: true }}>
             <DndProvider backend={HTML5Backend}>
@@ -141,6 +164,17 @@ function renderComposer({ legacyUploadUX = false }: { legacyUploadUX?: boolean }
             </DndProvider>
           </AuthContextProvider>
         </Router>
+=======
+        <SteerHostTestProvider>
+          <Router>
+            <AuthContextProvider authConfig={{ loginRedirect: '', test: true }}>
+              <DndProvider backend={HTML5Backend}>
+                <Harness />
+              </DndProvider>
+            </AuthContextProvider>
+          </Router>
+        </SteerHostTestProvider>
+>>>>>>> upstream/main
       </RecoilRoot>
     </QueryClientProvider>,
   );
@@ -160,6 +194,13 @@ const pasteImage = (textarea: HTMLElement) => {
   fireEvent(textarea, event);
 };
 
+<<<<<<< HEAD
+=======
+afterEach(() => {
+  getDefaultStore().set(filesFamily(0), new Map());
+});
+
+>>>>>>> upstream/main
 /**
  * The upload-destination dialog is opened by the paste itself, so Radix has no
  * trigger to return focus to when it closes and used to leave focus on

@@ -38,7 +38,11 @@ const MAX_PARENT_CHILDREN = 64;
 const MAX_PARENT_TASKS_PER_CHILD = 20;
 const MAX_PARENT_INDEX_BYTES = 96 * 1024;
 const MAX_PUBLIC_CONTROL_RECEIPTS = 32;
+<<<<<<< HEAD
 const MAX_PUBLIC_CONTROL_MESSAGE_BYTES = 512;
+=======
+const MAX_PUBLIC_CONTROL_BYTES = MAX_RESPONSE_BYTES / 4;
+>>>>>>> upstream/main
 type SubagentThreadViewDependencies = Pick<
   ConversationMethods,
   'getConvoOwnership' | 'getSubagentThreadForParent'
@@ -154,10 +158,13 @@ const publicControlReceipts = (
   const retained = [...accepted, ...(terminalLimit === 0 ? [] : terminal.slice(-terminalLimit))]
     .slice(0, MAX_PUBLIC_CONTROL_RECEIPTS)
     .map((receipt) => {
+<<<<<<< HEAD
       const message =
         receipt.message == null
           ? undefined
           : truncateUtf8(receipt.message, MAX_PUBLIC_CONTROL_MESSAGE_BYTES);
+=======
+>>>>>>> upstream/main
       return {
         invocationId: truncateUtf8(receipt.invocationId, MAX_PUBLIC_ID_BYTES).text,
         ...(receipt.controlId == null
@@ -171,12 +178,41 @@ const publicControlReceipts = (
         ...(receipt.reason == null
           ? {}
           : { reason: truncateUtf8(receipt.reason, MAX_PUBLIC_ID_BYTES).text }),
+<<<<<<< HEAD
         ...(message == null ? {} : { message: message.text }),
         ...(receipt.messageTruncated === true || message?.truncated === true
           ? { messageTruncated: true }
           : {}),
       };
     });
+=======
+        ...(receipt.message == null ? {} : { message: receipt.message }),
+        ...(receipt.messageTruncated === true ? { messageTruncated: true } : {}),
+      };
+    });
+  // Keep pending identities actionable. Budgeted pending bodies hydrate on expansion.
+  let bytes = Buffer.byteLength(JSON.stringify(retained), 'utf8');
+  while (bytes > MAX_PUBLIC_CONTROL_BYTES && retained.length > 0) {
+    let index = retained.findIndex((receipt) => receipt.status !== 'accepted');
+    if (index >= 0) {
+      const removed = retained.splice(index, 1)[0];
+      bytes -= Buffer.byteLength(JSON.stringify(removed), 'utf8') + 1;
+      continue;
+    }
+    index = retained.findIndex(
+      (receipt) => receipt.message != null && Buffer.byteLength(receipt.message, 'utf8') > 512,
+    );
+    if (index < 0) break;
+    const receipt = retained[index];
+    const before = Buffer.byteLength(JSON.stringify(receipt), 'utf8');
+    retained[index] = {
+      ...receipt,
+      message: truncateUtf8(receipt.message!, 512).text,
+      messageTruncated: true,
+    };
+    bytes += Buffer.byteLength(JSON.stringify(retained[index]), 'utf8') - before;
+  }
+>>>>>>> upstream/main
   return {
     receipts: retained,
     truncated:
@@ -268,6 +304,21 @@ const projectedTaskActivity = (
   taskId: string,
 ): ReturnType<typeof projectSubagentActivity> => {
   if (assistant?.subagentActivityProjectionJson != null) {
+<<<<<<< HEAD
+=======
+    const transcript = assistant.subagentTranscript;
+    if (
+      transcript?.taskId === taskId &&
+      (transcript.mode === 'append' || (input != null && input.textProjectionTruncated !== true))
+    ) {
+      const restored = projectSubagentActivity(
+        transcript.messagesJson,
+        transcript.mode,
+        input?.textProjectionTruncated === true ? undefined : input?.text,
+      );
+      if (restored.activity.some((item) => item.type === 'steer')) return restored;
+    }
+>>>>>>> upstream/main
     return projectPersistedMessageActivityJson(
       assistant.subagentActivityProjectionJson,
       assistant.subagentActivityProjectionTruncated === true,
@@ -339,6 +390,13 @@ const publicThreadTurns = (
     return [
       {
         taskId,
+<<<<<<< HEAD
+=======
+        contentRecoveryAvailable:
+          record.input?.contentRecoveryAvailable ??
+          record.assistant?.contentRecoveryAvailable ??
+          false,
+>>>>>>> upstream/main
         trigger: {
           kind: triggerKind,
           summary: eventThread ? '' : (input?.text ?? ''),

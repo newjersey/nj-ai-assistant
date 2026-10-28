@@ -1,9 +1,15 @@
 const { sleep } = require('@librechat/agents');
 const { logger } = require('@librechat/data-schemas');
+<<<<<<< HEAD
 const { RunStatus, defaultOrderQuery, CacheKeys } = require('librechat-data-provider');
 const getLogStores = require('~/cache/getLogStores');
 const { retrieveRun } = require('./methods');
 const RunManager = require('./RunManager');
+=======
+const { RunStatus, CacheKeys } = require('librechat-data-provider');
+const getLogStores = require('~/cache/getLogStores');
+const { retrieveRun } = require('./methods');
+>>>>>>> upstream/main
 
 async function withTimeout(promise, timeoutMs, timeoutMessage) {
   let timeoutHandle;
@@ -168,6 +174,7 @@ async function waitForRun({
   return run;
 }
 
+<<<<<<< HEAD
 /**
  * Retrieves all steps of a run.
  *
@@ -261,4 +268,9 @@ module.exports = {
   waitForRun,
   // _handleRun,
   // retrieveRunSteps,
+=======
+module.exports = {
+  createRun,
+  waitForRun,
+>>>>>>> upstream/main
 };

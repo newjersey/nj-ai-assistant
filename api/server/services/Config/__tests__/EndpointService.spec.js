@@ -26,6 +26,7 @@ const mockDataProvider = {
   isAssistantsEndpoint: (endpoint) => endpoint === 'assistants' || endpoint === 'azureAssistants',
 };
 
+<<<<<<< HEAD
 jest.mock(
   '@librechat/api',
   () => ({
@@ -37,6 +38,18 @@ jest.mock(
 );
 
 jest.mock('librechat-data-provider', () => mockDataProvider, { virtual: true });
+=======
+jest.mock('@librechat/api', () => ({
+  sendEvent: jest.fn(),
+  isEnabled: (value) => value === true || value === 'true' || value === '1',
+  isUserProvided: (value) => value === 'user_provided',
+}));
+
+jest.mock('librechat-data-provider', () => ({
+  ...jest.requireActual('librechat-data-provider'),
+  ...mockDataProvider,
+}));
+>>>>>>> upstream/main
 
 jest.mock('~/server/utils/handleText', () => ({
   generateConfig: (key) => (key ? { userProvide: key === 'user_provided' } : false),

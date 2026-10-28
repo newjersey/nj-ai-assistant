@@ -7,6 +7,10 @@ import {
   normalizeAgentEventActorSummary,
   type AgentTurnSemanticContext,
 } from './compatibility';
+<<<<<<< HEAD
+=======
+import { getChatProjectContextKey } from '../projects/context';
+>>>>>>> upstream/main
 
 const context = (): AgentTurnSemanticContext => ({
   checkpointerType: 'mongodb',
@@ -77,6 +81,29 @@ describe('agent context compatibility', () => {
       createAgentContextFingerprint(original).digest,
     );
   });
+<<<<<<< HEAD
+=======
+  it('invalidates warm context when the project identity or revision changes', () => {
+    const original = createAgentContextFingerprint({
+      ...context(),
+      projectContextKey: 'project:p1:r1',
+    });
+    const changed = createAgentContextFingerprint({
+      ...context(),
+      projectContextKey: 'project:p1:r2',
+    });
+    expect(changed.digest).not.toBe(original.digest);
+  });
+
+  it('keeps a no-project fingerprint equal to one written before projects carried a key', () => {
+    const legacy = createAgentContextFingerprint(context());
+    const current = createAgentContextFingerprint({
+      ...context(),
+      projectContextKey: getChatProjectContextKey(null),
+    });
+    expect(agentContextFingerprintsMatch(legacy, current)).toBe(true);
+  });
+>>>>>>> upstream/main
 
   it('excludes credential values from compatibility', () => {
     const left = context();

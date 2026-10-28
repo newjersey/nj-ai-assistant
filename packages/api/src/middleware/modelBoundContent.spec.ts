@@ -5,7 +5,10 @@ import {
   assertModelBoundContent,
   assertModelBoundProviderContent,
   collectModelBoundHistoricalFileIdState,
+<<<<<<< HEAD
   collectModelBoundHistoricalFileIds,
+=======
+>>>>>>> upstream/main
   createModelBoundChatModelCallback,
   createInitialModelBoundAdmissionCallback,
   hasModelBoundContentProtection,
@@ -2566,7 +2569,11 @@ describe('assertModelBoundProviderContent', () => {
 
   it('collects every provider-supported historical file locator', () => {
     expect(
+<<<<<<< HEAD
       collectModelBoundHistoricalFileIds([
+=======
+      collectModelBoundHistoricalFileIdState([
+>>>>>>> upstream/main
         {
           files: [{ file_id: 'top-file' }],
           attachments: [{ file_id: 'display-file' }],
@@ -2578,7 +2585,11 @@ describe('assertModelBoundProviderContent', () => {
             { type: 'input_file', files: [{ file_id: 'part-file' }] },
           ],
         },
+<<<<<<< HEAD
       ]),
+=======
+      ]).fileIds,
+>>>>>>> upstream/main
     ).toEqual([
       'top-file',
       'display-file',
@@ -6197,3 +6208,43 @@ describe('assertModelBoundProviderContent', () => {
     expect(onAllowed).not.toHaveBeenCalled();
   });
 });
+<<<<<<< HEAD
+=======
+
+it('admits only after every native batch passes and awaits the protected commit', async () => {
+  const onContentAllowed = jest.fn(async () => {});
+  const callback = createModelBoundChatModelCallback(
+    {
+      filters: {
+        messages: {
+          pii: {
+            fields: ['text', 'content_part'],
+            starterPatterns: [],
+            customPatterns: [{ id: 'secret', label: 'Secret', regex: 'BLOCK-ME' }],
+          },
+        },
+      },
+    },
+    { onContentAllowed },
+  );
+  expect(() =>
+    callback.handleChatModelStart(undefined, [
+      [{ role: 'user', content: 'safe' }],
+      [{ role: 'user', content: 'BLOCK-ME' }],
+    ]),
+  ).toThrow();
+  expect(onContentAllowed).not.toHaveBeenCalled();
+  let finish!: () => void;
+  onContentAllowed.mockImplementationOnce(
+    () =>
+      new Promise<void>((resolve) => {
+        finish = resolve;
+      }),
+  );
+  const pending = callback.handleChatModelStart(undefined, [[{ role: 'user', content: 'safe' }]]);
+  expect(pending).toBeInstanceOf(Promise);
+  finish();
+  await pending;
+  expect(onContentAllowed).toHaveBeenCalledTimes(1);
+});
+>>>>>>> upstream/main

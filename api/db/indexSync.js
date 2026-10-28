@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
 const { MeiliSearch } = require('meilisearch');
+<<<<<<< HEAD
 const { logger } = require('@librechat/data-schemas');
+=======
+const { logger, runAsSystem } = require('@librechat/data-schemas');
+>>>>>>> upstream/main
 const { CacheKeys } = require('librechat-data-provider');
 const { isEnabled, FlowStateManager, evalKeyvRedisScript } = require('@librechat/api');
 const { getLogStores } = require('~/cache');
@@ -428,4 +432,8 @@ process.on('exit', () => {
   clearTimeout(currentTimeout);
 });
 
+<<<<<<< HEAD
 module.exports = indexSync;
+=======
+module.exports = () => runAsSystem(indexSync);
+>>>>>>> upstream/main

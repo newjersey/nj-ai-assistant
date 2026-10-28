@@ -1,17 +1,38 @@
+<<<<<<< HEAD
 import { createHash } from 'node:crypto';
 import { logger } from '@librechat/data-schemas';
+=======
+import { logger } from '@librechat/data-schemas';
+import { createHash, randomUUID } from 'node:crypto';
+import { subagentActivityConfigSchema } from 'librechat-data-provider';
+import type {
+  TSubagentActivityConfig,
+  SubagentContentAvailableFrame,
+  SubagentContentWatermark,
+} from 'librechat-data-provider';
+>>>>>>> upstream/main
 import type { ConversationMethods, MessageMethods } from '@librechat/data-schemas';
 import type { SubagentUpdateEvent } from '@librechat/agents';
 import type { Response } from 'express';
 import type { IEventTransport } from '~/stream/interfaces/IJobStore';
 import type { ServerRequest } from '~/types';
 import { emitObservedChunk } from '~/stream/internal/chunkPublication';
+<<<<<<< HEAD
+=======
+import { SUBAGENT_ACTIVITY_LIMITS } from './activity';
+>>>>>>> upstream/main
 
 const STREAM_PREFIX = 'subagent-activity:';
 const MAX_ID_BYTES = 512;
 const MAX_LABEL_BYTES = 512;
 const MAX_ANCESTRY_ENTRIES = 16;
+<<<<<<< HEAD
 const MAX_EVENT_BYTES = 64 * 1024;
+=======
+/** Includes Redis type/data/seq wrappers and the largest safe omission count. */
+const REPLAY_WIRE_RESERVE_BYTES = 128;
+const MAX_EVENT_BYTES = SUBAGENT_ACTIVITY_LIMITS.bytes - REPLAY_WIRE_RESERVE_BYTES;
+>>>>>>> upstream/main
 const HEARTBEAT_MS = 15_000;
 const DEMAND_TTL_MS = 30_000;
 const DEMAND_HEARTBEAT_MS = 10_000;
@@ -20,7 +41,12 @@ const SHUTDOWN_SUBSCRIBER_ERROR = 'Server is shutting down';
 
 export type SubagentActivityTerminalStatus = 'completed' | 'failed' | 'cancelled';
 
+<<<<<<< HEAD
 export type SubagentActivityUpdateEvent = SubagentUpdateEvent & {
+=======
+export type SubagentActivityUpdateEvent = Omit<SubagentUpdateEvent, 'phase'> & {
+  phase: SubagentUpdateEvent['phase'] | 'steer_applied';
+>>>>>>> upstream/main
   /** Host-assigned identity shared by parent and detached delivery paths. */
   activityEventId?: string;
   /** Host-assigned monotonic sequence shared by parent and detached delivery paths. */
@@ -30,6 +56,15 @@ export type SubagentActivityUpdateEvent = SubagentUpdateEvent & {
 export type SubagentActivityEnvelope = {
   event: 'on_subagent_update';
   data: SubagentActivityUpdateEvent;
+<<<<<<< HEAD
+=======
+  droppedCount?: number;
+};
+
+export type SubagentActivityReplayEnvelope = {
+  event: 'subagent_activity_replay';
+  data: SubagentActivityEnvelope[];
+>>>>>>> upstream/main
 };
 
 export type SubagentActivitySubscription = {
@@ -38,7 +73,12 @@ export type SubagentActivitySubscription = {
 };
 
 export type SubagentActivitySubscriber = {
+<<<<<<< HEAD
   onEvent: (event: SubagentActivityEnvelope) => void;
+=======
+  onContent?: (event: SubagentContentAvailableFrame) => void;
+  onEvent: (event: SubagentActivityEnvelope | SubagentActivityReplayEnvelope) => void;
+>>>>>>> upstream/main
   onDone?: (event: {
     final: true;
     subagentActivity: true;
@@ -182,7 +222,23 @@ export const subagentActivityStreamId = (threadId: string, taskId: string): stri
 export class SubagentActivityStream {
   private readonly demandCache = new Map<string, { demanded: boolean; expiresAt: number }>();
 
+<<<<<<< HEAD
   constructor(private readonly transport: IEventTransport) {}
+=======
+  private readonly replayLimits: { items: number; bytes: number; ttlMs: number };
+
+  constructor(
+    private readonly transport: IEventTransport,
+    options: Partial<TSubagentActivityConfig> = {},
+  ) {
+    const config = subagentActivityConfigSchema.parse(options);
+    this.replayLimits = {
+      items: SUBAGENT_ACTIVITY_LIMITS.items,
+      bytes: SUBAGENT_ACTIVITY_LIMITS.bytes,
+      ttlMs: config.replayTtlMs,
+    };
+  }
+>>>>>>> upstream/main
 
   private async isDemanded(streamId: string): Promise<boolean> {
     if (this.transport.hasDemand == null) return true;
@@ -213,6 +269,7 @@ export class SubagentActivityStream {
     threadId: string,
     taskId: string,
     event: SubagentActivityUpdateEvent,
+<<<<<<< HEAD
   ): Promise<void> {
     const streamId = subagentActivityStreamId(threadId, taskId);
     if (!(await this.isDemanded(streamId))) return;
@@ -223,6 +280,50 @@ export class SubagentActivityStream {
     await emitObservedChunk(this.transport, streamId, envelope);
   }
 
+=======
+    droppedCount = 0,
+  ): Promise<void> {
+    const streamId = subagentActivityStreamId(threadId, taskId);
+    if (this.transport.emitReplayableChunk == null && !(await this.isDemanded(streamId))) return;
+    const envelope: SubagentActivityEnvelope = {
+      event: 'on_subagent_update',
+      data: boundSubagentActivityUpdate(event),
+      ...(droppedCount > 0 ? { droppedCount } : {}),
+    };
+    if (this.transport.emitReplayableChunk != null) {
+      await this.transport.emitReplayableChunk(streamId, envelope, this.replayLimits, {
+        id: `${droppedCount > 0 ? 'gap' : 'event'}:${envelope.data.activityEventId ?? envelope.data.activitySequence?.toString() ?? randomUUID()}`,
+        sequence: envelope.data.activitySequence,
+      });
+      return;
+    }
+    await emitObservedChunk(this.transport, streamId, envelope);
+  }
+
+  /** Tiny invalidations have their own sequence space and never evict activity replay. */
+  async publishContent(
+    threadId: string,
+    taskId: string,
+    watermark: SubagentContentWatermark,
+  ): Promise<void> {
+    const streamId = `${subagentActivityStreamId(threadId, taskId)}:content`;
+    const event: SubagentContentAvailableFrame = {
+      event: 'subagent_content_available',
+      data: watermark,
+    };
+    if (this.transport.emitReplayableChunk != null) {
+      await this.transport.emitReplayableChunk(
+        streamId,
+        event,
+        { ...this.replayLimits, items: 1, bytes: 1024 },
+        { id: `content:${watermark.revision}` },
+      );
+      return;
+    }
+    await emitObservedChunk(this.transport, streamId, event);
+  }
+
+>>>>>>> upstream/main
   subscribe(
     threadId: string,
     taskId: string,
@@ -239,10 +340,24 @@ export class SubagentActivityStream {
     };
     /** subscribe() registers synchronously. Sampling zero before it distinguishes a fresh
      * local attachment without moving an already-active shared reorder frontier. */
+<<<<<<< HEAD
     const synchronizeAttachment = this.transport.getSubscriberCount(streamId) === 0;
     const subscription = this.transport.subscribe(
       streamId,
       {
+=======
+    const replayable = this.transport.emitReplayableChunk != null;
+    const synchronizeAttachment = !replayable && this.transport.getSubscriberCount(streamId) === 0;
+    const subscription = this.transport.subscribe(
+      streamId,
+      {
+        onReplay: (events) => {
+          subscriber.onEvent({
+            event: 'subagent_activity_replay',
+            data: events.filter(isActivityEnvelope),
+          });
+        },
+>>>>>>> upstream/main
         onChunk: (event) => {
           if (isActivityEnvelope(event)) subscriber.onEvent(event);
         },
@@ -263,10 +378,30 @@ export class SubagentActivityStream {
         },
       },
       {
+<<<<<<< HEAD
+=======
+        ...(replayable ? { replay: this.replayLimits } : {}),
+>>>>>>> upstream/main
         deferSequenceDelivery: synchronizeAttachment,
         captureSequenceFrontier: synchronizeAttachment,
       },
     );
+<<<<<<< HEAD
+=======
+    const contentStreamId = `${streamId}:content`;
+    const onContent = (value: unknown): void => {
+      const frame = value as SubagentContentAvailableFrame | null;
+      if (frame?.event === 'subagent_content_available') subscriber.onContent?.(frame);
+    };
+    const contentSubscription =
+      subscriber.onContent == null
+        ? undefined
+        : this.transport.subscribe(
+            contentStreamId,
+            { onChunk: onContent, onReplay: (events) => events.forEach(onContent) },
+            replayable ? { replay: { ...this.replayLimits, items: 1, bytes: 1024 } } : undefined,
+          );
+>>>>>>> upstream/main
     let closed = false;
     let demandHeartbeat: ReturnType<typeof setInterval> | undefined;
     unsubscribe = () => {
@@ -274,9 +409,19 @@ export class SubagentActivityStream {
       closed = true;
       if (demandHeartbeat != null) clearInterval(demandHeartbeat);
       subscription.unsubscribe();
+<<<<<<< HEAD
       cleanupIfIdle();
     };
     const ready = Promise.resolve(subscription.ready).then(async () => {
+=======
+      contentSubscription?.unsubscribe();
+      if (contentSubscription != null && this.transport.getSubscriberCount(contentStreamId) === 0) {
+        this.transport.cleanup(contentStreamId);
+      }
+      cleanupIfIdle();
+    };
+    const ready = Promise.all([subscription.ready, contentSubscription?.ready]).then(async () => {
+>>>>>>> upstream/main
       if (synchronizeAttachment) {
         /** The attachment that deferred the shared buffer owns synchronization even if
          * its panel closes meanwhile; a surviving local subscriber still needs release. */
@@ -304,12 +449,24 @@ export class SubagentActivityStream {
     const streamId = subagentActivityStreamId(threadId, taskId);
     this.demandCache.delete(streamId);
     try {
+<<<<<<< HEAD
       if (!(await this.isDemanded(streamId))) return;
       await this.transport.emitDone(streamId, {
         final: true,
         subagentActivity: true,
         status,
       });
+=======
+      const terminal = { final: true, subagentActivity: true, status };
+      if (this.transport.emitReplayableDone != null) {
+        await this.transport.emitReplayableDone(streamId, terminal, this.replayLimits, {
+          id: 'done',
+        });
+        return;
+      }
+      if (!(await this.isDemanded(streamId))) return;
+      await this.transport.emitDone(streamId, terminal);
+>>>>>>> upstream/main
     } finally {
       this.demandCache.delete(streamId);
     }
@@ -377,17 +534,132 @@ const notFound = (res: Response): void => {
   res.status(404).json({ error: 'Conversation not found' });
 };
 
+<<<<<<< HEAD
 const writeSse = (res: Response, value: unknown): boolean =>
   !res.writableEnded && res.write(`data: ${JSON.stringify(value)}\n\n`);
+=======
+/** Snapshot plus attachment buffer can each hold one retention window. Public IDs
+ * may JSON-escape to six bytes per input byte; budget that expansion without trimming. */
+const MAX_PUBLIC_REPLAY_BYTES =
+  2 * (SUBAGENT_ACTIVITY_LIMITS.bytes + SUBAGENT_ACTIVITY_LIMITS.items * (6 * MAX_ID_BYTES + 32)) +
+  128;
+
+/** Node accepts a write that returns false. Hold later frames until drain instead of
+ * closing a healthy socket. One public snapshot has its own derived budget; later
+ * queued live activity retains the standard byte/item budget. */
+function createActivityWriter(res: Response, onClose: () => void) {
+  const pending: Array<{ frame: string; bytes: number }> = [];
+  let replaySent = false;
+  let pendingBytes = 0;
+  let blocked = false;
+  let ending = false;
+  let stopped = false;
+  let terminal: string | undefined;
+  const dispose = () => {
+    stopped = true;
+    pending.length = 0;
+    pendingBytes = 0;
+    terminal = undefined;
+    res.off('drain', flush);
+  };
+  const finish = () => {
+    dispose();
+    onClose();
+    if (!res.writableEnded && !res.destroyed) res.end();
+  };
+  const write = (frame: string) => {
+    if (res.writableEnded || res.destroyed) {
+      dispose();
+      onClose();
+      return;
+    }
+    blocked = !res.write(frame);
+  };
+  function flush(): void {
+    if (stopped) return;
+    blocked = false;
+    while (pending.length > 0 && !blocked && !stopped) {
+      const next = pending.shift()!;
+      pendingBytes -= next.bytes;
+      write(next.frame);
+    }
+    if (blocked || stopped || pending.length > 0) return;
+    if (terminal != null) {
+      const frame = terminal;
+      terminal = undefined;
+      write(frame);
+    }
+    if (ending && !blocked && !stopped) finish();
+  }
+  res.on('drain', flush);
+  return {
+    dispose,
+    isEnding: () => ending,
+    send: (value: unknown, final = false, replay = false): void => {
+      if (stopped || ending) return;
+      const frame = `data: ${JSON.stringify(value)}\n\n`;
+      if (final) {
+        ending = true;
+        terminal = frame;
+      } else {
+        const frameBytes = Buffer.byteLength(frame, 'utf8');
+        /** Reserve one bounded snapshot separately so public identity expansion cannot
+         * consume the live queue or cause a reconnect loop on an otherwise valid replay. */
+        const bytes = replay ? 0 : frameBytes;
+        if (replay && (replaySent || frameBytes > MAX_PUBLIC_REPLAY_BYTES)) {
+          finish();
+          return;
+        }
+        if (replay) replaySent = true;
+        if (!blocked && pending.length === 0) {
+          /** The socket accepts this already-bounded public frame. Queue limits govern
+           * waiting frames, not identity expansion of an immediately writable update. */
+          write(frame);
+          return;
+        }
+        if (
+          pending.length >= SUBAGENT_ACTIVITY_LIMITS.items ||
+          pendingBytes + bytes > SUBAGENT_ACTIVITY_LIMITS.bytes
+        ) {
+          /** A stalled reader cannot allocate unbounded memory; reconnect replays Redis. */
+          finish();
+          return;
+        }
+        pending.push({ frame, bytes });
+        pendingBytes += bytes;
+      }
+      if (!blocked) flush();
+    },
+    heartbeat: (): void => {
+      if (!stopped && !ending && !blocked) write(': keep-alive\n\n');
+    },
+  };
+}
+>>>>>>> upstream/main
 
 /** Event-bound children use a private binding id as their internal tool-call
  * identity. Keep that delivery identity behind the parent-authorized API
  * boundary while preserving a stable public identity for the activity UI. */
 const publicActivityEnvelope = (
+<<<<<<< HEAD
   event: SubagentActivityEnvelope,
   threadId: string,
   eventBound: boolean,
 ): SubagentActivityEnvelope => {
+=======
+  event: SubagentActivityEnvelope | SubagentActivityReplayEnvelope,
+  threadId: string,
+  eventBound: boolean,
+): SubagentActivityEnvelope | SubagentActivityReplayEnvelope => {
+  if (event.event === 'subagent_activity_replay') {
+    return {
+      ...event,
+      data: event.data.map(
+        (entry) => publicActivityEnvelope(entry, threadId, eventBound) as SubagentActivityEnvelope,
+      ),
+    };
+  }
+>>>>>>> upstream/main
   if (!eventBound) return event;
   const ancestry = (event.data.ancestry ?? []).map((entry) => {
     if (!entry.parentToolCallId?.startsWith('event-binding:')) return entry;
@@ -427,6 +699,10 @@ export function createSubagentActivityStreamHandler(
     let closed = req.destroyed || res.destroyed;
     let heartbeat: ReturnType<typeof setInterval> | undefined;
     let subscription: SubagentActivitySubscription | undefined;
+<<<<<<< HEAD
+=======
+    let writer: ReturnType<typeof createActivityWriter> | undefined;
+>>>>>>> upstream/main
     const dispose = () => {
       if (heartbeat != null) clearInterval(heartbeat);
       subscription?.unsubscribe();
@@ -434,6 +710,10 @@ export function createSubagentActivityStreamHandler(
     const close = () => {
       closed = true;
       dispose();
+<<<<<<< HEAD
+=======
+      writer?.dispose();
+>>>>>>> upstream/main
     };
     req.once('aborted', close);
     res.once('close', close);
@@ -471,6 +751,7 @@ export function createSubagentActivityStreamHandler(
       res.setHeader('X-Accel-Buffering', 'no');
       res.flushHeaders?.();
 
+<<<<<<< HEAD
       heartbeat = setInterval(() => {
         if (!res.writableEnded && !res.write(': keep-alive\n\n')) {
           close();
@@ -504,6 +785,32 @@ export function createSubagentActivityStreamHandler(
             close();
             writeSse(res, { error: 'Subagent activity stream unavailable' });
             res.end();
+=======
+      writer = createActivityWriter(res, close);
+      heartbeat = setInterval(() => writer?.heartbeat(), HEARTBEAT_MS);
+      heartbeat.unref?.();
+      try {
+        subscription = stream.subscribe(threadId, taskId, {
+          onContent: (event) => writer?.send(event),
+          onEvent: (event) => {
+            writer?.send(
+              publicActivityEnvelope(
+                event,
+                threadId,
+                lineage?.parentToolCallId?.startsWith('event-binding:') === true,
+              ),
+              false,
+              event.event === 'subagent_activity_replay',
+            );
+          },
+          onDone: (event) => {
+            dispose();
+            writer?.send(event, true);
+          },
+          onError: () => {
+            dispose();
+            writer?.send({ error: 'Subagent activity stream unavailable' }, true);
+>>>>>>> upstream/main
           },
         });
         await subscription.ready;
@@ -513,6 +820,7 @@ export function createSubagentActivityStreamHandler(
         dispose();
         throw error;
       }
+<<<<<<< HEAD
       if (closed || res.destroyed) return;
       const durableTerminal = await terminalTaskStatus(deps, userId, threadId, taskId, tenantId);
       if (closed || res.destroyed) return;
@@ -530,6 +838,27 @@ export function createSubagentActivityStreamHandler(
         close();
         res.end();
       }
+=======
+      if (closed || res.destroyed || writer.isEnding()) {
+        dispose();
+        return;
+      }
+      const durableTerminal = await terminalTaskStatus(deps, userId, threadId, taskId, tenantId);
+      if (closed || res.destroyed || writer.isEnding()) return;
+      if (durableTerminal != null) {
+        dispose();
+        writer.send(
+          {
+            final: true,
+            subagentActivity: true,
+            status: durableTerminal,
+          },
+          true,
+        );
+        return;
+      }
+      writer.send({ ready: true, contentRecovery: true });
+>>>>>>> upstream/main
     } catch (error) {
       if (closed || res.destroyed) return;
       logger.error('[subagentActivity] Failed to open child activity stream', error);
@@ -537,6 +866,7 @@ export function createSubagentActivityStreamHandler(
         res.status(500).json({ error: 'Failed to open subagent activity stream' });
         return;
       }
+<<<<<<< HEAD
       writeSse(res, { error: 'Subagent activity stream unavailable' });
       res.end();
     }
@@ -550,3 +880,10 @@ export const SUBAGENT_ACTIVITY_STREAM_LIMITS: Readonly<{
   eventBytes: MAX_EVENT_BYTES,
   labelBytes: MAX_LABEL_BYTES,
 });
+=======
+      dispose();
+      writer?.send({ error: 'Subagent activity stream unavailable' }, true);
+    }
+  };
+}
+>>>>>>> upstream/main

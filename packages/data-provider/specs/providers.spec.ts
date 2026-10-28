@@ -3,10 +3,15 @@ import {
   resolveProviderId,
   resolveModelCatalogKey,
   endpointToProvider,
+<<<<<<< HEAD
   knownEndpointToProvider,
 } from '../src/providers';
 import { EModelEndpoint, Providers } from '../src/schemas';
 import { KnownEndpoints } from '../src/config';
+=======
+} from '../src/providers';
+import { EModelEndpoint, Providers } from '../src/schemas';
+>>>>>>> upstream/main
 
 describe('ProviderId', () => {
   it('declares every value as its own lowercase key', () => {
@@ -73,6 +78,7 @@ describe('mapping tables', () => {
     expect(endpointToProvider[EModelEndpoint.azureAssistants]).toBeUndefined();
     expect(endpointToProvider[EModelEndpoint.custom]).toBeUndefined();
   });
+<<<<<<< HEAD
 
   it('covers every KnownEndpoints value', () => {
     for (const known of Object.values(KnownEndpoints)) {
@@ -80,6 +86,8 @@ describe('mapping tables', () => {
     }
     expect(knownEndpointToProvider[KnownEndpoints['together.ai']]).toBe(ProviderId.together);
   });
+=======
+>>>>>>> upstream/main
 });
 
 describe('resolveModelCatalogKey', () => {
@@ -100,4 +108,19 @@ describe('resolveModelCatalogKey', () => {
     expect(resolveModelCatalogKey(EModelEndpoint.google)).toBe(EModelEndpoint.google);
     expect(resolveModelCatalogKey('custom-provider')).toBe('custom-provider');
   });
+<<<<<<< HEAD
+=======
+
+  it.each(['Ollama', 'OLLAMA'])(
+    'reads the served ollama catalog for a provider saved as %s',
+    (provider) => {
+      expect(resolveModelCatalogKey(provider, { ollama: ['llama3.2'] })).toBe('ollama');
+    },
+  );
+
+  it('keeps an exact catalog and other names case-sensitive', () => {
+    expect(resolveModelCatalogKey('Ollama', { Ollama: ['a'], ollama: ['b'] })).toBe('Ollama');
+    expect(resolveModelCatalogKey('OpenRouter', { openrouter: ['a'] })).toBe('OpenRouter');
+  });
+>>>>>>> upstream/main
 });

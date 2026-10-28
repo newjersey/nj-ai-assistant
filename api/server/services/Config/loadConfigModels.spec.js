@@ -13,6 +13,10 @@ jest.mock('@librechat/data-schemas', () => ({
 }));
 jest.mock('~/models', () => ({
   getUserKeyValues: jest.fn(),
+<<<<<<< HEAD
+=======
+  initializeMessageBudget: jest.fn(),
+>>>>>>> upstream/main
 }));
 
 const exampleConfig = {

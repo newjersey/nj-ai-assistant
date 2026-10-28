@@ -311,11 +311,22 @@ export function createMemoryMethods(mongoose: typeof import('mongoose')): {
       return { withKeys, withoutKeys, totalTokens, tokenCountsByKey };
     } catch (error) {
       logger.error('Failed to get formatted memories:', error);
+<<<<<<< HEAD
       return {
         withKeys: '',
         withoutKeys: '',
         totalTokens: 0,
         tokenCountsByKey: new Map<string, number>(),
+=======
+      /** Keep the current error handling without presenting a read failure
+       *  as an eligible, empty memory partition to prompt consumers. */
+      return {
+        withKeys: undefined,
+        withoutKeys: undefined,
+        totalTokens: 0,
+        tokenCountsByKey: new Map<string, number>(),
+        readFailed: true,
+>>>>>>> upstream/main
       };
     }
   }

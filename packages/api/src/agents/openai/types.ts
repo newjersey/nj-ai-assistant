@@ -165,6 +165,7 @@ export interface ChatCompletionChunk {
 }
 
 /**
+<<<<<<< HEAD
  * SSE event wrapper for streaming
  */
 export interface SSEEvent {
@@ -172,6 +173,8 @@ export interface SSEEvent {
 }
 
 /**
+=======
+>>>>>>> upstream/main
  * Context for building OpenAI responses
  */
 export interface OpenAIResponseContext {
@@ -184,6 +187,7 @@ export interface OpenAIResponseContext {
 }
 
 /**
+<<<<<<< HEAD
  * Aggregated content for building final response
  */
 export interface AggregatedContent {
@@ -192,6 +196,8 @@ export interface AggregatedContent {
 }
 
 /**
+=======
+>>>>>>> upstream/main
  * Error response in OpenAI format
  */
 export interface OpenAIErrorResponse {

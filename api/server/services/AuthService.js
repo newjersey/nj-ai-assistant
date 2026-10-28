@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 const bcrypt = require('bcryptjs');
+=======
+>>>>>>> upstream/main
 const jwt = require('jsonwebtoken');
 const { webcrypto } = require('node:crypto');
 const {
@@ -7,7 +10,16 @@ const {
   DEFAULT_SESSION_EXPIRY,
   DEFAULT_REFRESH_TOKEN_EXPIRY,
 } = require('@librechat/data-schemas');
+<<<<<<< HEAD
 const { ErrorTypes, SystemRoles, errorsToString } = require('librechat-data-provider');
+=======
+const {
+  ErrorTypes,
+  SystemRoles,
+  errorsToString,
+  SESSION_HINT_COOKIE,
+} = require('librechat-data-provider');
+>>>>>>> upstream/main
 const {
   math,
   isEnabled,
@@ -21,10 +33,22 @@ const {
   shouldUseSecureCookie,
   setRefreshTokenCookie,
   setOpenIDMarkerCookies,
+<<<<<<< HEAD
+=======
+  setLocalSessionCookies,
+>>>>>>> upstream/main
   clearCloudFrontCookies,
   normalizeExpiresIn,
   createOpenIDSessionIdentity,
   resolveAppConfigForUser,
+<<<<<<< HEAD
+=======
+  resolvePreAuthAppConfig,
+  commitPasswordReset,
+  getSafeErrorMetadata,
+  hashSecret,
+  compareSecret,
+>>>>>>> upstream/main
 } = require('@librechat/api');
 const {
   findUser,
@@ -59,6 +83,13 @@ const AuthTokenTypes = Object.freeze({
 
 const latestAuthTokenOptions = Object.freeze({ sort: { createdAt: -1 } });
 const genericVerificationMessage = 'Please check your email to verify your email address.';
+<<<<<<< HEAD
+=======
+const genericResetMessage =
+  'If an account with that email exists, a password reset link has been sent to it.';
+const domainNotAllowedMessage =
+  'The email address provided cannot be used. Please use a different email address.';
+>>>>>>> upstream/main
 const invalidEmailVerificationMessage = 'Invalid or expired email verification token';
 const OPENID_SESSION_ID_TOKEN_EXPIRY_BUFFER_SECONDS = 30;
 
@@ -205,6 +236,10 @@ const clearOpenIDAuthTokens = (req, res, userId, tenantId) => {
     'openid_id_token',
     'openid_user_id',
     'token_provider',
+<<<<<<< HEAD
+=======
+    SESSION_HINT_COOKIE,
+>>>>>>> upstream/main
   ]) {
     res.clearCookie?.(name);
   }
@@ -246,11 +281,19 @@ const logoutUser = async (req, refreshToken) => {
 
 /**
  * Creates Token and corresponding Hash for verification
+<<<<<<< HEAD
  * @returns {[string, string]}
  */
 const createTokenHash = () => {
   const token = Buffer.from(webcrypto.getRandomValues(new Uint8Array(32))).toString('hex');
   const hash = bcrypt.hashSync(token, 10);
+=======
+ * @returns {Promise<[string, string]>}
+ */
+const createTokenHash = async () => {
+  const token = Buffer.from(webcrypto.getRandomValues(new Uint8Array(32))).toString('hex');
+  const hash = await hashSecret(token);
+>>>>>>> upstream/main
   return [token, hash];
 };
 
@@ -260,7 +303,11 @@ const createTokenHash = () => {
  * @returns {Promise<void>}
  */
 const sendVerificationEmail = async (user) => {
+<<<<<<< HEAD
   const [verifyToken, hash] = createTokenHash();
+=======
+  const [verifyToken, hash] = await createTokenHash();
+>>>>>>> upstream/main
   const email = user.email.toLowerCase();
 
   const verificationLink = `${
@@ -287,7 +334,11 @@ const sendVerificationEmail = async (user) => {
     expiresIn: 900,
   });
 
+<<<<<<< HEAD
   logger.info(`[sendVerificationEmail] Verification link issued. [Email: ${email}]`);
+=======
+  logger.info(`[sendVerificationEmail] Verification link issued. [User ID: ${user._id}]`);
+>>>>>>> upstream/main
 };
 
 /**
@@ -306,34 +357,51 @@ const verifyEmail = async (req) => {
   try {
     decodedEmail = decodeURIComponent(email);
   } catch {
+<<<<<<< HEAD
     logger.warn(`[verifyEmail] [Invalid email encoding] [Email: ${email}]`);
+=======
+    logger.warn('[verifyEmail] [Invalid email encoding]');
+>>>>>>> upstream/main
     return new Error(invalidEmailVerificationMessage);
   }
 
   const user = await findUser({ email: decodedEmail }, 'email _id emailVerified');
 
   if (!user) {
+<<<<<<< HEAD
     logger.warn(`[verifyEmail] [User not found] [Email: ${decodedEmail}]`);
+=======
+    logger.warn('[verifyEmail] [User not found]');
+>>>>>>> upstream/main
     return new Error(invalidEmailVerificationMessage);
   }
 
   const emailVerificationData = await findEmailVerificationToken(user);
 
   if (!emailVerificationData) {
+<<<<<<< HEAD
     logger.warn(`[verifyEmail] [No email verification data found] [Email: ${decodedEmail}]`);
+=======
+    logger.warn(`[verifyEmail] [No email verification data found] [User ID: ${user._id}]`);
+>>>>>>> upstream/main
     return new Error(invalidEmailVerificationMessage);
   }
 
   if (!emailVerificationData.token) {
+<<<<<<< HEAD
     logger.warn(
       `[verifyEmail] [Email verification token data is invalid] [Email: ${decodedEmail}]`,
     );
+=======
+    logger.warn(`[verifyEmail] [Email verification token data is invalid] [User ID: ${user._id}]`);
+>>>>>>> upstream/main
     return new Error(invalidEmailVerificationMessage);
   }
 
   const tokenUserId = emailVerificationData.userId?.toString();
   const userId = user._id?.toString();
   if (!tokenUserId || tokenUserId !== userId) {
+<<<<<<< HEAD
     logger.warn(`[verifyEmail] [Email verification token user mismatch] [Email: ${decodedEmail}]`);
     return new Error(invalidEmailVerificationMessage);
   }
@@ -343,30 +411,62 @@ const verifyEmail = async (req) => {
   if (!isValid) {
     logger.warn(
       `[verifyEmail] [Invalid or expired email verification token] [Email: ${decodedEmail}]`,
+=======
+    logger.warn(`[verifyEmail] [Email verification token user mismatch] [User ID: ${user._id}]`);
+    return new Error(invalidEmailVerificationMessage);
+  }
+
+  const isValid = await compareSecret(token, emailVerificationData.token);
+
+  if (!isValid) {
+    logger.warn(
+      `[verifyEmail] [Invalid or expired email verification token] [User ID: ${user._id}]`,
+>>>>>>> upstream/main
     );
     return new Error(invalidEmailVerificationMessage);
   }
 
   if (user.emailVerified) {
     await deleteTokens(getEmailVerificationTokenDeleteQuery(emailVerificationData));
+<<<<<<< HEAD
     logger.info(`[verifyEmail] Email already verified [Email: ${decodedEmail}]`);
+=======
+    logger.info(`[verifyEmail] Email already verified [User ID: ${user._id}]`);
+>>>>>>> upstream/main
     return { message: 'Email verification was successful', status: 'success' };
   }
 
   const updatedUser = await updateUser(emailVerificationData.userId, { emailVerified: true });
 
   if (!updatedUser) {
+<<<<<<< HEAD
     logger.warn(`[verifyEmail] [User update failed] [Email: ${decodedEmail}]`);
+=======
+    logger.warn(`[verifyEmail] [User update failed] [User ID: ${user._id}]`);
+>>>>>>> upstream/main
     return new Error(invalidEmailVerificationMessage);
   }
 
   await deleteTokens(getEmailVerificationTokenDeleteQuery(emailVerificationData));
+<<<<<<< HEAD
   logger.info(`[verifyEmail] Email verification successful [Email: ${decodedEmail}]`);
+=======
+  logger.info(`[verifyEmail] Email verification successful [User ID: ${user._id}]`);
+>>>>>>> upstream/main
   return { message: 'Email verification was successful', status: 'success' };
 };
 
 /**
  * Register a new user.
+<<<<<<< HEAD
+=======
+ *
+ * The email domain is checked against the pre-auth config (librechat.yaml plus the
+ * `__base__` override), then against the config of the role the account would be
+ * created with (ADMIN for the deployment's first user, otherwise USER), both before
+ * the email-in-use answer so neither reveals whether an account exists.
+ *
+>>>>>>> upstream/main
  * @param {IUser} user <email, password, name, username>
  * @param {Partial<IUser>} [additionalData={}] Trusted server-provided fields, such as CLI overrides.
  * @returns {Promise<{status: number, message: string, user?: IUser}>}
@@ -374,12 +474,20 @@ const verifyEmail = async (req) => {
 const registerUser = async (user, additionalData = {}) => {
   const result = registerSchema.safeParse(user);
   if (!result.success) {
+<<<<<<< HEAD
     const errorMessage = errorsToString(result.error.errors);
     logger.info(
       'Route: register - Validation Error',
       { name: 'Request params:', value: user },
       { name: 'Validation error:', value: errorMessage },
     );
+=======
+    const errorMessage = errorsToString(result.error.issues);
+    logger.info('Route: register - Validation Error', {
+      name: 'Validation error:',
+      value: errorMessage,
+    });
+>>>>>>> upstream/main
 
     return { status: 404, message: errorMessage };
   }
@@ -390,6 +498,7 @@ const registerUser = async (user, additionalData = {}) => {
   let newUserId;
   try {
     const tenantId = getTenantId();
+<<<<<<< HEAD
     const appConfig = await getAppConfig(tenantId ? { tenantId } : {});
     if (!isEmailDomainAllowed(email, appConfig?.registration?.allowedDomains)) {
       const errorMessage =
@@ -406,25 +515,59 @@ const registerUser = async (user, additionalData = {}) => {
         { name: 'Request params:', value: user },
         { name: 'Existing user:', value: existingUser },
       );
+=======
+    const preAuthConfig = await resolvePreAuthAppConfig(getAppConfig);
+    if (!isEmailDomainAllowed(email, preAuthConfig?.registration?.allowedDomains)) {
+      logger.error('[registerUser] [Registration not allowed]');
+      return { status: 403, message: domainNotAllowedMessage };
+    }
+
+    // Only the first user in the unscoped, single-tenant deployment bootstraps ADMIN.
+    // Tenant administrators must be provisioned through a trusted administrative flow.
+    const [existingUser, userCount] = await Promise.all([
+      findUser({ email }, 'email _id'),
+      tenantId ? null : countUsers(),
+    ]);
+    const role =
+      trustedAdditionalData.role ?? (userCount === 0 ? SystemRoles.ADMIN : SystemRoles.USER);
+
+    /** Checked before the email-in-use answer, which it must not depend on. */
+    const appConfig = await resolveAppConfigForUser(getAppConfig, { role });
+    if (!isEmailDomainAllowed(email, appConfig?.registration?.allowedDomains)) {
+      logger.error(`[registerUser] [Registration not allowed for a new ${role} account]`);
+      return { status: 403, message: domainNotAllowedMessage };
+    }
+
+    if (existingUser) {
+      logger.info(`[registerUser] Email in use [User ID: ${existingUser._id}]`);
+>>>>>>> upstream/main
 
       // Sleep for 1 second
       await new Promise((resolve) => setTimeout(resolve, 1000));
       return { status: 200, message: genericVerificationMessage };
     }
 
+<<<<<<< HEAD
     // Only the first user in the unscoped, single-tenant deployment bootstraps ADMIN.
     // Tenant administrators must be provisioned through a trusted administrative flow.
     const isFirstRegisteredUser = !tenantId && (await countUsers()) === 0;
 
     const salt = bcrypt.genSaltSync(10);
+=======
+>>>>>>> upstream/main
     const newUserData = {
       provider: provider ?? 'local',
       email,
       username,
       name,
       avatar: null,
+<<<<<<< HEAD
       role: isFirstRegisteredUser ? SystemRoles.ADMIN : SystemRoles.USER,
       password: bcrypt.hashSync(password, salt),
+=======
+      role,
+      password: await hashSecret(password),
+>>>>>>> upstream/main
       ...trustedAdditionalData,
     };
 
@@ -448,12 +591,28 @@ const registerUser = async (user, additionalData = {}) => {
      * without the response body revealing which of the two happened. */
     return { status: 200, message: genericVerificationMessage, userCreated: true };
   } catch (err) {
+<<<<<<< HEAD
     logger.error('[registerUser] Error in registering user:', err);
     if (newUserId) {
       const result = await deleteUserById(newUserId);
       logger.warn(
         `[registerUser] [Email: ${email}] [Temporary User deleted: ${JSON.stringify(result)}]`,
       );
+=======
+    logger.error('[registerUser] Error in registering user:', getSafeErrorMetadata(err));
+    if (newUserId) {
+      try {
+        const result = await deleteUserById(newUserId);
+        logger.warn(
+          `[registerUser] [User ID: ${newUserId}] [Temporary User deleted: ${JSON.stringify(result)}]`,
+        );
+      } catch (cleanupError) {
+        logger.error(
+          `[registerUser] [User ID: ${newUserId}] Failed to delete temporary user`,
+          getSafeErrorMetadata(cleanupError),
+        );
+      }
+>>>>>>> upstream/main
     }
     return { status: 500, message: 'Something went wrong' };
   }
@@ -462,6 +621,7 @@ const registerUser = async (user, additionalData = {}) => {
 /**
  * Request password reset.
  *
+<<<<<<< HEAD
  * Uses a two-phase domain check: fast-fail with the memory-cached base config
  * (zero DB queries) to block globally denied domains before user lookup, then
  * re-check with tenant-scoped config after user lookup so tenant-specific
@@ -471,17 +631,37 @@ const registerUser = async (user, additionalData = {}) => {
  * that the domain is globally blocked, but fires before any DB lookup so it
  * cannot confirm user existence. Phase 2 (tenant check) returns the generic
  * success message (HTTP 200) to prevent user-enumeration via status codes.
+=======
+ * Uses a two-phase domain check: fast-fail with the pre-auth config (librechat.yaml
+ * plus the `__base__` override, cached) to block globally denied domains before user
+ * lookup, then re-check with the account's config (its role's overrides, in its
+ * tenant if any) after user lookup so role- and tenant-specific restrictions are
+ * enforced.
+ *
+ * Phase 1 (base check) returns an Error (HTTP 400) — this intentionally reveals
+ * that the domain is globally blocked, but fires before the user lookup so it
+ * cannot confirm user existence. Phase 2 (account check) returns the generic
+ * success message (HTTP 200) to prevent user-enumeration via status codes. It
+ * also does so without issuing a link when the account's config cannot be read,
+ * so a broader policy never decides the reset.
+>>>>>>> upstream/main
  *
  * @param {ServerRequest} req
  */
 const requestPasswordReset = async (req) => {
   const { email } = req.body;
 
+<<<<<<< HEAD
   const baseConfig = await getAppConfig({ baseOnly: true });
   if (!isEmailDomainAllowed(email, baseConfig?.registration?.allowedDomains)) {
     logger.warn(
       `[requestPasswordReset] Blocked - email domain not allowed [Email: ${email}] [IP: ${req.ip}]`,
     );
+=======
+  const baseConfig = await resolvePreAuthAppConfig(getAppConfig);
+  if (!isEmailDomainAllowed(email, baseConfig?.registration?.allowedDomains)) {
+    logger.warn('[requestPasswordReset] Blocked - email domain not allowed');
+>>>>>>> upstream/main
     const error = new Error(ErrorTypes.AUTH_FAILED);
     error.code = ErrorTypes.AUTH_FAILED;
     error.message = 'Email domain not allowed';
@@ -490,15 +670,28 @@ const requestPasswordReset = async (req) => {
 
   const user = await findUser({ email }, 'email _id role tenantId');
   let appConfig = baseConfig;
+<<<<<<< HEAD
   if (user?.tenantId) {
     try {
       appConfig = await resolveAppConfigForUser(getAppConfig, user);
     } catch (err) {
       logger.error('[requestPasswordReset] Failed to resolve tenant config, using base:', err);
+=======
+  if (user) {
+    try {
+      appConfig = await resolveAppConfigForUser(getAppConfig, user);
+    } catch (err) {
+      logger.error(
+        "[requestPasswordReset] Failed to resolve the account's config; no link issued:",
+        getSafeErrorMetadata(err),
+      );
+      return { message: genericResetMessage };
+>>>>>>> upstream/main
     }
   }
 
   if (!isEmailDomainAllowed(email, appConfig?.registration?.allowedDomains)) {
+<<<<<<< HEAD
     logger.warn(
       `[requestPasswordReset] Tenant config blocked domain [Email: ${email}] [IP: ${req.ip}]`,
     );
@@ -515,6 +708,18 @@ const requestPasswordReset = async (req) => {
     return {
       message: 'If an account with that email exists, a password reset link has been sent to it.',
     };
+=======
+    logger.warn("[requestPasswordReset] The account's config blocked the domain");
+    return { message: genericResetMessage };
+  }
+  const emailEnabled = checkEmailConfig();
+
+  logger.warn('[requestPasswordReset] [Password reset request initiated]');
+
+  if (!user) {
+    logger.warn('[requestPasswordReset] [No user found]');
+    return { message: genericResetMessage };
+>>>>>>> upstream/main
   }
 
   await Promise.all([
@@ -522,10 +727,18 @@ const requestPasswordReset = async (req) => {
     deleteTokens({ userId: user._id, email: null, identifier: null, type: null }),
   ]);
 
+<<<<<<< HEAD
   const [resetToken, hash] = createTokenHash();
 
   await createToken({
     userId: user._id,
+=======
+  const [resetToken, hash] = await createTokenHash();
+
+  await createToken({
+    userId: user._id,
+    email: user.email.toLowerCase(),
+>>>>>>> upstream/main
     type: AuthTokenTypes.PASSWORD_RESET,
     token: hash,
     createdAt: Date.now(),
@@ -546,6 +759,7 @@ const requestPasswordReset = async (req) => {
       },
       template: 'requestPasswordReset.handlebars',
     });
+<<<<<<< HEAD
     logger.info(
       `[requestPasswordReset] Link emailed. [Email: ${email}] [ID: ${user._id}] [IP: ${req.ip}]`,
     );
@@ -559,6 +773,15 @@ const requestPasswordReset = async (req) => {
   return {
     message: 'If an account with that email exists, a password reset link has been sent to it.',
   };
+=======
+    logger.info(`[requestPasswordReset] Link emailed. [User ID: ${user._id}]`);
+  } else {
+    logger.info(`[requestPasswordReset] Link issued. [User ID: ${user._id}]`);
+    return { link };
+  }
+
+  return { message: genericResetMessage };
+>>>>>>> upstream/main
 };
 
 /**
@@ -570,6 +793,7 @@ const requestPasswordReset = async (req) => {
  * @returns
  */
 const resetPassword = async (userId, token, password) => {
+<<<<<<< HEAD
   const passwordResetToken = await findPasswordResetToken(userId);
 
   if (!passwordResetToken) {
@@ -584,6 +808,25 @@ const resetPassword = async (userId, token, password) => {
 
   const hash = bcrypt.hashSync(password, 10);
   const user = await updateUser(userId, { password: hash });
+=======
+  const outcome = await commitPasswordReset(
+    {
+      findResetToken: findPasswordResetToken,
+      getUserById,
+      updateUser,
+      deleteTokens,
+      compareToken: compareSecret,
+      hashPassword: hashSecret,
+    },
+    { userId, token, password },
+  );
+
+  if (!outcome.ok) {
+    return new Error('Invalid or expired password reset token');
+  }
+
+  const { user, resetToken: passwordResetToken } = outcome;
+>>>>>>> upstream/main
 
   if (checkEmailConfig()) {
     await sendEmail({
@@ -599,7 +842,11 @@ const resetPassword = async (userId, token, password) => {
   }
 
   await deleteTokens(getPasswordResetTokenDeleteQuery(passwordResetToken));
+<<<<<<< HEAD
   logger.info(`[resetPassword] Password reset successful. [Email: ${user.email}]`);
+=======
+  logger.info(`[resetPassword] Password reset successful. [User ID: ${userId}]`);
+>>>>>>> upstream/main
   return { message: 'Password reset was successful' };
 };
 
@@ -718,6 +965,7 @@ const setAuthTokens = async (userId, res, _session = null, req = null) => {
     const sessionExpiry = math(process.env.SESSION_EXPIRY, DEFAULT_SESSION_EXPIRY);
     const token = await generateToken(user, sessionExpiry);
 
+<<<<<<< HEAD
     res.cookie('refreshToken', refreshToken, {
       expires: new Date(refreshTokenExpires),
       httpOnly: true,
@@ -729,6 +977,13 @@ const setAuthTokens = async (userId, res, _session = null, req = null) => {
       httpOnly: true,
       secure: shouldUseSecureCookie(),
       sameSite: 'strict',
+=======
+    setLocalSessionCookies(res, {
+      refreshToken,
+      expires: new Date(refreshTokenExpires),
+      userId: user?._id ?? userId,
+      tenantId: user?.tenantId,
+>>>>>>> upstream/main
     });
 
     setCloudFrontAuthCookies(req, res, user, { userId: user?._id ?? userId });
@@ -928,6 +1183,10 @@ const setOpenIDAuthTokens = (
 
     setOpenIDMarkerCookies(res, {
       userId,
+<<<<<<< HEAD
+=======
+      tenantId,
+>>>>>>> upstream/main
       expires: expirationDate,
       refreshExpiryMs: expiryInMilliseconds,
       refreshToken,
@@ -963,13 +1222,21 @@ const resendVerificationEmail = async (req) => {
     const user = await findUser({ email }, 'email _id name');
 
     if (!user) {
+<<<<<<< HEAD
       logger.warn(`[resendVerificationEmail] [No user found] [Email: ${email}]`);
+=======
+      logger.warn('[resendVerificationEmail] [No user found]');
+>>>>>>> upstream/main
       return { status: 200, message: genericVerificationMessage };
     }
 
     await deleteEmailVerificationTokens(user);
 
+<<<<<<< HEAD
     const [verifyToken, hash] = createTokenHash();
+=======
+    const [verifyToken, hash] = await createTokenHash();
+>>>>>>> upstream/main
 
     const verificationLink = `${
       domains.client
@@ -996,14 +1263,25 @@ const resendVerificationEmail = async (req) => {
       expiresIn: 900,
     });
 
+<<<<<<< HEAD
     logger.info(`[resendVerificationEmail] Verification link issued. [Email: ${user.email}]`);
+=======
+    logger.info(`[resendVerificationEmail] Verification link issued. [User ID: ${user._id}]`);
+>>>>>>> upstream/main
 
     return {
       status: 200,
       message: genericVerificationMessage,
     };
   } catch (error) {
+<<<<<<< HEAD
     logger.error(`[resendVerificationEmail] Error resending verification email: ${error.message}`);
+=======
+    logger.error(
+      '[resendVerificationEmail] Error resending verification email:',
+      getSafeErrorMetadata(error),
+    );
+>>>>>>> upstream/main
     return {
       status: 200,
       message: genericVerificationMessage,

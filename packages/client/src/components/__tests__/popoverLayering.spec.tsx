@@ -1,8 +1,15 @@
 import '@testing-library/jest-dom';
+<<<<<<< HEAD
 import { render, screen } from '@testing-library/react';
 import { HoverCard, HoverCardContent, HoverCardPortal, HoverCardTrigger } from '../HoverCard';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../Select';
 import { OGDialog, OGDialogContent } from '../OriginalDialog';
+=======
+import { act, fireEvent, render, screen } from '@testing-library/react';
+import { HoverCard, HoverCardContent, HoverCardPortal, HoverCardTrigger } from '../HoverCard';
+import { DialogLayer, OGDialog, OGDialogContent } from '../OriginalDialog';
+import Dropdown from '../Dropdown';
+>>>>>>> upstream/main
 
 /**
  * A portaled popover lands beside the dialog in the DOM, not inside it, so its
@@ -24,6 +31,7 @@ function zIndexOf(element: HTMLElement): number {
 
 function EnvironmentSelect() {
   return (
+<<<<<<< HEAD
     <Select open value="attached">
       <SelectTrigger aria-label="Execution environment">
         <SelectValue />
@@ -35,6 +43,25 @@ function EnvironmentSelect() {
   );
 }
 
+=======
+    <Dropdown
+      value="attached"
+      onChange={() => undefined}
+      ariaLabel="Execution environment"
+      options={[{ value: 'attached', label: 'Attached VM' }]}
+    />
+  );
+}
+
+/** The Ariakit select opens from its trigger rather than a controlled `open` prop. */
+async function openSelect() {
+  await act(async () => {
+    fireEvent.click(screen.getByRole('combobox', { name: 'Execution environment' }));
+  });
+  return screen.findByRole('listbox');
+}
+
+>>>>>>> upstream/main
 function HelpHoverCard() {
   return (
     <HoverCard open>
@@ -47,7 +74,11 @@ function HelpHoverCard() {
 }
 
 describe('portaled popovers inside a dialog', () => {
+<<<<<<< HEAD
   it('opens a select above the dialog content it belongs to', () => {
+=======
+  it('opens a select above the dialog content it belongs to', async () => {
+>>>>>>> upstream/main
     render(
       <OGDialog open>
         <OGDialogContent>
@@ -56,9 +87,29 @@ describe('portaled popovers inside a dialog', () => {
       </OGDialog>,
     );
 
+<<<<<<< HEAD
     const listbox = screen.getByRole('listbox');
     expect(zIndexOf(listbox)).toBeGreaterThan(DIALOG_CONTENT_Z_INDEX);
     expect(listbox.style.pointerEvents).toBe('auto');
+=======
+    const listbox = await openSelect();
+    expect(zIndexOf(listbox)).toBeGreaterThan(DIALOG_CONTENT_Z_INDEX);
+    expect(listbox).toHaveClass('[pointer-events:auto]');
+  });
+
+  /** The Settings dialog is a Headless UI panel at z-50, not an OGDialog, so it declares its own
+   *  dialog level (berry-13/LibreChat#249). */
+  it('opens a select above a non-OGDialog panel that declares a dialog layer', async () => {
+    render(
+      <DialogLayer>
+        <EnvironmentSelect />
+      </DialogLayer>,
+    );
+
+    const listbox = await openSelect();
+    expect(zIndexOf(listbox)).toBeGreaterThan(50);
+    expect(listbox).toHaveClass('[pointer-events:auto]');
+>>>>>>> upstream/main
   });
 
   it('opens a hover card above the dialog content it belongs to', () => {
@@ -76,6 +127,7 @@ describe('portaled popovers inside a dialog', () => {
   });
 
   /** Outside a dialog the CSS layer still decides, so a consumer that raises it
+<<<<<<< HEAD
    *  by class — `z-[999]` to clear the legacy `Dialog` — keeps that override.
    *
    *  Only the absence of OUR inline z-index is asserted. `pointer-events` is
@@ -84,6 +136,13 @@ describe('portaled popovers inside a dialog', () => {
    *  on whether the two share a copy of `react-dismissable-layer` — which is a
    *  packaging fact, not this hook's contract. */
   it('leaves the CSS layer alone outside any dialog', () => {
+=======
+   *  by class keeps that override.
+   *
+   *  Only the absence of OUR inline z-index is asserted; the list keeps its
+   *  `z-40` class, which a consumer can still raise. */
+  it('leaves the CSS layer alone outside any dialog', async () => {
+>>>>>>> upstream/main
     render(
       <>
         <EnvironmentSelect />
@@ -91,7 +150,11 @@ describe('portaled popovers inside a dialog', () => {
       </>,
     );
 
+<<<<<<< HEAD
     const listbox = screen.getByRole('listbox');
+=======
+    const listbox = await openSelect();
+>>>>>>> upstream/main
     const card = screen.getByText('What stateful sessions do');
     expect(listbox.style.zIndex).toBe('');
     expect(listbox).toHaveClass('z-40');

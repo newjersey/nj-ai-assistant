@@ -2,6 +2,10 @@ import { useRef, useState, useCallback, useEffect } from 'react';
 import copy from 'copy-to-clipboard';
 import CopyButton from '~/components/Messages/Content/CopyButton';
 import LangIcon from '~/components/Messages/Content/LangIcon';
+<<<<<<< HEAD
+=======
+import { useToolContentPending } from '../disclosure';
+>>>>>>> upstream/main
 import { useLocalize } from '~/hooks';
 
 interface CodeWindowHeaderProps {
@@ -17,16 +21,32 @@ export default function CodeWindowHeader({ language, code, diffStats }: CodeWind
 
   useEffect(() => () => clearTimeout(timerRef.current), []);
 
+<<<<<<< HEAD
   const handleCopy = useCallback(() => {
+=======
+  const contentPending = useToolContentPending();
+  const handleCopy = useCallback(() => {
+    if (contentPending) {
+      return;
+    }
+>>>>>>> upstream/main
     setIsCopied(true);
     copy(code.trim(), { format: 'text/plain' });
     clearTimeout(timerRef.current);
     timerRef.current = setTimeout(() => setIsCopied(false), 3000);
+<<<<<<< HEAD
   }, [code]);
 
   return (
     <div className="flex items-center justify-between bg-surface-primary-alt px-1.5 py-1.5 font-sans text-xs text-text-secondary dark:bg-transparent">
       <span className="flex items-center gap-1.5 pl-1.5 text-xs font-medium">
+=======
+  }, [code, contentPending]);
+
+  return (
+    <div className="text-text-secondary flex items-center justify-between px-1.5 py-1.5 font-sans text-xs">
+      <span className="flex items-center gap-1.5 ps-1.5 text-xs font-medium">
+>>>>>>> upstream/main
         <LangIcon lang={language} className="size-3.5 shrink-0" />
         {language}
         {diffStats && (
@@ -47,7 +67,16 @@ export default function CodeWindowHeader({ language, code, diffStats }: CodeWind
           </>
         )}
       </span>
+<<<<<<< HEAD
       <CopyButton isCopied={isCopied} onClick={handleCopy} label={localize('com_ui_copy_code')} />
+=======
+      <CopyButton
+        isCopied={isCopied}
+        onClick={handleCopy}
+        disabled={contentPending}
+        label={localize('com_ui_copy_code')}
+      />
+>>>>>>> upstream/main
     </div>
   );
 }

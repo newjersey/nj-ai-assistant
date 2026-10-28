@@ -1,7 +1,15 @@
 import { useCallback } from 'react';
+<<<<<<< HEAD
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useGetModelsQuery } from 'librechat-data-provider/react-query';
 import { useRecoilState, useRecoilValue, useSetRecoilState, useRecoilCallback } from 'recoil';
+=======
+import { useAtom, useSetAtom } from 'jotai';
+import { useRecoilValue, useRecoilCallback } from 'recoil';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { filesFamily, submissionByIndex } from '@librechat/chat/react';
+import { useGetModelsQuery } from 'librechat-data-provider/react-query';
+>>>>>>> upstream/main
 import {
   Constants,
   FileSources,
@@ -23,6 +31,10 @@ import type {
   TConversation,
   TEndpointsConfig,
 } from 'librechat-data-provider';
+<<<<<<< HEAD
+=======
+import type { NewConversationOptions } from './Chat/contract';
+>>>>>>> upstream/main
 import type { AssistantListItem } from '~/common';
 import {
   updateLastSelectedModel,
@@ -36,6 +48,11 @@ import {
   renewNewConversationDraftToken,
   getNewConversationDraftId,
   getPendingDraftId,
+<<<<<<< HEAD
+=======
+  getActiveComposerDraftId,
+  getFilesDraft,
+>>>>>>> upstream/main
   isPastedTextFileMarked,
   loadPendingDiscardIds,
   storePendingDiscardIds,
@@ -45,13 +62,22 @@ import {
   retainFileDeletion,
   failedFileIdsFrom,
   logger,
+<<<<<<< HEAD
+=======
+  setDocumentTitle,
+>>>>>>> upstream/main
 } from '~/utils';
 import { useDeleteFilesMutation, useGetEndpointsQuery, useGetStartupConfig } from '~/data-provider';
 import { supersedeNavigation } from './Conversations/useNavigateToConvo';
 import useGetConversation from './Conversations/useGetConversation';
 import useAssistantListMap from './Assistants/useAssistantListMap';
+<<<<<<< HEAD
 import { clearUploadRecovery } from './Files/useFileHandling';
 import { useResetChatBadges } from './useChatBadges';
+=======
+import { useChatSettings } from '~/Providers/ChatSettingsContext';
+import { clearUploadRecovery } from './Files/useFileHandling';
+>>>>>>> upstream/main
 import { useApplyModelSpecEffects } from './Agents';
 import { useAgentsMapContext } from '~/Providers';
 import { usePauseGlobalAudio } from './Audio';
@@ -81,9 +107,14 @@ const useNewConvo = (index = 0) => {
   const clearAllConversations = store.useClearConvoState();
   const defaultPreset = useRecoilValue(store.defaultPreset);
   const { setConversation } = store.useSetConversationAtom(index);
+<<<<<<< HEAD
   const [files, setFiles] = useRecoilState(store.filesByIndex(index));
   const saveBadgesState = useRecoilValue<boolean>(store.saveBadgesState);
   const setSubmission = useSetRecoilState<TSubmission | null>(store.submissionByIndex(index));
+=======
+  const [files, setFiles] = useAtom(filesFamily(index));
+  const setSubmission = useSetAtom(submissionByIndex(index));
+>>>>>>> upstream/main
   const { data: endpointsConfig = {} as TEndpointsConfig } = useGetEndpointsQuery();
   const agentsMap = useAgentsMapContext();
 
@@ -95,8 +126,12 @@ const useNewConvo = (index = 0) => {
   const modelsQuery = useGetModelsQuery();
   const assistantsListMap = useAssistantListMap();
   const { pauseGlobalAudio } = usePauseGlobalAudio(index);
+<<<<<<< HEAD
   const saveDrafts = useRecoilValue<boolean>(store.saveDrafts);
   const resetBadges = useResetChatBadges();
+=======
+  const { saveDrafts } = useChatSettings();
+>>>>>>> upstream/main
 
   const { mutateAsync } = useDeleteFilesMutation({
     onSuccess: () => {
@@ -288,7 +323,11 @@ const useNewConvo = (index = 0) => {
         if (conversation.conversationId === Constants.NEW_CONVO && !modelsData) {
           const appTitle = localStorage.getItem(LocalStorageKeys.APP_TITLE) ?? '';
           if (appTitle) {
+<<<<<<< HEAD
             document.title = appTitle;
+=======
+            setDocumentTitle(appTitle, true);
+>>>>>>> upstream/main
           }
           const path = `/c/${Constants.NEW_CONVO}${getParams(conversation)}`;
           /** Honor disableFocus here too: the transient focus intent survives
@@ -327,6 +366,7 @@ const useNewConvo = (index = 0) => {
       keepAddedConvos = false,
       keepComposerState = false,
       disableParams,
+<<<<<<< HEAD
     }: {
       template?: Partial<TConversation>;
       preset?: Partial<TPreset>;
@@ -342,6 +382,12 @@ const useNewConvo = (index = 0) => {
     } = {}) {
       const nextConversationId = _template.conversationId ?? '';
       const keepsExistingDraft =
+=======
+    }: NewConversationOptions = {}) {
+      const nextConversationId = _template.conversationId ?? '';
+      const keepsExistingDraft =
+        modelsData != null ||
+>>>>>>> upstream/main
         keepComposerState ||
         (nextConversationId !== '' &&
           nextConversationId !== Constants.NEW_CONVO &&
@@ -350,9 +396,12 @@ const useNewConvo = (index = 0) => {
         renewNewConversationDraftToken(index);
       }
       pauseGlobalAudio();
+<<<<<<< HEAD
       if (!saveBadgesState) {
         resetBadges();
       }
+=======
+>>>>>>> upstream/main
 
       const templateConvoId = _template.conversationId ?? '';
       const paramEndpoint =
@@ -401,10 +450,38 @@ const useNewConvo = (index = 0) => {
         !modelsData &&
         !keepComposerState
       ) {
+<<<<<<< HEAD
         const filesToDelete = Array.from(files.entries()).flatMap(([fileId, file]) => {
           clearUploadRecovery(fileId);
           if (file.temp_file_id && file.temp_file_id !== fileId) {
             clearUploadRecovery(file.temp_file_id);
+=======
+        const sourceDraftId =
+          !prevConversation?.conversationId ||
+          prevConversation.conversationId === Constants.NEW_CONVO
+            ? getNewConversationDraftId(index)
+            : prevConversation.conversationId;
+        const activeDraftId = getActiveComposerDraftId(
+          index,
+          prevConversation?.conversationId ?? Constants.NEW_CONVO,
+        );
+        const retainedUploadIds = new Set(
+          saveDrafts
+            ? [
+                ...getFilesDraft(sourceDraftId).fileIds,
+                ...getFilesDraft(getPendingDraftId(index)).fileIds,
+                ...(activeDraftId ? getFilesDraft(activeDraftId).fileIds : []),
+              ]
+            : [],
+        );
+        const filesToDelete = Array.from(files.entries()).flatMap(([fileId, file]) => {
+          const retainFileSearch = [fileId, file.file_id, file.temp_file_id].some(
+            (id) => id != null && retainedUploadIds.has(id),
+          );
+          clearUploadRecovery(fileId, retainFileSearch);
+          if (file.temp_file_id && file.temp_file_id !== fileId) {
+            clearUploadRecovery(file.temp_file_id, retainFileSearch);
+>>>>>>> upstream/main
           }
 
           /** A generated paste is this composer's own upload and goes with it, even when that
@@ -531,9 +608,13 @@ const useNewConvo = (index = 0) => {
       agentsMap,
       saveDrafts,
       mutateAsync,
+<<<<<<< HEAD
       resetBadges,
       startupConfig,
       saveBadgesState,
+=======
+      startupConfig,
+>>>>>>> upstream/main
       endpointsConfig,
       getConversation,
       pauseGlobalAudio,

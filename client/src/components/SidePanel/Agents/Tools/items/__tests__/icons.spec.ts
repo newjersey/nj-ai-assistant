@@ -13,10 +13,17 @@ describe('getIconForItem', () => {
     };
     const result = getIconForItem(item);
     expect(result.Icon).toBeDefined();
+<<<<<<< HEAD
     expect(result.colorClass).toMatch(/emerald|green/);
   });
 
   test('returns the Brain icon + indigo color for built-in memory', () => {
+=======
+    expect(result.colorClass).toMatch(/series-7/);
+  });
+
+  test('returns the Brain icon + series color for built-in memory', () => {
+>>>>>>> upstream/main
     const item: AgentItem = {
       kind: 'builtin',
       id: 'memory',
@@ -26,7 +33,11 @@ describe('getIconForItem', () => {
     };
     const result = getIconForItem(item);
     expect(result.Icon).toBeDefined();
+<<<<<<< HEAD
     expect(result.colorClass).toMatch(/indigo/);
+=======
+    expect(result.colorClass).toMatch(/series-8/);
+>>>>>>> upstream/main
   });
 
   test('returns a distinct color class per kind', () => {

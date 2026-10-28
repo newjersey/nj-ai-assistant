@@ -46,7 +46,11 @@ import type {
   FileContentInput,
 } from '~/protection';
 import type { InitializeAgentParams as CoreInitializeAgentParams } from '../initialize';
+<<<<<<< HEAD
 import type { OpenAIStreamHandlerConfig, EventHandler } from './handlers';
+=======
+import type { OpenAIStreamWriterConfig, EventHandler } from './handlers';
+>>>>>>> upstream/main
 import type { LangfuseTraceContext } from '~/langfuse/identity';
 import type { MCPRuntimeRequestBody } from '~/mcp/request';
 import type { ToolExecuteOptions } from '../handlers';
@@ -63,6 +67,10 @@ import {
   createOpenAIContentAggregator,
   createOpenAIStreamTracker,
   createOpenAIHandlers,
+<<<<<<< HEAD
+=======
+  completeOpenAIToolCalls,
+>>>>>>> upstream/main
   sendFinalChunk,
   createChunk,
   writeSSE,
@@ -131,6 +139,18 @@ export interface ChatCompletionDependencies {
   getRoleByName?: Parameters<typeof resolveToolRoleGrants>[0]['getRoleByName'];
   /** Tool execute options for event-driven tool execution */
   toolExecuteOptions?: ToolExecuteOptions;
+<<<<<<< HEAD
+=======
+  /**
+   * Resolves an agent's `instructionsPrompt` link. Unlike `getRoleByName`,
+   * this has no default resolution path — the embedder must build it (a
+   * prompt service, cache, and logger) and supply it here for a linked agent
+   * to receive resolved instructions instead of falling back to empty.
+   */
+  resolveLinkedInstructions?: CoreInitializeAgentParams['resolveLinkedInstructions'];
+  /** Forwarded to `initializeAgent`; defaults to `true` when omitted. */
+  recordLinkedPromptUsage?: CoreInitializeAgentParams['recordLinkedPromptUsage'];
+>>>>>>> upstream/main
 }
 
 /**
@@ -221,6 +241,18 @@ interface InitializeAgentParams {
    */
   resolveWebSearchGrant?: () => Promise<boolean>;
   /**
+<<<<<<< HEAD
+=======
+   * Resolves this agent's `instructionsPrompt` link (a linked native prompt
+   * group). `initializeAgent` calls it only when the agent carries a
+   * resolvable link; absent, a linked agent falls back to empty instructions
+   * with a warning, since there is no default resolution path.
+   */
+  resolveLinkedInstructions?: CoreInitializeAgentParams['resolveLinkedInstructions'];
+  /** Forwarded to `initializeAgent`; defaults to `true` when omitted. */
+  recordLinkedPromptUsage?: CoreInitializeAgentParams['recordLinkedPromptUsage'];
+  /**
+>>>>>>> upstream/main
    * Whether the admin-level `stateful_code_sessions` capability is enabled.
    * Threaded to `initializeAgent` alongside `codeEnvAvailable` so this
    * OpenAI-compatible route resolves stateful sessions identically to the
@@ -272,7 +304,14 @@ type LoadToolsFn = (params: {
 /**
  * Create run function type
  */
+<<<<<<< HEAD
 type CreateRunAppConfig = Pick<AppConfig, 'endpoints' | 'filters' | 'langfuse' | 'messageFilter'>;
+=======
+type CreateRunAppConfig = Pick<
+  AppConfig,
+  'endpoints' | 'filters' | 'langfuse' | 'interfaceConfig' | 'messageFilter'
+>;
+>>>>>>> upstream/main
 
 type CreateRunFn = (params: {
   agents: unknown[];
@@ -302,6 +341,11 @@ interface AppConfig {
   endpoints?: Record<string, unknown>;
   filters?: FiltersConfig;
   langfuse?: Record<string, unknown>;
+<<<<<<< HEAD
+=======
+  /** Carries `retentionMode`, which keeps forced-temporary runs out of Langfuse. */
+  interfaceConfig?: Record<string, unknown>;
+>>>>>>> upstream/main
   messageFilter?: MessageFilterConfig;
   [key: string]: unknown;
 }
@@ -316,6 +360,12 @@ function selectCreateRunAppConfig(
     ...(appConfig.endpoints !== undefined && { endpoints: appConfig.endpoints }),
     ...(appConfig.filters !== undefined && { filters: appConfig.filters }),
     ...(appConfig.langfuse !== undefined && { langfuse: appConfig.langfuse }),
+<<<<<<< HEAD
+=======
+    ...(appConfig.interfaceConfig?.retentionMode !== undefined && {
+      interfaceConfig: { retentionMode: appConfig.interfaceConfig.retentionMode },
+    }),
+>>>>>>> upstream/main
     ...(appConfig.messageFilter !== undefined && { messageFilter: appConfig.messageFilter }),
   };
 }
@@ -569,9 +619,18 @@ export function buildNonStreamingResponse(
   reasoning: string,
   toolCalls: Map<number, ToolCall>,
   usage: CompletionUsage,
+<<<<<<< HEAD
 ): ChatCompletionResponse {
   const toolCallsArray = Array.from(toolCalls.values());
   const finishReason = toolCallsArray.length > 0 && !text ? 'tool_calls' : 'stop';
+=======
+  /** True when the map contains only accepted client-owned calls, not legacy run-step history. */
+  acceptedToolCallsOnly = false,
+): ChatCompletionResponse {
+  const toolCallsArray = Array.from(toolCalls.values());
+  const finishReason =
+    toolCallsArray.length > 0 && (acceptedToolCallsOnly || !text) ? 'tool_calls' : 'stop';
+>>>>>>> upstream/main
 
   return {
     id: context.requestId,
@@ -775,6 +834,11 @@ export async function createAgentChatCompletion(
       codeEnvAvailable,
       fileSearchAvailable,
       resolveWebSearchGrant,
+<<<<<<< HEAD
+=======
+      resolveLinkedInstructions: deps.resolveLinkedInstructions,
+      recordLinkedPromptUsage: deps.recordLinkedPromptUsage,
+>>>>>>> upstream/main
       statefulSessionsAvailable,
       allowedStatefulCodeEnvironments,
       backgroundToolsAvailable,
@@ -823,16 +887,24 @@ export async function createAgentChatCompletion(
     }
 
     // Create handler config (only used for streaming)
+<<<<<<< HEAD
     const handlerConfig: OpenAIStreamHandlerConfig | null =
       isStreaming && tracker
         ? {
             res,
+=======
+    const handlerConfig: OpenAIStreamWriterConfig | null =
+      isStreaming && tracker
+        ? {
+            writer: res,
+>>>>>>> upstream/main
             context,
             tracker,
           }
         : null;
 
     // Create event handlers
+<<<<<<< HEAD
     const eventHandlers =
       isStreaming && handlerConfig
         ? createOpenAIHandlers(
@@ -846,6 +918,23 @@ export async function createAgentChatCompletion(
                 },
           )
         : {};
+=======
+    const eventHandlers = createOpenAIHandlers(
+      handlerConfig
+        ? { ...handlerConfig, signal: abortController.signal }
+        : {
+            aggregator: aggregator!,
+            signal: abortController.signal,
+          },
+      deps.toolExecuteOptions == null
+        ? undefined
+        : {
+            ...deps.toolExecuteOptions,
+            runSignal: abortController.signal,
+            foregroundRunId: requestId,
+          },
+    );
+>>>>>>> upstream/main
 
     // Convert messages to internal format
     const messages = convertMessages(request.messages);
@@ -877,6 +966,7 @@ export async function createAgentChatCompletion(
       });
 
       if (run) {
+<<<<<<< HEAD
         await run.processStream(
           { messages },
           {
@@ -903,15 +993,58 @@ export async function createAgentChatCompletion(
             version: 'v2',
           },
           {},
+=======
+        const target = tracker ?? aggregator!;
+        await completeOpenAIToolCalls(
+          {
+            finish: () => target.finishToolCalls?.(),
+            abort: () => target.abortToolCalls?.(),
+          },
+          () =>
+            run.processStream(
+              { messages },
+              {
+                runName: 'AgentRun',
+                configurable: {
+                  thread_id: conversationId,
+                  user_id: userId,
+                  user: safeUser,
+                  requestBody: mcpRequestBody,
+                  /** Same per-agent channel the in-repo controllers thread via
+                   *  `loadTools`: without it, the executor's PTC path cannot
+                   *  strip host-injected `intent` params from the schemas the
+                   *  sandbox bridge advertises on this route. */
+                  ...(initializedAgent.intentToolNames?.length
+                    ? { intentToolNames: initializedAgent.intentToolNames }
+                    : {}),
+                },
+                recursionLimit: resolveRecursionLimit(
+                  agentsConfig as Partial<TAgentsEndpoint> | undefined,
+                  initializedAgent,
+                ),
+                signal: abortController.signal,
+                streamMode: 'values',
+                version: 'v2',
+              },
+              {},
+            ),
+>>>>>>> upstream/main
         );
       }
     }
 
     // Finalize response
     if (isStreaming && handlerConfig) {
+<<<<<<< HEAD
       sendFinalChunk(handlerConfig);
       res.end();
     } else if (aggregator) {
+=======
+      sendFinalChunk(handlerConfig, 'stop', undefined, true);
+      res.end();
+    } else if (aggregator) {
+      aggregator.finishToolCalls?.();
+>>>>>>> upstream/main
       // Build and send non-streaming response
       const usage: CompletionUsage = {
         prompt_tokens: aggregator.usage.promptTokens,
@@ -927,6 +1060,10 @@ export async function createAgentChatCompletion(
         aggregator.getReasoning(),
         aggregator.toolCalls,
         usage,
+<<<<<<< HEAD
+=======
+        true,
+>>>>>>> upstream/main
       );
       res.json(response);
     }

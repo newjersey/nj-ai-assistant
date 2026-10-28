@@ -12,6 +12,11 @@ export interface FlowState<T = unknown> {
   createdAt: number;
   result?: T;
   error?: string;
+<<<<<<< HEAD
+=======
+  /** Additive wire field; older flow records retain the default Error name. */
+  errorName?: string;
+>>>>>>> upstream/main
   completedAt?: number;
   failedAt?: number;
 }

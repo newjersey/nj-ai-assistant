@@ -23,7 +23,11 @@ jobs:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
         with:
+<<<<<<< HEAD
           node-version: '24.16.0'
+=======
+          node-version: '24.22.1'
+>>>>>>> upstream/main
       - run: cd packages/data-provider && npm ci
       - run: cd packages/data-provider && npm run build
       - name: Pack package
@@ -50,7 +54,11 @@ jobs:
     steps:
       - uses: actions/setup-node@v5
         with:
+<<<<<<< HEAD
           node-version: '24.16.0'
+=======
+          node-version: '24.22.1'
+>>>>>>> upstream/main
           registry-url: 'https://registry.npmjs.org'
 
       - name: Install npm with OIDC support

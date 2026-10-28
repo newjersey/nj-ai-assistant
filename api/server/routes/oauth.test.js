@@ -59,6 +59,10 @@ jest.mock('openid-client', () => ({
 }));
 
 jest.mock('@librechat/data-schemas', () => ({
+<<<<<<< HEAD
+=======
+  ...jest.requireActual('@librechat/data-schemas'),
+>>>>>>> upstream/main
   logger: mockLogger,
 }));
 
@@ -70,6 +74,10 @@ jest.mock('librechat-data-provider', () => ({
 }));
 
 jest.mock('@librechat/api', () => ({
+<<<<<<< HEAD
+=======
+  ...jest.requireActual('@librechat/api'),
+>>>>>>> upstream/main
   buildOAuthFailureLog: (...args) => mockBuildOAuthFailureLog(...args),
   createOpenIDCallbackAuthenticator: (...args) => mockCreateOpenIDCallbackAuthenticator(...args),
   createSetBalanceConfig: jest.fn(() => (_req, _res, next) => next()),

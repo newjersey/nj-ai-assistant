@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 const bcrypt = require('bcryptjs');
 const { logger } = require('@librechat/data-schemas');
 const { errorsToString } = require('librechat-data-provider');
@@ -12,6 +13,23 @@ const verificationEnabledTimestamp = 1717788018;
 async function validateLoginRequest(req) {
   const { error } = loginSchema.safeParse(req.body);
   return error ? errorsToString(error.errors) : null;
+=======
+const { logger } = require('@librechat/data-schemas');
+const { errorsToString } = require('librechat-data-provider');
+const { Strategy: PassportLocalStrategy } = require('passport-local');
+const {
+  isEnabled,
+  comparePassword,
+  grandfatherLegacyEmailVerification,
+  compareSecret,
+} = require('@librechat/api');
+const { findUser, updateUser } = require('~/models');
+const { loginSchema } = require('./validators');
+
+async function validateLoginRequest(req) {
+  const { error } = loginSchema.safeParse(req.body);
+  return error ? errorsToString(error.issues) : null;
+>>>>>>> upstream/main
 }
 
 async function passportLogin(req, email, password, done) {
@@ -36,13 +54,18 @@ async function passportLogin(req, email, password, done) {
       return done(null, false, { message: 'Email does not exist.' });
     }
 
+<<<<<<< HEAD
     const isMatch = await comparePassword(user, password, { compare: bcrypt.compare });
+=======
+    const isMatch = await comparePassword(user, password, { compare: compareSecret });
+>>>>>>> upstream/main
     if (!isMatch) {
       logError('Passport Local Strategy - Password does not match', { isMatch });
       logger.error(`[Login] [Login failed] [Username: ${email}] [Request-IP: ${req.ip}]`);
       return done(null, false, { message: 'Incorrect password.' });
     }
 
+<<<<<<< HEAD
     const emailEnabled = checkEmailConfig();
     const userCreatedAtTimestamp = Math.floor(new Date(user.createdAt).getTime() / 1000);
 
@@ -54,6 +77,9 @@ async function passportLogin(req, email, password, done) {
       await updateUser(user._id, { emailVerified: true });
       user.emailVerified = true;
     }
+=======
+    await grandfatherLegacyEmailVerification({ updateUser }, user);
+>>>>>>> upstream/main
 
     const unverifiedAllowed = isEnabled(process.env.ALLOW_UNVERIFIED_EMAIL_LOGIN);
     if (user.expiresAt && unverifiedAllowed) {

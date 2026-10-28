@@ -7,9 +7,19 @@ import type {
   TTraceRecordDetail,
 } from './types/traces';
 import type { TInsightsAccessResponse, TInsightsParams, TInsightsResponse } from './types/insights';
+<<<<<<< HEAD
 import type { TFileConfig } from './file-config';
 import type * as tl from './types/tools';
 import type * as t from './types';
+=======
+import type { ScheduleMCPConsentView, ConfirmScheduleMCPConsent } from './types/scheduleConsent';
+import type { CodeSetupAttempt, CodeSetupApprovalRequest } from './codeSetup';
+import type { TFileConfig } from './file-config';
+import type * as tl from './types/tools';
+import type * as t from './types';
+import { codeSetupAttemptSchema, codeSetupApprovalRequestSchema } from './codeSetup';
+import { TOOL_CALL_PREVIEWS_PARAM, TOOL_CALL_PREVIEWS_VERSION } from './previews';
+>>>>>>> upstream/main
 import * as permissions from './accessPermissions';
 import * as endpoints from './api-endpoints';
 import { uploadEventStream } from './upload';
@@ -23,7 +33,10 @@ import * as q from './types/queries';
 import * as sk from './types/skills';
 import * as f from './types/files';
 import * as config from './config';
+<<<<<<< HEAD
 import * as nj from './nj/files';
+=======
+>>>>>>> upstream/main
 import request from './request';
 import * as s from './schemas';
 import * as r from './roles';
@@ -93,6 +106,31 @@ export function getLangfuseSessionLink(
   return request.get(endpoints.adminLangfuseSessionLink(conversationId));
 }
 
+<<<<<<< HEAD
+=======
+export function updateLangfusePromptSync(
+  payload: t.TUpdateLangfusePromptSyncRequest,
+): Promise<t.TLangfuseConnectionStatus> {
+  return request.put(endpoints.adminLangfusePromptSync(), payload);
+}
+
+export function getLangfusePrompts(
+  params: t.TLangfusePromptListParams = {},
+): Promise<t.TLangfusePromptListResponse> {
+  return request.get(endpoints.adminLangfusePrompts(params));
+}
+
+export function getLangfusePrompt(
+  params: t.TLangfusePromptGetParams,
+): Promise<t.TLangfusePromptGetResponse> {
+  return request.get(endpoints.adminLangfusePrompt(params.name, params.version));
+}
+
+export function syncLangfusePrompts(): Promise<t.TLangfusePromptSyncResult> {
+  return request.post(endpoints.adminLangfuseSyncPrompts(), {});
+}
+
+>>>>>>> upstream/main
 export function revokeUserKey(name: string): Promise<unknown> {
   return request.delete(endpoints.revokeUserKey(name));
 }
@@ -105,6 +143,41 @@ export function deleteUser(payload?: t.TDeleteUserRequest): Promise<unknown> {
   return request.deleteWithOptions(endpoints.deleteUser(), { data: payload });
 }
 
+<<<<<<< HEAD
+=======
+function parseCodeSetupAttempt(attemptId: string, data: unknown): CodeSetupAttempt {
+  const attempt = codeSetupAttemptSchema.parse(data);
+  if (attempt.attemptId !== attemptId) {
+    throw new Error('Code setup response does not match the requested attempt');
+  }
+  return attempt;
+}
+
+export async function getCodeSetupAttempt(attemptId: string): Promise<CodeSetupAttempt> {
+  return parseCodeSetupAttempt(attemptId, await request.get(endpoints.codeSetupAttempt(attemptId)));
+}
+
+export async function approveCodeSetupAttempt(
+  attemptId: string,
+  payload: CodeSetupApprovalRequest,
+): Promise<CodeSetupAttempt> {
+  return parseCodeSetupAttempt(
+    attemptId,
+    await request.post(
+      endpoints.codeSetupApprove(attemptId),
+      codeSetupApprovalRequestSchema.parse(payload),
+    ),
+  );
+}
+
+export async function denyCodeSetupAttempt(attemptId: string): Promise<CodeSetupAttempt> {
+  return parseCodeSetupAttempt(
+    attemptId,
+    await request.post(endpoints.codeSetupDeny(attemptId), {}),
+  );
+}
+
+>>>>>>> upstream/main
 export function getCodeEnvironments(): Promise<t.TCodeEnvironmentsResponse> {
   return request.get(endpoints.codeEnvironments());
 }
@@ -206,8 +279,16 @@ export const listSharedLinks = async (
   return request.get(endpoints.getSharedLinks(pageSize, sortBy, sortDirection, search, cursor));
 };
 
+<<<<<<< HEAD
 export function getSharedLink(conversationId: string): Promise<t.TSharedLinkGetResponse> {
   return request.get(endpoints.getSharedLink(conversationId));
+=======
+export function getSharedLink(
+  conversationId: string,
+  signal?: AbortSignal,
+): Promise<t.TSharedLinkGetResponse> {
+  return request.get(endpoints.getSharedLink(conversationId), signal ? { signal } : undefined);
+>>>>>>> upstream/main
 }
 
 export function createSharedLink(
@@ -293,10 +374,13 @@ export function getUserBalance(): Promise<t.TBalanceResponse> {
   return request.get(endpoints.balance());
 }
 
+<<<<<<< HEAD
 export const updateTokenCount = (text: string) => {
   return request.post(endpoints.tokenizer(), { arg: text });
 };
 
+=======
+>>>>>>> upstream/main
 export const login = (payload: t.TLoginUser): Promise<t.TLoginResponse> => {
   return request.post(endpoints.login(), payload);
 };
@@ -312,10 +396,13 @@ export const register = (payload: t.TRegisterUser) => {
 export const userKeyQuery = (name: string): Promise<t.TCheckUserKeyResponse> =>
   request.get(endpoints.userKeyQuery(name));
 
+<<<<<<< HEAD
 export const getLoginGoogle = () => {
   return request.get(endpoints.loginGoogle());
 };
 
+=======
+>>>>>>> upstream/main
 export const requestPasswordReset = (
   payload: t.TRequestPasswordReset,
 ): Promise<t.TRequestPasswordResetResponse> => {
@@ -330,16 +417,34 @@ export const verifyEmail = (payload: t.TVerifyEmail): Promise<t.VerifyEmailRespo
   return request.post(endpoints.verifyEmail(), payload);
 };
 
+<<<<<<< HEAD
+=======
+export const requestEmailChange = (
+  payload: t.TRequestEmailChange,
+): Promise<t.TEmailChangeResponse> => {
+  return request.post(endpoints.requestEmailChange(), payload);
+};
+
+export const confirmEmailChange = (
+  payload: t.TConfirmEmailChange,
+): Promise<t.TEmailChangeResponse> => {
+  return request.post(endpoints.confirmEmailChange(), payload);
+};
+
+>>>>>>> upstream/main
 export const resendVerificationEmail = (
   payload: t.TResendVerificationEmail,
 ): Promise<t.VerifyEmailResponse> => {
   return request.post(endpoints.resendVerificationEmail(), payload);
 };
 
+<<<<<<< HEAD
 export const getAvailablePlugins = (): Promise<s.TPlugin[]> => {
   return request.get(endpoints.plugins());
 };
 
+=======
+>>>>>>> upstream/main
 export const updateUserPlugins = (payload: t.TUpdateUserPlugins) => {
   return request.post(endpoints.userPlugins(), payload);
 };
@@ -360,12 +465,15 @@ export const getMCPConnectionStatus = (): Promise<q.MCPConnectionStatusResponse>
   return request.get(endpoints.mcpConnectionStatus());
 };
 
+<<<<<<< HEAD
 export const getMCPServerConnectionStatus = (
   serverName: string,
 ): Promise<q.MCPServerConnectionStatusResponse> => {
   return request.get(endpoints.mcpServerConnectionStatus(serverName));
 };
 
+=======
+>>>>>>> upstream/main
 export const getMCPAuthValues = (serverName: string): Promise<q.MCPAuthValuesResponse> => {
   return request.get(endpoints.mcpAuthValues(serverName));
 };
@@ -402,6 +510,15 @@ export const getTokenConfig = (): Promise<t.TTokenConfigMap> => {
   return request.get(endpoints.tokenConfig());
 };
 
+<<<<<<< HEAD
+=======
+export const getReasoningCapabilities = (
+  endpoint: string,
+): Promise<t.TReasoningCapabilitiesResponse> => {
+  return request.get(endpoints.reasoningCapabilities(endpoint));
+};
+
+>>>>>>> upstream/main
 export const getModels = async (): Promise<t.TModelsConfig> => {
   return request.get(endpoints.models());
 };
@@ -552,6 +669,14 @@ export const callTool = <T extends m.ToolId>({
   );
 };
 
+<<<<<<< HEAD
+=======
+export const resetToolApprovalGrants = (params: {
+  agentId: string;
+  toolName?: string;
+}): Promise<{ reset: true }> => request.post(endpoints.resetToolApprovalGrants(), params);
+
+>>>>>>> upstream/main
 export const getToolCalls = (params: q.GetToolCallParams): Promise<q.ToolCallResults> => {
   return request.get(
     endpoints.agents({
@@ -563,8 +688,16 @@ export const getToolCalls = (params: q.GetToolCallParams): Promise<q.ToolCallRes
 
 /* Files */
 
+<<<<<<< HEAD
 export const getFiles = (): Promise<f.TFile[]> => {
   return request.get(endpoints.files());
+=======
+export const getFiles = (params?: { limit?: number }): Promise<f.TFile[]> => {
+  return request.get(
+    endpoints.files(),
+    params?.limit != null ? { params: { limit: params.limit } } : undefined,
+  );
+>>>>>>> upstream/main
 };
 
 /**
@@ -758,6 +891,7 @@ export const getAgentCategories = (): Promise<t.TMarketplaceCategory[]> => {
 /**
  * Unified marketplace agents endpoint with query string controls
  */
+<<<<<<< HEAD
 export const getMarketplaceAgents = (params: {
   requiredPermission: number;
   category?: string;
@@ -769,6 +903,11 @@ export const getMarketplaceAgents = (params: {
   return request.get(
     endpoints.agents({
       // path: 'marketplace',
+=======
+export const getMarketplaceAgents = (params: ag.AgentListParams): Promise<ag.AgentListResponse> => {
+  return request.get(
+    endpoints.agents({
+>>>>>>> upstream/main
       options: params,
     }),
   );
@@ -934,9 +1073,12 @@ export const deleteFiles = async (payload: {
     data: payload,
   });
 
+<<<<<<< HEAD
 export const updateFile = (payload: nj.UpdateFileMetadataBody): Promise<f.TFile> =>
   request.patch(endpoints.fileUpdate(payload.file_id), payload);
 
+=======
+>>>>>>> upstream/main
 /* Speech */
 
 export const speechToText = (data: FormData): Promise<f.SpeechToTextResponse> => {
@@ -957,6 +1099,7 @@ export const getCustomConfigSpeech = (): Promise<t.TCustomConfigSpeechResponse> 
 
 /* conversations */
 
+<<<<<<< HEAD
 export function duplicateConversation(
   payload: t.TDuplicateConvoRequest,
 ): Promise<t.TDuplicateConvoResponse> {
@@ -965,6 +1108,22 @@ export function duplicateConversation(
 
 export function forkConversation(payload: t.TForkConvoRequest): Promise<t.TForkConvoResponse> {
   return request.post(endpoints.forkConversation(), payload);
+=======
+/** Asks for tool-call previews in a response whose messages seed the conversation cache. */
+function withToolCallPreviews(url: string): string {
+  const separator = url.includes('?') ? '&' : '?';
+  return `${url}${separator}${TOOL_CALL_PREVIEWS_PARAM}=${TOOL_CALL_PREVIEWS_VERSION}`;
+}
+
+export function duplicateConversation(
+  payload: t.TDuplicateConvoRequest,
+): Promise<t.TDuplicateConvoResponse> {
+  return request.post(withToolCallPreviews(endpoints.duplicateConversation()), payload);
+}
+
+export function forkConversation(payload: t.TForkConvoRequest): Promise<t.TForkConvoResponse> {
+  return request.post(withToolCallPreviews(endpoints.forkConversation()), payload);
+>>>>>>> upstream/main
 }
 
 export function forkSharedConversation(
@@ -972,7 +1131,11 @@ export function forkSharedConversation(
   targetMessageIndex?: number,
   shareRevision?: string,
 ): Promise<t.TForkConvoResponse> {
+<<<<<<< HEAD
   return request.post(endpoints.forkSharedMessages(shareId), {
+=======
+  return request.post(withToolCallPreviews(endpoints.forkSharedMessages(shareId)), {
+>>>>>>> upstream/main
     targetMessageIndex,
     shareRevision,
   });
@@ -994,12 +1157,17 @@ export const listConversations = (
   return request.get(endpoints.conversations(params ?? {}));
 };
 
+<<<<<<< HEAD
 export function getConversations(cursor: string): Promise<t.TGetConversationsResponse> {
   return request.get(endpoints.conversations({ cursor }));
 }
 
 export function getConversationById(id: string): Promise<s.TConversation> {
   return request.get(endpoints.conversationById(id));
+=======
+export function getConversationById(id: string, signal?: AbortSignal): Promise<s.TConversation> {
+  return request.get(endpoints.conversationById(id), signal ? { signal } : undefined);
+>>>>>>> upstream/main
 }
 
 export function updateConversation(
@@ -1039,6 +1207,34 @@ export function deleteProject(projectId: string): Promise<t.TDeleteChatProjectRe
   return request.delete(endpoints.projectById(projectId));
 }
 
+<<<<<<< HEAD
+=======
+export function getProjectFiles(projectId: string): Promise<t.TChatProjectFile[]> {
+  return request.get(endpoints.projectFiles(projectId));
+}
+
+export function getAvailableProjectFiles(
+  projectId: string,
+  params: q.ProjectAvailableFilesParams = {},
+): Promise<q.ProjectAvailableFilesResponse> {
+  return request.get(endpoints.projectAvailableFiles(projectId, params));
+}
+
+export function addProjectFile(payload: {
+  projectId: string;
+  file_id: string;
+}): Promise<t.TChatProject> {
+  return request.post(endpoints.projectFiles(payload.projectId), { file_id: payload.file_id });
+}
+
+export function removeProjectFile(payload: {
+  projectId: string;
+  file_id: string;
+}): Promise<t.TChatProject> {
+  return request.delete(endpoints.projectFile(payload.projectId, payload.file_id));
+}
+
+>>>>>>> upstream/main
 export function assignConversationToProject(
   payload: t.TAssignConversationToProjectRequest,
 ): Promise<t.TAssignConversationToProjectResponse> {
@@ -1054,6 +1250,21 @@ export function pinConversation(
   return request.post(endpoints.pinConversation(), { arg: payload });
 }
 
+<<<<<<< HEAD
+=======
+export function markConversationSeen(
+  payload: t.TMarkConversationSeenRequest,
+): Promise<t.TMarkConversationSeenResponse> {
+  return request.post(endpoints.markConversationSeen(), { arg: payload });
+}
+
+export function markConversationUnread(
+  payload: t.TMarkConversationUnreadRequest,
+): Promise<t.TMarkConversationUnreadResponse> {
+  return request.post(endpoints.markConversationUnread(), { arg: payload });
+}
+
+>>>>>>> upstream/main
 export function genTitle(payload: m.TGenTitleRequest): Promise<m.TGenTitleResponse> {
   return request.get(endpoints.genTitle(payload.conversationId));
 }
@@ -1089,23 +1300,71 @@ export const editArtifact = async ({
   messageId,
   ...params
 }: m.TEditArtifactRequest): Promise<m.TEditArtifactResponse> => {
+<<<<<<< HEAD
   return request.post(endpoints.messagesArtifacts(messageId), params);
+=======
+  return request.post(withToolCallPreviews(endpoints.messagesArtifacts(messageId)), params);
+>>>>>>> upstream/main
 };
 
 export const branchMessage = async (
   payload: m.TBranchMessageRequest,
 ): Promise<m.TBranchMessageResponse> => {
+<<<<<<< HEAD
   return request.post(endpoints.messagesBranch(), payload);
 };
 
 export function getMessagesByConvoId(conversationId: string): Promise<s.TMessage[]> {
+=======
+  return request.post(withToolCallPreviews(endpoints.messagesBranch()), payload);
+};
+
+export interface OwnerMessageText {
+  canonicalText: string;
+  messageId: string;
+  revision: string;
+  text?: string;
+}
+
+/** Private display data; never merge into ordinary message/query-cache objects. */
+export function getOwnerMessageTexts(
+  conversationId: string,
+  messageIds: string[],
+): Promise<{ messages: OwnerMessageText[] }> {
+  return request.post(`${endpoints.messages({ conversationId })}/owner-text`, { messageIds });
+}
+
+/**
+ * Loads a conversation's messages. `toolPreviews` asks for bounded previews of settled tool
+ * calls; a caller that needs every byte (export, share, trace) leaves it off.
+ */
+export function getMessagesByConvoId(
+  conversationId: string,
+  options?: { toolPreviews?: boolean },
+): Promise<s.TMessage[]> {
+>>>>>>> upstream/main
   if (
     conversationId === config.Constants.NEW_CONVO ||
     conversationId === config.Constants.PENDING_CONVO
   ) {
     return Promise.resolve([]);
   }
+<<<<<<< HEAD
   return request.get(endpoints.messages({ conversationId }));
+=======
+  const url = endpoints.messages({ conversationId });
+  return request.get(options?.toolPreviews === true ? withToolCallPreviews(url) : url);
+}
+
+export function getToolCallPart(params: q.ToolCallPartParams): Promise<q.ToolCallPartResponse> {
+  return request.get(endpoints.messageToolCallPart(params));
+}
+
+export function getSubagentAttachmentCalls(
+  params: q.SubagentAttachmentCallsParams,
+): Promise<q.SubagentAttachmentCallsResponse> {
+  return request.get(endpoints.messageSubagentAttachmentCalls(params));
+>>>>>>> upstream/main
 }
 
 export function getMessageById(conversationId: string, messageId: string): Promise<s.TMessage[]> {
@@ -1125,6 +1384,32 @@ export function getSubagentThread(
   return request.get(endpoints.subagentThread(parentConversationId, threadId, taskId, cursor));
 }
 
+<<<<<<< HEAD
+=======
+export function getSubagentTaskContent(
+  parentConversationId: string,
+  threadId: string,
+  taskId: string,
+  afterSequence?: number,
+  cursor?: string,
+): Promise<t.SubagentTaskContentResponse> {
+  return request.get(
+    endpoints.subagentTaskContent(parentConversationId, threadId, taskId, afterSequence, cursor),
+  );
+}
+
+export function getSubagentControlReceipt(
+  parentConversationId: string,
+  threadId: string,
+  taskId: string,
+  invocationId: string,
+): Promise<t.SubagentControlResponse> {
+  return request.get(
+    endpoints.subagentControlReceipt(parentConversationId, threadId, taskId, invocationId),
+  );
+}
+
+>>>>>>> upstream/main
 export function controlSubagentTask(
   parentConversationId: string,
   threadId: string,
@@ -1133,6 +1418,46 @@ export function controlSubagentTask(
   return request.post(endpoints.subagentControl(parentConversationId, threadId), body);
 }
 
+<<<<<<< HEAD
+=======
+export function getBackgroundTasks(conversationId: string): Promise<t.BackgroundTaskIndex> {
+  return request.get(endpoints.backgroundTasks(conversationId));
+}
+
+export function cancelBackgroundTasks(
+  conversationId: string,
+  body: t.BackgroundTaskCancelRequest,
+): Promise<t.BackgroundTaskCancelResponse> {
+  return request.post(endpoints.backgroundTasksCancel(conversationId), body);
+}
+
+export function getConversationPullRequest(
+  conversationId: string,
+  options?: { signal?: AbortSignal },
+): Promise<t.TConversationPullRequestResponse> {
+  return request.get(endpoints.conversationPullRequest(conversationId), options);
+}
+
+export function getConversationPullRequests(
+  conversationIds: string[],
+  options?: { signal?: AbortSignal },
+): Promise<t.TConversationPullRequestsResponse> {
+  return request.post(endpoints.conversationPullRequests(), { conversationIds }, options);
+}
+
+export function getPullRequestConnection(): Promise<t.TPullRequestConnection> {
+  return request.get(endpoints.pullRequestConnection());
+}
+
+export function connectPullRequestAccount(): Promise<t.TPullRequestConnectStart> {
+  return request.get(endpoints.pullRequestConnect());
+}
+
+export function disconnectPullRequestAccount(): Promise<void> {
+  return request.delete(endpoints.pullRequestDisconnect());
+}
+
+>>>>>>> upstream/main
 export function getPrompt(id: string): Promise<{ prompt: t.TPrompt }> {
   return request.get(endpoints.getPrompt(id));
 }
@@ -1155,6 +1480,16 @@ export function getPromptGroup(id: string): Promise<t.TPromptGroup> {
   return request.get(endpoints.getPromptGroup(id));
 }
 
+<<<<<<< HEAD
+=======
+export function resolvePromptGroup(
+  id: string,
+  version?: number,
+): Promise<t.TResolvedPromptResponse> {
+  return request.get(endpoints.resolvePromptGroup(id, version));
+}
+
+>>>>>>> upstream/main
 export function createPrompt(payload: t.TCreatePrompt): Promise<t.TCreatePromptResponse> {
   return request.post(endpoints.postPrompt(), payload);
 }
@@ -1214,10 +1549,37 @@ export function getSchedules(): Promise<sch.TSchedulesResponse> {
   return request.get(endpoints.schedules());
 }
 
+<<<<<<< HEAD
 export function enqueueAgentQueuedTurn(
   payload: qt.TEnqueueAgentQueuedTurnRequest,
 ): Promise<qt.TEnqueueAgentQueuedTurnResponse> {
   return request.post(endpoints.agentQueuedTurns(), payload);
+=======
+export async function enqueueAgentQueuedTurn(
+  payload: qt.TEnqueueAgentQueuedTurnRequest,
+): Promise<qt.TEnqueueAgentQueuedTurnResponse> {
+  if (payload.codeApprovalMode == null) {
+    return request.post(endpoints.agentQueuedTurns(), payload);
+  }
+  const unsupported = () =>
+    Object.assign(new Error('Queued approval snapshots require protocol v2'), {
+      response: { status: 409, data: { code: 'QUEUED_TURN_PROTOCOL_REQUIRED' } },
+    });
+  try {
+    // The versioned URL is the capability gate. Do not preflight with a list:
+    // retries must reach receipt lookup even when mutable access has changed.
+    return await request.post(endpoints.agentQueuedTurns(2), payload);
+  } catch (error) {
+    const response = (error as { response?: { status?: number; data?: { code?: unknown } } })
+      ?.response;
+    const status = response?.status;
+    // Structured origin responses (notably priority fallback) are authoritative.
+    if ((status === 404 || status === 501) && typeof response?.data?.code !== 'string') {
+      throw unsupported();
+    }
+    throw error;
+  }
+>>>>>>> upstream/main
 }
 
 export function listAgentQueuedTurns(
@@ -1277,6 +1639,15 @@ export function listSkillFiles(skillId: string): Promise<sk.TListSkillFilesRespo
 }
 
 export function uploadSkillFile(skillId: string, formData: FormData): Promise<sk.TSkillFile> {
+<<<<<<< HEAD
+=======
+  const relativePath = formData.get('relativePath');
+  // Conditional edits use a new route: older servers must reject the request,
+  // not silently ignore expectedFileId and perform an unconditional replacement.
+  if (formData.has('expectedFileId') && typeof relativePath === 'string') {
+    return request.postMultiPart(endpoints.skillFile(skillId, relativePath), formData);
+  }
+>>>>>>> upstream/main
   return request.postMultiPart(endpoints.skillFiles(skillId), formData);
 }
 
@@ -1497,10 +1868,13 @@ export function addTagToConversation(
 ): Promise<t.TTagConversationResponse> {
   return request.put(endpoints.addTagToConversation(conversationId), payload);
 }
+<<<<<<< HEAD
 export function rebuildConversationTags(): Promise<t.TConversationTagsResponse> {
   return request.post(endpoints.conversationTags('rebuild'));
 }
 
+=======
+>>>>>>> upstream/main
 export function healthCheck(): Promise<string> {
   return request.get(endpoints.health());
 }
@@ -1530,6 +1904,33 @@ export function enableTwoFactor(payload?: t.TEnable2FARequest): Promise<t.TEnabl
   return request.post(endpoints.enableTwoFactor(), payload);
 }
 
+<<<<<<< HEAD
+=======
+export function enableTwoFactorSetup(
+  payload: t.TEnable2FASetupRequest,
+): Promise<t.TEnable2FAResponse> {
+  return request.post(endpoints.enableTwoFactorSetup(), payload);
+}
+
+export function confirmTwoFactorSetup(
+  payload: t.TConfirm2FASetupRequest,
+): Promise<t.TConfirm2FASetupResponse> {
+  return request.post(endpoints.confirmTwoFactorSetup(), payload);
+}
+
+export function acknowledgeTwoFactorSetup(
+  payload: t.TAcknowledge2FASetupRequest,
+): Promise<t.TAcknowledge2FASetupResponse> {
+  return request.post(endpoints.acknowledgeTwoFactorSetup(), payload);
+}
+
+export function finalizeTwoFactorSetup(
+  payload: t.TFinalize2FASetupRequest,
+): Promise<t.TFinalize2FASetupResponse> {
+  return request.post(endpoints.finalizeTwoFactorSetup(), payload);
+}
+
+>>>>>>> upstream/main
 export function verifyTwoFactor(payload: t.TVerify2FARequest): Promise<t.TVerify2FAResponse> {
   return request.post(endpoints.verifyTwoFactor(), payload);
 }
@@ -1554,6 +1955,50 @@ export function verifyTwoFactorTemp(
   return request.post(endpoints.verifyTwoFactorTemp(), payload);
 }
 
+<<<<<<< HEAD
+=======
+// Passkeys (WebAuthn)
+export function getPasskeys(): Promise<t.TPasskeysResponse> {
+  return request.get(endpoints.passkeys());
+}
+
+export function getPasskeyRegistrationOptions(
+  payload: t.TPasskeyRegistrationOptionsRequest,
+): Promise<t.TPasskeyCreationOptions> {
+  return request.post(endpoints.passkeyRegistrationOptions(), payload);
+}
+
+export function verifyPasskeyRegistration(
+  payload: t.TVerifyPasskeyRegistrationRequest,
+): Promise<t.TPasskeyResponse> {
+  return request.post(endpoints.passkeyRegistrationVerify(), payload);
+}
+
+export function getPasskeyLoginOptions(): Promise<t.TPasskeyAuthenticationOptionsResponse> {
+  return request.post(endpoints.passkeyLoginOptions(), {});
+}
+
+export function verifyPasskeyLogin(
+  payload: t.TVerifyPasskeyLoginRequest,
+): Promise<t.TLoginResponse> {
+  return request.post(endpoints.passkeyLoginVerify(), payload);
+}
+
+export function renamePasskey({
+  passkeyId,
+  name,
+}: t.TRenamePasskeyRequest): Promise<t.TPasskeyResponse> {
+  return request.patch(endpoints.passkey(passkeyId), { name });
+}
+
+export function deletePasskey({
+  passkeyId,
+  password,
+}: t.TDeletePasskeyRequest): Promise<{ message: string }> {
+  return request.deleteWithOptions(endpoints.passkey(passkeyId), { data: { password } });
+}
+
+>>>>>>> upstream/main
 /* Memories */
 export const getMemories = (): Promise<q.MemoriesResponse> => {
   return request.get(endpoints.memories());
@@ -1650,10 +2095,13 @@ export function getGraphApiToken(params: q.GraphTokenParams): Promise<q.GraphTok
   return request.get(endpoints.graphToken(params.scopes));
 }
 
+<<<<<<< HEAD
 export function getDomainServerBaseUrl(): string {
   return `${endpoints.apiBaseUrl()}/api`;
 }
 
+=======
+>>>>>>> upstream/main
 /* Active Jobs */
 export interface ActiveJobsResponse {
   activeJobIds: string[];
@@ -1662,3 +2110,21 @@ export interface ActiveJobsResponse {
 export const getActiveJobs = (): Promise<ActiveJobsResponse> => {
   return request.get(endpoints.activeJobs());
 };
+<<<<<<< HEAD
+=======
+
+export function getScheduleMCPConsent(id: string): Promise<ScheduleMCPConsentView> {
+  return request.get(endpoints.scheduleMCPConsent(id));
+}
+export function confirmScheduleMCPConsent(
+  id: string,
+  payload: ConfirmScheduleMCPConsent,
+): Promise<ScheduleMCPConsentView> {
+  return request.post(endpoints.scheduleMCPConsent(id), payload);
+}
+export function revokeScheduleMCPConsent(id: string, expectedRevision: string): Promise<void> {
+  return request.deleteWithOptions(endpoints.scheduleMCPConsent(id), {
+    data: { expectedRevision },
+  });
+}
+>>>>>>> upstream/main

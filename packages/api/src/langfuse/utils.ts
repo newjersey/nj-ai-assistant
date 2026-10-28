@@ -121,6 +121,15 @@ export function toBasicAuthorization(publicKey: string, secretKey: string): stri
   return `Basic ${Buffer.from(`${publicKey}:${secretKey}`).toString('base64')}`;
 }
 
+<<<<<<< HEAD
+=======
+/** True for the error `AbortSignal.timeout` produces when its deadline fires, so a
+ *  caller can tell a timed-out request apart from any other request failure. */
+export function isTimeout(error: unknown): boolean {
+  return error instanceof Error && (error.name === 'TimeoutError' || error.name === 'AbortError');
+}
+
+>>>>>>> upstream/main
 /**
  * Refuses redirects on requests carrying custom headers.
  *

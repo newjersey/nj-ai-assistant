@@ -1,6 +1,16 @@
 const cookies = require('cookie');
 const passport = require('passport');
+<<<<<<< HEAD
 const { isEnabled, tenantContextMiddleware } = require('@librechat/api');
+=======
+const {
+  isEnabled,
+  clearCloudFrontCookies,
+  continueAfterOptionalAuth,
+  tenantContextMiddleware,
+  isTwoFactorEnrollmentRequired,
+} = require('@librechat/api');
+>>>>>>> upstream/main
 
 const hasPassportStrategy = (strategy) =>
   typeof passport._strategy === 'function' && passport._strategy(strategy) != null;
@@ -20,9 +30,21 @@ const optionalJwtAuth = (req, res, next) => {
       return next(err);
     }
     if (user) {
+<<<<<<< HEAD
       req.user = user;
       req.authStrategy = useOpenIdJwt ? 'openidJwt' : 'jwt';
       return tenantContextMiddleware(req, res, next);
+=======
+      return continueAfterOptionalAuth(
+        req,
+        res,
+        next,
+        user,
+        useOpenIdJwt ? 'openidJwt' : 'jwt',
+        tenantContextMiddleware,
+        { clearCloudFrontCookies, enrollmentRequired: isTwoFactorEnrollmentRequired },
+      );
+>>>>>>> upstream/main
     }
     next();
   };

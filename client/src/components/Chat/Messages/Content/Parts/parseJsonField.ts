@@ -4,7 +4,11 @@ export function areToolCallArgsComplete(args: ToolCallArgs): boolean {
   if (typeof args === 'object' && args !== null) {
     return true;
   }
+<<<<<<< HEAD
   if (typeof args !== 'string' || args.trim().length === 0) {
+=======
+  if (typeof args !== 'string' || !args.trimEnd().endsWith('}')) {
+>>>>>>> upstream/main
     return false;
   }
   try {
@@ -15,10 +19,26 @@ export function areToolCallArgsComplete(args: ToolCallArgs): boolean {
   }
 }
 
+<<<<<<< HEAD
 /** Matches `"field":"value"`, tolerating a missing closing quote and a dangling escape at the end of partially streamed args. */
 function fieldRegex(field: string, flags?: string): RegExp {
   const escaped = field.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   return new RegExp(`"${escaped}"\\s*:\\s*"((?:[^"\\\\]|\\\\.)*)(?:"|\\\\?$)`, flags);
+=======
+const fieldRegexCache = new Map<string, RegExp>();
+
+/** Matches `"field":"value"`, tolerating a missing closing quote and a dangling escape at the end of partially streamed args. */
+function fieldRegex(field: string, flags?: string): RegExp {
+  const key = `${flags ?? ''}:${field}`;
+  const cached = fieldRegexCache.get(key);
+  if (cached) {
+    return cached;
+  }
+  const escaped = field.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const regex = new RegExp(`"${escaped}"\\s*:\\s*"((?:[^"\\\\]|\\\\.)*)(?:"|\\\\?$)`, flags);
+  fieldRegexCache.set(key, regex);
+  return regex;
+>>>>>>> upstream/main
 }
 
 const SIMPLE_ESCAPES: Record<string, string> = {

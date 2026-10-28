@@ -1,4 +1,8 @@
 const { logger } = require('@librechat/data-schemas');
+<<<<<<< HEAD
+=======
+const { getForwardedHeaders } = require('@librechat/api');
+>>>>>>> upstream/main
 
 /**
  * Middleware to log Forwarded Headers
@@ -10,6 +14,7 @@ const { logger } = require('@librechat/data-schemas');
  */
 const logHeaders = (req, res, next) => {
   try {
+<<<<<<< HEAD
     const forwardedHeaders = {};
     if (req.headers['x-forwarded-for']) {
       forwardedHeaders['x-forwarded-for'] = req.headers['x-forwarded-for'];
@@ -20,6 +25,9 @@ const logHeaders = (req, res, next) => {
     if (req.headers['x-forwarded-proto']) {
       forwardedHeaders['x-forwarded-proto'] = req.headers['x-forwarded-proto'];
     }
+=======
+    const forwardedHeaders = getForwardedHeaders(req.headers);
+>>>>>>> upstream/main
     if (Object.keys(forwardedHeaders).length > 0) {
       logger.debug('X-Forwarded headers detected in OAuth request:', forwardedHeaders);
     }

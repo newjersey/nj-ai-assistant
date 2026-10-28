@@ -4,6 +4,7 @@ import {
   VerifyEmail,
   Registration,
   ResetPassword,
+<<<<<<< HEAD
   ApiErrorWatcher,
   TwoFactorScreen,
   RequestPasswordReset,
@@ -19,6 +20,19 @@ import { OAuthSuccess, OAuthError } from '~/components/OAuth';
 import { AuthContextProvider } from '~/hooks/AuthContext';
 import RouteErrorBoundary from './RouteErrorBoundary';
 import StartupLayout from './Layouts/Startup';
+=======
+  TwoFactorScreen,
+  TwoFactorSetupScreen,
+  RequestPasswordReset,
+} from '~/components/Auth';
+import { OAuthSuccess, OAuthError } from '~/components/OAuth';
+import { AuthContextProvider } from '~/hooks/AuthContext';
+import { importWithRecovery } from '~/lib/assets/lazy';
+import RouteErrorBoundary from './RouteErrorBoundary';
+import StartupLayout from './Layouts/Startup';
+import MarketplaceRoute from './Marketplace';
+import { codeSetupRoute } from './CodeSetup';
+>>>>>>> upstream/main
 import LoginLayout from './Layouts/Login';
 import dashboardRoutes from './Dashboard';
 import WithRum from '~/lib/rum/WithRum';
@@ -32,32 +46,55 @@ const AuthLayout = () => (
     <WithRum>
       <Outlet />
     </WithRum>
+<<<<<<< HEAD
     <ApiErrorWatcher />
+=======
+>>>>>>> upstream/main
   </AuthContextProvider>
 );
 
 const loadInlinePromptsView = () =>
+<<<<<<< HEAD
   import('~/components/Prompts/layouts/InlinePromptsView').then((m) => ({
+=======
+  importWithRecovery(() => import('~/components/Prompts/layouts/InlinePromptsView')).then((m) => ({
+>>>>>>> upstream/main
     Component: m.default,
   }));
 
 const loadSkillsView = () =>
+<<<<<<< HEAD
   import('~/components/Skills/layouts/SkillsView').then((m) => ({
+=======
+  importWithRecovery(() => import('~/components/Skills/layouts/SkillsView')).then((m) => ({
+>>>>>>> upstream/main
     Component: m.default,
   }));
 
 const loadInsightsView = () =>
+<<<<<<< HEAD
   import('~/components/Insights').then((m) => ({
+=======
+  importWithRecovery(() => import('~/components/Insights')).then((m) => ({
+>>>>>>> upstream/main
     Component: m.default,
   }));
 
 const loadProjectsView = () =>
+<<<<<<< HEAD
   import('~/components/Projects').then((m) => ({
+=======
+  importWithRecovery(() => import('~/components/Projects')).then((m) => ({
+>>>>>>> upstream/main
     Component: m.ProjectsView,
   }));
 
 const loadProjectWorkspace = () =>
+<<<<<<< HEAD
   import('~/components/Projects').then((m) => ({
+=======
+  importWithRecovery(() => import('~/components/Projects')).then((m) => ({
+>>>>>>> upstream/main
     Component: m.ProjectWorkspace,
   }));
 
@@ -114,6 +151,7 @@ export const router = createBrowserRouter(
       errorElement: <RouteErrorBoundary />,
       children: [
         {
+<<<<<<< HEAD
           path: '/',
           element: <LoginLayout />,
           children: [
@@ -225,6 +263,94 @@ export const router = createBrowserRouter(
                 {
                   path: 'agent-guide',
                   Component: NewJerseyAgentGuide,
+=======
+          errorElement: <RouteErrorBoundary />,
+          children: [
+            {
+              path: '/',
+              element: <LoginLayout />,
+              children: [
+                {
+                  path: 'login',
+                  element: <Login />,
+                },
+                {
+                  path: 'login/2fa',
+                  element: <TwoFactorScreen />,
+                },
+                {
+                  path: 'login/2fa/setup',
+                  element: <TwoFactorSetupScreen />,
+                },
+              ],
+            },
+            dashboardRoutes,
+            codeSetupRoute,
+            {
+              path: '/',
+              element: <Root />,
+              children: [
+                {
+                  index: true,
+                  element: <Navigate to="/c/new" replace={true} />,
+                },
+                {
+                  path: 'c/:conversationId?',
+                  element: <ChatRoute />,
+                },
+                {
+                  path: 'search',
+                  element: <Search />,
+                },
+                {
+                  path: 'prompts',
+                  element: <Navigate to="/c/new" replace={true} />,
+                },
+                {
+                  /** Prompts are created from a dialog, so there is no "new" page to land on */
+                  path: 'prompts/new',
+                  element: <Navigate to="/c/new" replace={true} />,
+                },
+                {
+                  path: 'prompts/:promptId',
+                  lazy: loadInlinePromptsView,
+                },
+                {
+                  path: 'skills',
+                  lazy: loadSkillsView,
+                },
+                {
+                  path: 'insights',
+                  lazy: loadInsightsView,
+                },
+                {
+                  path: 'skills/new',
+                  lazy: loadSkillsView,
+                },
+                {
+                  path: 'skills/:skillId',
+                  lazy: loadSkillsView,
+                },
+                {
+                  path: 'skills/:skillId/edit',
+                  lazy: loadSkillsView,
+                },
+                {
+                  path: 'projects',
+                  lazy: loadProjectsView,
+                },
+                {
+                  path: 'projects/:projectId',
+                  lazy: loadProjectWorkspace,
+                },
+                {
+                  path: 'agents',
+                  element: <MarketplaceRoute />,
+                },
+                {
+                  path: 'agents/:category',
+                  element: <MarketplaceRoute />,
+>>>>>>> upstream/main
                 },
               ],
             },

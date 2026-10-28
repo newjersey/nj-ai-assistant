@@ -1,8 +1,21 @@
 import mongoose from 'mongoose';
+<<<<<<< HEAD
 import { logger, webSearchKeys } from '@librechat/data-schemas';
 import { Constants, extractVariableName } from 'librechat-data-provider';
 import type { TCustomConfig } from 'librechat-data-provider';
 import type { AppConfig } from '@librechat/data-schemas';
+=======
+import { AuthType, Constants, extractVariableName } from 'librechat-data-provider';
+import {
+  logger,
+  webSearchAuth,
+  webSearchKeys,
+  loadWebSearchConfig,
+  webSearchUrlApiKeys,
+} from '@librechat/data-schemas';
+import type { AppConfig, TWebSearchKeys } from '@librechat/data-schemas';
+import type { TCustomConfig } from 'librechat-data-provider';
+>>>>>>> upstream/main
 import type { CredentialFingerprintRecord } from '~/credentials';
 import {
   credentialMetadataCollection,
@@ -13,6 +26,10 @@ import {
   getLegacyCredentialNames,
 } from '~/credentials';
 import { isEnabled, checkEmailConfig } from '~/utils';
+<<<<<<< HEAD
+=======
+import { configureHashPool } from '~/auth/hashing';
+>>>>>>> upstream/main
 import { handleRateLimits } from './limits';
 
 interface CredentialMetadata {
@@ -364,6 +381,10 @@ export async function performStartupChecks(appConfig?: AppConfig): Promise<void>
   if (appConfig?.config?.rateLimits) {
     handleRateLimits(appConfig.config.rateLimits);
   }
+<<<<<<< HEAD
+=======
+  configureHashPool(appConfig?.config?.passwordHashing);
+>>>>>>> upstream/main
   await checkHealth();
 }
 
@@ -384,10 +405,73 @@ Latest version: ${Constants.CONFIG_VERSION}
   }
 }
 
+<<<<<<< HEAD
 /**
  * Checks web search configuration values to ensure they are environment variable references.
  * Warns if actual API keys or URLs are used instead of environment variable references.
  * Logs debug information for properly configured environment variable references.
+=======
+const WEB_SEARCH_DOCS_URL = 'https://www.librechat.ai/docs/configuration/librechat_yaml/web_search';
+
+/** Whether a service cannot run without `field`; a required URL has no provider default. */
+function isRequiredWebSearchField(field: TWebSearchKeys): boolean {
+  return Object.values(webSearchAuth).some((services: Record<string, Record<string, number>>) =>
+    Object.values(services).some((fields) => fields[field] === 1),
+  );
+}
+
+/**
+ * Whether a `${VAR}` reference supplies a key from outside config: the
+ * operator's environment value, or each user's saved key when the variable is
+ * `user_provided`.
+ */
+function readsOutsideKey(value: unknown): boolean {
+  if (typeof value !== 'string') {
+    return false;
+  }
+  const varName = extractVariableName(value);
+  return !!(varName && process.env[varName]?.trim());
+}
+
+/**
+ * Explains a web search value that is not a `${VAR}` reference. Such values are
+ * used as written, so this only flags what an operator may not expect, and it
+ * never repeats the value itself.
+ */
+function getLiteralValueWarning(
+  key: TWebSearchKeys,
+  value: string,
+  runtimeConfig: TCustomConfig['webSearch'],
+): string | null {
+  const trimmed = value.trim();
+  if (trimmed === '') {
+    return null;
+  }
+  if (trimmed === AuthType.USER_PROVIDED) {
+    return `Web search ${key} is "user_provided", which web search does not read. To let users supply it, reference an environment variable set to user_provided instead: ${key}: "\${YOUR_ENV_VAR_NAME}".`;
+  }
+  const apiKey = webSearchUrlApiKeys.get(key);
+  if (apiKey != null) {
+    if (!readsOutsideKey(runtimeConfig?.[apiKey])) {
+      return null;
+    }
+    const outcome = isRequiredWebSearchField(key)
+      ? `requests to ${key} carry no ${apiKey}`
+      : `${key} is ignored and ${apiKey} goes to the provider's default URL`;
+    return `Web search ${key} is set in librechat.yaml, but ${apiKey} comes from the environment or from each user's saved key, and neither is sent to a URL set in config: ${outcome}. Reference ${key} from the environment as well, or set ${apiKey} in librechat.yaml.`;
+  }
+  if (key.endsWith('ApiKey')) {
+    return `Web search ${key} holds a literal credential in librechat.yaml, used for every user's searches. Prefer an environment variable reference so the secret stays out of the file: ${key}: "\${YOUR_ENV_VAR_NAME}".`;
+  }
+  return null;
+}
+
+/**
+ * Logs how each web search value in librechat.yaml resolves: debug lines for
+ * environment variable references, and warnings for literal values that are
+ * ignored, shared as credentials, or kept from an API key that config does not
+ * store (an environment key or a user's saved key).
+>>>>>>> upstream/main
  * @param webSearchConfig - The loaded web search configuration object.
  */
 export function checkWebSearchConfig(
@@ -397,6 +481,7 @@ export function checkWebSearchConfig(
     return;
   }
 
+<<<<<<< HEAD
   webSearchKeys.forEach((key) => {
     const value = webSearchConfig[key as keyof typeof webSearchConfig];
 
@@ -430,4 +515,31 @@ export function checkWebSearchConfig(
       }
     }
   });
+=======
+  /** Fields librechat.yaml leaves out fall back to their default `${VAR}` references at runtime. */
+  const runtimeConfig = loadWebSearchConfig(webSearchConfig);
+  for (const key of webSearchKeys) {
+    const value = webSearchConfig[key];
+    if (typeof value !== 'string') {
+      continue;
+    }
+
+    const varName = extractVariableName(value);
+    if (varName) {
+      if (process.env[varName]) {
+        logger.debug(`Web search ${key}: Using environment variable ${varName} with value set`);
+      } else {
+        logger.debug(
+          `Web search ${key}: Using environment variable ${varName} (not set in environment, user provided value)`,
+        );
+      }
+      continue;
+    }
+
+    const warning = getLiteralValueWarning(key, value, runtimeConfig);
+    if (warning) {
+      logger.warn(`❗ ${warning}\n\nMore info: ${WEB_SEARCH_DOCS_URL}`);
+    }
+  }
+>>>>>>> upstream/main
 }

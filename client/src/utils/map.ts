@@ -1,5 +1,8 @@
 import type * as t from 'librechat-data-provider';
+<<<<<<< HEAD
 import type { TPluginMap } from '~/common';
+=======
+>>>>>>> upstream/main
 
 /** Maps Attachments by `toolCallId` for quick lookup */
 export function mapAttachments(attachments: Array<t.TAttachment | null | undefined>) {
@@ -90,6 +93,7 @@ export function mapAgents(agents: t.Agent[]) {
   return agentsMap;
 }
 
+<<<<<<< HEAD
 /** Maps Plugins by `pluginKey` for quick lookup */
 export function mapPlugins(plugins: t.TPlugin[]): TPluginMap {
   return plugins.reduce((acc, plugin) => {
@@ -133,6 +137,8 @@ export function processPlugins(
     .filter((tool: t.TPlugin | undefined): tool is t.TPlugin => tool !== undefined);
 }
 
+=======
+>>>>>>> upstream/main
 export function mapToolCalls(toolCalls: t.ToolCallResults = []): {
   [key: string]: t.ToolCallResult[] | undefined;
 } {

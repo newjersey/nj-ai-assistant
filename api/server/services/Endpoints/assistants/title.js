@@ -1,9 +1,23 @@
+<<<<<<< HEAD
 const { isEnabled, sanitizeTitle, getAttachmentTitleText } = require('@librechat/api');
+=======
+const {
+  isEnabled,
+  sanitizeTitle,
+  getAttachmentTitleText,
+  publishConversationTitle,
+  publishFallbackConversationTitle,
+} = require('@librechat/api');
+>>>>>>> upstream/main
 const { logger } = require('@librechat/data-schemas');
 const { CacheKeys } = require('librechat-data-provider');
 const getLogStores = require('~/cache/getLogStores');
 const initializeClient = require('./initalize');
+<<<<<<< HEAD
 const { saveConvo } = require('~/models');
+=======
+const { saveConvo, getConvo } = require('~/models');
+>>>>>>> upstream/main
 const { resolveConversationTitle } = require('../titlePolicy');
 
 /**
@@ -57,7 +71,10 @@ const addTitle = async (req, { text, responseText, conversationId }) => {
   }
 
   const titleCache = getLogStores(CacheKeys.GEN_TITLE);
+<<<<<<< HEAD
   const key = `${req.user.id}-${conversationId}`;
+=======
+>>>>>>> upstream/main
 
   try {
     const { openai } = await initializeClient({ req });
@@ -66,7 +83,10 @@ const addTitle = async (req, { text, responseText, conversationId }) => {
     if (title == null) {
       return;
     }
+<<<<<<< HEAD
     await titleCache.set(key, title, 120000);
+=======
+>>>>>>> upstream/main
 
     const reqCtx = {
       userId: req?.user?.id,
@@ -74,6 +94,7 @@ const addTitle = async (req, { text, responseText, conversationId }) => {
       expiredAt: req?.resolvedConversation?.expiredAt,
       interfaceConfig: req?.config?.interfaceConfig,
     };
+<<<<<<< HEAD
     await saveConvo(
       reqCtx,
       {
@@ -81,6 +102,11 @@ const addTitle = async (req, { text, responseText, conversationId }) => {
         title,
       },
       { context: 'api/server/services/Endpoints/assistants/addTitle.js', noUpsert: true },
+=======
+    await publishConversationTitle(
+      { saveConvo, getConvo, titleCache },
+      { ctx: reqCtx, conversationId, title },
+>>>>>>> upstream/main
     );
   } catch (error) {
     logger.error('[addTitle] Error generating title:', error);
@@ -100,6 +126,7 @@ const addTitle = async (req, { text, responseText, conversationId }) => {
     if (fallbackTitle == null) {
       return;
     }
+<<<<<<< HEAD
     await titleCache.set(key, fallbackTitle, 120000);
     await saveConvo(
       {
@@ -113,6 +140,20 @@ const addTitle = async (req, { text, responseText, conversationId }) => {
         title: fallbackTitle,
       },
       { context: 'api/server/services/Endpoints/assistants/addTitle.js', noUpsert: true },
+=======
+    await publishFallbackConversationTitle(
+      { saveConvo, getConvo, titleCache, logger },
+      {
+        ctx: {
+          userId: req?.user?.id,
+          isTemporary: req?.resolvedConversation?.isTemporary ?? req?.body?.isTemporary,
+          expiredAt: req?.resolvedConversation?.expiredAt,
+          interfaceConfig: req?.config?.interfaceConfig,
+        },
+        conversationId,
+        title: fallbackTitle,
+      },
+>>>>>>> upstream/main
     );
   }
 };

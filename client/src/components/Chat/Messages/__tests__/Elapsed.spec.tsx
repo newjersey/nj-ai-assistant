@@ -1,4 +1,5 @@
 import React from 'react';
+<<<<<<< HEAD
 import { RecoilRoot, type MutableSnapshot } from 'recoil';
 import { render, screen, act } from '@testing-library/react';
 import Elapsed, { shouldShowElapsed } from '~/components/Chat/Messages/Elapsed';
@@ -8,6 +9,28 @@ function renderElapsed(initializeState?: (snapshot: MutableSnapshot) => void) {
   return render(
     <RecoilRoot initializeState={initializeState}>
       <Elapsed index={0} />
+=======
+import { RecoilRoot } from 'recoil';
+import { Provider, createStore } from 'jotai';
+import { render, screen, act } from '@testing-library/react';
+import { submissionStartFamily } from '@librechat/chat/react';
+import Elapsed, { shouldShowElapsed } from '~/components/Chat/Messages/Elapsed';
+
+function storeWithStart(start?: number) {
+  const jotaiStore = createStore();
+  if (start != null) {
+    jotaiStore.set(submissionStartFamily(0), start);
+  }
+  return jotaiStore;
+}
+
+function renderElapsed(start?: number) {
+  return render(
+    <RecoilRoot>
+      <Provider store={storeWithStart(start)}>
+        <Elapsed index={0} />
+      </Provider>
+>>>>>>> upstream/main
     </RecoilRoot>,
   );
 }
@@ -29,7 +52,11 @@ describe('Elapsed', () => {
 
   it('renders seconds from the submission start anchor and rolls into minutes', () => {
     const start = Date.now() - 5_000;
+<<<<<<< HEAD
     renderElapsed(({ set }) => set(store.submissionStartFamily(0), start));
+=======
+    renderElapsed(start);
+>>>>>>> upstream/main
 
     expect(screen.getByTestId('stream-elapsed')).toHaveTextContent(/^5s$/);
     expect(screen.getByTestId('stream-elapsed')).toHaveAttribute('aria-hidden', 'true');
@@ -66,7 +93,11 @@ describe('Elapsed', () => {
 
   it('clamps a future anchor to zero instead of going negative', () => {
     const start = Date.now() + 60_000;
+<<<<<<< HEAD
     renderElapsed(({ set }) => set(store.submissionStartFamily(0), start));
+=======
+    renderElapsed(start);
+>>>>>>> upstream/main
 
     expect(screen.getByTestId('stream-elapsed')).toHaveTextContent(/^0s$/);
 
@@ -76,25 +107,46 @@ describe('Elapsed', () => {
 
   it('continues from the anchored start across an unmount and remount', () => {
     const start = Date.now() - 30_000;
+<<<<<<< HEAD
     const view = render(
       <RecoilRoot initializeState={({ set }) => set(store.submissionStartFamily(0), start)}>
         <Elapsed index={0} />
+=======
+    const jotaiStore = storeWithStart(start);
+    const view = render(
+      <RecoilRoot>
+        <Provider store={jotaiStore}>
+          <Elapsed index={0} />
+        </Provider>
+>>>>>>> upstream/main
       </RecoilRoot>,
     );
 
     expect(screen.getByTestId('stream-elapsed')).toHaveTextContent(/^30s$/);
 
     view.rerender(
+<<<<<<< HEAD
       <RecoilRoot initializeState={({ set }) => set(store.submissionStartFamily(0), start)}>
         {null}
+=======
+      <RecoilRoot>
+        <Provider store={jotaiStore}>{null}</Provider>
+>>>>>>> upstream/main
       </RecoilRoot>,
     );
     expect(screen.queryByTestId('stream-elapsed')).toBeNull();
 
     advance(5_000);
     view.rerender(
+<<<<<<< HEAD
       <RecoilRoot initializeState={({ set }) => set(store.submissionStartFamily(0), start)}>
         <Elapsed index={0} />
+=======
+      <RecoilRoot>
+        <Provider store={jotaiStore}>
+          <Elapsed index={0} />
+        </Provider>
+>>>>>>> upstream/main
       </RecoilRoot>,
     );
     expect(screen.getByTestId('stream-elapsed')).toHaveTextContent(/^35s$/);

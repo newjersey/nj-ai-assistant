@@ -51,7 +51,10 @@ export function detachLogsTransport(): void {
   logger.remove(activeTransport);
   activeTransport = undefined;
 }
+<<<<<<< HEAD
 
 export function getLogsTransport(): OpenTelemetryTransportV3 | undefined {
   return activeTransport;
 }
+=======
+>>>>>>> upstream/main

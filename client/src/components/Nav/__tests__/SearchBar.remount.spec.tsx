@@ -44,6 +44,11 @@ jest.mock('~/hooks', () => ({
 
 jest.mock('~/hooks/useKeyboardShortcuts', () => ({
   useShortcutAriaKey: () => 'Meta+/',
+<<<<<<< HEAD
+=======
+  /** The chord the field prints while it is empty. */
+  useShortcutDisplay: () => '⌘/',
+>>>>>>> upstream/main
 }));
 
 jest.mock('~/store', () => ({
@@ -102,6 +107,37 @@ describe('SearchBar across a breakpoint remount', () => {
     });
   });
 
+<<<<<<< HEAD
+=======
+  describe('what the field offers while it rests', () => {
+    /** The chord is painted under the pointer only, which is CSS; what is checked
+     *  here is which of the two the trailing slot holds. */
+    it('holds the chord until there is something to clear', () => {
+      render(<SearchBar />);
+
+      expect(screen.getByText('⌘/')).toBeInTheDocument();
+      expect(screen.queryByLabelText('com_ui_clear_search')).not.toBeInTheDocument();
+
+      type('mobile nav');
+
+      expect(screen.queryByText('⌘/')).not.toBeInTheDocument();
+      expect(screen.getByLabelText('com_ui_clear_search')).toBeInTheDocument();
+    });
+
+    /** A query left behind keeps the results route mounted, so the key that
+     *  dismisses the search has to dismiss what it found. */
+    it('empties itself on Escape', () => {
+      render(<SearchBar />);
+      type('mobile nav');
+
+      fireEvent.keyDown(input(), { key: 'Escape' });
+
+      expect(input().value).toBe('');
+      expect(mockSearchState.query).toBe('');
+    });
+  });
+
+>>>>>>> upstream/main
   describe('what the departing instance owes the search state', () => {
     beforeEach(() => jest.useFakeTimers());
     afterEach(() => jest.useRealTimers());
@@ -194,4 +230,21 @@ describe('SearchBar across a breakpoint remount', () => {
       expect(mockSearchState.debouncedQuery).toBe('');
     });
   });
+<<<<<<< HEAD
+=======
+
+  /** An IME uses Escape to cancel the text it is composing, not the search. */
+  describe('Escape while an IME is composing', () => {
+    it('keeps the query during composition and clears it after', () => {
+      render(<SearchBar />);
+      type('konnichiwa');
+
+      fireEvent.keyDown(input(), { key: 'Escape', isComposing: true });
+      expect(input().value).toBe('konnichiwa');
+
+      fireEvent.keyDown(input(), { key: 'Escape' });
+      expect(input().value).toBe('');
+    });
+  });
+>>>>>>> upstream/main
 });

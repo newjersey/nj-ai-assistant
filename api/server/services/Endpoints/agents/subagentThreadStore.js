@@ -12,7 +12,11 @@ const {
   SubagentActivityStream,
 } = require('@librechat/api');
 const db = require('~/models');
+<<<<<<< HEAD
 const { enqueueAgentTrigger } = require('../../Agents/triggers');
+=======
+const { enqueueAgentTrigger, expediteCompletionWakeups } = require('../../Agents/triggers');
+>>>>>>> upstream/main
 
 const GENERATION_DRAIN_TIMEOUT_MS = 45_000;
 const GENERATION_DRAIN_POLL_MS = 100;
@@ -55,12 +59,21 @@ async function cancelUnroutedGeneration({ userId, tenantId, taskId }) {
 const subagentThreadTaskStore = createSubagentThreadTaskStore(
   {
     acquireSubagentThreadLease: db.acquireSubagentThreadLease,
+<<<<<<< HEAD
+=======
+    appendSubagentContentBatch: db.appendSubagentContentBatch,
+    reconcileSubagentContent: db.reconcileSubagentContent,
+>>>>>>> upstream/main
     claimSubagentTaskResult: db.claimSubagentTaskResult,
     releaseSubagentTaskResultClaim: db.releaseSubagentTaskResultClaim,
     countActiveSubagentThreadLeases: db.countActiveSubagentThreadLeases,
     deleteConvos: db.deleteConvos,
     deleteMessages: db.deleteMessages,
     getConvo: db.getConvo,
+<<<<<<< HEAD
+=======
+    getAgentName: db.getAgentName,
+>>>>>>> upstream/main
     getSubagentTaskControlReplay: db.getSubagentTaskControlReplay,
     getMessages: db.getMessages,
     listActiveSubagentThreadLeases: db.listActiveSubagentThreadLeases,
@@ -78,6 +91,11 @@ const subagentThreadTaskStore = createSubagentThreadTaskStore(
     releaseOwnerAdmission: db.releaseSubagentAdmission,
     cancelUnroutedTask: cancelUnroutedGeneration,
     onTaskPrepared: completionWakeupHandler,
+<<<<<<< HEAD
+=======
+    onTaskSettled: (userId, conversationId, taskIds) =>
+      expediteCompletionWakeups({ user: userId, conversationId, taskIds }),
+>>>>>>> upstream/main
   },
 );
 
@@ -104,7 +122,12 @@ registerShutdownTask(
 );
 
 /** Starts the optional Redis owner directory before HTTP admission opens. */
+<<<<<<< HEAD
 async function configureSubagentTaskRouting() {
+=======
+async function configureSubagentTaskRouting(config) {
+  const activityOptions = subagentThreadTaskStore.configureActivity(config);
+>>>>>>> upstream/main
   if (taskRoutingConfigured || !cacheConfig.USE_REDIS) {
     return;
   }
@@ -124,14 +147,29 @@ async function configureSubagentTaskRouting() {
     ioredisClient,
     '[SubagentTaskRouting] activity subscriber',
   );
+<<<<<<< HEAD
   const activityPublisher = duplicateIoRedisClient(ioredisClient, { enableOfflineQueue: false });
+=======
+  const activityPublisher = duplicateIoRedisClient(ioredisClient, {
+    enableOfflineQueue: false,
+    maxRetriesPerRequest: 1,
+    commandTimeout: activityOptions.publicationTimeoutMs,
+  });
+>>>>>>> upstream/main
   const transport = new RedisSubagentTaskControlTransport(publisher, subscriber, {
     namespace: cacheConfig.REDIS_KEY_PREFIX,
   });
   try {
     await subagentThreadTaskStore.configureTaskControlTransport(transport);
     subagentThreadTaskStore.configureActivityStream(
+<<<<<<< HEAD
       new SubagentActivityStream(new RedisEventTransport(activityPublisher, activitySubscriber)),
+=======
+      new SubagentActivityStream(
+        new RedisEventTransport(activityPublisher, activitySubscriber),
+        activityOptions,
+      ),
+>>>>>>> upstream/main
     );
   } catch (error) {
     subscriber.disconnect();

@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import type { ReactEventHandler } from 'react';
+=======
+import type { CSSProperties, ReactEventHandler } from 'react';
+>>>>>>> upstream/main
 import useAdaptiveIcon from '~/hooks/useAdaptiveIcon';
 import { cn } from '~/utils';
 
@@ -29,12 +33,17 @@ export default function CustomIcon({
 
   if (shouldTint) {
     const maskUrl = `url("${src.replace(/["\\\n\r\f]/g, encodeURIComponent)}")`;
+<<<<<<< HEAD
     const maskSize = /\bobject-cover\b/.test(className ?? '') ? 'cover' : 'contain';
+=======
+    const maskSize = /\bobject-cover\b/.test(className ?? '') ? 'mask-cover' : 'mask-contain';
+>>>>>>> upstream/main
     return (
       <span
         role={decorative ? undefined : 'img'}
         aria-label={decorative ? undefined : alt}
         aria-hidden={decorative ? true : undefined}
+<<<<<<< HEAD
         className={cn('custom-icon-tint inline-block', className)}
         style={{
           backgroundColor: 'currentColor',
@@ -47,6 +56,14 @@ export default function CustomIcon({
           maskSize,
           WebkitMaskSize: maskSize,
         }}
+=======
+        className={cn(
+          'custom-icon-tint inline-block bg-current mask-(--custom-icon-mask) mask-center mask-no-repeat',
+          maskSize,
+          className,
+        )}
+        style={{ '--custom-icon-mask': maskUrl } as CSSProperties}
+>>>>>>> upstream/main
       >
         {onError != null && (
           <img src={src} alt="" aria-hidden="true" className="hidden" onError={onError} />

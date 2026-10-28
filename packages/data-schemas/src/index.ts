@@ -7,6 +7,12 @@ export * from './utils';
 export { createModels } from './models';
 export {
   createMethods,
+<<<<<<< HEAD
+=======
+  createSkillDeletionPersistenceAdapter,
+  AGENT_OWNER_CONTACT_RESOLVED_FIELD,
+  AgentSortCursorError,
+>>>>>>> upstream/main
   CLIENT_MESSAGE_SELECT,
   SUBAGENT_TRANSCRIPT_SOURCE_BYTE_LIMIT,
   RoleConflictError,
@@ -18,11 +24,19 @@ export {
   defaultRate,
   createTxMethods,
   permissionBitSupersets,
+<<<<<<< HEAD
+=======
+  PERM_BITS_WRITE_ATTEMPTS,
+>>>>>>> upstream/main
   partitionIssues,
   validateSkillName,
   validateSkillBody,
   validateRelativePath,
   inferSkillFileCategory,
+<<<<<<< HEAD
+=======
+  filterExistingSkillIds,
+>>>>>>> upstream/main
   validateSkillFrontmatter,
   getCanonicalSkillFrontmatterKey,
   normalizeSkillFrontmatterKeys,
@@ -43,6 +57,13 @@ export {
   MCPAuthorityProofError,
   createMCPAuthorizationFenceRetryStorage,
   MAX_MCP_AUTHORITY_TARGETS,
+<<<<<<< HEAD
+=======
+  InvalidAvailableProjectFilesCursorError,
+  parseAvailableProjectFilesCursor,
+  MAX_AVAILABLE_PROJECT_FILES_LIMIT,
+  DEFAULT_AVAILABLE_PROJECT_FILES_LIMIT,
+>>>>>>> upstream/main
   createMCPAuthorityBootRevision,
   createMCPAuthorityConfigSourceRevision,
   createMCPAuthorityCredentialRevision,
@@ -67,9 +88,19 @@ export {
   isCompactionSemanticIndexProjection,
 } from './types/compaction';
 export {
+<<<<<<< HEAD
   AGENT_TRIGGER_WORKER_CAPABILITY_BACKGROUND_COMPLETION_V1,
   AGENT_TRIGGER_WORKER_CAPABILITY_DETACHED_ACTION_V1,
   AGENT_TRIGGER_WORKER_CAPABILITY_QUEUED_TURN_V1,
+=======
+  AGENT_BACKGROUND_TOOL_RESULT_STORAGE_MAX_CHARS,
+  AGENT_TRIGGER_WORKER_CAPABILITY_BACKGROUND_COMPLETION_RECEIPT_V2,
+  AGENT_TRIGGER_WORKER_CAPABILITY_BACKGROUND_COMPLETION_BATCH_V3,
+  AGENT_TRIGGER_WORKER_CAPABILITY_BACKGROUND_COMPLETION_V1,
+  AGENT_TRIGGER_WORKER_CAPABILITY_DETACHED_ACTION_V1,
+  AGENT_TRIGGER_WORKER_CAPABILITY_QUEUED_TURN_V1,
+  AGENT_TRIGGER_WORKER_CAPABILITY_QUEUED_TURN_V2,
+>>>>>>> upstream/main
 } from './types/triggerDelivery';
 export type * from './types';
 export type * from './methods';
@@ -104,5 +135,16 @@ export {
   migrateTenantIndexes,
   dropSupersededPromptGroupIndexes,
   backfillMCPServerNormalizedNames,
+<<<<<<< HEAD
 } from './migrations';
 export { archiveOldConversations } from './nj/archiveOldConversations';
+=======
+  backfillSearchTokens,
+  warnOnMissingSearchTokens,
+} from './migrations';
+export type { SearchTokenBackfillResult } from './migrations';
+
+export { createBrowserSetupStore, createBrowserSetupBackend } from './methods/browserSetup';
+export type * from './types/browserSetup';
+export type * from './types/codeEnvironmentSetup';
+>>>>>>> upstream/main

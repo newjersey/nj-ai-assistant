@@ -1,9 +1,17 @@
 import { memo, useEffect, useState } from 'react';
+<<<<<<< HEAD
 import { useRecoilValue } from 'recoil';
 import { useTranslation } from 'react-i18next';
 import { getElapsedDurationLabels } from '~/utils';
 import { useLocalize } from '~/hooks';
 import store from '~/store';
+=======
+import { useAtomValue } from 'jotai';
+import { useTranslation } from 'react-i18next';
+import { submissionStartFamily } from '@librechat/chat/react';
+import { getElapsedDurationLabels } from '~/utils';
+import { useLocalize } from '~/hooks';
+>>>>>>> upstream/main
 
 const elapsedSeconds = (start: number): number =>
   Math.max(0, Math.floor((Date.now() - start) / 1000));
@@ -49,7 +57,11 @@ export const shouldShowElapsed = ({
  * settled state for the animation to misrepresent.
  */
 const Elapsed = memo(function Elapsed({ index }: { index: number }) {
+<<<<<<< HEAD
   const submissionStart = useRecoilValue(store.submissionStartFamily(index));
+=======
+  const submissionStart = useAtomValue(submissionStartFamily(index));
+>>>>>>> upstream/main
   return <ElapsedTimer start={submissionStart ?? undefined} />;
 });
 
@@ -76,7 +88,11 @@ export const ElapsedTimer = memo(function ElapsedTimer({ start: startAt }: { sta
    *  that replace the timer sit behind the same `p-1.5`. Inline-start, so
    *  the alignment holds in RTL. */
   return (
+<<<<<<< HEAD
     <span className="flex items-center ps-1.5 text-text-secondary">
+=======
+    <span className="text-text-secondary flex items-center ps-1.5">
+>>>>>>> upstream/main
       <span aria-hidden="true" className="shimmer tabular-nums" data-testid="stream-elapsed">
         {localize(labels.key, labels.values)}
       </span>

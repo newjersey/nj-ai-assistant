@@ -400,6 +400,13 @@ export class ApprovalLifecycle {
     const { steerQuotesCapable, ...ownerPatch } = resumePatch ?? {};
     const boundPatch = {
       ...ownerPatch,
+<<<<<<< HEAD
+=======
+      preResumeProvenance: {
+        userSubmittedPaths: job.userSubmittedPaths ?? [],
+        userSubmittedMessageFieldPaths: job.userSubmittedMessageFieldPaths ?? [],
+      },
+>>>>>>> upstream/main
       ...(steerQuotesCapable === true &&
         typeof ownerPatch.providerExecutionId === 'string' && {
           steerQuotesExecutionId: ownerPatch.providerExecutionId,

@@ -1,8 +1,13 @@
 const fs = require('fs');
 const path = require('path');
+<<<<<<< HEAD
 const sharp = require('sharp');
 const { logger } = require('@librechat/data-schemas');
 const { getStorageMetadata } = require('@librechat/api');
+=======
+const { logger } = require('@librechat/data-schemas');
+const { getStorageMetadata, convertImageBuffer } = require('@librechat/api');
+>>>>>>> upstream/main
 const { getStrategyFunctions } = require('../strategies');
 const { resizeImageBuffer } = require('./resize');
 
@@ -20,8 +25,11 @@ async function convertImage(req, file, resolution = 'high', basename = '') {
   try {
     const appConfig = req.config;
     let inputBuffer;
+<<<<<<< HEAD
     let outputBuffer;
     let extension = path.extname(file.path ?? basename).toLowerCase();
+=======
+>>>>>>> upstream/main
 
     // Check if the input is a buffer or a file path
     if (Buffer.isBuffer(file)) {
@@ -38,6 +46,7 @@ async function convertImage(req, file, resolution = 'high', basename = '') {
       buffer: resizedBuffer,
       width,
       height,
+<<<<<<< HEAD
     } = await resizeImageBuffer(inputBuffer, resolution);
 
     // Check if the file is already in target format; if it isn't, convert it:
@@ -52,6 +61,17 @@ async function convertImage(req, file, resolution = 'high', basename = '') {
     // Generate a new filename for the output file
     const newFileName =
       path.basename(file.path ?? basename, path.extname(file.path ?? basename)) + extension;
+=======
+      type,
+    } = await resizeImageBuffer(inputBuffer, resolution);
+
+    const { buffer: outputBuffer, fileName: newFileName } = await convertImageBuffer({
+      buffer: resizedBuffer,
+      type,
+      fileName: path.basename(file.path ?? basename),
+      outputType: appConfig.imageOutputType,
+    });
+>>>>>>> upstream/main
 
     const { saveBuffer } = getStrategyFunctions(appConfig.fileStrategy);
 

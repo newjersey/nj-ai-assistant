@@ -24,10 +24,13 @@ export interface VertexAIClientOptions {
   projectId?: string;
 }
 
+<<<<<<< HEAD
 export interface ThinkingConfigDisabled {
   type: 'disabled';
 }
 
+=======
+>>>>>>> upstream/main
 export interface ThinkingConfigEnabled {
   /**
    * Determines how many tokens Claude can use for its internal reasoning process.
@@ -50,6 +53,7 @@ export interface ThinkingConfigAdaptive {
   display?: ThinkingDisplayWireValue;
 }
 
+<<<<<<< HEAD
 /**
  * Configuration for enabling Claude's extended thinking.
  *
@@ -66,6 +70,8 @@ export type ThinkingConfigParam =
   | ThinkingConfigDisabled
   | ThinkingConfigAdaptive;
 
+=======
+>>>>>>> upstream/main
 export type AnthropicModelOptions = Partial<Omit<AnthropicParameters, 'thinking'>> & {
   thinking?: AnthropicParameters['thinking'] | null;
   user?: string;
@@ -75,6 +81,11 @@ export type AnthropicModelOptions = Partial<Omit<AnthropicParameters, 'thinking'
  * Configuration options for the getLLMConfig function
  */
 export interface AnthropicConfigOptions {
+<<<<<<< HEAD
+=======
+  /** Validated extra inference wire fields. */
+  inferenceParameters?: Record<string, unknown>;
+>>>>>>> upstream/main
   modelOptions?: AnthropicModelOptions;
   /** Proxy server URL */
   proxy?: string | null;

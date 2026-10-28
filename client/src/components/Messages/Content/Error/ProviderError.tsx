@@ -1,6 +1,17 @@
 import { ErrorTypes, stripLangChainTroubleshootingUrl } from 'librechat-data-provider';
 import type { ErrorPayload, ErrorRendererProps, UnclassifiedErrorProps } from './parts';
+<<<<<<< HEAD
 import { ErrorBody, ErrorDetails, readObject, readString, useErrorEndpoint } from './parts';
+=======
+import {
+  ErrorBody,
+  ErrorDetails,
+  ErrorWithDetail,
+  readObject,
+  readString,
+  useErrorEndpoint,
+} from './parts';
+>>>>>>> upstream/main
 import { extractJson } from '~/utils/json';
 import { useLocalize } from '~/hooks';
 
@@ -108,6 +119,23 @@ export function UnclassifiedError({ json, text, message }: UnclassifiedErrorProp
   const withoutPayload =
     jsonString !== '' ? text.replace(jsonString, () => payloadProse ?? '') : text;
   const prose = stripLangChainTroubleshootingUrl(withoutPayload).trim() || payloadProse;
+<<<<<<< HEAD
+=======
+  if (
+    prose != null &&
+    /^This turn exceeds the configured (attachment count|total attachment size|extracted document text) limit \(/.test(
+      prose,
+    )
+  ) {
+    return (
+      <ErrorWithDetail
+        headline={localize('com_error_attachment_limit')}
+        detail={prose}
+        label={localize('com_error_details_attachment')}
+      />
+    );
+  }
+>>>>>>> upstream/main
   /** A payload that told us nothing usable is its own statement; otherwise name who failed. */
   const providerHeadline =
     provider != null
@@ -115,6 +143,7 @@ export function UnclassifiedError({ json, text, message }: UnclassifiedErrorProp
       : localize('com_error_upstream_model');
   const headline = prose == null && json != null ? localize('com_error_unknown') : providerHeadline;
 
+<<<<<<< HEAD
   if (prose == null) {
     return headline;
   }
@@ -132,4 +161,13 @@ export function UnclassifiedError({ json, text, message }: UnclassifiedErrorProp
     label: localize('com_error_details_provider'),
     value: prose,
   });
+=======
+  return (
+    <ErrorWithDetail
+      headline={headline}
+      detail={prose}
+      label={localize('com_error_details_provider')}
+    />
+  );
+>>>>>>> upstream/main
 }

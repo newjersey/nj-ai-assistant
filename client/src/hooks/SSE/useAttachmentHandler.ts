@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { useSetRecoilState } from 'recoil';
+=======
+import { useSetAtom } from 'jotai';
+>>>>>>> upstream/main
 import { QueryKeys, Tools } from 'librechat-data-provider';
 import type {
   MemoriesResponse,
@@ -7,8 +11,14 @@ import type {
   TFile,
 } from 'librechat-data-provider';
 import type { QueryClient } from '@tanstack/react-query';
+<<<<<<< HEAD
 import { handleMemoryArtifact } from '~/utils/memory';
 import store from '~/store';
+=======
+import { messageAttachmentsMapAtom } from '~/hooks/SSE/atoms';
+import { invalidateRecentFiles } from '~/utils/files';
+import { handleMemoryArtifact } from '~/utils/memory';
+>>>>>>> upstream/main
 
 /** Identity of a re-emitted web-search snapshot: its tool call, turn, agent,
  *  and host step. Scoped to `web_search` because that is the flow whose server
@@ -30,7 +40,11 @@ const searchSnapshotKeyOf = (attachment: TAttachment): string | undefined => {
 };
 
 export default function useAttachmentHandler(queryClient?: QueryClient) {
+<<<<<<< HEAD
   const setAttachmentsMap = useSetRecoilState(store.messageAttachmentsMap);
+=======
+  const setAttachmentsMap = useSetAtom(messageAttachmentsMapAtom);
+>>>>>>> upstream/main
 
   return ({ data }: { data: TAttachment; submission: EventSubmission }) => {
     const { messageId } = data;
@@ -55,6 +69,10 @@ export default function useAttachmentHandler(queryClient?: QueryClient) {
         }
         return [fileData, ...oldData];
       });
+<<<<<<< HEAD
+=======
+      invalidateRecentFiles(queryClient);
+>>>>>>> upstream/main
     }
 
     if (queryClient && data.type === Tools.memory && data[Tools.memory]) {

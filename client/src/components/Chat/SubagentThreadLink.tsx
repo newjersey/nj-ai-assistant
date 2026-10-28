@@ -40,7 +40,11 @@ export default function SubagentThreadLink({
       title={label}
       onClick={() => navigateToConvo(targetConversation)}
     >
+<<<<<<< HEAD
       <ChevronLeft size={16} aria-hidden="true" />
+=======
+      <ChevronLeft size={16} className="rtl:-scale-x-100" aria-hidden="true" />
+>>>>>>> upstream/main
       <span className={labelClassName}>{label}</span>
     </Button>
   );

@@ -1,10 +1,17 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+<<<<<<< HEAD
 import { randomUUID } from 'node:crypto';
 import { pipeline } from 'node:stream/promises';
 import { logger } from '@librechat/data-schemas';
 import { getCodeBaseURL } from '@librechat/agents';
+=======
+import { pipeline } from 'node:stream/promises';
+import { logger } from '@librechat/data-schemas';
+import { getCodeBaseURL } from '@librechat/agents';
+import { createHash, randomUUID } from 'node:crypto';
+>>>>>>> upstream/main
 import {
   FileSources,
   getCodeEnvRefs,
@@ -13,6 +20,11 @@ import {
 } from 'librechat-data-provider';
 import type { CodeEnvRef, CodeEnvRefMap, TFile } from 'librechat-data-provider';
 import type { Readable } from 'node:stream';
+<<<<<<< HEAD
+=======
+import type { FileStorageUploadObserver } from '../operations';
+import type { CodeExecutionContext } from '~/agents/execution';
+>>>>>>> upstream/main
 import type { CodeEnvIdentity } from '~/files/code/identity';
 import type { CodeApiRateLimitBudget } from '~/utils';
 import type { ServerRequest } from '~/types';
@@ -27,6 +39,10 @@ import {
 } from '~/utils';
 import { getCodeEnvUploadFilename, getUploadedCodeEnvFilename } from '../code/form';
 import { buildCodeEnvIdentityParams } from '~/files/code/identity';
+<<<<<<< HEAD
+=======
+import { codeExecutionHeaders } from '~/agents/execution';
+>>>>>>> upstream/main
 import { getCodeApiAuthHeaders } from '~/auth/codeapi';
 import { resolveDownloadPath } from '~/storage/path';
 
@@ -50,6 +66,10 @@ export interface ProvisionDeps {
     file_id: string;
     entity_id?: string;
     signal?: AbortSignal;
+<<<<<<< HEAD
+=======
+    onUploadStart?: FileStorageUploadObserver;
+>>>>>>> upstream/main
   }) => Promise<{ embedded?: boolean } | undefined>;
   loadAuthValues: (params: {
     userId: string;
@@ -86,6 +106,14 @@ export interface CodeEnvReferenceSetResult {
   codeEnvRefs?: CodeEnvRefMap;
 }
 
+<<<<<<< HEAD
+=======
+export interface StoredFileDigest {
+  sha256: string;
+  bytes: number;
+}
+
+>>>>>>> upstream/main
 export interface ProvisionService {
   loadCodeApiKey: (userId: string) => Promise<string | undefined>;
   provisionToCodeEnv: (params: {
@@ -96,6 +124,10 @@ export interface ProvisionService {
     sandboxFilename?: string;
     signal?: AbortSignal;
     rateLimitBudget?: CodeApiRateLimitBudget;
+<<<<<<< HEAD
+=======
+    onUploadStart?: FileStorageUploadObserver;
+>>>>>>> upstream/main
   }) => Promise<{
     referenceSet: CodeEnvReferenceSetResult;
     refUpdate: CodeEnvRefUpdate;
@@ -108,12 +140,24 @@ export interface ProvisionService {
     entity_id?: string;
     existingStream?: Readable;
     signal?: AbortSignal;
+<<<<<<< HEAD
   }) => Promise<{ embedded: boolean; fileUpdate: ProvisionFileUpdate | null }>;
   checkCodeEnvFileAlive: (params: {
     file: TFile;
     apiKey?: string;
     req?: ServerRequest;
   }) => Promise<boolean>;
+=======
+    onUploadStart?: FileStorageUploadObserver;
+  }) => Promise<{ embedded: boolean; fileUpdate: ProvisionFileUpdate | null }>;
+  /** SHA-256 and length of the stored bytes, the same bytes a code-environment upload sends;
+   *  null when the file's storage cannot be streamed. */
+  digestFile: (params: {
+    req: ServerRequest;
+    file: TFile;
+    signal?: AbortSignal;
+  }) => Promise<StoredFileDigest | null>;
+>>>>>>> upstream/main
   checkSessionsAlive: (params: {
     files: TFile[];
     apiKey?: string;
@@ -123,6 +167,13 @@ export interface ProvisionService {
      *  against the Code API that issued it, not against the default one. */
     baseURL?: string;
     routeKey?: string;
+<<<<<<< HEAD
+=======
+    /** Wire profile and worker of that deployment. A worker-bound route authorizes
+     *  only a bearer minted for its worker, exactly as its uploads and reads do. */
+    executionProfile?: CodeExecutionContext['executionProfile'];
+    bridgeWorkerId?: string;
+>>>>>>> upstream/main
   }) => Promise<Set<string>>;
 }
 
@@ -187,6 +238,7 @@ export function createProvisionService({
     return stream;
   }
 
+<<<<<<< HEAD
   /** Uses managed bearer auth when available, otherwise the configured legacy API key. */
   async function buildCodeApiHeaders({
     apiKey,
@@ -200,6 +252,40 @@ export function createProvisionService({
       'User-Agent': 'LibreChat/1.0',
       ...(authHeaders.Authorization == null && apiKey ? { 'X-API-Key': apiKey } : {}),
       ...authHeaders,
+=======
+  /**
+   * Auth for a liveness probe against the route that issued the refs, matching what that
+   * route's uploads, reads and executions send. The legacy key belongs to the default
+   * Code API alone: an attached or stateful route never receives it, and a worker-bound
+   * route gets a bearer minted for its worker plus the route headers. Returns null when
+   * there is nothing to authenticate with, neither a request to mint from nor a key this
+   * route accepts, since the probe could only be rejected.
+   */
+  async function buildSessionProbeHeaders({
+    apiKey,
+    req,
+    routeKey,
+    executionProfile,
+    bridgeWorkerId,
+  }: {
+    apiKey?: string;
+    req?: ServerRequest;
+    routeKey?: string;
+    executionProfile?: CodeExecutionContext['executionProfile'];
+    bridgeWorkerId?: string;
+  }): Promise<Record<string, string> | null> {
+    const isDefaultRoute = (routeKey ?? 'default') === 'default';
+    const authHeaders = await getCodeApiAuthHeaders(req, bridgeWorkerId);
+    const legacyKey = isDefaultRoute && authHeaders.Authorization == null ? apiKey : undefined;
+    if (req == null && authHeaders.Authorization == null && !legacyKey) {
+      return null;
+    }
+    return {
+      'User-Agent': 'LibreChat/1.0',
+      ...(legacyKey ? { 'X-API-Key': legacyKey } : {}),
+      ...authHeaders,
+      ...(executionProfile ? codeExecutionHeaders({ executionProfile, bridgeWorkerId }) : {}),
+>>>>>>> upstream/main
     };
   }
 
@@ -245,6 +331,10 @@ export function createProvisionService({
     sandboxFilename: requestedSandboxFilename,
     signal,
     rateLimitBudget,
+<<<<<<< HEAD
+=======
+    onUploadStart,
+>>>>>>> upstream/main
   }: {
     req: ServerRequest;
     file: TFile;
@@ -253,6 +343,10 @@ export function createProvisionService({
     sandboxFilename?: string;
     signal?: AbortSignal;
     rateLimitBudget?: CodeApiRateLimitBudget;
+<<<<<<< HEAD
+=======
+    onUploadStart?: FileStorageUploadObserver;
+>>>>>>> upstream/main
   }) {
     signal?.throwIfAborted();
     const { handleFileUpload: uploadCodeEnvFile } = getStrategyFunctions(FileSources.execute_code);
@@ -305,10 +399,18 @@ export function createProvisionService({
           ...(route?.baseUrl ? { codeApiBaseUrl: route.baseUrl } : {}),
           executionProfile,
           signal,
+<<<<<<< HEAD
         }),
     });
     signal?.throwIfAborted();
 
+=======
+          onUploadStart,
+        }),
+    });
+
+    /* A successful upload must reach pointer persistence even if cancellation just arrived. */
+>>>>>>> upstream/main
     /* Merge rather than overwrite: the eager upload path persists the same shape via
      * mergeCodeEnvRef, so both the legacy pointer and the route-keyed map stay in sync
      * and pointers for other Code API routes survive re-provisioning. */
@@ -358,6 +460,10 @@ export function createProvisionService({
     file,
     entity_id,
     existingStream,
+<<<<<<< HEAD
+=======
+    onUploadStart,
+>>>>>>> upstream/main
     signal,
   }: {
     req: ServerRequest;
@@ -365,6 +471,10 @@ export function createProvisionService({
     entity_id?: string;
     existingStream?: Readable;
     signal?: AbortSignal;
+<<<<<<< HEAD
+=======
+    onUploadStart?: FileStorageUploadObserver;
+>>>>>>> upstream/main
   }): Promise<{ embedded: boolean; fileUpdate: { file_id: string; embedded?: boolean } | null }> {
     /* Unique per attempt: two concurrent requests provisioning the same file_id would
      * otherwise share one path, and the first to finish unlinks it while the second is
@@ -403,8 +513,13 @@ export function createProvisionService({
         file_id: file.file_id,
         entity_id,
         signal,
+<<<<<<< HEAD
       });
       signal?.throwIfAborted();
+=======
+        onUploadStart,
+      });
+>>>>>>> upstream/main
 
       const embedded = embeddingResult?.embedded ?? false;
 
@@ -426,6 +541,7 @@ export function createProvisionService({
   }
 
   /**
+<<<<<<< HEAD
    * Check if a single code env file is still alive by querying its session.
    *
    * @param {object} params
@@ -474,6 +590,8 @@ export function createProvisionService({
   }
 
   /**
+=======
+>>>>>>> upstream/main
    * Batch-check code env file liveness by `storage_session_id`.
    * Groups files by session, makes one API call per session.
    *
@@ -501,6 +619,11 @@ export function createProvisionService({
     staleSafeWindowMs = 6 * 60 * 60 * 1000,
     baseURL: routeBaseURL,
     routeKey,
+<<<<<<< HEAD
+=======
+    executionProfile,
+    bridgeWorkerId,
+>>>>>>> upstream/main
   }: {
     files: TFile[];
     apiKey?: string;
@@ -508,6 +631,11 @@ export function createProvisionService({
     staleSafeWindowMs?: number;
     baseURL?: string;
     routeKey?: string;
+<<<<<<< HEAD
+=======
+    executionProfile?: CodeExecutionContext['executionProfile'];
+    bridgeWorkerId?: string;
+>>>>>>> upstream/main
   }): Promise<Set<string>> {
     const aliveFileIds = new Set<string>();
     const now = Date.now();
@@ -556,6 +684,7 @@ export function createProvisionService({
       group.entries.push({ file_id: file.file_id, remoteFileId: ref.file_id });
     }
 
+<<<<<<< HEAD
     // One API call per session (in parallel)
     const baseURL = routeBaseURL ?? getCodeBaseURL();
     /* Minting can fail on its own, for example when the request carries no tenant
@@ -569,13 +698,54 @@ export function createProvisionService({
       logger.warn(
         `[checkSessionsAlive] Could not build Code API auth headers; treating ${files.length} reference(s) as unverified: ${(error as Error).message}`,
       );
+=======
+    if (sessionGroups.size === 0) {
+      return aliveFileIds;
+    }
+    const keepUnverified = () => {
+>>>>>>> upstream/main
       for (const file of files) {
         if (file?.file_id) {
           aliveFileIds.add(file.file_id);
         }
       }
       return aliveFileIds;
+<<<<<<< HEAD
     }
+=======
+    };
+
+    /* Minting can fail on its own, for example when the request carries no tenant
+     * context. That is an unverifiable probe, not an expired file, so it is handled
+     * like any other probe failure: every ref stays alive rather than the rejection
+     * propagating out and aborting initialization for the whole turn. */
+    let headers: Record<string, string> | null;
+    try {
+      headers = await buildSessionProbeHeaders({
+        apiKey,
+        req,
+        routeKey,
+        executionProfile,
+        bridgeWorkerId,
+      });
+    } catch (error) {
+      logger.warn(
+        `[checkSessionsAlive] Could not build Code API auth headers; treating ${files.length} reference(s) as unverified: ${(error as Error).message}`,
+      );
+      return keepUnverified();
+    }
+    /* Sending a credential the route does not accept only earns a 401, so a route with
+     * no usable credential this turn is left unverified without a request. */
+    if (headers == null) {
+      logger.debug(
+        `[checkSessionsAlive] No credential this route accepts is available; treating ${files.length} reference(s) as unverified`,
+      );
+      return keepUnverified();
+    }
+
+    // One API call per session (in parallel)
+    const baseURL = routeBaseURL ?? getCodeBaseURL();
+>>>>>>> upstream/main
     const sessionChecks = Array.from(sessionGroups.values()).map(
       async ({ session_id, identity, entries: fileEntries }) => {
         try {
@@ -619,11 +789,48 @@ export function createProvisionService({
     await Promise.allSettled(sessionChecks);
     return aliveFileIds;
   }
+<<<<<<< HEAD
+=======
+  async function digestFile({
+    req,
+    file,
+    signal,
+  }: {
+    req: ServerRequest;
+    file: TFile;
+    signal?: AbortSignal;
+  }): Promise<StoredFileDigest | null> {
+    const stream = await getStorageStream(file, req, signal);
+    if (stream == null) {
+      return null;
+    }
+    const hash = createHash('sha256');
+    let bytes = 0;
+    const abort = () => stream.destroy(signal?.reason instanceof Error ? signal.reason : undefined);
+    signal?.addEventListener('abort', abort, { once: true });
+    try {
+      for await (const chunk of stream) {
+        const buffer: Buffer = typeof chunk === 'string' ? Buffer.from(chunk) : chunk;
+        hash.update(buffer);
+        bytes += buffer.byteLength;
+      }
+    } finally {
+      signal?.removeEventListener('abort', abort);
+    }
+    signal?.throwIfAborted();
+    return { sha256: hash.digest('hex'), bytes };
+  }
+
+>>>>>>> upstream/main
   return {
     loadCodeApiKey,
     provisionToCodeEnv,
     provisionToVectorDB,
+<<<<<<< HEAD
     checkCodeEnvFileAlive,
+=======
+    digestFile,
+>>>>>>> upstream/main
     checkSessionsAlive,
   };
 }

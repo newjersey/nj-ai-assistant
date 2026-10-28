@@ -1,5 +1,10 @@
+<<<<<<< HEAD
 const { removeNullishValues } = require('librechat-data-provider');
 const generateArtifactsPrompt = require('~/app/clients/prompts/artifacts');
+=======
+const { generateArtifactsPrompt } = require('@librechat/api');
+const { removeNullishValues } = require('librechat-data-provider');
+>>>>>>> upstream/main
 const { getAssistant } = require('~/models');
 
 const buildOptions = async (endpoint, parsedBody) => {

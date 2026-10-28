@@ -10,6 +10,15 @@ import {
   sanitizeGeminiSchema,
 } from '../zod';
 
+<<<<<<< HEAD
+=======
+/** A parsed value read by key path; JSON Schema conversions have no static output type. */
+type ParsedTree = { readonly [key: string]: ParsedTree | undefined };
+
+const parseTree = (schema: z.ZodType | undefined, data: unknown): ParsedTree | undefined =>
+  schema?.parse(data) as ParsedTree | undefined;
+
+>>>>>>> upstream/main
 describe('convertJsonSchemaToZod', () => {
   describe('integer type handling', () => {
     // Before the fix, integer types were falling through to the default case
@@ -84,9 +93,15 @@ describe('convertJsonSchemaToZod', () => {
 
       // Test with valid data
       const validData = { query: 'test search' };
+<<<<<<< HEAD
       const parsedValid = result?.parse(validData);
       expect(parsedValid).toBeDefined();
       expect(parsedValid.query).toBe('test search');
+=======
+      const parsedValid = parseTree(result, validData);
+      expect(parsedValid).toBeDefined();
+      expect(parsedValid?.query).toBe('test search');
+>>>>>>> upstream/main
       // max_results is optional and may not be in the result when not provided
 
       // Test with max_results included
@@ -132,12 +147,21 @@ describe('convertJsonSchemaToZod', () => {
 
       // Test with optional fields omitted
       const minimalData = { numberField: 2.5 };
+<<<<<<< HEAD
       const parsedMinimal = result?.parse(minimalData);
       expect(parsedMinimal).toBeDefined();
       expect(parsedMinimal.numberField).toBe(2.5);
       // Optional fields may be undefined or null when not provided
       expect(parsedMinimal.integerField ?? null).toBe(null);
       expect(parsedMinimal.floatField ?? null).toBe(null);
+=======
+      const parsedMinimal = parseTree(result, minimalData);
+      expect(parsedMinimal).toBeDefined();
+      expect(parsedMinimal?.numberField).toBe(2.5);
+      // Optional fields may be undefined or null when not provided
+      expect(parsedMinimal?.integerField ?? null).toBe(null);
+      expect(parsedMinimal?.floatField ?? null).toBe(null);
+>>>>>>> upstream/main
     });
   });
 
@@ -1316,7 +1340,11 @@ describe('convertJsonSchemaToZod', () => {
         },
       };
 
+<<<<<<< HEAD
       const result = zodSchema?.parse(testData);
+=======
+      const result = parseTree(zodSchema, testData);
+>>>>>>> upstream/main
       expect(result).toEqual(testData);
       expect(result?.filter).toBeDefined();
       expect(result?.filter?.title?._icontains).toBe('Pirate');
@@ -1451,7 +1479,11 @@ describe('convertJsonSchemaToZod', () => {
         },
       };
 
+<<<<<<< HEAD
       const result = zodSchema?.parse(testData);
+=======
+      const result = parseTree(zodSchema, testData);
+>>>>>>> upstream/main
       expect(result).toEqual(testData);
       expect(result?.query?.filter?.title?._icontains).toBe('Pirate');
     });
@@ -1531,7 +1563,11 @@ describe('convertJsonSchemaToZod', () => {
       };
 
       // Without resolving refs, the filter field won't work correctly
+<<<<<<< HEAD
       const resultUnresolved = zodSchemaUnresolved?.parse(testData);
+=======
+      const resultUnresolved = parseTree(zodSchemaUnresolved, testData);
+>>>>>>> upstream/main
       expect(resultUnresolved?.query?.filter).toEqual({});
 
       // Now resolve refs first
@@ -1552,7 +1588,11 @@ describe('convertJsonSchemaToZod', () => {
       });
 
       // With resolved refs, it should work correctly
+<<<<<<< HEAD
       const resultResolved = zodSchemaResolved?.parse(testData);
+=======
+      const resultResolved = parseTree(zodSchemaResolved, testData);
+>>>>>>> upstream/main
       expect(resultResolved).toEqual(testData);
       expect(resultResolved?.query?.filter?.status?._eq).toBe('draft');
     });
@@ -1773,7 +1813,11 @@ describe('convertJsonSchemaToZod', () => {
         },
       };
 
+<<<<<<< HEAD
       const result = zodSchema?.parse(testData);
+=======
+      const result = parseTree(zodSchema, testData);
+>>>>>>> upstream/main
       expect(result).toEqual(testData);
       expect(result?.properties?.minutes_id).toBeDefined();
     });
@@ -2000,7 +2044,11 @@ describe('convertJsonSchemaToZod', () => {
       };
 
       // Without ref resolution, the data field should be stripped/empty
+<<<<<<< HEAD
       const result = zodSchema?.parse(testData);
+=======
+      const result = parseTree(zodSchema, testData);
+>>>>>>> upstream/main
       expect(result?.data).toEqual({});
     });
 
@@ -2031,7 +2079,11 @@ describe('convertJsonSchemaToZod', () => {
       };
 
       // The random field should be stripped because this isn't a bare object
+<<<<<<< HEAD
       const result = zodSchema?.parse(testData);
+=======
+      const result = parseTree(zodSchema, testData);
+>>>>>>> upstream/main
       expect(result?.config).toEqual({});
     });
   });

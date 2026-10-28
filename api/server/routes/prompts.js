@@ -1,4 +1,5 @@
 const express = require('express');
+<<<<<<< HEAD
 const { ObjectId } = require('mongodb');
 const { logger, isValidObjectIdString } = require('@librechat/data-schemas');
 const {
@@ -39,10 +40,24 @@ const {
   savePrompt,
   getPrompt,
 } = require('~/models');
+=======
+const {
+  generateCheckAccess,
+  createPromptHandlers,
+  invalidateLinkedPrompt,
+} = require('@librechat/api');
+const {
+  CacheKeys,
+  Permissions,
+  PermissionBits,
+  PermissionTypes,
+} = require('librechat-data-provider');
+>>>>>>> upstream/main
 const {
   canAccessPromptGroupResource,
   canAccessPromptViaGroup,
   promptUsageLimiter,
+<<<<<<< HEAD
   requireJwtAuth,
   configMiddleware,
 } = require('~/server/middleware');
@@ -75,11 +90,42 @@ router.use(requireJwtAuth);
 router.use(checkPromptAccess);
 
 const checkGlobalPromptShare = generateCheckAccess({
+=======
+  promptResolveLimiter,
+  requireJwtAuth,
+  configMiddleware,
+} = require('~/server/middleware');
+const { getEffectivePermissions } = require('~/server/services/PermissionService');
+const { promptService } = require('~/server/services/Prompts');
+const { getLogStores } = require('~/cache');
+const db = require('~/models');
+
+const { getRoleByName } = db;
+const router = express.Router();
+
+const linkedInstructionsCache = getLogStores(CacheKeys.AGENT_LINKED_INSTRUCTIONS);
+
+const handlers = createPromptHandlers({
+  service: promptService,
+  getPromptGroupAccessContext: db.getPromptGroupAccessContext,
+  getEffectivePermissions,
+  invalidateLinkedPrompt: (groupId, promptIds) =>
+    invalidateLinkedPrompt(linkedInstructionsCache, groupId, promptIds),
+});
+
+const checkPromptAccess = generateCheckAccess({
+  permissionType: PermissionTypes.PROMPTS,
+  permissions: [Permissions.USE],
+  getRoleByName,
+});
+const checkPromptCreate = generateCheckAccess({
+>>>>>>> upstream/main
   permissionType: PermissionTypes.PROMPTS,
   permissions: [Permissions.USE, Permissions.CREATE],
   getRoleByName,
 });
 
+<<<<<<< HEAD
 /**
  * Route to get single prompt group by its ID
  * GET /groups/:groupId
@@ -454,10 +500,60 @@ router.patch(
       res.status(500).send({ error: 'Error updating prompt production' });
     }
   },
+=======
+router.use(requireJwtAuth);
+router.use(checkPromptAccess);
+
+router.get(
+  '/groups/:groupId',
+  canAccessPromptGroupResource({ requiredPermission: PermissionBits.VIEW }),
+  configMiddleware,
+  handlers.getPromptGroup,
+);
+router.get(
+  '/groups/:groupId/resolve',
+  promptResolveLimiter,
+  canAccessPromptGroupResource({ requiredPermission: PermissionBits.VIEW }),
+  configMiddleware,
+  handlers.resolvePrompt,
+);
+router.get('/all', configMiddleware, handlers.listAllPromptGroups);
+router.get('/groups', configMiddleware, handlers.listPromptGroups);
+
+router.post('/', checkPromptCreate, configMiddleware, handlers.createPromptGroup);
+router.post(
+  '/groups/:groupId/prompts',
+  checkPromptAccess,
+  canAccessPromptGroupResource({ requiredPermission: PermissionBits.EDIT }),
+  configMiddleware,
+  handlers.savePrompt,
+);
+router.post(
+  '/groups/:groupId/use',
+  promptUsageLimiter,
+  canAccessPromptGroupResource({ requiredPermission: PermissionBits.VIEW }),
+  handlers.recordPromptUsage,
+);
+
+router.patch(
+  '/groups/:groupId',
+  checkPromptCreate,
+  canAccessPromptGroupResource({ requiredPermission: PermissionBits.EDIT }),
+  configMiddleware,
+  handlers.updatePromptGroup,
+);
+router.patch(
+  '/:promptId/tags/production',
+  checkPromptCreate,
+  canAccessPromptViaGroup({ requiredPermission: PermissionBits.EDIT, resourceIdParam: 'promptId' }),
+  configMiddleware,
+  handlers.makePromptProduction,
+>>>>>>> upstream/main
 );
 
 router.get(
   '/:promptId',
+<<<<<<< HEAD
   canAccessPromptViaGroup({
     requiredPermission: PermissionBits.VIEW,
     resourceIdParam: 'promptId',
@@ -570,6 +666,13 @@ const deletePromptGroupController = async (req, res) => {
     res.status(500).send({ message: 'Error deleting prompt group' });
   }
 };
+=======
+  canAccessPromptViaGroup({ requiredPermission: PermissionBits.VIEW, resourceIdParam: 'promptId' }),
+  configMiddleware,
+  handlers.getPrompt,
+);
+router.get('/', configMiddleware, handlers.getPrompts);
+>>>>>>> upstream/main
 
 router.delete(
   '/:promptId',
@@ -578,15 +681,26 @@ router.delete(
     requiredPermission: PermissionBits.DELETE,
     resourceIdParam: 'promptId',
   }),
+<<<<<<< HEAD
   deletePromptController,
+=======
+  configMiddleware,
+  handlers.deletePrompt,
+>>>>>>> upstream/main
 );
 router.delete(
   '/groups/:groupId',
   checkPromptCreate,
+<<<<<<< HEAD
   canAccessPromptGroupResource({
     requiredPermission: PermissionBits.DELETE,
   }),
   deletePromptGroupController,
+=======
+  canAccessPromptGroupResource({ requiredPermission: PermissionBits.DELETE }),
+  configMiddleware,
+  handlers.deletePromptGroup,
+>>>>>>> upstream/main
 );
 
 module.exports = router;

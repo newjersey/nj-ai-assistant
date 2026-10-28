@@ -62,6 +62,14 @@ const file: Schema<IMongoFile> = new Schema(
     storageRegion: {
       type: String,
     },
+<<<<<<< HEAD
+=======
+    storageOperations: {
+      provisioning: { type: [String], default: undefined },
+      deleting: { type: String, default: undefined },
+      deletionPending: { type: Boolean, default: undefined },
+    },
+>>>>>>> upstream/main
     object: {
       type: String,
       required: true,
@@ -70,6 +78,18 @@ const file: Schema<IMongoFile> = new Schema(
     embedded: {
       type: Boolean,
     },
+<<<<<<< HEAD
+=======
+    embeddingOwnersTrackedAt: {
+      type: Date,
+      default: undefined,
+      immutable: true,
+    },
+    embeddingOwnersComplete: {
+      type: Boolean,
+      default: undefined,
+    },
+>>>>>>> upstream/main
     type: {
       type: String,
       required: true,
@@ -163,6 +183,19 @@ const file: Schema<IMongoFile> = new Schema(
         type: [String],
         default: undefined,
       },
+<<<<<<< HEAD
+=======
+      /** Retains the code destination when confirmed deletion clears its pointers. */
+      codeDestination: {
+        type: Boolean,
+        default: undefined,
+      },
+      /** Retains the search destination when confirmed deletion clears its vectors. */
+      searchDestination: {
+        type: Boolean,
+        default: undefined,
+      },
+>>>>>>> upstream/main
       /** The user named this file's destination, through the chooser or by requesting a
        *  tool resource, so the destinations absent from the record were declined rather
        *  than deferred. Unlike the endpoint setting, which the next turn may resolve
@@ -177,6 +210,16 @@ const file: Schema<IMongoFile> = new Schema(
         type: String,
         default: undefined,
       },
+<<<<<<< HEAD
+=======
+      /** Copies placed in attached workspaces, keyed by opaque target digests; written only
+       *  through `recordFileWorkspaceImport`. Mixed for the same dotted-key reason as
+       *  `codeEnvRefs`. */
+      workspaceImports: {
+        type: Schema.Types.Mixed,
+        default: undefined,
+      },
+>>>>>>> upstream/main
     },
     llmDeliveryPath: {
       /* What upload time inferred about delivery, from the endpoint and MIME type it saw.
@@ -196,9 +239,12 @@ const file: Schema<IMongoFile> = new Schema(
       type: String,
       index: true,
     },
+<<<<<<< HEAD
     pinned: {
       type: Boolean,
     },
+=======
+>>>>>>> upstream/main
     expiredAt: {
       /* Retention deadline for persisted files. The file sweep deletes the
        * backing storage first, then removes this metadata record. */
@@ -223,6 +269,20 @@ const file: Schema<IMongoFile> = new Schema(
 );
 
 file.index({ expiredAt: 1 });
+<<<<<<< HEAD
+=======
+file.index(
+  { user: 1, tenantId: 1, context: 1, _id: -1 },
+  { name: 'project_file_picker', partialFilterExpression: { embedded: true } },
+);
+file.index(
+  { user: 1, tenantId: 1, context: 1, _id: -1 },
+  {
+    name: 'project_file_picker_search_destination',
+    partialFilterExpression: { 'metadata.searchDestination': true },
+  },
+);
+>>>>>>> upstream/main
 file.index({ createdAt: 1, updatedAt: 1 });
 file.index(
   { filename: 1, conversationId: 1, context: 1, tenantId: 1 },

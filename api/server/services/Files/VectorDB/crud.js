@@ -3,6 +3,7 @@ const axios = require('axios');
 const FormData = require('form-data');
 const { logger } = require('@librechat/data-schemas');
 const { FileSources } = require('librechat-data-provider');
+<<<<<<< HEAD
 const { logAxiosError, generateShortLivedToken } = require('@librechat/api');
 
 /**
@@ -47,6 +48,23 @@ const deleteVectors = async (req, file) => {
     }
   }
 };
+=======
+const {
+  logAxiosError,
+  generateShortLivedToken,
+  createVectorFileDeleter,
+  dispatchFileStorageOperation,
+} = require('@librechat/api');
+
+const deleteVectors = (req, file) =>
+  createVectorFileDeleter({
+    baseUrl: process.env.RAG_API_URL,
+    httpClient: axios,
+    generateToken: generateShortLivedToken,
+    ownershipTrackingStart: req.config?.fileConfig?.vectorOwnershipTrackingStart,
+    namespaceConcurrency: req.config?.fileConfig?.vectorDeletionConcurrency,
+  })(req, file);
+>>>>>>> upstream/main
 
 /**
  * Uploads a file to the configured Vector database
@@ -64,7 +82,19 @@ const deleteVectors = async (req, file) => {
  *            - filepath: The path where the file is saved.
  *            - bytes: The size of the file in bytes.
  */
+<<<<<<< HEAD
 async function uploadVectors({ req, file, file_id, entity_id, storageMetadata, signal }) {
+=======
+async function uploadVectors({
+  req,
+  file,
+  file_id,
+  entity_id,
+  storageMetadata,
+  signal,
+  onUploadStart,
+}) {
+>>>>>>> upstream/main
   if (!process.env.RAG_API_URL) {
     throw new Error('RAG_API_URL not defined');
   }
@@ -85,6 +115,7 @@ async function uploadVectors({ req, file, file_id, entity_id, storageMetadata, s
 
     const formHeaders = formData.getHeaders();
 
+<<<<<<< HEAD
     const response = await axios.post(`${process.env.RAG_API_URL}/embed`, formData, {
       ...(signal ? { signal } : {}),
       headers: {
@@ -93,6 +124,18 @@ async function uploadVectors({ req, file, file_id, entity_id, storageMetadata, s
         ...formHeaders,
       },
     });
+=======
+    const response = await dispatchFileStorageOperation(onUploadStart, () =>
+      axios.post(`${process.env.RAG_API_URL}/embed`, formData, {
+        ...(signal ? { signal } : {}),
+        headers: {
+          Authorization: `Bearer ${jwtToken}`,
+          accept: 'application/json',
+          ...formHeaders,
+        },
+      }),
+    );
+>>>>>>> upstream/main
 
     const responseData = response.data;
     logger.debug('Response from embedding file', responseData);
@@ -116,7 +159,11 @@ async function uploadVectors({ req, file, file_id, entity_id, storageMetadata, s
       error,
       message: 'Error uploading vectors',
     });
+<<<<<<< HEAD
     throw new Error(error.message || 'An error occurred during file upload.');
+=======
+    throw new Error(error.message || 'An error occurred during file upload.', { cause: error });
+>>>>>>> upstream/main
   }
 }
 

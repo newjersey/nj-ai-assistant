@@ -38,6 +38,7 @@ export default function ProviderKeys() {
           </Button>
         </OGDialogTrigger>
         <OGDialogContent
+<<<<<<< HEAD
           ref={contentRef}
           tabIndex={-1}
           onOpenAutoFocus={handleOpenAutoFocus}
@@ -45,13 +46,27 @@ export default function ProviderKeys() {
           aria-describedby={undefined}
         >
           <OGDialogHeader className="space-y-0 pr-8 text-left">
+=======
+          focusOutline="hidden"
+          ref={contentRef}
+          tabIndex={-1}
+          onOpenAutoFocus={handleOpenAutoFocus}
+          className="text-text-primary focus-visible:ring-text-primary w-11/12 max-w-2xl shadow-2xl focus-visible:ring-2 focus-visible:ring-inset"
+          aria-describedby={undefined}
+        >
+          <OGDialogHeader className="space-y-0 pe-8 text-start">
+>>>>>>> upstream/main
             <div className="flex items-center gap-1.5">
               <OGDialogTitle>{localize('com_ui_settings_label_provider_api_keys')}</OGDialogTitle>
               <InfoHoverCard text={localize('com_ui_provider_api_keys_description')} />
             </div>
           </OGDialogHeader>
           {endpointsConfig && (
+<<<<<<< HEAD
             <div className="divide-y divide-border-light">
+=======
+            <div className="divide-border-light divide-y">
+>>>>>>> upstream/main
               {endpoints.map((endpoint) => (
                 <ProviderKeyRow
                   key={endpoint}

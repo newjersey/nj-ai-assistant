@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { useRef } from 'react';
 import * as Popover from '@radix-ui/react-popover';
 import useLocalize from '~/hooks/useLocalize';
@@ -5,6 +6,13 @@ import useLocalize from '~/hooks/useLocalize';
 export function NoImage() {
   return (
     <div className="border-token-border-medium flex h-full w-full items-center justify-center rounded-full border-2 border-dashed border-black">
+=======
+import ProgressCircle from '~/components/Chat/Input/Files/ProgressCircle';
+
+export function NoImage() {
+  return (
+    <div className="border-border-medium flex h-full w-full items-center justify-center rounded-full border-2 border-dashed">
+>>>>>>> upstream/main
       <svg
         stroke="currentColor"
         fill="none"
@@ -45,6 +53,7 @@ export const AssistantAvatar = ({
       <div className="relative h-20 w-20 overflow-hidden rounded-full">
         <img
           src={url}
+<<<<<<< HEAD
           className="bg-token-surface-secondary h-full w-full rounded-full object-cover dark:bg-surface-tertiary"
           alt="GPT"
           width="80"
@@ -76,11 +85,25 @@ export const AssistantAvatar = ({
               />
             </svg>
           </div>
+=======
+          className={`bg-avatar-placeholder h-full w-full rounded-full object-cover ${progress < 1 ? 'opacity-40' : 'opacity-100'}`}
+          alt="GPT"
+          width="80"
+          height="80"
+        />
+        {progress < 1 && (
+          <ProgressCircle
+            circumference={circumference}
+            offset={offset}
+            circleCSSProperties={circleCSSProperties}
+          />
+>>>>>>> upstream/main
         )}
       </div>
     </div>
   );
 };
+<<<<<<< HEAD
 
 export function AvatarMenu({
   handleFileChange,
@@ -133,3 +156,5 @@ export function AvatarMenu({
     </Popover.Portal>
   );
 }
+=======
+>>>>>>> upstream/main

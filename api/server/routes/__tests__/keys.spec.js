@@ -9,8 +9,19 @@ jest.mock('~/models', () => ({
 
 jest.mock('~/server/middleware/requireJwtAuth', () => (req, res, next) => next());
 
+<<<<<<< HEAD
 jest.mock('~/server/middleware', () => ({
   requireJwtAuth: (req, res, next) => next(),
+=======
+let mockCredentialsConfig;
+
+jest.mock('~/server/middleware', () => ({
+  requireJwtAuth: (req, res, next) => next(),
+  configMiddleware: (req, res, next) => {
+    req.config = { credentials: mockCredentialsConfig };
+    next();
+  },
+>>>>>>> upstream/main
 }));
 
 describe('Keys Routes', () => {
@@ -33,6 +44,10 @@ describe('Keys Routes', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+<<<<<<< HEAD
+=======
+    mockCredentialsConfig = undefined;
+>>>>>>> upstream/main
   });
 
   describe('PUT /', () => {
@@ -53,6 +68,21 @@ describe('Keys Routes', () => {
       expect(updateUserKey).toHaveBeenCalledTimes(1);
     });
 
+<<<<<<< HEAD
+=======
+    it('passes the configured credentials write format from the loaded request config', async () => {
+      updateUserKey.mockResolvedValue({});
+      mockCredentialsConfig = { writeFormat: 'legacy' };
+
+      const response = await request(app).put('/api/keys').send({ name: 'openAI', value: 'sk-1' });
+
+      expect(response.status).toBe(201);
+      expect(updateUserKey).toHaveBeenCalledWith(
+        expect.objectContaining({ writeFormat: 'legacy' }),
+      );
+    });
+
+>>>>>>> upstream/main
     it('should not allow userId override via request body (IDOR prevention)', async () => {
       updateUserKey.mockResolvedValue({});
 

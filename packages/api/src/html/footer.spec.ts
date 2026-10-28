@@ -11,6 +11,7 @@ const flagOf = (html: string): boolean | undefined => {
 };
 
 describe('injectConfiguredFooterBootstrap', () => {
+<<<<<<< HEAD
   it('answers yes for each kind of configured footer content', () => {
     expect(flagOf(injectConfiguredFooterBootstrap(SHELL, { customFooter: 'Operator' }))).toBe(true);
     expect(
@@ -27,11 +28,17 @@ describe('injectConfiguredFooterBootstrap', () => {
         }),
       ),
     ).toBe(true);
+=======
+  it('answers yes for the footer the deployment configured', () => {
+    expect(flagOf(injectConfiguredFooterBootstrap(SHELL, { customFooter: 'Operator' }))).toBe(true);
+    expect(flagOf(injectConfiguredFooterBootstrap(SHELL, { customFooter: 'A | B' }))).toBe(true);
+>>>>>>> upstream/main
   });
 
   it('answers no for a deployment that configured nothing', () => {
     expect(flagOf(injectConfiguredFooterBootstrap(SHELL, {}))).toBe(false);
     expect(flagOf(injectConfiguredFooterBootstrap(SHELL))).toBe(false);
+<<<<<<< HEAD
     expect(
       flagOf(
         injectConfiguredFooterBootstrap(SHELL, {
@@ -40,6 +47,26 @@ describe('injectConfiguredFooterBootstrap', () => {
         }),
       ),
     ).toBe(false);
+=======
+    expect(flagOf(injectConfiguredFooterBootstrap(SHELL, { customFooter: undefined }))).toBe(false);
+    expect(flagOf(injectConfiguredFooterBootstrap(SHELL, { customFooter: null }))).toBe(false);
+    /** Set to nothing: the welcome screen's disclaimer is suppressed, and a
+     *  conversation renders no bar to reserve a band for. */
+    expect(flagOf(injectConfiguredFooterBootstrap(SHELL, { customFooter: '' }))).toBe(false);
+    expect(flagOf(injectConfiguredFooterBootstrap(SHELL, { customFooter: '  ' }))).toBe(false);
+  });
+
+  it('carries the welcome screen footer setting, on unless the deployment turned it off', () => {
+    const landingOf = (html: string): boolean | undefined => {
+      const match = /"landingFooter":(true|false)/.exec(html);
+      return match == null ? undefined : match[1] === 'true';
+    };
+
+    expect(landingOf(injectConfiguredFooterBootstrap(SHELL))).toBe(true);
+    expect(landingOf(injectConfiguredFooterBootstrap(SHELL, { landingFooter: null }))).toBe(true);
+    expect(landingOf(injectConfiguredFooterBootstrap(SHELL, { landingFooter: true }))).toBe(true);
+    expect(landingOf(injectConfiguredFooterBootstrap(SHELL, { landingFooter: false }))).toBe(false);
+>>>>>>> upstream/main
   });
 
   it('places the answer ahead of the app that reads it', () => {

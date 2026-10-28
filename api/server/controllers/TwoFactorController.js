@@ -1,4 +1,8 @@
 const { encryptV3, logger } = require('@librechat/data-schemas');
+<<<<<<< HEAD
+=======
+const { clearEnrollmentNonces } = require('@librechat/api');
+>>>>>>> upstream/main
 const {
   verifyOTPOrBackupCode,
   generateBackupCodes,
@@ -43,10 +47,20 @@ const enable2FA = async (req, res) => {
     const { plainCodes, codeObjects } = await generateBackupCodes();
     const encryptedSecret = encryptV3(secret);
 
+<<<<<<< HEAD
     const user = await updateUser(userId, {
       pendingTotpSecret: encryptedSecret,
       pendingBackupCodes: codeObjects,
     });
+=======
+    const user = await updateUser(
+      userId,
+      clearEnrollmentNonces({
+        pendingTotpSecret: encryptedSecret,
+        pendingBackupCodes: codeObjects,
+      }),
+    );
+>>>>>>> upstream/main
 
     const email = user.email || (existingUser && existingUser.email) || '';
     const otpauthUrl = `otpauth://totp/${safeAppTitle}:${email}?secret=${secret}&issuer=${safeAppTitle}`;
@@ -119,7 +133,11 @@ const confirm2FA = async (req, res) => {
       if (user.pendingBackupCodes?.length) {
         update.backupCodes = user.pendingBackupCodes;
       }
+<<<<<<< HEAD
       await updateUser(userId, update);
+=======
+      await updateUser(userId, clearEnrollmentNonces(update));
+>>>>>>> upstream/main
       return res.status(200).json();
     }
     return res.status(400).json({ message: 'Invalid token.' });
@@ -151,6 +169,7 @@ const disable2FA = async (req, res) => {
         return res.status(result.status ?? 400).json({ message: msg });
       }
     }
+<<<<<<< HEAD
     await updateUser(userId, {
       totpSecret: null,
       backupCodes: [],
@@ -158,6 +177,18 @@ const disable2FA = async (req, res) => {
       pendingTotpSecret: null,
       pendingBackupCodes: [],
     });
+=======
+    await updateUser(
+      userId,
+      clearEnrollmentNonces({
+        totpSecret: null,
+        backupCodes: [],
+        twoFactorEnabled: false,
+        pendingTotpSecret: null,
+        pendingBackupCodes: [],
+      }),
+    );
+>>>>>>> upstream/main
     return res.status(200).json();
   } catch (err) {
     logger.error('[disable2FA]', err);

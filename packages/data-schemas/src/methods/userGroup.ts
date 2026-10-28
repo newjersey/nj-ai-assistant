@@ -4,6 +4,10 @@ import { CacheKeys, PrincipalType, SystemRoles } from 'librechat-data-provider';
 import type { TPrincipalSearchResult } from 'librechat-data-provider';
 import type { Model, ClientSession, FilterQuery } from 'mongoose';
 import type { CacheStore, IGroup, IRole, IUser } from '~/types';
+<<<<<<< HEAD
+=======
+import { buildUserSearchFilter, scoreSearchMatch, buildGroupSearchFilter } from '~/utils/search';
+>>>>>>> upstream/main
 import { isValidObjectIdString } from '~/utils/objectId';
 import { scopedCacheKey } from '~/config/tenantContext';
 import { escapeRegExp } from '~/utils/string';
@@ -191,10 +195,13 @@ export function createUserGroupMethods(
     limit?: number,
     session?: ClientSession,
   ) => Promise<IGroup[]>;
+<<<<<<< HEAD
   findGroupsByMemberId: (
     userId: string | Types.ObjectId,
     session?: ClientSession,
   ) => Promise<IGroup[]>;
+=======
+>>>>>>> upstream/main
   createGroup: (groupData: Partial<IGroup>, session?: ClientSession) => Promise<IGroup>;
   upsertGroupByExternalId: (
     idOnTheSource: string,
@@ -206,17 +213,33 @@ export function createUserGroupMethods(
     userId: string | Types.ObjectId,
     groupId: string | Types.ObjectId,
     session?: ClientSession,
+<<<<<<< HEAD
   ) => Promise<{ user: IUser; group: IGroup | null }>;
+=======
+  ) => Promise<{ user: IUser; group: IGroup | null; changed: boolean }>;
+>>>>>>> upstream/main
   removeUserFromGroup: (
     userId: string | Types.ObjectId,
     groupId: string | Types.ObjectId,
     session?: ClientSession,
+<<<<<<< HEAD
   ) => Promise<{ user: IUser; group: IGroup | null }>;
+=======
+  ) => Promise<{ user: IUser; group: IGroup | null; changed: boolean }>;
+>>>>>>> upstream/main
   removeUserFromAllGroups: (userId: string | Types.ObjectId) => Promise<void>;
   findGroupByQuery: (
     filter: Record<string, unknown>,
     session?: ClientSession,
   ) => Promise<IGroup | null>;
+<<<<<<< HEAD
+=======
+  /** Sets scalar fields and reports atomically whether any value actually changed. */
+  updateGroupFieldsTracked: (
+    groupId: string | Types.ObjectId,
+    data: Partial<Pick<IGroup, 'name' | 'description' | 'email' | 'avatar'>>,
+  ) => Promise<{ group: IGroup; changed: boolean; changedFields: string[] } | null>;
+>>>>>>> upstream/main
   updateGroupById: (
     groupId: string | Types.ObjectId,
     data: Record<string, unknown>,
@@ -227,7 +250,10 @@ export function createUserGroupMethods(
     update: Record<string, unknown>,
     options?: { session?: ClientSession },
   ) => Promise<import('mongoose').UpdateWriteOpResult>;
+<<<<<<< HEAD
   getUserGroups: (userId: string | Types.ObjectId, session?: ClientSession) => Promise<IGroup[]>;
+=======
+>>>>>>> upstream/main
   getUserPrincipals: (
     params: {
       userId: string | Types.ObjectId;
@@ -236,6 +262,7 @@ export function createUserGroupMethods(
     },
     session?: ClientSession,
   ) => Promise<Array<{ principalType: PrincipalType; principalId?: string | Types.ObjectId }>>;
+<<<<<<< HEAD
   syncUserEntraGroups: (
     userId: string | Types.ObjectId,
     entraGroups: Array<{ id: string; name: string; description?: string; email?: string }>,
@@ -245,6 +272,8 @@ export function createUserGroupMethods(
     addedGroups: IGroup[];
     removedGroups: IGroup[];
   }>;
+=======
+>>>>>>> upstream/main
   searchPrincipals: (
     searchPattern: string,
     limitPerType?: number,
@@ -279,6 +308,14 @@ export function createUserGroupMethods(
     memberId: string,
     session?: ClientSession,
   ) => Promise<IGroup | null>;
+<<<<<<< HEAD
+=======
+  removeMemberByIdTracked: (
+    groupId: string | Types.ObjectId,
+    memberId: string,
+    session?: ClientSession,
+  ) => Promise<{ group: IGroup | null; changed: boolean }>;
+>>>>>>> upstream/main
 } {
   const getPrincipalsCache = (): CacheStore | undefined =>
     deps.getCache?.(CacheKeys.USER_PRINCIPALS);
@@ -611,7 +648,11 @@ export function createUserGroupMethods(
   }
 
   /**
+<<<<<<< HEAD
    * Find groups by name pattern (case-insensitive partial match)
+=======
+   * Find groups by word prefix of name or email (see `buildGroupSearchFilter`)
+>>>>>>> upstream/main
    * @param namePattern - The name pattern to search for
    * @param source - Optional source filter ('entra', 'local', or null for all)
    * @param limit - Maximum number of results to return
@@ -625,10 +666,18 @@ export function createUserGroupMethods(
     session?: ClientSession,
   ): Promise<IGroup[]> {
     const Group = mongoose.models.Group as Model<IGroup>;
+<<<<<<< HEAD
     const regex = new RegExp(escapeRegExp(namePattern), 'i');
     const query: Record<string, unknown> = {
       $or: [{ name: regex }, { email: regex }, { description: regex }],
     };
+=======
+    const filter = buildGroupSearchFilter(namePattern);
+    if (!filter) {
+      return [];
+    }
+    const query: Record<string, unknown> = { ...filter };
+>>>>>>> upstream/main
 
     if (source) {
       query.source = source;
@@ -642,6 +691,7 @@ export function createUserGroupMethods(
   }
 
   /**
+<<<<<<< HEAD
    * Find all groups a user is a member of by their ID or idOnTheSource
    * @param userId - The user ID
    * @param session - Optional MongoDB session for transactions
@@ -674,6 +724,8 @@ export function createUserGroupMethods(
   }
 
   /**
+=======
+>>>>>>> upstream/main
    * Create a new group
    * @param groupData - Group data including name, source, and optional idOnTheSource
    * @param session - Optional MongoDB session for transactions
@@ -742,7 +794,11 @@ export function createUserGroupMethods(
     userId: string | Types.ObjectId,
     groupId: string | Types.ObjectId,
     session?: ClientSession,
+<<<<<<< HEAD
   ): Promise<{ user: IUser; group: IGroup | null }> {
+=======
+  ): Promise<{ user: IUser; group: IGroup | null; changed: boolean }> {
+>>>>>>> upstream/main
     const User = mongoose.models.User as Model<IUser>;
     const Group = mongoose.models.Group as Model<IGroup>;
 
@@ -757,6 +813,7 @@ export function createUserGroupMethods(
     }
 
     const userIdOnTheSource = user.idOnTheSource || userId.toString();
+<<<<<<< HEAD
     const updatedGroup = await Group.findByIdAndUpdate(
       groupId,
       { $addToSet: { memberIds: userIdOnTheSource } },
@@ -765,6 +822,21 @@ export function createUserGroupMethods(
     await runAfterTransaction(session, () => invalidateMemberGroupsCache([userIdOnTheSource]));
 
     return { user: user as IUser, group: updatedGroup };
+=======
+    /** The filter makes the update match only when the member is absent, so a match
+     * is exactly one real change even when identical requests overlap. */
+    const changedGroup = await Group.findOneAndUpdate(
+      { _id: groupId, memberIds: { $ne: userIdOnTheSource } },
+      { $addToSet: { memberIds: userIdOnTheSource } },
+      options,
+    ).lean<IGroup>();
+    const updatedGroup =
+      changedGroup ??
+      (await Group.findById(groupId, null, session ? { session } : {}).lean<IGroup>());
+    await runAfterTransaction(session, () => invalidateMemberGroupsCache([userIdOnTheSource]));
+
+    return { user: user as IUser, group: updatedGroup, changed: changedGroup != null };
+>>>>>>> upstream/main
   }
 
   /**
@@ -781,7 +853,11 @@ export function createUserGroupMethods(
     userId: string | Types.ObjectId,
     groupId: string | Types.ObjectId,
     session?: ClientSession,
+<<<<<<< HEAD
   ): Promise<{ user: IUser; group: IGroup | null }> {
+=======
+  ): Promise<{ user: IUser; group: IGroup | null; changed: boolean }> {
+>>>>>>> upstream/main
     const User = mongoose.models.User as Model<IUser>;
     const Group = mongoose.models.Group as Model<IGroup>;
 
@@ -796,6 +872,7 @@ export function createUserGroupMethods(
     }
 
     const userIdOnTheSource = user.idOnTheSource || userId.toString();
+<<<<<<< HEAD
     const updatedGroup = await Group.findByIdAndUpdate(
       groupId,
       { $pullAll: { memberIds: [userIdOnTheSource] } },
@@ -817,6 +894,19 @@ export function createUserGroupMethods(
     session?: ClientSession,
   ): Promise<IGroup[]> {
     return await findGroupsByMemberId(userId, session);
+=======
+    const changedGroup = await Group.findOneAndUpdate(
+      { _id: groupId, memberIds: userIdOnTheSource },
+      { $pullAll: { memberIds: [userIdOnTheSource] } },
+      options,
+    ).lean<IGroup>();
+    const updatedGroup =
+      changedGroup ??
+      (await Group.findById(groupId, null, session ? { session } : {}).lean<IGroup>());
+    await runAfterTransaction(session, () => invalidateMemberGroupsCache([userIdOnTheSource]));
+
+    return { user: user as IUser, group: updatedGroup, changed: changedGroup != null };
+>>>>>>> upstream/main
   }
 
   /**
@@ -904,6 +994,7 @@ export function createUserGroupMethods(
   }
 
   /**
+<<<<<<< HEAD
    * Sync a user's Entra ID group memberships
    * @param userId - The user ID
    * @param entraGroups - Array of Entra groups with id and name
@@ -1007,12 +1098,15 @@ export function createUserGroupMethods(
   }
 
   /**
+=======
+>>>>>>> upstream/main
    * Calculate relevance score for a search result
    * @param item - The search result item
    * @param searchPattern - The search pattern
    * @returns Relevance score (0-100)
    */
   function calculateRelevanceScore(item: TPrincipalSearchResult, searchPattern: string): number {
+<<<<<<< HEAD
     const normalizedPattern = searchPattern.toLowerCase();
 
     /** Get searchable text based on type */
@@ -1046,6 +1140,14 @@ export function createUserGroupMethods(
     }
 
     return maxScore;
+=======
+    /** The fields each search matches on; a group's description is not one of them */
+    const values =
+      item.type === PrincipalType.USER
+        ? [item.name, item.email, item.username]
+        : [item.name, item.email];
+    return scoreSearchMatch(values, searchPattern);
+>>>>>>> upstream/main
   }
 
   /**
@@ -1114,7 +1216,12 @@ export function createUserGroupMethods(
   }
 
   /**
+<<<<<<< HEAD
    * Search for principals (users and groups) by pattern matching on name/email
+=======
+   * Search for principals: users and groups by word prefix (see `buildSearchTokenFilter`),
+   * roles by name
+>>>>>>> upstream/main
    * Returns combined results in TPrincipalSearchResult format without sorting
    * @param searchPattern - The pattern to search for
    * @param limitPerType - Maximum number of results to return
@@ -1136,6 +1243,7 @@ export function createUserGroupMethods(
     const escapedPattern = escapeRegExp(trimmedPattern);
     const promises: Promise<TPrincipalSearchResult[]>[] = [];
 
+<<<<<<< HEAD
     if (!typeFilter || typeFilter.includes(PrincipalType.USER)) {
       /** Note: searchUsers is imported from ~/models and needs to be passed in or implemented */
       const userFields = 'name email username avatar provider idOnTheSource role';
@@ -1147,6 +1255,13 @@ export function createUserGroupMethods(
       })
         .select(userFields)
         .limit(limitPerType);
+=======
+    const userFilter = buildUserSearchFilter(trimmedPattern);
+    if (userFilter && (!typeFilter || typeFilter.includes(PrincipalType.USER))) {
+      const userFields = 'name email username avatar provider idOnTheSource role';
+      const User = mongoose.models.User as Model<IUser>;
+      const userQuery = User.find(userFilter).select(userFields).limit(limitPerType);
+>>>>>>> upstream/main
 
       if (session) {
         userQuery.session(session);
@@ -1246,6 +1361,39 @@ export function createUserGroupMethods(
    * @param groupId - The group's ObjectId
    * @param data - Fields to set via $set
    */
+<<<<<<< HEAD
+=======
+  async function updateGroupFieldsTracked(
+    groupId: string | Types.ObjectId,
+    data: Partial<Pick<IGroup, 'name' | 'description' | 'email' | 'avatar'>>,
+  ): Promise<{ group: IGroup; changed: boolean; changedFields: string[] } | null> {
+    const Group = mongoose.models.Group as Model<IGroup>;
+    const entries = Object.entries(data);
+    const unchanged = async () => {
+      const current = await Group.findById(groupId).lean<IGroup>();
+      return current ? { group: current, changed: false, changedFields: [] as string[] } : null;
+    };
+    if (entries.length === 0) {
+      return unchanged();
+    }
+    /** The filter matches only a group that differs, and the pre-image names exactly the fields
+     * this write changed, so overlapping identical requests record one change. */
+    const previous = await Group.findOneAndUpdate(
+      { _id: groupId, $or: entries.map(([key, value]) => ({ [key]: { $ne: value } })) },
+      { $set: data },
+      { new: false },
+    ).lean<IGroup>();
+    if (!previous) {
+      return unchanged();
+    }
+    const changedFields = entries
+      .filter(([key, value]) => (previous as unknown as Record<string, unknown>)[key] !== value)
+      .map(([key]) => key);
+    const group = (await Group.findById(groupId).lean<IGroup>()) ?? previous;
+    return { group, changed: true, changedFields };
+  }
+
+>>>>>>> upstream/main
   async function updateGroupById(
     groupId: string | Types.ObjectId,
     data: Record<string, unknown>,
@@ -1381,11 +1529,34 @@ export function createUserGroupMethods(
    * @param memberId - The raw memberId string to remove (ObjectId or idOnTheSource)
    * @param session - Optional MongoDB session for transactions
    */
+<<<<<<< HEAD
+=======
+  async function removeMemberByIdTracked(
+    groupId: string | Types.ObjectId,
+    memberId: string,
+    session?: ClientSession,
+  ): Promise<{ group: IGroup | null; changed: boolean }> {
+    const Group = mongoose.models.Group as Model<IGroup>;
+    const options = { new: true, ...(session ? { session } : {}) };
+    const changedGroup = await Group.findOneAndUpdate(
+      { _id: groupId, memberIds: memberId },
+      { $pull: { memberIds: memberId } },
+      options,
+    ).lean<IGroup>();
+    const group =
+      changedGroup ??
+      (await Group.findById(groupId, null, session ? { session } : {}).lean<IGroup>());
+    await runAfterTransaction(session, () => invalidateMemberGroupsCache([memberId]));
+    return { group, changed: changedGroup != null };
+  }
+
+>>>>>>> upstream/main
   async function removeMemberById(
     groupId: string | Types.ObjectId,
     memberId: string,
     session?: ClientSession,
   ): Promise<IGroup | null> {
+<<<<<<< HEAD
     const Group = mongoose.models.Group as Model<IGroup>;
     const options = { new: true, ...(session ? { session } : {}) };
     const group = await Group.findByIdAndUpdate(
@@ -1395,6 +1566,9 @@ export function createUserGroupMethods(
     ).lean<IGroup>();
     await runAfterTransaction(session, () => invalidateMemberGroupsCache([memberId]));
     return group;
+=======
+    return (await removeMemberByIdTracked(groupId, memberId, session)).group;
+>>>>>>> upstream/main
   }
 
   return {
@@ -1402,7 +1576,10 @@ export function createUserGroupMethods(
     findGroupByExternalId,
     findGroupsByExternalIds,
     findGroupsByNamePattern,
+<<<<<<< HEAD
     findGroupsByMemberId,
+=======
+>>>>>>> upstream/main
     createGroup,
     upsertGroupByExternalId,
     addUserToGroup,
@@ -1410,10 +1587,16 @@ export function createUserGroupMethods(
     removeUserFromAllGroups,
     findGroupByQuery,
     updateGroupById,
+<<<<<<< HEAD
     bulkUpdateGroups,
     getUserGroups,
     getUserPrincipals,
     syncUserEntraGroups,
+=======
+    updateGroupFieldsTracked,
+    bulkUpdateGroups,
+    getUserPrincipals,
+>>>>>>> upstream/main
     searchPrincipals,
     calculateRelevanceScore,
     sortPrincipalsByRelevance,
@@ -1421,6 +1604,10 @@ export function createUserGroupMethods(
     countGroups,
     deleteGroup,
     removeMemberById,
+<<<<<<< HEAD
+=======
+    removeMemberByIdTracked,
+>>>>>>> upstream/main
   };
 }
 

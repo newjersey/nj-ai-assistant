@@ -118,6 +118,7 @@ export function hasIntentArg(args: unknown): boolean {
   return obj != null && INTENT_ARG in obj;
 }
 
+<<<<<<< HEAD
 /** Reads the model-authored intent from tool-call args (handles stringified args). */
 export function readIntentArg(args: unknown): string | undefined {
   const value = coerceArgsObject(args)?.[INTENT_ARG];
@@ -128,6 +129,8 @@ export function readIntentArg(args: unknown): string | undefined {
   return trimmed === '' ? undefined : trimmed;
 }
 
+=======
+>>>>>>> upstream/main
 /**
  * Returns the args without the injected `intent` key so a tool that did not
  * declare the parameter never receives it. Parses stringified JSON object

@@ -3,11 +3,19 @@ import { RecoilRoot } from 'recoil';
 import { EModelEndpoint } from 'librechat-data-provider';
 import { act, render, screen } from '@testing-library/react';
 import { Provider as JotaiProvider, createStore } from 'jotai';
+<<<<<<< HEAD
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { TConversation, TMessage } from 'librechat-data-provider';
 import type { RevealedQueuedTurn } from '~/store/steer';
 import PendingTurn from '~/components/Chat/Messages/PendingTurn';
 import { revealedQueuedTurnFamily } from '~/store/steer';
+=======
+import { revealedQueuedTurnFamily } from '@librechat/chat/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import type { TConversation, TMessage } from 'librechat-data-provider';
+import type { RevealedQueuedTurn } from '@librechat/chat/react';
+import PendingTurn from '~/components/Chat/Messages/PendingTurn';
+>>>>>>> upstream/main
 import { ChatContext } from '~/Providers';
 
 jest.mock('~/hooks', () => ({

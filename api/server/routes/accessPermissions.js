@@ -19,7 +19,17 @@ const {
   checkShareAccess,
   checkSharePublicAccess,
 } = require('~/server/middleware/checkSharePublicAccess');
+<<<<<<< HEAD
 const { requireJwtAuth, checkBan, uaParser, canAccessResource } = require('~/server/middleware');
+=======
+const {
+  requireJwtAuth,
+  checkBan,
+  uaParser,
+  canAccessResource,
+  configMiddleware,
+} = require('~/server/middleware');
+>>>>>>> upstream/main
 const { checkPeoplePickerAccess } = require('~/server/middleware/checkPeoplePickerAccess');
 const db = require('~/models');
 const { findMCPServerByObjectId, getSkillById } = db;
@@ -198,6 +208,10 @@ router.put(
   checkShareAccessUnlessAgentAdmin,
   checkSharePublicAccess,
   rejectSharedLinkOwnerPermissionChanges,
+<<<<<<< HEAD
+=======
+  configMiddleware,
+>>>>>>> upstream/main
   updateResourcePermissions,
 );
 

@@ -4,7 +4,13 @@ import {
   ReasoningEffort,
   ReasoningParameterFormat,
   removeNullishValues,
+<<<<<<< HEAD
   supportsAdaptiveThinking,
+=======
+  prefersResponsesApiByModel,
+  supportsAdaptiveThinking,
+  gpt6Tier,
+>>>>>>> upstream/main
 } from 'librechat-data-provider';
 import type { BindToolsInput } from '@librechat/agents/langchain/language_models/chat_models';
 import type { AzureOpenAIInput } from '@librechat/agents/langchain/openai';
@@ -137,6 +143,7 @@ function isOpenAIEndpoint(endpoint?: EModelEndpoint | string | null): boolean {
  */
 const responsesApiRequiredPattern = /\bgpt-5\.6\b/;
 
+<<<<<<< HEAD
 /**
  * Models that take the Responses API for every turn, not only reasoning ones.
  * OpenAI's guidance for GPT-6 Astra is to use Responses, and tool calls require
@@ -155,6 +162,10 @@ function prefersResponsesApi(model?: string): boolean {
   return typeof model === 'string' && responsesApiPreferredPattern.test(model);
 }
 
+=======
+/** Native model defaults apply only to canonical Azure transports; gateways
+ * may implement a different API contract even for the same model name. */
+>>>>>>> upstream/main
 function isCanonicalAzureBaseURL(baseURL?: string | null, azure?: false | t.AzureOptions): boolean {
   if (!azure) {
     return false;
@@ -214,9 +225,16 @@ function removeReasoningField(target: Record<string, unknown>, field: string) {
   target.reasoning = rest;
 }
 
+<<<<<<< HEAD
 function removeReasoningPayload(target: Record<string, unknown>) {
   delete target.reasoning;
   delete target.reasoning_effort;
+=======
+export function removeReasoningPayload(target: Record<string, unknown>): void {
+  delete target.reasoning;
+  delete target.reasoning_effort;
+  delete target.include_reasoning;
+>>>>>>> upstream/main
 }
 
 function deleteConfigParam({
@@ -228,6 +246,16 @@ function deleteConfigParam({
   llmConfig: OpenAILLMConfig;
   modelKwargs: Record<string, unknown>;
 }) {
+<<<<<<< HEAD
+=======
+  if (param === 'top_p' || param === 'topP') {
+    delete llmConfig.topP;
+    delete llmConfig.top_p;
+    delete modelKwargs.topP;
+    delete modelKwargs.top_p;
+    return;
+  }
+>>>>>>> upstream/main
   if (param === 'reasoning_effort') {
     removeReasoningPayload(llmConfig as Record<string, unknown>);
     removeReasoningPayload(modelKwargs);
@@ -613,6 +641,10 @@ export function getOpenAILLMConfig({
   addParams,
   dropParams,
   defaultParams,
+<<<<<<< HEAD
+=======
+  inferenceParameters,
+>>>>>>> upstream/main
   useOpenRouter,
   reasoningFormat = ReasoningParameterFormat.reasoningEffort,
   modelOptions: _modelOptions,
@@ -625,6 +657,10 @@ export function getOpenAILLMConfig({
   addParams?: Record<string, unknown>;
   dropParams?: string[];
   defaultParams?: Record<string, unknown>;
+<<<<<<< HEAD
+=======
+  inferenceParameters?: Record<string, unknown>;
+>>>>>>> upstream/main
   useOpenRouter?: boolean;
   reasoningFormat?: ReasoningParameterFormat;
   azure?: false | t.AzureOptions;
@@ -648,9 +684,21 @@ export function getOpenAILLMConfig({
     promptCacheTtl,
     frequency_penalty,
     presence_penalty,
+<<<<<<< HEAD
     ...modelOptions
   } = cleanedModelOptions as Partial<
     t.OpenAIParameters & { promptCache?: boolean; promptCacheTtl?: '5m' | '1h' }
+=======
+    top_p,
+    modelKwargs: _untrustedModelKwargs,
+    ...modelOptions
+  } = cleanedModelOptions as Partial<
+    t.OpenAIParameters & {
+      promptCache?: boolean;
+      promptCacheTtl?: '5m' | '1h';
+      modelKwargs?: unknown;
+    }
+>>>>>>> upstream/main
   >;
 
   const llmConfig = Object.assign(
@@ -661,6 +709,12 @@ export function getOpenAILLMConfig({
     modelOptions,
   ) as OpenAILLMConfig;
 
+<<<<<<< HEAD
+=======
+  if (top_p != null) {
+    llmConfig.topP = top_p;
+  }
+>>>>>>> upstream/main
   if (frequency_penalty != null) {
     llmConfig.frequencyPenalty = frequency_penalty;
   }
@@ -668,8 +722,13 @@ export function getOpenAILLMConfig({
     llmConfig.presencePenalty = presence_penalty;
   }
 
+<<<<<<< HEAD
   const modelKwargs: Record<string, unknown> = {};
   let hasModelKwargs = false;
+=======
+  const modelKwargs: Record<string, unknown> = { ...inferenceParameters };
+  let hasModelKwargs = Object.keys(modelKwargs).length > 0;
+>>>>>>> upstream/main
   let reasoningEffort = reasoning_effort;
   let reasoningSummary = reasoning_summary;
   let reasoningMode = reasoning_mode;
@@ -743,6 +802,27 @@ export function getOpenAILLMConfig({
         continue;
       }
 
+<<<<<<< HEAD
+=======
+      if (
+        key === 'modelKwargs' &&
+        value != null &&
+        typeof value === 'object' &&
+        !Array.isArray(value)
+      ) {
+        applyDefaultParams(modelKwargs, value as Record<string, unknown>);
+        hasModelKwargs = true;
+        continue;
+      }
+      if (key === 'seed' && inferenceParameters != null) {
+        applyDefaultParams(modelKwargs, { [key]: value });
+        hasModelKwargs = true;
+        continue;
+      }
+      if (modelKwargs[key] !== undefined) {
+        continue;
+      }
+>>>>>>> upstream/main
       if (knownOpenAIParams.has(key)) {
         applyDefaultParams(llmConfig as Record<string, unknown>, { [key]: value });
       } else {
@@ -811,7 +891,35 @@ export function getOpenAILLMConfig({
           }) || hasModelKwargs;
         continue;
       }
+<<<<<<< HEAD
       if (knownOpenAIParams.has(key)) {
+=======
+      if (
+        key === 'modelKwargs' &&
+        value != null &&
+        typeof value === 'object' &&
+        !Array.isArray(value)
+      ) {
+        Object.assign(modelKwargs, value);
+        hasModelKwargs = true;
+        continue;
+      }
+      if (
+        inferenceParameters != null &&
+        Object.prototype.hasOwnProperty.call(inferenceParameters, key)
+      ) {
+        modelKwargs[key] = value;
+        hasModelKwargs = true;
+        continue;
+      }
+      if (key === 'seed' && inferenceParameters != null) {
+        modelKwargs[key] = value;
+        hasModelKwargs = true;
+        continue;
+      }
+      if (knownOpenAIParams.has(key)) {
+        delete modelKwargs[key];
+>>>>>>> upstream/main
         (llmConfig as Record<string, unknown>)[key] = value;
       } else {
         hasModelKwargs = true;
@@ -820,7 +928,14 @@ export function getOpenAILLMConfig({
     }
   }
 
+<<<<<<< HEAD
   if (useOpenRouter) {
+=======
+  if (reasoningFormat === ReasoningParameterFormat.disabled) {
+    removeReasoningPayload(llmConfig as Record<string, unknown>);
+    removeReasoningPayload(modelKwargs);
+  } else if (useOpenRouter) {
+>>>>>>> upstream/main
     /**
      * OpenRouter uses a `reasoning` object — `summary` is not supported.
      * ChatOpenRouter treats `reasoning` and `include_reasoning` as mutually exclusive:
@@ -885,7 +1000,11 @@ export function getOpenAILLMConfig({
     (dropParams.includes('reasoning_effort') || dropParams.includes('useResponsesApi'));
   /**
    * The GPT-5.6 default above is reasoning-driven, so dropping `reasoning_effort`
+<<<<<<< HEAD
    * removes its reason to route. Astra's is not: it takes Responses for every
+=======
+   * removes its reason to route. GPT-6's is not: it takes Responses for every
+>>>>>>> upstream/main
    * turn, and a drop rule clearing an unsupported stored effort must not also
    * disable its routing. Only an explicit `useResponsesApi` drop does that.
    */
@@ -898,8 +1017,14 @@ export function getOpenAILLMConfig({
     endpoint === EModelEndpoint.azureOpenAI &&
     isCanonicalAzureBaseURL(baseURL, azure);
   const firstPartyEndpoint = firstPartyOpenAI || firstPartyAzure;
+<<<<<<< HEAD
   /** Astra keeps its model identity on Azure, where the deployment becomes the wire model. */
   const firstPartyAstra = firstPartyEndpoint && prefersResponsesApi(llmConfig.model);
+=======
+  /** Keep GPT-6 model identity on Azure, with the deployment name used on the wire. */
+  const firstPartyResponsesModel =
+    firstPartyEndpoint && prefersResponsesApiByModel(llmConfig.model);
+>>>>>>> upstream/main
   if (
     firstPartyOpenAI &&
     reasoningFormat !== ReasoningParameterFormat.disabled &&
@@ -911,11 +1036,22 @@ export function getOpenAILLMConfig({
   }
 
   /**
+<<<<<<< HEAD
    * Route GPT-6 Astra to the Responses API for every turn. Unlike the GPT-5.6
    * rule above this does not depend on reasoning params: Astra serves tool calls
    * only from Responses on both OpenAI and Azure OpenAI.
    */
   if (firstPartyAstra && llmConfig.useResponsesApi == null && !responsesApiExplicitlyOptedOut) {
+=======
+   * Route GPT-6 to Responses before invocation, including unset effort, so tools
+   * bound later cannot accidentally reach Chat Completions with default reasoning.
+   */
+  if (
+    firstPartyResponsesModel &&
+    llmConfig.useResponsesApi == null &&
+    !responsesApiExplicitlyOptedOut
+  ) {
+>>>>>>> upstream/main
     llmConfig.useResponsesApi = true;
   }
 
@@ -930,6 +1066,15 @@ export function getOpenAILLMConfig({
     llmConfig.firstPartyEndpoint = true;
   }
 
+<<<<<<< HEAD
+=======
+  /** Settle an administrator route drop before shaping API-specific fields.
+   * The drop loop later removes the flag, but it must already govern effort. */
+  if (responsesApiExplicitlyOptedOut) llmConfig.useResponsesApi = false;
+
+  const tier = gpt6Tier(llmConfig.model);
+  const solLunaRulesApply = firstPartyEndpoint && (tier === 'sol' || tier === 'luna');
+>>>>>>> upstream/main
   if (!useOpenRouter) {
     hasModelKwargs =
       applyReasoningConfig({
@@ -944,6 +1089,20 @@ export function getOpenAILLMConfig({
       }) || hasModelKwargs;
   }
 
+<<<<<<< HEAD
+=======
+  /** Flat effort is an ignored constructor field in Chat Completions. Convert
+   * after shaping (including nested defaults), before administrator drops. */
+  if (solLunaRulesApply && llmConfig.useResponsesApi !== true) {
+    const effort = llmConfig.reasoning_effort ?? llmConfig.reasoning?.effort;
+    if (effort != null && effort !== '') {
+      modelKwargs.reasoning_effort = effort;
+      hasModelKwargs = true;
+    }
+    delete llmConfig.reasoning_effort;
+  }
+
+>>>>>>> upstream/main
   /** DeepSeek thinking-mode requires `reasoning_content` replay on tool turns (#13366). */
   const isDeepSeekModel =
     typeof modelOptions.model === 'string' &&
@@ -1003,6 +1162,47 @@ export function getOpenAILLMConfig({
     dropParams.forEach((param) => deleteConfigParam({ param, llmConfig, modelKwargs }));
   }
 
+<<<<<<< HEAD
+=======
+  /** Normalize the final effective value in either API, regardless of whether
+   * it came from saved settings, flat params, or a nested configured object.
+   * Copy nested objects so administrator defaults are never mutated. */
+  if (solLunaRulesApply) {
+    if (llmConfig.reasoning?.effort === ReasoningEffort.minimal) {
+      llmConfig.reasoning = { ...llmConfig.reasoning, effort: ReasoningEffort.low };
+    }
+    if (modelKwargs.reasoning_effort === ReasoningEffort.minimal) {
+      modelKwargs.reasoning_effort = ReasoningEffort.low;
+    }
+  }
+
+  /** Sol/Luna reject sampling controls when Responses uses reasoning. The
+   * provider default is medium, so an unset effort is reasoning-enabled too.
+   * Strip only the request copy; saved settings remain available when the user
+   * switches models or explicitly selects `none`. */
+  const solLunaResponsesReasoning =
+    solLunaRulesApply &&
+    llmConfig.useResponsesApi === true &&
+    llmConfig.reasoning?.effort !== ReasoningEffort.none;
+  if (solLunaResponsesReasoning) {
+    for (const param of [
+      'temperature',
+      'topP',
+      'top_p',
+      'logprobs',
+      'topLogprobs',
+      'top_logprobs',
+    ]) {
+      deleteConfigParam({ param, llmConfig, modelKwargs });
+    }
+    for (const target of [llmConfig as Record<string, unknown>, modelKwargs]) {
+      if (Array.isArray(target.include)) {
+        target.include = target.include.filter((value) => value !== 'message.output_text.logprobs');
+      }
+    }
+  }
+
+>>>>>>> upstream/main
   hasModelKwargs =
     applyResponsesVerbosity({
       llmConfig,
@@ -1022,7 +1222,15 @@ export function getOpenAILLMConfig({
     hasModelKwargs = true;
   }
 
+<<<<<<< HEAD
   if (hasModelKwargs && Object.keys(modelKwargs).length > 0) {
+=======
+  if (
+    hasModelKwargs &&
+    Object.keys(modelKwargs).length > 0 &&
+    !dropParams?.includes('modelKwargs')
+  ) {
+>>>>>>> upstream/main
     llmConfig.modelKwargs = modelKwargs;
   }
 
@@ -1038,7 +1246,11 @@ export function getOpenAILLMConfig({
     ? sanitizeModelName(llmConfig.model || '')
     : azure.azureOpenAIApiDeploymentName ||
       getAzureDeploymentName(baseURL, azure) ||
+<<<<<<< HEAD
       (firstPartyAstra || llmConfig.useResponsesApi ? model : undefined);
+=======
+      (firstPartyResponsesModel || llmConfig.useResponsesApi ? model : undefined);
+>>>>>>> upstream/main
 
   if (process.env.AZURE_OPENAI_DEFAULT_MODEL) {
     llmConfig.model = process.env.AZURE_OPENAI_DEFAULT_MODEL;
@@ -1074,7 +1286,11 @@ export function getOpenAILLMConfig({
   constructAzureResponsesApi();
 
   /** Keep Astra's identity for SDK constraints; only the wire model is a deployment alias. */
+<<<<<<< HEAD
   if (firstPartyAstra) {
+=======
+  if (firstPartyResponsesModel) {
+>>>>>>> upstream/main
     llmConfig.model = model;
     llmConfig.modelKwargs = {
       ...llmConfig.modelKwargs,

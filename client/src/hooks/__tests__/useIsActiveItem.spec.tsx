@@ -1,6 +1,9 @@
+<<<<<<< HEAD
 /**
  * @jest-environment @happy-dom/jest-environment
  */
+=======
+>>>>>>> upstream/main
 import React from 'react';
 import { act, render } from '@testing-library/react';
 
@@ -36,13 +39,21 @@ const nextActiveItemMutation = (element: HTMLElement): Promise<void> =>
  * mutation; this unfiltered observer proves delivery happened before the test asserts
  * that the hook did not react.
  */
+<<<<<<< HEAD
 const nextAttributeMutation = (element: HTMLElement): Promise<void> =>
+=======
+const nextAttributeMutation = (element: HTMLElement, attributeName: string): Promise<void> =>
+>>>>>>> upstream/main
   new Promise((resolve) => {
     const observer = new MutationObserver(() => {
       observer.disconnect();
       resolve();
     });
+<<<<<<< HEAD
     observer.observe(element, { attributes: true });
+=======
+    observer.observe(element, { attributes: true, attributeFilter: [attributeName] });
+>>>>>>> upstream/main
   });
 
 describe('useIsActiveItem', () => {
@@ -87,7 +98,11 @@ describe('useIsActiveItem', () => {
     const { container } = render(<Probe />);
     const probe = getProbe(container);
 
+<<<<<<< HEAD
     const delivered = nextAttributeMutation(probe);
+=======
+    const delivered = nextAttributeMutation(probe, 'data-something-else');
+>>>>>>> upstream/main
     await act(async () => {
       probe.setAttribute('data-something-else', 'x');
       await delivered;

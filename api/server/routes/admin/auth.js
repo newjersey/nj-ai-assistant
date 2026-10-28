@@ -12,6 +12,12 @@ const {
 } = require('@librechat/data-schemas');
 const {
   isEnabled,
+<<<<<<< HEAD
+=======
+  TENANT_CONTEXT_REQUIRED,
+  createPreAuthTenantGuard,
+  requirePreAuthTenantContext,
+>>>>>>> upstream/main
   getAdminPanelUrl,
   exchangeAdminCode,
   createSetBalanceConfig,
@@ -155,6 +161,11 @@ function buildGoogleAdminRefreshDeps(sessionExpiry) {
 
 router.post(
   '/login/local',
+<<<<<<< HEAD
+=======
+  preAuthTenantMiddleware,
+  requirePreAuthTenantContext,
+>>>>>>> upstream/main
   middleware.logHeaders,
   middleware.requireSameOrigin,
   middleware.loginLimiter,
@@ -231,6 +242,7 @@ function retrievePkceChallenge(provider) {
  * OpenID Admin Routes
  * ────────────────────────────────────────────── */
 
+<<<<<<< HEAD
 router.get('/oauth/openid', requireOpenIdConfig, async (req, res, next) => {
   const state = generateState();
   const cache = getLogStores(CacheKeys.ADMIN_OAUTH_EXCHANGE);
@@ -249,6 +261,36 @@ router.get('/oauth/openid', requireOpenIdConfig, async (req, res, next) => {
 
 router.get(
   '/oauth/openid/callback',
+=======
+router.get(
+  '/oauth/openid',
+  preAuthTenantMiddleware,
+  requirePreAuthTenantContext,
+  requireOpenIdConfig,
+  async (req, res, next) => {
+    const state = generateState();
+    const cache = getLogStores(CacheKeys.ADMIN_OAUTH_EXCHANGE);
+    const stored = await storeAndStripChallenge(cache, req, state, 'openid');
+    if (!stored) {
+      return res.redirect(
+        `${getAdminPanelUrl()}/auth/openid/callback?error=pkce_store_failed&error_description=Failed+to+store+PKCE+challenge`,
+      );
+    }
+
+    return passport.authenticate('openidAdmin', {
+      session: false,
+      state,
+    })(req, res, next);
+  },
+);
+
+router.get(
+  '/oauth/openid/callback',
+  preAuthTenantMiddleware,
+  createPreAuthTenantGuard({
+    failureRedirect: `${getAdminPanelUrl()}/auth/openid/callback?error=${TENANT_CONTEXT_REQUIRED}&error_description=Tenant+context+required+in+strict+isolation+mode`,
+  }),
+>>>>>>> upstream/main
   (req, res, next) => {
     req.oauthState = typeof req.query.state === 'string' ? req.query.state : undefined;
     next();
@@ -271,6 +313,7 @@ router.get(
  * SAML Admin Routes
  * ────────────────────────────────────────────── */
 
+<<<<<<< HEAD
 router.get('/oauth/saml', requireAdminStrategy('samlAdmin', 'SAML'), async (req, res, next) => {
   const state = generateState();
   const cache = getLogStores(CacheKeys.ADMIN_OAUTH_EXCHANGE);
@@ -289,6 +332,36 @@ router.get('/oauth/saml', requireAdminStrategy('samlAdmin', 'SAML'), async (req,
 
 router.post(
   '/oauth/saml/callback',
+=======
+router.get(
+  '/oauth/saml',
+  preAuthTenantMiddleware,
+  requirePreAuthTenantContext,
+  requireAdminStrategy('samlAdmin', 'SAML'),
+  async (req, res, next) => {
+    const state = generateState();
+    const cache = getLogStores(CacheKeys.ADMIN_OAUTH_EXCHANGE);
+    const stored = await storeAndStripChallenge(cache, req, state, 'saml');
+    if (!stored) {
+      return res.redirect(
+        `${getAdminPanelUrl()}/auth/saml/callback?error=pkce_store_failed&error_description=Failed+to+store+PKCE+challenge`,
+      );
+    }
+
+    return passport.authenticate('samlAdmin', {
+      session: false,
+      additionalParams: { RelayState: state },
+    })(req, res, next);
+  },
+);
+
+router.post(
+  '/oauth/saml/callback',
+  preAuthTenantMiddleware,
+  createPreAuthTenantGuard({
+    failureRedirect: `${getAdminPanelUrl()}/auth/saml/callback?error=${TENANT_CONTEXT_REQUIRED}&error_description=Tenant+context+required+in+strict+isolation+mode`,
+  }),
+>>>>>>> upstream/main
   (req, res, next) => {
     req.oauthState = typeof req.body.RelayState === 'string' ? req.body.RelayState : undefined;
     next();
@@ -313,6 +386,11 @@ router.post(
 
 router.get(
   '/oauth/google',
+<<<<<<< HEAD
+=======
+  preAuthTenantMiddleware,
+  requirePreAuthTenantContext,
+>>>>>>> upstream/main
   requireAdminStrategy('googleAdmin', 'Google'),
   async (req, res, next) => {
     const state = generateState();
@@ -336,6 +414,13 @@ router.get(
 
 router.get(
   '/oauth/google/callback',
+<<<<<<< HEAD
+=======
+  preAuthTenantMiddleware,
+  createPreAuthTenantGuard({
+    failureRedirect: `${getAdminPanelUrl()}/auth/google/callback?error=${TENANT_CONTEXT_REQUIRED}&error_description=Tenant+context+required+in+strict+isolation+mode`,
+  }),
+>>>>>>> upstream/main
   (req, res, next) => {
     req.oauthState = typeof req.query.state === 'string' ? req.query.state : undefined;
     next();
@@ -360,6 +445,11 @@ router.get(
 
 router.get(
   '/oauth/github',
+<<<<<<< HEAD
+=======
+  preAuthTenantMiddleware,
+  requirePreAuthTenantContext,
+>>>>>>> upstream/main
   requireAdminStrategy('githubAdmin', 'GitHub'),
   async (req, res, next) => {
     const state = generateState();
@@ -381,6 +471,13 @@ router.get(
 
 router.get(
   '/oauth/github/callback',
+<<<<<<< HEAD
+=======
+  preAuthTenantMiddleware,
+  createPreAuthTenantGuard({
+    failureRedirect: `${getAdminPanelUrl()}/auth/github/callback?error=${TENANT_CONTEXT_REQUIRED}&error_description=Tenant+context+required+in+strict+isolation+mode`,
+  }),
+>>>>>>> upstream/main
   (req, res, next) => {
     req.oauthState = typeof req.query.state === 'string' ? req.query.state : undefined;
     next();
@@ -405,6 +502,11 @@ router.get(
 
 router.get(
   '/oauth/discord',
+<<<<<<< HEAD
+=======
+  preAuthTenantMiddleware,
+  requirePreAuthTenantContext,
+>>>>>>> upstream/main
   requireAdminStrategy('discordAdmin', 'Discord'),
   async (req, res, next) => {
     const state = generateState();
@@ -426,6 +528,13 @@ router.get(
 
 router.get(
   '/oauth/discord/callback',
+<<<<<<< HEAD
+=======
+  preAuthTenantMiddleware,
+  createPreAuthTenantGuard({
+    failureRedirect: `${getAdminPanelUrl()}/auth/discord/callback?error=${TENANT_CONTEXT_REQUIRED}&error_description=Tenant+context+required+in+strict+isolation+mode`,
+  }),
+>>>>>>> upstream/main
   (req, res, next) => {
     req.oauthState = typeof req.query.state === 'string' ? req.query.state : undefined;
     next();
@@ -450,6 +559,11 @@ router.get(
 
 router.get(
   '/oauth/facebook',
+<<<<<<< HEAD
+=======
+  preAuthTenantMiddleware,
+  requirePreAuthTenantContext,
+>>>>>>> upstream/main
   requireAdminStrategy('facebookAdmin', 'Facebook'),
   async (req, res, next) => {
     const state = generateState();
@@ -471,6 +585,13 @@ router.get(
 
 router.get(
   '/oauth/facebook/callback',
+<<<<<<< HEAD
+=======
+  preAuthTenantMiddleware,
+  createPreAuthTenantGuard({
+    failureRedirect: `${getAdminPanelUrl()}/auth/facebook/callback?error=${TENANT_CONTEXT_REQUIRED}&error_description=Tenant+context+required+in+strict+isolation+mode`,
+  }),
+>>>>>>> upstream/main
   (req, res, next) => {
     req.oauthState = typeof req.query.state === 'string' ? req.query.state : undefined;
     next();
@@ -493,6 +614,7 @@ router.get(
  * Apple Admin Routes (POST callback)
  * ────────────────────────────────────────────── */
 
+<<<<<<< HEAD
 router.get('/oauth/apple', requireAdminStrategy('appleAdmin', 'Apple'), async (req, res, next) => {
   const state = generateState();
   const cache = getLogStores(CacheKeys.ADMIN_OAUTH_EXCHANGE);
@@ -511,6 +633,36 @@ router.get('/oauth/apple', requireAdminStrategy('appleAdmin', 'Apple'), async (r
 
 router.post(
   '/oauth/apple/callback',
+=======
+router.get(
+  '/oauth/apple',
+  preAuthTenantMiddleware,
+  requirePreAuthTenantContext,
+  requireAdminStrategy('appleAdmin', 'Apple'),
+  async (req, res, next) => {
+    const state = generateState();
+    const cache = getLogStores(CacheKeys.ADMIN_OAUTH_EXCHANGE);
+    const stored = await storeAndStripChallenge(cache, req, state, 'apple');
+    if (!stored) {
+      return res.redirect(
+        `${getAdminPanelUrl()}/auth/apple/callback?error=pkce_store_failed&error_description=Failed+to+store+PKCE+challenge`,
+      );
+    }
+
+    return passport.authenticate('appleAdmin', {
+      session: false,
+      state,
+    })(req, res, next);
+  },
+);
+
+router.post(
+  '/oauth/apple/callback',
+  preAuthTenantMiddleware,
+  createPreAuthTenantGuard({
+    failureRedirect: `${getAdminPanelUrl()}/auth/apple/callback?error=${TENANT_CONTEXT_REQUIRED}&error_description=Tenant+context+required+in+strict+isolation+mode`,
+  }),
+>>>>>>> upstream/main
   (req, res, next) => {
     req.oauthState = typeof req.body.state === 'string' ? req.body.state : undefined;
     next();

@@ -1,6 +1,10 @@
 export * from './classify';
 export * from './artifactDelivery';
 export * from './destinations';
+<<<<<<< HEAD
+=======
+export * from './delete';
+>>>>>>> upstream/main
 export * from './errors';
 export * from './extract';
 export * from './form';
@@ -12,3 +16,7 @@ export * from './priming';
 export * from './process';
 export * from './publication';
 export * from './snapshot';
+<<<<<<< HEAD
+=======
+export * from './text';
+>>>>>>> upstream/main

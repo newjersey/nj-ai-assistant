@@ -161,7 +161,10 @@ const callTool = async (req, res) => {
     const { loadedTools } = await loadTools({
       user: req.user.id,
       tools: [toolId],
+<<<<<<< HEAD
       functions: true,
+=======
+>>>>>>> upstream/main
       options: {
         req,
         returnMetadata: true,

@@ -198,12 +198,15 @@
  */
 
 /**
+<<<<<<< HEAD
  * @exports Ollama
  * @typedef {import('ollama').Ollama} Ollama
  * @memberof typedefs
  */
 
 /**
+=======
+>>>>>>> upstream/main
  * @exports AxiosResponse
  * @typedef {import('axios').AxiosResponse} AxiosResponse
  * @memberof typedefs
@@ -288,12 +291,15 @@
  */
 
 /**
+<<<<<<< HEAD
  * @exports OllamaMessage
  * @typedef {import('ollama').Message} OllamaMessage
  * @memberof typedefs
  */
 
 /**
+=======
+>>>>>>> upstream/main
  * @exports ChatCompletionMessage
  * @typedef {import('openai').OpenAI.ChatCompletionMessageParam} ChatCompletionMessage
  * @memberof typedefs
@@ -1504,9 +1510,12 @@
 /**
  * @exports EndpointServiceConfig
  * @typedef {Object} EndpointServiceConfig
+<<<<<<< HEAD
  * @property {string} openAIApiKey - The API key for OpenAI.
  * @property {string} azureOpenAIApiKey - The API key for Azure OpenAI.
  * @property {boolean} userProvidedOpenAI - Flag to indicate if OpenAI API key is user provided.
+=======
+>>>>>>> upstream/main
  * @property {string} googleKey - The Palm key.
  * @property {boolean|{userProvide: boolean}} [openAI] - Flag to indicate if OpenAI endpoint is user provided, or its configuration.
  * @property {boolean|{userProvide: boolean}} [assistant] - Flag to indicate if Assistant endpoint is user provided, or its configuration.

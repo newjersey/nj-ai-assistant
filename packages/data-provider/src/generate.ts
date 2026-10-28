@@ -1,10 +1,14 @@
 import { z, ZodArray, ZodError, ZodIssueCode } from 'zod';
 import type { ZodIssue } from 'zod';
 import type { TConversation, TSetOption, TPreset } from './schemas';
+<<<<<<< HEAD
 import { tConversationSchema, googleSettings as google, openAISettings as openAI } from './schemas';
 
 export type GoogleSettings = Partial<typeof google>;
 export type OpenAISettings = Partial<typeof google>;
+=======
+import { tConversationSchema } from './schemas';
+>>>>>>> upstream/main
 
 export type ComponentType =
   | 'input'
@@ -241,9 +245,15 @@ export function generateDynamicSchema(settings: SettingsConfiguration) {
 }
 
 const ZodTypeToSettingType: Record<string, string | undefined> = {
+<<<<<<< HEAD
   ZodString: 'string',
   ZodNumber: 'number',
   ZodBoolean: 'boolean',
+=======
+  string: 'string',
+  number: 'number',
+  boolean: 'boolean',
+>>>>>>> upstream/main
 };
 
 const minColumns = 1;
@@ -503,7 +513,11 @@ export function validateSettingDefinitions(settings: SettingsConfiguration): voi
           path: ['optionType'],
         });
       } else {
+<<<<<<< HEAD
         const zodType = conversationSchema._def.typeName;
+=======
+        const zodType = conversationSchema.def.type;
+>>>>>>> upstream/main
         const settingTypeEquivalent = ZodTypeToSettingType[zodType] || null;
         if (settingTypeEquivalent !== setting.type) {
           errors.push({
@@ -623,6 +637,7 @@ export function validateSettingDefinitions(settings: SettingsConfiguration): voi
     throw new ZodError(errors);
   }
 }
+<<<<<<< HEAD
 
 export const generateOpenAISchema = (customOpenAI: OpenAISettings) => {
   const defaults = { ...openAI, ...customOpenAI };
@@ -709,3 +724,5 @@ export const generateGoogleSchema = (customGoogle: GoogleSettings) => {
       maxContextTokens: undefined,
     }));
 };
+=======
+>>>>>>> upstream/main

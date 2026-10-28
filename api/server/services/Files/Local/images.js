@@ -1,6 +1,10 @@
 const fs = require('fs');
 const path = require('path');
 const sharp = require('sharp');
+<<<<<<< HEAD
+=======
+const { stripCacheBust, convertImageBuffer } = require('@librechat/api');
+>>>>>>> upstream/main
 const { resizeImageBuffer } = require('../images/resize');
 const { updateUser, updateFile } = require('~/models');
 
@@ -35,6 +39,7 @@ async function uploadLocalImage({ req, file, file_id, endpoint, resolution = 'hi
     buffer: resizedBuffer,
     width,
     height,
+<<<<<<< HEAD
   } = await resizeImageBuffer(inputBuffer, resolution, endpoint);
   const extension = path.extname(inputFilePath);
 
@@ -63,6 +68,24 @@ async function uploadLocalImage({ req, file, file_id, endpoint, resolution = 'hi
   const filepath = path.posix.join('/', 'images', req.user.id, path.basename(outputFilePath));
   await fs.promises.unlink(inputFilePath);
   return { filepath, bytes, width, height };
+=======
+    type,
+  } = await resizeImageBuffer(inputBuffer, resolution, endpoint);
+  const { buffer: outputBuffer, fileName } = await convertImageBuffer({
+    buffer: resizedBuffer,
+    type,
+    fileName: `${file_id}__${path.basename(inputFilePath)}`,
+    outputType: appConfig.imageOutputType,
+  });
+
+  const { imageOutput } = appConfig.paths;
+  const userPath = path.join(imageOutput, req.user.id);
+  await fs.promises.mkdir(userPath, { recursive: true });
+  await fs.promises.writeFile(path.join(userPath, fileName), outputBuffer);
+  await fs.promises.unlink(inputFilePath);
+  const filepath = path.posix.join('/', 'images', req.user.id, fileName);
+  return { filepath, bytes: outputBuffer.length, width, height };
+>>>>>>> upstream/main
 }
 
 /**
@@ -97,7 +120,11 @@ async function prepareImagesLocal(req, file) {
   if (!fs.existsSync(userPath)) {
     fs.mkdirSync(userPath, { recursive: true });
   }
+<<<<<<< HEAD
   const filepath = path.join(publicPath, file.filepath);
+=======
+  const filepath = path.join(publicPath, stripCacheBust(file.filepath));
+>>>>>>> upstream/main
 
   const promises = [];
   promises.push(updateFile({ file_id: file.file_id }));

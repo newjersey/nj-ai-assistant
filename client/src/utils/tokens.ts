@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { Tools, Constants, inputTokensIncludesCache } from 'librechat-data-provider';
 import type {
   TMessage,
@@ -960,6 +961,54 @@ export function normalizeUsageUnits(usage: TTokenUsageEvent): CostUnits {
     cacheRead,
   };
 }
+=======
+import { normalizeTokenCount } from '@librechat/chat';
+
+export type {
+  AnchorReading,
+  BranchTotals,
+  BranchUsage,
+  CostUnits,
+  TokenEntry,
+  ToolTokenGroups,
+} from '@librechat/chat';
+export {
+  EMPTY_BRANCH,
+  EMPTY_TOOL_GROUPS,
+  EMPTY_USAGE,
+  addUsage,
+  buildIndex,
+  clearIndex,
+  collectAnchorSeries,
+  countTrailingOutputChars,
+  estimateTokens,
+  findBranchSnapshotAnchor,
+  getOutputChars,
+  groupToolTokens,
+  hasKnownCost,
+  latestExchangeTokens,
+  mergeUsage,
+  messageChars,
+  messageToolChars,
+  migrateIndex,
+  normalizeTokenCount,
+  normalizeUsageUnits,
+  partTextChars,
+  prunedBranchTokens,
+  quoteChars,
+  readPersistedUsage,
+  registry,
+  setEntryUsage,
+  snapshotConfiguration,
+  stickyUsage,
+  sumBranch,
+  sumTotalUsage,
+  toEntry,
+  toolCallLengths,
+  upsertEntries,
+  usageHistory,
+} from '@librechat/chat';
+>>>>>>> upstream/main
 
 const tokenFormatter = new Intl.NumberFormat(undefined, {
   notation: 'compact',

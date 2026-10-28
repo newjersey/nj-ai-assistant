@@ -1,6 +1,10 @@
 import type { TenantScope } from './policy';
 import {
   tenantFilter,
+<<<<<<< HEAD
+=======
+  tenantPartition,
+>>>>>>> upstream/main
   scopeReplacement,
   currentTenantScope,
   resolveTenantScope,
@@ -114,6 +118,20 @@ describe('tenantFilter', () => {
   });
 });
 
+<<<<<<< HEAD
+=======
+describe('tenantPartition', () => {
+  it('names the active tenant when scoped', () => {
+    expect(tenantPartition(SCOPED)).toBe('tenant-a');
+  });
+
+  it('names the tenantless partition for system and unscoped reads', () => {
+    expect(tenantPartition(SYSTEM)).toBeNull();
+    expect(tenantPartition(UNSCOPED)).toBeNull();
+  });
+});
+
+>>>>>>> upstream/main
 describe('sanitizeTenantMutation (guard mode)', () => {
   it('refuses a cross-tenant $set', () => {
     expect(() =>

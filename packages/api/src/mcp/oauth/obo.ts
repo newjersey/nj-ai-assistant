@@ -117,7 +117,14 @@ export function createLazyOboUpstreamTokenProvider(
       effectiveSignal?.throwIfAborted();
       if (!provider) {
         pending = undefined;
+<<<<<<< HEAD
         throw new Error('Renewable upstream credentials are unavailable.');
+=======
+        throw new OboTokenResolutionError(
+          'missing_upstream_provider',
+          'No renewable upstream credential provider is available for this MCP server.',
+        );
+>>>>>>> upstream/main
       }
       return await detachOnAbort(
         provider({ ...options, signal: effectiveSignal }),
@@ -130,6 +137,10 @@ export function createLazyOboUpstreamTokenProvider(
 }
 
 export type OboTokenResolutionReason =
+<<<<<<< HEAD
+=======
+  | 'missing_upstream_provider'
+>>>>>>> upstream/main
   | 'missing_upstream_token'
   | 'missing_upstream_access_token'
   | 'empty_exchange_response'
@@ -299,6 +310,12 @@ export async function resolveOboToken(
     liveTokens = await upstreamTokenProvider();
   } catch (error) {
     if (isAbortError(error)) throw error;
+<<<<<<< HEAD
+=======
+    if (error instanceof OboTokenResolutionError && error.reason === 'missing_upstream_provider') {
+      throw error;
+    }
+>>>>>>> upstream/main
     logger.error('[OBO] Upstream session refresh failed:', error);
     const retryable = isRetryableOboExchangeError(error);
     throw new OboTokenResolutionError(

@@ -16,7 +16,10 @@ import {
   applyRetainedAnswers,
   prepareRetainedAnswerInvocationMessages,
   RETAINED_ANSWERS_MESSAGE_ID,
+<<<<<<< HEAD
   buildRetainedAnswersContext,
+=======
+>>>>>>> upstream/main
   collectRetainedAnswers,
   orderConversationBranch,
   reachesBranchRoot,
@@ -372,7 +375,14 @@ describe('resolveRetainedAnswersConfig', () => {
   });
 });
 
+<<<<<<< HEAD
 describe('buildRetainedAnswersContext', () => {
+=======
+describe('retained answers context', () => {
+  const buildRetainedAnswersContext = async (
+    input: Parameters<typeof prepareRetainedAnswers>[0],
+  ): Promise<string | undefined> => (await prepareRetainedAnswers(input)).block;
+>>>>>>> upstream/main
   const answered = askPart(batchRequest, JSON.stringify({ answers: { environment: 'staging' } }));
   const summary = {
     type: ContentTypes.SUMMARY,

@@ -2,6 +2,7 @@ import { Types } from 'mongoose';
 import { TokenExchangeMethodEnum } from 'librechat-data-provider';
 import type { MCPOptions } from 'librechat-data-provider';
 import type { IUser } from '@librechat/data-schemas';
+<<<<<<< HEAD
 import {
   createSafeUser,
   resolveHeaders,
@@ -9,6 +10,10 @@ import {
   processMCPEnv,
   encodeHeaderValue,
 } from './env';
+=======
+import { createSafeUser, resolveHeaders, processMCPEnv, encodeHeaderValue } from './env';
+import { applyRequestHeaders } from '~/mcp/utils';
+>>>>>>> upstream/main
 
 function isStdioOptions(options: MCPOptions): options is Extract<MCPOptions, { type?: 'stdio' }> {
   return !options.type || options.type === 'stdio';
@@ -715,6 +720,7 @@ describe('resolveHeaders', () => {
   });
 });
 
+<<<<<<< HEAD
 describe('resolveNestedObject', () => {
   beforeEach(() => {
     process.env.TEST_API_KEY = 'test-api-key-value';
@@ -1010,6 +1016,8 @@ describe('resolveNestedObject', () => {
   });
 });
 
+=======
+>>>>>>> upstream/main
 describe('processMCPEnv', () => {
   beforeEach(() => {
     process.env.TEST_API_KEY = 'test-api-key-value';
@@ -1189,6 +1197,80 @@ describe('processMCPEnv', () => {
     });
   });
 
+<<<<<<< HEAD
+=======
+  /**
+   * `applyRequestHeaders` runs at each pipeline entry, ahead of `processMCPEnv`,
+   * so the merged map is what env resolution sees. These exercise that order
+   * rather than either half alone.
+   */
+  it('should resolve merged requestHeaders like any other header', () => {
+    const user = createTestUser({ id: 'user-123' });
+    const options: MCPOptions = {
+      type: 'streamable-http',
+      url: 'https://mcp.example.com/api',
+      headers: { 'X-User-Id': '{{LIBRECHAT_USER_ID}}' },
+      requestHeaders: {
+        'X-Conversation-Id': '{{LIBRECHAT_BODY_CONVERSATIONID}}',
+        'X-Static': 'static-value',
+      },
+    };
+
+    const result = processMCPEnv({
+      options: applyRequestHeaders(options),
+      user,
+      body: { conversationId: 'conv-1' },
+    });
+
+    expect('headers' in result! && result.headers).toEqual({
+      'X-User-Id': 'user-123',
+      'X-Conversation-Id': 'conv-1',
+      'X-Static': 'static-value',
+    });
+    expect(result).not.toHaveProperty('requestHeaders');
+  });
+
+  it('should NOT resolve merged requestHeaders when dbSourced', () => {
+    const user = createTestUser({ id: 'user-123' });
+    const options: MCPOptions = {
+      type: 'streamable-http',
+      url: 'https://mcp.example.com/api',
+      requestHeaders: {
+        'X-Conversation-Id': '{{LIBRECHAT_BODY_CONVERSATIONID}}',
+      },
+    };
+
+    const result = processMCPEnv({
+      options: applyRequestHeaders(options),
+      user,
+      body: { conversationId: 'conv-1' },
+      dbSourced: true,
+    });
+
+    expect('headers' in result! && result.headers).toEqual({
+      'X-Conversation-Id': '{{LIBRECHAT_BODY_CONVERSATIONID}}',
+    });
+  });
+
+  it('should keep plugin-sourced requestHeaders verbatim', () => {
+    const user = createTestUser({ id: 'user-123' });
+    const options = {
+      type: 'streamable-http',
+      url: 'https://mcp.example.com/api',
+      source: 'plugin',
+      headers: { 'X-Keep': 'kept' },
+      requestHeaders: { 'X-Conversation-Id': '{{LIBRECHAT_BODY_CONVERSATIONID}}' },
+    } as MCPOptions & { source: string };
+
+    const result = processMCPEnv({ options, user, body: { conversationId: 'conv-1' } });
+
+    expect('headers' in result! && result.headers).toEqual({ 'X-Keep': 'kept' });
+    expect((result as { requestHeaders?: Record<string, string> }).requestHeaders).toEqual({
+      'X-Conversation-Id': '{{LIBRECHAT_BODY_CONVERSATIONID}}',
+    });
+  });
+
+>>>>>>> upstream/main
   it('should process user field placeholders in all fields', () => {
     const user = createTestUser({
       id: 'user-123',
@@ -1728,6 +1810,10 @@ describe('processMCPEnv', () => {
           source: 'user',
           authorization_type: 'bearer',
         },
+<<<<<<< HEAD
+=======
+        customUserVars: { MCP_API_KEY: { title: 'API Key', description: 'Per-user key' } },
+>>>>>>> upstream/main
         headers: {
           Authorization: 'Bearer {{MCP_API_KEY}}',
         },
@@ -1805,6 +1891,10 @@ describe('processMCPEnv', () => {
       const options: MCPOptions = {
         type: 'streamable-http',
         url: 'https://api.example.com',
+<<<<<<< HEAD
+=======
+        customUserVars: { MCP_API_KEY: { title: 'API Key', description: 'Per-user key' } },
+>>>>>>> upstream/main
         headers: {
           Authorization: 'Bearer {{MCP_API_KEY}}',
         },
@@ -1921,6 +2011,10 @@ describe('processMCPEnv', () => {
       const options: MCPOptions = {
         type: 'streamable-http',
         url: '${DATABASE_URL}',
+<<<<<<< HEAD
+=======
+        customUserVars: { MCP_API_KEY: { title: 'API Key', description: 'Per-user key' } },
+>>>>>>> upstream/main
         headers: {
           Authorization: 'Bearer {{MCP_API_KEY}}',
           'X-Env-Leak': '${TEST_API_KEY}',
@@ -1953,6 +2047,10 @@ describe('processMCPEnv', () => {
       const options: MCPOptions = {
         type: 'streamable-http',
         url: 'https://api.example.com',
+<<<<<<< HEAD
+=======
+        customUserVars: { MCP_API_KEY: { title: 'API Key', description: 'Per-user key' } },
+>>>>>>> upstream/main
         headers: {
           Authorization: 'Bearer {{MCP_API_KEY}}',
           'X-Env': '${TEST_API_KEY}',
@@ -1980,6 +2078,10 @@ describe('processMCPEnv', () => {
       const options: MCPOptions = {
         type: 'stdio',
         command: 'mcp-server',
+<<<<<<< HEAD
+=======
+        customUserVars: { MY_VAR: { title: 'Custom', description: 'Per-user variable' } },
+>>>>>>> upstream/main
         args: ['--key', '${TEST_API_KEY}', '--custom', '{{MY_VAR}}'],
         env: {
           SECRET: '${DATABASE_URL}',
@@ -2046,6 +2148,13 @@ describe('processMCPEnv', () => {
       const options: MCPOptions = {
         type: 'streamable-http',
         url: 'https://api.example.com',
+<<<<<<< HEAD
+=======
+        customUserVars: {
+          MY_CLIENT_ID: { title: 'Client ID', description: 'Per-user client' },
+          MY_CLIENT_SECRET: { title: 'Client secret', description: 'Per-user secret' },
+        },
+>>>>>>> upstream/main
         oauth: {
           client_id: '{{MY_CLIENT_ID}}',
           client_secret: '{{MY_CLIENT_SECRET}}',
@@ -2069,6 +2178,10 @@ describe('processMCPEnv', () => {
       const options: MCPOptions = {
         type: 'streamable-http',
         url: 'https://api.example.com',
+<<<<<<< HEAD
+=======
+        customUserVars: { MCP_API_KEY: { title: 'API Key', description: 'Per-user key' } },
+>>>>>>> upstream/main
         headers: {
           Authorization: 'Bearer {{MCP_API_KEY}}',
         },
@@ -2088,6 +2201,10 @@ describe('processMCPEnv', () => {
       const options: MCPOptions = {
         type: 'streamable-http',
         url: '${DATABASE_URL}',
+<<<<<<< HEAD
+=======
+        customUserVars: { MCP_API_KEY: { title: 'API Key', description: 'Per-user key' } },
+>>>>>>> upstream/main
         headers: {
           Authorization: 'Bearer {{MCP_API_KEY}}',
           'X-Env': '${TEST_API_KEY}',

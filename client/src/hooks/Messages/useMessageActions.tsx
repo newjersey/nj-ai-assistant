@@ -13,10 +13,21 @@ import {
 } from 'librechat-data-provider';
 import type { TMessageChatContext } from '~/common/types';
 import type { TMessageProps } from '~/common';
+<<<<<<< HEAD
 import { useCopyMessageToClipboard, hasCopyableText } from './useCopyToClipboard';
 import { useAssistantsMapContext, useAgentsMapContext } from '~/Providers';
 import { useAuthContext } from '~/hooks/AuthContext';
 import { useGetAddedConvo } from '~/hooks/Chat';
+=======
+import {
+  useCopyMessageToClipboard,
+  getMessageClipboardSource,
+  hasCopyableText,
+} from './useCopyToClipboard';
+import { useAssistantsMapContext, useAgentsMapContext } from '~/Providers';
+import useGetAddedConvo from '~/hooks/Conversations/useGetAddedConvo';
+import { useAuthContext } from '~/hooks/AuthContext';
+>>>>>>> upstream/main
 import { useLocalize } from '~/hooks';
 import store from '~/store';
 
@@ -45,6 +56,7 @@ export default function useMessageActions(props: TMessageActions) {
     index,
     regenerate,
     conversation,
+<<<<<<< HEAD
     latestMessageId,
     latestMessageDepth,
     handleContinue,
@@ -52,6 +64,13 @@ export default function useMessageActions(props: TMessageActions) {
     // NOTE: isSubmitting is intentionally NOT destructured here.
     // chatContext.isSubmitting is a getter backed by a ref — destructuring
     // would capture a one-time snapshot. Always access via chatContext.isSubmitting.
+=======
+    handleContinue,
+    feedbackEnabled,
+    // NOTE: isSubmitting, latestMessageId and latestMessageDepth are intentionally
+    // NOT destructured here. They are getters backed by a ref — destructuring
+    // would capture a one-time snapshot. Rows render them from their own props.
+>>>>>>> upstream/main
   } = chatContext;
 
   const getAddedConvo = useGetAddedConvo();
@@ -59,7 +78,11 @@ export default function useMessageActions(props: TMessageActions) {
   const agentsMap = useAgentsMapContext();
   const assistantMap = useAssistantsMapContext();
 
+<<<<<<< HEAD
   const { text, content, messageId = null, isCreatedByUser } = message ?? {};
+=======
+  const { messageId = null, isCreatedByUser } = message ?? {};
+>>>>>>> upstream/main
   const edit = useMemo(() => messageId === currentEditId, [messageId, currentEditId]);
 
   const [feedback, setFeedback] = useState<TFeedback | undefined>(() => {
@@ -123,6 +146,7 @@ export default function useMessageActions(props: TMessageActions) {
     regenerate(message, { addedConvo: getAddedConvo() });
   }, [chatContext, isCreatedByUser, message, regenerate, getAddedConvo]);
 
+<<<<<<< HEAD
   const copyToClipboard = useCopyMessageToClipboard({
     text,
     content,
@@ -134,6 +158,17 @@ export default function useMessageActions(props: TMessageActions) {
   const getCanCopy = useCallback(
     () => hasCopyableText({ text, content, searchResults }),
     [text, content, searchResults],
+=======
+  const clipboardSource = useMemo(() => getMessageClipboardSource(message), [message]);
+  const copyToClipboard = useCopyMessageToClipboard({
+    ...clipboardSource,
+    searchResults,
+  });
+
+  const getCanCopy = useCallback(
+    () => hasCopyableText({ ...clipboardSource, searchResults }),
+    [clipboardSource, searchResults],
+>>>>>>> upstream/main
   );
 
   const messageLabel = useMemo(() => {
@@ -144,7 +179,10 @@ export default function useMessageActions(props: TMessageActions) {
     } else if (assistant) {
       return assistant.name ?? 'Assistant';
     } else {
+<<<<<<< HEAD
       return 'NJ AI Assistant'; // NJ: Default to saying it came from us
+=======
+>>>>>>> upstream/main
       return message?.sender;
     }
   }, [message, agent, assistant, UsernameDisplay, user, localize]);
@@ -206,8 +244,12 @@ export default function useMessageActions(props: TMessageActions) {
     handleFeedback: feedbackEnabled ? handleFeedback : undefined,
     handleContinue,
     copyToClipboard,
+<<<<<<< HEAD
     latestMessageId,
     regenerateMessage,
     latestMessageDepth,
+=======
+    regenerateMessage,
+>>>>>>> upstream/main
   };
 }

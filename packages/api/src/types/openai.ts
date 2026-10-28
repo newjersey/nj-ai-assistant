@@ -13,7 +13,17 @@ export type OpenAIModelOptions = Partial<OpenAIParameters>;
  * Configuration options for the getLLMConfig function
  */
 export interface OpenAIConfigOptions {
+<<<<<<< HEAD
   modelOptions?: OpenAIModelOptions;
+=======
+  /** Validated extra inference wire fields. */
+  inferenceParameters?: Record<string, unknown>;
+  modelOptions?: OpenAIModelOptions;
+  transportTimeouts?: {
+    bodyTimeout: number;
+    headersTimeout: number;
+  };
+>>>>>>> upstream/main
   directEndpoint?: boolean;
   reverseProxyUrl?: string | null;
   baseURLIsUserProvided?: boolean;

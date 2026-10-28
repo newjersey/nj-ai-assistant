@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import type { MessageFilterPiiConfig } from 'librechat-data-provider';
 import type { ProtectionFinding, TextContentFragment } from './types';
 import { createPatternContentInspector } from './detectors/pattern';
@@ -10,6 +11,9 @@ export interface LegacyPiiMatch {
 export interface LegacyPiiInspector {
   inspect(fragments: Iterable<TextContentFragment>): ProtectionFinding | null;
 }
+=======
+import type { TextContentFragment } from './types';
+>>>>>>> upstream/main
 
 const LEGACY_STORED_MESSAGE_FIELDS = new Set([
   'text',
@@ -20,9 +24,12 @@ const LEGACY_STORED_MESSAGE_FIELDS = new Set([
   'content_part',
 ]);
 
+<<<<<<< HEAD
 const LEGACY_INSPECTOR_CACHE = new WeakMap<object, LegacyPiiInspector>();
 const INACTIVE_LEGACY_CONFIGS = new WeakSet<object>();
 
+=======
+>>>>>>> upstream/main
 export function isLegacyPiiFragment(fragment: TextContentFragment): boolean {
   if (fragment.source === 'assembled_context') {
     return (
@@ -49,6 +56,7 @@ export function isLegacyPiiFragment(fragment: TextContentFragment): boolean {
     /^external-message\.\d+\.(?:content|part\.\d+)$/.test(fragment.id)
   );
 }
+<<<<<<< HEAD
 
 export function createLegacyPiiInspector(
   config: MessageFilterPiiConfig | undefined,
@@ -101,3 +109,5 @@ export function toLegacyPiiMatch(finding: ProtectionFinding | null): LegacyPiiMa
     label: finding.label,
   };
 }
+=======
+>>>>>>> upstream/main

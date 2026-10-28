@@ -1,10 +1,19 @@
 import React from 'react';
 import '@testing-library/jest-dom';
+<<<<<<< HEAD
+=======
+import { ChatSettingsContext, defaultChatSettings } from '~/Providers/ChatSettingsContext';
+>>>>>>> upstream/main
 import { render, screen } from 'test/layout-test-utils';
 import ChatView from '../ChatView';
 
 const mockParams = jest.fn();
 const mockConversation = jest.fn();
+<<<<<<< HEAD
+=======
+const mockChatFormProps = jest.fn();
+const mockAskHostSaveDrafts = jest.fn();
+>>>>>>> upstream/main
 
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
@@ -19,6 +28,10 @@ jest.mock('~/hooks/AuthContext', () => ({
 
 jest.mock('~/data-provider', () => ({
   useGetMessagesByConvoId: () => ({ data: null, isLoading: false, isFetching: false }),
+<<<<<<< HEAD
+=======
+  useProjectQuery: () => ({ data: undefined }),
+>>>>>>> upstream/main
 }));
 
 /**
@@ -26,6 +39,7 @@ jest.mock('~/data-provider', () => ({
  * helper surface so the suite can inject matching vs stale IDs without standing
  * up SSE, message trees, or full ChatRoute synchronization.
  */
+<<<<<<< HEAD
 jest.mock('~/hooks', () => ({
   useLocalize: () => (key: string) => (key === 'com_ui_new_chat' ? 'New chat' : key),
   useChatHelpers: () => ({ conversation: mockConversation() }),
@@ -37,11 +51,36 @@ jest.mock('~/hooks', () => ({
   useScrollbarGutterSeed: jest.fn(),
 }));
 
+=======
+jest.mock('@librechat/chat/react', () => ({
+  ...jest.requireActual('@librechat/chat/react'),
+  useQueueDrain: jest.fn(),
+  useQueuedTurnReveal: jest.fn(),
+}));
+
+jest.mock('~/hooks', () => ({
+  useLocalize: () => (key: string) => (key === 'com_ui_new_chat' ? 'New chat' : key),
+  useAddedResponse: () => ({}),
+  useScrollbarGutterSeed: jest.fn(),
+}));
+
+jest.mock('~/hooks/Chat/useChatHelpers', () => ({
+  __esModule: true,
+  default: () => ({ conversation: mockConversation() }),
+}));
+
+jest.mock('~/hooks/SSE', () => ({
+  useAdaptiveSSE: jest.fn(),
+  useResumeOnLoad: jest.fn(),
+}));
+
+>>>>>>> upstream/main
 jest.mock('../Presentation', () => ({
   __esModule: true,
   default: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
 jest.mock('../Header', () => ({ __esModule: true, default: () => <div /> }));
+<<<<<<< HEAD
 jest.mock('../Footer', () => ({
   __esModule: true,
   default: () => <div />,
@@ -50,6 +89,29 @@ jest.mock('../Footer', () => ({
 jest.mock('../Landing', () => ({ __esModule: true, default: () => <div /> }));
 jest.mock('../Messages/MessagesView', () => ({ __esModule: true, default: () => <div /> }));
 jest.mock('../Input/ChatForm', () => ({ __esModule: true, default: () => <div /> }));
+=======
+let mockConfiguredFooter = false;
+let mockLandingFooter = true;
+jest.mock('../Footer', () => ({
+  __esModule: true,
+  default: ({ configuredOnly }: { configuredOnly?: boolean }) => (
+    <div data-testid={configuredOnly ? 'configured-footer' : 'landing-footer'} />
+  ),
+  useConfiguredFooter: () => mockConfiguredFooter,
+  useLandingFooter: () => mockLandingFooter,
+}));
+jest.mock('../Landing', () => ({ __esModule: true, default: () => <div /> }));
+jest.mock('~/components/Lia', () => ({ __esModule: true, default: () => null }));
+jest.mock('../Messages/MessagesView', () => ({ __esModule: true, default: () => <div /> }));
+jest.mock('../Input/ChatForm', () => ({
+  __esModule: true,
+  default: (props: Record<string, unknown>) => {
+    mockChatFormProps(props);
+    mockAskHostSaveDrafts(jest.requireActual('../ask/state').useAskAnswerHost());
+    return <div />;
+  },
+}));
+>>>>>>> upstream/main
 jest.mock('../Input/ConversationStarters', () => ({ __esModule: true, default: () => <div /> }));
 
 describe('ChatView page heading', () => {
@@ -65,12 +127,15 @@ describe('ChatView page heading', () => {
     expect(headings).toHaveLength(1);
   });
 
+<<<<<<< HEAD
   test('keeps the heading visually hidden', () => {
     render(<ChatView />);
 
     expect(screen.getByRole('heading', { level: 1 })).toHaveClass('sr-only');
   });
 
+=======
+>>>>>>> upstream/main
   test('announces a localized new chat heading on the landing page', () => {
     render(<ChatView />);
 
@@ -116,6 +181,52 @@ describe('ChatView page heading', () => {
   });
 });
 
+<<<<<<< HEAD
+=======
+describe('ChatView composer preferences', () => {
+  beforeEach(() => {
+    mockParams.mockReturnValue({});
+    mockConversation.mockReturnValue(null);
+    mockChatFormProps.mockClear();
+    localStorage.clear();
+  });
+
+  /** ChatForm used to read this preference itself via `useRecoilValue(store.enterToSend)`,
+   *  reaching into app-global state the composer only consumes. ChatView now owns the
+   *  read and passes it down, the same boundary `showComposerTips` already follows. */
+  test('reads the persisted enterToSend preference and passes it into ChatForm', () => {
+    localStorage.setItem('enterToSend', JSON.stringify(false));
+
+    render(<ChatView />);
+
+    expect(mockChatFormProps).toHaveBeenCalledWith(expect.objectContaining({ enterToSend: false }));
+  });
+
+  /** The same boundary for the dictation preferences: ChatForm consumes them
+   *  but ChatView owns the reads. */
+  test('passes the persisted Auto Send Text preference and the speech init state', () => {
+    localStorage.setItem('autoSendText', JSON.stringify(3));
+
+    render(<ChatView />);
+
+    expect(mockChatFormProps).toHaveBeenCalledWith(
+      expect.objectContaining({ autoSendText: 3, speechSettingsInitialized: false }),
+    );
+  });
+
+  test.each([true, false])('passes routePending=%p into ChatForm', (routePending) => {
+    render(<ChatView routePending={routePending} />);
+    expect(mockChatFormProps).toHaveBeenCalledWith(expect.objectContaining({ routePending }));
+  });
+
+  test('falls back to the atom default when nothing is persisted', () => {
+    render(<ChatView />);
+
+    expect(mockChatFormProps).toHaveBeenCalledWith(expect.objectContaining({ enterToSend: true }));
+  });
+});
+
+>>>>>>> upstream/main
 describe('ChatView composer column', () => {
   beforeEach(() => {
     mockParams.mockReturnValue({ conversationId: 'convo-1' });
@@ -135,4 +246,80 @@ describe('ChatView composer column', () => {
     expect(composerColumn).not.toHaveClass('overflow-y-auto');
     expect(composerColumn).not.toHaveClass('scrollbar-gutter-stable');
   });
+<<<<<<< HEAD
+=======
+
+  test('layers composer overlays above positioned tool glyphs in the message column', () => {
+    const { container } = render(<ChatView />);
+
+    const composerColumn = container.querySelector('.scrollbar-gutter-spacer');
+
+    expect(composerColumn).toHaveClass('[view-transition-name:chat-form]');
+    expect(composerColumn).toHaveClass('relative', 'z-10');
+  });
+});
+
+describe('ChatView draft saving', () => {
+  beforeEach(() => {
+    mockParams.mockReturnValue({});
+    mockConversation.mockReturnValue(null);
+    mockAskHostSaveDrafts.mockReset();
+  });
+
+  /** A host that supplies its own chat settings drives ask-answer draft saving too. */
+  test.each([true, false])('hands the host saveDrafts=%s to ask-answer drafts', (saveDrafts) => {
+    render(
+      <ChatSettingsContext.Provider value={{ ...defaultChatSettings, saveDrafts }}>
+        <ChatView />
+      </ChatSettingsContext.Provider>,
+    );
+
+    expect(mockAskHostSaveDrafts).toHaveBeenLastCalledWith(saveDrafts);
+  });
+});
+
+describe('ChatView landing footer', () => {
+  beforeEach(() => {
+    mockParams.mockReturnValue({});
+    mockConversation.mockReturnValue(null);
+    mockConfiguredFooter = false;
+    mockLandingFooter = true;
+    mockChatFormProps.mockClear();
+  });
+
+  test('renders the full footer beneath the welcome screen by default', () => {
+    render(<ChatView />);
+
+    expect(screen.getByTestId('landing-footer')).toBeInTheDocument();
+    expect(screen.queryByTestId('configured-footer')).not.toBeInTheDocument();
+    expect(mockChatFormProps).toHaveBeenLastCalledWith(
+      expect.objectContaining({ footerBelow: true }),
+    );
+  });
+
+  test('drops the welcome screen footer when the deployment turns it off', () => {
+    mockLandingFooter = false;
+
+    render(<ChatView />);
+
+    expect(screen.queryByTestId('landing-footer')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('configured-footer')).not.toBeInTheDocument();
+    expect(mockChatFormProps).toHaveBeenLastCalledWith(
+      expect.objectContaining({ footerBelow: false }),
+    );
+  });
+
+  test('keeps a configured footer on the welcome screen when the full footer is off', () => {
+    mockLandingFooter = false;
+    mockConfiguredFooter = true;
+
+    render(<ChatView />);
+
+    expect(screen.queryByTestId('landing-footer')).not.toBeInTheDocument();
+    expect(screen.getByTestId('configured-footer')).toBeInTheDocument();
+    expect(mockChatFormProps).toHaveBeenLastCalledWith(
+      expect.objectContaining({ footerBelow: true }),
+    );
+  });
+>>>>>>> upstream/main
 });

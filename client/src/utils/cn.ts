@@ -1,5 +1,15 @@
+<<<<<<< HEAD
 import { twMerge } from 'tailwind-merge';
 import { type ClassValue, clsx } from 'clsx';
+=======
+import { type ClassValue, clsx } from 'clsx';
+import { extendTailwindMerge } from 'tailwind-merge';
+
+/** Mirrors `TYPE_STEPS` in `@librechat/client`; imported values there are mocked away in specs. */
+const twMerge = extendTailwindMerge({
+  extend: { classGroups: { 'font-size': [{ text: ['3xs', '2xs', '1xs', '1sm'] }] } },
+});
+>>>>>>> upstream/main
 
 /**
  * Merges the tailwind clases (using twMerge). Conditionally removes false values

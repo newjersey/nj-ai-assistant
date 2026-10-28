@@ -1,5 +1,9 @@
 const {
+<<<<<<< HEAD
   handleAgentQueuedTurnEnqueue,
+=======
+  createAgentQueuedTurnEnqueueHandlers,
+>>>>>>> upstream/main
   handleAgentQueuedTurnList,
   handleAgentQueuedTurnCancel,
 } = require('@librechat/api');
@@ -28,6 +32,7 @@ const dependencies = (req) => {
 
 const send = (res, result) => res.status(result.status).json(result.body);
 
+<<<<<<< HEAD
 const AgentQueuedTurnEnqueueController = async (req, res) => {
   try {
     return send(
@@ -39,6 +44,10 @@ const AgentQueuedTurnEnqueueController = async (req, res) => {
     return res.status(500).json({ code: 'QUEUED_TURN_FAILED' });
   }
 };
+=======
+const { enqueue: AgentQueuedTurnEnqueueController, enqueueV2: AgentQueuedTurnEnqueueV2Controller } =
+  createAgentQueuedTurnEnqueueHandlers(dependencies);
+>>>>>>> upstream/main
 
 const AgentQueuedTurnListController = async (req, res) => {
   try {
@@ -75,6 +84,10 @@ const AgentQueuedTurnCancelController = async (req, res) => {
 
 module.exports = {
   AgentQueuedTurnEnqueueController,
+<<<<<<< HEAD
+=======
+  AgentQueuedTurnEnqueueV2Controller,
+>>>>>>> upstream/main
   AgentQueuedTurnListController,
   AgentQueuedTurnCancelController,
 };

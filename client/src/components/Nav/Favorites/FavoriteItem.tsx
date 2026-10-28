@@ -32,6 +32,10 @@ type ModelFavoriteProps = FavoriteItemBaseProps & {
   type: 'model';
   item: FavoriteModel;
   onSelectEndpoint?: (endpoint?: EModelEndpoint | string | null, kwargs?: Kwargs) => void;
+<<<<<<< HEAD
+=======
+  endpointsConfig?: TEndpointsConfig;
+>>>>>>> upstream/main
 };
 
 type SpecFavoriteProps = FavoriteItemBaseProps & {
@@ -90,11 +94,19 @@ export default function FavoriteItem(props: FavoriteItemProps) {
 
   const renderIcon = () => {
     if (props.type === 'agent') {
+<<<<<<< HEAD
       return renderAgentAvatar(props.item, { size: 'icon', className: 'mr-2' });
     }
     if (props.type === 'spec') {
       return (
         <div className="mr-2 h-5 w-5">
+=======
+      return renderAgentAvatar(props.item, { size: 'icon', className: 'me-2' });
+    }
+    if (props.type === 'spec') {
+      return (
+        <div className="me-2 h-5 w-5">
+>>>>>>> upstream/main
           <SpecIcon
             currentSpec={props.item}
             endpointsConfig={props.endpointsConfig}
@@ -104,8 +116,19 @@ export default function FavoriteItem(props: FavoriteItemProps) {
       );
     }
     return (
+<<<<<<< HEAD
       <div className="mr-2 h-5 w-5">
         <MinimalIcon endpoint={props.item.endpoint} size={20} isCreatedByUser={false} />
+=======
+      <div className="me-2 h-5 w-5">
+        <MinimalIcon
+          endpoint={props.item.endpoint}
+          endpointsConfig={props.endpointsConfig}
+          model={props.item.model}
+          size={20}
+          isCreatedByUser={false}
+        />
+>>>>>>> upstream/main
       </div>
     );
   };
@@ -130,12 +153,20 @@ export default function FavoriteItem(props: FavoriteItemProps) {
       tabIndex={0}
       aria-label={ariaLabel}
       aria-keyshortcuts={keyShortcuts}
+<<<<<<< HEAD
       className="group relative flex w-full cursor-pointer items-center justify-between rounded-lg p-2 text-sm text-text-primary outline-none hover:bg-surface-active-alt focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-text-primary"
+=======
+      className="group text-text-primary hover:bg-surface-nav-hover focus-visible:ring-text-primary relative flex w-full cursor-pointer items-center justify-between rounded-lg p-2 text-sm outline-hidden focus-visible:ring-2 focus-visible:outline-hidden focus-visible:ring-inset"
+>>>>>>> upstream/main
       onClick={handleClick}
       onKeyDown={handleKeyDown}
       data-testid="favorite-item"
     >
+<<<<<<< HEAD
       <div className="flex flex-1 items-center truncate pr-6">
+=======
+      <div className="flex flex-1 items-center truncate pe-6">
+>>>>>>> upstream/main
         {renderIcon()}
         <span className="truncate">{name}</span>
       </div>
@@ -144,7 +175,11 @@ export default function FavoriteItem(props: FavoriteItemProps) {
           36px row, which is also where a pinned chat keeps its last control, so
           the two row kinds line up. Clicks are swallowed here rather than
           reaching the row underneath. */}
+<<<<<<< HEAD
       <div className="absolute right-1 flex items-center" onClick={(e) => e.stopPropagation()}>
+=======
+      <div className="absolute inset-e-1 flex items-center" onClick={(e) => e.stopPropagation()}>
+>>>>>>> upstream/main
         <UnpinButton
           testId="favorite-unpin-button"
           onClick={handleRemove}

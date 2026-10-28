@@ -1,6 +1,10 @@
 {
   "name": "@librechat/data-schemas",
+<<<<<<< HEAD
   "version": "0.0.70",
+=======
+  "version": "0.0.77",
+>>>>>>> upstream/main
   "description": "Mongoose schemas and models for LibreChat",
   "type": "module",
   "main": "dist/index.cjs",
@@ -44,12 +48,20 @@
   },
   "repository": {
     "type": "git",
+<<<<<<< HEAD
     "url": "https://github.com/danny-avila/LibreChat"
+=======
+    "url": "https://github.com/LibreChat-AI/LibreChat"
+>>>>>>> upstream/main
   },
   "author": "",
   "license": "MIT",
   "bugs": {
+<<<<<<< HEAD
     "url": "https://github.com/danny-avila/LibreChat/issues"
+=======
+    "url": "https://github.com/LibreChat-AI/LibreChat/issues"
+>>>>>>> upstream/main
   },
   "homepage": "https://librechat.ai",
   "dependencies": {
@@ -63,14 +75,22 @@
     "micromark-util-decode-string": "^2.0.0"
   },
   "devDependencies": {
+<<<<<<< HEAD
     "@types/express": "^5.0.0",
+=======
+>>>>>>> upstream/main
     "@types/jest": "^29.5.2",
     "@types/node": "^24.12.4",
     "jest": "^30.2.0",
     "jest-junit": "^17.0.0",
+<<<<<<< HEAD
     "mongodb-memory-server": "^11.0.1",
     "rimraf": "^6.1.3",
     "ts-node": "^10.9.2",
+=======
+    "mongodb-memory-server": "^11.3.0",
+    "rimraf": "^6.1.3",
+>>>>>>> upstream/main
     "tsdown": "^0.22.2",
     "typescript": "^5.9.3"
   },

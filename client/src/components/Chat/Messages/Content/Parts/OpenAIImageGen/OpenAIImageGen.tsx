@@ -9,6 +9,10 @@ import type {
 } from 'librechat-data-provider';
 import { ToolIcon, isError } from '~/components/Chat/Messages/Content/ToolOutput';
 import Image from '~/components/Chat/Messages/Content/Image';
+<<<<<<< HEAD
+=======
+import { useToolPreparation } from '../../preparation';
+>>>>>>> upstream/main
 import { useProgress, useLocalize } from '~/hooks';
 import { useToolCallIntent } from '../intent';
 import { ROW_GLYPH_SLOT } from '../../rows';
@@ -16,7 +20,11 @@ import ProgressText from './ProgressText';
 import { scaleImage } from '~/utils';
 
 function computeCancelled(
+<<<<<<< HEAD
   isSubmitting: boolean | undefined,
+=======
+  isSubmitting: boolean,
+>>>>>>> upstream/main
   initialProgress: number,
   hasError: boolean,
   runStepStatus?: PartMetadata['runStepStatus'],
@@ -25,12 +33,17 @@ function computeCancelled(
    * The step's own terminal status wins when the run emitted one. Checked
    * first and not gated on `hasError`, so output parsing cannot demote a step
    * the run reported as stopped. Everything below is the pre-existing
+<<<<<<< HEAD
    * inference, kept for messages saved before `on_run_step_closed` and for the
    * legacy path that has no submitting signal at all.
+=======
+   * inference, kept for messages saved before `on_run_step_closed`.
+>>>>>>> upstream/main
    */
   if (runStepStatus != null) {
     return runStepStatus === 'cancelled';
   }
+<<<<<<< HEAD
   if (isSubmitting !== undefined) {
     return (!isSubmitting && initialProgress < 1) || hasError;
   }
@@ -40,6 +53,9 @@ function computeCancelled(
     return false;
   }
   return hasError;
+=======
+  return (!isSubmitting && initialProgress < 1) || hasError;
+>>>>>>> upstream/main
 }
 
 export default function OpenAIImageGen({
@@ -53,7 +69,11 @@ export default function OpenAIImageGen({
   runStepStatus,
 }: {
   initialProgress: number;
+<<<<<<< HEAD
   isSubmitting?: boolean;
+=======
+  isSubmitting: boolean;
+>>>>>>> upstream/main
   toolName?: string;
   args: string | Record<string, unknown>;
   output?: string | null;
@@ -62,6 +82,10 @@ export default function OpenAIImageGen({
   runStepStatus?: PartMetadata['runStepStatus'];
 }) {
   const localize = useLocalize();
+<<<<<<< HEAD
+=======
+  const preparationText = useToolPreparation();
+>>>>>>> upstream/main
   /** Model-authored live label (injected when the tool is opted into
    *  describe_intent); wins over the phase texts. */
   const intent = useToolCallIntent(_args);
@@ -80,9 +104,13 @@ export default function OpenAIImageGen({
 
   /**
    * Determines if the image generation was cancelled.
+<<<<<<< HEAD
    * - Agent path (isSubmitting defined): cancelled if not submitting + incomplete, or on error.
    * - Legacy path (isSubmitting undefined): in-progress (0 < progress < 1) is never cancelled
    *   because legacy image gen lacks a submitting signal — only errors cancel.
+=======
+   * Cancelled if not submitting + incomplete, or on error.
+>>>>>>> upstream/main
    */
   const cancelled = computeCancelled(isSubmitting, initialProgress, hasError, runStepStatus);
   /**
@@ -248,7 +276,11 @@ export default function OpenAIImageGen({
       <span className="sr-only" aria-live="polite" aria-atomic="true">
         {(() => {
           if (progress < 1 && !cancelled && !reportsError) {
+<<<<<<< HEAD
             return '';
+=======
+            return preparationText ?? '';
+>>>>>>> upstream/main
           }
           if (reportsError) {
             return localize('com_ui_image_gen_failed');
@@ -259,7 +291,11 @@ export default function OpenAIImageGen({
           return intent ?? localize('com_ui_image_created');
         })()}
       </span>
+<<<<<<< HEAD
       <div className="relative my-1 flex h-5 shrink-0 items-center gap-2 text-text-secondary">
+=======
+      <div className="text-text-secondary relative my-1 flex h-5 shrink-0 items-center gap-2">
+>>>>>>> upstream/main
         <span className={ROW_GLYPH_SLOT} aria-hidden="true">
           <ToolIcon type="image_gen" isAnimating={isInProgress} />
         </span>

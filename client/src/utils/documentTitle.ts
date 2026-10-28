@@ -2,6 +2,12 @@ import { LocalStorageKeys } from 'librechat-data-provider';
 
 export const CHAT_TITLE_IN_TAB_KEY = 'chatTitleInTab';
 export const DEFAULT_APP_TITLE = 'LibreChat';
+<<<<<<< HEAD
+=======
+let documentTitleRevision = 0;
+
+export const getDocumentTitleRevision = (): number => documentTitleRevision;
+>>>>>>> upstream/main
 
 export const hasRealTitle = (title?: string | null): title is string =>
   title != null && title !== '' && title !== 'New Chat';
@@ -26,11 +32,20 @@ export const isChatTitleInTabEnabled = (): boolean => {
 
 /**
  * Sets the tab title to the conversation title, or to the app title when the
+<<<<<<< HEAD
  * conversation title is empty or the user opted out.
+=======
+ * conversation title is empty or the user opted out. The revision signal lets
+ * title decorators observe a write even when the resulting string is unchanged.
+>>>>>>> upstream/main
  * Pass `enabled` when the atom's value is already known, since Recoil writes to
  * localStorage after the change handler runs.
  */
 export const setDocumentTitle = (title?: string | null, enabled?: boolean): void => {
   const showChatTitle = enabled ?? isChatTitleInTabEnabled();
   document.title = showChatTitle && title != null && title !== '' ? title : getAppTitle();
+<<<<<<< HEAD
+=======
+  documentTitleRevision += 1;
+>>>>>>> upstream/main
 };

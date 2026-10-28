@@ -2,8 +2,16 @@ import { memo, useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronUp, ChevronDown } from 'lucide-react';
 import { ContentTypes } from 'librechat-data-provider';
+<<<<<<< HEAD
 import type { TMessage, TMessageContentParts } from 'librechat-data-provider';
 import { useMessagesConversation, useMessagesSubmission } from '~/Providers';
+=======
+import { pxToRem, useRemScale } from '@librechat/client';
+import type { TMessage, TMessageContentParts } from 'librechat-data-provider';
+import type { TranslationKeys } from '~/hooks';
+import { useMessagesConversation, useMessagesSubmission } from '~/Providers';
+import { parseWakeupMessage } from './Content/Parts/wakeup';
+>>>>>>> upstream/main
 import { useGetMessagesByConvoId } from '~/data-provider';
 import { useLocalize } from '~/hooks';
 import { cn } from '~/utils';
@@ -11,6 +19,10 @@ import { cn } from '~/utils';
 type MessageEntry = {
   id: string;
   isUser: boolean;
+<<<<<<< HEAD
+=======
+  isSystem?: boolean;
+>>>>>>> upstream/main
   preview: string;
   isEnd?: boolean;
   isStart?: boolean;
@@ -64,6 +76,12 @@ function rowText(node: HTMLElement): string {
 }
 
 export function buildEntry(id: string, msg: TMessage, node?: HTMLElement): MessageEntry {
+<<<<<<< HEAD
+=======
+  const isSystem =
+    node?.querySelector('[data-system-turn]') != null ||
+    parseWakeupMessage(msg)?.kind === 'background_tool';
+>>>>>>> upstream/main
   const raw = msg.text?.trim() ? msg.text : extractPreviewFromContent(msg.content);
   const trimmed = raw.trim();
   /** Image-, tool-call- and reasoning-only messages carry no text part at all,
@@ -73,16 +91,28 @@ export function buildEntry(id: string, msg: TMessage, node?: HTMLElement): Messa
   const preview = trimmed === '' && node ? rowText(node) : trimmed;
   return {
     id,
+<<<<<<< HEAD
     isUser: !!msg.isCreatedByUser,
+=======
+    isUser: !!msg.isCreatedByUser && !isSystem,
+    ...(isSystem && { isSystem: true }),
+>>>>>>> upstream/main
     preview: truncatePreview(preview),
   };
 }
 
 const USER_TURN_SELECTOR = '.user-turn';
+<<<<<<< HEAD
 const STEER_RENDER_CLASS = 'steer-render';
 /** One query, document order: steer nodes interleave at their in-thread
  *  position INSIDE the response that absorbed them. */
 const ENTRY_NODE_SELECTOR = `.message-render, .${STEER_RENDER_CLASS}`;
+=======
+const STEER_RENDER_ATTRIBUTE = 'data-steer-render';
+/** One query, document order: steer nodes interleave at their in-thread
+ *  position INSIDE the response that absorbed them. */
+const ENTRY_NODE_SELECTOR = `.message-render, [${STEER_RENDER_ATTRIBUTE}]`;
+>>>>>>> upstream/main
 
 /** Rail-relevant node: a message row or an in-thread steer part. The mutation
  *  filter must match BOTH — a steer node swap (optimistic → persisted) or
@@ -90,7 +120,11 @@ const ENTRY_NODE_SELECTOR = `.message-render, .${STEER_RENDER_CLASS}`;
 function isEntryNode(node: HTMLElement): boolean {
   return (
     node.classList?.contains('message-render') === true ||
+<<<<<<< HEAD
     node.classList?.contains(STEER_RENDER_CLASS) === true
+=======
+    node.hasAttribute?.(STEER_RENDER_ATTRIBUTE) === true
+>>>>>>> upstream/main
   );
 }
 
@@ -105,6 +139,10 @@ export function buildFallbackEntry(node: HTMLElement, id: string): MessageEntry 
   return {
     id,
     isUser,
+<<<<<<< HEAD
+=======
+    ...(node.querySelector('[data-system-turn]') != null && { isSystem: true }),
+>>>>>>> upstream/main
     preview: truncatePreview(rowText(node)),
   };
 }
@@ -164,7 +202,11 @@ function getMessageEntries(root: ParentNode, messagesById: Map<string, TMessage>
       continue;
     }
     seen.add(id);
+<<<<<<< HEAD
     if (node.classList.contains(STEER_RENDER_CLASS)) {
+=======
+    if (node.hasAttribute(STEER_RENDER_ATTRIBUTE)) {
+>>>>>>> upstream/main
       entries.push(buildSteerEntry(node, id));
       continue;
     }
@@ -253,14 +295,22 @@ const RIB_MESSAGE: RibDims = { baseW: 12, baseH: 3, peakW: 39, peakH: 6 };
  *  from length alone — the only axis a 3px line has left once colour is spent
  *  on the in-view band. */
 const RIB_CURRENT: RibDims = { baseW: 21, baseH: 3, peakW: 39, peakH: 6 };
+<<<<<<< HEAD
 /** Row height in px. `peakH` may reach it but never exceed it: the magnifier
+=======
+/** Row height in baseline px. `peakH` may reach it but never exceed it: the magnifier
+>>>>>>> upstream/main
  *  writes into normal flow, and a rib taller than its row would reflow every
  *  rib below the pointer — moving the rail out from under the pointer and
  *  leaving the measured centres (and so the preview and the click target)
  *  pointing at the wrong message. */
 const RIB_ROW_HEIGHT = 6;
 
+<<<<<<< HEAD
 /** Vertical falloff radius (content-space px) over which neighbouring ribs magnify. */
+=======
+/** Vertical falloff radius, in baseline px, over which neighbouring ribs magnify. */
+>>>>>>> upstream/main
 const MAG_INFLUENCE = 50;
 /** Delay before the shared preview first opens; subsequent moves reposition instantly. */
 const TOOLTIP_OPEN_DELAY = 60;
@@ -286,7 +336,11 @@ export function magnifyFalloff(distance: number, influence: number): number {
  *  exists to navigate. */
 const indicatorButtonClasses = cn(
   'flex w-full shrink-0 items-center justify-end rounded-sm transition-opacity duration-300',
+<<<<<<< HEAD
   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-xheavy',
+=======
+  'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-border-xheavy',
+>>>>>>> upstream/main
 );
 
 const dimIndicatorClasses =
@@ -331,7 +385,11 @@ const MessageIndicator = memo(function MessageIndicator({
         indicatorButtonClasses,
         isEmphasized || isInView ? 'opacity-100' : dimIndicatorClasses,
       )}
+<<<<<<< HEAD
       style={{ height: RIB_ROW_HEIGHT }}
+=======
+      style={{ height: pxToRem(RIB_ROW_HEIGHT) }}
+>>>>>>> upstream/main
       aria-label={label}
       aria-current={isCurrent ? 'true' : undefined}
       tabIndex={tabIndex}
@@ -340,27 +398,54 @@ const MessageIndicator = memo(function MessageIndicator({
       <span
         className={cn(
           'block rounded-full',
+<<<<<<< HEAD
           entry.isEnd === true || entry.isStart === true ? 'mr-[4.5px]' : '',
           tone,
         )}
         style={{ width: dims.baseW, height: dims.baseH }}
+=======
+          entry.isEnd === true || entry.isStart === true ? 'me-[0.28125rem]' : '',
+          tone,
+        )}
+        style={{ width: pxToRem(dims.baseW), height: pxToRem(dims.baseH) }}
+>>>>>>> upstream/main
       />
     </button>
   );
 });
 
 const chevronButtonClasses = cn(
+<<<<<<< HEAD
   '-mr-1 rounded-md p-0.5 text-text-tertiary opacity-40 transition-[color,opacity] duration-300 high-contrast:opacity-50',
+=======
+  '-me-1 rounded-md p-0.5 text-text-tertiary opacity-40 transition-[color,opacity] duration-300 high-contrast:opacity-50',
+>>>>>>> upstream/main
   'group-hover/nav:text-text-secondary group-hover/nav:opacity-100',
   'group-focus-within/nav:text-text-secondary group-focus-within/nav:opacity-100',
   'group-hover/nav:hover:text-text-primary',
   'group-hover/nav:disabled:opacity-30 group-focus-within/nav:disabled:opacity-30',
+<<<<<<< HEAD
   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border-xheavy',
 );
 
 function MessageNav({ scrollableRef }: { scrollableRef: React.RefObject<HTMLDivElement> }) {
   const localize = useLocalize();
   const { conversationId } = useMessagesConversation();
+=======
+  'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-border-xheavy',
+);
+
+function MessageNav({
+  scrollableRef,
+  conversationId: renderedConversationId,
+}: {
+  scrollableRef: React.RefObject<HTMLDivElement>;
+  conversationId?: string | null;
+}) {
+  const localize = useLocalize();
+  const { conversationId: contextConversationId } = useMessagesConversation();
+  const conversationId = renderedConversationId ?? contextConversationId;
+>>>>>>> upstream/main
   const { isSubmitting } = useMessagesSubmission();
   const { data: messages } = useGetMessagesByConvoId(
     conversationId ?? '',
@@ -417,13 +502,27 @@ function MessageNav({ scrollableRef }: { scrollableRef: React.RefObject<HTMLDivE
   const pointerClientYRef = useRef<number | null>(null);
   const magRafRef = useRef<number | null>(null);
   const reducedMotionRef = useRef(false);
+<<<<<<< HEAD
+=======
+  /** The resting ribs are sized in rem while magnification writes inline pixels, so
+   *  both the peak dimensions and the reach have to be read into the same units. */
+  const remScale = useRemScale();
+  const remScaleRef = useRef(remScale);
+  remScaleRef.current = remScale;
+>>>>>>> upstream/main
   const focusedIdRef = useRef<string | null>(null);
   const tipShownRef = useRef(false);
   const tipTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const tipElRef = useRef<HTMLDivElement | null>(null);
+<<<<<<< HEAD
   const tipPosRef = useRef({ top: 0, right: 0 });
 
   const [tip, setTip] = useState<{ id: string; top: number; right: number } | null>(null);
+=======
+  const tipPosRef = useRef({ top: 0, inlineEnd: 0 });
+
+  const [tip, setTip] = useState<{ id: string; top: number; inlineEnd: number } | null>(null);
+>>>>>>> upstream/main
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   /** The rib the keyboard last landed on. A roving tab stop has to travel with
    *  focus, not sit on the scroll-spy's current rib: leave it behind and the
@@ -865,12 +964,28 @@ function MessageNav({ scrollableRef }: { scrollableRef: React.RefObject<HTMLDivE
     };
   }, [entries, currentId, measureRibs]);
 
+<<<<<<< HEAD
   const positionTip = useCallback((top: number, right: number) => {
     tipPosRef.current = { top, right };
     const el = tipElRef.current;
     if (el) {
       el.style.top = `${top}px`;
       el.style.right = `${right}px`;
+=======
+  /** Distance from the viewport edge the tooltip shares with the column: the right edge in LTR, the left in RTL. */
+  const tipInlineEnd = useCallback((rect: { left: number; right: number }) => {
+    const rtl =
+      columnRef.current != null && getComputedStyle(columnRef.current).direction === 'rtl';
+    return rtl ? rect.right + 8 : window.innerWidth - rect.left + 8;
+  }, []);
+
+  const positionTip = useCallback((top: number, inlineEnd: number) => {
+    tipPosRef.current = { top, inlineEnd };
+    const el = tipElRef.current;
+    if (el) {
+      el.style.top = `${top}px`;
+      el.style.insetInlineEnd = `${inlineEnd}px`;
+>>>>>>> upstream/main
     }
   }, []);
 
@@ -880,7 +995,11 @@ function MessageNav({ scrollableRef }: { scrollableRef: React.RefObject<HTMLDivE
         setTip(null);
         return;
       }
+<<<<<<< HEAD
       setTip({ id, top: tipPosRef.current.top, right: tipPosRef.current.right });
+=======
+      setTip({ id, top: tipPosRef.current.top, inlineEnd: tipPosRef.current.inlineEnd });
+>>>>>>> upstream/main
     },
     [entryById],
   );
@@ -901,8 +1020,13 @@ function MessageNav({ scrollableRef }: { scrollableRef: React.RefObject<HTMLDivE
   }, []);
 
   const focusTooltip = useCallback(
+<<<<<<< HEAD
     (id: string, top: number, right: number) => {
       positionTip(top, right);
+=======
+    (id: string, top: number, inlineEnd: number) => {
+      positionTip(top, inlineEnd);
+>>>>>>> upstream/main
       if (focusedIdRef.current === id) {
         return;
       }
@@ -929,10 +1053,17 @@ function MessageNav({ scrollableRef }: { scrollableRef: React.RefObject<HTMLDivE
   const showTerminusTip = useCallback(
     (el: HTMLElement, id: string) => {
       const rect = el.getBoundingClientRect();
+<<<<<<< HEAD
       const left = columnRef.current?.getBoundingClientRect().left ?? rect.left;
       focusTooltip(id, rect.top + rect.height / 2, window.innerWidth - left + 8);
     },
     [focusTooltip],
+=======
+      const colRect = columnRef.current?.getBoundingClientRect() ?? rect;
+      focusTooltip(id, rect.top + rect.height / 2, tipInlineEnd(colRect));
+    },
+    [focusTooltip, tipInlineEnd],
+>>>>>>> upstream/main
   );
 
   const handleEndPointerEnter = useCallback(
@@ -976,6 +1107,11 @@ function MessageNav({ scrollableRef }: { scrollableRef: React.RefObject<HTMLDivE
       return;
     }
     const reduce = reducedMotionRef.current;
+<<<<<<< HEAD
+=======
+    const scale = remScaleRef.current;
+    const influence = MAG_INFLUENCE * scale;
+>>>>>>> upstream/main
     const colRect = col.getBoundingClientRect();
     const scrollTop = col.scrollTop;
     const py = clientY - colRect.top + scrollTop;
@@ -993,6 +1129,7 @@ function MessageNav({ scrollableRef }: { scrollableRef: React.RefObject<HTMLDivE
       if (reduce) {
         continue;
       }
+<<<<<<< HEAD
       const t = magnifyFalloff(d, MAG_INFLUENCE);
       const dims = rib.dims;
       rib.line.style.transition = 'none';
@@ -1007,6 +1144,21 @@ function MessageNav({ scrollableRef }: { scrollableRef: React.RefObject<HTMLDivE
       clearTooltip();
     }
   }, [focusTooltip, clearTooltip, ensureRibLayout]);
+=======
+      const t = magnifyFalloff(d, influence);
+      const dims = rib.dims;
+      rib.line.style.transition = 'none';
+      rib.line.style.width = pxToRem(dims.baseW + (dims.peakW - dims.baseW) * t);
+      rib.line.style.height = pxToRem(dims.baseH + (dims.peakH - dims.baseH) * t);
+    }
+    if (nearestId != null && nearestD <= influence && !isDraggingRef.current) {
+      const top = colRect.top - scrollTop + nearestCenter;
+      focusTooltip(nearestId, top, tipInlineEnd(colRect));
+    } else {
+      clearTooltip();
+    }
+  }, [focusTooltip, clearTooltip, ensureRibLayout, tipInlineEnd]);
+>>>>>>> upstream/main
 
   /** Restores the resting dimensions rather than clearing them: the ribs carry
    *  their base size inline, from the same `ribDimsFor` the magnifier reads, so
@@ -1017,8 +1169,13 @@ function MessageNav({ scrollableRef }: { scrollableRef: React.RefObject<HTMLDivE
     for (let i = 0; i < layout.length; i++) {
       const rib = layout[i];
       rib.line.style.transition = 'width 140ms ease-out, height 140ms ease-out';
+<<<<<<< HEAD
       rib.line.style.width = `${rib.dims.baseW}px`;
       rib.line.style.height = `${rib.dims.baseH}px`;
+=======
+      rib.line.style.width = pxToRem(rib.dims.baseW);
+      rib.line.style.height = pxToRem(rib.dims.baseH);
+>>>>>>> upstream/main
     }
   }, [ensureRibLayout]);
 
@@ -1597,7 +1754,11 @@ function MessageNav({ scrollableRef }: { scrollableRef: React.RefObject<HTMLDivE
       aria-label={localize('com_ui_message_nav')}
       aria-keyshortcuts="Shift+Alt+M"
       className={cn(
+<<<<<<< HEAD
         'group/nav absolute right-2 top-1/2 z-40 hidden max-h-[min(24rem,calc(100%-2rem))]',
+=======
+        'group/nav absolute inset-e-2 top-1/2 z-40 hidden max-h-[min(24rem,calc(100%-2rem))]',
+>>>>>>> upstream/main
         '-translate-y-1/2 flex-col items-end gap-1.5 px-1.5 py-2 md:flex',
       )}
     >
@@ -1613,7 +1774,11 @@ function MessageNav({ scrollableRef }: { scrollableRef: React.RefObject<HTMLDivE
 
       {startEntry && (
         <div
+<<<<<<< HEAD
           className="flex w-14 cursor-pointer touch-none select-none flex-col items-stretch"
+=======
+          className="flex w-14 cursor-pointer touch-none flex-col items-stretch select-none"
+>>>>>>> upstream/main
           onPointerDown={handlePointerDown}
           onPointerEnter={handleStartPointerEnter}
           onPointerLeave={clearTooltip}
@@ -1643,6 +1808,7 @@ function MessageNav({ scrollableRef }: { scrollableRef: React.RefObject<HTMLDivE
         onKeyDown={handleColumnKeyDown}
         onScroll={handleColumnScroll}
         data-message-nav-column=""
+<<<<<<< HEAD
         className="relative flex min-h-0 w-14 cursor-pointer touch-none select-none flex-col items-stretch gap-1.5 overflow-y-auto [&::-webkit-scrollbar]:hidden"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
@@ -1651,6 +1817,20 @@ function MessageNav({ scrollableRef }: { scrollableRef: React.RefObject<HTMLDivE
             entry.isUser ? 'com_ui_message_nav_go_to_user' : 'com_ui_message_nav_go_to_assistant',
             { 0: previewTextFor(entry, localize, entry.id === pendingId).slice(0, 30) },
           );
+=======
+        className="hide-scrollbar relative flex min-h-0 w-14 cursor-pointer touch-none flex-col items-stretch gap-1.5 overflow-y-auto select-none [&::-webkit-scrollbar]:hidden"
+      >
+        {messageEntries.map((entry) => {
+          let labelKey: TranslationKeys = entry.isUser
+            ? 'com_ui_message_nav_go_to_user'
+            : 'com_ui_message_nav_go_to_assistant';
+          if (entry.isSystem) {
+            labelKey = 'com_ui_message_nav_go_to_system';
+          }
+          const label = localize(labelKey, {
+            0: previewTextFor(entry, localize, entry.id === pendingId).slice(0, 30),
+          });
+>>>>>>> upstream/main
           return (
             <MessageIndicator
               key={entry.id}
@@ -1668,7 +1848,11 @@ function MessageNav({ scrollableRef }: { scrollableRef: React.RefObject<HTMLDivE
 
       {endEntry && (
         <div
+<<<<<<< HEAD
           className="flex w-14 cursor-pointer touch-none select-none flex-col items-stretch"
+=======
+          className="flex w-14 cursor-pointer touch-none flex-col items-stretch select-none"
+>>>>>>> upstream/main
           onPointerDown={handlePointerDown}
           onPointerEnter={handleEndPointerEnter}
           onPointerLeave={clearTooltip}
@@ -1702,6 +1886,7 @@ function MessageNav({ scrollableRef }: { scrollableRef: React.RefObject<HTMLDivE
           <div
             ref={tipElRef}
             role="tooltip"
+<<<<<<< HEAD
             style={{
               position: 'fixed',
               top: tip.top,
@@ -1710,6 +1895,17 @@ function MessageNav({ scrollableRef }: { scrollableRef: React.RefObject<HTMLDivE
               zIndex: 999,
             }}
             className="pointer-events-none max-w-[280px] rounded-xl border border-border-light bg-surface-secondary px-3 py-2 text-text-secondary shadow-lg"
+=======
+            style={
+              {
+                top: tip.top,
+                '--tip-inline-end': `${tip.inlineEnd}px`,
+                transform: 'translateY(-50%)',
+                zIndex: 999,
+              } as React.CSSProperties
+            }
+            className="border-border-light bg-surface-secondary text-text-secondary pointer-events-none fixed inset-e-(--tip-inline-end) max-w-[17.5rem] rounded-xl border px-3 py-2 shadow-lg"
+>>>>>>> upstream/main
           >
             <p className="line-clamp-3 text-xs">{tipText}</p>
           </div>,
