@@ -76,6 +76,7 @@ const {
   sendResponsesErrorResponse,
   createResponsesEventHandlers,
   createAggregatorEventHandlers,
+  createClientToolHandoff,
   getLangfuseTraceMessageFields,
   stripActivityLabelParts,
   stripUnusableSummaryParts,
@@ -629,9 +630,14 @@ const executeResponse = async (envelope, { req, res }) => {
   // Generate IDs
   const responseId = generateResponseId();
   const terminalRunError = createTerminalRunErrorObserver({
+    maxProviderErrorChars: appConfig?.endpoints?.agents?.maxProviderErrorChars,
     logger,
     responseMessageId: responseId,
     source: '[Responses API]',
+    protectionEnabled: hasModelBoundContentProtection(
+      appConfig?.filters,
+      appConfig?.messageFilter?.pii,
+    ),
   });
   const context = createResponseContext(request, responseId);
 
@@ -727,6 +733,8 @@ const executeResponse = async (envelope, { req, res }) => {
       const agentsEConfig = appConfig?.endpoints?.[EModelEndpoint.agents];
       const ordinaryToolCancellationEnabled =
         agentsEConfig?.backgroundTasks?.ordinaryToolCancellation === true;
+      const backgroundCompletionResultMaxChars =
+        agentsEConfig?.backgroundTasks?.completionResultMaxChars;
       const previousMessages = request.previous_response_id
         ? await loadPreviousMessages(request.previous_response_id, principal.userId)
         : [];
@@ -1084,6 +1092,25 @@ const executeResponse = async (envelope, { req, res }) => {
       // Merge previous messages with new input
       const allMessages = [...previousMessages, ...inputMessages];
 
+      /** The caller's function tools: declared to the model with no server-side
+       *  executor, handed back when the model calls one, and reported on the
+       *  response as the subset that was actually applied.
+       *
+       *  Built once every agent of the run is known, because the interception
+       *  matches on tool name across the whole graph: a name a subagent owns
+       *  collides exactly as a primary one does. */
+      const clientTools = createClientToolHandoff({
+        tools: request.tools,
+        agentDefinitions: primaryConfig.toolDefinitions,
+        serverDefinitions: modelBoundAgents.flatMap((runAgent) => runAgent.toolDefinitions ?? []),
+        responseId,
+      });
+      if (clientTools.error != null) {
+        return sendResponsesErrorResponse(res, 400, clientTools.error, 'invalid_request');
+      }
+      primaryConfig.toolDefinitions = clientTools.toolDefinitions;
+      context.tools = clientTools.appliedTools;
+
       const toolSet = buildRunToolSet(
         primaryConfig,
         handoffAgentConfigs.values(),
@@ -1162,6 +1189,9 @@ const executeResponse = async (envelope, { req, res }) => {
           res,
           context,
           tracker,
+          /* The run terminates a caller-executed call's item itself: the server
+             never executes one, so `on_tool_end` cannot. */
+          clientToolNames: clientTools.clientToolNames,
         };
 
         // Emit response.created then response.in_progress per Open Responses spec
@@ -1169,8 +1199,11 @@ const executeResponse = async (envelope, { req, res }) => {
         emitResponseInProgress(handlerConfig);
 
         // Create event handlers
-        const { handlers: responsesHandlers, finalizeStream } =
-          createResponsesEventHandlers(handlerConfig);
+        const {
+          handlers: responsesHandlers,
+          finalizeStream,
+          emitClientToolDeferral,
+        } = createResponsesEventHandlers(handlerConfig);
 
         // Collect usage for balance tracking
         const collectedUsage = [];
@@ -1189,6 +1222,7 @@ const executeResponse = async (envelope, { req, res }) => {
           runSignal: execution.signal,
           foregroundRunId: responseId,
           ordinaryToolCancellation: ordinaryToolCancellationEnabled,
+          backgroundCompletionResultMaxChars,
           provisionFiles: createProvisionFilesCallback({
             req,
             agentToolContexts,
@@ -1237,7 +1271,7 @@ const executeResponse = async (envelope, { req, res }) => {
         const handlers = {
           on_message_delta: responsesHandlers.on_message_delta,
           on_reasoning_delta: responsesHandlers.on_reasoning_delta,
-          on_run_step: responsesHandlers.on_run_step,
+          on_run_step: clientTools.wrapRunStep(responsesHandlers.on_run_step),
           on_run_step_delta: responsesHandlers.on_run_step_delta,
           on_chat_model_end: {
             handle: (event, data, metadata, graph) => {
@@ -1256,7 +1290,12 @@ const executeResponse = async (envelope, { req, res }) => {
           on_chain_end: { handle: () => {} },
           on_agent_update: { handle: () => {} },
           on_custom_event: { handle: () => {} },
-          on_tool_execute: createToolExecuteHandler(toolExecuteOptions),
+          /** The deferral answer is emitted as the call's `function_call_output`,
+           *  so a caller can tell an answered call from one handed back to it. */
+          on_tool_execute: clientTools.wrapToolExecute(
+            createToolExecuteHandler(toolExecuteOptions),
+            emitClientToolDeferral,
+          ),
           on_agent_log: agentLogHandlerObj,
           ...(summarizationConfig?.enabled !== false
             ? buildSummarizationHandlers({ isStreaming: actuallyStreaming, res })
@@ -1283,6 +1322,7 @@ const executeResponse = async (envelope, { req, res }) => {
           traceContext: { endpoint: EModelEndpoint.agents },
           tenantId: principal.tenantId,
           modelCallbacks: [terminalRunError.modelCallback],
+          clientToolNames: clientTools.clientToolNames,
           /** Bills subagent child-run model calls (reported outside the
            *  streamEvents loop) into the same collectedUsage array. */
           subagentUsageSink: createSubagentUsageSink(collectedUsage),
@@ -1419,6 +1459,7 @@ const executeResponse = async (envelope, { req, res }) => {
           runSignal: execution.signal,
           foregroundRunId: responseId,
           ordinaryToolCancellation: ordinaryToolCancellationEnabled,
+          backgroundCompletionResultMaxChars,
           provisionFiles: createProvisionFilesCallback({
             req,
             agentToolContexts,
@@ -1466,7 +1507,7 @@ const executeResponse = async (envelope, { req, res }) => {
         const handlers = {
           on_message_delta: aggregatorHandlers.on_message_delta,
           on_reasoning_delta: aggregatorHandlers.on_reasoning_delta,
-          on_run_step: aggregatorHandlers.on_run_step,
+          on_run_step: clientTools.wrapRunStep(aggregatorHandlers.on_run_step),
           on_run_step_delta: aggregatorHandlers.on_run_step_delta,
           on_chat_model_end: {
             handle: (event, data, metadata, graph) => {
@@ -1485,7 +1526,10 @@ const executeResponse = async (envelope, { req, res }) => {
           on_chain_end: { handle: () => {} },
           on_agent_update: { handle: () => {} },
           on_custom_event: { handle: () => {} },
-          on_tool_execute: createToolExecuteHandler(toolExecuteOptions),
+          on_tool_execute: clientTools.wrapToolExecute(
+            createToolExecuteHandler(toolExecuteOptions),
+            (callId, output) => aggregator.toolOutputs.set(callId, output),
+          ),
           on_agent_log: agentLogHandlerObj,
           ...(summarizationConfig?.enabled !== false
             ? buildSummarizationHandlers({ isStreaming: false, res })
@@ -1511,6 +1555,7 @@ const executeResponse = async (envelope, { req, res }) => {
           traceContext: { endpoint: EModelEndpoint.agents },
           tenantId: principal.tenantId,
           modelCallbacks: [terminalRunError.modelCallback],
+          clientToolNames: clientTools.clientToolNames,
           /** Bills subagent child-run model calls (reported outside the
            *  streamEvents loop) into the same collectedUsage array. */
           subagentUsageSink: createSubagentUsageSink(collectedUsage),
