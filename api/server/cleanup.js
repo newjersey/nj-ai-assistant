@@ -1,5 +1,6 @@
 const { logger } = require('@librechat/data-schemas');
 
+<<<<<<< HEAD
 /** WeakMap to hold temporary data associated with requests */
 const requestDataMap = new WeakMap();
 
@@ -29,6 +30,8 @@ const clientRegistry = FinalizationRegistry
     })
   : null;
 
+=======
+>>>>>>> upstream/main
 const graphPropsToClean = [
   'handlerRegistry',
   'runId',
@@ -153,9 +156,12 @@ function disposeClient(client) {
     if (client.isVisionModel) {
       client.isVisionModel = null;
     }
+<<<<<<< HEAD
     if (client.isChatCompletion !== undefined) {
       client.isChatCompletion = null;
     }
+=======
+>>>>>>> upstream/main
     if (client.contextHandlers) {
       client.contextHandlers = null;
     }
@@ -386,6 +392,7 @@ function disposeClient(client) {
   }
 }
 
+<<<<<<< HEAD
 function processReqData(data = {}, context) {
   let {
     abortKey,
@@ -428,4 +435,8 @@ module.exports = {
   requestDataMap,
   clientRegistry,
   processReqData,
+=======
+module.exports = {
+  disposeClient,
+>>>>>>> upstream/main
 };

@@ -1,6 +1,19 @@
+<<<<<<< HEAD
 import { useMemo, useState, useEffect, useRef } from 'react';
 import { Constants } from 'librechat-data-provider';
 import { useRecoilState, useRecoilValue, useResetRecoilState } from 'recoil';
+=======
+import { useMemo, useEffect, useRef } from 'react';
+import { useAtom, useSetAtom } from 'jotai';
+import { Constants } from 'librechat-data-provider';
+import { useRecoilCallback, useRecoilState, useRecoilValue, useResetRecoilState } from 'recoil';
+import {
+  artifactsActiveTab,
+  artifactsOpenedArtifactId,
+  artifactsPaneFocusRequest,
+} from '~/components/Artifacts/state';
+import { useCodeState } from '~/Providers/EditorContext';
+>>>>>>> upstream/main
 import { isCodeOnlyArtifact } from '~/utils/artifacts';
 import { useArtifactsContext } from '~/Providers';
 import { logger } from '~/utils';
@@ -52,8 +65,21 @@ const getArtifactFence = (text: string, lineStart: number): ArtifactFence | null
 };
 
 const isClosingArtifactFence = (line: string, openingFence: ArtifactFence): boolean => {
+<<<<<<< HEAD
   const closePattern = new RegExp(`^\\${openingFence.marker}{${openingFence.length},}\\s*$`);
   return closePattern.test(line.trim());
+=======
+  const trimmed = line.trim();
+  if (trimmed.length < openingFence.length) {
+    return false;
+  }
+  for (const char of trimmed) {
+    if (char !== openingFence.marker) {
+      return false;
+    }
+  }
+  return true;
+>>>>>>> upstream/main
 };
 
 const isArtifactCloseLine = (line: string): boolean => {
@@ -97,6 +123,12 @@ const hasUnfencedArtifactClose = (text: string, start: number): boolean => {
 };
 
 const hasEnclosedArtifact = (messageText: string): boolean => {
+<<<<<<< HEAD
+=======
+  if (!messageText.includes(':::artifact')) {
+    return false;
+  }
+>>>>>>> upstream/main
   const text = messageText.trim();
   const artifactPattern = /:::artifact(?:\{[^}]*\})?/g;
   let artifactMatch = artifactPattern.exec(text);
@@ -136,7 +168,16 @@ const hasEnclosedArtifact = (messageText: string): boolean => {
 };
 
 export default function useArtifacts() {
+<<<<<<< HEAD
   const [activeTab, setActiveTab] = useState('preview');
+=======
+  /* Pane state, not instance state: the pane is remounted when it changes
+   * hosts, and the tab the user was on has to come with it. */
+  const [activeTab, setActiveTab] = useAtom(artifactsActiveTab);
+  const setPaneFocusRequest = useSetAtom(artifactsPaneFocusRequest);
+  const setOpenedArtifactId = useSetAtom(artifactsOpenedArtifactId);
+  const { endCodeSession } = useCodeState();
+>>>>>>> upstream/main
   const { isSubmitting, latestMessageId, latestMessageText, conversationId } =
     useArtifactsContext();
 
@@ -165,10 +206,42 @@ export default function useArtifacts() {
   const lastRunMessageIdRef = useRef<string | null>(null);
   const prevConversationIdRef = useRef<string | null>(null);
 
+<<<<<<< HEAD
+=======
+  /**
+   * Whether the pane is closing for good rather than moving. The pane changes
+   * hosts — side panel, mobile sheet, undocked window — by unmounting one
+   * instance and mounting another, and clearing the registry on that unmount
+   * would close the pane the user was moving. Closing clears visibility and
+   * the focused id first, so a fresh snapshot distinguishes the two; the
+   * component's own render props cannot, because the parent stops rendering
+   * it before it sees the new values.
+   */
+  const isPaneClosed = useRecoilCallback(
+    ({ snapshot }) =>
+      () =>
+        snapshot.getLoadable(store.artifactsVisibility).valueMaybe() !== true ||
+        snapshot.getLoadable(store.currentArtifactId).valueMaybe() == null,
+    [],
+  );
+
+>>>>>>> upstream/main
   useEffect(() => {
     const resetState = () => {
       resetArtifacts();
       resetCurrentArtifactId();
+<<<<<<< HEAD
+=======
+      /* The tab and the editor buffer outlive a host move but not the session:
+       * the next artifact opens on the default view, with its own text, as it
+       * did when both lived in the pane instance. Ending the code session also
+       * tells a save still in flight that its callbacks have nothing to
+       * restore here. */
+      setActiveTab('preview');
+      setOpenedArtifactId(null);
+      endCodeSession();
+      setPaneFocusRequest(false);
+>>>>>>> upstream/main
       prevConversationIdRef.current = conversationId;
       lastRunMessageIdRef.current = null;
       lastContentRef.current = null;
@@ -181,12 +254,33 @@ export default function useArtifacts() {
       resetState();
     }
     prevConversationIdRef.current = conversationId;
+<<<<<<< HEAD
     /** Resets artifacts when unmounting */
     return () => {
       logger.log('artifacts_visibility', 'Unmounting artifacts');
       resetState();
     };
   }, [conversationId, resetArtifacts, resetCurrentArtifactId]);
+=======
+    /** Resets artifacts when the pane closes */
+    return () => {
+      if (!isPaneClosed()) {
+        return;
+      }
+      logger.log('artifacts_visibility', 'Unmounting artifacts');
+      resetState();
+    };
+  }, [
+    conversationId,
+    isPaneClosed,
+    resetArtifacts,
+    resetCurrentArtifactId,
+    setActiveTab,
+    endCodeSession,
+    setPaneFocusRequest,
+    setOpenedArtifactId,
+  ]);
+>>>>>>> upstream/main
 
   /**
    * Read currentArtifactId in effects without subscribing as a dependency.
@@ -229,7 +323,14 @@ export default function useArtifacts() {
     }
     const latestArtifactId = orderedArtifactIds[orderedArtifactIds.length - 1];
     const latestArtifact = artifacts?.[latestArtifactId];
+<<<<<<< HEAD
     if (latestArtifact?.content === lastContentRef.current && !justFinishedSubmitting) {
+=======
+    if (latestArtifact?.messageId !== latestMessageId) {
+      return;
+    }
+    if (latestArtifact.content === lastContentRef.current && !justFinishedSubmitting) {
+>>>>>>> upstream/main
       return;
     }
     lastContentRef.current = latestArtifact?.content ?? null;
@@ -253,6 +354,10 @@ export default function useArtifacts() {
     latestMessageId,
     latestMessageText,
     orderedArtifactIds,
+<<<<<<< HEAD
+=======
+    setActiveTab,
+>>>>>>> upstream/main
     setCurrentArtifactId,
   ]);
 
@@ -271,7 +376,11 @@ export default function useArtifacts() {
       hasEnclosedArtifactRef.current = true;
       hasAutoSwitchedToCodeRef.current = false;
     }
+<<<<<<< HEAD
   }, [isSubmitting, latestMessageText]);
+=======
+  }, [isSubmitting, latestMessageText, setActiveTab]);
+>>>>>>> upstream/main
 
   useEffect(() => {
     if (latestMessageId !== lastRunMessageIdRef.current) {

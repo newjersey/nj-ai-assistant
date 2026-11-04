@@ -219,14 +219,20 @@ describe('Content Security Policy', () => {
     expect(csp).toContain("object-src 'none'");
   });
 
+<<<<<<< HEAD
   /* NJ: nj-helmet sets a global CSP
+=======
+>>>>>>> upstream/main
   it('does not attach the policy to API responses', async () => {
     const response = await request(app).get('/api/does-not-exist');
 
     expect(response.status).toBe(404);
     expect(response.headers['content-security-policy']).toBeUndefined();
   });
+<<<<<<< HEAD
   */
+=======
+>>>>>>> upstream/main
 });
 
 // Polls the /health endpoint every 30ms for up to 10 seconds to wait for the server to start completely

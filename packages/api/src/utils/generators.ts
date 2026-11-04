@@ -1,4 +1,5 @@
 import fetch from 'node-fetch';
+<<<<<<< HEAD
 import { logger } from '@librechat/data-schemas';
 import { GraphEvents, sleep } from '@librechat/agents';
 import type { Response as ServerResponse } from 'express';
@@ -7,6 +8,13 @@ import type { Agent as HttpAgent } from 'node:http';
 import type { URL as NodeURL } from 'node:url';
 import type { ServerSentEvent } from '~/types';
 import { sendEvent } from './events';
+=======
+import { sleep } from '@librechat/agents';
+import { logger } from '@librechat/data-schemas';
+import type { Agent as HttpsAgent } from 'node:https';
+import type { Agent as HttpAgent } from 'node:http';
+import type { URL as NodeURL } from 'node:url';
+>>>>>>> upstream/main
 
 type SSRFSafeAgents = {
   httpAgent: HttpAgent;
@@ -64,6 +72,7 @@ export function createFetch({
 }
 
 /**
+<<<<<<< HEAD
  * Creates event handlers for stream events that don't capture client references
  * @param res - The response object to send events to
  * @returns Object containing handler functions
@@ -93,6 +102,8 @@ export function createStreamEventHandlers(res: ServerResponse): {
 }
 
 /**
+=======
+>>>>>>> upstream/main
  * @deprecated No longer used internally: stream pacing lives in
  * `@librechat/agents` (adaptive smoothing via `_lc_stream_delay` /
  * `streamRate`), and LangChain runs callback handlers in the background, so

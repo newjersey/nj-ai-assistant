@@ -13,7 +13,11 @@ const MessageContainer = React.memo(function MessageContainer({
 }) {
   return (
     <div
+<<<<<<< HEAD
       className="w-full border-0 bg-transparent text-text-primary"
+=======
+      className="text-text-primary w-full border-0 bg-transparent"
+>>>>>>> upstream/main
       onWheel={handleScroll}
       onTouchMove={handleScroll}
     >
@@ -27,7 +31,12 @@ function Message(props: TMessageProps) {
     message: props.message,
   });
   const { message } = props;
+<<<<<<< HEAD
   const { chatContext, effectiveIsSubmitting } = useMemoizedChatContext(message, isSubmitting);
+=======
+  const { chatContext, effectiveIsSubmitting, latestMessageId, latestMessageDepth } =
+    useMemoizedChatContext(message, isSubmitting);
+>>>>>>> upstream/main
 
   if (!message || typeof message !== 'object') {
     return null;
@@ -36,7 +45,17 @@ function Message(props: TMessageProps) {
   return (
     <MessageContainer handleScroll={handleScroll}>
       <div className="m-auto justify-center px-4 py-3 sm:px-0">
+<<<<<<< HEAD
         <MessageRender {...props} isSubmitting={effectiveIsSubmitting} chatContext={chatContext} />
+=======
+        <MessageRender
+          {...props}
+          chatContext={chatContext}
+          isSubmitting={effectiveIsSubmitting}
+          latestMessageId={latestMessageId}
+          latestMessageDepth={latestMessageDepth}
+        />
+>>>>>>> upstream/main
       </div>
     </MessageContainer>
   );

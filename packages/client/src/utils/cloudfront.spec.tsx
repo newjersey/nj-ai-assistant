@@ -5,6 +5,10 @@ const mockGetTokenHeader = jest.fn(() => 'Bearer test-token');
 
 jest.mock('librechat-data-provider', () => ({
   apiBaseUrl: () => mockApiBaseUrl(),
+<<<<<<< HEAD
+=======
+  getClientLimit: () => 15000,
+>>>>>>> upstream/main
 }));
 
 import {

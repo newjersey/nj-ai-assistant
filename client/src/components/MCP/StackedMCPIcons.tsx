@@ -14,14 +14,24 @@ interface StackedMCPIconsProps {
 
 const sizeConfig = {
   sm: {
+<<<<<<< HEAD
     icon: 'h-[18px] w-[18px]',
     container: 'h-[22px] w-[22px]',
     overlap: '-ml-2.5',
+=======
+    icon: 'h-[1.125rem] w-[1.125rem]',
+    container: 'h-[1.375rem] w-[1.375rem]',
+    overlap: '-ms-2.5',
+>>>>>>> upstream/main
   },
   md: {
     icon: 'h-5 w-5',
     container: 'h-6 w-6',
+<<<<<<< HEAD
     overlap: '-ml-3',
+=======
+    overlap: '-ms-3',
+>>>>>>> upstream/main
   },
 };
 
@@ -51,7 +61,11 @@ export default function StackedMCPIcons({
     return (
       <MCPIcon
         aria-hidden="true"
+<<<<<<< HEAD
         className={cn('flex-shrink-0 text-text-primary', sizeConfig.md.icon)}
+=======
+        className={cn('text-text-primary shrink-0', sizeConfig.md.icon)}
+>>>>>>> upstream/main
       />
     );
   }
@@ -66,7 +80,11 @@ export default function StackedMCPIcons({
           key={icon.key}
           title={icon.displayName}
           className={cn(
+<<<<<<< HEAD
             'relative flex items-center justify-center rounded-full border',
+=======
+            'text-text-primary relative flex items-center justify-center rounded-full border',
+>>>>>>> upstream/main
             colors.border,
             colors.bg,
             sizes.container,
@@ -78,17 +96,28 @@ export default function StackedMCPIcons({
             <CustomIcon
               src={icon.iconPath}
               alt={icon.displayName}
+<<<<<<< HEAD
               className={cn('rounded-full object-cover text-text-primary', sizes.icon)}
             />
           ) : (
             <MCPIcon className={cn('text-text-primary', sizes.icon)} />
+=======
+              className={cn('rounded-full object-cover', sizes.icon)}
+            />
+          ) : (
+            <MCPIcon className={sizes.icon} />
+>>>>>>> upstream/main
           )}
         </div>
       ))}
       {overflowCount > 0 && (
         <div
           className={cn(
+<<<<<<< HEAD
             'relative flex items-center justify-center rounded-full border border-surface-primary bg-surface-tertiary text-xs font-medium text-text-secondary',
+=======
+            'border-surface-primary bg-surface-tertiary text-text-secondary relative flex items-center justify-center rounded-full border text-xs font-medium',
+>>>>>>> upstream/main
             sizes.container,
             sizes.overlap,
           )}

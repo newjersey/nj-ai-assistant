@@ -180,6 +180,29 @@ describe('formatMessageContent', () => {
     ]);
   });
 
+<<<<<<< HEAD
+=======
+  it('exports only the readable part of reasoning with encrypted payloads', () => {
+    const encoded = Buffer.from(Array.from({ length: 900 }, (_, i) => (i * 37 + 3) % 256)).toString(
+      'base64',
+    );
+    expect(
+      formatMessageContent({
+        sender: 'Assistant',
+        content: { type: ContentTypes.THINK, think: `<think>${encoded}</think>` },
+        localize,
+      }),
+    ).toEqual([]);
+    expect(
+      formatMessageContent({
+        sender: 'Assistant',
+        content: { type: ContentTypes.THINK, think: `Check assumptions\n${encoded}` },
+        localize,
+      }),
+    ).toEqual(['Assistant', 'Thinking:\nCheck assumptions']);
+  });
+
+>>>>>>> upstream/main
   it('concatenates summary chunks without inserted paragraphs', () => {
     expect(
       formatMessageContent({

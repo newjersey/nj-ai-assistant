@@ -65,6 +65,7 @@ export function createAgentApiKeyMethods(mongoose: typeof import('mongoose')): {
   async function validateAgentApiKey(
     apiKey: string,
   ): Promise<{ userId: Types.ObjectId; keyId: Types.ObjectId } | null> {
+<<<<<<< HEAD
     try {
       const AgentApiKey = mongoose.models.AgentApiKey;
       const keyHash = await hashToken(apiKey);
@@ -89,6 +90,31 @@ export function createAgentApiKeyMethods(mongoose: typeof import('mongoose')): {
       logger.error('[validateAgentApiKey] Error validating API key:', error);
       return null;
     }
+=======
+    const AgentApiKey = mongoose.models.AgentApiKey;
+    const keyHash = await hashToken(apiKey);
+
+    const keyDoc = (await AgentApiKey.findOne({ keyHash }).lean()) as IAgentApiKey | null;
+
+    if (!keyDoc) {
+      return null;
+    }
+
+    if (keyDoc.expiresAt && new Date(keyDoc.expiresAt) < new Date()) {
+      return null;
+    }
+
+    AgentApiKey.updateOne({ _id: keyDoc._id }, { $set: { lastUsedAt: new Date() } }).catch(
+      (error: unknown) => {
+        logger.error('[validateAgentApiKey] Error updating lastUsedAt:', error);
+      },
+    );
+
+    return {
+      userId: keyDoc.userId,
+      keyId: keyDoc._id as Types.ObjectId,
+    };
+>>>>>>> upstream/main
   }
 
   async function listAgentApiKeys(userId: string | Types.ObjectId): Promise<AgentApiKeyListItem[]> {

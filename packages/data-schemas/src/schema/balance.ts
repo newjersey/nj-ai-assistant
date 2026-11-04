@@ -1,5 +1,9 @@
 import { Schema } from 'mongoose';
+<<<<<<< HEAD
 import { REFILL_INTERVAL_UNITS } from 'librechat-data-provider';
+=======
+import { BALANCE_REFILL_MODES, REFILL_INTERVAL_UNITS } from 'librechat-data-provider';
+>>>>>>> upstream/main
 import type * as t from '~/types';
 
 const balanceSchema: Schema<t.IBalance> = new Schema<t.IBalance>({
@@ -37,6 +41,14 @@ const balanceSchema: Schema<t.IBalance> = new Schema<t.IBalance>({
     type: Number,
     default: 0,
   },
+<<<<<<< HEAD
+=======
+  refillMode: {
+    type: String,
+    enum: BALANCE_REFILL_MODES,
+    default: 'add',
+  },
+>>>>>>> upstream/main
   tenantId: {
     type: String,
     index: true,
@@ -62,6 +74,10 @@ const balanceSchema: Schema<t.IBalance> = new Schema<t.IBalance>({
     type: {
       transactionId: { type: Schema.Types.ObjectId, required: true },
       rawAmount: { type: Number, required: true },
+<<<<<<< HEAD
+=======
+      context: { type: String, enum: ['autoRefill', 'balanceReset'] },
+>>>>>>> upstream/main
     },
     _id: false,
     default: undefined,

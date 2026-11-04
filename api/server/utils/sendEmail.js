@@ -4,7 +4,16 @@ const FormData = require('form-data');
 const nodemailer = require('nodemailer');
 const handlebars = require('handlebars');
 const { logger } = require('@librechat/data-schemas');
+<<<<<<< HEAD
 const { logAxiosError, isEnabled, readFileAsString } = require('@librechat/api');
+=======
+const {
+  isEnabled,
+  logAxiosError,
+  readFileAsString,
+  serviceRequestBudget,
+} = require('@librechat/api');
+>>>>>>> upstream/main
 
 /**
  * Sends an email using Mailgun API.
@@ -36,6 +45,10 @@ const sendEmailViaMailgun = async ({ to, from, subject, html }) => {
 
   try {
     const response = await axios.post(`${mailgunHost}/v3/${mailgunDomain}/messages`, formData, {
+<<<<<<< HEAD
+=======
+      ...serviceRequestBudget(),
+>>>>>>> upstream/main
       headers: {
         ...formData.getHeaders(),
         Authorization: `Basic ${Buffer.from(`api:${mailgunApiKey}`).toString('base64')}`,
@@ -119,7 +132,11 @@ const sendEmail = async ({ email, subject, payload, template, throwError = true 
       // Use STARTTLS by default instead of obligatory TLS
       secure: process.env.EMAIL_ENCRYPTION === 'tls',
       // If explicit STARTTLS is set, require it when connecting
+<<<<<<< HEAD
       requireTls: process.env.EMAIL_ENCRYPTION === 'starttls',
+=======
+      requireTLS: process.env.EMAIL_ENCRYPTION === 'starttls',
+>>>>>>> upstream/main
       tls: {
         // Whether to accept unsigned certificates
         rejectUnauthorized: !isEnabled(process.env.EMAIL_ALLOW_SELFSIGNED),

@@ -15,8 +15,17 @@ export interface MenuItemProps {
   separate?: boolean;
   hideOnClick?: boolean;
   dialog?: React.ReactElement;
+<<<<<<< HEAD
   ariaLabel?: string;
   ariaChecked?: boolean;
+=======
+  ariaHasPopup?: React.AriaAttributes['aria-haspopup'];
+  ariaControls?: string;
+  ariaLabel?: string;
+  ariaChecked?: boolean;
+  /** Role of an item that has `ariaChecked`: a checkbox by default, a radio for an exclusive choice. */
+  ariaRole?: 'menuitemcheckbox' | 'menuitemradio';
+>>>>>>> upstream/main
   ref?: React.Ref<any>;
   className?: string;
   render?:

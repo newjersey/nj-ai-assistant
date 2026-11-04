@@ -1,4 +1,8 @@
 import {
+<<<<<<< HEAD
+=======
+  getUserLogId,
+>>>>>>> upstream/main
   createAuthIdentityContext,
   createOpenIDOboIdentityTuple,
   createOpenIDSessionIdentity,
@@ -146,3 +150,15 @@ describe('auth identity helpers', () => {
     ).toBe('tenant-a\x1fissuer-a\x1fsub-a');
   });
 });
+<<<<<<< HEAD
+=======
+
+describe('getUserLogId', () => {
+  it('prefers _id, falls back to id, and never throws', () => {
+    expect(getUserLogId({ _id: 'a', id: 'b' })).toBe('a');
+    expect(getUserLogId({ id: 'b' })).toBe('b');
+    expect(getUserLogId({})).toBe('unknown');
+    expect(getUserLogId(undefined)).toBe('unknown');
+  });
+});
+>>>>>>> upstream/main

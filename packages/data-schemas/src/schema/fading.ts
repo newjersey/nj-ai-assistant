@@ -6,7 +6,11 @@ interface AgentFadingContextDefinition {
 
 /** Mongoose definition of one persisted context-fading tier (`IAgentFadingTier`). */
 const agentFadingTierDefinition = {
+<<<<<<< HEAD
   v: { type: Number, enum: [1], required: true },
+=======
+  v: { type: Number, enum: [1, 2], required: true },
+>>>>>>> upstream/main
   budgetTokens: { type: Number, min: 1, required: true },
   masked: { type: Boolean, required: true },
 };

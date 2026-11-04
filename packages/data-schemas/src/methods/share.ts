@@ -75,7 +75,21 @@ export type SharedLinkContentPreflight = (
   snapshot: SharedLinkContentSnapshot,
 ) => void | Promise<void>;
 
+<<<<<<< HEAD
 export type SharedMessagesPreflight = (snapshot: t.SharedMessagesResult) => void | Promise<void>;
+=======
+export type SharedMessagesPreflight = (
+  snapshot: t.SharedMessagesResult,
+  context?: {
+    readonly canonicalMessages: readonly {
+      readonly text?: string;
+      readonly isCreatedByUser?: boolean;
+      readonly privacyRevision?: string;
+      readonly privateTextTokens?: readonly string[];
+    }[];
+  },
+) => void | Promise<void>;
+>>>>>>> upstream/main
 
 export interface GetSharedMessagesOptions {
   readonly snapshotFiles?: boolean;
@@ -698,6 +712,10 @@ function anonymizeMessages(
       ...(message.manualSkills && { manualSkills: message.manualSkills }),
       ...(message.alwaysAppliedSkills && { alwaysAppliedSkills: message.alwaysAppliedSkills }),
       ...(message.quotes && { quotes: message.quotes }),
+<<<<<<< HEAD
+=======
+      ...(message.reasoningOverride && { reasoningOverride: message.reasoningOverride }),
+>>>>>>> upstream/main
       ...(files && { files }),
       ...(attachments && { attachments }),
     };
@@ -955,7 +973,11 @@ export function createShareMethods(mongoose: typeof import('mongoose')): {
       const share = (await query
         .populate({
           path: 'messages',
+<<<<<<< HEAD
           select: CLIENT_MESSAGE_SELECT,
+=======
+          select: `${CLIENT_MESSAGE_SELECT.replace(' -privateTextTokens', '')} +privateTextTokens`,
+>>>>>>> upstream/main
         })
         .select('-__v')
         .lean()) as (t.ISharedLink & { messages: t.IMessage[] }) | null;
@@ -1047,7 +1069,11 @@ export function createShareMethods(mongoose: typeof import('mongoose')): {
       };
 
       try {
+<<<<<<< HEAD
         await options?.preflight?.(result);
+=======
+        await options?.preflight?.(result, { canonicalMessages: messagesToShare });
+>>>>>>> upstream/main
       } catch (error) {
         preflightFailed = true;
         throw error;
@@ -1272,7 +1298,14 @@ export function createShareMethods(mongoose: typeof import('mongoose')): {
         })
           .select('-_id -__v -user')
           .lean() as Promise<t.ISharedLink | null>,
+<<<<<<< HEAD
         Message.find({ conversationId, user }).sort({ createdAt: 1 }).lean(),
+=======
+        Message.find({ conversationId, user })
+          .select('+privateTextTokens')
+          .sort({ createdAt: 1 })
+          .lean(),
+>>>>>>> upstream/main
       ]);
 
       if (existingShare) {
@@ -1447,6 +1480,10 @@ export function createShareMethods(mongoose: typeof import('mongoose')): {
       }
 
       const updatedMessages = await Message.find({ conversationId: share.conversationId, user })
+<<<<<<< HEAD
+=======
+        .select('+privateTextTokens')
+>>>>>>> upstream/main
         .sort({ createdAt: 1 })
         .lean();
 

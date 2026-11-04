@@ -26,6 +26,10 @@ export { default as GithubIcon } from './GithubIcon';
 export { default as DiscordIcon } from './DiscordIcon';
 export { default as AppleIcon } from './AppleIcon';
 export { default as SamlIcon } from './SamlIcon';
+<<<<<<< HEAD
+=======
+export { default as PasskeyIcon } from './PasskeyIcon';
+>>>>>>> upstream/main
 export { default as AnthropicIcon } from './AnthropicIcon';
 export { default as SendIcon } from './SendIcon';
 export { default as LinkIcon } from './LinkIcon';

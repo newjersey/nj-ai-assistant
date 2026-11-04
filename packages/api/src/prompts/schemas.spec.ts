@@ -1,9 +1,43 @@
 import {
   updatePromptGroupSchema,
+<<<<<<< HEAD
   validatePromptGroupUpdate,
   safeValidatePromptGroupUpdate,
 } from './schemas';
 
+=======
+  safeValidatePromptPayload,
+  safeValidatePromptGroupUpdate,
+} from './schemas';
+
+describe('safeValidatePromptPayload', () => {
+  it('keeps the prompt fields and removes other fields', () => {
+    const result = safeValidatePromptPayload({
+      prompt: 'Text',
+      type: 'chat',
+      groupId: 'group-1',
+      author: 'user-1',
+    });
+
+    expect(result.success && result.data).toEqual({ prompt: 'Text', type: 'chat' });
+  });
+
+  it.each([
+    [null, 'Prompt text is required and must be a non-empty string'],
+    [{ type: 'text' }, 'Prompt text is required and must be a non-empty string'],
+    [{ prompt: 42, type: 'text' }, 'Prompt text is required and must be a non-empty string'],
+    [{ prompt: '   ', type: 'text' }, 'Prompt text is required and must be a non-empty string'],
+    [{ prompt: 'Text' }, 'Prompt type must be "text" or "chat"'],
+    [{ prompt: 'Text', type: 'image' }, 'Prompt type must be "text" or "chat"'],
+  ])('rejects %j with the route message', (payload, message) => {
+    const result = safeValidatePromptPayload(payload);
+
+    expect(result.success).toBe(false);
+    expect(result.success ? undefined : result.error.issues[0]?.message).toBe(message);
+  });
+});
+
+>>>>>>> upstream/main
 describe('updatePromptGroupSchema', () => {
   describe('allowed fields', () => {
     it('should accept valid name field', () => {
@@ -122,6 +156,25 @@ describe('updatePromptGroupSchema', () => {
       expect(result.success).toBe(false);
     });
 
+<<<<<<< HEAD
+=======
+    it('should reject source field', () => {
+      const result = updatePromptGroupSchema.safeParse({
+        name: 'Test',
+        source: 'langfuse',
+      });
+      expect(result.success).toBe(false);
+    });
+
+    it('should reject a source identity field', () => {
+      const result = updatePromptGroupSchema.safeParse({
+        name: 'Test',
+        sourcePromptName: 'langfuse-prompt',
+      });
+      expect(result.success).toBe(false);
+    });
+
+>>>>>>> upstream/main
     it('should reject multiple sensitive fields in a single request', () => {
       const result = updatePromptGroupSchema.safeParse({
         name: 'Legit Name',
@@ -174,6 +227,7 @@ describe('updatePromptGroupSchema', () => {
   });
 });
 
+<<<<<<< HEAD
 describe('validatePromptGroupUpdate', () => {
   it('should return validated data for valid input', () => {
     const input = { name: 'Test', category: 'testing' };
@@ -186,6 +240,8 @@ describe('validatePromptGroupUpdate', () => {
   });
 });
 
+=======
+>>>>>>> upstream/main
 describe('safeValidatePromptGroupUpdate', () => {
   it('should return success true for valid input', () => {
     const result = safeValidatePromptGroupUpdate({ name: 'Test' });
@@ -196,7 +252,11 @@ describe('safeValidatePromptGroupUpdate', () => {
     const result = safeValidatePromptGroupUpdate({ author: 'malicious-id' });
     expect(result.success).toBe(false);
     if (!result.success) {
+<<<<<<< HEAD
       expect(result.error.errors.length).toBeGreaterThan(0);
+=======
+      expect(result.error.issues.length).toBeGreaterThan(0);
+>>>>>>> upstream/main
     }
   });
 });

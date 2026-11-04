@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 const { logger } = require('@librechat/data-schemas');
 const { generate2FATempToken } = require('~/server/services/twoFactorService');
 const { setAuthTokens } = require('~/server/services/AuthService');
@@ -28,3 +29,19 @@ const loginController = async (req, res) => {
 module.exports = {
   loginController,
 };
+=======
+const { createLoginController, clearCloudFrontCookies } = require('@librechat/api');
+const { generate2FATempToken } = require('~/server/services/twoFactorService');
+const { getUserById, deleteAllUserSessions } = require('~/models');
+const { setAuthTokens } = require('~/server/services/AuthService');
+
+const loginController = createLoginController({
+  generate2FATempToken,
+  getUserById,
+  deleteAllUserSessions,
+  setAuthTokens,
+  clearCloudFrontCookies,
+});
+
+module.exports = { loginController };
+>>>>>>> upstream/main

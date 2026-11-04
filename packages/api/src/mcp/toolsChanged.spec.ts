@@ -8,10 +8,17 @@ import {
   getMCPToolsChangedGeneration,
   renewMCPToolsChangedGeneration,
   reserveMCPToolsChangedRevision,
+<<<<<<< HEAD
   hasMCPToolsChangedHandler,
   cancelMCPToolsChanged,
   notifyMCPToolsChanged,
   getMCPAppToolsPublicationGeneration,
+=======
+  cancelMCPToolsChanged,
+  notifyMCPToolsChanged,
+  getMCPAppToolsPublicationGeneration,
+  getMCPToolCatalogGeneration,
+>>>>>>> upstream/main
 } from './toolsChanged';
 
 const createEvent = (name = 'one'): MCPToolsChangedEvent => ({
@@ -29,6 +36,7 @@ describe('MCP tools-changed dispatch', () => {
     jest.useRealTimers();
   });
 
+<<<<<<< HEAD
   it('reports whether a handler is registered', () => {
     expect(hasMCPToolsChangedHandler()).toBe(false);
     setMCPToolsChangedHandler(jest.fn());
@@ -37,6 +45,8 @@ describe('MCP tools-changed dispatch', () => {
     expect(hasMCPToolsChangedHandler()).toBe(false);
   });
 
+=======
+>>>>>>> upstream/main
   it('derives stable app publication generations from connection-relevant config', () => {
     const first: ParsedServerConfig = {
       type: 'sse',
@@ -65,6 +75,78 @@ describe('MCP tools-changed dispatch', () => {
     );
   });
 
+<<<<<<< HEAD
+=======
+  it('keeps catalog headers and request overrides in the server identity', () => {
+    const declared: ParsedServerConfig = {
+      type: 'streamable-http',
+      url: 'https://mcp.example.com/mcp',
+      headers: { 'X-Workspace': 'catalog-1' },
+      requestHeaders: { 'X-Workspace': 'chat' },
+    };
+    const generation = getMCPAppToolsPublicationGeneration(declared);
+    expect(
+      getMCPAppToolsPublicationGeneration({
+        ...declared,
+        headers: { 'X-Workspace': 'catalog-2' },
+      }),
+    ).not.toBe(generation);
+    expect(
+      getMCPAppToolsPublicationGeneration({
+        ...declared,
+        requestHeaders: { 'X-Workspace': 'chat-2' },
+      }),
+    ).not.toBe(generation);
+    expect(
+      getMCPAppToolsPublicationGeneration({
+        ...declared,
+        headers: { 'X-Workspace': 'chat' },
+        requestHeaders: undefined,
+      }),
+    ).not.toBe(generation);
+  });
+
+  it('rotates the declared identity when a chat override of the catalog API key changes', () => {
+    const config: ParsedServerConfig = {
+      type: 'streamable-http',
+      url: 'https://mcp.example.com',
+      source: 'yaml',
+      apiKey: { source: 'admin', authorization_type: 'bearer', key: 'catalog' },
+      requestHeaders: { Authorization: 'Bearer chat-one' },
+    };
+    expect(getMCPAppToolsPublicationGeneration(config)).not.toBe(
+      getMCPAppToolsPublicationGeneration({
+        ...config,
+        requestHeaders: { Authorization: 'Bearer chat-two' },
+      }),
+    );
+  });
+
+  it('includes request-header environment changes without mutating the declaration', () => {
+    const variable = 'MCP_REQUEST_HEADER_GENERATION_TEST';
+    const original = process.env[variable];
+    const config: ParsedServerConfig = {
+      type: 'streamable-http',
+      url: 'https://mcp.example.com',
+      source: 'yaml',
+      requestHeaders: { 'X-Workspace': `\${${variable}}` },
+    };
+    try {
+      process.env[variable] = 'first';
+      const first = getMCPAppToolsPublicationGeneration(config);
+      process.env[variable] = 'second';
+      expect(getMCPAppToolsPublicationGeneration(config)).not.toBe(first);
+      expect(config.requestHeaders).toEqual({ 'X-Workspace': `\${${variable}}` });
+    } finally {
+      if (original === undefined) {
+        delete process.env[variable];
+      } else {
+        process.env[variable] = original;
+      }
+    }
+  });
+
+>>>>>>> upstream/main
   it('includes the resolved runtime environment in app publication generations', () => {
     const variable = 'LIBRECHAT_MCP_CATALOG_ORIGIN_TEST';
     const original = process.env[variable];
@@ -132,7 +214,11 @@ describe('MCP tools-changed dispatch', () => {
     expect(revisionHandler).toHaveBeenCalledTimes(1);
     expect(revisionHandler).toHaveBeenCalledWith({
       serverName: 'dynamic',
+<<<<<<< HEAD
       configGeneration: getMCPAppToolsPublicationGeneration(serverConfig),
+=======
+      configGeneration: getMCPToolCatalogGeneration(serverConfig),
+>>>>>>> upstream/main
     });
   });
 

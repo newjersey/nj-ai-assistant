@@ -38,12 +38,21 @@ export default function SkillList({
         >
           <ChevronRight
             className={cn(
+<<<<<<< HEAD
               'size-3 shrink-0 text-text-secondary transition-transform duration-200',
               sectionOpen && 'rotate-90',
             )}
             aria-hidden="true"
           />
           <span className="text-xs text-text-secondary">{localize('com_ui_my_skills')}</span>
+=======
+              'text-text-secondary size-3 shrink-0 transition-transform duration-200',
+              sectionOpen ? 'rotate-90' : 'rtl:rotate-180',
+            )}
+            aria-hidden="true"
+          />
+          <span className="text-text-secondary text-xs">{localize('com_ui_my_skills')}</span>
+>>>>>>> upstream/main
         </button>
       </div>
 
@@ -51,7 +60,11 @@ export default function SkillList({
       <Collapse open={sectionOpen}>
         <div className="flex flex-col gap-px">
           {skills.length === 0 ? (
+<<<<<<< HEAD
             <p className="px-3 py-4 text-center text-xs text-text-secondary">
+=======
+            <p className="text-text-secondary px-3 py-4 text-center text-xs">
+>>>>>>> upstream/main
               {localize('com_ui_skills_empty')}
             </p>
           ) : (

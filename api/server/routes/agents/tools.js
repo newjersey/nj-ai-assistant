@@ -1,14 +1,50 @@
 const express = require('express');
 const {
   reportLocatorTraversalFailure,
+<<<<<<< HEAD
+=======
+  createResetToolApprovalController,
+>>>>>>> upstream/main
   createContentFilter,
   extractToolArgumentContent,
 } = require('@librechat/api');
 const { callTool, verifyToolAuth, getToolCalls } = require('~/server/controllers/tools');
+<<<<<<< HEAD
 const { getAvailableTools } = require('~/server/controllers/PluginController');
 const { toolCallLimiter } = require('~/server/middleware');
 
 const router = express.Router();
+=======
+const { ResourceType, PermissionBits } = require('librechat-data-provider');
+const { checkPermission } = require('~/server/services/PermissionService');
+const { hasCapability } = require('~/server/middleware/roles/capabilities');
+const { resolveAllMcpConfigs } = require('~/server/services/MCP');
+const { getMCPServerTools } = require('~/server/services/Config');
+const { getAvailableTools } = require('~/server/controllers/PluginController');
+const { toolCallLimiter } = require('~/server/middleware');
+
+const approvalStorage = require('~/models');
+const router = express.Router();
+router.post(
+  '/approvals/reset',
+  toolCallLimiter,
+  createResetToolApprovalController({
+    storage: approvalStorage,
+    hasCapability,
+    getMCPServerConfigs: resolveAllMcpConfigs,
+    getMCPServerTools,
+    getAgent: approvalStorage.getAgent,
+    canAccessAgent: (agent, user) =>
+      checkPermission({
+        userId: user.id,
+        role: user.role,
+        resourceType: ResourceType.AGENT,
+        resourceId: agent._id,
+        requiredPermission: PermissionBits.VIEW,
+      }),
+  }),
+);
+>>>>>>> upstream/main
 const filterToolArguments = createContentFilter({
   onTraversalFailure: reportLocatorTraversalFailure,
   getFilters: (req) => req.config?.filters,

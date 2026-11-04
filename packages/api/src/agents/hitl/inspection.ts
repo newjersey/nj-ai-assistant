@@ -18,6 +18,10 @@ import {
   type CanonicalFileInspectionFile,
 } from '~/protection/files';
 import { ContentTraversalLimitError } from '~/protection/adapters/nested';
+<<<<<<< HEAD
+=======
+import { getLookupConcurrency } from '~/utils/concurrency';
+>>>>>>> upstream/main
 import { collectReachableAgents } from '../traversal';
 import { getEdgeParticipants } from '../edges';
 
@@ -62,6 +66,10 @@ interface ResumeAgentSnapshotInput {
   subagentsEnabled: boolean;
   getAgent: (filter: { id: string }) => Promise<Agent | null>;
   canAccessAgent?: (agent: Agent) => Promise<boolean>;
+<<<<<<< HEAD
+=======
+  appConfig?: Pick<AppConfig, 'concurrency'>;
+>>>>>>> upstream/main
 }
 
 type GetResumeMessages = (filter: {
@@ -152,6 +160,10 @@ export async function getResumeAgentSnapshot({
   subagentsEnabled,
   getAgent,
   canAccessAgent,
+<<<<<<< HEAD
+=======
+  appConfig,
+>>>>>>> upstream/main
 }: ResumeAgentSnapshotInput): Promise<ResumeSnapshotAgent[]> {
   const primary: ResumeSnapshotAgent = {
     ...primaryAgent,
@@ -161,6 +173,10 @@ export async function getResumeAgentSnapshot({
     },
     subagentAgentConfigs: [],
   };
+<<<<<<< HEAD
+=======
+  const resumeLoadConcurrency = getLookupConcurrency(appConfig, 'resumeAgentLoads');
+>>>>>>> upstream/main
   const roots: ResumeSnapshotAgent[] = [primary];
   const byId = new Map<string, ResumeSnapshotAgent>([[primary.id, primary]]);
 
@@ -180,6 +196,7 @@ export async function getResumeAgentSnapshot({
     for (let index = 0; index < pending.length; index++) {
       const { agent, includeLegacyChain } = pending[index];
       const children: ResumeSnapshotAgent[] = [];
+<<<<<<< HEAD
       for (const id of getReferencedAgentIds(agent, subagentsEnabled, includeLegacyChain)) {
         let child = byId.get(id);
         if (!child) {
@@ -203,6 +220,46 @@ export async function getResumeAgentSnapshot({
           pending.push({ agent: child, includeLegacyChain: false });
         }
         children.push(child);
+=======
+      const referencedIds = getReferencedAgentIds(agent, subagentsEnabled, includeLegacyChain);
+      /** Fetch one small chunk of unseen references together, then fold it in reference
+       *  order, so the node limit and de-duplication match a serial walk, a failed lookup
+       *  rejects at once, and an over-budget graph stops fetching after at most one chunk. */
+      for (let start = 0; start < referencedIds.length; start += resumeLoadConcurrency) {
+        const chunk = referencedIds.slice(start, start + resumeLoadConcurrency);
+        const unseenIds = [...new Set(chunk)].filter((id) => !byId.has(id));
+        const fetched = new Map<string, Agent | null>();
+        await Promise.all(
+          unseenIds.map(async (id) => {
+            let loaded: Agent | null;
+            try {
+              loaded = await getAgent({ id });
+            } catch {
+              throw new ContentTraversalLimitError();
+            }
+            if (loaded && canAccessAgent && !(await canAccessAgent(loaded))) {
+              loaded = null;
+            }
+            fetched.set(id, loaded);
+          }),
+        );
+        for (const id of chunk) {
+          let child = byId.get(id);
+          if (!child) {
+            const loaded = fetched.get(id);
+            if (!loaded) {
+              continue;
+            }
+            if (byId.size >= MAX_SUBAGENT_GRAPH_NODES) {
+              throw new ContentTraversalLimitError();
+            }
+            child = { ...loaded, subagentAgentConfigs: [] };
+            byId.set(id, child);
+            pending.push({ agent: child, includeLegacyChain: false });
+          }
+          children.push(child);
+        }
+>>>>>>> upstream/main
       }
       agent.subagentAgentConfigs = children;
     }

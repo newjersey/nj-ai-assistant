@@ -1,5 +1,9 @@
 import { QueryClient, QueryObserver } from '@tanstack/react-query';
+<<<<<<< HEAD
 import { InfiniteCollections, QueryKeys } from 'librechat-data-provider';
+=======
+import { InfiniteCollections, QueryKeys, PermissionBits } from 'librechat-data-provider';
+>>>>>>> upstream/main
 import type { PromptGroupListResponse, TPromptGroup } from 'librechat-data-provider';
 import type { InfiniteData } from '@tanstack/react-query';
 import {
@@ -11,8 +15,14 @@ import {
   updateGroupFieldsInPlace,
   updateGroupInAll,
   updatePromptGroup,
+<<<<<<< HEAD
   getSnippet,
   findPromptGroup,
+=======
+  findPromptGroup,
+  isExternalPromptGroup,
+  getPromptGroupPermissions,
+>>>>>>> upstream/main
 } from '../promptGroups';
 
 // ---------------------------------------------------------------------------
@@ -326,6 +336,7 @@ describe('findPromptGroup', () => {
 });
 
 // ---------------------------------------------------------------------------
+<<<<<<< HEAD
 // getSnippet
 // ---------------------------------------------------------------------------
 
@@ -356,6 +367,75 @@ describe('getSnippet', () => {
 
   it('handles an empty string without throwing', () => {
     expect(getSnippet('')).toBe('');
+=======
+// isExternalPromptGroup
+// ---------------------------------------------------------------------------
+
+describe('isExternalPromptGroup', () => {
+  it('returns false for a native group', () => {
+    expect(isExternalPromptGroup(makeGroup({ source: 'native' }))).toBe(false);
+  });
+
+  it('returns true for a Langfuse-sourced group', () => {
+    expect(isExternalPromptGroup(makeGroup({ source: 'langfuse' }))).toBe(true);
+  });
+
+  it('returns false for undefined or null', () => {
+    expect(isExternalPromptGroup(undefined)).toBe(false);
+    expect(isExternalPromptGroup(null)).toBe(false);
+  });
+
+  it('returns false for a group without a source (older server during a rolling deploy)', () => {
+    const { source: _source, ...rest } = makeGroup({ source: 'native' });
+    const groupWithoutSource = rest as { source?: TPromptGroup['source'] };
+    expect(isExternalPromptGroup(groupWithoutSource)).toBe(false);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// getPromptGroupPermissions
+// ---------------------------------------------------------------------------
+
+describe('getPromptGroupPermissions', () => {
+  const ALL_BITS =
+    PermissionBits.VIEW | PermissionBits.EDIT | PermissionBits.DELETE | PermissionBits.SHARE;
+
+  it('grants full control for a native group with full ACL bits', () => {
+    const result = getPromptGroupPermissions(makeGroup({ source: 'native' }), ALL_BITS);
+    expect(result).toEqual({
+      isExternal: false,
+      canView: true,
+      canEdit: true,
+      canDelete: true,
+    });
+  });
+
+  it('denies edit and delete for a Langfuse group even with full ACL bits', () => {
+    const result = getPromptGroupPermissions(makeGroup({ source: 'langfuse' }), ALL_BITS);
+    expect(result.isExternal).toBe(true);
+    expect(result.canView).toBe(true);
+    expect(result.canEdit).toBe(false);
+    expect(result.canDelete).toBe(false);
+  });
+
+  it('treats a group with no source as native (older server during a rolling deploy)', () => {
+    const { source: _source, ...rest } = makeGroup({ source: 'native' });
+    const groupWithoutSource = rest as { source?: TPromptGroup['source'] };
+    const result = getPromptGroupPermissions(groupWithoutSource, ALL_BITS);
+    expect(result.isExternal).toBe(false);
+    expect(result.canEdit).toBe(true);
+    expect(result.canDelete).toBe(true);
+  });
+
+  it('denies view, edit and delete when permission bits are 0', () => {
+    const result = getPromptGroupPermissions(makeGroup({ source: 'native' }), 0);
+    expect(result).toEqual({
+      isExternal: false,
+      canView: false,
+      canEdit: false,
+      canDelete: false,
+    });
+>>>>>>> upstream/main
   });
 });
 

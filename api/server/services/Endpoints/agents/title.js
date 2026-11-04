@@ -1,8 +1,16 @@
+<<<<<<< HEAD
 const { isEnabled } = require('@librechat/api');
 const { logger } = require('@librechat/data-schemas');
 const { CacheKeys } = require('librechat-data-provider');
 const getLogStores = require('~/cache/getLogStores');
 const { saveConvo } = require('~/models');
+=======
+const { isEnabled, publishConversationTitle, raceWithTimeout } = require('@librechat/api');
+const { logger } = require('@librechat/data-schemas');
+const { CacheKeys } = require('librechat-data-provider');
+const getLogStores = require('~/cache/getLogStores');
+const { saveConvo, getConvo } = require('~/models');
+>>>>>>> upstream/main
 const { resolveConversationTitle } = require('../titlePolicy');
 
 /**
@@ -30,8 +38,12 @@ const { resolveConversationTitle } = require('../titlePolicy');
  *   clobber the conversation now owned by the newer run. A plain user Stop does
  *   NOT abort this — its generated title is kept.
  * @param {(params: { conversationId: string, title: string }) => Promise<void>|void} [params.onTitleGenerated]
+<<<<<<< HEAD
  *   Called after the title is cached and before persistence waits for the
  *   conversation row. Used by live streams to push the title immediately.
+=======
+ *   Called after caching the title for the live stream.
+>>>>>>> upstream/main
  */
 const addTitle = async (
   req,
@@ -69,6 +81,7 @@ const addTitle = async (
 
   const titleCache = getLogStores(CacheKeys.GEN_TITLE);
   const key = `${req.user.id}-${convoId}`;
+<<<<<<< HEAD
   /** @type {NodeJS.Timeout} */
   let timeoutId;
   try {
@@ -78,6 +91,9 @@ const addTitle = async (
       logger.error('Title error:', error);
     });
 
+=======
+  try {
+>>>>>>> upstream/main
     let titlePromise;
     let abortController = new AbortController();
     /** Propagate a request abort (Stop) to the title generation so a cancelled
@@ -90,7 +106,11 @@ const addTitle = async (
       }
     }
     if (client && typeof client.titleConvo === 'function') {
+<<<<<<< HEAD
       titlePromise = Promise.race([
+=======
+      titlePromise = raceWithTimeout(
+>>>>>>> upstream/main
         client
           .titleConvo({
             text,
@@ -100,8 +120,15 @@ const addTitle = async (
           .catch((error) => {
             logger.error('Client title error:', error);
           }),
+<<<<<<< HEAD
         timeoutPromise,
       ]);
+=======
+        45000,
+        logger,
+        'Title generation',
+      );
+>>>>>>> upstream/main
     } else {
       return;
     }
@@ -110,9 +137,12 @@ const addTitle = async (
     if (!abortController.signal.aborted) {
       abortController.abort();
     }
+<<<<<<< HEAD
     if (timeoutId) {
       clearTimeout(timeoutId);
     }
+=======
+>>>>>>> upstream/main
 
     if (!generatedTitle) {
       logger.debug(`[${key}] No title generated`);
@@ -124,6 +154,7 @@ const addTitle = async (
       return;
     }
 
+<<<<<<< HEAD
     await titleCache.set(key, title, 120000);
 
     if (!signal?.aborted && typeof onTitleGenerated === 'function') {
@@ -170,6 +201,24 @@ const addTitle = async (
         title,
       },
       { context: 'api/server/services/Endpoints/agents/title.js', noUpsert: true },
+=======
+    await publishConversationTitle(
+      { saveConvo, getConvo, titleCache },
+      {
+        ctx: {
+          userId: req?.user?.id,
+          isTemporary: req?.resolvedConversation?.isTemporary ?? req?.body?.isTemporary,
+          expiredAt: req?.resolvedConversation?.expiredAt,
+          interfaceConfig: req?.config?.interfaceConfig,
+        },
+        conversationId: convoId,
+        title,
+        convoReady,
+        discardSignal,
+        signal,
+        onTitleGenerated,
+      },
+>>>>>>> upstream/main
     );
   } catch (error) {
     logger.error('Error generating title:', error);

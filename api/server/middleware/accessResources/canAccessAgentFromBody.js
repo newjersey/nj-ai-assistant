@@ -13,7 +13,11 @@ const { checkPermission } = require('~/server/services/PermissionService');
 const { canAccessResource } = require('./canAccessResource');
 const db = require('~/models');
 
+<<<<<<< HEAD
 const { getRoleByName, getAgent } = db;
+=======
+const { getRoleByName, getAgentWithVersionCount } = db;
+>>>>>>> upstream/main
 
 const resolveEnforcedAgentId = (req, endpoint) => {
   const modelSpecs = req.config?.modelSpecs;
@@ -39,7 +43,11 @@ const resolveAgentIdFromBody = async (agentCustomId) => {
   if (isEphemeralAgentId(agentCustomId)) {
     return null;
   }
+<<<<<<< HEAD
   return getAgent({ id: agentCustomId });
+=======
+  return getAgentWithVersionCount({ id: agentCustomId });
+>>>>>>> upstream/main
 };
 
 /**

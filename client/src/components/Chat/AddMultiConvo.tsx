@@ -1,6 +1,11 @@
 import { PlusCircle } from 'lucide-react';
+<<<<<<< HEAD
 import { TooltipAnchor } from '@librechat/client';
 import useMultiConvo from '~/hooks/Chat/useMultiConvo';
+=======
+import { Button, TooltipAnchor } from '@librechat/client';
+import useMultiConvo from '~/hooks/Conversations/useMultiConvo';
+>>>>>>> upstream/main
 import { useLocalize } from '~/hooks';
 
 function AddMultiConvo() {
@@ -14,6 +19,7 @@ function AddMultiConvo() {
   return (
     <TooltipAnchor
       description={localize('com_ui_add_multi_conversation')}
+<<<<<<< HEAD
       role="button"
       tabIndex={0}
       aria-label={localize('com_ui_add_multi_conversation')}
@@ -23,6 +29,21 @@ function AddMultiConvo() {
     >
       <PlusCircle className="icon-sm" aria-hidden="true" />
     </TooltipAnchor>
+=======
+      render={
+        <Button
+          size="icon"
+          className="size-9"
+          variant="header-action"
+          aria-label={localize('com_ui_add_multi_conversation')}
+          onClick={addConversation}
+          data-testid="add-multi-convo-button"
+        >
+          <PlusCircle className="icon-sm" aria-hidden="true" />
+        </Button>
+      }
+    />
+>>>>>>> upstream/main
   );
 }
 

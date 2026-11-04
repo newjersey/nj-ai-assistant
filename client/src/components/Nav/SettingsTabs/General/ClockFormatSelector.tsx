@@ -17,14 +17,22 @@ export default function ClockFormatSelector() {
   const labelId = 'clock-format-selector-label';
 
   return (
+<<<<<<< HEAD
     <div className="flex w-full items-center justify-between">
+=======
+    <div className="flex w-full flex-wrap items-center justify-between gap-2">
+>>>>>>> upstream/main
       <div id={labelId}>{localize('com_nav_clock_format')}</div>
       <Dropdown
         value={clockFormat}
         options={options}
         onChange={(value) => setClockFormat(value as ClockFormatPreference)}
         testId="clock-format-selector"
+<<<<<<< HEAD
         sizeClasses="z-50 w-[150px]"
+=======
+        sizeClasses="w-[150px]"
+>>>>>>> upstream/main
         className="z-50"
         aria-labelledby={labelId}
       />

@@ -10,6 +10,11 @@ interface ToggleSwitchProps {
   stateAtom: RecoilState<boolean> | WritableAtom<boolean, [boolean], void>;
   localizationKey: LocalizeKey;
   hoverCardText?: LocalizeKey;
+<<<<<<< HEAD
+=======
+  /** Rendered after the label, outside its accessible name (for example a Beta pill). */
+  badge?: React.ReactNode;
+>>>>>>> upstream/main
   switchId: string;
   onCheckedChange?: (value: boolean) => void;
   showSwitch?: boolean;
@@ -27,6 +32,10 @@ const RecoilToggle: React.FC<
   stateAtom,
   localizationKey,
   hoverCardText,
+<<<<<<< HEAD
+=======
+  badge,
+>>>>>>> upstream/main
   switchId,
   onCheckedChange,
   disabled = false,
@@ -48,6 +57,10 @@ const RecoilToggle: React.FC<
         <div id={labelId}>
           {strongLabel ? <strong>{localize(localizationKey)}</strong> : localize(localizationKey)}
         </div>
+<<<<<<< HEAD
+=======
+        {badge}
+>>>>>>> upstream/main
         {hoverCardText && <InfoHoverCard side={ESide.Bottom} text={localize(hoverCardText)} />}
       </div>
       <Switch
@@ -55,7 +68,11 @@ const RecoilToggle: React.FC<
         checked={switchState}
         onCheckedChange={handleCheckedChange}
         disabled={disabled}
+<<<<<<< HEAD
         className="ml-4"
+=======
+        className="ms-4"
+>>>>>>> upstream/main
         data-testid={switchId}
         aria-labelledby={labelId}
       />
@@ -69,6 +86,10 @@ const JotaiToggle: React.FC<
   stateAtom,
   localizationKey,
   hoverCardText,
+<<<<<<< HEAD
+=======
+  badge,
+>>>>>>> upstream/main
   switchId,
   onCheckedChange,
   disabled = false,
@@ -90,6 +111,10 @@ const JotaiToggle: React.FC<
         <div id={labelId}>
           {strongLabel ? <strong>{localize(localizationKey)}</strong> : localize(localizationKey)}
         </div>
+<<<<<<< HEAD
+=======
+        {badge}
+>>>>>>> upstream/main
         {hoverCardText && <InfoHoverCard side={ESide.Bottom} text={localize(hoverCardText)} />}
       </div>
       <Switch
@@ -97,7 +122,11 @@ const JotaiToggle: React.FC<
         checked={switchState}
         onCheckedChange={handleCheckedChange}
         disabled={disabled}
+<<<<<<< HEAD
         className="ml-4"
+=======
+        className="ms-4"
+>>>>>>> upstream/main
         data-testid={switchId}
         aria-labelledby={labelId}
       />

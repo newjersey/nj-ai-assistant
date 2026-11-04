@@ -1,8 +1,16 @@
 import type { InfiniteData } from '@tanstack/react-query';
 import type { RerankerTypes, SearchProviders, ScraperProviders } from '../config';
+<<<<<<< HEAD
 import type * as p from '../accessPermissions';
 import type * as a from '../types/agents';
 import type * as s from '../schemas';
+=======
+import type { FullToolCall } from '../previews';
+import type * as p from '../accessPermissions';
+import type * as a from '../types/agents';
+import type * as s from '../schemas';
+import type { TFile } from './files';
+>>>>>>> upstream/main
 import type * as t from '../types';
 
 export type Conversation = {
@@ -23,6 +31,22 @@ export type ConversationListParams = {
   tags?: string[];
   search?: string;
   projectId?: string;
+<<<<<<< HEAD
+=======
+  /**
+   * Absolute cutoffs rather than a named window, so the server validates one thing
+   * (a date) instead of an enum it would have to keep in step with the client, and a
+   * caller can ask for a range the menu does not offer. ISO 8601, inclusive.
+   */
+  updatedAfter?: string;
+  createdAfter?: string;
+  /** OR-matched: a conversation qualifies if it ran on any of these endpoints. */
+  endpoints?: string[];
+  /** Only conversations carrying at least one attachment. */
+  hasFiles?: boolean;
+  /** Only conversations the user is actively sharing through a link. */
+  sharedOnly?: boolean;
+>>>>>>> upstream/main
 };
 
 export type MinimalConversation = Pick<
@@ -37,6 +61,18 @@ export type MinimalConversation = Pick<
   | 'user'
   | 'chatProjectId'
   | 'pinned'
+<<<<<<< HEAD
+=======
+  | 'lastResponseAt'
+  | 'lastResponseMessageId'
+  | 'lastResponseIsManual'
+  | 'isMarkedUnread'
+  | 'lastSeenAt'
+  /** Lets a row tell a code conversation, the only kind that can have a pull request. */
+  | 'codeEnvironmentMode'
+  | 'codeWorkspaces'
+  | 'codeDecisionListed'
+>>>>>>> upstream/main
 >;
 
 export type ConversationListResponse = {
@@ -64,6 +100,19 @@ export type ProjectListResponse = {
 };
 
 export type ProjectData = InfiniteData<ProjectListResponse>;
+<<<<<<< HEAD
+=======
+export type ProjectAvailableFilesParams = {
+  cursor?: string;
+  limit?: number;
+  search?: string;
+};
+
+export type ProjectAvailableFilesResponse = {
+  files: TFile[];
+  nextCursor: string | null;
+};
+>>>>>>> upstream/main
 
 /* Messages */
 export type MessagesListParams = {
@@ -81,6 +130,48 @@ export type MessagesListResponse = {
   nextCursor: string | null;
 };
 
+<<<<<<< HEAD
+=======
+/** Locates one tool-call part. `toolCallId` disambiguates when the part moved. */
+export type ToolCallPartParams = {
+  conversationId: string;
+  messageId: string;
+  partIndex: number;
+  toolCallId?: string;
+  /** Host run-step id; provider tool-call ids can repeat within one response. */
+  stepId?: string;
+  /** Agent that produced the part, when parallel agents share a response. */
+  agentId?: string;
+};
+
+export type ToolCallPartResponse = {
+  conversationId: string;
+  messageId: string;
+  /** Index of the part in the stored message, which may differ from the requested one. */
+  partIndex: number;
+  tool_call: FullToolCall;
+};
+
+/** A file whose owner a client resolves: the tool call it was saved under, with its scope. */
+export type SubagentAttachmentFile = { toolCallId: string; agentId?: string; stepId?: string };
+
+export type SubagentAttachmentCallsParams = {
+  conversationId: string;
+  messageId: string;
+  files: SubagentAttachmentFile[];
+};
+
+export type SubagentAttachmentCallsResponse = {
+  /** Each subagent call of the stored message whose transcript holds a call the files name. */
+  parts: Array<{
+    toolCallId: string;
+    stepId?: string;
+    agentId?: string;
+    calls: a.Agents.SubagentAttachmentCall[];
+  }>;
+};
+
+>>>>>>> upstream/main
 /* Shared Links */
 export type SharedMessagesResponse = Omit<s.TSharedLink, 'messages'> & {
   messages: s.TMessage[];
@@ -258,6 +349,7 @@ export interface MCPConnectionStatusResponse {
   oauthTimeout?: number;
 }
 
+<<<<<<< HEAD
 export interface MCPServerConnectionStatusResponse {
   success: boolean;
   serverName: string;
@@ -269,6 +361,8 @@ export interface MCPServerConnectionStatusResponse {
   authorizationGeneration?: string;
 }
 
+=======
+>>>>>>> upstream/main
 export interface MCPAuthValuesResponse {
   success: boolean;
   serverName: string;

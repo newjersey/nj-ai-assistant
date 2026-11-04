@@ -1,6 +1,10 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
+<<<<<<< HEAD
+=======
+import type { ChatContract } from '~/hooks/Chat/contract';
+>>>>>>> upstream/main
 import { ChatContext, useChatContext } from '~/Providers/ChatContext';
 
 function TestConsumer() {
@@ -18,9 +22,13 @@ describe('ChatContext', () => {
   });
 
   it('provides context value when wrapped in provider', () => {
+<<<<<<< HEAD
     const mockHelpers = { index: 0 } as ReturnType<
       typeof import('~/hooks/Chat/useChatHelpers').default
     >;
+=======
+    const mockHelpers = { index: 0 } as ChatContract;
+>>>>>>> upstream/main
     render(
       <ChatContext.Provider value={mockHelpers}>
         <TestConsumer />

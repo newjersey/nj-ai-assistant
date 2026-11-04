@@ -1,27 +1,72 @@
+<<<<<<< HEAD
+=======
+import { isComposerFileTaken, releaseComposerFile } from '@librechat/chat';
+>>>>>>> upstream/main
 import type { ExtendedFile, FileSetter } from '~/common';
 import useSetFilesToDelete from './useSetFilesToDelete';
 
 export default function useUpdateFiles(setFiles: FileSetter) {
   const setFilesToDelete = useSetFilesToDelete();
 
+<<<<<<< HEAD
   const addFile = (newFile: ExtendedFile) => {
     setFiles((currentFiles) => {
+=======
+  /**
+   * Always a deliberate attach: the first, synchronous step of an upload the
+   * user just started, or an explicit pick from the file panel. That intent
+   * outranks any earlier consumption of the same id: re-attaching a library
+   * file reuses its server id, so the mark is dropped rather than obeyed.
+   */
+  const addFile = (newFile: ExtendedFile, shouldCommit?: () => boolean) => {
+    if (shouldCommit?.() === false) return;
+    releaseComposerFile(newFile.file_id);
+    setFiles((currentFiles) => {
+      if (shouldCommit?.() === false) return currentFiles;
+>>>>>>> upstream/main
       const updatedFiles = new Map(currentFiles);
       updatedFiles.set(newFile.file_id, newFile);
       return updatedFiles;
     });
   };
 
+<<<<<<< HEAD
   const replaceFile = (newFile: ExtendedFile) => {
     setFiles((currentFiles) => {
+=======
+  /**
+   * Only ever a continuation of an upload already in the composer (conversion
+   * progress, resize, image measurement). A steer or a queued message can have
+   * consumed that attachment while those callbacks were in flight, and writing
+   * it back would resurrect a file the message already owns, so a consumed id
+   * is dropped here instead of re-entering the composer.
+   */
+  const replaceFile = (newFile: ExtendedFile, shouldCommit?: () => boolean) => {
+    if (isComposerFileTaken(newFile.file_id)) {
+      return;
+    }
+    setFiles((currentFiles) => {
+      if (shouldCommit?.() === false) return currentFiles;
+>>>>>>> upstream/main
       const updatedFiles = new Map(currentFiles);
       updatedFiles.set(newFile.file_id, newFile);
       return updatedFiles;
     });
   };
 
+<<<<<<< HEAD
   const updateFileById = (fileId: string, updates: Partial<ExtendedFile>, isEntityFile = false) => {
     setFiles((currentFiles) => {
+=======
+  const updateFileById = (
+    fileId: string,
+    updates: Partial<ExtendedFile>,
+    isEntityFile = false,
+    shouldCommit?: () => boolean,
+  ) => {
+    setFiles((currentFiles) => {
+      if (shouldCommit?.() === false) return currentFiles;
+>>>>>>> upstream/main
       if (!currentFiles.has(fileId)) {
         console.warn(`File with id ${fileId} not found.`);
         return currentFiles;
@@ -44,8 +89,17 @@ export default function useUpdateFiles(setFiles: FileSetter) {
     });
   };
 
+<<<<<<< HEAD
   const deleteFileById = (fileId: string) => {
     setFiles((currentFiles) => {
+=======
+  const deleteFileById = (
+    fileId: string,
+    shouldCommit?: (currentFiles: Map<string, ExtendedFile>) => boolean,
+  ) => {
+    setFiles((currentFiles) => {
+      if (shouldCommit?.(currentFiles) === false) return currentFiles;
+>>>>>>> upstream/main
       const updatedFiles = new Map(currentFiles);
       if (updatedFiles.has(fileId)) {
         updatedFiles.delete(fileId);

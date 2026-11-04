@@ -1,6 +1,10 @@
 import { useMemo } from 'react';
+<<<<<<< HEAD
 import { presetSettings } from 'librechat-data-provider';
 import { getSettingsKeys } from 'librechat-data-provider';
+=======
+import { presetSettings, getSettingsKeys, applyModelAwareDefaults } from 'librechat-data-provider';
+>>>>>>> upstream/main
 import type { SettingDefinition } from 'librechat-data-provider';
 import type { TModelSelectProps } from '~/common';
 import { componentMapping } from '~/components/SidePanel/Parameters/components';
@@ -16,7 +20,18 @@ export default function AnthropicSettings({
       conversation?.endpointType ?? conversation?.endpoint ?? '',
       conversation?.model ?? '',
     );
+<<<<<<< HEAD
     return presetSettings[combinedKey] ?? presetSettings[endpointKey];
+=======
+    const settings = presetSettings[combinedKey] ?? presetSettings[endpointKey];
+    if (!settings) {
+      return undefined;
+    }
+    return {
+      col1: applyModelAwareDefaults(settings.col1, endpointKey, conversation?.model ?? undefined),
+      col2: applyModelAwareDefaults(settings.col2, endpointKey, conversation?.model ?? undefined),
+    };
+>>>>>>> upstream/main
   }, [conversation]);
 
   if (!parameters) {
@@ -34,7 +49,10 @@ export default function AnthropicSettings({
     const { key, default: defaultValue, ...rest } = setting;
 
     const props = {
+<<<<<<< HEAD
       key,
+=======
+>>>>>>> upstream/main
       settingKey: key,
       defaultValue,
       ...rest,
@@ -44,10 +62,17 @@ export default function AnthropicSettings({
     };
 
     if (key === 'model') {
+<<<<<<< HEAD
       return <Component {...props} options={models} />;
     }
 
     return <Component {...props} />;
+=======
+      return <Component key={key} {...props} options={models} />;
+    }
+
+    return <Component key={key} {...props} />;
+>>>>>>> upstream/main
   };
 
   return (

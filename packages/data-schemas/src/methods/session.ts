@@ -31,12 +31,15 @@ export function createSessionMethods(mongoose: typeof import('mongoose')): {
     options: t.UpsertSessionOptions,
   ) => Promise<t.ISession>;
   ensureSessionIndexes: () => Promise<void>;
+<<<<<<< HEAD
   updateExpiration: (
     session: t.ISession | string,
     newExpiration?: Date,
     options?: t.UpdateExpirationOptions,
   ) => Promise<t.ISession>;
   countActiveSessions: (userId: string) => Promise<number>;
+=======
+>>>>>>> upstream/main
   generateRefreshToken: (session: t.ISession) => Promise<string>;
   deleteAllUserSessions: (
     userId: string | { userId: string },
@@ -178,6 +181,7 @@ export function createSessionMethods(mongoose: typeof import('mongoose')): {
   }
 
   /**
+<<<<<<< HEAD
    * Updates session expiration
    */
   async function updateExpiration(
@@ -204,6 +208,8 @@ export function createSessionMethods(mongoose: typeof import('mongoose')): {
   }
 
   /**
+=======
+>>>>>>> upstream/main
    * Deletes a session by refresh token or session ID
    */
   async function deleteSession(params: t.DeleteSessionParams): Promise<{ deletedCount?: number }> {
@@ -301,6 +307,12 @@ export function createSessionMethods(mongoose: typeof import('mongoose')): {
         payload: {
           id: session.user,
           sessionId: session._id,
+<<<<<<< HEAD
+=======
+          /** `iat` is whole seconds, too coarse to order this token against a password reset that
+           * lands in the same second. `isTokenRetired` reads this claim to settle that exactly. */
+          issuedAtMs: Date.now(),
+>>>>>>> upstream/main
         },
         secret: process.env.JWT_REFRESH_SECRET!,
         expirationTime: Math.floor((expiresIn - Date.now()) / 1000),
@@ -316,6 +328,7 @@ export function createSessionMethods(mongoose: typeof import('mongoose')): {
     }
   }
 
+<<<<<<< HEAD
   /**
    * Counts active sessions for a user
    */
@@ -336,6 +349,8 @@ export function createSessionMethods(mongoose: typeof import('mongoose')): {
     }
   }
 
+=======
+>>>>>>> upstream/main
   return {
     findSession,
     SessionError,
@@ -343,8 +358,11 @@ export function createSessionMethods(mongoose: typeof import('mongoose')): {
     createSession,
     upsertSession,
     ensureSessionIndexes,
+<<<<<<< HEAD
     updateExpiration,
     countActiveSessions,
+=======
+>>>>>>> upstream/main
     generateRefreshToken,
     deleteAllUserSessions,
   };

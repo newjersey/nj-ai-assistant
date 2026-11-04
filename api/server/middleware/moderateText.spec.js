@@ -9,6 +9,12 @@ jest.mock('@librechat/api', () => ({
   mergeQuotedText: jest.fn(),
   getBoundedAskUserAnswerValues: jest.fn(() => []),
   serializeAskUserAnswerVariants: jest.fn(() => []),
+<<<<<<< HEAD
+=======
+  getOutboundTimeoutMs: (config, key) => config?.timeouts?.[key] ?? 10_000,
+  outboundRequestBudget: (timeout) => ({ timeout, signal: AbortSignal.timeout(timeout) }),
+  logAxiosError: jest.fn(),
+>>>>>>> upstream/main
 }));
 jest.mock('@librechat/data-schemas', () => ({ logger: { error: jest.fn() } }));
 jest.mock('librechat-data-provider', () => ({ ErrorTypes: { MODERATION: 'moderation' } }));
@@ -32,4 +38,25 @@ describe('moderateText', () => {
     expect(axios.post).not.toHaveBeenCalled();
     expect(next).toHaveBeenCalledTimes(1);
   });
+<<<<<<< HEAD
+=======
+
+  it('bounds the moderation request by the configured timeout', async () => {
+    axios.post.mockResolvedValue({ data: { results: [{ flagged: false }] } });
+    const next = jest.fn();
+
+    await moderateText(
+      { body: { text: 'hello' }, config: { timeouts: { moderationMs: 2_500 } } },
+      {},
+      next,
+    );
+
+    expect(axios.post).toHaveBeenCalledWith(
+      expect.any(String),
+      { input: 'hello' },
+      expect.objectContaining({ timeout: 2_500 }),
+    );
+    expect(next).toHaveBeenCalledTimes(1);
+  });
+>>>>>>> upstream/main
 });

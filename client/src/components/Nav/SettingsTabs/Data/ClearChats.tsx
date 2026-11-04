@@ -36,7 +36,11 @@ export const ClearChats = () => {
         <OGDialogTrigger asChild>
           <Button
             aria-labelledby="clear-all-chats-label"
+<<<<<<< HEAD
             variant="destructive"
+=======
+            variant="destructive-soft"
+>>>>>>> upstream/main
             onClick={() => setOpen(true)}
           >
             {localize('com_ui_delete')}
@@ -45,7 +49,11 @@ export const ClearChats = () => {
         <OGDialogTemplate
           showCloseButton={false}
           title={localize('com_nav_confirm_clear')}
+<<<<<<< HEAD
           className="max-w-[450px]"
+=======
+          className="max-w-[28.125rem]"
+>>>>>>> upstream/main
           main={
             <Label className="break-words">
               {localize('com_nav_clear_conversation_confirm_message')}

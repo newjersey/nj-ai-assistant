@@ -2,12 +2,19 @@ import axios from 'axios';
 import { logger, encryptV2 } from '@librechat/data-schemas';
 import { TokenExchangeMethodEnum } from 'librechat-data-provider';
 import type { IToken, TokenMethods } from '@librechat/data-schemas';
+<<<<<<< HEAD
 import type { AxiosError } from 'axios';
+=======
+import { getSafeErrorMetadata, outboundRequestBudget, DEFAULT_OUTBOUND_TIMEOUTS_MS } from '~/utils';
+>>>>>>> upstream/main
 import { DEFAULT_OAUTH_TOKEN_TTL_SECONDS, normalizeExpiresIn } from './expiry';
 import { validateActionOAuthEndpoint } from './validation';
 import { decryptSensitiveValue } from '~/actions/crypto';
 import { createSSRFSafeAgents } from '~/auth';
+<<<<<<< HEAD
 import { logAxiosError } from '~/utils';
+=======
+>>>>>>> upstream/main
 
 const actionOAuthAgents = createSSRFSafeAgents();
 const actionOAuthAgentsByAddress = new Map<string, ReturnType<typeof createSSRFSafeAgents>>();
@@ -113,7 +120,11 @@ async function processAccessTokens(
 ) {
   const { access_token, expires_in = 3600, refresh_token, refresh_token_expires_in } = tokenData;
   if (!access_token) {
+<<<<<<< HEAD
     logger.error('Access token not found: ', tokenData);
+=======
+    logger.error('Access token not found');
+>>>>>>> upstream/main
     throw new Error('Access token not found');
   }
   const handleOAuthToken = createHandleOAuthToken({
@@ -162,6 +173,10 @@ export async function refreshAccessToken(
     encrypted_oauth_client_id,
     encrypted_oauth_client_secret,
     allowedAddresses,
+<<<<<<< HEAD
+=======
+    timeout = DEFAULT_OUTBOUND_TIMEOUTS_MS.actionsMs,
+>>>>>>> upstream/main
   }: {
     userId: string;
     client_url: string;
@@ -171,6 +186,11 @@ export async function refreshAccessToken(
     encrypted_oauth_client_id: string;
     encrypted_oauth_client_secret: string;
     allowedAddresses?: string[] | null;
+<<<<<<< HEAD
+=======
+    /** Milliseconds before the token request is abandoned. */
+    timeout?: number;
+>>>>>>> upstream/main
   },
   {
     findToken,
@@ -218,6 +238,10 @@ export async function refreshAccessToken(
       maxRedirects: 0,
       httpsAgent: getActionOAuthAgents(allowedAddresses).httpsAgent,
       data: params.toString(),
+<<<<<<< HEAD
+=======
+      ...outboundRequestBudget(timeout, 'actionsMs'),
+>>>>>>> upstream/main
     });
     await processAccessTokens(
       response.data,
@@ -235,12 +259,17 @@ export async function refreshAccessToken(
     return response.data;
   } catch (error) {
     const message = 'Error refreshing OAuth tokens';
+<<<<<<< HEAD
     throw new Error(
       logAxiosError({
         message,
         error: error as AxiosError,
       }),
     );
+=======
+    logger.error(message, getSafeErrorMetadata(error));
+    throw new Error(message);
+>>>>>>> upstream/main
   }
 }
 
@@ -267,6 +296,10 @@ export async function getAccessToken(
     encrypted_oauth_client_id,
     encrypted_oauth_client_secret,
     allowedAddresses,
+<<<<<<< HEAD
+=======
+    timeout = DEFAULT_OUTBOUND_TIMEOUTS_MS.actionsMs,
+>>>>>>> upstream/main
   }: {
     code: string;
     userId: string;
@@ -277,6 +310,11 @@ export async function getAccessToken(
     encrypted_oauth_client_id: string;
     encrypted_oauth_client_secret: string;
     allowedAddresses?: string[] | null;
+<<<<<<< HEAD
+=======
+    /** Milliseconds before the token request is abandoned. */
+    timeout?: number;
+>>>>>>> upstream/main
   },
   {
     findToken,
@@ -325,6 +363,10 @@ export async function getAccessToken(
       maxRedirects: 0,
       httpsAgent: getActionOAuthAgents(allowedAddresses).httpsAgent,
       data: params.toString(),
+<<<<<<< HEAD
+=======
+      ...outboundRequestBudget(timeout, 'actionsMs'),
+>>>>>>> upstream/main
     });
 
     await processAccessTokens(
@@ -343,11 +385,16 @@ export async function getAccessToken(
     return response.data;
   } catch (error) {
     const message = 'Error exchanging OAuth code';
+<<<<<<< HEAD
     throw new Error(
       logAxiosError({
         message,
         error: error as AxiosError,
       }),
     );
+=======
+    logger.error(message, getSafeErrorMetadata(error));
+    throw new Error(message);
+>>>>>>> upstream/main
   }
 }

@@ -1,6 +1,12 @@
+<<<<<<< HEAD
 import { fireEvent, render, screen } from '@testing-library/react';
 import { RecorderInfo, RecorderPill, useShortcutRecorder } from '../ShortcutRecorder';
 import { bindingHash } from '~/utils/shortcuts';
+=======
+import { bindingHash } from '@librechat/chat';
+import { fireEvent, render, screen } from '@testing-library/react';
+import { RecorderInfo, RecorderPill, useShortcutRecorder } from '../ShortcutRecorder';
+>>>>>>> upstream/main
 
 jest.mock('~/hooks', () => ({
   useLocalize: () => (key: string) => key,

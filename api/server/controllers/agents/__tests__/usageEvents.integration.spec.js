@@ -392,8 +392,12 @@ describe('usage events through the real agents pipeline', () => {
     }
   });
 
+<<<<<<< HEAD
   /** Drives a real summarization (tight context + padded history); self-summarize
    *  reuses the overridden fake model so no API key is needed. */
+=======
+  /** Leave recent turns small and reserve room for the summary request. */
+>>>>>>> upstream/main
   async function runSummarizationLoop({ res, collectedUsage, contextUsageSink, usageEmitSink }) {
     const { aggregateContent } = createContentAggregator();
     const handlers = getDefaultHandlers({
@@ -412,7 +416,13 @@ describe('usage events through the real agents pipeline', () => {
       new AIMessage(`Turn 1 answer. ${pad}`),
       new HumanMessage(`Turn 2 question. ${pad}`),
       new AIMessage(`Turn 2 answer. ${pad}`),
+<<<<<<< HEAD
       new HumanMessage(`Final question after a lot of prior history. ${pad}`),
+=======
+      new HumanMessage('Turn 3 question.'),
+      new AIMessage('3.'),
+      new HumanMessage('Final question?'),
+>>>>>>> upstream/main
     ];
     const indexTokenCountMap = {};
     history.forEach((message, i) => {
@@ -430,9 +440,38 @@ describe('usage events through the real agents pipeline', () => {
           streamUsage: false,
         },
         instructions: 'You are a helpful assistant.',
+<<<<<<< HEAD
         maxContextTokens: 700,
         summarizationEnabled: true,
         summarizationConfig: { provider: Providers.OPENAI, model: 'gpt-4o-mini' },
+=======
+        maxContextTokens: 6000,
+        summarizationEnabled: true,
+        summarizationConfig: {
+          provider: Providers.OPENAI,
+          model: 'gpt-4o-mini',
+          reserveRatio: 0.5,
+          parameters: {
+            streaming: false,
+            apiKey: 'test-summary-key',
+            configuration: {
+              fetch: async () =>
+                Response.json({
+                  id: 'summary-response',
+                  model: 'gpt-4o-mini',
+                  choices: [
+                    {
+                      index: 0,
+                      message: { role: 'assistant', content: '## Summary\nPrior turns compacted.' },
+                      finish_reason: 'stop',
+                    },
+                  ],
+                  usage: { prompt_tokens: 40, completion_tokens: 8, total_tokens: 48 },
+                }),
+            },
+          },
+        },
+>>>>>>> upstream/main
       },
       returnContent: true,
       customHandlers: handlers,
@@ -440,10 +479,16 @@ describe('usage events through the real agents pipeline', () => {
       indexTokenCountMap,
     });
 
+<<<<<<< HEAD
     run.Graph.overrideModel = new UsageFakeModel(
       { responses: ['## Summary\nPrior turns compacted.', 'Here is the final answer.'] },
       [{ input_tokens: 40, output_tokens: 8, total_tokens: 48 }],
     );
+=======
+    run.Graph.overrideModel = new UsageFakeModel({ responses: ['Here is the final answer.'] }, [
+      { input_tokens: 40, output_tokens: 8, total_tokens: 48 },
+    ]);
+>>>>>>> upstream/main
 
     await run.processStream(
       { messages: history },

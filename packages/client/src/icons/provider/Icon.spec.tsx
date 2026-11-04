@@ -9,9 +9,16 @@ describe('ProviderIcon', () => {
     expect(screen.getByRole('img', { name: 'OpenAI' })).toBeInTheDocument();
   });
 
+<<<<<<< HEAD
   it('renders asset art as an image from the packaged module', () => {
     render(<ProviderIcon provider={ProviderId.ollama} />);
     expect(screen.getByRole('img', { name: 'Ollama' })).toHaveAttribute('src', 'assets/ollama.png');
+=======
+  it('renders brand marks as inline art that follows the theme', () => {
+    const { container } = render(<ProviderIcon provider={ProviderId.groq} />);
+    expect(screen.getByRole('img', { name: 'Groq' })).toHaveClass('text-text-primary');
+    expect(container.querySelector('svg')).toHaveAttribute('fill', 'currentColor');
+>>>>>>> upstream/main
   });
 
   it('gives monochrome art a theme token so it follows light and dark', () => {

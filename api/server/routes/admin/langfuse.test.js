@@ -22,16 +22,39 @@ const mockHandlers = {
   getSessionLink: jest.fn((_req, res) => res.status(200).json({ handler: 'session' })),
   updateConnection: jest.fn((_req, res) => res.status(200).json({ handler: 'update' })),
   testConnection: jest.fn((_req, res) => res.status(200).json({ handler: 'test' })),
+<<<<<<< HEAD
 };
 
 jest.mock('@librechat/data-schemas', () => ({
   SystemCapabilities: { ACCESS_ADMIN: 'access:admin' },
+=======
+  updatePromptSync: jest.fn((_req, res) => res.status(200).json({ handler: 'prompt-sync' })),
+  listPrompts: jest.fn((_req, res) => res.status(200).json({ handler: 'prompts' })),
+  syncPrompts: jest.fn((_req, res) => res.status(200).json({ handler: 'sync' })),
+  getPrompt: jest.fn((req, res) =>
+    res.status(200).json({ handler: 'prompt', name: req.params.name }),
+  ),
+};
+const mockSyncPromptCatalog = jest.fn();
+const mockLogger = { warn: jest.fn(), error: jest.fn() };
+
+jest.mock('@librechat/data-schemas', () => ({
+  logger: mockLogger,
+  SystemCapabilities: { ACCESS_ADMIN: 'access:admin', MANAGE_PROMPTS: 'manage:prompts' },
+>>>>>>> upstream/main
 }));
 
 jest.mock('@librechat/api', () => ({
   createAdminLangfuseHandlers: jest.fn(() => mockHandlers),
 }));
 
+<<<<<<< HEAD
+=======
+jest.mock('~/server/services/LangfusePromptSync', () => ({
+  syncLangfusePromptCatalog: mockSyncPromptCatalog,
+}));
+
+>>>>>>> upstream/main
 jest.mock('~/server/middleware/roles/capabilities', () => ({
   requireCapability: mockRequireCapability,
   hasConfigCapability: mockHasConfigCapability,
@@ -73,6 +96,21 @@ describe('admin Langfuse routes', () => {
     return app;
   }
 
+<<<<<<< HEAD
+=======
+  // The router module builds its handler dependencies once, at `require`
+  // time, not per request. `createApp()` only reloads the module the first
+  // time it runs in this file (later `beforeEach` clears already took effect
+  // by the time any other test observes it), so this captures that one
+  // load's dependency wiring before anything can clear it.
+  let handlerDepsAtLoad;
+  beforeAll(() => {
+    createApp();
+    const { createAdminLangfuseHandlers } = require('@librechat/api');
+    handlerDepsAtLoad = createAdminLangfuseHandlers.mock.calls[0]?.[0];
+  });
+
+>>>>>>> upstream/main
   beforeEach(() => {
     deniedCapability = undefined;
     canManageLangfuse = true;
@@ -98,6 +136,7 @@ describe('admin Langfuse routes', () => {
   });
 
   it.each([
+<<<<<<< HEAD
     ['GET', '/api/admin/langfuse/connection/session/conversation-1', 'getSessionLink'],
     ['PUT', '/api/admin/langfuse/connection', 'updateConnection'],
     ['POST', '/api/admin/langfuse/connection/test', 'testConnection'],
@@ -114,11 +153,47 @@ describe('admin Langfuse routes', () => {
     expect(middlewareCalls).toEqual(['jwt', 'access:admin', 'config']);
     expect(mockHandlers[handlerName]).toHaveBeenCalledTimes(1);
   });
+=======
+    [
+      'GET',
+      '/api/admin/langfuse/connection/session/conversation-1',
+      'getSessionLink',
+      { handler: 'session' },
+    ],
+    ['PUT', '/api/admin/langfuse/connection', 'updateConnection', { handler: 'update' }],
+    ['POST', '/api/admin/langfuse/connection/test', 'testConnection', { handler: 'test' }],
+    ['PUT', '/api/admin/langfuse/prompt-sync', 'updatePromptSync', { handler: 'prompt-sync' }],
+    ['GET', '/api/admin/langfuse/prompts', 'listPrompts', { handler: 'prompts' }],
+    [
+      'GET',
+      '/api/admin/langfuse/prompts/greeting',
+      'getPrompt',
+      { handler: 'prompt', name: 'greeting' },
+    ],
+  ])(
+    'requires Langfuse manage access for %s %s',
+    async (method, path, handlerName, expectedBody) => {
+      const app = createApp();
+      const response = await request(app)[method.toLowerCase()](path).send({}).expect(200);
+
+      expect(response.body).toEqual(expectedBody);
+      expect(middlewareCalls).toEqual(['jwt', 'access:admin', 'config']);
+      expect(mockHandlers[handlerName]).toHaveBeenCalledTimes(1);
+    },
+  );
+>>>>>>> upstream/main
 
   it.each([
     ['GET', '/api/admin/langfuse/connection/session/conversation-1', 'getSessionLink'],
     ['PUT', '/api/admin/langfuse/connection', 'updateConnection'],
     ['POST', '/api/admin/langfuse/connection/test', 'testConnection'],
+<<<<<<< HEAD
+=======
+    ['PUT', '/api/admin/langfuse/prompt-sync', 'updatePromptSync'],
+    ['GET', '/api/admin/langfuse/prompts', 'listPrompts'],
+    ['GET', '/api/admin/langfuse/prompts/greeting', 'getPrompt'],
+    ['POST', '/api/admin/langfuse/prompts/sync', 'syncPrompts'],
+>>>>>>> upstream/main
   ])('blocks %s %s without Langfuse manage access', async (method, path, handlerName) => {
     canManageLangfuse = false;
 
@@ -127,6 +202,44 @@ describe('admin Langfuse routes', () => {
     expect(mockHandlers[handlerName]).not.toHaveBeenCalled();
   });
 
+<<<<<<< HEAD
+=======
+  it.each([
+    ['GET', '/api/admin/langfuse/prompts', 'listPrompts'],
+    ['GET', '/api/admin/langfuse/prompts/greeting', 'getPrompt'],
+    ['POST', '/api/admin/langfuse/prompts/sync', 'syncPrompts'],
+  ])('rejects %s %s for an unauthenticated caller', async (method, path, handlerName) => {
+    mockRequireJwtAuth.mockImplementationOnce((_req, res) => {
+      middlewareCalls.push('jwt');
+      res.status(401).json({ message: 'Authentication required' });
+    });
+
+    await request(createApp())[method.toLowerCase()](path).expect(401);
+
+    expect(mockHandlers[handlerName]).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['GET', '/api/admin/langfuse/prompts', 'listPrompts'],
+    ['GET', '/api/admin/langfuse/prompts/greeting', 'getPrompt'],
+    ['POST', '/api/admin/langfuse/prompts/sync', 'syncPrompts'],
+  ])('rejects %s %s for a non-admin caller', async (method, path, handlerName) => {
+    deniedCapability = 'access:admin';
+
+    await request(createApp())[method.toLowerCase()](path).expect(403);
+
+    expect(mockHandlers[handlerName]).not.toHaveBeenCalled();
+  });
+
+  it('decodes an encoded slash in the prompt name before it reaches the handler', async () => {
+    await request(createApp()).get('/api/admin/langfuse/prompts/a%2Fb').expect(200);
+
+    expect(mockHandlers.getPrompt).toHaveBeenCalledTimes(1);
+    const [req] = mockHandlers.getPrompt.mock.calls[0];
+    expect(req.params.name).toBe('a/b');
+  });
+
+>>>>>>> upstream/main
   /**
    * Credential verification reads the deployment's Langfuse headers off
    * `req.config`. The handler unit tests inject `config` into their mock
@@ -152,4 +265,36 @@ describe('admin Langfuse routes', () => {
 
     expect(mockConfigMiddleware).not.toHaveBeenCalled();
   });
+<<<<<<< HEAD
+=======
+
+  it('passes the composed Langfuse prompt-sync runner to the handler factory, not its dependencies', () => {
+    expect(handlerDepsAtLoad).toMatchObject({ syncPromptCatalog: mockSyncPromptCatalog });
+    expect(handlerDepsAtLoad).not.toHaveProperty('lock');
+    expect(handlerDepsAtLoad).not.toHaveProperty('grantPermission');
+    expect(handlerDepsAtLoad).not.toHaveProperty('findLangfusePromptGroup');
+    expect(handlerDepsAtLoad).not.toHaveProperty('createLangfusePromptGroup');
+    expect(handlerDepsAtLoad).not.toHaveProperty('deletePromptGroup');
+    expect(handlerDepsAtLoad).not.toHaveProperty('promptService');
+  });
+
+  it('requires manage:prompts access, in addition to Langfuse manage access, for POST /prompts/sync', async () => {
+    const response = await request(createApp())
+      .post('/api/admin/langfuse/prompts/sync')
+      .send({})
+      .expect(200);
+
+    expect(response.body).toEqual({ handler: 'sync' });
+    expect(middlewareCalls).toEqual(['jwt', 'access:admin', 'config', 'manage:prompts']);
+    expect(mockHandlers.syncPrompts).toHaveBeenCalledTimes(1);
+  });
+
+  it('blocks POST /prompts/sync for a caller without manage:prompts access', async () => {
+    deniedCapability = 'manage:prompts';
+
+    await request(createApp()).post('/api/admin/langfuse/prompts/sync').send({}).expect(403);
+
+    expect(mockHandlers.syncPrompts).not.toHaveBeenCalled();
+  });
+>>>>>>> upstream/main
 });

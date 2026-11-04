@@ -10,6 +10,10 @@ import {
   TooltipAnchor,
 } from '@librechat/client';
 import type { VersionRecord } from './types';
+<<<<<<< HEAD
+=======
+import useDirection, { inlineSide } from '~/hooks/Nav/useDirection';
+>>>>>>> upstream/main
 import { useLocalize, useClockFormat } from '~/hooks';
 import { cn } from '~/utils';
 
@@ -45,6 +49,10 @@ export default function VersionItem({
   onRestore,
 }: VersionItemProps) {
   const localize = useLocalize();
+<<<<<<< HEAD
+=======
+  const direction = useDirection();
+>>>>>>> upstream/main
   const hour12 = useClockFormat();
   const [open, setOpen] = useState(false);
 
@@ -94,7 +102,11 @@ export default function VersionItem({
         {!isLast && (
           <div
             className={cn(
+<<<<<<< HEAD
               'absolute -bottom-3 top-0 w-px',
+=======
+              'absolute top-0 -bottom-3 w-px',
+>>>>>>> upstream/main
               isActive ? 'bg-status-success-strong' : 'bg-border-light',
             )}
           />
@@ -119,10 +131,17 @@ export default function VersionItem({
       {/* Card */}
       <div
         className={cn(
+<<<<<<< HEAD
           'group relative mb-2 ml-2 flex flex-1 flex-col rounded-xl border p-3 transition-colors',
           isActive
             ? 'border-status-success-border bg-status-success-subtle'
             : 'border-border-light bg-transparent hover:border-border-medium hover:bg-surface-secondary',
+=======
+          'group relative ms-2 mb-2 flex flex-1 flex-col rounded-xl border p-3 transition-colors',
+          isActive
+            ? 'border-status-success-border bg-status-success-subtle'
+            : 'border-border-light hover:border-border-medium hover:bg-surface-secondary bg-transparent',
+>>>>>>> upstream/main
         )}
       >
         <div className="flex items-start justify-between gap-2">
@@ -137,22 +156,36 @@ export default function VersionItem({
                 {versionTitle}
               </span>
               {isActive && (
+<<<<<<< HEAD
                 <span className="inline-flex items-center gap-1 rounded-full bg-status-success-subtle px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-status-success">
                   <span
                     className="size-1.5 rounded-full bg-status-success-strong"
+=======
+                <span className="bg-status-success-subtle text-status-success text-3xs inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-semibold tracking-wide uppercase">
+                  <span
+                    className="bg-status-success-strong size-1.5 rounded-full"
+>>>>>>> upstream/main
                     aria-hidden="true"
                   />
                   {localize('com_ui_agent_version_current')}
                 </span>
               )}
               {!isActive && isLatest && (
+<<<<<<< HEAD
                 <span className="rounded-full bg-surface-tertiary px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-text-secondary">
+=======
+                <span className="bg-surface-tertiary text-text-secondary text-3xs rounded-full px-2 py-0.5 font-semibold tracking-wide uppercase">
+>>>>>>> upstream/main
                   {localize('com_ui_latest')}
                 </span>
               )}
             </div>
             {versionName && (
+<<<<<<< HEAD
               <span className="mt-0.5 truncate text-xs text-text-secondary" title={versionName}>
+=======
+              <span className="text-text-secondary mt-0.5 truncate text-xs" title={versionName}>
+>>>>>>> upstream/main
                 {versionName}
               </span>
             )}
@@ -162,6 +195,7 @@ export default function VersionItem({
               <OGDialogTrigger asChild>
                 <TooltipAnchor
                   description={localize('com_ui_agent_version_restore')}
+<<<<<<< HEAD
                   side="left"
                   render={
                     <Button
@@ -169,6 +203,15 @@ export default function VersionItem({
                       size="icon"
                       aria-label={localize('com_ui_agent_version_restore')}
                       className="size-7 flex-shrink-0 rounded-lg border border-border-light text-text-secondary opacity-0 transition-all hover:border-border-medium focus:outline-none focus-visible:opacity-100 group-hover:opacity-100"
+=======
+                  side={inlineSide(direction, 'start')}
+                  render={
+                    <Button
+                      variant="quiet"
+                      size="icon"
+                      aria-label={localize('com_ui_agent_version_restore')}
+                      className="border-border-light hover:border-border-medium size-7 shrink-0 border opacity-0 transition-all group-hover:opacity-100 focus-visible:opacity-100"
+>>>>>>> upstream/main
                     >
                       <RotateCcw className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden="true" />
                     </Button>
@@ -177,6 +220,7 @@ export default function VersionItem({
               </OGDialogTrigger>
               <OGDialogTemplate
                 title={localize('com_ui_agent_version_restore_confirm')}
+<<<<<<< HEAD
                 className="max-w-[450px]"
                 main={
                   <div className="flex w-full flex-col gap-3 text-sm">
@@ -190,13 +234,32 @@ export default function VersionItem({
                         </span>
                         <time
                           className="text-xs text-text-secondary"
+=======
+                className="max-w-[28.125rem]"
+                main={
+                  <div className="flex w-full flex-col gap-3 text-sm">
+                    <Label className="text-start font-medium">
+                      {localize('com_ui_agent_version_restore_description')}
+                    </Label>
+                    <div className="border-border-light bg-surface-secondary rounded-lg border px-3 py-2">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-text-primary text-sm font-semibold">
+                          {versionTitle}
+                        </span>
+                        <time
+                          className="text-text-secondary text-xs"
+>>>>>>> upstream/main
                           dateTime={date?.toISOString()}
                         >
                           {absoluteLabel}
                         </time>
                       </div>
                       {versionName && (
+<<<<<<< HEAD
                         <div className="mt-1 truncate text-xs text-text-secondary">
+=======
+                        <div className="text-text-secondary mt-1 truncate text-xs">
+>>>>>>> upstream/main
                           {versionName}
                         </div>
                       )}
@@ -222,14 +285,22 @@ export default function VersionItem({
               render={
                 <time
                   dateTime={date.toISOString()}
+<<<<<<< HEAD
                   className="cursor-help text-xs text-text-secondary"
+=======
+                  className="text-text-secondary cursor-help text-xs"
+>>>>>>> upstream/main
                 >
                   {relativeLabel}
                 </time>
               }
             />
           ) : (
+<<<<<<< HEAD
             <span className="text-xs text-text-secondary">{relativeLabel}</span>
+=======
+            <span className="text-text-secondary text-xs">{relativeLabel}</span>
+>>>>>>> upstream/main
           )}
           {summaryChips.length > 0 && (
             <>
@@ -243,7 +314,11 @@ export default function VersionItem({
                       ·
                     </span>
                   )}
+<<<<<<< HEAD
                   <span className="text-xs text-text-secondary">{chip.label}</span>
+=======
+                  <span className="text-text-secondary text-xs">{chip.label}</span>
+>>>>>>> upstream/main
                 </span>
               ))}
             </>

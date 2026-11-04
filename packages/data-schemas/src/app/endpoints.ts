@@ -5,6 +5,10 @@ import type {
   TAgentsEndpoint,
   TAnthropicEndpoint,
 } from 'librechat-data-provider';
+<<<<<<< HEAD
+=======
+import type { ConfigDerivation } from './derive';
+>>>>>>> upstream/main
 import type { AppConfig } from '~/types';
 import { azureAssistantsDefaults, assistantsConfigSetup } from './assistants';
 import { agentsConfigSetup } from './agents';
@@ -15,12 +19,24 @@ import { azureConfigSetup } from './azure';
  * Loads custom config endpoints
  * @param [config]
  * @param [agentsDefaults]
+<<<<<<< HEAD
+=======
+ * @param [expandCustomEndpoint] - Expands each custom endpoint's `customParams` into the copy
+ * served, so `config` keeps them as librechat.yaml writes them.
+>>>>>>> upstream/main
  */
 export const loadEndpoints = (
   config: Partial<TCustomConfig>,
   agentsDefaults?: Partial<TAgentsEndpoint>,
+<<<<<<< HEAD
 ): {
   allowedAddresses?: string[];
+=======
+  expandCustomEndpoint?: ConfigDerivation['expandCustomEndpoint'],
+): {
+  allowedAddresses?: string[];
+  catalogModelsTtlMs?: number;
+>>>>>>> upstream/main
   openAI?: Partial<import('librechat-data-provider').TEndpoint>;
   google?: Partial<import('librechat-data-provider').TEndpoint>;
   bedrock?: Partial<import('librechat-data-provider').TEndpoint>;
@@ -78,12 +94,16 @@ export const loadEndpoints = (
     };
   }
 
+<<<<<<< HEAD
   const endpointKeys = [
     EModelEndpoint.openAI,
     EModelEndpoint.google,
     EModelEndpoint.custom,
     EModelEndpoint.bedrock,
   ];
+=======
+  const endpointKeys = [EModelEndpoint.openAI, EModelEndpoint.google, EModelEndpoint.bedrock];
+>>>>>>> upstream/main
 
   endpointKeys.forEach((key) => {
     const currentKey = key as keyof typeof endpoints;
@@ -92,6 +112,16 @@ export const loadEndpoints = (
     }
   });
 
+<<<<<<< HEAD
+=======
+  const custom = endpoints?.[EModelEndpoint.custom] as TEndpoint[] | undefined;
+  if (custom) {
+    loadedEndpoints[EModelEndpoint.custom] = expandCustomEndpoint
+      ? custom.map(expandCustomEndpoint)
+      : custom;
+  }
+
+>>>>>>> upstream/main
   if (endpoints?.all) {
     /**
      * `DeepPartial<TCustomConfig>` widens record values to `string | undefined`
@@ -105,5 +135,12 @@ export const loadEndpoints = (
     loadedEndpoints.allowedAddresses = endpoints.allowedAddresses;
   }
 
+<<<<<<< HEAD
+=======
+  if (endpoints?.catalogModelsTtlMs !== undefined) {
+    loadedEndpoints.catalogModelsTtlMs = endpoints.catalogModelsTtlMs;
+  }
+
+>>>>>>> upstream/main
   return loadedEndpoints;
 };

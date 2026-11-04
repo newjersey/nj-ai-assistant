@@ -113,6 +113,7 @@ function projectStoredPromptWithPolicy<T extends PromptRecordInput>(
   };
 }
 
+<<<<<<< HEAD
 /** Reapplies current prompt policy while retaining structural management fields. */
 export function projectStoredPrompt<T extends PromptRecordInput>(
   prompt: T,
@@ -124,6 +125,8 @@ export function projectStoredPrompt<T extends PromptRecordInput>(
   return projectStoredPromptWithPolicy(prompt, filters);
 }
 
+=======
+>>>>>>> upstream/main
 /** Projects stored prompts in one pass under the current prompt policy. */
 export function projectStoredPrompts<T extends PromptRecordInput>(
   prompts: readonly T[],
@@ -241,6 +244,7 @@ function projectStoredPresetWithPolicy<T extends PresetContentInput>(
   };
 }
 
+<<<<<<< HEAD
 /** Reapplies prompt and model-parameter policy to stored presets. */
 export function projectStoredPreset<T extends PresetContentInput>(
   preset: T,
@@ -257,6 +261,8 @@ export function projectStoredPreset<T extends PresetContentInput>(
   return projectStoredPresetWithPolicy(preset, filters, inspectPrompt, inspectModelParameters);
 }
 
+=======
+>>>>>>> upstream/main
 /** Projects stored presets in one pass under the current prompt/model policy. */
 export function projectStoredPresets<T extends PresetContentInput>(
   presets: readonly T[],

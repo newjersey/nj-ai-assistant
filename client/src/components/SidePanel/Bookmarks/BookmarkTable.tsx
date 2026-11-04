@@ -1,11 +1,20 @@
+<<<<<<< HEAD
 import React, { useCallback, useEffect, useState } from 'react';
+=======
+import React, { useCallback, useEffect, useId, useState } from 'react';
+>>>>>>> upstream/main
 import { Plus } from 'lucide-react';
 import { Button, FilterInput, OGDialogTrigger, TooltipAnchor } from '@librechat/client';
 import type { ConversationTagsResponse, TConversationTag } from 'librechat-data-provider';
 import { BookmarkContext, useBookmarkContext } from '~/Providers/BookmarkContext';
 import { BookmarkEditDialog } from '~/components/Bookmarks';
+<<<<<<< HEAD
 import BookmarkCardSkeleton from './BookmarkCardSkeleton';
 import { PanelContent } from '~/components/ui';
+=======
+import { PanelContent, PanelHeader } from '~/components/ui';
+import BookmarkCardSkeleton from './BookmarkCardSkeleton';
+>>>>>>> upstream/main
 import BookmarkList from './BookmarkList';
 import { useLocalize } from '~/hooks';
 
@@ -20,6 +29,10 @@ const removeDuplicates = (bookmarks: TConversationTag[]) => {
 
 const BookmarkTable = ({ isLoading = false }: { isLoading?: boolean }) => {
   const localize = useLocalize();
+<<<<<<< HEAD
+=======
+  const headingId = useId();
+>>>>>>> upstream/main
   const [rows, setRows] = useState<ConversationTagsResponse>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [createOpen, setCreateOpen] = useState(false);
@@ -46,6 +59,7 @@ const BookmarkTable = ({ isLoading = false }: { isLoading?: boolean }) => {
 
   return (
     <BookmarkContext.Provider value={{ bookmarks }}>
+<<<<<<< HEAD
       <div
         role="region"
         aria-label={localize('com_ui_bookmarks')}
@@ -80,6 +94,43 @@ const BookmarkTable = ({ isLoading = false }: { isLoading?: boolean }) => {
             </OGDialogTrigger>
           </BookmarkEditDialog>
         </div>
+=======
+      <div role="region" aria-labelledby={headingId} className="flex min-h-0 flex-1 flex-col">
+        {/* Sticky header: title, create, filter */}
+        <PanelHeader
+          title={localize('com_ui_bookmarks')}
+          titleId={headingId}
+          action={
+            <BookmarkEditDialog context="BookmarkTable" open={createOpen} setOpen={setCreateOpen}>
+              <OGDialogTrigger asChild>
+                <TooltipAnchor
+                  description={localize('com_ui_bookmarks_new')}
+                  side="bottom"
+                  render={
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="size-8 shrink-0"
+                      aria-label={localize('com_ui_bookmarks_new')}
+                      onClick={() => setCreateOpen(true)}
+                    >
+                      <Plus className="size-4" aria-hidden="true" />
+                    </Button>
+                  }
+                />
+              </OGDialogTrigger>
+            </BookmarkEditDialog>
+          }
+          search={
+            <FilterInput
+              inputId="bookmarks-filter"
+              label={localize('com_ui_bookmarks_filter')}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          }
+        />
+>>>>>>> upstream/main
 
         {/* Only the list scrolls */}
         <PanelContent

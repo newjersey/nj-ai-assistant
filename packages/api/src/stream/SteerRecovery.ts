@@ -1,5 +1,11 @@
+<<<<<<< HEAD
 import type { TFile, TPendingSteer } from 'librechat-data-provider';
 import { getReferencedQuotes } from '~/utils';
+=======
+import { logger } from '@librechat/data-schemas';
+import type { TFile, TPendingSteer } from 'librechat-data-provider';
+import { getReferencedQuotes } from '../utils/quotes';
+>>>>>>> upstream/main
 
 /** Immutable user-visible payload a parked steer recovery is allowed to submit. */
 export interface RecoveredSteerPayload {
@@ -14,16 +20,53 @@ export interface RecoveredSteerPayload {
   quotes: string[];
 }
 
+<<<<<<< HEAD
 /** A recovery-shaped request did not reproduce the parked source exactly. */
 export class RecoveredSteerPayloadMismatchError extends Error {
   readonly code = 'RECOVERY_PAYLOAD_MISMATCH';
 
   constructor() {
     super('Recovered steer payload does not match its parked source');
+=======
+const recoveryFailureMessages = {
+  source_missing: 'Recovered steer source is no longer available',
+  protocol_mismatch: 'Recovered steer source requires protocol v2',
+  owner_mismatch: 'Recovered steer source belongs to a different owner',
+  invalid_payload: 'Recovered steer request payload is invalid',
+  payload_mismatch: 'Recovered steer payload does not match its parked source',
+} as const;
+
+type RecoveryFailureReason = keyof typeof recoveryFailureMessages;
+
+/** Retain the wire code for old clients; the reason distinguishes permanent failures. */
+export class RecoveredSteerPayloadMismatchError extends Error {
+  readonly code = 'RECOVERY_PAYLOAD_MISMATCH';
+  readonly reason: RecoveryFailureReason;
+
+  constructor(reason: RecoveryFailureReason = 'payload_mismatch') {
+    super(recoveryFailureMessages[reason]);
+    this.reason = reason;
+>>>>>>> upstream/main
     this.name = 'RecoveredSteerPayloadMismatchError';
   }
 }
 
+<<<<<<< HEAD
+=======
+export function getSteerRecoveryFailure(
+  error: RecoveredSteerPayloadMismatchError,
+  context: { conversationId?: string; streamId: string; recoveredSteerId?: string },
+): { code: 'RECOVERY_PAYLOAD_MISMATCH'; reason: RecoveryFailureReason; error: string } {
+  const reason = error.reason ?? 'payload_mismatch';
+  logger.warn('[SteerRecovery] Recovery rejected', { ...context, reason });
+  return {
+    code: error.code,
+    reason,
+    error: 'The queued message could not be recovered. Review it before sending again.',
+  };
+}
+
+>>>>>>> upstream/main
 /** Canonical attachment identity: every entry must name a file; ordering,
  * duplicates, and mutable display metadata do not affect identity. */
 export function canonicalRecoveryFileIds(files: unknown): string[] | null {

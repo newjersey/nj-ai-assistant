@@ -20,6 +20,10 @@ export async function getUserMCPAuthMap({
   toolInstances,
   serverNames,
   findPluginAuthsByKeys,
+<<<<<<< HEAD
+=======
+  throwOnError = false,
+>>>>>>> upstream/main
 }: {
   userId: string;
   tools?: (string | undefined)[];
@@ -33,6 +37,15 @@ export async function getUserMCPAuthMap({
    */
   serverNames?: readonly string[];
   findPluginAuthsByKeys: PluginAuthMethods['findPluginAuthsByKeys'];
+<<<<<<< HEAD
+=======
+  /**
+   * Propagate lookup/decryption failures instead of degrading to an empty map. Callers that must
+   * distinguish "this user has no vars" from "we could not read them" (and fail closed rather than
+   * proceed with unresolved credentials) opt in; every other caller keeps the swallowing default.
+   */
+  throwOnError?: boolean;
+>>>>>>> upstream/main
 }): Promise<Record<string, Record<string, string>>> {
   let allMcpCustomUserVars: Record<string, Record<string, string>> = {};
   let mcpPluginKeysToFetch: string[] = [];
@@ -86,7 +99,11 @@ export async function getUserMCPAuthMap({
     allMcpCustomUserVars = await getPluginAuthMap({
       userId,
       pluginKeys: mcpPluginKeysToFetch,
+<<<<<<< HEAD
       throwError: false,
+=======
+      throwError: throwOnError,
+>>>>>>> upstream/main
       findPluginAuthsByKeys,
     });
   } catch (err) {
@@ -96,6 +113,12 @@ export async function getUserMCPAuthMap({
       )}), user ${userId}: ${err instanceof Error ? err.message : 'Unknown error'}`,
       err,
     );
+<<<<<<< HEAD
+=======
+    if (throwOnError) {
+      throw err;
+    }
+>>>>>>> upstream/main
   }
 
   return allMcpCustomUserVars;

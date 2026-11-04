@@ -241,7 +241,11 @@ export default function ActionsInput({
         <div className="mb-1 flex flex-wrap items-center justify-between gap-2">
           <label
             htmlFor="schemaInput"
+<<<<<<< HEAD
             className="whitespace-nowrap text-sm font-medium text-text-primary"
+=======
+            className="text-text-primary text-sm font-medium whitespace-nowrap"
+>>>>>>> upstream/main
           >
             {localize('com_ui_schema')}
           </label>
@@ -253,7 +257,11 @@ export default function ActionsInput({
                 type="button"
                 onClick={() => setIsSchemaDialogOpen(true)}
                 aria-label={localize('com_ui_expand_editor')}
+<<<<<<< HEAD
                 className="inline-flex h-7 w-7 items-center justify-center rounded-lg text-text-secondary transition-colors hover:bg-surface-secondary hover:text-text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-text-primary"
+=======
+                className="text-text-secondary hover:bg-surface-secondary hover:text-text-primary focus-visible:ring-text-primary inline-flex h-7 w-7 items-center justify-center rounded-lg transition-colors focus-visible:ring-2 focus-visible:outline-hidden"
+>>>>>>> upstream/main
               >
                 <Maximize2 className="h-4 w-4" strokeWidth={1.75} aria-hidden={true} />
               </button>
@@ -261,15 +269,26 @@ export default function ActionsInput({
           />
         </div>
         <Textarea
+<<<<<<< HEAD
+=======
+          variant="transparent"
+>>>>>>> upstream/main
           id="schemaInput"
           value={inputValue}
           onChange={handleInputChange}
           spellCheck="false"
           placeholder={localize('com_ui_enter_openapi_schema')}
+<<<<<<< HEAD
           className="block min-h-[12rem] w-full resize-y rounded-lg border border-border-light bg-transparent p-3 font-mono text-xs leading-relaxed transition-colors focus-visible:border-border-heavy focus-visible:ring-0"
         />
         {validationError && (
           <div className="mt-1.5 text-xs text-text-destructive">
+=======
+          className="focus-visible:border-border-heavy block min-h-[12rem] w-full resize-y p-3 font-mono text-xs leading-relaxed transition-colors focus-visible:ring-0"
+        />
+        {validationError && (
+          <div className="text-text-destructive mt-1.5 text-xs">
+>>>>>>> upstream/main
             {validationError.split('\n').map((line: string, i: number) => (
               <div key={i}>{line}</div>
             ))}
@@ -296,7 +315,11 @@ export default function ActionsInput({
           variant="submit"
           onClick={saveAction}
           disabled={!functions || !functions.length}
+<<<<<<< HEAD
           className="min-w-[100px]"
+=======
+          className="min-w-[6.25rem]"
+>>>>>>> upstream/main
         >
           {getButtonContent()}
         </Button>
@@ -304,26 +327,45 @@ export default function ActionsInput({
 
       <OGDialog open={isSchemaDialogOpen} onOpenChange={setIsSchemaDialogOpen}>
         <OGDialogContent className="flex h-[85vh] max-h-[85vh] w-11/12 max-w-5xl flex-col gap-3 p-5">
+<<<<<<< HEAD
           <OGDialogHeader className="space-y-0 pr-10">
             <OGDialogTitle className="text-left text-sm font-medium text-text-primary">
+=======
+          <OGDialogHeader className="space-y-0 pe-10">
+            <OGDialogTitle className="text-start text-sm font-medium">
+>>>>>>> upstream/main
               {localize('com_ui_schema')}
             </OGDialogTitle>
             <OGDialogDescription className="sr-only">
               {localize('com_ui_enter_openapi_schema')}
             </OGDialogDescription>
           </OGDialogHeader>
+<<<<<<< HEAD
           <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg border border-border-medium bg-surface-secondary focus-within:border-border-heavy">
             <Textarea
+=======
+          <div className="border-border-control bg-surface-secondary focus-within:border-border-heavy flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg border">
+            <Textarea
+              variant="transparent"
+>>>>>>> upstream/main
               value={inputValue}
               onChange={handleInputChange}
               spellCheck="false"
               placeholder={localize('com_ui_enter_openapi_schema')}
               aria-label={localize('com_ui_schema')}
+<<<<<<< HEAD
               className="min-h-0 flex-1 resize-none border-0 bg-transparent p-4 font-mono text-[13px] leading-relaxed focus-visible:ring-0"
             />
           </div>
           {validationError && (
             <div className="max-h-24 shrink-0 overflow-y-auto text-xs text-text-destructive">
+=======
+              className="min-h-0 flex-1 resize-none border-0 p-4 font-mono text-[13px] leading-relaxed focus-visible:ring-0"
+            />
+          </div>
+          {validationError && (
+            <div className="text-text-destructive max-h-24 shrink-0 overflow-y-auto text-xs">
+>>>>>>> upstream/main
               {validationError.split('\n').map((line: string, i: number) => (
                 <div key={i}>{line}</div>
               ))}

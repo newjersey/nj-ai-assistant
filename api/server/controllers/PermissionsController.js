@@ -9,7 +9,12 @@ const {
   enrichRemoteAgentPrincipals,
   createPrincipalSearch,
   backfillRemoteAgentPermissions,
+<<<<<<< HEAD
   auditInsightsPermissionChanges,
+=======
+  runAuditedPermissionUpdate,
+  permissionErrorCode,
+>>>>>>> upstream/main
   getInsightsPrincipalState,
   maskAgentInsightsBit,
   sanitizeInsightsPermissionPrincipals,
@@ -17,7 +22,10 @@ const {
 } = require('@librechat/api');
 const {
   bulkUpdateResourcePermissions,
+<<<<<<< HEAD
   restoreInsightsPermissionChanges,
+=======
+>>>>>>> upstream/main
   ensureGroupPrincipalExists,
   getResourcePermissionsMap,
   findAccessibleResources,
@@ -170,6 +178,7 @@ const updateResourcePermissions = async (req, res) => {
       });
     }
 
+<<<<<<< HEAD
     const results = await bulkUpdateResourcePermissions({
       resourceType,
       resourceId,
@@ -194,6 +203,26 @@ const updateResourcePermissions = async (req, res) => {
           }),
         logger,
       },
+=======
+    const results = await runAuditedPermissionUpdate({
+      req,
+      resourceType,
+      resourceId,
+      deps: { recordAuditEntry: db.recordAuditEntry, getAgent: db.getAgent, logger },
+      update: (beforeWrite, afterWrite) =>
+        bulkUpdateResourcePermissions({
+          resourceType,
+          resourceId,
+          maxWriteAttempts: req.config?.config?.permissions?.maxWriteAttempts,
+          leaseTtlMs: req.config?.config?.permissions?.leaseTtlMs,
+          leaseWaitMs: req.config?.config?.permissions?.leaseWaitMs,
+          updatedPrincipals: validatedPrincipals,
+          revokedPrincipals,
+          grantedBy: userId,
+          beforeWrite,
+          afterWrite,
+        }),
+>>>>>>> upstream/main
     });
 
     if (resourceType === ResourceType.CODE_ENVIRONMENT) {
@@ -237,6 +266,10 @@ const updateResourcePermissions = async (req, res) => {
     res.status(error.statusCode ?? 400).json({
       error: 'Failed to update permissions',
       details: error.message,
+<<<<<<< HEAD
+=======
+      ...permissionErrorCode(error),
+>>>>>>> upstream/main
     });
   }
 };

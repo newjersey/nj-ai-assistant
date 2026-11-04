@@ -1,4 +1,8 @@
 export * from './Audio';
+<<<<<<< HEAD
+=======
+export * from './Auth';
+>>>>>>> upstream/main
 export * from './Assistants';
 export * from './Agents';
 export * from './Chat';
@@ -31,14 +35,20 @@ export { default as useGreeting } from './useGreeting';
 export { default as useFocusTrap } from './useFocusTrap';
 export { default as useFavorites } from './useFavorites';
 export { default as useToolFavorites } from './useToolFavorites';
+<<<<<<< HEAD
 export { default as useChatBadges } from './useChatBadges';
+=======
+>>>>>>> upstream/main
 export { default as useAdaptiveIcon } from './useAdaptiveIcon';
 export { default as useScrollToRef } from './useScrollToRef';
 export { default as useIsActiveItem } from './useIsActiveItem';
 export { default as useLocalStorage } from './useLocalStorage';
 export { default as useDocumentTitle } from './useDocumentTitle';
 export { default as useSpeechToText } from './Input/useSpeechToText';
+<<<<<<< HEAD
 export { default as useTextToSpeech } from './Input/useTextToSpeech';
+=======
+>>>>>>> upstream/main
 export { default as useGenerationsByLatest } from './useGenerationsByLatest';
 export { default as useLocalizedConfig } from './useLocalizedConfig';
 export { default as useResourcePermissions } from './useResourcePermissions';
@@ -52,3 +62,7 @@ export {
 export type { CatalogId } from './useCatalogWarmup';
 export { default as useClockFormat } from './useClockFormat';
 export { default as useWeekStart } from './useWeekStart';
+<<<<<<< HEAD
+=======
+export { default as useScrollFade } from './useScrollFade';
+>>>>>>> upstream/main

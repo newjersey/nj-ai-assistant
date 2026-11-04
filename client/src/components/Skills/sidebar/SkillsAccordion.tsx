@@ -8,7 +8,11 @@ export default function SkillsAccordion() {
   const { user } = useAuthContext();
   return (
     <div className="flex h-full w-full flex-col overflow-hidden">
+<<<<<<< HEAD
       <SkillsSidePanel className="min-h-0 flex-1 border-r-0" />
+=======
+      <SkillsSidePanel className="min-h-0 flex-1 border-e-0" />
+>>>>>>> upstream/main
       {user?.role === SystemRoles.ADMIN && (
         <PanelFooter>
           <AdminSettings />

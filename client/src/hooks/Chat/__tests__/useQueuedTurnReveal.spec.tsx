@@ -1,4 +1,5 @@
 import React from 'react';
+<<<<<<< HEAD
 import { QueryKeys } from 'librechat-data-provider';
 import { RecoilRoot, useSetRecoilState } from 'recoil';
 import { Provider as JotaiProvider, createStore } from 'jotai';
@@ -17,6 +18,29 @@ import { agentQueuedTurnsQueryKey } from '~/data-provider/SSE/queuedTurns';
 import { streamStatusQueryKey } from '~/data-provider/SSE/queries';
 import { revealedQueuedTurnFamily } from '~/store/steer';
 import store from '~/store';
+=======
+import { RecoilRoot } from 'recoil';
+import { QueryKeys } from 'librechat-data-provider';
+import { selectQueuedTurnReveal } from '@librechat/chat';
+import { isSubmittingFamily } from '@librechat/chat/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Provider as JotaiProvider, createStore, useSetAtom } from 'jotai';
+import {
+  hasRevealSuccessor,
+  useQueuedTurnReveal,
+  shouldRollbackReveal,
+  buildRevealedMessage,
+  revealedQueuedTurnFamily,
+  activeGenerationCreatedAtByConvoId,
+} from '@librechat/chat/react';
+import type { TMessage, TAgentQueuedTurnReceipt } from 'librechat-data-provider';
+import type { RevealedQueuedTurn } from '@librechat/chat/react';
+import type { QueuedMessage, RunEnd } from '@librechat/chat';
+import { agentQueuedTurnsQueryKey } from '~/data-provider/SSE/queuedTurns';
+import { streamStatusQueryKey } from '~/data-provider/SSE/queries';
+import { SteerHostTestProvider } from 'test/steerHost';
+>>>>>>> upstream/main
 
 const CONVO_ID = 'convo-reveal';
 const RESPONSE_ID = 'response-1';
@@ -179,8 +203,13 @@ describe('useQueuedTurnReveal', () => {
     let setSubmitting: (value: boolean) => void;
     let setEpoch: (value: number | null) => void;
     function StateProbe() {
+<<<<<<< HEAD
       setSubmitting = useSetRecoilState(store.isSubmittingFamily(0));
       setEpoch = useSetRecoilState(store.activeGenerationCreatedAtByConvoId(CONVO_ID));
+=======
+      setSubmitting = useSetAtom(isSubmittingFamily(0));
+      setEpoch = useSetAtom(activeGenerationCreatedAtByConvoId(CONVO_ID));
+>>>>>>> upstream/main
       return null;
     }
     const queryClient = new QueryClient({
@@ -195,8 +224,15 @@ describe('useQueuedTurnReveal', () => {
       <QueryClientProvider client={queryClient}>
         <RecoilRoot>
           <JotaiProvider store={jotaiStore}>
+<<<<<<< HEAD
             <StateProbe />
             {children}
+=======
+            <SteerHostTestProvider>
+              <StateProbe />
+              {children}
+            </SteerHostTestProvider>
+>>>>>>> upstream/main
           </JotaiProvider>
         </RecoilRoot>
       </QueryClientProvider>
@@ -211,8 +247,13 @@ describe('useQueuedTurnReveal', () => {
       setMessages,
       current,
       attach: (epoch: number, submitting = true) => {
+<<<<<<< HEAD
         setEpoch(epoch);
         setSubmitting(submitting);
+=======
+        setSubmitting(submitting);
+        setEpoch(epoch);
+>>>>>>> upstream/main
       },
       setReceipts: (receipts: TAgentQueuedTurnReceipt[]) =>
         queryClient.setQueryData(agentQueuedTurnsQueryKey(CONVO_ID), receipts),

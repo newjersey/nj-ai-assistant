@@ -1,4 +1,8 @@
 import { AGENT_STYLE_TOOLS } from '.';
+<<<<<<< HEAD
+=======
+import { useToolPreparation } from '../../preparation';
+>>>>>>> upstream/main
 import { useLocalize } from '~/hooks';
 import { cn } from '~/utils';
 
@@ -19,6 +23,10 @@ export default function ProgressText({
   intent?: string;
 }) {
   const localize = useLocalize();
+<<<<<<< HEAD
+=======
+  const preparationText = useToolPreparation();
+>>>>>>> upstream/main
 
   const getText = () => {
     /** Failure outranks cancellation: the legacy inference folds errors into
@@ -30,6 +38,12 @@ export default function ProgressText({
     if (cancelled) {
       return localize('com_ui_cancelled');
     }
+<<<<<<< HEAD
+=======
+    if (progress < 1 && preparationText != null) {
+      return preparationText;
+    }
+>>>>>>> upstream/main
     if (intent != null) {
       return intent;
     }

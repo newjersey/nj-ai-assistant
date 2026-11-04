@@ -18,6 +18,10 @@ module.exports = {
   loadCodeApiKey: (...args) => getService().loadCodeApiKey(...args),
   provisionToCodeEnv: (...args) => getService().provisionToCodeEnv(...args),
   provisionToVectorDB: (...args) => getService().provisionToVectorDB(...args),
+<<<<<<< HEAD
   checkCodeEnvFileAlive: (...args) => getService().checkCodeEnvFileAlive(...args),
+=======
+  digestFile: (...args) => getService().digestFile(...args),
+>>>>>>> upstream/main
   checkSessionsAlive: (...args) => getService().checkSessionsAlive(...args),
 };

@@ -52,6 +52,7 @@ export interface OCRResult {
   usage_info: OCRUsageInfo;
 }
 
+<<<<<<< HEAD
 export interface MistralOCRRequest {
   model: string;
   image_limit?: number;
@@ -63,6 +64,8 @@ export interface MistralOCRRequest {
   };
 }
 
+=======
+>>>>>>> upstream/main
 export interface MistralOCRError {
   detail?: string;
   message?: string;

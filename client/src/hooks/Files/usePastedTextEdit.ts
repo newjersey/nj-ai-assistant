@@ -1,6 +1,9 @@
 import { useState, useCallback, useRef } from 'react';
 import { v4 } from 'uuid';
+<<<<<<< HEAD
 import { useRecoilValue } from 'recoil';
+=======
+>>>>>>> upstream/main
 import { useToastContext } from '@librechat/client';
 import {
   dataService,
@@ -8,6 +11,10 @@ import {
   FileSources,
   isAssistantsEndpoint,
 } from 'librechat-data-provider';
+<<<<<<< HEAD
+=======
+import type { PastedTextEdit } from '@librechat/chat/components';
+>>>>>>> upstream/main
 import type { TFile } from 'librechat-data-provider';
 import type { ExtendedFile, FileSetter } from '~/common';
 import {
@@ -26,12 +33,17 @@ import {
   retainFileDeletion,
 } from '~/utils';
 import { useDeleteFilesMutation, useGetFiles } from '~/data-provider';
+<<<<<<< HEAD
+=======
+import { useChatSettings } from '~/Providers/ChatSettingsContext';
+>>>>>>> upstream/main
 import { useChatContext, useChatFormContext } from '~/Providers';
 import useFileUploadRouter from './useFileUploadRouter';
 import { getNewConversationDraftToken } from '~/utils';
 import { useAuthContext } from '~/hooks/AuthContext';
 import useFileDeletion from './useFileDeletion';
 import { useLocalize } from '~/hooks';
+<<<<<<< HEAD
 import store from '~/store';
 
 /** The attachment being edited, with its text already resolved so the dialog stays controlled. */
@@ -43,6 +55,8 @@ export type PastedTextEdit = {
   /** Distinguishes two successive unsaved chats, which share the `new` conversation id. */
   draftToken: symbol;
 };
+=======
+>>>>>>> upstream/main
 
 /**
  * Backs the paste editor: resolves an attached `pasted-text.txt` back to the text it holds, and
@@ -66,7 +80,11 @@ export default function usePastedTextEdit({
   const methods = useChatFormContext();
   const routeFiles = useFileUploadRouter();
   const { data: fileList } = useGetFiles<TFile[]>();
+<<<<<<< HEAD
   const saveDrafts = useRecoilValue(store.saveDrafts);
+=======
+  const { saveDrafts } = useChatSettings();
+>>>>>>> upstream/main
   const [editing, setEditing] = useState<PastedTextEdit | null>(null);
   /** Failed edits that could not reopen their dialog because another chip was open. Their
    * corrections have no other owner, so they wait for the dialog to free up. */

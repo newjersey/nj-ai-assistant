@@ -146,7 +146,10 @@ describe('ToolCard', () => {
       );
       const star = screen.getByRole('button', { name: 'com_ui_unfavorite' });
       expect(star).toHaveAttribute('aria-pressed', 'true');
+<<<<<<< HEAD
       expect(star).toHaveClass('opacity-100');
+=======
+>>>>>>> upstream/main
     });
 
     test('renders no star without an onToggleFavorite handler', () => {

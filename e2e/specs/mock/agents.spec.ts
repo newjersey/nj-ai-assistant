@@ -133,7 +133,11 @@ test.describe('agent builder', () => {
 
       await form.getByLabel('Agent name').fill(agentName);
       await form.getByLabel('Agent description').fill(DESCRIPTION);
+<<<<<<< HEAD
       await form.getByLabel('Instructions').fill(INSTRUCTIONS);
+=======
+      await form.getByRole('textbox', { name: 'Instructions', exact: true }).fill(INSTRUCTIONS);
+>>>>>>> upstream/main
 
       await selectMockModel(page);
       await fillAnthropicStyleModelParameters(page);
@@ -180,7 +184,13 @@ test.describe('agent builder', () => {
 
       await expect(form.getByLabel('Agent name')).toHaveValue(agentName);
       await expect(form.getByLabel('Agent description')).toHaveValue(DESCRIPTION);
+<<<<<<< HEAD
       await expect(form.getByLabel('Instructions')).toHaveValue(INSTRUCTIONS);
+=======
+      await expect(form.getByRole('textbox', { name: 'Instructions', exact: true })).toHaveValue(
+        INSTRUCTIONS,
+      );
+>>>>>>> upstream/main
 
       await form.locator('label[for="provider"] + button').click();
       await expectAnthropicStyleModelParameters(page);

@@ -1,9 +1,18 @@
+<<<<<<< HEAD
 import React, { useRef } from 'react';
 import { SystemRoles } from 'librechat-data-provider';
 import { render, screen } from '@testing-library/react';
 import type { Agent, AgentCreateParams, ResourceType, TUser } from 'librechat-data-provider';
 import type { UseMutationResult } from '@tanstack/react-query';
 import '@testing-library/jest-dom/extend-expect';
+=======
+import React from 'react';
+import { SystemRoles } from 'librechat-data-provider';
+import { render, screen } from '@testing-library/react';
+import type { UseMutationResult } from '@tanstack/react-query';
+import '@testing-library/jest-dom/extend-expect';
+import type { Agent, AgentCreateParams, TUser, ResourceType } from 'librechat-data-provider';
+>>>>>>> upstream/main
 import AgentFooter from '../AgentFooter';
 import { Panel } from '~/common';
 
@@ -78,7 +87,10 @@ jest.mock('~/hooks', () => ({
   useAuthContext: () => mockUseAuthContext(),
   useHasAccess: () => mockUseHasAccess(),
   useResourcePermissions: () => mockUseResourcePermissions(),
+<<<<<<< HEAD
   useSelectAgent: () => jest.fn(),
+=======
+>>>>>>> upstream/main
 }));
 
 const createBaseMutation = <T = Agent, P = any>(
@@ -190,10 +202,13 @@ jest.mock('~/components/Sharing', () => ({
   ),
 }));
 
+<<<<<<< HEAD
 jest.mock('~/Providers/AgentPanelContext', () => ({
   useAgentPanelContext: () => ({ returnFocusRef: { current: null } }),
 }));
 
+=======
+>>>>>>> upstream/main
 describe('AgentFooter', () => {
   const mockUsers = {
     regular: mockUser,
@@ -280,11 +295,19 @@ describe('AgentFooter', () => {
       const { container } = render(<AgentFooter {...defaultProps} />);
       expect(screen.getByText('Save')).toBeInTheDocument();
       expect(screen.getByTestId('advanced-button')).toBeInTheDocument();
+<<<<<<< HEAD
       expect(screen.queryByTestId('version-button')).not.toBeInTheDocument();
       expect(screen.queryByTestId('delete-button')).not.toBeInTheDocument(); // NJ: Removed
       expect(screen.queryByTestId('admin-settings')).not.toBeInTheDocument();
       expect(screen.queryByTestId('grant-access-dialog-agent')).not.toBeInTheDocument(); // NJ: Removed
       expect(screen.queryByTestId('duplicate-button')).not.toBeInTheDocument(); // NJ: Removed
+=======
+      expect(screen.getByTestId('version-button')).toBeInTheDocument();
+      expect(screen.getByTestId('delete-button')).toBeInTheDocument();
+      expect(screen.queryByTestId('admin-settings')).not.toBeInTheDocument();
+      expect(screen.getByTestId('grant-access-dialog-agent')).toBeInTheDocument();
+      expect(screen.getByTestId('duplicate-button')).toBeInTheDocument();
+>>>>>>> upstream/main
       // The icon-swap always renders both label and spinner; the visible state
       // is driven by data-state ('a' = idle/label, 'b' = saving/spinner).
       expect(container.querySelector('.t-icon-swap')).toHaveAttribute('data-state', 'a');
@@ -361,7 +384,11 @@ describe('AgentFooter', () => {
       mockUseHasAccess.mockReturnValue(false);
       const { unmount } = render(<AgentFooter {...defaultProps} />);
       expect(screen.getByTestId('admin-settings')).toBeInTheDocument();
+<<<<<<< HEAD
       expect(screen.queryByTestId('grant-access-dialog-agent')).toBeInTheDocument();
+=======
+      expect(screen.getByTestId('grant-access-dialog-agent')).toBeInTheDocument();
+>>>>>>> upstream/main
 
       // Clean up the first render
       unmount();
@@ -463,7 +490,11 @@ describe('AgentFooter', () => {
         permissionBits: 2,
       });
       render(<AgentFooter {...defaultProps} />);
+<<<<<<< HEAD
       expect(screen.queryByTestId('duplicate-button')).not.toBeInTheDocument(); // NJ: Removed
+=======
+      expect(screen.getByTestId('duplicate-button')).toBeInTheDocument();
+>>>>>>> upstream/main
     });
 
     test('hides duplicate button for non-owner with only VIEW permission', () => {
@@ -515,7 +546,11 @@ describe('AgentFooter', () => {
         permissionBits: 0,
       });
       render(<AgentFooter {...defaultProps} />);
+<<<<<<< HEAD
       expect(screen.queryByTestId('duplicate-button')).not.toBeInTheDocument(); // NJ: Removed
+=======
+      expect(screen.getByTestId('duplicate-button')).toBeInTheDocument();
+>>>>>>> upstream/main
     });
   });
 

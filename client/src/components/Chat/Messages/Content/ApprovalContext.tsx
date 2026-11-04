@@ -7,22 +7,40 @@ import {
   useRef,
   useState,
 } from 'react';
+<<<<<<< HEAD
 import { useRecoilValue } from 'recoil';
 import { useAtom, useStore } from 'jotai';
 import { Constants } from 'librechat-data-provider';
 import type { Agents } from 'librechat-data-provider';
 import type { AskAnswerStatus } from '~/components/Chat/ask/state';
+=======
+import { Constants } from 'librechat-data-provider';
+import { useAtom, useStore, useAtomValue } from 'jotai';
+import {
+  askSubmitStatusAtom,
+  pendingApprovalActionFamily,
+  activeGenerationCreatedAtByConvoId,
+} from '@librechat/chat/react';
+import type { AskAnswerStatus } from '@librechat/chat/react';
+import type { Agents } from 'librechat-data-provider';
+>>>>>>> upstream/main
 import {
   useSubmitToolApprovalMutation,
   useSubmitAskAnswerMutation,
   type ResumeAgentFields,
 } from '~/data-provider';
+<<<<<<< HEAD
 import { pendingApprovalActionFamily } from '~/components/Chat/approval/state';
 import { askSubmitStatusAtom } from '~/components/Chat/ask/state';
 import { resolveAskUserQuestionPart } from '~/utils/approval';
 import { ChatContext } from '~/Providers/ChatContext';
 import { useGetEphemeralAgent } from '~/store/agents';
 import store from '~/store';
+=======
+import { useChatSettings } from '~/Providers/ChatSettingsContext';
+import { resolveAskUserQuestionPart } from '~/utils/approval';
+import { ChatContext } from '~/Providers/ChatContext';
+>>>>>>> upstream/main
 
 /** Shared read/write for the ask-answer submit status. */
 export function useAskSubmitStatus(): {
@@ -98,6 +116,11 @@ const ApprovalContext = createContext<ApprovalContextValue | null>(null);
 
 export interface ToolApprovalDecisionDraft {
   active: Agents.ToolApprovalDecisionType | null;
+<<<<<<< HEAD
+=======
+  /** With `active === 'approve'`: also approve this tool for the rest of the conversation. */
+  allowAlways?: boolean;
+>>>>>>> upstream/main
   editText: string;
   responseText: string;
   reason: string;
@@ -427,7 +450,11 @@ export function useResumeSubmit() {
   const jotaiStore = useStore();
   const chatContext = useContext(ChatContext);
   const conversation = chatContext?.conversation;
+<<<<<<< HEAD
   const getEphemeralAgent = useGetEphemeralAgent();
+=======
+  const { getEphemeralAgent } = useChatSettings();
+>>>>>>> upstream/main
   const approvalMutation = useSubmitToolApprovalMutation();
   const askMutation = useSubmitAskAnswerMutation();
   const { getDecisions, isReady, setStatus, beginToolSubmission, endToolSubmission } =
@@ -436,8 +463,13 @@ export function useResumeSubmit() {
   /** Ask status lives in Jotai so it works from the composer (outside the
    *  provider); tool-approval status stays on the context. */
   const { setAskStatus } = useAskSubmitStatus();
+<<<<<<< HEAD
   const activeGenerationCreatedAt = useRecoilValue(
     store.activeGenerationCreatedAtByConvoId(conversation?.conversationId ?? Constants.NEW_CONVO),
+=======
+  const activeGenerationCreatedAt = useAtomValue(
+    activeGenerationCreatedAtByConvoId(conversation?.conversationId ?? Constants.NEW_CONVO),
+>>>>>>> upstream/main
   );
 
   const buildResumeFields = useCallback((): ResumeAgentFields | null => {

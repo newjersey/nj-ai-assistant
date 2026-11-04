@@ -29,7 +29,11 @@ const TermsAndConditionsModal = ({
       onOpenChange(false);
     },
     onError: () => {
+<<<<<<< HEAD
       showToast({ message: 'Failed to accept terms' });
+=======
+      showToast({ message: localize('com_ui_terms_accept_failed'), status: 'error' });
+>>>>>>> upstream/main
     },
   });
 
@@ -76,7 +80,11 @@ const TermsAndConditionsModal = ({
             className="max-h-[60vh] overflow-y-auto p-4"
             aria-label={localize('com_ui_terms_and_conditions')}
           >
+<<<<<<< HEAD
             <div className="prose dark:prose-invert w-full max-w-none !text-text-primary">
+=======
+            <div className="prose !text-text-primary w-full max-w-none">
+>>>>>>> upstream/main
               {content !== '' ? (
                 <MarkdownLite content={content} />
               ) : (

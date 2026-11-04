@@ -12,8 +12,13 @@ jest.mock(
   { virtual: true },
 );
 
+<<<<<<< HEAD
 import { stripCodeChallenge, storeAndStripChallenge, isAdminPanelRedirect } from './exchange';
 import type { PkceStrippableRequest } from './exchange';
+=======
+import { stripCodeChallenge, storeAndStripChallenge, preserveAdminOAuthState } from './exchange';
+import type { PkceStrippableRequest, PkceSupportMetadata } from './exchange';
+>>>>>>> upstream/main
 
 function makeReq(overrides: Partial<PkceStrippableRequest> = {}): PkceStrippableRequest {
   return { query: {}, originalUrl: '', url: '', ...overrides };
@@ -271,6 +276,7 @@ describe('storeAndStripChallenge', () => {
   });
 });
 
+<<<<<<< HEAD
 describe('isAdminPanelRedirect', () => {
   const crossOriginAdmin = 'http://localhost:3000';
   const crossOriginClient = 'http://localhost:3080';
@@ -331,5 +337,63 @@ describe('isAdminPanelRedirect', () => {
         isAdminPanelRedirect('https://other.com/callback', crossOriginAdmin, crossOriginClient),
       ).toBe(false);
     });
+=======
+describe('preserveAdminOAuthState', () => {
+  const state = 'b'.repeat(64);
+
+  /** Mirrors openid-client's `serverMetadata().supportsPKCE`, which defaults to S256. */
+  const metadataWith = (methods?: string[]): PkceSupportMetadata => ({
+    supportsPKCE: (method = 'S256') => methods?.includes(method) === true,
+  });
+
+  it('adds a nonce when the IdP does not advertise PKCE, so the admin state is kept', () => {
+    const params = new URLSearchParams({ scope: 'openid', state });
+
+    const result = preserveAdminOAuthState(params, metadataWith());
+
+    expect(result).toBe(params);
+    expect(params.get('state')).toBe(state);
+    expect(params.get('nonce')).toMatch(/^[A-Za-z0-9_-]{43}$/);
+  });
+
+  it('adds a nonce when the IdP advertises only the plain method', () => {
+    const params = new URLSearchParams({ state });
+
+    preserveAdminOAuthState(params, metadataWith(['plain']));
+
+    expect(params.has('nonce')).toBe(true);
+  });
+
+  it('generates a fresh nonce for each request', () => {
+    const first = preserveAdminOAuthState(new URLSearchParams({ state }), metadataWith());
+    const second = preserveAdminOAuthState(new URLSearchParams({ state }), metadataWith());
+
+    expect(first.get('nonce')).not.toBe(second.get('nonce'));
+  });
+
+  it('leaves the request alone when the IdP advertises S256', () => {
+    const params = new URLSearchParams({ scope: 'openid', state });
+
+    preserveAdminOAuthState(params, metadataWith(['plain', 'S256']));
+
+    expect(params.has('nonce')).toBe(false);
+    expect(params.get('state')).toBe(state);
+  });
+
+  it('keeps a nonce the request already carries', () => {
+    const params = new URLSearchParams({ state, nonce: 'configured-nonce' });
+
+    preserveAdminOAuthState(params, metadataWith());
+
+    expect(params.get('nonce')).toBe('configured-nonce');
+  });
+
+  it('adds nothing when the request has no state to keep', () => {
+    const params = new URLSearchParams({ scope: 'openid' });
+
+    preserveAdminOAuthState(params, metadataWith());
+
+    expect(params.has('nonce')).toBe(false);
+>>>>>>> upstream/main
   });
 });

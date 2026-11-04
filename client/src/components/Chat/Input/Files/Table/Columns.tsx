@@ -1,6 +1,10 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import { FileSources, FileContext } from 'librechat-data-provider';
 import { ArrowUpDown, ArrowUp, ArrowDown, Database } from 'lucide-react';
+<<<<<<< HEAD
+=======
+import { ImagePreview, FilePreview, getFileType } from '@librechat/chat/components';
+>>>>>>> upstream/main
 import {
   Button,
   Checkbox,
@@ -11,11 +15,17 @@ import {
 } from '@librechat/client';
 import type { ColumnDef } from '@tanstack/react-table';
 import type { TFile } from 'librechat-data-provider';
+<<<<<<< HEAD
 import ImagePreview from '~/components/Chat/Input/Files/ImagePreview';
 import FilePreview from '~/components/Chat/Input/Files/FilePreview';
 import { TranslationKeys, useLocalize } from '~/hooks';
 import { SortFilterHeader } from './SortFilterHeader';
 import { formatDate, getFileType } from '~/utils';
+=======
+import { TranslationKeys, useLocalize } from '~/hooks';
+import { SortFilterHeader } from './SortFilterHeader';
+import { formatDate } from '~/utils';
+>>>>>>> upstream/main
 
 const contextMap: Record<any, TranslationKeys> = {
   [FileContext.avatar]: 'com_ui_avatar',
@@ -90,7 +100,11 @@ export const columns: ColumnDef<TFile>[] = [
           render={
             <Button
               variant="ghost"
+<<<<<<< HEAD
               className="px-2 py-0 text-xs hover:bg-surface-hover sm:px-2 sm:py-2 sm:text-sm"
+=======
+              className="px-2 py-0 text-xs sm:px-2 sm:py-2 sm:text-sm"
+>>>>>>> upstream/main
               onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
               aria-sort={ariaSort}
               aria-label={localize('com_ui_name_sort')}
@@ -98,7 +112,11 @@ export const columns: ColumnDef<TFile>[] = [
               aria-current={sortState ? 'true' : 'false'}
             >
               {localize('com_ui_name')}
+<<<<<<< HEAD
               <SortIcon className="ml-2 h-3 w-4 sm:h-4 sm:w-4" />
+=======
+              <SortIcon className="ms-2 h-3 w-4 sm:h-4 sm:w-4" />
+>>>>>>> upstream/main
             </Button>
           }
         />
@@ -150,14 +168,22 @@ export const columns: ColumnDef<TFile>[] = [
             <Button
               variant="ghost"
               onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+<<<<<<< HEAD
               className="px-2 py-0 text-xs hover:bg-surface-hover sm:px-2 sm:py-2 sm:text-sm"
+=======
+              className="px-2 py-0 text-xs sm:px-2 sm:py-2 sm:text-sm"
+>>>>>>> upstream/main
               aria-sort={ariaSort}
               aria-label={localize('com_ui_date_sort')}
               aria-hidden="true"
               aria-current={sortState ? 'true' : 'false'}
             >
               {localize('com_ui_date')}
+<<<<<<< HEAD
               <SortIcon className="ml-2 h-3 w-4 sm:h-4 sm:w-4" />
+=======
+              <SortIcon className="ms-2 h-3 w-4 sm:h-4 sm:w-4" />
+>>>>>>> upstream/main
             </Button>
           }
         />
@@ -199,21 +225,33 @@ export const columns: ColumnDef<TFile>[] = [
       if (source === FileSources.openai) {
         return (
           <div className="flex flex-wrap items-center gap-2">
+<<<<<<< HEAD
             <OpenAIMinimalIcon className="icon-sm text-green-600/50" />
+=======
+            <OpenAIMinimalIcon className="icon-sm" />
+>>>>>>> upstream/main
             {'OpenAI'}
           </div>
         );
       } else if (source === FileSources.azure) {
         return (
           <div className="flex flex-wrap items-center gap-2">
+<<<<<<< HEAD
             <AzureMinimalIcon className="icon-sm text-cyan-700" />
+=======
+            <AzureMinimalIcon className="icon-sm" />
+>>>>>>> upstream/main
             {'Azure'}
           </div>
         );
       }
       return (
         <div className="flex flex-wrap items-center gap-2">
+<<<<<<< HEAD
           <Database className="icon-sm text-cyan-700" aria-hidden="true" />
+=======
+          <Database className="icon-sm" aria-hidden="true" />
+>>>>>>> upstream/main
           {localize('com_ui_host')}
         </div>
       );
@@ -268,7 +306,11 @@ export const columns: ColumnDef<TFile>[] = [
           render={
             <Button
               variant="ghost"
+<<<<<<< HEAD
               className="px-2 py-0 text-xs hover:bg-surface-hover sm:px-2 sm:py-2 sm:text-sm"
+=======
+              className="px-2 py-0 text-xs sm:px-2 sm:py-2 sm:text-sm"
+>>>>>>> upstream/main
               onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
               aria-sort={ariaSort}
               aria-label={localize('com_ui_size_sort')}
@@ -276,7 +318,11 @@ export const columns: ColumnDef<TFile>[] = [
               aria-current={sortState ? 'true' : 'false'}
             >
               {localize('com_ui_size')}
+<<<<<<< HEAD
               <SortIcon className="ml-2 h-3 w-4 sm:h-4 sm:w-4" />
+=======
+              <SortIcon className="ms-2 h-3 w-4 sm:h-4 sm:w-4" />
+>>>>>>> upstream/main
             </Button>
           }
         />

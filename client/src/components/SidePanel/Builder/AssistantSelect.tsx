@@ -1,6 +1,10 @@
 import { useMemo, useCallback, useEffect, useRef } from 'react';
 import { Plus } from 'lucide-react';
+<<<<<<< HEAD
 import { SelectDropDown } from '@librechat/client';
+=======
+import { Dropdown } from '@librechat/client';
+>>>>>>> upstream/main
 import {
   Tools,
   FileSources,
@@ -20,7 +24,10 @@ import type { UseMutationResult } from '@tanstack/react-query';
 import type { UseFormReset } from 'react-hook-form';
 import type { Actions, ExtendedFile, AssistantForm, TAssistantOption } from '~/common';
 import { useListAssistantsQuery } from '~/data-provider';
+<<<<<<< HEAD
 import { cn, createDropdownSetter } from '~/utils';
+=======
+>>>>>>> upstream/main
 import { useFileMapContext } from '~/Providers';
 import { useLocalize } from '~/hooks';
 
@@ -242,6 +249,7 @@ export default function AssistantSelect({
   }, [selectedAssistant, query.data, onSelect]);
 
   const createAssistant = localize('com_ui_create_assistant');
+<<<<<<< HEAD
   return (
     <SelectDropDown
       value={!value ? createAssistant : value}
@@ -281,6 +289,30 @@ export default function AssistantSelect({
           </span>
         </span>
       )}
+=======
+  const assistants = query.data ?? [];
+  const selectedValue = typeof value === 'string' ? value : (value.value?.toString() ?? '');
+  return (
+    <Dropdown
+      variant="field"
+      className="w-auto min-w-0 grow"
+      /** Kept from the previous picker, so existing locators still find it. */
+      testId="select-dropdown-button"
+      ariaLabel={localize('com_ui_assistant')}
+      value={selectedValue}
+      placeholder={createAssistant}
+      onChange={onSelect}
+      searchable={assistants.length > 10}
+      searchPlaceholder={localize('com_assistants_search_name')}
+      searchEmptyText={localize('com_ui_no_results_found')}
+      options={[
+        { value: '', label: createAssistant, icon: <Plus className="size-4" aria-hidden="true" /> },
+        ...assistants.map((assistant) => ({
+          value: assistant.id,
+          label: assistant.name ?? '',
+        })),
+      ]}
+>>>>>>> upstream/main
     />
   );
 }

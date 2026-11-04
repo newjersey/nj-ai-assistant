@@ -3,11 +3,21 @@ import {
   assertAttachedCodeEnvironmentApprovalSupported,
   buildAttachedCodeEnvironmentAdmissionHooks,
   collectAttachedCodeEnvironmentAgentIds,
+<<<<<<< HEAD
+=======
+  collectAttachedCodeApprovalPolicies,
+  collectAttachedCodeRoutePolicies,
+>>>>>>> upstream/main
   collectAttachedCodeEnvironmentPolicySettings,
   createAttachedCodeEnvironmentPolicyHook,
   isStatefulCodeEnvironmentToolName,
   markNativeCodeToolApprovalRequests,
   resolveAttachedCodeApprovalMode,
+<<<<<<< HEAD
+=======
+  resolvePersistedCodeApprovalMode,
+  getCodeApprovalPreservedFields,
+>>>>>>> upstream/main
 } from './byom';
 import { canAgentGraphPause } from './admission';
 
@@ -25,7 +35,11 @@ const fullAccessSettings: AttachedCodeEnvironmentPolicySettings = {
 describe('full access', () => {
   test('allows native writes and commands while preserving mandatory skill review', async () => {
     const settings = new Map([['attached-agent', fullAccessSettings]]);
+<<<<<<< HEAD
     const mode = resolveAttachedCodeApprovalMode('fullAccess', settings);
+=======
+    const mode = resolveAttachedCodeApprovalMode('fullAccess', settings.values());
+>>>>>>> upstream/main
     const hook = createAttachedCodeEnvironmentPolicyHook(new Set(settings.keys()), settings, mode);
     for (const toolName of ['create_file', 'edit_file', 'bash_tool', 'execute_code']) {
       await expect(
@@ -70,7 +84,11 @@ describe('full access', () => {
       expect(() =>
         resolveAttachedCodeApprovalMode(
           'fullAccess',
+<<<<<<< HEAD
           new Map(reverse ? entries.reverse() : entries),
+=======
+          new Map(reverse ? entries.reverse() : entries).values(),
+>>>>>>> upstream/main
         ),
       ).toThrow('not permitted');
     },
@@ -82,7 +100,11 @@ describe('full access', () => {
     const hook = createAttachedCodeEnvironmentPolicyHook(
       attachedIds,
       settings,
+<<<<<<< HEAD
       resolveAttachedCodeApprovalMode('fullAccess', settings),
+=======
+      resolveAttachedCodeApprovalMode('fullAccess', settings.values()),
+>>>>>>> upstream/main
     );
     settings.set('attached-agent', {
       ...fullAccessSettings,
@@ -96,7 +118,11 @@ describe('full access', () => {
     await expect(
       hook({ toolName: 'bash_tool', executingAgentId: 'lazy-agent' } as never, signal),
     ).resolves.toMatchObject({ decision: 'ask' });
+<<<<<<< HEAD
     expect(() => resolveAttachedCodeApprovalMode('fullAccess', settings, false)).toThrow(
+=======
+    expect(() => resolveAttachedCodeApprovalMode('fullAccess', settings.values(), false)).toThrow(
+>>>>>>> upstream/main
       'not permitted',
     );
   });
@@ -164,6 +190,7 @@ describe('markNativeCodeToolApprovalRequests', () => {
 });
 
 describe('createAttachedCodeEnvironmentPolicyHook', () => {
+<<<<<<< HEAD
   test('asks before a shell action in an attached environment', async () => {
     const hook = createAttachedCodeEnvironmentPolicyHook(new Set(['attached-agent']));
 
@@ -174,6 +201,21 @@ describe('createAttachedCodeEnvironmentPolicyHook', () => {
       reason: 'bash_tool can modify your attached code environment',
     });
   });
+=======
+  test.each(['bash_tool', 'run_tools_with_bash'])(
+    'asks before a shell action in an attached environment: %s',
+    async (toolName) => {
+      const hook = createAttachedCodeEnvironmentPolicyHook(new Set(['attached-agent']));
+
+      await expect(
+        hook({ toolName, executingAgentId: 'attached-agent' } as never, signal),
+      ).resolves.toEqual({
+        decision: 'ask',
+        reason: `${toolName} can modify your attached code environment`,
+      });
+    },
+  );
+>>>>>>> upstream/main
 
   test('allows the baseline policy to auto-approve read-only coding actions', async () => {
     const hook = createAttachedCodeEnvironmentPolicyHook(new Set(['attached-agent']));
@@ -252,7 +294,11 @@ describe('createAttachedCodeEnvironmentPolicyHook', () => {
         },
       ],
     ]);
+<<<<<<< HEAD
     const mode = resolveAttachedCodeApprovalMode('acceptEdits', settings);
+=======
+    const mode = resolveAttachedCodeApprovalMode('acceptEdits', settings.values());
+>>>>>>> upstream/main
     const hook = createAttachedCodeEnvironmentPolicyHook(
       new Set(['attached-agent']),
       settings,
@@ -269,6 +315,7 @@ describe('createAttachedCodeEnvironmentPolicyHook', () => {
 
   test('rejects accept edits when the attached machine excludes file-write allow', () => {
     expect(() =>
+<<<<<<< HEAD
       resolveAttachedCodeApprovalMode(
         'acceptEdits',
         new Map([
@@ -282,6 +329,15 @@ describe('createAttachedCodeEnvironmentPolicyHook', () => {
           ],
         ]),
       ),
+=======
+      resolveAttachedCodeApprovalMode('acceptEdits', [
+        {
+          configSchema: {
+            permissions: { fileWrite: { allowed: ['ask'], default: 'ask' } },
+          },
+        },
+      ]),
+>>>>>>> upstream/main
     ).toThrow('not permitted');
   });
 
@@ -304,7 +360,11 @@ describe('createAttachedCodeEnvironmentPolicyHook', () => {
         },
       ],
     ]);
+<<<<<<< HEAD
     const mode = resolveAttachedCodeApprovalMode('acceptEdits', settings);
+=======
+    const mode = resolveAttachedCodeApprovalMode('acceptEdits', settings.values());
+>>>>>>> upstream/main
     const hook = createAttachedCodeEnvironmentPolicyHook(
       new Set(['permissive-agent', 'restrictive-agent']),
       settings,
@@ -331,7 +391,11 @@ describe('createAttachedCodeEnvironmentPolicyHook', () => {
         },
       ],
     ]);
+<<<<<<< HEAD
     const mode = resolveAttachedCodeApprovalMode('acceptEdits', settings);
+=======
+    const mode = resolveAttachedCodeApprovalMode('acceptEdits', settings.values());
+>>>>>>> upstream/main
     const hook = createAttachedCodeEnvironmentPolicyHook(attachedIds, settings, mode);
 
     attachedIds.add('lazy-agent');
@@ -347,11 +411,19 @@ describe('createAttachedCodeEnvironmentPolicyHook', () => {
   });
 
   test('rejects an explicit mode when approvals are disabled by the administrator', () => {
+<<<<<<< HEAD
     expect(resolveAttachedCodeApprovalMode('ask', new Map(), false)).toBeUndefined();
     expect(() => resolveAttachedCodeApprovalMode('acceptEdits', new Map(), false)).toThrow(
       'not permitted',
     );
     expect(resolveAttachedCodeApprovalMode(undefined, new Map(), false)).toBeUndefined();
+=======
+    expect(resolveAttachedCodeApprovalMode('ask', [], false)).toBeUndefined();
+    expect(() => resolveAttachedCodeApprovalMode('acceptEdits', [], false)).toThrow(
+      'not permitted',
+    );
+    expect(resolveAttachedCodeApprovalMode(undefined, [], false)).toBeUndefined();
+>>>>>>> upstream/main
   });
 
   test.each(['create_file', 'edit_file'])(
@@ -598,6 +670,122 @@ describe('collectAttachedCodeEnvironmentAgentIds', () => {
   });
 });
 
+<<<<<<< HEAD
+=======
+describe('collectAttachedCodeApprovalPolicies', () => {
+  const acceptEditsMachine = {
+    environmentType: 'attached',
+    codeEnvironmentConfigSchema: fullAccessSettings.configSchema,
+    codeEnvironmentSettings: { permissions: { fileWrite: 'allow' as const } },
+  };
+
+  test('validates a mode against a fallback-routable child by its per-call machines', () => {
+    const agents = [
+      {
+        id: 'root',
+        codeExecutionContext: { environmentType: 'managed' },
+        lazySubagentConfigs: [
+          {
+            id: 'reviewer',
+            codeExecutionChoices: [{ environmentType: 'managed' }, acceptEditsMachine],
+          },
+        ],
+      },
+    ];
+
+    /** Default routes alone see no attached target, so the mode would only gate at `ask`. */
+    expect(
+      resolveAttachedCodeApprovalMode(
+        'acceptEdits',
+        collectAttachedCodeEnvironmentPolicySettings(agents).values(),
+      ),
+    ).toBe('ask');
+    expect(
+      resolveAttachedCodeApprovalMode('acceptEdits', collectAttachedCodeApprovalPolicies(agents)),
+    ).toBe('acceptEdits');
+  });
+
+  test('lets an asking per-call machine make a permissive-by-default child pause-capable', () => {
+    const agents = [
+      {
+        id: 'reviewer',
+        codeExecutionContext: {
+          ...acceptEditsMachine,
+          codeEnvironmentSettings: {
+            permissions: { fileWrite: 'allow' as const, commandExecution: 'allow' as const },
+          },
+        },
+        codeExecutionChoices: [
+          {
+            environmentType: 'attached',
+            codeEnvironmentConfigSchema: fullAccessSettings.configSchema,
+          },
+        ],
+      },
+    ];
+    const ids = collectAttachedCodeEnvironmentAgentIds(agents);
+    const settings = collectAttachedCodeEnvironmentPolicySettings(agents);
+    const pausing = (hooks: ReturnType<typeof buildAttachedCodeEnvironmentAdmissionHooks>) =>
+      hooks.flatMap((hook) => hook.toolNames ?? []);
+
+    expect(pausing(buildAttachedCodeEnvironmentAdmissionHooks(ids, settings))).not.toContain(
+      'bash_tool',
+    );
+    expect(
+      pausing(
+        buildAttachedCodeEnvironmentAdmissionHooks(
+          ids,
+          settings,
+          undefined,
+          collectAttachedCodeRoutePolicies(agents),
+        ),
+      ),
+    ).toContain('bash_tool');
+  });
+
+  test('does not treat a missing default as asking when every per-call machine decides', () => {
+    const decides = {
+      environmentType: 'attached',
+      codeEnvironmentConfigSchema: fullAccessSettings.configSchema,
+      codeEnvironmentSettings: {
+        permissions: { fileWrite: 'allow' as const, commandExecution: 'deny' as const },
+      },
+    };
+    const agents = [{ id: 'reviewer', codeExecutionChoices: [decides, decides] }];
+
+    expect(
+      buildAttachedCodeEnvironmentAdmissionHooks(
+        collectAttachedCodeEnvironmentAgentIds(agents),
+        collectAttachedCodeEnvironmentPolicySettings(agents),
+        undefined,
+        collectAttachedCodeRoutePolicies(agents),
+      ),
+    ).toEqual([]);
+  });
+
+  test('requires every machine a child may be routed to before granting full access', () => {
+    const agents = [
+      {
+        id: 'reviewer',
+        codeExecutionContext: { ...acceptEditsMachine, codeEnvironmentSettings: undefined },
+        codeExecutionChoices: [
+          {
+            environmentType: 'attached',
+            codeEnvironmentConfigSchema: fullAccessSettings.configSchema,
+          },
+          { environmentType: 'attached' },
+        ],
+      },
+    ];
+
+    expect(collectAttachedCodeApprovalPolicies(agents)).toHaveLength(3);
+    expect(() =>
+      resolveAttachedCodeApprovalMode('fullAccess', collectAttachedCodeApprovalPolicies(agents)),
+    ).toThrow('not permitted');
+  });
+});
+
+>>>>>>> upstream/main
 describe('assertAttachedCodeEnvironmentApprovalSupported', () => {
   test('rejects attached environments on callers without an approval/resume surface', () => {
     expect(() =>
@@ -626,3 +814,194 @@ describe('assertAttachedCodeEnvironmentApprovalSupported', () => {
     ).not.toThrow();
   });
 });
+<<<<<<< HEAD
+=======
+
+for (const placement of ['lazySubagentConfigs', 'subagentGraphMemberMetadata'] as const) {
+  test.each(['dontAsk', 'bypass'] as const)(
+    `${placement} BYOM hooks cannot predict review of statically denied tools under %s`,
+    (mode) => {
+      const graph = {
+        id: 'root',
+        tools: ['read_file'],
+        [placement]: [
+          {
+            id: 'attached-member',
+            codeExecutionContext: { environmentType: 'attached' },
+            skillAuthoringAvailable: true,
+          },
+        ],
+      };
+      const ids = collectAttachedCodeEnvironmentAgentIds([graph]);
+      const settings = collectAttachedCodeEnvironmentPolicySettings([graph]);
+      const hooks = buildAttachedCodeEnvironmentAdmissionHooks(ids, settings);
+      expect(hooks.every((h) => h.toolNames?.length)).toBe(true);
+      const denied = {
+        enabled: true,
+        mode,
+        allow: ['read_file'],
+        ...(mode === 'bypass'
+          ? {
+              deny: [
+                'write_file',
+                'edit_file',
+                'create_file',
+                'bash_tool',
+                'execute_code',
+                'run_tools_with_bash',
+                'run_tools_with_code',
+                'compile_check',
+              ],
+            }
+          : {}),
+      };
+      expect(
+        canAgentGraphPause({ policy: denied, agents: [graph], resolvedProgrammaticHooks: hooks }),
+      ).toBe(false);
+      expect(
+        canAgentGraphPause({
+          policy: { enabled: true, mode: 'dontAsk', allow: ['read_file', 'bash_tool'] },
+          agents: [graph],
+          resolvedProgrammaticHooks: hooks,
+        }),
+      ).toBe(true);
+      expect(
+        canAgentGraphPause({
+          policy: {
+            enabled: true,
+            mode: 'dontAsk',
+            allow: ['read_file', 'bash_tool'],
+            deny: ['bash_tool'],
+          },
+          agents: [graph],
+          resolvedProgrammaticHooks: hooks,
+        }),
+      ).toBe(false);
+      expect(
+        canAgentGraphPause({
+          policy: { enabled: true, mode: 'dontAsk', allow: ['read_file', 'create_file'] },
+          agents: [graph],
+          resolvedProgrammaticHooks: hooks,
+        }),
+      ).toBe(true);
+      expect(
+        canAgentGraphPause({
+          policy: { enabled: true, mode: 'bypass', deny: ['*'] },
+          agents: [graph],
+          resolvedProgrammaticHooks: hooks,
+        }),
+      ).toBe(false);
+    },
+  );
+}
+
+describe('approval mode without attached targets', () => {
+  const restrictedSettings: AttachedCodeEnvironmentPolicySettings = {
+    configSchema: { permissions: { fileWrite: { allowed: ['ask'], default: 'ask' } } },
+  };
+  const attachedContext = (settings: AttachedCodeEnvironmentPolicySettings) => ({
+    environmentType: 'attached',
+    codeEnvironmentConfigSchema: settings.configSchema,
+    codeEnvironmentSettings: settings.settings,
+  });
+
+  test.each(['ask', 'acceptEdits', 'fullAccess'] as const)(
+    'accepts a remembered %s mode for a turn that has nothing attached, resolving it to ask',
+    (requested) => {
+      const policies = collectAttachedCodeApprovalPolicies([
+        { id: 'terra', codeExecutionContext: { environmentType: 'managed' } },
+      ]);
+      expect(policies).toEqual([]);
+      expect(resolveAttachedCodeApprovalMode(requested, policies)).toBe('ask');
+    },
+  );
+
+  test('still rejects values that are not approval modes and treats an absent mode as none', () => {
+    for (const requested of ['unrestricted', 'FULLACCESS', 1, {}]) {
+      expect(() => resolveAttachedCodeApprovalMode(requested, [])).toThrow('not permitted');
+    }
+    expect(resolveAttachedCodeApprovalMode(undefined, [])).toBeUndefined();
+    expect(resolveAttachedCodeApprovalMode(null, [])).toBeUndefined();
+  });
+
+  test('keeps strict validation once any attached target exists', () => {
+    const unconfigured: AttachedCodeEnvironmentPolicySettings[] = [{}];
+    expect(resolveAttachedCodeApprovalMode('ask', unconfigured)).toBe('ask');
+    expect(() => resolveAttachedCodeApprovalMode('acceptEdits', unconfigured)).toThrow(
+      'not permitted',
+    );
+    expect(() => resolveAttachedCodeApprovalMode('fullAccess', unconfigured)).toThrow(
+      'not permitted',
+    );
+  });
+
+  test('validates against a subagent machine when the parent runs without a workspace', () => {
+    type PolicyAgent = Parameters<typeof collectAttachedCodeApprovalPolicies>[0][number];
+    const parent = (child: PolicyAgent) =>
+      collectAttachedCodeApprovalPolicies([{ id: 'parent', lazySubagentConfigs: [child] }]);
+    const restricted = parent({
+      id: 'child',
+      codeExecutionContext: attachedContext(restrictedSettings),
+    });
+    expect(restricted).toHaveLength(1);
+    expect(() => resolveAttachedCodeApprovalMode('fullAccess', restricted)).toThrow(
+      'not permitted',
+    );
+    const permissive = parent({
+      id: 'child',
+      codeExecutionContext: attachedContext(fullAccessSettings),
+    });
+    expect(resolveAttachedCodeApprovalMode('fullAccess', permissive)).toBe('fullAccess');
+    const routable = parent({
+      id: 'child',
+      codeExecutionContext: { environmentType: 'managed' },
+      codeExecutionChoices: [attachedContext(restrictedSettings)],
+    });
+    expect(() => resolveAttachedCodeApprovalMode('fullAccess', routable)).toThrow('not permitted');
+    const graphMember = collectAttachedCodeApprovalPolicies([
+      {
+        id: 'parent',
+        subagentGraphConfigs: [
+          {
+            memberConfigs: [
+              { id: 'member', codeExecutionContext: attachedContext(restrictedSettings) },
+            ],
+          },
+        ],
+      },
+    ]);
+    expect(() => resolveAttachedCodeApprovalMode('fullAccess', graphMember)).toThrow(
+      'not permitted',
+    );
+  });
+
+  test('leaves the approvals-disabled contract unchanged', () => {
+    expect(() => resolveAttachedCodeApprovalMode('fullAccess', [], false)).toThrow('not permitted');
+    expect(
+      resolvePersistedCodeApprovalMode({ requested: 'ask', policies: [], approvalsEnabled: false }),
+    ).toBeUndefined();
+    expect(getCodeApprovalPreservedFields([], false)).toEqual([]);
+  });
+
+  describe('persisted mode', () => {
+    const permissive = [fullAccessSettings];
+    const persist = (requested: unknown, policies: AttachedCodeEnvironmentPolicySettings[] = []) =>
+      resolvePersistedCodeApprovalMode({ requested, policies });
+
+    test('records nothing and keeps the stored mode through a turn with nothing attached', () => {
+      for (const requested of ['ask', 'acceptEdits', 'fullAccess', undefined]) {
+        expect(persist(requested)).toBeUndefined();
+      }
+      expect(getCodeApprovalPreservedFields([])).toEqual(['codeApprovalMode']);
+      expect(() => persist('unrestricted')).toThrow('not permitted');
+    });
+
+    test('records exactly the validated mode once a target is attached', () => {
+      expect(persist('acceptEdits', permissive)).toBe('acceptEdits');
+      expect(persist(undefined, permissive)).toBeUndefined();
+      expect(getCodeApprovalPreservedFields(permissive)).toEqual([]);
+      expect(() => persist('fullAccess', [restrictedSettings])).toThrow('not permitted');
+    });
+  });
+});
+>>>>>>> upstream/main

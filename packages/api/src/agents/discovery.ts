@@ -25,6 +25,10 @@ import { initializeAgent as defaultInitializeAgent } from './initialize';
 import { createEdgeCollector, resolveReachableGraph } from './edges';
 import { isFatalAgentInitializationError } from './errors';
 import { createConcurrencyLimiter } from '~/utils/promise';
+<<<<<<< HEAD
+=======
+import { getLookupConcurrency } from '~/utils/concurrency';
+>>>>>>> upstream/main
 import { createSequentialChainEdges } from './chain';
 import { detachOnAbort } from '~/utils/promises';
 
@@ -121,10 +125,23 @@ export interface DiscoverConnectedAgentsParams {
    * request-memoized read as its parent.
    */
   resolveWebSearchGrant?: InitializeAgentParams['resolveWebSearchGrant'];
+<<<<<<< HEAD
+=======
+  /**
+   * Resolves a handoff/subagent's own `instructionsPrompt` link, forwarded so
+   * every discovered agent honors its link the same way the primary does.
+   * There is no default resolution path, unlike `resolveWebSearchGrant` —
+   * omitting it leaves a linked handoff agent with empty instructions.
+   */
+  resolveLinkedInstructions?: InitializeAgentParams['resolveLinkedInstructions'];
+  /** Forwarded verbatim; the resume path sets this `false` for every discovered agent. */
+  recordLinkedPromptUsage?: InitializeAgentParams['recordLinkedPromptUsage'];
+>>>>>>> upstream/main
   /** Sibling of `codeEnvAvailable` — the `stateful_code_sessions` capability flag, forwarded to every handoff `initializeAgent`. */
   statefulSessionsAvailable?: InitializeAgentParams['statefulSessionsAvailable'];
   /** Deployment policy for stateful workspace scopes, forwarded unchanged to every referenced agent. */
   allowedStatefulCodeEnvironments?: InitializeAgentParams['allowedStatefulCodeEnvironments'];
+<<<<<<< HEAD
   /**
    * Run-level inline memory availability gate. Forwarded verbatim to every
    * handoff agent so sub-agents that list the `memory` capability expand the
@@ -132,6 +149,17 @@ export interface DiscoverConnectedAgentsParams {
    */
   memoryAvailable?: InitializeAgentParams['memoryAvailable'];
   /**
+=======
+  memoryAvailable?: InitializeAgentParams['memoryAvailable'];
+  /**
+   * Explicitly enables the authoritative ChatProject guidance/resources for
+   * every discovered handoff and saved graph member. This is intentionally
+   * independent of the request marker so remote callers can opt in without
+   * broadening unrelated agent initialization.
+   */
+  useChatProjectContext?: InitializeAgentParams['useChatProjectContext'];
+  /**
+>>>>>>> upstream/main
    * Run-level `run_in_background` capability gate. Forwarded verbatim so a
    * handoff/connected agent's own event-driven tools with
    * `tool_options[tool].run_in_background` (and its background-native code
@@ -261,6 +289,10 @@ async function initializeReferencedAgent(
           endpoint: EModelEndpoint.agents,
         },
         allowedProviders: params.allowedProviders,
+<<<<<<< HEAD
+=======
+        useChatProjectContext: params.useChatProjectContext,
+>>>>>>> upstream/main
         accessibleSkillIds: scopedSkillIds,
         skillAuthoringAvailable: params.computeSkillAuthoringAvailable?.(agent, scopedSkillIds),
         skillStates: params.skillStates,
@@ -268,6 +300,11 @@ async function initializeReferencedAgent(
         codeEnvAvailable: params.codeEnvAvailable,
         fileSearchAvailable: params.fileSearchAvailable,
         resolveWebSearchGrant: params.resolveWebSearchGrant,
+<<<<<<< HEAD
+=======
+        resolveLinkedInstructions: params.resolveLinkedInstructions,
+        recordLinkedPromptUsage: params.recordLinkedPromptUsage,
+>>>>>>> upstream/main
         backgroundToolsAvailable: params.backgroundToolsAvailable,
         toolIntentsAvailable: params.toolIntentsAvailable,
         statefulSessionsAvailable: params.statefulSessionsAvailable,
@@ -429,11 +466,25 @@ export async function discoverConnectedAgents(
     onAgentSkipped?.(agentId);
   };
 
+<<<<<<< HEAD
   const processAgent = async (agentId: string): Promise<Agent | null> => {
     const loaded = await initializeReferencedAgent(agentId, params, {
       ...deps,
       onAgentSkipped: markSkipped,
     });
+=======
+  const loadAgent = (agentId: string): ReturnType<typeof initializeReferencedAgent> =>
+    initializeReferencedAgent(agentId, params, {
+      ...deps,
+      onAgentSkipped: markSkipped,
+    });
+
+  /** Side effects are applied in discovery order so merges stay deterministic. */
+  const applyLoaded = (
+    agentId: string,
+    loaded: Awaited<ReturnType<typeof initializeReferencedAgent>>,
+  ): Agent | null => {
+>>>>>>> upstream/main
     if (!loaded) {
       return null;
     }
@@ -452,6 +503,12 @@ export async function discoverConnectedAgents(
     return agent;
   };
 
+<<<<<<< HEAD
+=======
+  const processAgent = async (agentId: string): Promise<Agent | null> =>
+    applyLoaded(agentId, await loadAgent(agentId));
+
+>>>>>>> upstream/main
   const checkAgentInit = (agentId: string): boolean =>
     agentId === primaryConfig.id || agentConfigs.has(agentId);
 
@@ -462,6 +519,7 @@ export async function discoverConnectedAgents(
 
   collectEdges(primaryConfig.edges);
 
+<<<<<<< HEAD
   while (agentsToProcess.size > 0) {
     const agentId = agentsToProcess.values().next().value as string;
     agentsToProcess.delete(agentId);
@@ -476,6 +534,55 @@ export async function discoverConnectedAgents(
       }
       logger.error(`[discoverConnectedAgents] Error processing agent ${agentId}:`, err);
       markSkipped(agentId);
+=======
+  const loadDiscovered = createConcurrencyLimiter(
+    getLookupConcurrency(params.req.config, 'connectedAgentLoads'),
+  );
+  while (agentsToProcess.size > 0) {
+    /** One BFS level: agents already queued are independent, so load them together
+     *  and fold results back in queue order. Edges they expose form the next level. */
+    const level = [...agentsToProcess];
+    agentsToProcess.clear();
+    /** Outcomes never reject; a fatal error also rejects `fatal`, so it surfaces as soon
+     *  as it happens instead of after earlier, slower siblings finish. */
+    let rejectFatal: (error: unknown) => void = () => undefined;
+    const fatal = new Promise<never>((_, reject) => {
+      rejectFatal = reject;
+    });
+    fatal.catch(() => undefined);
+    const outcomes = level.map((agentId) =>
+      loadDiscovered(async () => {
+        try {
+          return { loaded: await loadAgent(agentId) };
+        } catch (error) {
+          if (isFatalAgentInitializationError(error, { signal: params.signal })) {
+            rejectFatal(error);
+          }
+          return { error };
+        }
+      }),
+    );
+    /** Stage every loaded config before collecting edges, so a sibling referenced by
+     *  another member of the level is not queued a second time. */
+    const loadedAgents: Array<Agent | null> = [];
+    for (let index = 0; index < level.length; index++) {
+      const agentId = level[index];
+      const outcome = await Promise.race([outcomes[index], fatal]);
+      if ('error' in outcome) {
+        if (isFatalAgentInitializationError(outcome.error, { signal: params.signal })) {
+          throw outcome.error;
+        }
+        logger.error(`[discoverConnectedAgents] Error processing agent ${agentId}:`, outcome.error);
+        markSkipped(agentId);
+        continue;
+      }
+      loadedAgents.push(applyLoaded(agentId, outcome.loaded));
+    }
+    for (const agent of loadedAgents) {
+      if (agent?.edges?.length) {
+        collectEdges(agent.edges);
+      }
+>>>>>>> upstream/main
     }
   }
 

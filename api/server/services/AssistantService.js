@@ -4,13 +4,19 @@ const { sendEvent } = require('@librechat/api');
 const { logger } = require('@librechat/data-schemas');
 const {
   StepTypes,
+<<<<<<< HEAD
   RunStatus,
+=======
+>>>>>>> upstream/main
   StepStatus,
   ContentTypes,
   ToolCallTypes,
   imageGenTools,
   EModelEndpoint,
+<<<<<<< HEAD
   defaultOrderQuery,
+=======
+>>>>>>> upstream/main
 } = require('librechat-data-provider');
 const { retrieveAndProcessFile } = require('~/server/services/Files/process');
 const { processRequiredActions } = require('~/server/services/ToolService');
@@ -78,6 +84,7 @@ async function createOnTextProgress({
 }
 
 /**
+<<<<<<< HEAD
  * Retrieves the response from an OpenAI run.
  *
  * @param {Object} params - The parameters for getting the response.
@@ -116,6 +123,8 @@ async function getResponse({ openai, run_id, thread_id }) {
 }
 
 /**
+=======
+>>>>>>> upstream/main
  * Filters the steps to keep only the most recent instance of each unique step.
  * @param {RunStep[]} steps - The array of RunSteps to filter.
  * @return {RunStep[]} The filtered array of RunSteps.
@@ -369,6 +378,7 @@ async function runAssistant({
       logger.debug(`[runAssistant] Final step for ${run_id} with status ${runStatus}`, step);
 
       const promises = [];
+<<<<<<< HEAD
       // promises.push(
       //   openai.beta.threads.messages.list(thread_id, defaultOrderQuery),
       // );
@@ -377,6 +387,8 @@ async function runAssistant({
       // for (const stepPromise of finalSteps) {
       //   promises.push(stepPromise);
       // }
+=======
+>>>>>>> upstream/main
 
       // loop across all statuses
       for (const [_status, stepsPromises] of Object.entries(stepsByStatus)) {
@@ -395,8 +407,11 @@ async function runAssistant({
         }
       }
       await in_progress({ step });
+<<<<<<< HEAD
       // const res = resolved.shift();
       // messages = messages.concat(res.data.filter((msg) => msg && msg.run_id === run_id));
+=======
+>>>>>>> upstream/main
       resolved.push(step);
       /* Note: no issues without deep cloning, but it's safer to do so */
       steps = klona(finalSteps);
@@ -418,8 +433,11 @@ async function runAssistant({
   });
 
   if (!run.required_action) {
+<<<<<<< HEAD
     // const { messages: sortedMessages, text } = await processMessages(openai, messages);
     // return { run, steps, messages: sortedMessages, text };
+=======
+>>>>>>> upstream/main
     const sortedMessages = messages.sort((a, b) => a.created_at - b.created_at);
     return {
       run,
@@ -461,7 +479,10 @@ async function runAssistant({
 }
 
 module.exports = {
+<<<<<<< HEAD
   getResponse,
+=======
+>>>>>>> upstream/main
   runAssistant,
   createOnTextProgress,
 };

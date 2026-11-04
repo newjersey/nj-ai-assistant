@@ -4,6 +4,10 @@ import { Tools, MemoryScope, ArtifactModes, AgentCapabilities } from 'librechat-
 import type { TranslationKeys } from '~/hooks/useLocalize';
 import type { AgentForm, ExtendedFile } from '~/common';
 import type { BuiltinId } from '../../items/types';
+<<<<<<< HEAD
+=======
+import OrchestrationHub from '../../../Advanced/OrchestrationHub';
+>>>>>>> upstream/main
 import { useVerifyAgentToolAuth } from '~/data-provider';
 import CodeBackground from '../../../Code/Background';
 import CodeSettings from '../../../Code/Settings';
@@ -22,10 +26,20 @@ interface Props {
   description?: string;
 }
 
+<<<<<<< HEAD
+=======
+const ARTIFACTS_CUSTOM_DOCS_URL =
+  'https://www.librechat.ai/docs/features/artifacts#custom-instructions';
+
+>>>>>>> upstream/main
 const ARTIFACT_MODES: Array<{
   value: string;
   labelKey: TranslationKeys;
   infoKey?: TranslationKeys;
+<<<<<<< HEAD
+=======
+  docs?: { url: string; labelKey: TranslationKeys };
+>>>>>>> upstream/main
 }> = [
   {
     value: ArtifactModes.DEFAULT,
@@ -41,6 +55,10 @@ const ARTIFACT_MODES: Array<{
     value: ArtifactModes.CUSTOM,
     labelKey: 'com_ui_artifacts_mode_custom',
     infoKey: 'com_ui_artifacts_mode_custom_info',
+<<<<<<< HEAD
+=======
+    docs: { url: ARTIFACTS_CUSTOM_DOCS_URL, labelKey: 'com_ui_artifacts_mode_custom_docs' },
+>>>>>>> upstream/main
   },
 ];
 
@@ -59,7 +77,11 @@ function ArtifactsConfig({ value, onChange }: ArtifactsConfigProps) {
 
   return (
     <div className="flex flex-col gap-3">
+<<<<<<< HEAD
       <span id="artifacts-mode-label" className="text-sm font-medium text-text-primary">
+=======
+      <span id="artifacts-mode-label" className="text-text-primary text-sm font-medium">
+>>>>>>> upstream/main
         {localize('com_ui_artifacts_mode')}
       </span>
       <Radio
@@ -70,7 +92,27 @@ function ArtifactsConfig({ value, onChange }: ArtifactsConfigProps) {
         aria-labelledby="artifacts-mode-label"
       />
       {active?.infoKey ? (
+<<<<<<< HEAD
         <p className="text-sm leading-relaxed text-text-secondary">{localize(active.infoKey)}</p>
+=======
+        <p className="text-text-secondary text-sm leading-relaxed">
+          {localize(active.infoKey)}
+          {active.docs ? (
+            <>
+              {' '}
+              <a
+                href={active.docs.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={localize(active.docs.labelKey)}
+                className="text-link hover:text-link-hover underline"
+              >
+                {localize('com_ui_learn_more')}
+              </a>
+            </>
+          ) : null}
+        </p>
+>>>>>>> upstream/main
       ) : null}
     </div>
   );
@@ -94,19 +136,31 @@ function MemoryConfig({ value, onChange }: MemoryConfigProps) {
           onCheckedChange={(checked) =>
             onChange(checked === true ? MemoryScope.agent : MemoryScope.user)
           }
+<<<<<<< HEAD
           className="relative float-left mr-2 inline-flex h-4 w-4 cursor-pointer"
+=======
+          className="relative float-start me-2 inline-flex cursor-pointer"
+>>>>>>> upstream/main
           value={isolated.toString()}
           aria-labelledby="memory-scope-label"
         />
         <label
           id="memory-scope-label"
           htmlFor="memory-scope-checkbox"
+<<<<<<< HEAD
           className="cursor-pointer text-sm font-medium text-text-primary"
+=======
+          className="text-text-primary cursor-pointer text-sm font-medium"
+>>>>>>> upstream/main
         >
           {localize('com_agents_memory_scope')}
         </label>
       </div>
+<<<<<<< HEAD
       <p className="text-sm leading-relaxed text-text-secondary">
+=======
+      <p className="text-text-secondary text-sm leading-relaxed">
+>>>>>>> upstream/main
         {localize('com_agents_memory_scope_info')}
       </p>
     </div>
@@ -142,7 +196,13 @@ export default function BuiltinSection({
 
   let body: React.ReactNode = null;
 
+<<<<<<< HEAD
   if (builtinId === 'execute_code') {
+=======
+  if (builtinId === 'subagents' || builtinId === 'handoffs') {
+    body = <OrchestrationHub currentAgentId={agentId} tool={builtinId} />;
+  } else if (builtinId === 'execute_code') {
+>>>>>>> upstream/main
     body = (
       <div className="flex flex-col gap-4">
         <CodeSettings />
@@ -172,12 +232,23 @@ export default function BuiltinSection({
     );
   }
 
+<<<<<<< HEAD
   const localizedDescription = description ? localize(description as TranslationKeys) : '';
+=======
+  const localizedDescription =
+    description && builtinId !== 'subagents' && builtinId !== 'handoffs'
+      ? localize(description as TranslationKeys)
+      : '';
+>>>>>>> upstream/main
 
   return (
     <div className="flex flex-col gap-5">
       {localizedDescription && (
+<<<<<<< HEAD
         <p className="text-sm leading-relaxed text-text-secondary">{localizedDescription}</p>
+=======
+        <p className="text-text-secondary text-sm leading-relaxed">{localizedDescription}</p>
+>>>>>>> upstream/main
       )}
       {body}
     </div>

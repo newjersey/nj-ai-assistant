@@ -15,6 +15,11 @@
     "isolatedModules": true,
     "noImplicitAny": false,
     "noEmit": true,
+<<<<<<< HEAD
+=======
+    "types": ["node", "jest", "@testing-library/jest-dom", "vite/client"],
+    "noUncheckedSideEffectImports": false,
+>>>>>>> upstream/main
     "jsx": "preserve",
     "paths": {
       "~/*": ["./src/*"],
@@ -23,7 +28,10 @@
       "librechat-data-provider/*": ["../packages/data-provider/*"]
     }
   },
+<<<<<<< HEAD
   "types": ["node", "jest", "@testing-library/jest-dom"],
+=======
+>>>>>>> upstream/main
   "exclude": ["node_modules", "vite.config.ts"],
   "include": [
     "src/**/*",

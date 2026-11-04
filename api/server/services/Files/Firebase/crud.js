@@ -5,9 +5,18 @@ const fetch = require('node-fetch');
 const { logger } = require('@librechat/data-schemas');
 const {
   deleteRagFile,
+<<<<<<< HEAD
   getFirebaseStorage,
   assertRemoteFileURL,
   getSafeErrorMetadata,
+=======
+  createOwnedBlobFileDeleter,
+  extractFirebaseBlobPath,
+  getFirebaseStorage,
+  assertRemoteFileURL,
+  getSafeErrorMetadata,
+  getOutboundTimeoutMs,
+>>>>>>> upstream/main
   getRemoteFileFetchMaxBytes,
   getRemoteFileFetchTimeoutMs,
   assertRemoteFileContentLength,
@@ -153,6 +162,7 @@ async function saveBufferToFirebase({ userId, buffer, fileName, basePath = 'imag
  * @param {string} urlString - The Firebase Storage URL.
  * @returns {string} The decoded file path.
  */
+<<<<<<< HEAD
 function extractFirebaseFilePath(urlString) {
   try {
     const url = new URL(urlString);
@@ -173,6 +183,8 @@ function extractFirebaseFilePath(urlString) {
   }
 }
 
+=======
+>>>>>>> upstream/main
 /**
  * Deletes a file from Firebase storage. This function determines the filepath from the
  * Firebase storage URL via regex for deletion. Validated by the user's ID.
@@ -185,6 +197,7 @@ function extractFirebaseFilePath(urlString) {
  *          A promise that resolves when the file has been successfully deleted from Firebase storage.
  *          Throws an error if there is an issue with deletion.
  */
+<<<<<<< HEAD
 const deleteFirebaseFile = async (req, file) => {
   await deleteRagFile({ userId: req.user.id, file });
 
@@ -202,6 +215,15 @@ const deleteFirebaseFile = async (req, file) => {
     throw error;
   }
 };
+=======
+const deleteFirebaseFile = (req, file) =>
+  createOwnedBlobFileDeleter({
+    extractPath: extractFirebaseBlobPath,
+    deleteBlob: (filepath) => deleteFile('', filepath),
+    isMissing: (error) => error?.code === 'storage/object-not-found',
+    deleteRagFile,
+  })(req, file);
+>>>>>>> upstream/main
 
 /**
  * Uploads a file to Firebase Storage.
@@ -246,11 +268,19 @@ async function uploadFileToFirebase({ req, file, file_id }) {
 /**
  * Retrieves a readable stream for a file from Firebase storage.
  *
+<<<<<<< HEAD
  * @param {ServerRequest} _req
  * @param {string} filepath - The filepath.
  * @returns {Promise<ReadableStream>} A readable stream of the file.
  */
 async function getFirebaseFileStream(_req, filepath, { signal } = {}) {
+=======
+ * @param {ServerRequest} req
+ * @param {string} filepath - The filepath.
+ * @returns {Promise<ReadableStream>} A readable stream of the file.
+ */
+async function getFirebaseFileStream(req, filepath, { signal } = {}) {
+>>>>>>> upstream/main
   try {
     const storage = getFirebaseStorage();
     if (!storage) {
@@ -261,6 +291,11 @@ async function getFirebaseFileStream(_req, filepath, { signal } = {}) {
       method: 'get',
       url: filepath,
       responseType: 'stream',
+<<<<<<< HEAD
+=======
+      /** Idle socket time only: a long download that keeps flowing is not cut off. */
+      timeout: getOutboundTimeoutMs(req?.config, 'imageFetchMs'),
+>>>>>>> upstream/main
       signal,
     });
 

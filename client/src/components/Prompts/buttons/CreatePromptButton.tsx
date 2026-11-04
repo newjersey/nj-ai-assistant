@@ -25,9 +25,15 @@ export default function CreatePromptButton() {
           side="bottom"
           render={
             <Button
+<<<<<<< HEAD
               variant="outline"
               size="icon"
               className="size-9 shrink-0 bg-transparent"
+=======
+              variant="ghost"
+              size="icon"
+              className="size-8 shrink-0"
+>>>>>>> upstream/main
               aria-label={localize('com_ui_create_prompt')}
               onClick={() => setIsDialogOpen(true)}
             >

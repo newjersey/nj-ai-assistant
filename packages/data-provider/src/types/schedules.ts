@@ -1,4 +1,9 @@
 import { z } from 'zod';
+<<<<<<< HEAD
+=======
+import { scheduledMCPFailureReasonSchema } from './scheduleConsent';
+import { partialWithoutDefaults } from '../zod';
+>>>>>>> upstream/main
 
 /** Cadences the dialog builds from structured pickers (hour, minute, weekday). */
 export const scheduleStructuredFrequencies = ['hourly', 'daily', 'weekdays', 'weekly'] as const;
@@ -101,6 +106,7 @@ export const createSchedulePayloadSchema = z.object({
 export type TCreateSchedule = z.infer<typeof createSchedulePayloadSchema>;
 
 /** Idempotency is a property of the CREATE attempt, not of the schedule's config. */
+<<<<<<< HEAD
 export const updateSchedulePayloadSchema = createSchedulePayloadSchema
   .omit({ clientRequestId: true })
   .partial()
@@ -114,6 +120,20 @@ export const updateSchedulePayloadSchema = createSchedulePayloadSchema
      */
     expectedConfigRevision: z.number().int().min(0).optional(),
   });
+=======
+export const updateSchedulePayloadSchema = partialWithoutDefaults(
+  createSchedulePayloadSchema.omit({ clientRequestId: true }),
+).extend({
+  /**
+   * The configRevision the client's edit was computed from (captured when the
+   * dialog opened). The server fences the update on it, so a concurrent edit
+   * from another tab answers 409 instead of being silently overwritten by a
+   * payload rebuilt from a stale snapshot (cadence is sent whole, so the
+   * server-side fresh-read fence alone cannot detect this).
+   */
+  expectedConfigRevision: z.number().int().min(0).optional(),
+});
+>>>>>>> upstream/main
 export type TUpdateSchedule = z.infer<typeof updateSchedulePayloadSchema>;
 
 export type TScheduleLastRun = {
@@ -125,6 +145,10 @@ export type TScheduleLastRun = {
 };
 
 export type TSchedule = {
+<<<<<<< HEAD
+=======
+  hasMCPConsent?: boolean;
+>>>>>>> upstream/main
   id: string;
   user: string;
   name: string;
@@ -171,6 +195,10 @@ export type TScheduleRun = {
  *  per-principal `interface.schedules` resolution the write handlers and the fire
  *  path enforce, so the form can never offer a choice the server would refuse. */
 export type TScheduleLimits = {
+<<<<<<< HEAD
+=======
+  mcpConsent?: boolean;
+>>>>>>> upstream/main
   maxPerUser: number;
   /** Served with the list so the dialog can refuse a cadence the floor would reject
    *  rather than surfacing it as a 400 after submit. */
@@ -193,6 +221,17 @@ export type TScheduleRunNowResponse = {
   status: 'started';
 };
 
+<<<<<<< HEAD
+=======
+/** A durable invocation receipt, not a readiness snapshot or an arbitrary tool error. */
+export function isScheduleMCPAuthorizationFailure(outcome: ScheduleMCPOutcome): boolean {
+  return (
+    outcome.detail === 'unattended_auth_required' ||
+    (outcome.status !== 'ready' && outcome.reason != null && outcome.automaticReplay === false)
+  );
+}
+
+>>>>>>> upstream/main
 /** Only structured schedule preflight failures may request immediate suspension. */
 export function getScheduleMCPDisabledReason(
   outcomes?: ScheduleMCPOutcome[],
@@ -209,6 +248,14 @@ export const scheduleMCPOutcomeSchema = z.object({
   /** Agent whose selected tool requires this server. Used to open the correct
    * recovery chat when the requirement belongs to a handoff or subagent. */
   agentId: z.string().optional(),
+<<<<<<< HEAD
+=======
+  /** Additional diagnosis; older clients ignore unknown keys and retain the known status. */
+  detail: z.enum(['unattended_auth_required']).optional(),
+  reason: scheduledMCPFailureReasonSchema.optional(),
+  recovery: z.enum(['authorize', 'configure', 'restore_permission', 'retry_later']).optional(),
+  automaticReplay: z.literal(false).optional(),
+>>>>>>> upstream/main
   status: z.enum([
     'ready',
     'mcp_reauth_required',
@@ -235,3 +282,55 @@ export function readScheduleMCPOutcomes(error?: string): ScheduleMCPOutcome[] {
     return [];
   }
 }
+<<<<<<< HEAD
+=======
+
+/** Verified generation evidence only; never infer authorization from this projection. */
+export function readScheduleMCPReceipts(error?: string): ScheduleMCPOutcome[] {
+  return readScheduleMCPOutcomes(error).filter(isScheduleMCPAuthorizationFailure);
+}
+export function mergeScheduleMCPReceipts(
+  ...groups: readonly ScheduleMCPOutcome[][]
+): ScheduleMCPOutcome[] {
+  const merged = new Map<string, ScheduleMCPOutcome>();
+  for (const group of groups)
+    for (const outcome of group) {
+      const key = JSON.stringify([
+        outcome.server,
+        outcome.agentId,
+        outcome.status,
+        outcome.reason,
+        outcome.recovery,
+        outcome.detail,
+        outcome.automaticReplay,
+      ]);
+      merged.set(key, outcome);
+    }
+  return Array.from(merged.values());
+}
+export interface ScheduleMCPReceiptProjection {
+  status:
+    | 'success'
+    | 'error'
+    | 'requires_action'
+    | 'interrupted'
+    | 'skipped_balance'
+    | 'skipped_overlap';
+  error?: string;
+  mcp?: ScheduleMCPOutcome[];
+}
+/** A known denial dominates every ending, including paused and interrupted recovery. */
+export function projectScheduleMCPReceipt<S extends ScheduleMCPReceiptProjection['status']>(
+  outcome: Omit<ScheduleMCPReceiptProjection, 'status'> & { status: S },
+  ...receipts: readonly ScheduleMCPOutcome[][]
+): Omit<ScheduleMCPReceiptProjection, 'status'> & { status: S | 'error' } {
+  const mcp = mergeScheduleMCPReceipts(outcome.mcp ?? [], ...receipts);
+  const denied = mcp.some(isScheduleMCPAuthorizationFailure);
+  if (!denied) return { ...outcome, ...(mcp.length > 0 && { mcp }) };
+  return {
+    status: 'error',
+    mcp,
+    error: `${getScheduleMCPDisabledReason(mcp) ?? 'mcp_unavailable'}: ${JSON.stringify(mcp)}`,
+  };
+}
+>>>>>>> upstream/main

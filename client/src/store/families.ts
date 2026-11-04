@@ -3,7 +3,10 @@ import { createSearchParams } from 'react-router-dom';
 import { LocalStorageKeys, isEphemeralAgentId, Constants } from 'librechat-data-provider';
 import {
   atom,
+<<<<<<< HEAD
   selector,
+=======
+>>>>>>> upstream/main
   atomFamily,
   DefaultValue,
   selectorFamily,
@@ -11,6 +14,7 @@ import {
   useSetRecoilState,
   useRecoilCallback,
 } from 'recoil';
+<<<<<<< HEAD
 import type {
   EModelEndpoint,
   TConversation,
@@ -20,6 +24,9 @@ import type {
 } from 'librechat-data-provider';
 import type { GenerationProtocolVersion } from '~/data-provider/SSE/protocol';
 import type { TOptionSettings, ExtendedFile } from '~/common';
+=======
+import type { EModelEndpoint, TConversation } from 'librechat-data-provider';
+>>>>>>> upstream/main
 import {
   clearModelForNonEphemeralAgent,
   createChatSearchParams,
@@ -28,6 +35,7 @@ import {
 } from '~/utils';
 import { useSetConvoContext } from '~/Providers/SetConvoContext';
 
+<<<<<<< HEAD
 const submissionKeysAtom = atom<(string | number)[]>({
   key: 'submissionKeys',
   default: [],
@@ -67,6 +75,8 @@ const submissionKeysSelector = selector<(string | number)[]>({
   },
 });
 
+=======
+>>>>>>> upstream/main
 const conversationByIndex = atomFamily<TConversation | null, string | number>({
   key: 'conversationByIndex',
   default: null,
@@ -137,16 +147,20 @@ const conversationByIndex = atomFamily<TConversation | null, string | number>({
   ] as const,
 });
 
+<<<<<<< HEAD
 const filesByIndex = atomFamily<Map<string, ExtendedFile>, string | number>({
   key: 'filesByIndex',
   default: new Map(),
 });
 
+=======
+>>>>>>> upstream/main
 const conversationKeysAtom = atom<(string | number)[]>({
   key: 'conversationKeys',
   default: [],
 });
 
+<<<<<<< HEAD
 const allConversationsSelector = selector({
   key: 'allConversationsSelector',
   get: ({ get }) => {
@@ -155,6 +169,8 @@ const allConversationsSelector = selector({
   },
 });
 
+=======
+>>>>>>> upstream/main
 const conversationIdByIndex = selectorFamily<string | null, string | number>({
   key: 'conversationIdByIndex',
   get:
@@ -214,6 +230,7 @@ const conversationAssistantIdByIndex = selectorFamily<string | null, string | nu
       get(conversationByIndex(index))?.assistant_id ?? null,
 });
 
+<<<<<<< HEAD
 const presetByIndex = atomFamily<TPreset | null, string | number>({
   key: 'presetByIndex',
   default: null,
@@ -279,6 +296,8 @@ const showPopoverFamily = atomFamily({
   default: false,
 });
 
+=======
+>>>>>>> upstream/main
 const activePromptByIndex = atomFamily<string | undefined, string | number | null>({
   key: 'activePromptByIndex',
   default: undefined,
@@ -300,6 +319,7 @@ const showPromptsPopoverFamily = atomFamily<boolean, string | number | null>({
 });
 
 /**
+<<<<<<< HEAD
  * Per-conversation queue of skill names the user invoked manually via the
  * `$` popover for the next submission. Structured channel that the submit
  * pipeline (`useChatFunctions.ask`) drains and pins onto the user message's
@@ -328,6 +348,8 @@ const pendingQuotesByConvoId = atomFamily<string[], string>({
 });
 
 /**
+=======
+>>>>>>> upstream/main
  * Text handed to a conversation's composer by a surface the user is leaving —
  * today, a subagent thread continued into a chat of its own, where the panel
  * and its composer unmount as the destination opens.
@@ -346,6 +368,7 @@ const pendingComposerTextByConvoId = atomFamily<string | undefined, string>({
   default: undefined,
 });
 
+<<<<<<< HEAD
 /**
  * A steer message submitted mid-run. Server truth: `sending` covers the POST
  * in flight, `pending` means the server queued it (awaiting its injection
@@ -653,6 +676,8 @@ const activeGenerationProtocolVersionByConvoId = atomFamily<GenerationProtocolVe
   default: 1,
 });
 
+=======
+>>>>>>> upstream/main
 const globalAudioURLFamily = atomFamily<string | null, string | number | null>({
   key: 'globalAudioURLByIndex',
   default: null,
@@ -668,11 +693,14 @@ const globalAudioPlayingFamily = atomFamily<boolean, string | number | null>({
   default: false,
 });
 
+<<<<<<< HEAD
 const activeRunFamily = atomFamily<string | null, string | number | null>({
   key: 'activeRunByIndex',
   default: null,
 });
 
+=======
+>>>>>>> upstream/main
 const audioRunFamily = atomFamily<string | null, string | number | null>({
   key: 'audioRunByIndex',
   default: null,
@@ -731,6 +759,7 @@ function useClearConvoState() {
 
 const conversationByKeySelector = conversationByIndex;
 
+<<<<<<< HEAD
 function useClearSubmissionState() {
   const clearAllSubmissions = useRecoilCallback(
     ({ reset, set, snapshot }) =>
@@ -755,6 +784,8 @@ function useClearSubmissionState() {
   return clearAllSubmissions;
 }
 
+=======
+>>>>>>> upstream/main
 const updateConversationSelector = selectorFamily({
   key: 'updateConversationSelector',
   get: () => () => null as Partial<TConversation> | null,
@@ -783,6 +814,7 @@ const updateConversationSelector = selectorFamily({
 export default {
   conversationKeysAtom,
   conversationByIndex,
+<<<<<<< HEAD
   filesByIndex,
   presetByIndex,
   submissionByIndex,
@@ -795,6 +827,8 @@ export default {
   showPopoverFamily,
   anySubmittingSelector,
   allConversationsSelector,
+=======
+>>>>>>> upstream/main
   conversationIdByIndex,
   conversationEndpointByIndex,
   effectiveEndpointByIndex,
@@ -808,12 +842,16 @@ export default {
   useSetConversationAtom,
   showMentionPopoverFamily,
   globalAudioURLFamily,
+<<<<<<< HEAD
   activeRunFamily,
+=======
+>>>>>>> upstream/main
   audioRunFamily,
   globalAudioPlayingFamily,
   globalAudioFetchingFamily,
   showPlusPopoverFamily,
   activePromptByIndex,
+<<<<<<< HEAD
   useClearSubmissionState,
   showPromptsPopoverFamily,
   pendingComposerTextByConvoId,
@@ -832,5 +870,9 @@ export default {
   acceptedSteerClientIdsByConvoId,
   activeGenerationCreatedAtByConvoId,
   activeGenerationProtocolVersionByConvoId,
+=======
+  showPromptsPopoverFamily,
+  pendingComposerTextByConvoId,
+>>>>>>> upstream/main
   updateConversationSelector,
 };

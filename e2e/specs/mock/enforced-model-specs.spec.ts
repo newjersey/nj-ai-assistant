@@ -4,6 +4,10 @@ import type { Page } from '@playwright/test';
 import {
   MOCK_ENDPOINTS,
   NEW_CHAT_PATH,
+<<<<<<< HEAD
+=======
+  escapeRegExp,
+>>>>>>> upstream/main
   getAccessToken,
   messagesView,
   replyPrompt,
@@ -31,7 +35,11 @@ async function createProject(page: Page, name: string): Promise<string> {
   await dialog.getByRole('textbox', { name: 'Project name' }).fill(name);
   await dialog.getByRole('button', { name: 'Create project' }).click();
 
+<<<<<<< HEAD
   await expect(page.getByRole('heading', { name })).toBeVisible();
+=======
+  await expect(page.getByRole('heading', { name: new RegExp(escapeRegExp(name)) })).toBeVisible();
+>>>>>>> upstream/main
   const projectId = new URL(page.url()).pathname.split('/projects/')[1];
   expect(projectId).toBeTruthy();
   return projectId;

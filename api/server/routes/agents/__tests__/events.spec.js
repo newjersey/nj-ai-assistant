@@ -46,6 +46,10 @@ jest.mock('~/server/services/Agents/triggers', () => ({
 jest.mock('~/server/middleware', () => ({
   agentEventUserLimiter: (_req, _res, next) => next(),
   configMiddleware: (_req, _res, next) => next(),
+<<<<<<< HEAD
+=======
+  requireTermsAcceptance: (_req, _res, next) => next(),
+>>>>>>> upstream/main
 }));
 
 jest.mock('../middleware', () => ({

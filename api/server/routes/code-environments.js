@@ -1,15 +1,32 @@
 const express = require('express');
+<<<<<<< HEAD
 const {
   GenerationJobManager,
   createCodeEnvironmentHttpHandlers,
+=======
+const mongoose = require('mongoose');
+const {
+  GenerationJobManager,
+  createCodeEnvironmentHttpHandlers,
+  createCodeSetupRouter,
+>>>>>>> upstream/main
   codeEnvironmentPairingLimiter,
   codeEnvironmentStatusIpLimiter,
   codeEnvironmentStatusLimiter,
 } = require('@librechat/api');
+<<<<<<< HEAD
 const { SystemCapabilities } = require('@librechat/data-schemas');
 const { requireCapability } = require('~/server/middleware/roles/capabilities');
 const { getAppConfig, getCodeEnvironmentRegistry } = require('~/server/services/Config');
 const { requireJwtAuth } = require('~/server/middleware');
+=======
+const { SystemCapabilities, createBrowserSetupBackend } = require('@librechat/data-schemas');
+const { requireCapability } = require('~/server/middleware/roles/capabilities');
+const { getAppConfig, getCodeEnvironmentRegistry } = require('~/server/services/Config');
+const { requireJwtAuth, requireSameOrigin, checkBan } = require('~/server/middleware');
+const { ViolationTypes } = require('librechat-data-provider');
+const getLogStores = require('~/cache/getLogStores');
+>>>>>>> upstream/main
 const db = require('~/models');
 
 const router = express.Router();
@@ -21,7 +38,11 @@ function getHandlers() {
       registry: getCodeEnvironmentRegistry(),
       principalIsActive: db.isAgentTriggerPrincipalActive,
       conversations: {
+<<<<<<< HEAD
         get: db.getConvo,
+=======
+        get: db.getConvoCodeEnvironmentDecision,
+>>>>>>> upstream/main
         replaceDecision: db.replaceConvoCodeEnvironmentDecision,
       },
       generations: GenerationJobManager,
@@ -31,6 +52,21 @@ function getHandlers() {
 }
 const requireCodeEnvironmentManage = requireCapability(SystemCapabilities.MANAGE_CODE_ENVIRONMENTS);
 
+<<<<<<< HEAD
+=======
+router.use(
+  '/setup',
+  createCodeSetupRouter({
+    backend: createBrowserSetupBackend(mongoose),
+    getAppConfig,
+    registry: getCodeEnvironmentRegistry,
+    requireJwtAuth,
+    requireSameOrigin,
+    checkBan,
+    banStore: getLogStores(ViolationTypes.BAN),
+  }),
+);
+>>>>>>> upstream/main
 router.use(requireJwtAuth);
 router.get('/', (req, res, next) => getHandlers().list(req, res, next));
 router.post('/pairings', codeEnvironmentPairingLimiter, (req, res, next) =>

@@ -7,12 +7,20 @@ import {
   clearMessagesCache,
   clearArchivedConversationMessagesCache,
   clearDeletedConversationMessagesCache,
+<<<<<<< HEAD
   isValidTimestamp,
   getMessageAriaLabel,
   getMessageTimestamp,
   getHeaderPrefixForScreenReader,
   areMessageFieldsEqual,
   areMessageRowPropsEqual,
+=======
+  getMessageAriaLabel,
+  getHeaderPrefixForScreenReader,
+  areMessageFieldsEqual,
+  areMessageRowPropsEqual,
+  isSameTailRelation,
+>>>>>>> upstream/main
   isSubmittableMessage,
   createDualMessageContent,
 } from '../messages';
@@ -222,6 +230,7 @@ describe('getHeaderPrefixForScreenReader', () => {
   });
 });
 
+<<<<<<< HEAD
 describe('isValidTimestamp', () => {
   it('returns false for missing values', () => {
     expect(isValidTimestamp(undefined)).toBe(false);
@@ -289,6 +298,8 @@ describe('getMessageTimestamp', () => {
   });
 });
 
+=======
+>>>>>>> upstream/main
 const noop = () => {};
 /** Shared content reference so the baseline compares equal on `content` (which
  *  the comparator diffs BY REFERENCE); the mutation below hands a fresh array. */
@@ -326,6 +337,10 @@ const FIELD_MUTATIONS: Array<[string, Partial<TMessage>]> = [
   ['createdAt', { createdAt: '2026-07-02T00:00:00.000Z' }],
   ['depth', { depth: 3 }],
   ['isCreatedByUser', { isCreatedByUser: true }],
+<<<<<<< HEAD
+=======
+  ['isUserSubmitted', { isUserSubmitted: true }],
+>>>>>>> upstream/main
   ['children length', { children: [makeFieldsMsg(), makeFieldsMsg()] }],
   ['content reference', { content: [] as TMessage['content'] }],
   ['model', { model: 'gpt-5' }],
@@ -411,6 +426,45 @@ describe('areMessageRowPropsEqual', () => {
   });
 });
 
+<<<<<<< HEAD
+=======
+describe('isSameTailRelation', () => {
+  const tailProps = (
+    messageId: string,
+    depth: number,
+    latestMessageId: string | undefined,
+    latestMessageDepth: number | undefined,
+  ) => ({
+    message: makeMessage({ messageId, depth }),
+    latestMessageId,
+    latestMessageDepth,
+  });
+
+  it('ignores a tail move that neither reaches nor leaves the row', () => {
+    expect(isSameTailRelation(tailProps('a', 1, 'b', 3), tailProps('a', 1, 'c_', 5))).toBe(true);
+    expect(isSameTailRelation(tailProps('a', 1, 'c_', 5), tailProps('a', 1, 'c', 5))).toBe(true);
+  });
+
+  it('re-renders the row the tail leaves', () => {
+    expect(isSameTailRelation(tailProps('b', 3, 'b', 3), tailProps('b', 3, 'c_', 5))).toBe(false);
+  });
+
+  it('re-renders the row the tail reaches', () => {
+    expect(isSameTailRelation(tailProps('c', 5, 'c_', 5), tailProps('c', 5, 'c', 5))).toBe(false);
+  });
+
+  it('re-renders when the tail depth reaches or leaves the row depth', () => {
+    expect(isSameTailRelation(tailProps('x', 3, 'b', 3), tailProps('x', 3, 'c', 5))).toBe(false);
+  });
+
+  it('re-renders when the tail becomes known or unknown', () => {
+    expect(isSameTailRelation(tailProps('a', 1, 'b', 3), tailProps('a', 1, undefined, 3))).toBe(
+      false,
+    );
+  });
+});
+
+>>>>>>> upstream/main
 describe('isSubmittableMessage', () => {
   it('accepts non-whitespace text without files', () => {
     expect(isSubmittableMessage('Hello')).toBe(true);

@@ -6,8 +6,15 @@ const {
   countTokens,
   isAbortError,
   GenerationJobManager,
+<<<<<<< HEAD
   sanitizeMessageForTransmit,
   buildAbortedResponseMetadata,
+=======
+  abortOwnedGeneration,
+  sanitizeMessageForTransmit,
+  buildAbortedResponseMetadata,
+  announceReply,
+>>>>>>> upstream/main
 } = require('@librechat/api');
 const { truncateText, smartTruncateText } = require('~/app/clients/prompts');
 const clearPendingReq = require('~/cache/clearPendingReq');
@@ -30,8 +37,13 @@ async function abortMessage(req, res) {
   const conversationId = abortKey?.split(':')?.[0] ?? req.user.id;
   const userId = req.user.id;
 
+<<<<<<< HEAD
   // Use GenerationJobManager to abort the job (streamId === conversationId)
   const abortResult = await GenerationJobManager.abortJob(conversationId);
+=======
+  // streamId === conversationId; only the job's owner may stop it
+  const abortResult = await abortOwnedGeneration(conversationId, req.user, GenerationJobManager);
+>>>>>>> upstream/main
 
   if (!abortResult.success) {
     if (!res.headersSent) {
@@ -78,7 +90,11 @@ async function abortMessage(req, res) {
    *  (`AgentClient` labels a stopped turn `'abort'`), so billing here would
    *  charge it a second time. This route only stops and persists. */
 
+<<<<<<< HEAD
   await db.saveMessage(
+=======
+  const savedMessage = await db.saveMessage(
+>>>>>>> upstream/main
     {
       userId: req?.user?.id,
       isTemporary: req?.resolvedConversation?.isTemporary ?? req?.body?.isTemporary,
@@ -89,6 +105,31 @@ async function abortMessage(req, res) {
     { context: 'api/server/middleware/abortMiddleware.js' },
   );
 
+<<<<<<< HEAD
+=======
+  /* Mirrors the agents abort route: when Stop wins the terminal claim, the request controller
+     can return before its own save, making this direct write the only one that could reach
+     the unseen-reply indicator. The assistants path stamps inside `syncMessages`; this one
+     saves the message directly, so the stamp rides along here. Best-effort: the row is
+     already durable, and a missed stamp must not suppress the final event.
+     The temporary flag comes from the job: the client's abort request carries only the abort
+     key and endpoint, so the request body alone would stamp a stopped temporary chat.
+     An interrupt before the first real token still persists the unfinished assistant row, but
+     that row renders nothing: stamping it would raise a dot for a reply with nothing to read,
+     and opening the conversation could never clear it. */
+  await announceReply(db, {
+    userId,
+    conversationId: jobData?.conversationId,
+    reply: {
+      messageId: savedMessage?.messageId,
+      content,
+      text,
+      isTemporary: (jobData?.isTemporary ?? req?.body?.isTemporary) === true,
+    },
+    context: 'abortMessage',
+  });
+
+>>>>>>> upstream/main
   // Get conversation for title
   const conversation = await db.getConvo(userId, conversationId);
 
@@ -103,15 +144,23 @@ async function abortMessage(req, res) {
           conversationId: jobData.userMessage.conversationId,
           text: jobData.userMessage.text,
           quotes: jobData.userMessage.quotes,
+<<<<<<< HEAD
+=======
+          reasoningOverride: jobData.userMessage.reasoningOverride,
+>>>>>>> upstream/main
           isCreatedByUser: true,
         })
       : null,
     responseMessage,
   };
 
+<<<<<<< HEAD
   logger.debug(
     `[abortMessage] ID: ${userId} | ${req.user.email} | Aborted request: ${conversationId}`,
   );
+=======
+  logger.debug(`[abortMessage] ID: ${userId} | Aborted request: ${conversationId}`);
+>>>>>>> upstream/main
 
   if (res.headersSent) {
     return sendEvent(res, finalEvent);

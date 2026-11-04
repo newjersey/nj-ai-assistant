@@ -82,7 +82,13 @@ test.describe('scheduled chat execution', () => {
    * where a broken loopback URL, a rejected fire token, or a lost schedule identity
    * surfaces. The smoke spec only proves the card renders.
    */
+<<<<<<< HEAD
   test('Run Now generates a conversation and records it on the schedule', async ({ page }) => {
+=======
+  test('Run Now generates a conversation and records it on the schedule @scenario:schedule-run-now', async ({
+    page,
+  }) => {
+>>>>>>> upstream/main
     test.setTimeout(120000);
     await page.goto('/c/new', { timeout: 15000 });
     const token = await getAccessToken(page);

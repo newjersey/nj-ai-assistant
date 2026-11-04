@@ -1,5 +1,8 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
+<<<<<<< HEAD
 import * as Popover from '@radix-ui/react-popover';
+=======
+>>>>>>> upstream/main
 import { useToastContext } from '@librechat/client';
 import { useQueryClient } from '@tanstack/react-query';
 import {
@@ -17,12 +20,24 @@ import type {
 } from 'librechat-data-provider';
 import type { UseMutationResult } from '@tanstack/react-query';
 import { useUploadAssistantAvatarMutation, useGetFileConfig } from '~/data-provider';
+<<<<<<< HEAD
 import { AssistantAvatar, NoImage, AvatarMenu } from './Images';
 import { useAssistantsMapContext } from '~/Providers';
+=======
+import { AvatarMenu } from '~/components/SidePanel/Agents/Images';
+import { useAssistantsMapContext } from '~/Providers';
+import { AssistantAvatar, NoImage } from './Images';
+>>>>>>> upstream/main
 // import { Spinner } from '@librechat/client';
 import { useLocalize } from '~/hooks';
 import { formatBytes } from '~/utils';
 
+<<<<<<< HEAD
+=======
+/** Assistants have no avatar reset, so the shared menu only offers the upload. */
+const noReset = () => undefined;
+
+>>>>>>> upstream/main
 function Avatar({
   endpoint,
   version,
@@ -39,7 +54,10 @@ function Avatar({
   // console.log('Avatar', assistant_id, metadata, createMutation);
   const queryClient = useQueryClient();
   const assistantsMap = useAssistantsMapContext();
+<<<<<<< HEAD
   const [menuOpen, setMenuOpen] = useState(false);
+=======
+>>>>>>> upstream/main
   const [progress, setProgress] = useState<number>(1);
   const [input, setInput] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -179,7 +197,10 @@ function Avatar({
       }
 
       setInput(file);
+<<<<<<< HEAD
       setMenuOpen(false);
+=======
+>>>>>>> upstream/main
 
       if (!assistant_id) {
         // wait for successful form submission before uploading avatar
@@ -205,6 +226,7 @@ function Avatar({
         status: 'error',
       });
     }
+<<<<<<< HEAD
 
     setMenuOpen(false);
   };
@@ -213,6 +235,14 @@ function Avatar({
     <Popover.Root open={menuOpen} onOpenChange={setMenuOpen}>
       <div className="flex w-full items-center justify-center gap-4">
         <Popover.Trigger asChild>
+=======
+  };
+
+  return (
+    <div className="flex w-full items-center justify-center gap-4">
+      <AvatarMenu
+        trigger={
+>>>>>>> upstream/main
           <button
             type="button"
             className="h-20 w-20"
@@ -220,10 +250,19 @@ function Avatar({
           >
             {previewUrl ? <AssistantAvatar url={previewUrl} progress={progress} /> : <NoImage />}
           </button>
+<<<<<<< HEAD
         </Popover.Trigger>
       </div>
       {<AvatarMenu handleFileChange={handleFileChange} />}
     </Popover.Root>
+=======
+        }
+        handleFileChange={handleFileChange}
+        onReset={noReset}
+        canReset={false}
+      />
+    </div>
+>>>>>>> upstream/main
   );
 }
 

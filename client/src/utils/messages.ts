@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import {
   QueryKeys,
   Constants,
@@ -28,6 +29,50 @@ export type BranchSiblingIndex = {
   siblingIdx: number;
 };
 
+=======
+import { getBranchSiblingIndexesForTarget } from '@librechat/chat';
+import { QueryKeys, Constants, buildTree, ContentTypes } from 'librechat-data-provider';
+import {
+  getPartKeyIndex,
+  isEmptyContentPart,
+  hasStreamStartFailed,
+  stripStreamedIndexStamps,
+  createDualMessageContent,
+  preserveStreamedContentIdentity,
+  STREAM_START_FAILED_METADATA_KEY,
+} from '@librechat/chat';
+import type { TMessage, TMessageContentParts } from 'librechat-data-provider';
+import type { BranchSiblingIndex } from '@librechat/chat';
+import type { QueryClient } from '@tanstack/react-query';
+import type { LocalizeFunction, TMessageProps } from '~/common';
+
+export {
+  getPartKeyIndex,
+  isEmptyContentPart,
+  hasStreamStartFailed,
+  stripStreamedIndexStamps,
+  createDualMessageContent,
+  preserveStreamedContentIdentity,
+  STREAM_START_FAILED_METADATA_KEY,
+};
+export const TEXT_KEY_DIVIDER = '|||';
+
+/** A locally submitted user row is not canonical until the server acknowledges it. */
+export function isUnacknowledgedUserMessage(message: TMessage): boolean {
+  return (
+    message.isCreatedByUser === true &&
+    message.clientTimestamp != null &&
+    message.createdAt == null &&
+    !message.privacyRevision
+  );
+}
+
+export { getBranchSiblingIndexesForTarget };
+export type { BranchSiblingIndex };
+
+type SiblingIndexLookup = (parentMessageId: string | null | undefined) => number;
+
+>>>>>>> upstream/main
 export const selectActiveBranchTail = (
   messages: TMessage[] | null | undefined,
   rootSiblingKey: string | null | undefined,
@@ -69,6 +114,7 @@ export const getMessageBranchSiblingParentIds = (
   }
 
   const parentIds = new Set<string | null>();
+<<<<<<< HEAD
   const collectBranchParents = (
     siblings: TMessage[] | undefined,
     parentMessageId: string | null | undefined,
@@ -139,6 +185,26 @@ export const getBranchSiblingIndexesForTarget = (
   return branchIndexes;
 };
 
+=======
+  const stack = [{ siblings: messagesTree, parentMessageId: rootSiblingKey, index: 0 }];
+  while (stack.length > 0) {
+    const frame = stack[stack.length - 1];
+    if (frame.index === 0 && frame.siblings.length > 1) {
+      parentIds.add(frame.parentMessageId ?? null);
+    }
+    const message = frame.siblings[frame.index++];
+    if (!message) {
+      stack.pop();
+      continue;
+    }
+    if (message.children?.length) {
+      stack.push({ siblings: message.children, parentMessageId: message.messageId, index: 0 });
+    }
+  }
+  return Array.from(parentIds);
+};
+
+>>>>>>> upstream/main
 export const getLatestText = (message?: TMessage | null, includeIndex?: boolean): string => {
   if (!message) {
     return '';
@@ -193,6 +259,7 @@ export const getAllContentText = (message?: TMessage | null): string => {
   return '';
 };
 
+<<<<<<< HEAD
 const getPartTextValue = (value?: string | { value?: string }): string =>
   (typeof value === 'string' ? value : value?.value) ?? '';
 
@@ -401,6 +468,9 @@ export const isSubmittableMessage = (text?: string | null, fileCount = 0): boole
 
 export const hasStreamStartFailed = (message?: Pick<TMessage, 'metadata'> | null): boolean =>
   message?.metadata?.[STREAM_START_FAILED_METADATA_KEY] === true;
+=======
+export { isSubmittableMessage } from '@librechat/chat';
+>>>>>>> upstream/main
 
 export const markStreamStartFailedMetadata = (
   metadata?: TMessage['metadata'],
@@ -409,6 +479,7 @@ export const markStreamStartFailedMetadata = (
   [STREAM_START_FAILED_METADATA_KEY]: true,
 });
 
+<<<<<<< HEAD
 const getLatestContentForKey = (message: TMessage): string => {
   const formatText = (str: string, index: number): string => {
     if (str.length === 0) {
@@ -489,6 +560,8 @@ export const getTextKey = (message?: TMessage | null, convoId?: string | null) =
   return `${(message.messageId as string | null) ?? ''}${TEXT_KEY_DIVIDER}${contentKey}${TEXT_KEY_DIVIDER}${message.conversationId ?? convoId}`;
 };
 
+=======
+>>>>>>> upstream/main
 export const scrollToEnd = (callback?: () => void) => {
   const messagesEndElement = document.getElementById('messages-end');
   if (messagesEndElement) {
@@ -604,6 +677,7 @@ export const getHeaderPrefixForScreenReader = (
     : `${localize('com_ui_response')}${suffix}: `;
 };
 
+<<<<<<< HEAD
 export type MessageTimestamp = {
   /** Localized relative time, e.g. "2 hours ago". */
   relative: string;
@@ -789,6 +863,10 @@ export const createDualMessageContent = (
   // that will be replaced by real content with proper types from the server
   return [primaryContent, addedContent] as unknown as TMessageContentParts[];
 };
+=======
+export { isValidTimestamp, getMessageTimestamp } from '@librechat/chat/components';
+export type { MessageTimestamp } from '@librechat/chat/components';
+>>>>>>> upstream/main
 
 export function areMessageFilesEqual(prevFiles?: TMessage['files'], nextFiles?: TMessage['files']) {
   if (prevFiles === nextFiles) {
@@ -824,6 +902,10 @@ export function areMessageFieldsEqual(
   return (
     prevMsg.messageId === nextMsg.messageId &&
     prevMsg.text === nextMsg.text &&
+<<<<<<< HEAD
+=======
+    prevMsg.privacyRevision === nextMsg.privacyRevision &&
+>>>>>>> upstream/main
     prevMsg.error === nextMsg.error &&
     prevMsg.unfinished === nextMsg.unfinished &&
     /** Read by the row: `useGenerationsByLatest` gates the Continue button on it and
@@ -832,6 +914,10 @@ export function areMessageFieldsEqual(
     prevMsg.createdAt === nextMsg.createdAt &&
     prevMsg.depth === nextMsg.depth &&
     prevMsg.isCreatedByUser === nextMsg.isCreatedByUser &&
+<<<<<<< HEAD
+=======
+    prevMsg.isUserSubmitted === nextMsg.isUserSubmitted &&
+>>>>>>> upstream/main
     (prevMsg.children?.length ?? 0) === (nextMsg.children?.length ?? 0) &&
     prevMsg.content === nextMsg.content &&
     prevMsg.model === nextMsg.model &&
@@ -846,6 +932,31 @@ export function areMessageFieldsEqual(
   );
 }
 
+<<<<<<< HEAD
+=======
+type TailRelationProps = {
+  message?: TMessage | null;
+  latestMessageId?: string;
+  latestMessageDepth?: number;
+};
+
+/**
+ * True when moving the thread's tail leaves a row's rendering unchanged. Rows read
+ * `latestMessageId` and `latestMessageDepth` only by comparing them to their own id
+ * and depth, and for whether a tail is known at all, so a submission or a server id
+ * hydration re-renders just the rows entering or leaving the tail.
+ */
+export function isSameTailRelation(prev: TailRelationProps, next: TailRelationProps): boolean {
+  return (
+    (prev.latestMessageId == null) === (next.latestMessageId == null) &&
+    (prev.latestMessageId === prev.message?.messageId) ===
+      (next.latestMessageId === next.message?.messageId) &&
+    (prev.latestMessageDepth === prev.message?.depth) ===
+      (next.latestMessageDepth === next.message?.depth)
+  );
+}
+
+>>>>>>> upstream/main
 /**
  * Comparator for the memoized message-row wrappers (Message / MessageContent /
  * MessageParts): identity-compare the scalar props, field-compare the message.

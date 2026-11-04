@@ -7,6 +7,11 @@ import type {
   SubagentTaskSnapshot,
 } from '@librechat/agents';
 import type { Cluster, Redis } from 'ioredis';
+<<<<<<< HEAD
+=======
+import type { ActivitySnapshot } from './digest';
+import { snapshotActivity, snapshotActivitySummary } from './digest';
+>>>>>>> upstream/main
 import { createConcurrencyLimiter } from '~/utils/promise';
 
 const PROTOCOL_VERSION = 1;
@@ -258,8 +263,18 @@ function truncateMiddle(value: string, maxChars: number): string {
   return `${value.slice(0, head)}${marker}${value.slice(value.length - (available - head))}`;
 }
 
+<<<<<<< HEAD
 function boundedSnapshot(snapshot: SubagentTaskSnapshot): SubagentTaskSnapshot {
   return {
+=======
+/** Progress decorations are re-validated on every hop, so a peer cannot widen them. */
+function boundedSnapshot(snapshot: SubagentTaskSnapshot): ActivitySnapshot {
+  const activity = snapshotActivity(snapshot);
+  const activitySummary = snapshotActivitySummary(snapshot);
+  return {
+    ...(activity == null ? {} : { activity }),
+    ...(activitySummary == null ? {} : { activitySummary }),
+>>>>>>> upstream/main
     taskId: truncateMiddle(snapshot.taskId, MAX_TASK_ID_CHARS),
     ...(snapshot.threadId == null
       ? {}

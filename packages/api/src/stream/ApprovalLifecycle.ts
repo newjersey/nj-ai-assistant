@@ -11,6 +11,10 @@ import type {
   SteerQueueItem,
 } from '~/stream/interfaces/IJobStore';
 import type { ActivityPhaseSnapshot } from '~/agents/activityPhases/runtime';
+<<<<<<< HEAD
+=======
+import type { AuthoredSkillBinding } from '~/agents/authored';
+>>>>>>> upstream/main
 import {
   JobStatusTransitionDeadlineError,
   isPendingActionExpired,
@@ -33,6 +37,10 @@ export interface ApprovalLifecycleCallbacks {
 
 export interface ApprovalPauseOptions {
   discoveredTools?: string[];
+<<<<<<< HEAD
+=======
+  authoredSkills?: AuthoredSkillBinding[];
+>>>>>>> upstream/main
   activityPhaseSnapshot?: ActivityPhaseSnapshot;
   compactionSemanticIndex?: ICompactionSemanticIndexProjection;
   /** Calibration and fading state at the pause; seeds the resumed run's pruner. */
@@ -153,6 +161,10 @@ export class ApprovalLifecycle {
           ...(discoveredTools != null && discoveredTools.length > 0
             ? { discoveredTools: [...discoveredTools] }
             : {}),
+<<<<<<< HEAD
+=======
+          ...(options.authoredSkills != null ? { authoredSkills: options.authoredSkills } : {}),
+>>>>>>> upstream/main
           ...(activityPhaseSnapshot != null ? { activityPhaseSnapshot } : {}),
           ...(compactionSemanticIndex != null ? { compactionSemanticIndex } : {}),
           ...(contextMeta != null ? { contextMeta } : {}),
@@ -400,6 +412,13 @@ export class ApprovalLifecycle {
     const { steerQuotesCapable, ...ownerPatch } = resumePatch ?? {};
     const boundPatch = {
       ...ownerPatch,
+<<<<<<< HEAD
+=======
+      preResumeProvenance: {
+        userSubmittedPaths: job.userSubmittedPaths ?? [],
+        userSubmittedMessageFieldPaths: job.userSubmittedMessageFieldPaths ?? [],
+      },
+>>>>>>> upstream/main
       ...(steerQuotesCapable === true &&
         typeof ownerPatch.providerExecutionId === 'string' && {
           steerQuotesExecutionId: ownerPatch.providerExecutionId,

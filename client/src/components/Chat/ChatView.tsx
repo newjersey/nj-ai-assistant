@@ -2,6 +2,7 @@ import { memo, useMemo } from 'react';
 import { useAtomValue } from 'jotai';
 import { useRecoilValue } from 'recoil';
 import { useForm } from 'react-hook-form';
+<<<<<<< HEAD
 import { Spinner } from '@librechat/client';
 import { useParams } from 'react-router-dom';
 import { Constants, buildTree } from 'librechat-data-provider';
@@ -25,10 +26,34 @@ import { pendingApprovalActionFamily } from './approval/state';
 import { useGetMessagesByConvoId } from '~/data-provider';
 import Footer, { useConfiguredFooter } from './Footer';
 import { AskAnswerHostProvider } from './ask/state';
+=======
+import { useParams } from 'react-router-dom';
+import { Constants, buildTree } from 'librechat-data-provider';
+import { ChatPane, getChatPaneView, QueuedTurnPortalProvider } from '@librechat/chat/components';
+import {
+  submissionByIndex,
+  ChatSessionProvider,
+  useScrollbarGutterSeed,
+  AskAnswerHostProvider,
+  ComposerRestoreProvider,
+  pendingApprovalActionFamily,
+} from '@librechat/chat/react';
+import type { TChatProject, TMessage } from 'librechat-data-provider';
+import type { ChatFormValues } from '~/common';
+import { AddedChatContext, ChatFormProvider, useChatContext, useFileMapContext } from '~/Providers';
+import Footer, { useLandingFooter, useConfiguredFooter } from './Footer';
+import { useChatSettings } from '~/Providers/ChatSettingsContext';
+import ApprovalProvider from './Messages/Content/ApprovalContext';
+import ConversationStarters from './Input/ConversationStarters';
+import ProjectBadge from '~/components/Projects/ProjectBadge';
+import { OwnerTextProvider } from './Messages/PrivateText';
+import { useAddedResponse, useLocalize } from '~/hooks';
+>>>>>>> upstream/main
 import MessagesView from './Messages/MessagesView';
 import Presentation from './Presentation';
 import ChatForm from './Input/ChatForm';
 import { TraceSurface } from './Trace';
+<<<<<<< HEAD
 import Landing from './Landing';
 import Header from './Header';
 import { cn } from '~/utils';
@@ -51,18 +76,59 @@ function ChatView({ index = 0, project }: { index?: number; project?: TChatProje
   const isSubmitting = useRecoilValue(store.isSubmittingFamily(index));
   const saveDrafts = useRecoilValue(store.saveDrafts);
   const centerFormOnLanding = false; // NJ: force this to be `false` to put our landing page text up
+=======
+import Lia from '~/components/Lia';
+import Landing from './Landing';
+import Header from './Header';
+import store from '~/store';
+
+type ChatViewProps = {
+  index?: number;
+  project?: TChatProject;
+  /** The route is loading another conversation, or failed to. */
+  routePending?: boolean;
+};
+
+function ChatViewPane({
+  index = 0,
+  project,
+  routePending = false,
+  conversationId,
+  messages,
+  isLoading,
+}: ChatViewProps & {
+  conversationId?: string;
+  messages: TMessage[] | null;
+  isLoading: boolean;
+}) {
+  const localize = useLocalize();
+  const rootSubmission = useAtomValue(submissionByIndex(index));
+  const { saveDrafts } = useChatSettings();
+  const enterToSend = useRecoilValue(store.enterToSend);
+  const autoSendText = useRecoilValue(store.autoSendText);
+  const speechSettingsInitialized = useRecoilValue(store.speechSettingsInitialized);
+  const centerFormOnLanding = useRecoilValue(store.centerFormOnLanding);
+>>>>>>> upstream/main
   const pendingAction = useAtomValue(
     pendingApprovalActionFamily(conversationId ?? Constants.NEW_CONVO),
   );
 
   /** The welcome screen reserves the message column's scrollbar band before any
+<<<<<<< HEAD
    *  column exists to measure it (see the column's class list below). */
+=======
+   *  column exists to measure it (see the column classes in `ChatPane`). */
+>>>>>>> upstream/main
   useScrollbarGutterSeed();
 
   /** A conversation carries a footer only for configured content, and the
    *  composer's clearance has to account for the bar when it does — including
    *  before the config answers, so a cold load does not jump. */
   const configuredFooter = useConfiguredFooter();
+<<<<<<< HEAD
+=======
+  const landingFooter = useLandingFooter();
+>>>>>>> upstream/main
 
   const methods = useForm<ChatFormValues>({
     defaultValues: { text: '' },
@@ -70,6 +136,7 @@ function ChatView({ index = 0, project }: { index?: number; project?: TChatProje
 
   const fileMap = useFileMapContext();
 
+<<<<<<< HEAD
   const {
     data: messages = null,
     isLoading,
@@ -85,11 +152,14 @@ function ChatView({ index = 0, project }: { index?: number; project?: TChatProje
     },
     { isStreaming: isSubmitting },
   );
+=======
+>>>>>>> upstream/main
   const messagesTree = useMemo(() => {
     const dataTree = buildTree({ messages, fileMap });
     return dataTree?.length === 0 ? null : (dataTree ?? null);
   }, [messages, fileMap]);
 
+<<<<<<< HEAD
   const chatHelpers = useChatHelpers(index, conversationId);
   const addedChatHelpers = useAddedResponse();
 
@@ -137,6 +207,29 @@ function ChatView({ index = 0, project }: { index?: number; project?: TChatProje
     content = <Landing centerFormOnLanding={centerFormOnLanding} />;
   }
 
+=======
+  const chat = useChatContext();
+  const addedChatHelpers = useAddedResponse();
+
+  const activeConversation =
+    chat.conversation?.conversationId === conversationId ? chat.conversation : undefined;
+  const activeSubagentThread = activeConversation?.subagentThread;
+  const chatProjectId = activeConversation?.chatProjectId || undefined;
+
+  const view = getChatPaneView({
+    conversationId,
+    isLoading,
+    hasMessages: messagesTree != null && messagesTree.length > 0,
+  });
+  const { isLanding: isLandingPage } = view;
+
+  /** The welcome screen carries the full footer unless the deployment turned it
+   *  off; otherwise a footer bar renders only for configured content. */
+  const fullFooter = isLandingPage && landingFooter;
+  const footerBelow = fullFooter || configuredFooter;
+  const isProjectLandingPage = isLandingPage && project != null;
+
+>>>>>>> upstream/main
   const chatFormPlaceholder =
     isProjectLandingPage && project
       ? localize('com_ui_new_chat_in_project', { name: project.name })
@@ -144,10 +237,14 @@ function ChatView({ index = 0, project }: { index?: number; project?: TChatProje
 
   // Recoil conversation can lag the route during navigation; only announce a
   // title that belongs to the conversation currently in the URL.
+<<<<<<< HEAD
   const conversationTitle =
     chatHelpers.conversation?.conversationId === conversationId
       ? chatHelpers.conversation?.title?.trim()
       : undefined;
+=======
+  const conversationTitle = activeConversation?.title?.trim();
+>>>>>>> upstream/main
   const pageHeading =
     isLandingPage || !conversationTitle ? localize('com_ui_new_chat') : conversationTitle;
   const parentConversationId = activeSubagentThread?.parentConversationId;
@@ -159,6 +256,7 @@ function ChatView({ index = 0, project }: { index?: number; project?: TChatProje
   return (
     <AskAnswerHostProvider saveDrafts={saveDrafts}>
       <ChatFormProvider {...methods}>
+<<<<<<< HEAD
         <ChatContext.Provider value={chatHelpers}>
           <AddedChatContext.Provider value={addedChatHelpers}>
             <ApprovalProvider pendingAction={pendingAction}>
@@ -233,9 +331,101 @@ function ChatView({ index = 0, project }: { index?: number; project?: TChatProje
             </ApprovalProvider>
           </AddedChatContext.Provider>
         </ChatContext.Provider>
+=======
+        <ComposerRestoreProvider>
+          <QueuedTurnPortalProvider>
+            <AddedChatContext.Provider value={addedChatHelpers}>
+              <ApprovalProvider pendingAction={pendingAction}>
+                <Presentation routePending={routePending}>
+                  <TraceSurface conversationId={conversationId}>
+                    <ChatPane
+                      index={index}
+                      view={view}
+                      heading={pageHeading}
+                      header={
+                        <Header
+                          parentConversationId={parentConversationId}
+                          readOnly={isSubagentThreadReadOnly}
+                        />
+                      }
+                      badge={chatProjectId ? <ProjectBadge projectId={chatProjectId} /> : null}
+                      messages={<MessagesView messagesTree={messagesTree} messages={messages} />}
+                      landing={<Landing centerFormOnLanding={centerFormOnLanding} />}
+                      renderColumn={(column) => (
+                        <OwnerTextProvider
+                          messages={messages}
+                          conversationId={conversationId}
+                          isSubmitting={chat.isSubmitting}
+                        >
+                          {column}
+                        </OwnerTextProvider>
+                      )}
+                      starters={<ConversationStarters />}
+                      readOnlyNote={
+                        isSubagentThreadReadOnly
+                          ? localize('com_ui_subagent_thread_read_only')
+                          : undefined
+                      }
+                      composer={
+                        <ChatForm
+                          index={index}
+                          routePending={routePending}
+                          placeholder={chatFormPlaceholder}
+                          project={isProjectLandingPage ? project : undefined}
+                          isLandingPage={isLandingPage}
+                          enterToSend={enterToSend}
+                          autoSendText={autoSendText}
+                          speechSettingsInitialized={speechSettingsInitialized}
+                          footerBelow={footerBelow}
+                          centerFormOnLanding={centerFormOnLanding}
+                        />
+                      }
+                      /* The generic disclaimer and the policy links are the welcome
+                         screen's; a deployment's own footer stays with the
+                         conversation that always showed it. */
+                      bandFooter={
+                        !fullFooter && configuredFooter ? <Footer configuredOnly /> : null
+                      }
+                      footer={fullFooter ? <Footer /> : null}
+                      renderMascot={(bandRef) => (
+                        <Lia
+                          bandRef={bandRef}
+                          landing={isLandingPage}
+                          submission={rootSubmission}
+                        />
+                      )}
+                    />
+                  </TraceSurface>
+                </Presentation>
+              </ApprovalProvider>
+            </AddedChatContext.Provider>
+          </QueuedTurnPortalProvider>
+        </ComposerRestoreProvider>
+>>>>>>> upstream/main
       </ChatFormProvider>
     </AskAnswerHostProvider>
   );
 }
 
+<<<<<<< HEAD
+=======
+function ChatView(props: ChatViewProps) {
+  const { index = 0 } = props;
+  const { conversationId } = useParams();
+
+  return (
+    <ChatSessionProvider index={index} conversationId={conversationId}>
+      {({ messages, isLoading }) => (
+        <ChatViewPane
+          {...props}
+          conversationId={conversationId}
+          messages={messages}
+          isLoading={isLoading}
+        />
+      )}
+    </ChatSessionProvider>
+  );
+}
+
+>>>>>>> upstream/main
 export default memo(ChatView);

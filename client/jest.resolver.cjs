@@ -7,9 +7,12 @@ const ESM_ONLY_ARIAKIT =
   /^@ariakit\/(react-components|react-utils|react-store|components|store|utils)(\/|$)/;
 
 module.exports = (request, options) => {
+<<<<<<< HEAD
   // NJ: We strip the `?raw` suffix (for Vite raw imports)
   request = request.replace(/\?raw$/, '');
 
+=======
+>>>>>>> upstream/main
   if (ESM_ONLY_ARIAKIT.test(request)) {
     return options.defaultResolver(request, {
       ...options,

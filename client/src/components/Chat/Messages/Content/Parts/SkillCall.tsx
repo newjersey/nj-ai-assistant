@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { ScrollText } from 'lucide-react';
+<<<<<<< HEAD
 import type { TAttachment, PartMetadata } from 'librechat-data-provider';
 import ProgressText from '~/components/Chat/Messages/Content/ProgressText';
 import { toolPanelSpacingClassName } from '../disclosure';
@@ -10,6 +11,16 @@ import { useToolCallIntent } from './intent';
 import { TOOL_ROW_CLASSES } from '../rows';
 import { useLocalize } from '~/hooks';
 import Stdout from './Stdout';
+=======
+import { parseJsonField } from '@librechat/chat';
+import { TOOL_ROW_CLASSES, BareStatus, Stdout } from '@librechat/chat/components';
+import { toolPanelSpacingClassName, useToolCallIntent } from '@librechat/chat/react';
+import type { TAttachment, PartMetadata } from 'librechat-data-provider';
+import ProgressText from '~/components/Chat/Messages/Content/ProgressText';
+import useToolCallState from './useToolCallState';
+import { AttachmentGroup } from './Attachment';
+import { useLocalize } from '~/hooks';
+>>>>>>> upstream/main
 import { cn } from '~/utils';
 
 export default function SkillCall({
@@ -38,6 +49,7 @@ export default function SkillCall({
   const skillName = parsedSkillName || localize('com_ui_skill').toLowerCase();
   const intent = useToolCallIntent(args);
 
+<<<<<<< HEAD
   const { showCode, toggleCode, expandStyle, expandRef, phase, hasOutput } = useToolCallState({
     initialProgress,
     isSubmitting,
@@ -73,12 +85,57 @@ export default function SkillCall({
           isExpanded={showCode}
         />
       </div>
+=======
+  const { showCode, toggleCode, expandStyle, expandRef, phase, hasOutput, bare, rowRef } =
+    useToolCallState({
+      initialProgress,
+      isSubmitting,
+      output,
+      hasInput: !!parsedSkillName,
+      /** The row is the only place that names the skill that ran. */
+      keepRow: true,
+      onExpand,
+      runStepStatus,
+    });
+
+  const finishedText =
+    phase === 'cancelled'
+      ? localize('com_ui_cancelled')
+      : (intent ?? localize('com_ui_skill_finished', { 0: skillName }));
+
+  return (
+    <>
+      <BareStatus active={bare} text={finishedText} />
+      {!bare && (
+        <div className={TOOL_ROW_CLASSES} ref={rowRef}>
+          <ProgressText
+            phase={phase}
+            onClick={toggleCode}
+            inProgressText={intent ?? localize('com_ui_skill_running', { 0: skillName })}
+            finishedText={finishedText}
+            durationMs={runStepDurationMs}
+            icon={
+              <ScrollText
+                className={cn(
+                  'text-text-secondary size-4 shrink-0',
+                  phase === 'running' && 'animate-pulse',
+                )}
+                aria-hidden="true"
+              />
+            }
+            hasInput={!!parsedSkillName || hasOutput}
+            isExpanded={showCode}
+          />
+        </div>
+      )}
+>>>>>>> upstream/main
       <div style={expandStyle}>
         <div className="overflow-hidden" ref={expandRef}>
           {hasOutput && (
             <div
               className={cn(
                 toolPanelSpacingClassName,
+<<<<<<< HEAD
                 'overflow-hidden rounded-lg border border-border-light bg-surface-secondary',
               )}
             >
@@ -87,6 +144,16 @@ export default function SkillCall({
                   {localize('com_ui_output')}
                 </div>
                 <div className="max-h-[200px] overflow-auto text-text-primary">
+=======
+                'border-border-light bg-surface-secondary overflow-hidden rounded-lg border',
+              )}
+            >
+              <div className="p-4 text-xs">
+                <div className="text-text-secondary text-3xs mb-1.5 font-medium tracking-wide uppercase">
+                  {localize('com_ui_output')}
+                </div>
+                <div className="text-text-primary max-h-[12.5rem] overflow-auto">
+>>>>>>> upstream/main
                   <Stdout output={output} />
                 </div>
               </div>

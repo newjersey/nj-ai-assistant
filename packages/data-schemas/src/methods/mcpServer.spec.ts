@@ -1,9 +1,26 @@
 import mongoose from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
+<<<<<<< HEAD
 import type { MCPOptions } from 'librechat-data-provider';
 import type * as t from '~/types';
 import { createMCPServerMethods } from './mcpServer';
 import mcpServerSchema from '~/schema/mcpServer';
+=======
+import {
+  PrincipalType,
+  PrincipalModel,
+  ResourceType,
+  PermissionBits,
+} from 'librechat-data-provider';
+import type { MCPOptions } from 'librechat-data-provider';
+import type * as t from '~/types';
+import { createMCPServerMethods } from './mcpServer';
+import { createAclEntryMethods } from './aclEntry';
+import mcpServerSchema from '~/schema/mcpServer';
+import aclEntrySchema from '~/schema/aclEntry';
+import groupSchema from '~/schema/group';
+import userSchema from '~/schema/user';
+>>>>>>> upstream/main
 
 let mongoServer: MongoMemoryServer;
 let MCPServer: mongoose.Model<t.MCPServerDocument>;
@@ -13,7 +30,22 @@ beforeAll(async () => {
   mongoServer = await MongoMemoryServer.create();
   const mongoUri = mongoServer.getUri();
   MCPServer = mongoose.models.MCPServer || mongoose.model('MCPServer', mcpServerSchema);
+<<<<<<< HEAD
   methods = createMCPServerMethods(mongoose);
+=======
+  if (!mongoose.models.AclEntry) {
+    mongoose.model('AclEntry', aclEntrySchema);
+  }
+  if (!mongoose.models.Group) {
+    mongoose.model('Group', groupSchema);
+  }
+  if (!mongoose.models.User) {
+    mongoose.model('User', userSchema);
+  }
+  methods = createMCPServerMethods(mongoose, {
+    getSoleOwnedResourceIds: createAclEntryMethods(mongoose).getSoleOwnedResourceIds,
+  });
+>>>>>>> upstream/main
   await mongoose.connect(mongoUri);
 });
 
@@ -332,6 +364,7 @@ describe('MCPServer Model Tests', () => {
     });
   });
 
+<<<<<<< HEAD
   describe('findMCPServersByAuthor', () => {
     test('should find all servers by author', async () => {
       await methods.createMCPServer({
@@ -395,6 +428,8 @@ describe('MCPServer Model Tests', () => {
     });
   });
 
+=======
+>>>>>>> upstream/main
   describe('getListMCPServersByIds', () => {
     let server1: t.MCPServerDocument;
     let server2: t.MCPServerDocument;
@@ -674,6 +709,74 @@ describe('MCPServer Model Tests', () => {
     });
   });
 
+<<<<<<< HEAD
+=======
+  describe('deleteMCPServersWithAcl', () => {
+    test('keeps the owner ACL until the server is gone so a failed delete can be retried', async () => {
+      const ownerId = new mongoose.Types.ObjectId();
+      const created = await methods.createMCPServer({
+        config: createSSEConfig('Erase Retry'),
+        author: authorId,
+      });
+      await mongoose.model('AclEntry').create({
+        principalType: PrincipalType.USER,
+        principalId: ownerId,
+        principalModel: PrincipalModel.USER,
+        resourceType: ResourceType.MCPSERVER,
+        resourceId: created._id,
+        permBits:
+          PermissionBits.VIEW | PermissionBits.EDIT | PermissionBits.DELETE | PermissionBits.SHARE,
+        grantedBy: ownerId,
+      });
+
+      const failure = jest
+        .spyOn(MCPServer, 'deleteMany')
+        .mockRejectedValueOnce(new Error('transient outage'));
+      await expect(methods.deleteMCPServersWithAcl([created._id.toString()])).rejects.toThrow(
+        'transient outage',
+      );
+      failure.mockRestore();
+
+      const found = await methods.findUserErasableMCPServers(ownerId.toString());
+      expect(found.map((s) => s.id)).toEqual([created._id.toString()]);
+
+      await methods.deleteMCPServersWithAcl(found.map((s) => s.id));
+      expect(await methods.findMCPServerByServerName(created.serverName)).toBeNull();
+      expect(await methods.findUserErasableMCPServers(ownerId.toString())).toEqual([]);
+    });
+  });
+
+  describe('findMCPServerViewerUserIds', () => {
+    test('expands direct and group viewers to user ids, external members by source id', async () => {
+      const directId = new mongoose.Types.ObjectId();
+      const localMemberId = new mongoose.Types.ObjectId();
+      const externalMemberId = new mongoose.Types.ObjectId();
+      const groupId = new mongoose.Types.ObjectId();
+      await mongoose.model('User').collection.insertMany([
+        { _id: localMemberId, email: 'local@example.com' },
+        { _id: externalMemberId, email: 'external@example.com', idOnTheSource: 'entra-7' },
+      ]);
+      await mongoose.model('Group').collection.insertOne({
+        _id: groupId,
+        name: 'Viewers',
+        source: 'local',
+        memberIds: [localMemberId.toString(), 'entra-7', 'entra-unknown'],
+      });
+
+      const userIds = await methods.findMCPServerViewerUserIds([
+        { principalType: PrincipalType.USER, principalId: directId },
+        { principalType: PrincipalType.GROUP, principalId: groupId.toString() },
+        { principalType: PrincipalType.ROLE, principalId: 'USER' },
+        { principalType: PrincipalType.PUBLIC },
+      ]);
+
+      expect(userIds.sort()).toEqual(
+        [directId, localMemberId, externalMemberId].map(String).sort(),
+      );
+    });
+  });
+
+>>>>>>> upstream/main
   describe('getListMCPServersByNames', () => {
     test('should return empty data for empty names array', async () => {
       const result = await methods.getListMCPServersByNames({ names: [] });

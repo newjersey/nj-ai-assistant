@@ -20,7 +20,11 @@ export function validateAzureGroups(configs: TAzureGroups): TAzureConfigValidati
   const result = azureGroupConfigsSchema.safeParse(configs);
   if (!result.success) {
     isValid = false;
+<<<<<<< HEAD
     errors.push(errorsToString(result.error.errors));
+=======
+    errors.push(errorsToString(result.error.issues));
+>>>>>>> upstream/main
   } else {
     for (const group of result.data) {
       const {
@@ -240,6 +244,7 @@ export function mapModelToAzureConfig({
 
   return result;
 }
+<<<<<<< HEAD
 
 export function mapGroupToAzureConfig({
   groupName,
@@ -326,3 +331,5 @@ export function mapGroupToAzureConfig({
 
   return result;
 }
+=======
+>>>>>>> upstream/main

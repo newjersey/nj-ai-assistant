@@ -158,7 +158,11 @@ export default function MCPServerDialog({
                   type="text"
                   readOnly
                   value={redirectUri}
+<<<<<<< HEAD
                   className="flex-1 text-text-secondary"
+=======
+                  className="text-text-secondary flex-1"
+>>>>>>> upstream/main
                 />
                 <Button
                   size="icon"
@@ -169,7 +173,10 @@ export default function MCPServerDialog({
                     showToast({ message: localize('com_ui_copied_to_clipboard') });
                   }}
                   disabled={isCopying || !redirectUri}
+<<<<<<< HEAD
                   className="p-0"
+=======
+>>>>>>> upstream/main
                   aria-label={localize('com_ui_copy_link')}
                 >
                   <MorphIcon icon={isCopying ? CopyCheck : Copy} className="size-4" />
@@ -214,7 +221,11 @@ export default function MCPServerDialog({
             isEditMode ? (
               <div className="flex items-center gap-2">
                 <Button
+<<<<<<< HEAD
                   variant="destructive"
+=======
+                  variant="destructive-soft"
+>>>>>>> upstream/main
                   size="sm"
                   aria-label={localize('com_ui_delete_mcp_server_name', {
                     0: server?.config?.title || server?.serverName || '',

@@ -4,7 +4,10 @@ import sharp from 'sharp';
 import { logger } from '@librechat/data-schemas';
 import type { IUser } from '@librechat/data-schemas';
 import type { TFile } from 'librechat-data-provider';
+<<<<<<< HEAD
 import type { FormatEnum } from 'sharp';
+=======
+>>>>>>> upstream/main
 import type {
   SaveBufferFn,
   UploadImageParams,
@@ -12,13 +15,21 @@ import type {
   ProcessAvatarParams,
 } from '~/storage/types';
 import { AVATAR_BASE_PATH, DEFAULT_BASE_PATH as defaultBasePath } from '~/storage/constants';
+<<<<<<< HEAD
+=======
+import { convertImageBuffer } from '~/files/format';
+>>>>>>> upstream/main
 
 export interface ImageServiceDeps {
   resizeImageBuffer: (
     buffer: Buffer,
     resolution: string,
     endpoint: string,
+<<<<<<< HEAD
   ) => Promise<{ buffer: Buffer; width: number; height: number }>;
+=======
+  ) => Promise<{ buffer: Buffer; width: number; height: number; type?: string }>;
+>>>>>>> upstream/main
   updateUser: (userId: string, update: { avatar: string }) => Promise<IUser | null>;
   updateFile: (params: { file_id: string }) => Promise<TFile>;
 }
@@ -71,6 +82,7 @@ export class ImageService {
         buffer: resizedBuffer,
         width,
         height,
+<<<<<<< HEAD
       } = await this.deps.resizeImageBuffer(inputBuffer, resolution, endpoint);
 
       const extension = path.extname(inputFilePath);
@@ -91,6 +103,18 @@ export class ImageService {
           fileName += targetExtension;
         }
       }
+=======
+        type,
+      } = await this.deps.resizeImageBuffer(inputBuffer, resolution, endpoint);
+
+      const userId = req.user.id;
+      const { buffer: processedBuffer, fileName } = await convertImageBuffer({
+        buffer: resizedBuffer,
+        type,
+        fileName: `${file_id}__${path.basename(inputFilePath)}`,
+        outputType: appConfig?.imageOutputType ?? 'webp',
+      });
+>>>>>>> upstream/main
 
       const downloadURL = await this.saveBuffer({
         userId,

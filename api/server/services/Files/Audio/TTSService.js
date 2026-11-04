@@ -6,6 +6,14 @@ const {
   applyAxiosProxyConfig,
   resolveConfigSecret,
   applySSRFSafeAgentIfDirect,
+<<<<<<< HEAD
+=======
+  pipeSegment,
+  abortOnClose,
+  pipeToResponse,
+  capSpeechInput,
+  createSpeechBudget,
+>>>>>>> upstream/main
 } = require('@librechat/api');
 const {
   TTSProviders,
@@ -259,10 +267,24 @@ class TTSService {
    * @param {string} options.voice - The voice to use.
    * @param {boolean} [options.stream=true] - Whether to use streaming.
    * @param {string[]} [allowedAddresses] - Section-level SSRF exemption list of host:port pairs.
+<<<<<<< HEAD
    * @returns {Promise<Object>} The axios response object.
    * @throws {Error} If the provider is invalid or the request fails.
    */
   async ttsRequest(provider, ttsSchema, { input, voice, stream = true }, allowedAddresses) {
+=======
+   * @param {import('axios').AxiosRequestConfig} [requestOptions] - Timeout and abort options for the request.
+   * @returns {Promise<Object>} The axios response object.
+   * @throws {Error} If the provider is invalid or the request fails.
+   */
+  async ttsRequest(
+    provider,
+    ttsSchema,
+    { input, voice, stream = true },
+    allowedAddresses,
+    requestOptions,
+  ) {
+>>>>>>> upstream/main
     const strategy = this.providerStrategies[provider];
     if (!strategy) {
       throw new Error('Invalid provider');
@@ -272,7 +294,11 @@ class TTSService {
 
     [data, headers].forEach(this.removeUndefined.bind(this));
 
+<<<<<<< HEAD
     const options = { headers, responseType: stream ? 'stream' : 'arraybuffer' };
+=======
+    const options = { headers, responseType: stream ? 'stream' : 'arraybuffer', ...requestOptions };
+>>>>>>> upstream/main
 
     applyAxiosProxyConfig(options, url);
     applySSRFSafeAgentIfDirect(options, url, allowedAddresses);
@@ -295,10 +321,13 @@ class TTSService {
   async processTextToSpeech(req, res) {
     const { input, voice: requestVoice } = req.body;
 
+<<<<<<< HEAD
     if (!input) {
       return res.status(400).send('Missing text in request body');
     }
 
+=======
+>>>>>>> upstream/main
     const appConfig =
       req.config ??
       (await getAppConfig({
@@ -306,12 +335,20 @@ class TTSService {
         userId: req.user?.id,
         tenantId: req.user?.tenantId,
       }));
+<<<<<<< HEAD
+=======
+    const text = capSpeechInput(input, appConfig?.speech?.tts);
+    if (!text) {
+      return res.status(400).send('Missing text in request body');
+    }
+>>>>>>> upstream/main
     try {
       res.setHeader('Content-Type', 'audio/mpeg');
       const provider = this.getProvider(appConfig);
       const ttsSchema = appConfig?.speech?.tts?.[provider];
       const allowedAddresses = appConfig?.speech?.tts?.allowedAddresses;
       const voice = await this.getVoice(ttsSchema, requestVoice);
+<<<<<<< HEAD
 
       if (input.length < 4096) {
         const response = await this.ttsRequest(
@@ -325,6 +362,25 @@ class TTSService {
       }
 
       const textChunks = splitTextIntoChunks(input, 1000);
+=======
+      const nextBudget = createSpeechBudget(appConfig, abortOnClose(res));
+
+      if (text.length < 4096) {
+        const response = await this.ttsRequest(
+          provider,
+          ttsSchema,
+          { input: text, voice },
+          allowedAddresses,
+          nextBudget(),
+        );
+        pipeToResponse(response.data, res, (error) =>
+          logAxiosError({ message: '[TTS] Audio stream failed:', error }),
+        );
+        return;
+      }
+
+      const textChunks = splitTextIntoChunks(text, 1000);
+>>>>>>> upstream/main
 
       for (const chunk of textChunks) {
         try {
@@ -337,6 +393,7 @@ class TTSService {
               stream: true,
             },
             allowedAddresses,
+<<<<<<< HEAD
           );
 
           logger.debug(`[textToSpeech] user: ${req?.user?.id} | writing audio stream`);
@@ -344,6 +401,13 @@ class TTSService {
             response.data.pipe(res, { end: chunk.isFinished });
             response.data.on('end', resolve);
           });
+=======
+            nextBudget(),
+          );
+
+          logger.debug(`[textToSpeech] user: ${req?.user?.id} | writing audio stream`);
+          await pipeSegment(response.data, res, { end: chunk.isFinished });
+>>>>>>> upstream/main
 
           if (chunk.isFinished) {
             break;
@@ -356,6 +420,10 @@ class TTSService {
           if (!res.headersSent) {
             return res.status(500).end();
           }
+<<<<<<< HEAD
+=======
+          res.destroy();
+>>>>>>> upstream/main
           return;
         }
       }
@@ -391,6 +459,10 @@ class TTSService {
     const ttsSchema = appConfig?.speech?.tts?.[provider];
     const allowedAddresses = appConfig?.speech?.tts?.allowedAddresses;
     const voice = await this.getVoice(ttsSchema, req.body.voice);
+<<<<<<< HEAD
+=======
+    const nextBudget = createSpeechBudget(appConfig, abortOnClose(res));
+>>>>>>> upstream/main
 
     let shouldContinue = true;
 
@@ -399,7 +471,15 @@ class TTSService {
       shouldContinue = false;
     });
 
+<<<<<<< HEAD
     const processChunks = createChunkProcessor(req.user.id, req.body.messageId);
+=======
+    const processChunks = createChunkProcessor(
+      req.user.id,
+      req.body.messageId,
+      appConfig?.speech?.tts?.maxInputChars,
+    );
+>>>>>>> upstream/main
 
     try {
       while (shouldContinue) {
@@ -425,6 +505,10 @@ class TTSService {
                 stream: true,
               },
               allowedAddresses,
+<<<<<<< HEAD
+=======
+              nextBudget(),
+>>>>>>> upstream/main
             );
 
             if (!shouldContinue) {
@@ -432,10 +516,14 @@ class TTSService {
             }
 
             logger.debug(`[streamAudio] user: ${req?.user?.id} | writing audio stream`);
+<<<<<<< HEAD
             await new Promise((resolve) => {
               response.data.pipe(res, { end: update.isFinished });
               response.data.on('end', resolve);
             });
+=======
+            await pipeSegment(response.data, res, { end: update.isFinished });
+>>>>>>> upstream/main
 
             if (update.isFinished) {
               shouldContinue = false;

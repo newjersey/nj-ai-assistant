@@ -2,15 +2,26 @@ const fs = require('fs');
 const path = require('path');
 const { Calculator } = require('@librechat/agents');
 const { logger } = require('@librechat/data-schemas');
+<<<<<<< HEAD
 const { zodToJsonSchema } = require('zod-to-json-schema');
+=======
+>>>>>>> upstream/main
 const { Tool } = require('@librechat/agents/langchain/tools');
 const { Tools, ImageVisionTool } = require('librechat-data-provider');
 const {
   getToolkitKey,
+<<<<<<< HEAD
+=======
+  getGitHubCompareCatalogTools,
+>>>>>>> upstream/main
   isToolModuleFile,
   oaiToolkit,
   geminiToolkit,
   createAskUserQuestionTool,
+<<<<<<< HEAD
+=======
+  toToolParameters,
+>>>>>>> upstream/main
 } = require('@librechat/api');
 const { toolkits } = require('~/app/clients/tools/manifest');
 
@@ -106,7 +117,11 @@ function loadAndFormatTools({ directory, adminFilter = [], adminIncluded = [] })
     tools.push(formattedTool);
   }
 
+<<<<<<< HEAD
   tools.push(ImageVisionTool);
+=======
+  tools.push(ImageVisionTool, ...getGitHubCompareCatalogTools(adminIncluded, adminFilter));
+>>>>>>> upstream/main
 
   return tools.reduce((map, tool) => {
     map[tool.function.name] = tool;
@@ -115,6 +130,7 @@ function loadAndFormatTools({ directory, adminFilter = [], adminIncluded = [] })
 }
 
 /**
+<<<<<<< HEAD
  * Checks if a schema is a Zod schema by looking for the _def property
  * @param {unknown} schema - The schema to check
  * @returns {boolean} True if it's a Zod schema
@@ -129,12 +145,21 @@ function isZodSchema(schema) {
  * function to convert the schema of the `StructuredTool` into a JSON
  * schema, which is then used as the parameters for the OpenAI function.
  * If the schema is already a JSON schema, it is used directly.
+=======
+ * Formats a `StructuredTool` instance into a format that is compatible
+ * with OpenAI's ChatCompletionFunctions, converting the schema of the
+ * `StructuredTool` into the JSON schema used as the function parameters.
+>>>>>>> upstream/main
  *
  * @param {StructuredTool} tool - The StructuredTool to format.
  * @returns {FunctionTool} The OpenAI Assistant Tool.
  */
 function formatToOpenAIAssistantTool(tool) {
+<<<<<<< HEAD
   const parameters = isZodSchema(tool.schema) ? zodToJsonSchema(tool.schema) : tool.schema;
+=======
+  const parameters = toToolParameters(tool.schema);
+>>>>>>> upstream/main
   return {
     type: Tools.function,
     [Tools.function]: {

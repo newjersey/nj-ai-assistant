@@ -13,6 +13,7 @@ const FileUpload: React.ForwardRefExoticComponent<
   return (
     <>
       {children}
+<<<<<<< HEAD
       <input
         ref={ref}
         multiple
@@ -20,6 +21,9 @@ const FileUpload: React.ForwardRefExoticComponent<
         style={{ display: 'none' }}
         onChange={handleFileChange}
       />
+=======
+      <input ref={ref} multiple type="file" className="hidden" onChange={handleFileChange} />
+>>>>>>> upstream/main
     </>
   );
 });

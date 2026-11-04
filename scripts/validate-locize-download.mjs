@@ -19,6 +19,10 @@ if (!baseDir || !currentDir) {
 
 const errors = [];
 const placeholderPattern = /\{\{[^{}]+\}\}|\{[^{}]+\}|%[-+0-9.#]*[a-zA-Z]/g;
+<<<<<<< HEAD
+=======
+const pluralSuffixPattern = /_(zero|one|two|few|many|other)$/;
+>>>>>>> upstream/main
 
 async function jsonFiles(directory, relative = '') {
   const entries = await readdir(path.join(directory, relative), { withFileTypes: true });
@@ -51,8 +55,22 @@ function flatten(value, prefix = '', output = new Map()) {
   return output;
 }
 
+<<<<<<< HEAD
 function placeholders(value) {
   return (value.match(placeholderPattern) ?? []).sort().join('\u0000');
+=======
+/**
+ * i18next passes `count` to every plural form, so a locale may spell it out where English
+ * writes the number (`_one`: "1 chat") and omit it where its own grammar does not need it.
+ */
+function placeholders(value, key) {
+  const matches = value.match(placeholderPattern) ?? [];
+  const ignoreCount = pluralSuffixPattern.test(key);
+  return matches
+    .filter((match) => !ignoreCount || match.replace(/\s/g, '') !== '{{count}}')
+    .sort()
+    .join('\u0000');
+>>>>>>> upstream/main
 }
 
 function boundaryWhitespace(value) {
@@ -102,7 +120,11 @@ if (currentSet.has(englishRelative)) {
         const baseline = baselineValuesByFile.get(relative)?.get(key);
         const changedSinceBaseline = baseline === undefined || baseline !== value;
         if (changedSinceBaseline && typeof source === 'string' && typeof value === 'string') {
+<<<<<<< HEAD
           if (placeholders(source) !== placeholders(value)) {
+=======
+          if (placeholders(source, key) !== placeholders(value, key)) {
+>>>>>>> upstream/main
             errors.push(`${relative}: placeholder mismatch with English for ${key}`);
           }
           if (value !== value.trim() && boundaryWhitespace(source) !== boundaryWhitespace(value)) {

@@ -1,10 +1,19 @@
 import React from 'react';
 import { RecoilRoot } from 'recoil';
+<<<<<<< HEAD
 import { render, screen } from '@testing-library/react';
 import type { TAttachment } from 'librechat-data-provider';
 import type { MutableSnapshot } from 'recoil';
 import LogContent from '../LogContent';
 import store from '~/store';
+=======
+import { getDefaultStore } from 'jotai';
+import { render, screen } from '@testing-library/react';
+import { isSubmittingFamily, resetSubmitting } from '@librechat/chat/react';
+import type { TAttachment } from 'librechat-data-provider';
+import { MessageContext } from '~/Providers/MessageContext';
+import LogContent from '../LogContent';
+>>>>>>> upstream/main
 
 jest.mock('~/hooks', () => ({
   useLocalize:
@@ -31,9 +40,15 @@ jest.mock('../LogLink', () => ({
   useAttachmentLink: () => ({ handleDownload: jest.fn() }),
 }));
 
+<<<<<<< HEAD
 jest.mock('~/components/Chat/Input/Files/FilePreview', () => ({
   __esModule: true,
   default: () => <div data-testid="file-preview" />,
+=======
+jest.mock('@librechat/chat/components', () => ({
+  ...jest.requireActual('@librechat/chat/components'),
+  FilePreview: () => <div data-testid="file-preview" />,
+>>>>>>> upstream/main
 }));
 
 jest.mock('~/components/Chat/Messages/Content/Image', () => ({
@@ -72,12 +87,33 @@ const baseAttachment = (overrides: Partial<TAttachment> = {}): TAttachment =>
  */
 const renderWith = (ui: React.ReactElement, opts: { streaming?: boolean } = {}) => {
   const streaming = opts.streaming ?? true;
+<<<<<<< HEAD
   const initializeState = (snapshot: MutableSnapshot) => {
     snapshot.set(store.isSubmittingFamily(0), streaming);
   };
   return render(<RecoilRoot initializeState={initializeState}>{ui}</RecoilRoot>);
 };
 
+=======
+  const initializeState = () => {
+    getDefaultStore().set(isSubmittingFamily(0), streaming);
+  };
+  return render(
+    <RecoilRoot initializeState={initializeState}>
+      <MessageContext.Provider
+        value={{ messageId: 'test-response', isExpanded: true, isSubmitting: streaming }}
+      >
+        {ui}
+      </MessageContext.Provider>
+    </RecoilRoot>,
+  );
+};
+
+afterEach(() => {
+  resetSubmitting(getDefaultStore());
+});
+
+>>>>>>> upstream/main
 describe('LogContent attachment routing', () => {
   it('routes HTML attachments through ToolArtifactCard (panel)', () => {
     const html = baseAttachment({

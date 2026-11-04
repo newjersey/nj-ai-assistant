@@ -1,7 +1,13 @@
 import { Suspense, useMemo, Fragment } from 'react';
+<<<<<<< HEAD
 import { useRecoilValue } from 'recoil';
 import { DelayedRender } from '@librechat/client';
 import { ContentTypes } from 'librechat-data-provider';
+=======
+import { DelayedRender } from '@librechat/client';
+import { ContentTypes } from 'librechat-data-provider';
+import { MessagePartIndex } from '@librechat/chat/react';
+>>>>>>> upstream/main
 import type {
   Agents,
   TMessage,
@@ -11,12 +17,21 @@ import type {
 } from 'librechat-data-provider';
 import type { ReactNode, ReactElement } from 'react';
 import { ErrorSourceProvider } from '~/components/Messages/Content/Error/source';
+<<<<<<< HEAD
 import { MessageContext, SearchContext, useMessageContext } from '~/Providers';
 import { ErrorMessage, UnfinishedMessage } from './MessageContent';
 import { cn, mapAttachments } from '~/utils';
 import MarkdownLite from './MarkdownLite';
 import { AgentUpdate } from './Parts';
 import store from '~/store';
+=======
+import { useMessagePartsHost } from '~/Providers/MessagePartsHostContext';
+import { ErrorMessage, UnfinishedMessage } from './MessageContent';
+import { cn, mapAttachments } from '~/utils';
+import { SearchContext } from '~/Providers';
+import MarkdownLite from './MarkdownLite';
+import { AgentUpdate } from './Parts';
+>>>>>>> upstream/main
 import Part from './Part';
 
 /**
@@ -39,8 +54,12 @@ const SearchContent = ({
   /** Author icon + label re-rendered before content that resumes after an inline steer. */
   authorHeader?: ReactNode;
 }) => {
+<<<<<<< HEAD
   const enableUserMsgMarkdown = useRecoilValue(store.enableUserMsgMarkdown);
   const messageContext = useMessageContext();
+=======
+  const { enableUserMsgMarkdown } = useMessagePartsHost().useUserTextPreferences();
+>>>>>>> upstream/main
   const { messageId } = message;
 
   const attachmentMap = useMemo(() => mapAttachments(attachments ?? []), [attachments]);
@@ -79,6 +98,7 @@ const SearchContent = ({
               />
             );
             /** An error part resolves the agent a handoff made active from its own position,
+<<<<<<< HEAD
              *  which it reads from `MessageContext`; persisted content is compacted, so `idx` is
              *  that position in `message.content`. */
             const rendered: ReactElement =
@@ -89,6 +109,15 @@ const SearchContent = ({
                 >
                   {partElement}
                 </MessageContext.Provider>
+=======
+             *  which it reads from the message context; persisted content is compacted, so `idx` is
+             *  that position in `message.content`. */
+            const rendered: ReactElement =
+              part.type === ContentTypes.ERROR ? (
+                <MessagePartIndex key={`display-${messageId}-${idx}`} index={idx}>
+                  {partElement}
+                </MessagePartIndex>
+>>>>>>> upstream/main
               ) : (
                 partElement
               );
@@ -126,7 +155,11 @@ const SearchContent = ({
   return (
     <div
       className={cn(
+<<<<<<< HEAD
         'markdown prose dark:prose-invert light w-full break-words',
+=======
+        'markdown prose light w-full break-words',
+>>>>>>> upstream/main
         message.isCreatedByUser && !enableUserMsgMarkdown && 'whitespace-pre-wrap',
         'text-text-primary',
       )}

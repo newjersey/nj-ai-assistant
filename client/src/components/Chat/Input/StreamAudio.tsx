@@ -1,8 +1,14 @@
 import { useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
+<<<<<<< HEAD
 import { QueryKeys } from 'librechat-data-provider';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+=======
+import { useQueryClient } from '@tanstack/react-query';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { QueryKeys, getSpeechText, getClientLimit } from 'librechat-data-provider';
+>>>>>>> upstream/main
 import type { TMessage } from 'librechat-data-provider';
 import {
   useCustomAudioRef,
@@ -10,9 +16,21 @@ import {
   MediaSourceAppender,
   usePauseGlobalAudio,
 } from '~/hooks/Audio';
+<<<<<<< HEAD
 import { useAuthContext } from '~/hooks';
 import { globalAudioId } from '~/common';
 import { logger } from '~/utils';
+=======
+import {
+  logger,
+  getTTSCacheKey,
+  setCachedTTSAudio,
+  getCachedTTSAudio,
+  getTTSCacheGeneration,
+} from '~/utils';
+import { useAuthContext } from '~/hooks';
+import { globalAudioId } from '~/common';
+>>>>>>> upstream/main
 import store from '~/store';
 
 function timeoutPromise(ms: number, message?: string) {
@@ -25,7 +43,11 @@ const promiseTimeoutMessage = 'Reader promise timed out';
 const maxPromiseTime = 15000;
 
 export default function StreamAudio({ index = 0 }) {
+<<<<<<< HEAD
   const { token } = useAuthContext();
+=======
+  const { token, user } = useAuthContext();
+>>>>>>> upstream/main
 
   const cacheTTS = useRecoilValue(store.cacheTTS);
   const playbackRate = useRecoilValue(store.playbackRate);
@@ -57,6 +79,10 @@ export default function StreamAudio({ index = 0 }) {
 
     async function fetchAudio() {
       setIsFetching(true);
+<<<<<<< HEAD
+=======
+      const generation = getTTSCacheGeneration();
+>>>>>>> upstream/main
       let mediaSource: MediaSourceAppender | undefined;
 
       try {
@@ -66,6 +92,7 @@ export default function StreamAudio({ index = 0 }) {
           setGlobalAudioURL(null);
         }
 
+<<<<<<< HEAD
         let cacheKey = latestMessage?.text ?? '';
         const cache = await caches.open('tts-responses');
         const cachedResponse = await cache.match(cacheKey);
@@ -75,17 +102,50 @@ export default function StreamAudio({ index = 0 }) {
           logger.log('Audio found in cache');
           const audioBlob = await cachedResponse.blob();
           const blobUrl = URL.createObjectURL(audioBlob);
+=======
+        /** Keyed by the spoken text, as manual playback is, so audio cached from an
+         *  unfiltered message (reasoning included) is never replayed. */
+        let cacheKey = latestMessage
+          ? await getTTSCacheKey(getSpeechText(latestMessage), voice, user?.id)
+          : null;
+        const cachedAudio = cacheKey ? getCachedTTSAudio(cacheKey) : undefined;
+
+        setAudioRunId(activeRunId);
+        if (cachedAudio) {
+          logger.log('Audio found in cache');
+          const blobUrl = URL.createObjectURL(cachedAudio);
+>>>>>>> upstream/main
           setGlobalAudioURL(blobUrl);
           setIsFetching(false);
           return;
         }
 
         logger.log('Fetching audio...', navigator.userAgent);
+<<<<<<< HEAD
         const response = await fetch('/api/files/speech/tts', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
           body: JSON.stringify({ messageId: latestMessage?.messageId, runId: activeRunId, voice }),
         });
+=======
+        const controller = new AbortController();
+        const abortTimer = setTimeout(() => controller.abort(), getClientLimit('ttsMs'));
+        let response: Response;
+        try {
+          response = await fetch('/api/files/speech/tts', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+            body: JSON.stringify({
+              messageId: latestMessage?.messageId,
+              runId: activeRunId,
+              voice,
+            }),
+            signal: controller.signal,
+          });
+        } finally {
+          clearTimeout(abortTimer);
+        }
+>>>>>>> upstream/main
 
         if (!response.ok) {
           throw new Error('Failed to fetch audio');
@@ -139,12 +199,22 @@ export default function StreamAudio({ index = 0 }) {
             const targetMessage = latestMessages.find(
               (msg) => msg.messageId === latestMessage?.messageId,
             );
+<<<<<<< HEAD
             cacheKey = targetMessage?.text ?? '';
+=======
+            cacheKey = targetMessage
+              ? await getTTSCacheKey(getSpeechText(targetMessage), voice, user?.id)
+              : null;
+>>>>>>> upstream/main
             if (!cacheKey) {
               logger.warn('Cache key not found, skipping audio cache');
             } else {
               logger.log('Adding audio to cache');
+<<<<<<< HEAD
               await cache.put(cacheKey, new Response(audioBlob));
+=======
+              setCachedTTSAudio(cacheKey, audioBlob, generation);
+>>>>>>> upstream/main
             }
           }
         }
@@ -179,6 +249,10 @@ export default function StreamAudio({ index = 0 }) {
     audioRef,
     voice,
     token,
+<<<<<<< HEAD
+=======
+    user?.id,
+>>>>>>> upstream/main
   ]);
 
   useEffect(() => {
@@ -206,6 +280,7 @@ export default function StreamAudio({ index = 0 }) {
       ref={audioRef}
       controls
       controlsList="nodownload nofullscreen noremoteplayback"
+<<<<<<< HEAD
       style={{
         position: 'absolute',
         overflow: 'hidden',
@@ -213,6 +288,9 @@ export default function StreamAudio({ index = 0 }) {
         height: '0px',
         width: '0px',
       }}
+=======
+      className="absolute hidden size-0 overflow-hidden"
+>>>>>>> upstream/main
       src={globalAudioURL ?? undefined}
       id={globalAudioId}
       autoPlay

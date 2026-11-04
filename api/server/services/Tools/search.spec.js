@@ -5,6 +5,16 @@ jest.mock('nanoid', () => ({
 }));
 
 jest.mock('@librechat/api', () => ({
+<<<<<<< HEAD
+=======
+  writeGuarded: (res, chunk) => {
+    if (res.writableEnded === true || res.destroyed === true) {
+      return false;
+    }
+    res.write(chunk);
+    return true;
+  },
+>>>>>>> upstream/main
   GenerationJobManager: {
     emitChunk: (...args) => mockEmitChunk(...args),
   },

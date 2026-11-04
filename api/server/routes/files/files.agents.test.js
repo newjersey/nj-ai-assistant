@@ -98,7 +98,11 @@ describe('File Routes - Agent Files Endpoint', () => {
   let modelsToCleanup = [];
 
   beforeAll(async () => {
+<<<<<<< HEAD
     mongoServer = await MongoMemoryServer.create();
+=======
+    mongoServer = await MongoMemoryServer.create({ instance: { launchTimeout: 30_000 } });
+>>>>>>> upstream/main
     const mongoUri = mongoServer.getUri();
     await mongoose.connect(mongoUri);
 
@@ -137,6 +141,7 @@ describe('File Routes - Agent Files Endpoint', () => {
     });
 
     app.use('/files', router);
+<<<<<<< HEAD
   });
 
   afterAll(async () => {
@@ -144,6 +149,17 @@ describe('File Routes - Agent Files Endpoint', () => {
     const collections = mongoose.connection.collections;
     for (const key in collections) {
       await collections[key].deleteMany({});
+=======
+  }, 60_000);
+
+  afterAll(async () => {
+    // Clean up all collections before disconnecting
+    if (mongoose.connection.readyState === 1) {
+      const collections = mongoose.connection.collections;
+      for (const key in collections) {
+        await collections[key].deleteMany({});
+      }
+>>>>>>> upstream/main
     }
 
     // Clear only the models we added
@@ -154,7 +170,11 @@ describe('File Routes - Agent Files Endpoint', () => {
     }
 
     await mongoose.disconnect();
+<<<<<<< HEAD
     await mongoServer.stop();
+=======
+    await mongoServer?.stop();
+>>>>>>> upstream/main
   });
 
   beforeEach(async () => {

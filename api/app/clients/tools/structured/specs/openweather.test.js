@@ -317,7 +317,11 @@ describe('OpenWeather Tool', () => {
       Promise.resolve({
         ok: false,
         status: 404,
+<<<<<<< HEAD
         json: async () => ({ message: 'Not found' }),
+=======
+        json: async () => ({ message: 'Not found for PRIVATE-PROVIDER-DETAIL' }),
+>>>>>>> upstream/main
       }),
     );
 
@@ -325,7 +329,12 @@ describe('OpenWeather Tool', () => {
       action: 'current_forecast',
       city: 'Knoxville, Tennessee',
     });
+<<<<<<< HEAD
     expect(result).toMatch(/Error: OpenWeather API request failed with status 404: Not found/);
+=======
+    expect(result).toBe('Error: OpenWeather found no result for this request (status 404).');
+    expect(result).not.toContain('PRIVATE-PROVIDER-DETAIL');
+>>>>>>> upstream/main
   });
 
   test('invalid date format returns an error', async () => {
@@ -340,6 +349,7 @@ describe('OpenWeather Tool', () => {
       return Promise.reject('Unexpected fetch call for geocoding');
     });
 
+<<<<<<< HEAD
     // Mock timestamp API response
     fetch.mockImplementationOnce((url) => {
       if (url.includes('onecall/timemachine')) {
@@ -355,4 +365,25 @@ describe('OpenWeather Tool', () => {
     });
     expect(result).toMatch(/Error: Invalid date format. Expected YYYY-MM-DD./);
   });
+=======
+    const result = await tool.call({
+      action: 'timestamp',
+      city: 'Knoxville, Tennessee',
+      date: '2020/03/04', // Wrong format
+    });
+    expect(result).toMatch(/Error: Invalid date format. Expected YYYY-MM-DD./);
+  });
+
+  test('a failed request returns approved text, not the exception message', async () => {
+    fetch.mockImplementationOnce((url) =>
+      Promise.reject(new Error(`request to ${url} failed, reason: getaddrinfo ENOTFOUND`)),
+    );
+
+    const result = await tool.call({ action: 'current_forecast', lat: 35.96, lon: -83.92 });
+
+    expect(result).toBe('Error: The tool request failed.');
+    expect(result).not.toContain('test-api-key');
+    expect(result).not.toContain('ENOTFOUND');
+  });
+>>>>>>> upstream/main
 });

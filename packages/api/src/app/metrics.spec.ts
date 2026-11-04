@@ -63,11 +63,24 @@ describe('normalizePath', () => {
     // Static paths are not modified
     ['/api/auth/login', '/api/auth/login'],
     ['/api/config', '/api/config'],
+<<<<<<< HEAD
+=======
+    ['/api/insights', '/api/insights'],
+    ['/api/insights/', '/api/insights'],
+    ['/api/insights?agentIds=agent-private&search=private-query', '/api/insights'],
+    ['/api/insights/access', '/api/insights/access'],
+    ['/api/insights/access/?agentIds=agent-private', '/api/insights/access'],
+>>>>>>> upstream/main
     ['/health', '/health'],
     ['/metrics', '/metrics'],
     ['/', '/'],
     // Unknown/user-generated routes collapse into bounded label buckets
     ['/api/not-a-real-route/user-generated-value', '/api/#path'],
+<<<<<<< HEAD
+=======
+    ['/api/insights/user-generated-value', '/api/#path'],
+    ['/api/insights/access/user-generated-value', '/api/#path'],
+>>>>>>> upstream/main
     ['/images/user-123/avatar-1700000000000.png', '/images/#path'],
     ['/avatars/user-123/avatar-1700000000000.png', '/avatars/#path'],
     ['/t/tenant-a/images/user-123/avatar-1700000000000.png', '/t/#path'],
@@ -139,6 +152,39 @@ describe('createMetrics', () => {
     );
   });
 
+<<<<<<< HEAD
+=======
+  it.each([
+    ['/api/insights', 200],
+    ['/api/insights', 500],
+    ['/api/insights/access', 200],
+    ['/api/insights/access', 403],
+  ])('exports Insights request metrics for %s with status %i', async (path, status) => {
+    process.env.METRICS_SECRET = 'test-secret';
+    const app = express();
+    const { metricsMiddleware, metricsRouter } = createMetrics();
+    app.use(metricsMiddleware);
+    app.get(path, (_req, res) => {
+      res.sendStatus(status);
+    });
+    app.use('/metrics', metricsRouter);
+
+    await request(app).get(`${path}/?agentIds=private-agent&search=private-query`).expect(status);
+    const response = await request(app)
+      .get('/metrics')
+      .set('Authorization', 'Bearer test-secret')
+      .expect(200);
+
+    const labels = `method="GET",path="${path}",status="${status}"`;
+    expect(response.text).toContain(`http_requests_total{${labels}} 1`);
+    expect(response.text).toContain(`http_request_duration_seconds_count{${labels}} 1`);
+    expect(response.text).toContain(`http_request_duration_seconds_sum{${labels}}`);
+    expect(response.text).not.toContain('private-agent');
+    expect(response.text).not.toContain('private-query');
+    expect(response.text).not.toContain('path="/api/#path"');
+  });
+
+>>>>>>> upstream/main
   it('records locator traversal reasons and count distributions without content labels', async () => {
     process.env.METRICS_SECRET = 'test-secret';
     createMetrics();

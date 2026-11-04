@@ -77,6 +77,10 @@ describe('Share Methods', () => {
         conversationId: { type: String, required: true },
         user: { type: String, required: true },
         text: String,
+<<<<<<< HEAD
+=======
+        privateTextTokens: { type: [String], select: false, default: undefined },
+>>>>>>> upstream/main
         isCreatedByUser: Boolean,
         isUserSubmitted: Boolean,
         userSubmittedPaths: {

@@ -3,10 +3,23 @@ const requireJwtAuth = require('~/server/middleware/requireJwtAuth');
 const configMiddleware = require('~/server/middleware/config/app');
 const endpointController = require('~/server/controllers/EndpointController');
 const tokenConfigController = require('~/server/controllers/TokenConfigController');
+<<<<<<< HEAD
+=======
+const reasoningCapabilitiesController = require('~/server/controllers/ReasoningCapabilitiesController');
+>>>>>>> upstream/main
 
 const router = express.Router();
 /** Auth required for role/tenant-scoped endpoint config resolution. */
 router.get('/', requireJwtAuth, configMiddleware, endpointController);
 router.get('/token-config', requireJwtAuth, configMiddleware, tokenConfigController);
+<<<<<<< HEAD
+=======
+router.get(
+  '/reasoning-capabilities',
+  requireJwtAuth,
+  configMiddleware,
+  reasoningCapabilitiesController,
+);
+>>>>>>> upstream/main
 
 module.exports = router;

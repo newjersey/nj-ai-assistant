@@ -20,6 +20,10 @@ import type {
   ResponseStatus,
   Usage,
 } from './types';
+<<<<<<< HEAD
+=======
+import { writeGuarded } from '~/utils/events';
+>>>>>>> upstream/main
 
 /* =============================================================================
  * RESPONSE TRACKER
@@ -102,15 +106,24 @@ export function createResponseTracker(): ResponseTracker {
  * The `event:` field matches the `type` in the data payload.
  */
 export function writeEvent(res: ServerResponse, event: ResponseEvent): void {
+<<<<<<< HEAD
   res.write(`event: ${event.type}\n`);
   res.write(`data: ${JSON.stringify(event)}\n\n`);
+=======
+  writeGuarded(res, `event: ${event.type}\n`);
+  writeGuarded(res, `data: ${JSON.stringify(event)}\n\n`);
+>>>>>>> upstream/main
 }
 
 /**
  * Write the terminal [DONE] event
  */
 export function writeDone(res: ServerResponse): void {
+<<<<<<< HEAD
   res.write('data: [DONE]\n\n');
+=======
+  writeGuarded(res, 'data: [DONE]\n\n');
+>>>>>>> upstream/main
 }
 
 /* =============================================================================
@@ -142,7 +155,11 @@ export function buildResponse(
     instructions: context.instructions ?? null,
     output: tracker.items,
     error: null,
+<<<<<<< HEAD
     tools: [],
+=======
+    tools: context.tools ?? [],
+>>>>>>> upstream/main
     tool_choice: 'auto',
     truncation: 'disabled',
     parallel_tool_calls: true,
@@ -278,6 +295,16 @@ export interface StreamHandlerConfig {
   res: ServerResponse;
   context: ResponseContext;
   tracker: ResponseTracker;
+<<<<<<< HEAD
+=======
+  /**
+   * Names the caller declared and executes itself. A call to one of these is
+   * never run by the server, so `on_tool_end` cannot terminate its item and the
+   * run's own finalization has to. Omitted by every request that declares none,
+   * which leaves that request's event stream untouched.
+   */
+  clientToolNames?: ReadonlySet<string>;
+>>>>>>> upstream/main
 }
 
 /**
@@ -322,6 +349,7 @@ export function emitResponseCompleted(config: StreamHandlerConfig, usage?: Usage
 }
 
 /**
+<<<<<<< HEAD
  * Emit response.failed event
  */
 export function emitResponseFailed(
@@ -349,6 +377,8 @@ export function emitResponseFailed(
 }
 
 /**
+=======
+>>>>>>> upstream/main
  * Emit response.output_item.added event for a message
  */
 export function emitMessageItemAdded(config: StreamHandlerConfig): MessageItem {
@@ -893,6 +923,7 @@ export function writeAttachmentEvent(
     conversation_id: options?.conversationId,
   });
 }
+<<<<<<< HEAD
 
 /* =============================================================================
  * NON-STREAMING RESPONSE BUILDER
@@ -933,3 +964,5 @@ export function updateTrackerUsage(
     tracker.usage.cachedTokens = usage.cachedTokens;
   }
 }
+=======
+>>>>>>> upstream/main

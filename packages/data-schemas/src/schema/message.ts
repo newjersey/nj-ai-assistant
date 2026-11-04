@@ -59,6 +59,12 @@ const messageSchema: Schema<IMessage> = new Schema(
     summary: {
       type: String,
     },
+<<<<<<< HEAD
+=======
+    privateText: { type: String, select: false },
+    privacyRevision: { type: String },
+    privateTextTokens: { type: [String], select: false, default: undefined },
+>>>>>>> upstream/main
     isCreatedByUser: {
       type: Boolean,
       required: true,
@@ -149,6 +155,19 @@ const messageSchema: Schema<IMessage> = new Schema(
       type: String,
     },
     metadata: { type: mongoose.Schema.Types.Mixed },
+<<<<<<< HEAD
+=======
+    subagentContent: {
+      type: {
+        version: { type: Number, enum: [1], required: true },
+        throughSequence: Number,
+        deleted: { type: Boolean, default: undefined },
+      },
+      _id: false,
+      select: false,
+      default: undefined,
+    },
+>>>>>>> upstream/main
     subagentTranscript: {
       type: {
         taskId: { type: String, required: true },
@@ -162,7 +181,11 @@ const messageSchema: Schema<IMessage> = new Schema(
     subagentActivityProjection: {
       type: {
         taskId: { type: String, required: true },
+<<<<<<< HEAD
         version: { type: Number, enum: [1], required: true },
+=======
+        version: { type: Number, enum: [1, 2], required: true },
+>>>>>>> upstream/main
         activityJson: { type: String, required: true },
         truncated: { type: Boolean, required: true },
       },
@@ -270,6 +293,22 @@ const messageSchema: Schema<IMessage> = new Schema(
      * count), so they are not duplicated into the stored `text`.
      */
     quotes: { type: [String], default: undefined },
+<<<<<<< HEAD
+=======
+    /** Request-scoped reasoning selection used for this user turn. */
+    reasoningOverride: {
+      type: {
+        key: {
+          type: String,
+          enum: ['reasoning_effort', 'effort', 'thinkingLevel', 'thinkingBudget'],
+          required: true,
+        },
+        value: { type: mongoose.Schema.Types.Mixed, required: true },
+      },
+      _id: false,
+      default: undefined,
+    },
+>>>>>>> upstream/main
     /*
     attachments: {
       type: [
@@ -340,6 +379,15 @@ messageSchema.index({
 messageSchema.index({ conversationId: 1, user: 1, createdAt: 1, _id: 1 });
 
 /**
+<<<<<<< HEAD
+=======
+ * Serves the cursor-paginated message read when sorted by `updatedAt`, the
+ * default of `GET /api/messages`; the `createdAt` sort uses the index above.
+ */
+messageSchema.index({ conversationId: 1, user: 1, updatedAt: 1, _id: 1 });
+
+/**
+>>>>>>> upstream/main
  * Serves the batched newest-task read for child threads. `user` is an equality
  * prefix and `conversationId` is the partition key, so Mongo/DocumentDB can
  * stream each partition newest-first without materializing an unbounded sort.

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { Constants, Providers } from 'librechat-data-provider';
 import type { TMessage, TResponseUsage } from 'librechat-data-provider';
 import {
@@ -534,6 +535,11 @@ describe('estimateTokens', () => {
     expect(estimateTokens(100, 0)).toBe(25);
   });
 
+=======
+import { formatCost, formatTokens } from './tokens';
+
+describe('formatTokens', () => {
+>>>>>>> upstream/main
   it('renders malformed token counts as a bounded zero', () => {
     expect(formatTokens(Number.NaN)).toBe('0');
     expect(formatTokens(Number.POSITIVE_INFINITY)).toBe('0');
@@ -541,6 +547,7 @@ describe('estimateTokens', () => {
   });
 });
 
+<<<<<<< HEAD
 describe('normalizeUsageUnits', () => {
   it('subtracts cache from input for Anthropic (input_tokens is cache-inclusive)', () => {
     /** The agents SDK folds cache into Anthropic input_tokens, so cache is a
@@ -629,6 +636,8 @@ describe('normalizeUsageUnits', () => {
   });
 });
 
+=======
+>>>>>>> upstream/main
 describe('formatCost', () => {
   it('formats across magnitude bands (USD default, unchanged)', () => {
     expect(formatCost(0)).toBe('$0.00');
@@ -687,6 +696,7 @@ describe('formatCost', () => {
     expect(formatCost(10, { code: 'USD', rate: Number.NaN })).toBe('$10.00');
   });
 });
+<<<<<<< HEAD
 
 describe('groupToolTokens', () => {
   it('classifies tools into system, mcp, skills, and subagent groups', () => {
@@ -1087,3 +1097,5 @@ describe('per-message usage index (branch + total)', () => {
     expect(latestExchangeTokens(CONVO, 'a1', false)).toBe(509);
   });
 });
+=======
+>>>>>>> upstream/main

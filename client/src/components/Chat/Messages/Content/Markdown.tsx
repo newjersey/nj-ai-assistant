@@ -1,4 +1,5 @@
 import React, { memo, useRef, useEffect } from 'react';
+<<<<<<< HEAD
 import { useRecoilValue } from 'recoil';
 import { getRemarkPlugins, getRehypePlugins, getMarkdownComponents } from './markdownConfig';
 import useSmoothStreaming from '~/hooks/Messages/useSmoothStreaming';
@@ -7,6 +8,14 @@ import { FADE_HYDRATION_THRESHOLD } from './animate';
 import { useMessageContext } from '~/Providers';
 import MarkdownBlocks from './MarkdownBlocks';
 import store from '~/store';
+=======
+import { getRemarkPlugins, getRehypePlugins, getMarkdownComponents } from './markdownConfig';
+import { useMessagePartsHost } from '~/Providers/MessagePartsHostContext';
+import useSmoothStreaming from '~/hooks/Messages/useSmoothStreaming';
+import MarkdownErrorBoundary from './MarkdownErrorBoundary';
+import { FADE_HYDRATION_THRESHOLD } from './animate';
+import MarkdownBlocks from './MarkdownBlocks';
+>>>>>>> upstream/main
 
 type TContentProps = {
   content: string;
@@ -14,12 +23,23 @@ type TContentProps = {
 };
 
 const Markdown = memo(function Markdown({ content = '', isLatestMessage }: TContentProps) {
+<<<<<<< HEAD
   const { isSubmitting = false } = useMessageContext() ?? {};
   const smoothStreaming = useSmoothStreaming();
   const LaTeXParsing = useRecoilValue<boolean>(store.LaTeXParsing);
   const isInitializing = content === '';
 
   const animate = smoothStreaming && isLatestMessage && isSubmitting;
+=======
+  const { useMessage, useLaTeXParsing } = useMessagePartsHost();
+  const { isSubmitting = false } = useMessage();
+  const smoothStreaming = useSmoothStreaming();
+  const LaTeXParsing = useLaTeXParsing();
+  const isInitializing = content === '';
+
+  const streaming = isLatestMessage && isSubmitting;
+  const animate = smoothStreaming && streaming;
+>>>>>>> upstream/main
 
   // Hydration signal for the fade: substantial content already present at the
   // render where `animate` flips on means resumed/switched-to/follow-up
@@ -52,6 +72,10 @@ const Markdown = memo(function Markdown({ content = '', isLatestMessage }: TCont
     <MarkdownErrorBoundary content={content} codeExecution={true}>
       <MarkdownBlocks
         content={content}
+<<<<<<< HEAD
+=======
+        streaming={streaming}
+>>>>>>> upstream/main
         remarkPlugins={getRemarkPlugins(LaTeXParsing)}
         rehypePlugins={getRehypePlugins()}
         components={getMarkdownComponents()}

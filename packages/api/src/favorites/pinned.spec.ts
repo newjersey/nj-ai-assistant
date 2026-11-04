@@ -11,6 +11,10 @@ import {
 import { createPinnedOrderHandlers } from './pinned';
 
 jest.mock('@librechat/data-schemas', () => ({
+<<<<<<< HEAD
+=======
+  ...jest.requireActual('@librechat/data-schemas'),
+>>>>>>> upstream/main
   logger: { error: jest.fn(), warn: jest.fn(), info: jest.fn(), debug: jest.fn() },
 }));
 
@@ -131,10 +135,22 @@ describe('createPinnedOrderHandlers', () => {
 
     it('invalidates cached auth user state after persisting a new order', async () => {
       const store = makeAuthUserDocCacheStore();
+<<<<<<< HEAD
       await setCachedAuthUserDoc(store, 'auth-user-doc-key', {
         id: 'user-1',
         pinnedOrder: ['convo:stale'],
       });
+=======
+      await setCachedAuthUserDoc(
+        store,
+        'auth-user-doc-key',
+        {
+          id: 'user-1',
+          pinnedOrder: ['convo:stale'],
+        },
+        Date.now(),
+      );
+>>>>>>> upstream/main
       expect(await getCachedAuthUserDoc(store, 'auth-user-doc-key')).toEqual(
         expect.objectContaining({ pinnedOrder: ['convo:stale'] }),
       );

@@ -1,6 +1,13 @@
+<<<<<<< HEAD
 import { useState, useEffect, useCallback } from 'react';
 import { useRecoilValue } from 'recoil';
 import { MessageCircleQuestion, TriangleAlert } from 'lucide-react';
+=======
+import { useCallback } from 'react';
+import { useToolExpansion } from '@librechat/chat/react';
+import { MessageCircleQuestion, TriangleAlert } from 'lucide-react';
+import { EmptyText, TOOL_ROW_CLASSES } from '@librechat/chat/components';
+>>>>>>> upstream/main
 import type { Agents, PartMetadata } from 'librechat-data-provider';
 import {
   getSubmittedAskAnswer,
@@ -10,10 +17,14 @@ import {
 import AskUserQuestionProgress from './AskUserQuestionProgress';
 import { useLocalize, useExpandCollapse } from '~/hooks';
 import ProgressText from './ProgressText';
+<<<<<<< HEAD
 import EmptyText from './Parts/EmptyText';
 import { TOOL_ROW_CLASSES } from './rows';
 import Container from './Container';
 import store from '~/store';
+=======
+import Container from './Container';
+>>>>>>> upstream/main
 
 /**
  * Static rendering of a COMPLETED (or abandoned) `ask_user_question` tool call —
@@ -48,6 +59,7 @@ export default function AskUserQuestionCall({
   onExpand?: () => void;
 }) {
   const localize = useLocalize();
+<<<<<<< HEAD
   const autoExpand = useRecoilValue(store.autoExpandTools);
   const [expanded, setExpanded] = useState(autoExpand);
   const { style: expandStyle, ref: expandRef } = useExpandCollapse(expanded);
@@ -67,6 +79,17 @@ export default function AskUserQuestionCall({
       return next;
     });
   }, [onExpand]);
+=======
+  const [expanded, setExpanded] = useToolExpansion(true);
+  const { style: expandStyle, ref: expandRef } = useExpandCollapse(expanded);
+
+  const toggleExpanded = useCallback(() => {
+    setExpanded(!expanded);
+    if (!expanded) {
+      onExpand?.();
+    }
+  }, [expanded, onExpand, setExpanded]);
+>>>>>>> upstream/main
 
   const question = parseAskUserQuestionArgs(args);
   const batch = parseAskUserQuestionsArgs(args);
@@ -150,17 +173,28 @@ export default function AskUserQuestionCall({
     <>
       <div className={TOOL_ROW_CLASSES} data-testid="ask-user-question-call">
         <ProgressText
+<<<<<<< HEAD
           phase="completed"
+=======
+          phase={terminalFailure ? 'failed' : 'completed'}
+>>>>>>> upstream/main
           onClick={toggleExpanded}
           inProgressText={statusLabel}
           finishedText={statusLabel}
           subtitle={summary}
           icon={
             terminalFailure ? (
+<<<<<<< HEAD
               <TriangleAlert className="size-4 shrink-0 text-text-warning" aria-hidden="true" />
             ) : (
               <MessageCircleQuestion
                 className="size-4 shrink-0 text-text-secondary"
+=======
+              <TriangleAlert className="text-text-warning size-4 shrink-0" aria-hidden="true" />
+            ) : (
+              <MessageCircleQuestion
+                className="text-text-secondary size-4 shrink-0"
+>>>>>>> upstream/main
                 aria-hidden="true"
               />
             )
@@ -179,15 +213,26 @@ export default function AskUserQuestionCall({
       )}
       <div style={expandStyle}>
         <div className="overflow-hidden" ref={expandRef}>
+<<<<<<< HEAD
           <div className="my-2 flex w-full flex-col gap-4 rounded-lg border border-border-light bg-surface-secondary p-4">
+=======
+          <div className="border-border-light bg-surface-secondary my-2 flex w-full flex-col gap-4 rounded-lg border p-4">
+>>>>>>> upstream/main
             {batch != null ? (
               batch.questions.map((item, index) => (
                 <div
                   key={item.id}
+<<<<<<< HEAD
                   className={index > 0 ? 'border-t border-border-light pt-4' : undefined}
                 >
                   {item.header != null && (
                     <p className="mb-1 text-xs font-medium text-text-secondary">{item.header}</p>
+=======
+                  className={index > 0 ? 'border-border-inset border-t pt-4' : undefined}
+                >
+                  {item.header != null && (
+                    <p className="text-text-secondary mb-1 text-xs font-medium">{item.header}</p>
+>>>>>>> upstream/main
                   )}
                   <QuestionBody
                     question={item.question}
@@ -210,7 +255,11 @@ export default function AskUserQuestionCall({
               />
             )}
             {terminalFailure && (
+<<<<<<< HEAD
               <p className="text-sm leading-relaxed text-text-secondary">
+=======
+              <p className="text-text-secondary text-sm leading-relaxed">
+>>>>>>> upstream/main
                 {localize('com_ui_question_failed_description')}
               </p>
             )}
@@ -248,27 +297,47 @@ function QuestionBody({
   return (
     <div className="min-w-0">
       {question.length > 0 && (
+<<<<<<< HEAD
         <p className="whitespace-pre-wrap text-sm font-medium leading-relaxed text-text-primary [overflow-wrap:anywhere]">
+=======
+        <p className="text-text-primary text-sm leading-relaxed font-medium [overflow-wrap:anywhere] whitespace-pre-wrap">
+>>>>>>> upstream/main
           {question}
         </p>
       )}
       {description != null && description.length > 0 && (
+<<<<<<< HEAD
         <p className="mt-1 whitespace-pre-wrap text-sm leading-relaxed text-text-secondary [overflow-wrap:anywhere]">
+=======
+        <p className="text-text-secondary mt-1 text-sm leading-relaxed [overflow-wrap:anywhere] whitespace-pre-wrap">
+>>>>>>> upstream/main
           {description}
         </p>
       )}
       {typeof answer === 'string' && (
+<<<<<<< HEAD
         <div className="mt-2.5 border-l-2 border-border-medium pl-3">
           <p className="text-xs font-medium text-text-secondary">
             {localize('com_ui_you_answered')}
           </p>
           <p className="mt-0.5 whitespace-pre-wrap text-sm leading-relaxed text-text-primary [overflow-wrap:anywhere]">
+=======
+        <div className="border-border-medium mt-2.5 border-s-2 ps-3">
+          <p className="text-text-secondary text-xs font-medium">
+            {localize('com_ui_you_answered')}
+          </p>
+          <p className="text-text-primary mt-0.5 text-sm leading-relaxed [overflow-wrap:anywhere] whitespace-pre-wrap">
+>>>>>>> upstream/main
             {formatAnswerLabel({ question, options, multiSelect }, answer)}
           </p>
         </div>
       )}
       {typeof answer !== 'string' && !failed && (
+<<<<<<< HEAD
         <p className="mt-2.5 text-sm italic text-text-secondary">
+=======
+        <p className="text-text-secondary mt-2.5 text-sm italic">
+>>>>>>> upstream/main
           {localize('com_ui_question_unanswered')}
         </p>
       )}

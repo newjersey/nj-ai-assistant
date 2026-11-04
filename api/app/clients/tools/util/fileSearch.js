@@ -5,8 +5,14 @@ const {
   logAxiosError,
   selectFileCitationSources,
   generateShortLivedToken,
+<<<<<<< HEAD
 } = require('@librechat/api');
 const { Tools, EModelEndpoint, EToolResources } = require('librechat-data-provider');
+=======
+  executeFileSearchQuery,
+} = require('@librechat/api');
+const { Tools, EToolResources } = require('librechat-data-provider');
+>>>>>>> upstream/main
 const { filterFilesByAgentAccess } = require('~/server/services/Files/permissions');
 const { getFiles } = require('~/models');
 
@@ -101,6 +107,7 @@ const createFileSearchTool = async ({
   appConfig,
 }) => {
   return tool(
+<<<<<<< HEAD
     async ({ query }) => {
       if (files.length === 0) {
         return ['No files to search. Instruct the user to add files for the search.', undefined];
@@ -210,6 +217,23 @@ const createFileSearchTool = async ({
 
       return [formattedString, { [Tools.file_search]: { sources, fileCitations } }];
     },
+=======
+    ({ query }) =>
+      executeFileSearchQuery({
+        query,
+        userId,
+        files,
+        entity_id,
+        fileCitations,
+        appConfig,
+        ragApiUrl: process.env.RAG_API_URL,
+        httpClient: axios,
+        generateShortLivedToken,
+        logAxiosError,
+        selectFileCitationSources,
+        logger,
+      }),
+>>>>>>> upstream/main
     {
       name: Tools.file_search,
       responseFormat: 'content_and_artifact',

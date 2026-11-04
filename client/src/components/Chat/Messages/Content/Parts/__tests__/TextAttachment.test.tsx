@@ -1,6 +1,14 @@
 import React from 'react';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import type { TAttachment } from 'librechat-data-provider';
+<<<<<<< HEAD
+=======
+
+let mockRemScale = 1;
+jest.mock('@librechat/client', () => ({
+  useRemScale: () => mockRemScale,
+}));
+>>>>>>> upstream/main
 import Attachment, { AttachmentGroup } from '../Attachment';
 
 jest.mock('~/hooks', () => ({
@@ -28,13 +36,23 @@ jest.mock('../LogLink', () => ({
   useAttachmentLink: () => ({ handleDownload: mockHandleDownload }),
 }));
 
+<<<<<<< HEAD
 jest.mock('~/components/Chat/Input/Files/FileContainer', () => ({
   __esModule: true,
   default: ({ file, onClick }: { file: { filename?: string }; onClick?: () => void }) => (
+=======
+jest.mock('@librechat/chat/components', () => ({
+  ...jest.requireActual('@librechat/chat/components'),
+  FileContainer: ({ file, onClick }: { file: { filename?: string }; onClick?: () => void }) => (
+>>>>>>> upstream/main
     <button type="button" data-testid="file-container" onClick={onClick}>
       {file.filename ?? ''}
     </button>
   ),
+<<<<<<< HEAD
+=======
+  FilePreview: () => <div data-testid="file-preview" />,
+>>>>>>> upstream/main
 }));
 
 jest.mock('~/components/Chat/Messages/Content/Image', () => ({
@@ -49,11 +67,14 @@ jest.mock('~/components/Messages/Content/Mermaid/Mermaid', () => ({
   ),
 }));
 
+<<<<<<< HEAD
 jest.mock('~/components/Chat/Input/Files/FilePreview', () => ({
   __esModule: true,
   default: () => <div data-testid="file-preview" />,
 }));
 
+=======
+>>>>>>> upstream/main
 jest.mock('~/utils', () => ({
   cn: (...classes: Array<string | false | null | undefined>) => classes.filter(Boolean).join(' '),
   getFileType: () => ({ paths: [], color: '', title: 'Artifact' }),
@@ -101,11 +122,19 @@ const restoreScrollHeight = () => {
 };
 
 afterAll(() => {
+<<<<<<< HEAD
+=======
+  mockRemScale = 1;
+>>>>>>> upstream/main
   restoreScrollHeight();
 });
 
 describe('TextAttachment (via Attachment default export)', () => {
   beforeEach(() => {
+<<<<<<< HEAD
+=======
+    mockRemScale = 1;
+>>>>>>> upstream/main
     mockHandleDownload.mockReset();
     setScrollHeight(0);
   });
@@ -152,6 +181,29 @@ describe('TextAttachment (via Attachment default export)', () => {
     expect(expanded).toHaveAttribute('aria-expanded', 'true');
   });
 
+<<<<<<< HEAD
+=======
+  it('recalculates the text preview when the root scale changes', () => {
+    setScrollHeight(300);
+    mockRemScale = 1.5;
+    const { container, rerender } = render(<Attachment attachment={textAttachment()} />);
+    expect(screen.queryByRole('button', { name: 'Show all' })).not.toBeInTheDocument();
+
+    mockRemScale = 0.5;
+    rerender(<Attachment attachment={textAttachment()} />);
+    expect(screen.getByRole('button', { name: 'Show all' })).toHaveAttribute(
+      'aria-expanded',
+      'false',
+    );
+    expect(container.querySelector('pre')).toHaveStyle({ maxHeight: '160px' });
+
+    mockRemScale = 1.5;
+    rerender(<Attachment attachment={textAttachment()} />);
+    expect(screen.queryByRole('button', { name: 'Show all' })).not.toBeInTheDocument();
+    expect(container.querySelector('pre')?.style.maxHeight).toBe('');
+  });
+
+>>>>>>> upstream/main
   it('falls through to FileAttachment when text is missing', () => {
     const noText = textAttachment({ text: undefined as unknown as string });
     render(<Attachment attachment={noText} />);
@@ -171,6 +223,10 @@ describe('TextAttachment (via Attachment default export)', () => {
 
 describe('AttachmentGroup', () => {
   beforeEach(() => {
+<<<<<<< HEAD
+=======
+    mockRemScale = 1;
+>>>>>>> upstream/main
     setScrollHeight(0);
   });
 

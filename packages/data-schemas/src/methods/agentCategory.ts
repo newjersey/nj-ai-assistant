@@ -1,10 +1,15 @@
+<<<<<<< HEAD
 import type { Model, Types } from 'mongoose';
+=======
+import type { Model } from 'mongoose';
+>>>>>>> upstream/main
 import type { IAgentCategory } from '~/types';
 import { tenantSafeBulkWrite } from '~/utils/tenantBulkWrite';
 
 export function createAgentCategoryMethods(mongoose: typeof import('mongoose')): {
   getActiveCategories: () => Promise<IAgentCategory[]>;
   getCategoriesWithCounts: () => Promise<(IAgentCategory & { agentCount: number })[]>;
+<<<<<<< HEAD
   getValidCategoryValues: () => Promise<string[]>;
   seedCategories: (
     categories: Array<{
@@ -23,6 +28,9 @@ export function createAgentCategoryMethods(mongoose: typeof import('mongoose')):
   ) => Promise<IAgentCategory | null>;
   deleteCategory: (value: string) => Promise<boolean>;
   findCategoryById: (id: string | Types.ObjectId) => Promise<IAgentCategory | null>;
+=======
+  createCategory: (categoryData: Partial<IAgentCategory>) => Promise<IAgentCategory>;
+>>>>>>> upstream/main
   getAllCategories: () => Promise<IAgentCategory[]>;
   ensureDefaultCategories: () => Promise<boolean>;
 } {
@@ -44,6 +52,7 @@ export function createAgentCategoryMethods(mongoose: typeof import('mongoose')):
   async function getCategoriesWithCounts(): Promise<(IAgentCategory & { agentCount: number })[]> {
     const Agent = mongoose.models.Agent;
 
+<<<<<<< HEAD
     const categoryCounts = await Agent.aggregate([
       { $match: { category: { $exists: true, $ne: null } } },
       { $group: { _id: '$category', count: { $sum: 1 } } },
@@ -51,6 +60,17 @@ export function createAgentCategoryMethods(mongoose: typeof import('mongoose')):
 
     const countMap = new Map(categoryCounts.map((c) => [c._id, c.count]));
     const categories = await getActiveCategories();
+=======
+    const [categoryCounts, categories] = await Promise.all([
+      Agent.aggregate([
+        { $match: { category: { $exists: true, $ne: null } } },
+        { $group: { _id: '$category', count: { $sum: 1 } } },
+      ]),
+      getActiveCategories(),
+    ]);
+
+    const countMap = new Map(categoryCounts.map((c) => [c._id, c.count]));
+>>>>>>> upstream/main
 
     return categories.map((category) => ({
       ...category,
@@ -59,6 +79,7 @@ export function createAgentCategoryMethods(mongoose: typeof import('mongoose')):
   }
 
   /**
+<<<<<<< HEAD
    * Get valid category values for Agent model validation
    * @returns Array of valid category values
    */
@@ -114,6 +135,8 @@ export function createAgentCategoryMethods(mongoose: typeof import('mongoose')):
   }
 
   /**
+=======
+>>>>>>> upstream/main
    * Create a new category
    * @param categoryData - The category data to create
    * @returns The created category
@@ -125,6 +148,7 @@ export function createAgentCategoryMethods(mongoose: typeof import('mongoose')):
   }
 
   /**
+<<<<<<< HEAD
    * Update a category by value
    * @param value - The category value to update
    * @param updateData - The data to update
@@ -164,6 +188,8 @@ export function createAgentCategoryMethods(mongoose: typeof import('mongoose')):
   }
 
   /**
+=======
+>>>>>>> upstream/main
    * Get all categories (active and inactive)
    * @returns Array of all categories
    */
@@ -276,6 +302,7 @@ export function createAgentCategoryMethods(mongoose: typeof import('mongoose')):
   return {
     getActiveCategories,
     getCategoriesWithCounts,
+<<<<<<< HEAD
     getValidCategoryValues,
     seedCategories,
     findCategoryByValue,
@@ -283,6 +310,9 @@ export function createAgentCategoryMethods(mongoose: typeof import('mongoose')):
     updateCategory,
     deleteCategory,
     findCategoryById,
+=======
+    createCategory,
+>>>>>>> upstream/main
     getAllCategories,
     ensureDefaultCategories,
   };

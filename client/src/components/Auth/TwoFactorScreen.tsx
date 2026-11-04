@@ -1,9 +1,16 @@
 import React, { useState, useCallback } from 'react';
+<<<<<<< HEAD
+=======
+import { REGEXP_ONLY_DIGITS } from 'input-otp';
+>>>>>>> upstream/main
 import { useSearchParams } from 'react-router-dom';
 import { useToastContext } from '@librechat/client';
 import { ErrorTypes } from 'librechat-data-provider';
 import { useForm, Controller } from 'react-hook-form';
+<<<<<<< HEAD
 import { REGEXP_ONLY_DIGITS, REGEXP_ONLY_DIGITS_AND_CHARS } from 'input-otp';
+=======
+>>>>>>> upstream/main
 import {
   Label,
   Button,
@@ -13,6 +20,11 @@ import {
   InputOTPSeparator,
 } from '@librechat/client';
 import { useVerifyTwoFactorTempMutation } from '~/data-provider';
+<<<<<<< HEAD
+=======
+import { useAuthContext } from '~/hooks/AuthContext';
+import BackupCodeInput from './BackupCodeInput';
+>>>>>>> upstream/main
 import { useLocalize } from '~/hooks';
 
 interface VerifyPayload {
@@ -37,13 +49,22 @@ const TwoFactorScreen: React.FC = React.memo(() => {
     formState: { errors },
   } = useForm<TwoFactorFormInputs>();
   const localize = useLocalize();
+<<<<<<< HEAD
+=======
+  const { completeAuthentication } = useAuthContext();
+>>>>>>> upstream/main
   const { showToast } = useToastContext();
   const [useBackup, setUseBackup] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { mutate: verifyTempMutate } = useVerifyTwoFactorTempMutation({
     onSuccess: (result) => {
+<<<<<<< HEAD
       if (result.token != null && result.token !== '') {
         window.location.href = '/';
+=======
+      if (result.token != null && result.token !== '' && result.user != null) {
+        completeAuthentication(result.token, result.user);
+>>>>>>> upstream/main
       }
     },
     onMutate: () => {
@@ -86,11 +107,19 @@ const TwoFactorScreen: React.FC = React.memo(() => {
   return (
     <div className="mt-4">
       <form onSubmit={handleSubmit(onSubmit)}>
+<<<<<<< HEAD
         <Label className="flex justify-center break-keep text-center text-sm text-text-primary">
           {localize('com_auth_two_factor')}
         </Label>
         {!useBackup && (
           <div className="my-4 flex justify-center text-text-primary">
+=======
+        <Label className="flex justify-center text-center text-sm break-keep">
+          {localize('com_auth_two_factor')}
+        </Label>
+        {!useBackup && (
+          <div className="text-text-primary my-4 flex justify-center">
+>>>>>>> upstream/main
             <Controller
               name="token"
               control={control}
@@ -100,6 +129,10 @@ const TwoFactorScreen: React.FC = React.memo(() => {
                   value={value != null ? value : ''}
                   onChange={onChange}
                   pattern={REGEXP_ONLY_DIGITS}
+<<<<<<< HEAD
+=======
+                  aria-label={localize('com_ui_2fa_verification_required')}
+>>>>>>> upstream/main
                 >
                   <InputOTPGroup>
                     <InputOTPSlot index={0} />
@@ -116,16 +149,25 @@ const TwoFactorScreen: React.FC = React.memo(() => {
               )}
             />
             {errors.token && (
+<<<<<<< HEAD
               <span className="text-sm text-text-destructive">{errors.token.message}</span>
+=======
+              <span className="text-text-destructive text-sm">{errors.token.message}</span>
+>>>>>>> upstream/main
             )}
           </div>
         )}
         {useBackup && (
+<<<<<<< HEAD
           <div className="my-4 flex justify-center text-text-primary">
+=======
+          <div className="text-text-primary my-4 flex justify-center">
+>>>>>>> upstream/main
             <Controller
               name="backupCode"
               control={control}
               render={({ field: { onChange, value } }) => (
+<<<<<<< HEAD
                 <InputOTP
                   maxLength={8}
                   value={value != null ? value : ''}
@@ -147,6 +189,13 @@ const TwoFactorScreen: React.FC = React.memo(() => {
             />
             {errors.backupCode && (
               <span className="text-sm text-text-destructive">{errors.backupCode.message}</span>
+=======
+                <BackupCodeInput value={value ?? ''} onChange={onChange} />
+              )}
+            />
+            {errors.backupCode && (
+              <span className="text-text-destructive text-sm">{errors.backupCode.message}</span>
+>>>>>>> upstream/main
             )}
           </div>
         )}
@@ -154,10 +203,18 @@ const TwoFactorScreen: React.FC = React.memo(() => {
           <Button
             type="submit"
             variant="submit"
+<<<<<<< HEAD
             aria-label={localize('com_auth_continue')}
             data-testid="login-button"
             disabled={isLoading}
             className="w-full rounded-2xl px-4 py-3 text-sm font-medium disabled:opacity-80"
+=======
+            data-testid="login-button"
+            disabled={isLoading}
+            shape="soft"
+            size="auth-action"
+            className="w-full disabled:opacity-80"
+>>>>>>> upstream/main
           >
             {isLoading ? localize('com_auth_email_verifying_ellipsis') : localize('com_ui_verify')}
           </Button>
@@ -166,18 +223,32 @@ const TwoFactorScreen: React.FC = React.memo(() => {
           {!useBackup ? (
             <Button
               type="button"
+<<<<<<< HEAD
               variant="link"
               onClick={toggleBackupOn}
               className="inline-flex p-1 text-sm font-medium text-accent-primary transition-colors hover:text-accent-primary-hover"
+=======
+              variant="link-accent"
+              onClick={toggleBackupOn}
+              size="snug"
+              className="inline-flex"
+>>>>>>> upstream/main
             >
               {localize('com_ui_use_backup_code')}
             </Button>
           ) : (
             <Button
               type="button"
+<<<<<<< HEAD
               variant="link"
               onClick={toggleBackupOff}
               className="inline-flex p-1 text-sm font-medium text-accent-primary transition-colors hover:text-accent-primary-hover"
+=======
+              variant="link-accent"
+              onClick={toggleBackupOff}
+              size="snug"
+              className="inline-flex"
+>>>>>>> upstream/main
             >
               {localize('com_ui_use_2fa_code')}
             </Button>

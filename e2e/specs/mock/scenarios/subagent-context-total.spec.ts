@@ -97,6 +97,7 @@ test.describe('subagent context usage totals', () => {
       const totals = popover.getByTestId('token-usage-totals');
       await expect(totals).toBeVisible({ timeout: 10000 });
       await expect(totals.getByRole('heading', { name: 'Totals' })).toBeVisible();
+<<<<<<< HEAD
       await expect(totals.getByText('Input', { exact: true })).toBeVisible();
       await expect(totals.getByText('Output', { exact: true })).toBeVisible();
 
@@ -106,6 +107,18 @@ test.describe('subagent context usage totals', () => {
       await expect(subagentRow).toHaveCount(1);
       await expect(
         subagentRow.locator(':scope > span').nth(1),
+=======
+      await expect(totals.getByText('Input (uncached)', { exact: true })).toBeVisible();
+      await expect(totals.getByText('Output', { exact: true })).toBeVisible();
+
+      const subagentTerm = totals
+        .getByRole('term')
+        .filter({ hasText: /^Subagents \(all branches\)$/ });
+      await expect(subagentTerm).toHaveCount(1);
+      await expect(subagentTerm).toBeVisible();
+      await expect(
+        subagentTerm.locator('..').getByRole('definition'),
+>>>>>>> upstream/main
         // The value is compact-formatted when large; a leading non-zero digit
         // proves the all-branches usage emitted by the child is not zero.
       ).toHaveText(/^[1-9]\d*(?:\.\d+)?[KMB]?$/);

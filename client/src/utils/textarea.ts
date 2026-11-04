@@ -1,3 +1,8 @@
+<<<<<<< HEAD
+=======
+export { removeCharIfLast } from '@librechat/chat';
+
+>>>>>>> upstream/main
 /**
  * Insert text at the cursor position in a textarea.
  */
@@ -40,6 +45,7 @@ export const forceResize = (element: HTMLTextAreaElement | null) => {
 };
 
 /**
+<<<<<<< HEAD
  * Necessary undo event helper for edge cases where undoing pasted content leaves newlines filling the previous container height.
  */
 export const trimUndoneRange = (textAreaRef: React.RefObject<HTMLTextAreaElement>) => {
@@ -75,6 +81,8 @@ export function removeCharIfLast(textarea: HTMLTextAreaElement, charToRemove: st
 }
 
 /**
+=======
+>>>>>>> upstream/main
  * Check if the textarea is scrollable.
  * @param element
  * @returns

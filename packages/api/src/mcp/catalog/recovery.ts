@@ -3,6 +3,11 @@ import { ErrorCode, McpError } from '@modelcontextprotocol/sdk/types.js';
 import type { Tool } from '@modelcontextprotocol/sdk/types.js';
 import type { IUser } from '@librechat/data-schemas';
 import type { LCAvailableTools, ParsedServerConfig, ToolDiscoveryOptions } from '../types';
+<<<<<<< HEAD
+=======
+import type { MCPClientCapabilityProfile } from '../capabilities';
+import { MCP_APPS_CAPABILITY_PROFILE, STANDARD_MCP_CAPABILITY_PROFILE } from '../capabilities';
+>>>>>>> upstream/main
 import { hasCustomUserVars, waitUntilDeadline, getMissingCustomUserVars } from '../utils';
 import { usesDirectOpenIDBearerRecovery } from '../openid';
 import { getServerCustomUserVars } from '../auth';
@@ -39,6 +44,10 @@ const DEFAULT_RECOVERY_POLICY: MCPServerCatalogRecoveryPolicy = {
 export interface MCPServerCatalogRecoveryInput {
   serverName: string;
   serverConfig: ParsedServerConfig;
+<<<<<<< HEAD
+=======
+  capabilityProfile?: MCPClientCapabilityProfile;
+>>>>>>> upstream/main
 }
 
 export interface MCPServerCatalogRecoveryDeps {
@@ -178,12 +187,24 @@ export interface MCPServerCatalogLoaderDeps extends MCPServerCatalogRecoveryDeps
     userId: string,
     serverName: string,
     serverConfig: ParsedServerConfig,
+<<<<<<< HEAD
+=======
+    capabilityProfile?: MCPClientCapabilityProfile,
+>>>>>>> upstream/main
   ) => Promise<LCAvailableTools | null>;
   getServerToolFunctionsSnapshot: (
     userId: string,
     serverName: string,
     serverConfig: ParsedServerConfig,
+<<<<<<< HEAD
     options?: { deadlineMs?: number; signal?: AbortSignal },
+=======
+    options?: {
+      deadlineMs?: number;
+      signal?: AbortSignal;
+      capabilityProfile?: MCPClientCapabilityProfile;
+    },
+>>>>>>> upstream/main
   ) => Promise<MCPServerCatalogSnapshot>;
   cacheServerTools: (params: {
     userId: string;
@@ -192,6 +213,10 @@ export interface MCPServerCatalogLoaderDeps extends MCPServerCatalogRecoveryDeps
     serverConfig: ParsedServerConfig;
     publicationGeneration?: string;
     publicationRevision?: string;
+<<<<<<< HEAD
+=======
+    capabilityProfile?: MCPClientCapabilityProfile;
+>>>>>>> upstream/main
   }) => Promise<void>;
 }
 
@@ -211,6 +236,10 @@ interface MCPServerCatalogRecoveryResult {
 interface MCPServerCatalogEntry extends MCPServerCatalogSnapshot {
   serverName: string;
   serverConfig: ParsedServerConfig;
+<<<<<<< HEAD
+=======
+  capabilityProfile?: MCPClientCapabilityProfile;
+>>>>>>> upstream/main
   source: 'cache' | 'snapshot';
 }
 
@@ -342,15 +371,30 @@ function resolveBudget(
   return policy.discoveryTimeoutMs;
 }
 
+<<<<<<< HEAD
 function getRecoveryKey(userId: string, serverName: string): string {
   return `${userId}\u0000${serverName}`;
+=======
+function getRecoveryKey(
+  userId: string,
+  serverName: string,
+  capabilityProfile: MCPClientCapabilityProfile = STANDARD_MCP_CAPABILITY_PROFILE,
+): string {
+  return JSON.stringify([userId, serverName, capabilityProfile]);
+>>>>>>> upstream/main
 }
 
 function getRecoveryFingerprint(
   serverConfig: ParsedServerConfig,
   policy: MCPServerCatalogRecoveryPolicy,
+<<<<<<< HEAD
 ): string {
   return JSON.stringify([serverConfig, policy]);
+=======
+  capabilityProfile: MCPClientCapabilityProfile = STANDARD_MCP_CAPABILITY_PROFILE,
+): string {
+  return JSON.stringify([serverConfig, policy, capabilityProfile]);
+>>>>>>> upstream/main
 }
 
 export class MCPServerCatalogRecoveryTracker {
@@ -371,8 +415,13 @@ export class MCPServerCatalogRecoveryTracker {
     policy: MCPServerCatalogRecoveryPolicy,
   ): boolean {
     return !this.isDiscoveryHeld(
+<<<<<<< HEAD
       getRecoveryKey(user.id, candidate.serverName),
       getRecoveryFingerprint(candidate.serverConfig, policy),
+=======
+      getRecoveryKey(user.id, candidate.serverName, candidate.capabilityProfile),
+      getRecoveryFingerprint(candidate.serverConfig, policy, candidate.capabilityProfile),
+>>>>>>> upstream/main
       undefined,
     );
   }
@@ -385,8 +434,19 @@ export class MCPServerCatalogRecoveryTracker {
     discovery: Promise<unknown>,
   ): void {
     this.detach(
+<<<<<<< HEAD
       getRecoveryKey(user.id, candidate.serverName),
       { configFingerprint: getRecoveryFingerprint(candidate.serverConfig, policy) },
+=======
+      getRecoveryKey(user.id, candidate.serverName, candidate.capabilityProfile),
+      {
+        configFingerprint: getRecoveryFingerprint(
+          candidate.serverConfig,
+          policy,
+          candidate.capabilityProfile,
+        ),
+      },
+>>>>>>> upstream/main
       discovery,
     );
   }
@@ -458,6 +518,7 @@ export class MCPServerCatalogRecoveryTracker {
    * Clears suppression after a credential/config mutation commits. A clear from a publication
    * carries the generation it wrote; see `clearState` for the state it spares.
    */
+<<<<<<< HEAD
   public clear(userId: string, serverName?: string, generation?: string): void {
     if (serverName != null) {
       this.clearState(getRecoveryKey(userId, serverName), generation);
@@ -466,6 +527,28 @@ export class MCPServerCatalogRecoveryTracker {
     const prefix = `${userId}\u0000`;
     for (const key of this.states.keys()) {
       if (key.startsWith(prefix)) {
+=======
+  public clear(
+    userId: string,
+    serverName?: string,
+    generation?: string,
+    capabilityProfile?: MCPClientCapabilityProfile,
+  ): void {
+    if (serverName != null) {
+      if (capabilityProfile != null) {
+        this.clearState(getRecoveryKey(userId, serverName, capabilityProfile), generation);
+        return;
+      }
+      this.clearState(
+        getRecoveryKey(userId, serverName, STANDARD_MCP_CAPABILITY_PROFILE),
+        generation,
+      );
+      this.clearState(getRecoveryKey(userId, serverName, MCP_APPS_CAPABILITY_PROFILE), generation);
+      return;
+    }
+    for (const key of this.states.keys()) {
+      if ((JSON.parse(key) as unknown[])[0] === userId) {
+>>>>>>> upstream/main
         this.clearState(key, generation);
       }
     }
@@ -504,8 +587,17 @@ export class MCPServerCatalogRecoveryTracker {
       detach: DiscoveryDetacher,
     ) => Promise<RecoveryOutcome>,
   ): Promise<RecoveryOutcome> {
+<<<<<<< HEAD
     const key = getRecoveryKey(user.id, candidate.serverName);
     const configFingerprint = getRecoveryFingerprint(candidate.serverConfig, policy);
+=======
+    const key = getRecoveryKey(user.id, candidate.serverName, candidate.capabilityProfile);
+    const configFingerprint = getRecoveryFingerprint(
+      candidate.serverConfig,
+      policy,
+      candidate.capabilityProfile,
+    );
+>>>>>>> upstream/main
     const now = Date.now();
     const existing = this.states.get(key);
     const held = this.isDiscoveryHeld(key, configFingerprint, recoveryGeneration);
@@ -656,7 +748,11 @@ function trackPublications(
 
 async function discoverCandidate(
   user: IUser,
+<<<<<<< HEAD
   { serverName, serverConfig, customUserVars }: RecoveryCandidate,
+=======
+  { serverName, serverConfig, customUserVars, capabilityProfile }: RecoveryCandidate,
+>>>>>>> upstream/main
   deps: MCPServerCatalogRecoveryDeps,
   policy: MCPServerCatalogRecoveryPolicy,
   {
@@ -682,7 +778,16 @@ async function discoverCandidate(
         deps.onOAuthCredentialsChanging,
         trackPublication,
       ),
+<<<<<<< HEAD
       onDiscoveryDetached: onDetached,
+=======
+      onOAuthCredentialsAdopted: async (generation) => {
+        // Adoption changes the generation this flight serves without writing another fence.
+        await trackPublication?.(async () => generation);
+      },
+      onDiscoveryDetached: onDetached,
+      capabilityProfile,
+>>>>>>> upstream/main
     });
     /** Discovery can await work that ignores its budget — a token refresh persisting behind a
      *  stalled write — and a shared flight has no request signal to end that wait, so it would hold
@@ -927,7 +1032,11 @@ async function recoverMCPServerCatalogsWithState(
           observedGeneration == null ||
           snapshotGeneration !== observedGeneration)
       ) {
+<<<<<<< HEAD
         tracker.clear(user.id, candidate.serverName);
+=======
+        tracker.clear(user.id, candidate.serverName, undefined, candidate.capabilityProfile);
+>>>>>>> upstream/main
         results[index] = { serverName: candidate.serverName, tools: null };
         return;
       }
@@ -964,7 +1073,11 @@ async function recoverMCPServerCatalogsWithState(
           ? finalGeneration !== outcomeGeneration
           : finalGeneration != null && finalGeneration !== outcomeGeneration);
       if (superseded) {
+<<<<<<< HEAD
         tracker.clear(user.id, candidate.serverName);
+=======
+        tracker.clear(user.id, candidate.serverName, undefined, candidate.capabilityProfile);
+>>>>>>> upstream/main
         results[index] = { serverName: candidate.serverName, tools: null };
         return;
       }
@@ -1016,6 +1129,7 @@ export async function loadMCPServerCatalogs(
 ): Promise<MCPServerCatalogLoaderResult> {
   const { user, servers, signal } = params;
   const cached: MCPServerCatalogEntry[] = await Promise.all(
+<<<<<<< HEAD
     servers.map(async ({ serverName, serverConfig }) => {
       try {
         const tools = await deps.getCachedServerTools(user.id, serverName, serverConfig);
@@ -1023,6 +1137,26 @@ export async function loadMCPServerCatalogs(
       } catch (error) {
         logger.error(`[MCP catalog loader] Failed to read cached tools for ${serverName}:`, error);
         return { serverName, serverConfig, tools: null, source: 'cache' as const };
+=======
+    servers.map(async ({ serverName, serverConfig, capabilityProfile }) => {
+      try {
+        const tools = await deps.getCachedServerTools(
+          user.id,
+          serverName,
+          serverConfig,
+          capabilityProfile,
+        );
+        return { serverName, serverConfig, capabilityProfile, tools, source: 'cache' as const };
+      } catch (error) {
+        logger.error(`[MCP catalog loader] Failed to read cached tools for ${serverName}:`, error);
+        return {
+          serverName,
+          serverConfig,
+          capabilityProfile,
+          tools: null,
+          source: 'cache' as const,
+        };
+>>>>>>> upstream/main
       }
     }),
   );
@@ -1039,7 +1173,15 @@ export async function loadMCPServerCatalogs(
                   user.id,
                   entry.serverName,
                   entry.serverConfig,
+<<<<<<< HEAD
                   { deadlineMs: Date.now() + mcpConfig.TOOLS_LIST_TIMEOUT_MS, signal },
+=======
+                  {
+                    deadlineMs: Date.now() + mcpConfig.TOOLS_LIST_TIMEOUT_MS,
+                    signal,
+                    capabilityProfile: entry.capabilityProfile,
+                  },
+>>>>>>> upstream/main
                 );
                 snapshots[index] = { ...entry, ...snapshot, source: 'snapshot' as const };
               } catch (error) {
@@ -1060,7 +1202,15 @@ export async function loadMCPServerCatalogs(
 
   const coldServers = snapshots
     .filter(({ tools }) => tools == null)
+<<<<<<< HEAD
     .map(({ serverName, serverConfig }) => ({ serverName, serverConfig }));
+=======
+    .map(({ serverName, serverConfig, capabilityProfile }) => ({
+      serverName,
+      serverConfig,
+      capabilityProfile,
+    }));
+>>>>>>> upstream/main
   let recovered: MCPServerCatalogRecoveryResult = {
     serverTools: new Map(),
     reauthRequiredServers: new Set(),
@@ -1090,7 +1240,16 @@ export async function loadMCPServerCatalogs(
     }
     serverTools.set(snapshot.serverName, tools);
     if (snapshot.tools != null) {
+<<<<<<< HEAD
       deps.recoveryTracker?.clear(user.id, snapshot.serverName);
+=======
+      deps.recoveryTracker?.clear(
+        user.id,
+        snapshot.serverName,
+        undefined,
+        snapshot.capabilityProfile,
+      );
+>>>>>>> upstream/main
     }
 
     if (snapshot.source !== 'snapshot' || snapshot.tools == null) {
@@ -1104,6 +1263,10 @@ export async function loadMCPServerCatalogs(
         serverConfig: snapshot.serverConfig,
         publicationGeneration: snapshot.publicationGeneration,
         publicationRevision: snapshot.publicationRevision,
+<<<<<<< HEAD
+=======
+        capabilityProfile: snapshot.capabilityProfile,
+>>>>>>> upstream/main
       })
       .catch((error) =>
         logger.error(

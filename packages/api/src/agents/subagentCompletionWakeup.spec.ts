@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+import type { CodeApprovalMode } from 'librechat-data-provider';
+>>>>>>> upstream/main
 import type { IMessage } from '@librechat/data-schemas';
 import type { AgentContinueTriggerEnvelope } from './triggers/envelope';
 import type { SubagentTaskWakeupRegistration } from './subagentThreads';
@@ -59,7 +63,11 @@ describe('createSubagentCompletionWakeupHandler', () => {
     const enqueue = enqueueMock();
     const notify = createSubagentCompletionWakeupHandler(enqueue);
 
+<<<<<<< HEAD
     await notify(registration());
+=======
+    await expect(notify(registration())).resolves.toBe(true);
+>>>>>>> upstream/main
 
     expect(enqueue).toHaveBeenCalledTimes(1);
     const [envelopeValue, options] = enqueue.mock.calls[0]!;
@@ -111,7 +119,11 @@ describe('createSubagentCompletionWakeupHandler', () => {
     const enqueue = enqueueMock();
     const notify = createSubagentCompletionWakeupHandler(enqueue);
 
+<<<<<<< HEAD
     await notify(registration({ parentAgentId: undefined }));
+=======
+    await expect(notify(registration({ parentAgentId: undefined }))).resolves.toBe(false);
+>>>>>>> upstream/main
 
     expect(enqueue).not.toHaveBeenCalled();
   });
@@ -126,7 +138,13 @@ describe('createSubagentCompletionWakeupHandler', () => {
   });
 });
 
+<<<<<<< HEAD
 function wakeupEnvelope(): AgentContinueTriggerEnvelope {
+=======
+function wakeupEnvelope(
+  scheduleMCPIdentity?: SubagentTaskWakeupRegistration['scheduleMCPIdentity'],
+): AgentContinueTriggerEnvelope {
+>>>>>>> upstream/main
   const envelope = createAgentTriggerEnvelope({
     mode: 'continue',
     requestId: 'request-1',
@@ -138,7 +156,16 @@ function wakeupEnvelope(): AgentContinueTriggerEnvelope {
       type: 'subagent.completion',
       occurredAt: NOW,
       source: { id: 'subagent-completion', type: 'internal' },
+<<<<<<< HEAD
       payload: { taskId: 'task-1', threadId: 'thread-1', subagentType: 'researcher' },
+=======
+      payload: {
+        taskId: 'task-1',
+        threadId: 'thread-1',
+        subagentType: 'researcher',
+        scheduleMCPIdentity: scheduleMCPIdentity ?? null,
+      },
+>>>>>>> upstream/main
     },
     target: {
       agentId: 'agent_parent_1',
@@ -153,7 +180,11 @@ function wakeupEnvelope(): AgentContinueTriggerEnvelope {
   return envelope;
 }
 
+<<<<<<< HEAD
 function resolverMethods() {
+=======
+function resolverMethods(codeApprovalMode?: CodeApprovalMode) {
+>>>>>>> upstream/main
   const subagentTask: IMessage['subagentTask'] = {
     attemptKey: 'attempt-1',
     parentRunId: 'response-1',
@@ -173,7 +204,15 @@ function resolverMethods() {
   const methods = {
     getConvo: jest.fn(async (_userId: string, conversationId: string) =>
       conversationId === 'conversation-1'
+<<<<<<< HEAD
         ? { conversationId, tenantId: 'tenant-1' }
+=======
+        ? {
+            conversationId,
+            tenantId: 'tenant-1',
+            ...(codeApprovalMode != null && { codeApprovalMode }),
+          }
+>>>>>>> upstream/main
         : {
             conversationId,
             tenantId: 'tenant-1',
@@ -259,6 +298,30 @@ function orchestrationSnapshot(
 }
 
 describe('createSubagentCompletionWakeupResolver', () => {
+<<<<<<< HEAD
+=======
+  it.each([undefined, 'ask', 'acceptEdits', 'fullAccess'] as const)(
+    'inherits parent approval mode %s rather than child or event permissions',
+    async (mode) => {
+      const { methods } = resolverMethods(mode);
+      const resolve = createSubagentCompletionWakeupResolver({
+        methods: methods as never,
+        getGenerationJob: async () => null,
+      });
+      const delivery = wakeupEnvelope();
+      if (delivery.event.payload == null || typeof delivery.event.payload !== 'object') {
+        throw new Error('Expected a completion payload');
+      }
+      delivery.event.payload = { ...delivery.event.payload, codeApprovalMode: 'fullAccess' };
+
+      const prepared = await resolve(delivery, { idempotencyKey: 'delivery-1' });
+
+      expect(prepared?.status).toBe('ready');
+      expect(prepared?.status === 'ready' && prepared.codeApprovalMode).toBe(mode);
+    },
+  );
+
+>>>>>>> upstream/main
   it('defers without claiming while the parent generation is active', async () => {
     const { methods } = resolverMethods();
     const resolve = createSubagentCompletionWakeupResolver({
@@ -1261,6 +1324,62 @@ describe('createSubagentCompletionWakeupResolver', () => {
     expect(snapshot.value.note).toContain('Do not infer that no other children ran');
   });
 
+<<<<<<< HEAD
+=======
+  it('backs off by waiting age while the child task is still running', async () => {
+    const { methods } = resolverMethods();
+    methods.getMessages.mockImplementation(async (filter: { conversationId: string }) =>
+      filter.conversationId === 'conversation-1'
+        ? [
+            {
+              messageId: 'response-1',
+              parentMessageId: 'user-1',
+              isCreatedByUser: false,
+              createdAt: new Date(NOW - 30),
+            },
+          ]
+        : [{ messageId: 'task-1:user', conversationId: 'thread-1', isCreatedByUser: true }],
+    );
+    const resolverAt = (offsetMs: number) =>
+      createSubagentCompletionWakeupResolver({
+        methods: methods as never,
+        getGenerationJob: async () => null,
+        now: () => NOW + offsetMs,
+      });
+
+    await expect(
+      resolverAt(5_000)(wakeupEnvelope(), { idempotencyKey: 'trigger_claim_1' } as never),
+    ).rejects.toMatchObject({ code: 'CHILD_NOT_READY', retryAfter: '5' });
+    await expect(
+      resolverAt(90_000)(wakeupEnvelope(), { idempotencyKey: 'trigger_claim_1' } as never),
+    ).rejects.toMatchObject({ code: 'CHILD_NOT_READY', retryAfter: '9' });
+    await expect(
+      resolverAt(20 * 60_000)(wakeupEnvelope(), { idempotencyKey: 'trigger_claim_1' } as never),
+    ).rejects.toMatchObject({ code: 'CHILD_NOT_READY', retryAfter: '60' });
+    await expect(
+      createSubagentCompletionWakeupResolver({
+        methods: methods as never,
+        getGenerationJob: async () => null,
+        now: () => NOW + 20 * 60_000,
+        getWaitMaxIntervalMs: () => 30_000,
+      })(wakeupEnvelope(), { idempotencyKey: 'trigger_claim_1' } as never),
+    ).rejects.toMatchObject({ code: 'CHILD_NOT_READY', retryAfter: '30' });
+  });
+
+  it('backs off by waiting age while the parent generation keeps running', async () => {
+    const { methods } = resolverMethods();
+    const resolve = createSubagentCompletionWakeupResolver({
+      methods: methods as never,
+      getGenerationJob: async () => ({ status: 'running' }),
+      now: () => NOW + 150_000,
+    });
+
+    await expect(
+      resolve(wakeupEnvelope(), { idempotencyKey: 'trigger_claim_1' } as never),
+    ).rejects.toMatchObject({ code: 'PARENT_NOT_READY', retryAfter: '15' });
+  });
+
+>>>>>>> upstream/main
   it('dead-letters a child whose process disappeared after the task timeout grace', async () => {
     const { methods } = resolverMethods();
     methods.getMessages.mockImplementation(async (filter: { conversationId: string }) =>
@@ -1485,3 +1604,50 @@ describe('createSubagentCompletionWakeupResolver', () => {
     });
   });
 });
+<<<<<<< HEAD
+=======
+
+it('refuses a queued legacy scheduled wakeup after enrollment before claiming its result', async () => {
+  const { methods } = resolverMethods();
+  const lookup = jest.fn(async () => ({
+    identity: {
+      scheduleId: 'schedule',
+      ownerId: 'user-1',
+      tenantId: 'tenant-1',
+      agentId: 'agent_parent_1',
+      invocationMode: 'delegated' as const,
+    },
+    enrolled: true,
+  }));
+  const prepare = createSubagentCompletionWakeupResolver({
+    methods: methods as never,
+    getGenerationJob: async () => null,
+    getScheduleMCPCompletionState: lookup,
+  });
+  await expect(
+    prepare(wakeupEnvelope((await lookup()).identity), {
+      idempotencyKey: 'wakeup',
+      attempt: 1,
+      maxAttempts: 3,
+    }),
+  ).rejects.toMatchObject({ failure: { reason: 'binding_mismatch' } });
+  expect(lookup).toHaveBeenCalledWith((await lookup()).identity);
+  expect(methods.claimSubagentTaskResult).not.toHaveBeenCalled();
+});
+
+it('does not attach a historical schedule to an ordinary later subagent completion', async () => {
+  const { methods } = resolverMethods();
+  const lookup = jest.fn(async () => {
+    throw new Error('historical schedule must not be consulted');
+  });
+  const prepare = createSubagentCompletionWakeupResolver({
+    methods: methods as never,
+    getGenerationJob: async () => null,
+    getScheduleMCPCompletionState: lookup,
+  });
+  const prepared = await prepare(wakeupEnvelope(), { idempotencyKey: 'ordinary' });
+  expect(prepared).toMatchObject({ status: 'ready' });
+  expect(prepared).not.toHaveProperty('scheduleMCPIdentity');
+  expect(lookup).not.toHaveBeenCalled();
+});
+>>>>>>> upstream/main

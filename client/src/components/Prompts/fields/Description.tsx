@@ -11,7 +11,11 @@ const Description = ({
   onValueChange,
   disabled,
   tabIndex,
+<<<<<<< HEAD
   labelBgClassName = 'bg-presentation',
+=======
+  labelBgClassName = 'bg-surface-primary-alt',
+>>>>>>> upstream/main
 }: {
   initialValue?: string;
   onValueChange?: (value: string) => void;
@@ -46,6 +50,7 @@ const Description = ({
   }
 
   return (
+<<<<<<< HEAD
     <div className="rounded-xl border border-border-medium">
       <label
         htmlFor={descriptionId}
@@ -56,6 +61,19 @@ const Description = ({
       <div className="relative flex h-10 items-center gap-1 pl-4 pr-2 text-sm text-text-secondary">
         <Info className="icon-sm shrink-0" aria-hidden="true" />
         <div className="relative min-w-0 flex-1">
+=======
+    <div className="border-border-inset-medium rounded-xl border">
+      <label
+        htmlFor={descriptionId}
+        className="text-text-secondary block px-4 pt-2 text-sm md:hidden"
+      >
+        {localize('com_ui_description_placeholder')}
+      </label>
+      <div className="text-text-secondary relative flex h-10 items-center gap-1 ps-4 pe-2 text-sm">
+        <Info className="icon-sm shrink-0" aria-hidden="true" />
+        {/* The wrapper reserves the counter's side so it follows the inline end; <Input> owns its own padding. */}
+        <div className="relative min-w-0 flex-1 pe-11">
+>>>>>>> upstream/main
           <Input
             type="text"
             id={descriptionId}
@@ -64,13 +82,21 @@ const Description = ({
             placeholder=" "
             value={description}
             onChange={handleInputChange}
+<<<<<<< HEAD
             className="peer w-full border-none pr-14"
+=======
+            className="peer w-full border-none"
+>>>>>>> upstream/main
             aria-label={localize('com_ui_description_placeholder')}
           />
           <label
             htmlFor={descriptionId}
             className={cn(
+<<<<<<< HEAD
               'pointer-events-none absolute left-0 top-0.5 hidden max-w-[calc(100%-3.5rem)] origin-[0] translate-y-2 scale-100 rounded px-1 text-sm text-text-secondary transition-transform duration-200 peer-placeholder-shown:translate-y-2 peer-placeholder-shown:scale-100 peer-focus:-translate-y-3 peer-focus:scale-75 peer-focus:text-text-primary peer-[:not(:placeholder-shown)]:-translate-y-3 peer-[:not(:placeholder-shown)]:scale-75 md:block',
+=======
+              'text-text-secondary peer-focus:text-text-primary pointer-events-none absolute inset-s-0 top-0.5 hidden max-w-[calc(100%-3.5rem)] origin-[0] translate-y-2 scale-100 rounded px-1 text-sm transition-transform duration-200 peer-placeholder-shown:translate-y-2 peer-placeholder-shown:scale-100 peer-focus:-translate-y-3 peer-focus:scale-75 peer-[:not(:placeholder-shown)]:-translate-y-3 peer-[:not(:placeholder-shown)]:scale-75 md:block rtl:origin-right',
+>>>>>>> upstream/main
               labelBgClassName,
             )}
           >
@@ -78,7 +104,11 @@ const Description = ({
           </label>
         </div>
         {!disabled && (
+<<<<<<< HEAD
           <span className="absolute right-2 shrink-0 text-xs text-text-secondary md:text-sm">{`${charCount}/${MAX_LENGTH}`}</span>
+=======
+          <span className="text-text-secondary absolute inset-e-2 shrink-0 text-xs md:text-sm">{`${charCount}/${MAX_LENGTH}`}</span>
+>>>>>>> upstream/main
         )}
       </div>
     </div>

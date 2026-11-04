@@ -2,6 +2,10 @@ import React from 'react';
 import { RecoilRoot } from 'recoil';
 import { render, screen, fireEvent } from '@testing-library/react';
 import type { TAttachment } from 'librechat-data-provider';
+<<<<<<< HEAD
+=======
+import '~/Providers/MessagePartsHostContext';
+>>>>>>> upstream/main
 import RetrievalCall from '../RetrievalCall';
 
 jest.mock('~/hooks', () => ({

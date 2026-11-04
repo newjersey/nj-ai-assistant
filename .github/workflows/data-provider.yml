@@ -19,19 +19,48 @@ permissions:
 jobs:
   pack:
     runs-on: ubuntu-latest
+<<<<<<< HEAD
+=======
+    outputs:
+      skip: ${{ steps.check.outputs.skip }}
+>>>>>>> upstream/main
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
         with:
+<<<<<<< HEAD
           node-version: '24.16.0'
       - run: cd packages/data-provider && npm ci
       - run: cd packages/data-provider && npm run build
       - name: Pack package
+=======
+          node-version: '24.22.1'
+      - run: cd packages/data-provider && npm ci
+      - run: cd packages/data-provider && npm run build
+      - name: Check version change
+        id: check
+        working-directory: packages/data-provider
+        run: |
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+          if npm view "librechat-data-provider@$PACKAGE_VERSION" version 2>/dev/null | grep -q .; then
+            echo "Version $PACKAGE_VERSION is already published, skipping publish"
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "Version $PACKAGE_VERSION is unpublished, proceeding with publish"
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+      - name: Pack package
+        if: steps.check.outputs.skip != 'true'
+>>>>>>> upstream/main
         run: |
           mkdir -p npm-package
           cd packages/data-provider
           npm pack --pack-destination "$GITHUB_WORKSPACE/npm-package"
       - name: Upload package
+<<<<<<< HEAD
+=======
+        if: steps.check.outputs.skip != 'true'
+>>>>>>> upstream/main
         uses: actions/upload-artifact@v6
         with:
           name: librechat-data-provider-package
@@ -41,7 +70,11 @@ jobs:
 
   publish-npm:
     needs: pack
+<<<<<<< HEAD
     if: github.ref == 'refs/heads/main'
+=======
+    if: github.ref == 'refs/heads/main' && needs.pack.outputs.skip != 'true'
+>>>>>>> upstream/main
     runs-on: ubuntu-latest
     environment: publish  # Must match npm trusted publisher config
     permissions:
@@ -50,7 +83,11 @@ jobs:
     steps:
       - uses: actions/setup-node@v5
         with:
+<<<<<<< HEAD
           node-version: '24.16.0'
+=======
+          node-version: '24.22.1'
+>>>>>>> upstream/main
           registry-url: 'https://registry.npmjs.org'
 
       - name: Install npm with OIDC support

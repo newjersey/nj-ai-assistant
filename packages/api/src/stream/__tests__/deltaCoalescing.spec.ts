@@ -4,6 +4,10 @@ import { InMemoryEventTransport } from '~/stream/implementations/InMemoryEventTr
 import { registerChunkPublicationCapability } from '~/stream/internal/chunkPublication';
 import { InMemoryJobStore } from '~/stream/implementations/InMemoryJobStore';
 import { GenerationJobManagerClass } from '~/stream/GenerationJobManager';
+<<<<<<< HEAD
+=======
+import { resolveCoalesceWindowMs } from '~/stream/internal/coalescing';
+>>>>>>> upstream/main
 
 jest.spyOn(console, 'log').mockImplementation();
 
@@ -37,6 +41,10 @@ describe('delta coalescing manager gating and backpressure', () => {
   async function createManager(options: {
     windowMs: string | undefined;
     advertise: boolean;
+<<<<<<< HEAD
+=======
+    isRedis?: boolean;
+>>>>>>> upstream/main
   }): Promise<{
     manager: GenerationJobManagerClass;
     publishCalls: Array<unknown[]>;
@@ -64,7 +72,11 @@ describe('delta coalescing manager gating and backpressure', () => {
     });
 
     const manager = new GenerationJobManagerClass();
+<<<<<<< HEAD
     manager.configure({ jobStore, eventTransport, isRedis: true });
+=======
+    manager.configure({ jobStore, eventTransport, isRedis: options.isRedis ?? true });
+>>>>>>> upstream/main
     manager.initialize();
     return {
       manager,
@@ -83,6 +95,10 @@ describe('delta coalescing manager gating and backpressure', () => {
       advertise: false,
     });
     await manager.createJob('gate-off', 'user-1', 'gate-off');
+<<<<<<< HEAD
+=======
+    await manager.subscribe('gate-off', jest.fn());
+>>>>>>> upstream/main
 
     const emission = manager.emitChunk('gate-off', DELTA_EVENT);
     await new Promise((resolve) => setImmediate(resolve));
@@ -105,6 +121,7 @@ describe('delta coalescing manager gating and backpressure', () => {
     await manager.destroy();
   });
 
+<<<<<<< HEAD
   it('sends coalesce hints and stops awaiting receipts when both services advertise support', async () => {
     const { manager, publishCalls, settleAll } = await createManager({
       windowMs: '25',
@@ -121,11 +138,68 @@ describe('delta coalescing manager gating and backpressure', () => {
   });
 
   it('keeps the awaited path when the window is unset even with capable services', async () => {
+=======
+  it.each([undefined, '25'])(
+    'sends coalesce hints without awaiting receipts with capable Redis services and window %s',
+    async (windowMs) => {
+      const { manager, publishCalls, settleAll } = await createManager({
+        windowMs,
+        advertise: true,
+      });
+      await manager.createJob('gate-on', 'user-1', 'gate-on');
+      await manager.subscribe('gate-on', jest.fn());
+
+      await manager.emitChunk('gate-on', DELTA_EVENT);
+      expect(publishCalls).toHaveLength(1);
+      expect(publishCalls[0][3]).toEqual({ coalesce: true });
+
+      settleAll(0);
+      await manager.destroy();
+    },
+  );
+
+  it('does not batch the awaited append path before first subscriber admission', async () => {
+>>>>>>> upstream/main
     const { manager, publishCalls, settleAll } = await createManager({
       windowMs: undefined,
       advertise: true,
     });
+<<<<<<< HEAD
     await manager.createJob('window-off', 'user-1', 'window-off');
+=======
+    await manager.createJob('before-admission', 'user-1', 'before-admission');
+
+    const emission = manager.emitChunk('before-admission', DELTA_EVENT);
+    await new Promise((resolve) => setImmediate(resolve));
+    expect(publishCalls[0]).toHaveLength(3);
+    settleAll(0);
+    await emission;
+    await manager.destroy();
+  });
+
+  it('continues batching after an admitted subscriber disconnects', async () => {
+    const { manager, publishCalls, settleAll } = await createManager({
+      windowMs: undefined,
+      advertise: true,
+    });
+    await manager.createJob('after-admission', 'user-1', 'after-admission');
+    const subscription = await manager.subscribe('after-admission', jest.fn());
+    subscription?.unsubscribe();
+
+    await manager.emitChunk('after-admission', DELTA_EVENT);
+    expect(publishCalls[0][3]).toEqual({ coalesce: true });
+    settleAll(0);
+    await manager.destroy();
+  });
+
+  it('keeps the awaited path with an explicit zero even with capable services', async () => {
+    const { manager, publishCalls, settleAll } = await createManager({
+      windowMs: '0',
+      advertise: true,
+    });
+    await manager.createJob('window-off', 'user-1', 'window-off');
+    await manager.subscribe('window-off', jest.fn());
+>>>>>>> upstream/main
 
     const emission = manager.emitChunk('window-off', DELTA_EVENT);
     await new Promise((resolve) => setImmediate(resolve));
@@ -136,12 +210,58 @@ describe('delta coalescing manager gating and backpressure', () => {
     await manager.destroy();
   });
 
+<<<<<<< HEAD
+=======
+  it('keeps attached in-memory streams on the awaited path with the default window', async () => {
+    const { manager, publishCalls, settleAll } = await createManager({
+      windowMs: undefined,
+      advertise: true,
+      isRedis: false,
+    });
+    await manager.createJob('memory-default', 'user-1', 'memory-default');
+    const subscription = await manager.subscribe('memory-default', jest.fn());
+
+    const emission = manager.emitChunk('memory-default', DELTA_EVENT);
+    await new Promise((resolve) => setImmediate(resolve));
+    expect(publishCalls[0]).toHaveLength(3);
+    settleAll(0);
+    await emission;
+    subscription?.unsubscribe();
+    await manager.destroy();
+  });
+
+  it.each([
+    [undefined, 25],
+    ['0', 0],
+    ['', 0],
+    ['invalid', 0],
+    ['NaN', 0],
+    ['Infinity', 0],
+    ['-1', 0],
+    ['0.5', 0],
+    ['25', 25],
+    ['50.9', 50],
+    ['2000', 1000],
+  ])('resolves window %s to %s ms', (value, expected) => {
+    if (value === undefined) {
+      delete process.env.STREAM_DELTA_COALESCE_MS;
+    } else {
+      process.env.STREAM_DELTA_COALESCE_MS = value;
+    }
+    expect(resolveCoalesceWindowMs()).toBe(expected);
+  });
+
+>>>>>>> upstream/main
   it('applies backpressure once outstanding coalesced receipts hit the cap', async () => {
     const { manager, publishCalls, settleAll } = await createManager({
       windowMs: '25',
       advertise: true,
     });
     await manager.createJob('backpressure', 'user-1', 'backpressure');
+<<<<<<< HEAD
+=======
+    await manager.subscribe('backpressure', jest.fn());
+>>>>>>> upstream/main
 
     /** The cap is 256: every emission below it resolves without awaiting the
      * (deliberately unsettled) publication receipts. */

@@ -405,4 +405,8 @@ For Redis-specific issues:
 - [Redis Cluster Tutorial](https://redis.io/docs/manual/scaling/)
 
 For LibreChat integration:
+<<<<<<< HEAD
 - [LibreChat Documentation](https://github.com/danny-avila/LibreChat)
+=======
+- [LibreChat Documentation](https://github.com/LibreChat-AI/LibreChat)
+>>>>>>> upstream/main

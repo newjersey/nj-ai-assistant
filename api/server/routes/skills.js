@@ -1,13 +1,24 @@
 const path = require('path');
+<<<<<<< HEAD
 const crypto = require('crypto');
+=======
+>>>>>>> upstream/main
 const multer = require('multer');
 const express = require('express');
 const {
   createImportHandler,
+<<<<<<< HEAD
   blockFilteredSkillFile,
   generateCheckAccess,
   getStorageMetadata,
   resolveRequestTenantId,
+=======
+  createSkillUploadHandler,
+  createSkillBlobReserver,
+  createSkillBufferWriter,
+  createSkillStorageResolver,
+  generateCheckAccess,
+>>>>>>> upstream/main
   restoreTenantContextFromReq,
 } = require('@librechat/api');
 const { logger } = require('@librechat/data-schemas');
@@ -15,15 +26,25 @@ const {
   PermissionBits,
   PermissionTypes,
   Permissions,
+<<<<<<< HEAD
   FileContext,
+=======
+>>>>>>> upstream/main
   mergeFileConfig,
 } = require('librechat-data-provider');
 const {
   createSkill,
   getSkillById,
+<<<<<<< HEAD
   deleteSkill,
   upsertSkillFile,
   getSkillFileByPath,
+=======
+  upsertSkillFile,
+  getSkillFileByPath,
+  reserveSkillUploadIntent,
+  transitionSkillUploadIntent,
+>>>>>>> upstream/main
   getRoleByName,
 } = require('~/models');
 const { requireJwtAuth, canAccessSkillResource } = require('~/server/middleware');
@@ -31,10 +52,26 @@ const { grantPermission } = require('~/server/services/PermissionService');
 const { getStrategyFunctions } = require('~/server/services/Files/strategies');
 const { createFileLimiters } = require('~/server/middleware/limiters/uploadLimiters');
 const { maybeRunGitHubSkillSyncForRequest } = require('~/server/services/Skills/sync');
+<<<<<<< HEAD
+=======
+const { deleteSkillForLegacy } = require('~/server/services/Skills/deletion');
+>>>>>>> upstream/main
 const configMiddleware = require('~/server/middleware/config/app');
 const { getFileStrategy } = require('~/server/utils/getFileStrategy');
 
 const router = express.Router();
+<<<<<<< HEAD
+=======
+const reserveSkillBlobForConfig = createSkillBlobReserver({
+  getFileStrategy,
+  getStrategyFunctions,
+});
+const resolveSkillStorageForConfig = createSkillStorageResolver({
+  getFileStrategy,
+  getStrategyFunctions,
+});
+const saveSkillBuffer = createSkillBufferWriter({ getStrategyFunctions });
+>>>>>>> upstream/main
 
 // ---------------------------------------------------------------------------
 // Multer: memory storage for skill imports (zip processed in-memory)
@@ -105,6 +142,7 @@ const handlers = getSkillsHandlers();
 // ---------------------------------------------------------------------------
 // File storage helper: resolve the active strategy's saveBuffer
 // ---------------------------------------------------------------------------
+<<<<<<< HEAD
 function resolveSkillStorage(req, { isImage = false } = {}) {
   const source = getFileStrategy(req.config, { context: FileContext.skill_file, isImage });
   const strategy = getStrategyFunctions(source);
@@ -113,6 +151,9 @@ function resolveSkillStorage(req, { isImage = false } = {}) {
   }
   return { saveBuffer: strategy.saveBuffer, source };
 }
+=======
+const resolveSkillStorage = (req, options) => resolveSkillStorageForConfig(req.config, options);
+>>>>>>> upstream/main
 
 // ---------------------------------------------------------------------------
 // Import handler (zip/md/skill → create skill + files)
@@ -123,6 +164,7 @@ const importHandler = createImportHandler({
   }),
   createSkill,
   getSkillById,
+<<<<<<< HEAD
   deleteSkill,
   upsertSkillFile,
   saveBuffer: (req, { userId, buffer, fileName, basePath, isImage, tenantId }) => {
@@ -142,6 +184,19 @@ const importHandler = createImportHandler({
       return deleteFile(req, file);
     }
     return Promise.resolve();
+=======
+  deleteSkill: deleteSkillForLegacy,
+  upsertSkillFile,
+  getSkillFileByPath,
+  reserveSkillUploadIntent,
+  transitionSkillUploadIntent,
+  reserveBlob: (req, options) => reserveSkillBlobForConfig(req.config, options),
+  saveBuffer: (_req, options) => saveSkillBuffer(options),
+  deleteFile: (req, file) => {
+    const { deleteFile } = getStrategyFunctions(file.source);
+    if (!deleteFile) throw new Error(`Skill storage backend ${file.source} cannot delete files`);
+    return deleteFile(req, file);
+>>>>>>> upstream/main
   },
   grantPermission,
 });
@@ -149,6 +204,7 @@ const importHandler = createImportHandler({
 // ---------------------------------------------------------------------------
 // Per-file upload handler (add a single file to an existing skill)
 // ---------------------------------------------------------------------------
+<<<<<<< HEAD
 async function uploadFileHandler(req, res) {
   try {
     const { file } = req;
@@ -253,6 +309,17 @@ async function uploadFileHandler(req, res) {
     return res.status(500).json({ error: 'Failed to upload file' });
   }
 }
+=======
+const uploadFileHandler = createSkillUploadHandler({
+  getSkillById,
+  getSkillFileByPath,
+  upsertSkillFile,
+  resolveStorage: resolveSkillStorage,
+  getStrategyFunctions,
+  reserveSkillUploadIntent,
+  transitionSkillUploadIntent,
+});
+>>>>>>> upstream/main
 
 // ---------------------------------------------------------------------------
 // Routes
@@ -306,9 +373,15 @@ router.get(
   handlers.listFiles,
 );
 
+<<<<<<< HEAD
 // Per-file upload (live — replaces 501 stub)
 router.post(
   '/:id/files',
+=======
+// Legacy upload and revision-checked editing. Older servers have no POST wildcard route.
+router.post(
+  ['/:id/files', '/:id/files/*relativePath'],
+>>>>>>> upstream/main
   canAccessSkillResource({ requiredPermission: PermissionBits.EDIT }),
   fileUploadIpLimiter,
   fileUploadUserLimiter,

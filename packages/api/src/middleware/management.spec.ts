@@ -134,6 +134,42 @@ describe('getMachineClientId', () => {
     expect(next).toHaveBeenCalledTimes(1);
   });
 
+<<<<<<< HEAD
+=======
+  it('passes Cognito access-token requirements to the verifier', async () => {
+    const config = createConfig();
+    const oidc = config.endpoints?.agents?.managementApi?.auth?.oidc;
+    if (oidc) {
+      delete oidc.audience;
+      oidc.tokenUse = 'access';
+      oidc.requiredScopes = ['agents-api/manage'];
+    }
+    const deps = createDeps({
+      getAppConfig: jest.fn().mockResolvedValue(config),
+      verifyAccessToken: jest.fn().mockResolvedValue(
+        createPayload({
+          azp: undefined,
+          client_id: CLIENT_ID,
+          sub: CLIENT_ID,
+          token_use: 'access',
+          scope: 'agents-api/manage',
+        }),
+      ),
+    });
+    const next = jest.fn();
+
+    await runMiddleware(deps, createRequest(), createResponse(), next);
+
+    expect(deps.verifyAccessToken).toHaveBeenCalledWith(TOKEN, {
+      enabled: true,
+      issuer: 'https://issuer.example.com',
+      tokenUse: 'access',
+      requiredScopes: ['agents-api/manage'],
+    });
+    expect(next).toHaveBeenCalledTimes(1);
+  });
+
+>>>>>>> upstream/main
   it.each([
     ['the default subject rule', createConfig(), createPayload({ sub: 'auth0|human-user' })],
     [
@@ -241,6 +277,29 @@ describe('createAgentManagementAuth', () => {
     expect(res.status).toHaveBeenCalledWith(401);
   });
 
+<<<<<<< HEAD
+=======
+  it('rejects audience-less access-token auth without required scopes before verification', async () => {
+    const config = createConfig();
+    const oidc = config.endpoints?.agents?.managementApi?.auth?.oidc;
+    if (oidc) {
+      delete oidc.audience;
+      oidc.tokenUse = 'access';
+      delete oidc.requiredScopes;
+    }
+    const deps = createDeps({ getAppConfig: jest.fn().mockResolvedValue(config) });
+    const res = createResponse();
+    const next = jest.fn();
+
+    await runMiddleware(deps, createRequest(), res, next);
+
+    expect(deps.verifyAccessToken).not.toHaveBeenCalled();
+    expect(deps.findUser).not.toHaveBeenCalled();
+    expect(res.status).toHaveBeenCalledWith(401);
+    expect(next).not.toHaveBeenCalled();
+  });
+
+>>>>>>> upstream/main
   it.each([
     ['unknown', createPayload({ azp: 'unknown', sub: 'unknown@clients' }), createConfig()],
     [

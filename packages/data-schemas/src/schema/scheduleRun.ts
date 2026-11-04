@@ -1,4 +1,8 @@
 import { Schema } from 'mongoose';
+<<<<<<< HEAD
+=======
+import { scheduledMCPFailureReasonSchema } from 'librechat-data-provider';
+>>>>>>> upstream/main
 import type { IScheduleRunDocument } from '~/types/schedule';
 
 const SCHEDULE_RUN_TTL_SECONDS = 90 * 24 * 60 * 60;
@@ -71,6 +75,16 @@ const scheduleRunSchema: Schema<IScheduleRunDocument> = new Schema(
           _id: false,
           server: { type: String, required: true },
           agentId: { type: String },
+<<<<<<< HEAD
+=======
+          detail: { type: String, enum: ['unattended_auth_required'] },
+          reason: { type: String, enum: scheduledMCPFailureReasonSchema.options },
+          recovery: {
+            type: String,
+            enum: ['authorize', 'configure', 'restore_permission', 'retry_later'],
+          },
+          automaticReplay: { type: Boolean, enum: [false] },
+>>>>>>> upstream/main
           status: {
             type: String,
             required: true,
@@ -184,4 +198,10 @@ scheduleRunSchema.index({ status: 1, firedAt: 1 });
 // without this the round-robin rotation re-sorts the whole live set every tick.
 scheduleRunSchema.index({ status: 1, reconciledAt: 1, firedAt: 1 });
 
+<<<<<<< HEAD
+=======
+// Owner-scoped automatic-completion admission, including settled occurrences.
+scheduleRunSchema.index({ user: 1, tenantId: 1, conversationId: 1 });
+
+>>>>>>> upstream/main
 export default scheduleRunSchema;

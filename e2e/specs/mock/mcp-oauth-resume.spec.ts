@@ -27,7 +27,14 @@ type GenerationStatus = {
 };
 
 test.describe('MCP OAuth stream resume', () => {
+<<<<<<< HEAD
   test('restores one actionable OAuth prompt after reloading the stream', async ({ page }) => {
+=======
+  test('restores one browser-bound OAuth prompt after rejecting an unbound callback', async ({
+    page,
+    browser,
+  }) => {
+>>>>>>> upstream/main
     test.setTimeout(120000);
     await page.goto(NEW_CHAT_PATH, { timeout: 10000 });
 
@@ -78,6 +85,10 @@ test.describe('MCP OAuth stream resume', () => {
       const signIn = page.getByRole('button', { name: SIGN_IN_BUTTON });
       await expect(signIn).toBeVisible({ timeout: 30000 });
       await expect(signIn).toHaveCount(1);
+<<<<<<< HEAD
+=======
+      await expect(signIn).toBeEnabled();
+>>>>>>> upstream/main
 
       const status = await fetchJson<GenerationStatus>(
         page,
@@ -93,6 +104,34 @@ test.describe('MCP OAuth stream resume', () => {
         }),
       ]);
 
+<<<<<<< HEAD
+=======
+      const authorizationUrl = new URL(status.resumeState!.pendingOAuthPrompts![0].authURL);
+      const callbackUrl = new URL(authorizationUrl.searchParams.get('redirect_uri')!);
+      callbackUrl.searchParams.set('state', authorizationUrl.searchParams.get('state')!);
+      callbackUrl.searchParams.set('code', 'unbound-provider-code');
+      const unboundBrowser = await browser.newContext();
+      try {
+        const callback = await unboundBrowser.request.get(callbackUrl.toString(), {
+          maxRedirects: 0,
+        });
+        expect(callback.status()).toBe(302);
+        expect(callback.headers().location).toContain('/oauth/error?error=csrf_validation_failed');
+      } finally {
+        await unboundBrowser.close();
+      }
+
+      const afterUnboundCallback = await fetchJson<GenerationStatus>(
+        page,
+        `/api/agents/chat/status/${encodeURIComponent(conversationId)}`,
+        token,
+      );
+      expect(afterUnboundCallback.active).toBe(true);
+      expect(afterUnboundCallback.resumeState?.pendingOAuthPrompts).toEqual(
+        status.resumeState?.pendingOAuthPrompts,
+      );
+
+>>>>>>> upstream/main
       const resumeRequest = page.waitForRequest(
         (request) => {
           const url = new URL(request.url());

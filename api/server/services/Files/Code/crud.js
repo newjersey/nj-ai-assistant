@@ -1,9 +1,17 @@
 const FormData = require('form-data');
 const { logger } = require('@librechat/data-schemas');
 const { getCodeBaseURL } = require('@librechat/agents');
+<<<<<<< HEAD
 const { EModelEndpoint, getCodeEnvRefs } = require('librechat-data-provider');
 const {
   logAxiosError,
+=======
+const { clearFileCodeEnvRefs } = require('~/models');
+const {
+  logAxiosError,
+  createCodeFileDeleter,
+  dispatchFileStorageOperation,
+>>>>>>> upstream/main
   wrapCodeApiUploadError,
   appendCodeEnvFile,
   createAxiosInstance,
@@ -72,6 +80,7 @@ async function getCodeOutputDownloadStream(fileIdentifier, identity, req, route 
   }
 }
 
+<<<<<<< HEAD
 /**
  * Deletes a file from the Code Environment server.
  *
@@ -161,6 +170,20 @@ async function deleteCodeEnvFile(req, file) {
     }
   }
 }
+=======
+const deleteCodeEnvFile = createCodeFileDeleter({
+  httpClient: axios,
+  getAuthHeaders: getCodeApiAuthHeaders,
+  getBaseUrl: getCodeExecutionBaseUrl,
+  routeKey: createCodeExecutionRouteKey,
+  profileHeaders: codeExecutionHeaders,
+  downloadQuery: buildCodeEnvDownloadQuery,
+  clearFileCodeEnvRefs,
+  logger,
+  httpAgent: codeServerHttpAgent,
+  httpsAgent: codeServerHttpsAgent,
+});
+>>>>>>> upstream/main
 
 /**
  * Uploads a file to the Code Environment server.
@@ -200,6 +223,10 @@ async function uploadCodeEnvFile({
   executionProfile,
   bridgeWorkerId,
   signal,
+<<<<<<< HEAD
+=======
+  onUploadStart,
+>>>>>>> upstream/main
 }) {
   try {
     const form = new FormData();
@@ -226,7 +253,13 @@ async function uploadCodeEnvFile({
       ...(signal ? { signal } : {}),
     };
 
+<<<<<<< HEAD
     const response = await axios.post(`${baseURL}/upload`, form, options);
+=======
+    const response = await dispatchFileStorageOperation(onUploadStart, () =>
+      axios.post(`${baseURL}/upload`, form, options),
+    );
+>>>>>>> upstream/main
 
     /** @type {{ message: string; storage_session_id: string; files: Array<{ fileId: string; filename: string }> }} */
     const result = response.data;

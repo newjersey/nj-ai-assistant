@@ -42,7 +42,28 @@ export function payloadParser({
   if (isAgentsEndpoint(endpoint)) {
     return;
   }
+<<<<<<< HEAD
   return req.body?.endpointOption?.model_parameters;
+=======
+  const modelParameters = req.body?.endpointOption?.model_parameters;
+  if (modelParameters == null || req.reasoningOverrideBase == null) {
+    return modelParameters;
+  }
+
+  const { key, hadValue, value } = req.reasoningOverrideBase;
+  const persistedParameters = { ...modelParameters };
+  if (hadValue) {
+    persistedParameters[key] = value;
+  } else {
+    delete persistedParameters[key];
+  }
+  if (req.reasoningOverrideBase.thinkingHadValue === true) {
+    persistedParameters.thinking = req.reasoningOverrideBase.thinkingValue;
+  } else if (req.reasoningOverrideBase.thinkingHadValue === false) {
+    delete persistedParameters.thinking;
+  }
+  return persistedParameters;
+>>>>>>> upstream/main
 }
 
 /**
@@ -284,6 +305,7 @@ function estimateDocumentBlockTokens(
 }
 
 /**
+<<<<<<< HEAD
  * Estimates token cost for image and document blocks in a message's
  * content array. Covers: image_url, image, image_file, document, file.
  */
@@ -313,6 +335,8 @@ export function estimateMediaTokensForMessage(
 }
 
 /**
+=======
+>>>>>>> upstream/main
  * Single-pass token counter for formatted messages (plain objects with role/content/name).
  * Handles text, tool_call, image, and document content types in one iteration,
  * then applies Claude correction when applicable.
@@ -493,6 +517,7 @@ export function collectToolCallIds(
   return ids;
 }
 
+<<<<<<< HEAD
 export function createTokenCounter(
   encoding: Parameters<typeof Tokenizer.getTokenCount>[1],
 ): TokenCounter {
@@ -501,6 +526,8 @@ export function createTokenCounter(
   );
 }
 
+=======
+>>>>>>> upstream/main
 function createMessageTokenCounter(
   encoding: Parameters<typeof Tokenizer.getTokenCount>[1],
   countTokens: (text: string) => number,

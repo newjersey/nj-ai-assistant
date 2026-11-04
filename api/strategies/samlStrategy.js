@@ -5,17 +5,37 @@ const { ErrorTypes } = require('librechat-data-provider');
 const { hashToken, logger } = require('@librechat/data-schemas');
 const { Strategy: SamlStrategy } = require('@node-saml/passport-saml');
 const {
+<<<<<<< HEAD
   getBalanceConfig,
+=======
+  findSamlUser,
+  getBalanceConfig,
+  provisionSamlUser,
+>>>>>>> upstream/main
   isEmailDomainAllowed,
   getAvatarFileStrategy,
   getAvatarSaveParams,
   resolveAppConfigForUser,
+<<<<<<< HEAD
+=======
+  resolvePreAuthAppConfig,
+>>>>>>> upstream/main
   resolveSamlSubject,
   TRANSIENT_SAML_NAME_ID_FORMAT,
 } = require('@librechat/api');
 const { getStrategyFunctions } = require('~/server/services/Files/strategies');
 const { resizeAvatar } = require('~/server/services/Files/images/avatar');
+<<<<<<< HEAD
 const { findUser, createUser, updateUser, claimSamlIdentity } = require('~/models');
+=======
+const {
+  findUser,
+  updateUser,
+  findBalanceByUser,
+  claimSamlIdentity,
+  createUserIfAbsent,
+} = require('~/models');
+>>>>>>> upstream/main
 const { getAppConfig } = require('~/server/services/Config');
 const paths = require('~/config/paths');
 
@@ -192,7 +212,11 @@ function createSamlCallback(existingUsersOnly = false) {
 
       const userEmail = getEmail(profile) || '';
 
+<<<<<<< HEAD
       const baseConfig = await getAppConfig({ baseOnly: true });
+=======
+      const baseConfig = await resolvePreAuthAppConfig(getAppConfig);
+>>>>>>> upstream/main
       if (!isEmailDomainAllowed(userEmail, baseConfig?.registration?.allowedDomains)) {
         logger.error(
           '[samlStrategy] Authentication blocked because the email domain is not allowed',
@@ -200,6 +224,7 @@ function createSamlCallback(existingUsersOnly = false) {
         return done(null, false, { message: 'Email domain not allowed' });
       }
 
+<<<<<<< HEAD
       let user = await findUser({ samlId: nameID });
       logger.info(`[samlStrategy] User ${user ? 'found' : 'not found'} by SAML identity`);
 
@@ -228,6 +253,18 @@ function createSamlCallback(existingUsersOnly = false) {
 
       if (!isEmailDomainAllowed(userEmail, appConfig?.registration?.allowedDomains)) {
         logger.error('[samlStrategy] Authentication blocked by the tenant email-domain policy');
+=======
+      const found = await findSamlUser({ findUser, nameID, email: userEmail });
+      if (found.error) {
+        return done(null, false, { message: ErrorTypes.AUTH_FAILED });
+      }
+      let user = found.user;
+
+      let appConfig = user ? await resolveAppConfigForUser(getAppConfig, user) : baseConfig;
+
+      if (!isEmailDomainAllowed(userEmail, appConfig?.registration?.allowedDomains)) {
+        logger.error("[samlStrategy] Authentication blocked by the account's email-domain policy");
+>>>>>>> upstream/main
         return done(null, false, { message: 'Email domain not allowed' });
       }
 
@@ -237,6 +274,7 @@ function createSamlCallback(existingUsersOnly = false) {
         getUserName(profile) || getGivenName(profile) || getEmail(profile),
       );
 
+<<<<<<< HEAD
       if (!user) {
         if (existingUsersOnly) {
           logger.error('[samlStrategy] Admin auth blocked because the user does not exist');
@@ -264,6 +302,32 @@ function createSamlCallback(existingUsersOnly = false) {
         }
       }
 
+=======
+      if (!user && existingUsersOnly) {
+        logger.error('[samlStrategy] Admin auth blocked because the user does not exist');
+        return done(null, false, { message: 'User does not exist' });
+      }
+
+      const provisioned = await provisionSamlUser({
+        user,
+        nameID,
+        email: userEmail,
+        username,
+        name: fullName,
+        appConfig,
+        getBalanceConfig,
+        getAppConfig,
+        findUser,
+        createUserIfAbsent,
+        findBalanceByUser,
+        claimSamlIdentity,
+      });
+      if (provisioned.error) {
+        return done(null, false, { message: provisioned.error });
+      }
+      ({ user, appConfig } = provisioned);
+
+>>>>>>> upstream/main
       const picture = getPicture(profile);
       if (picture && !user.avatar?.includes('manual=true')) {
         const userId = user._id.toString();

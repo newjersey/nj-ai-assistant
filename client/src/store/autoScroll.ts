@@ -1,6 +1,10 @@
 import { createStorageAtom } from './jotai-utils';
 
+<<<<<<< HEAD
 const DEFAULT_AUTO_SCROLL = false;
+=======
+const DEFAULT_AUTO_SCROLL = true;
+>>>>>>> upstream/main
 
 /**
  * Whether opening a conversation lands the reader on its newest message.

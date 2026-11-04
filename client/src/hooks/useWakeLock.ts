@@ -42,7 +42,11 @@ const DEBUG_WAKE_LOCK = false;
  *
  * @example
  * ```tsx
+<<<<<<< HEAD
  * const isGeneratingResponse = useRecoilValue(anySubmittingSelector);
+=======
+ * const isGeneratingResponse = useAtomValue(anySubmittingAtom);
+>>>>>>> upstream/main
  * useWakeLock(isGeneratingResponse);
  * ```
  *
@@ -118,6 +122,14 @@ export const useWakeLock = (shouldHold: boolean) => {
 
       try {
         const sentinel = await wakeLock.request('screen');
+<<<<<<< HEAD
+=======
+        if (cancelled || wakeLockRef.current) {
+          /** The effect ended (or another request won) while this one was in flight. */
+          await sentinel.release().catch(() => undefined);
+          return;
+        }
+>>>>>>> upstream/main
         wakeLockRef.current = sentinel;
 
         if (DEBUG_WAKE_LOCK) {

@@ -5,7 +5,12 @@ import type { AddressInfo, Socket } from 'node:net';
  * Minimal RESP2 server standing in for a Redis node whose role can be flipped
  * between master and demoted replica. Real node-redis and ioredis clients speak
  * to it over TCP, which is what a READONLY failover scenario needs: the socket
+<<<<<<< HEAD
  * stays open and healthy while every write is rejected.
+=======
+ * stays open and healthy while every write is rejected. PUBLISH fans out to the
+ * connections subscribed to the channel, so pub/sub between clients works too.
+>>>>>>> upstream/main
  */
 export type RespServer = {
   url: string;
@@ -87,7 +92,47 @@ export async function startRespServer(port = 0): Promise<RespServer> {
   const sockets = new Set<Socket>();
   const state = { connections: 0, readonly: false, silent: false, commands: [] as string[][] };
 
+<<<<<<< HEAD
   const reply = (args: string[]): string => {
+=======
+  const subscriptions = new Map<Socket, Set<string>>();
+
+  const channelsOf = (socket: Socket): Set<string> => {
+    let channels = subscriptions.get(socket);
+    if (!channels) {
+      channels = new Set();
+      subscriptions.set(socket, channels);
+    }
+    return channels;
+  };
+
+  const publish = (channel: string, message: string): number => {
+    let delivered = 0;
+    for (const [subscriber, channels] of subscriptions) {
+      if (channels.has(channel)) {
+        delivered += 1;
+        subscriber.write(`*3\r\n$7\r\nmessage\r\n${encodeBulk(channel)}${encodeBulk(message)}`);
+      }
+    }
+    return delivered;
+  };
+
+  const subscriptionReply = (socket: Socket, kind: string, names: string[]): string => {
+    const channels = channelsOf(socket);
+    return names
+      .map((name) => {
+        if (kind === 'subscribe') {
+          channels.add(name);
+        } else {
+          channels.delete(name);
+        }
+        return `*3\r\n${encodeBulk(kind)}${encodeBulk(name)}:${channels.size}\r\n`;
+      })
+      .join('');
+  };
+
+  const reply = (socket: Socket, args: string[]): string => {
+>>>>>>> upstream/main
     const command = args[0]?.toUpperCase() ?? '';
     if (state.readonly && WRITE_COMMANDS.has(command)) {
       return READONLY_REPLY;
@@ -96,7 +141,15 @@ export async function startRespServer(port = 0): Promise<RespServer> {
       case 'PING':
         return '+PONG\r\n';
       case 'SUBSCRIBE':
+<<<<<<< HEAD
         return `*3\r\n$9\r\nsubscribe\r\n${encodeBulk(args[1])}:1\r\n`;
+=======
+        return subscriptionReply(socket, 'subscribe', args.slice(1));
+      case 'UNSUBSCRIBE':
+        return subscriptionReply(socket, 'unsubscribe', args.slice(1));
+      case 'PUBLISH':
+        return `:${publish(args[1], args[2])}\r\n`;
+>>>>>>> upstream/main
       case 'INFO':
         return encodeBulk('# Server\r\nredis_version:7.2.4\r\nloading:0\r\n');
       case 'GET':
@@ -127,11 +180,22 @@ export async function startRespServer(port = 0): Promise<RespServer> {
       for (const frame of frames) {
         state.commands.push(frame);
         if (!state.silent) {
+<<<<<<< HEAD
           socket.write(reply(frame));
         }
       }
     });
     socket.on('close', () => sockets.delete(socket));
+=======
+          socket.write(reply(socket, frame));
+        }
+      }
+    });
+    socket.on('close', () => {
+      sockets.delete(socket);
+      subscriptions.delete(socket);
+    });
+>>>>>>> upstream/main
     socket.on('error', () => undefined);
   });
 

@@ -1,5 +1,10 @@
 import { useCallback, useMemo } from 'react';
+<<<<<<< HEAD
 import { atomFamily, useRecoilState, useResetRecoilState } from 'recoil';
+=======
+import { atom, useAtom } from 'jotai';
+import { atomFamily } from 'jotai/utils';
+>>>>>>> upstream/main
 import type { Agents } from 'librechat-data-provider';
 import {
   useAskSubmitStatus,
@@ -14,12 +19,31 @@ interface AskQuestionsFormState {
   step: number;
   text: Record<string, string>;
   selected: Record<string, string[]>;
+<<<<<<< HEAD
 }
 
 const askQuestionsFormState = atomFamily<AskQuestionsFormState, string>({
   key: 'askQuestionsFormState',
   default: { step: 0, text: {}, selected: {} },
 });
+=======
+  /** The batch's arrival already placed focus. Moving it between the composer
+   *  popover and the chat card remounts it, and that is not a new arrival. */
+  arrivalFocused: boolean;
+}
+
+const EMPTY_FORM: AskQuestionsFormState = {
+  step: 0,
+  text: {},
+  selected: {},
+  arrivalFocused: false,
+};
+
+/** Keyed by action id, so the composer popover and the chat card share one form. */
+const askQuestionsFormFamily = atomFamily((_actionId: string) =>
+  atom<AskQuestionsFormState>(EMPTY_FORM),
+);
+>>>>>>> upstream/main
 
 function ownValue<T>(record: Record<string, T>, key: string): T | undefined {
   return Object.hasOwn(record, key) ? record[key] : undefined;
@@ -29,8 +53,13 @@ export default function useAskQuestionsForm(
   actionId: string,
   questions: Agents.AskUserQuestionBatchItem[],
 ) {
+<<<<<<< HEAD
   const [state, setState] = useRecoilState(askQuestionsFormState(actionId));
   const resetState = useResetRecoilState(askQuestionsFormState(actionId));
+=======
+  const [state, setState] = useAtom(askQuestionsFormFamily(actionId));
+  const resetState = useCallback(() => setState(EMPTY_FORM), [setState]);
+>>>>>>> upstream/main
   const { submitAskAnswer } = useResumeSubmit();
   const { getAskStatus } = useAskSubmitStatus();
   const status = getAskStatus(actionId);
@@ -41,8 +70,15 @@ export default function useAskQuestionsForm(
       setState((previous) => ({
         ...previous,
         text: { ...previous.text, [question.id]: value },
+<<<<<<< HEAD
         selected:
           question.multiSelect === true || value.length === 0
+=======
+        /** A typed answer replaces the choices: the rows lock while the field
+         *  has text, so nothing stays selected behind them. */
+        selected:
+          value.trim().length === 0
+>>>>>>> upstream/main
             ? previous.selected
             : { ...previous.selected, [question.id]: [] },
       }));
@@ -81,6 +117,17 @@ export default function useAskQuestionsForm(
     [questions.length, setState],
   );
 
+<<<<<<< HEAD
+=======
+  const markArrivalFocused = useCallback(
+    () =>
+      setState((previous) =>
+        previous.arrivalFocused ? previous : { ...previous, arrivalFocused: true },
+      ),
+    [setState],
+  );
+
+>>>>>>> upstream/main
   const answers = useMemo(() => {
     const resolved = Object.create(null) as Record<string, string>;
     for (const question of questions) {
@@ -133,5 +180,10 @@ export default function useAskQuestionsForm(
     goToStep,
     submit,
     skip,
+<<<<<<< HEAD
+=======
+    arrivalFocused: state.arrivalFocused,
+    markArrivalFocused,
+>>>>>>> upstream/main
   };
 }

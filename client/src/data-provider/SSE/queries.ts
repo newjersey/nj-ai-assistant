@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+<<<<<<< HEAD
 import { useQuery, useQueries, useQueryClient } from '@tanstack/react-query';
 import { apiBaseUrl, QueryKeys, request, dataService } from 'librechat-data-provider';
 import type { Agents, TConversation, TPendingSteer } from 'librechat-data-provider';
@@ -29,6 +30,23 @@ export interface StreamStatusResponse {
    *  recovery turn persists or the user discards the item. */
   unrecoveredSteers?: TPendingSteer[];
 }
+=======
+import { ACTIVE_JOBS_SUCCESSOR_GRACE_MS } from '@librechat/chat/react';
+import { useQuery, useQueries, useQueryClient } from '@tanstack/react-query';
+import { apiBaseUrl, QueryKeys, request, dataService } from 'librechat-data-provider';
+import type { TConversation } from 'librechat-data-provider';
+import type { StreamStatusResponse } from '@librechat/chat';
+import {
+  isNotFoundError,
+  updateConvoInAllQueries,
+  setDocumentTitle,
+  findManualConvoTitleInAllQueries,
+} from '~/utils';
+import { generationProtocolHeaders, withGenerationProtocolQuery } from './protocol';
+import { useGetStartupConfig } from '../Endpoints';
+
+export type { StreamStatusResponse } from '@librechat/chat';
+>>>>>>> upstream/main
 
 export const streamStatusQueryKey = (conversationId: string) => ['streamStatus', conversationId];
 
@@ -74,12 +92,31 @@ const queueListeners = new Set<() => void>();
 
 /** Queue a conversation for title generation (call when starting new conversation) */
 export function queueTitleGeneration(conversationId: string) {
+<<<<<<< HEAD
   if (!processedTitles.has(conversationId)) {
+=======
+  if (!isTitleGenerationProcessed(conversationId)) {
+>>>>>>> upstream/main
     titleQueue.add(conversationId);
     queueListeners.forEach((listener) => listener());
   }
 }
 
+<<<<<<< HEAD
+=======
+/** Drops all module-level title state; called when a session ends so the next account starts clean. */
+export function clearTitleGenerationState() {
+  titleQueue.clear();
+  processedTitles.clear();
+  deferredTitles.clear();
+  queueListeners.forEach((listener) => listener());
+}
+
+export function isTitleGenerationProcessed(conversationId: string): boolean {
+  return processedTitles.has(conversationId);
+}
+
+>>>>>>> upstream/main
 export function markTitleGenerationProcessed(conversationId: string) {
   processedTitles.add(conversationId);
   titleQueue.delete(conversationId);
@@ -174,6 +211,7 @@ export function useTitleGeneration(enabled = true) {
       }
 
       if (titleQuery.isSuccess && titleQuery.data) {
+<<<<<<< HEAD
         const { title } = titleQuery.data;
         queryClient.setQueryData(
           [QueryKeys.conversation, conversationId],
@@ -183,6 +221,23 @@ export function useTitleGeneration(enabled = true) {
         // Only update document title if this conversation is currently active
         if (window.location.pathname.includes(conversationId)) {
           // setDocumentTitle(title); // NJ: Don't change title to match conversation
+=======
+        const incoming = titleQuery.data;
+        const titleState =
+          findManualConvoTitleInAllQueries(queryClient, conversationId, incoming) ?? incoming;
+        const applyTitle = (convo: TConversation): TConversation => ({ ...convo, ...titleState });
+        queryClient.setQueryData<TConversation>(
+          [QueryKeys.conversation, conversationId],
+          (convo) => (convo ? applyTitle(convo) : convo),
+        );
+        updateConvoInAllQueries(queryClient, conversationId, applyTitle);
+        const title =
+          queryClient.getQueryData<TConversation>([QueryKeys.conversation, conversationId])
+            ?.title ?? incoming.title;
+        // Only update document title if this conversation is currently active
+        if (window.location.pathname.includes(conversationId)) {
+          setDocumentTitle(title);
+>>>>>>> upstream/main
         }
         markTitleGenerationProcessed(conversationId);
         setReadyToFetch((prev) => prev.filter((id) => id !== conversationId));
@@ -234,7 +289,11 @@ export const ACTIVE_JOBS_POLL_MS = 5_000;
  * moment a successor appears, and with the tab already focused there is no
  * focus refetch to recover: the pane waits for a reload.
  */
+<<<<<<< HEAD
 export const ACTIVE_JOBS_SUCCESSOR_GRACE_MS = 30_000;
+=======
+export { ACTIVE_JOBS_SUCCESSOR_GRACE_MS };
+>>>>>>> upstream/main
 
 /** Module-scoped rather than per-observer: this is one shared query, and a
  *  component mounting mid-handover should inherit the grace, not restart it. */

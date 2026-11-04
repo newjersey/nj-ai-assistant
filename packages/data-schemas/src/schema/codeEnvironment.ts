@@ -60,6 +60,12 @@ const codeEnvironmentSchema: Schema<CodeEnvironmentDocument> = new Schema<CodeEn
       required: true,
       index: true,
     },
+<<<<<<< HEAD
+=======
+    setupAttemptId: { type: String },
+    setupRequestHash: { type: String },
+    setupDiscardedAt: { type: Date },
+>>>>>>> upstream/main
     ownerSlot: {
       type: Number,
       min: 0,
@@ -120,6 +126,17 @@ const codeEnvironmentSchema: Schema<CodeEnvironmentDocument> = new Schema<CodeEn
 );
 
 codeEnvironmentSchema.index({ environmentId: 1, tenantId: 1 }, { unique: true });
+<<<<<<< HEAD
+=======
+codeEnvironmentSchema.index(
+  { createdBy: 1, ownerSlot: 1, tenantId: 1 },
+  { unique: true, partialFilterExpression: { ownerSlot: { $type: 'number' } } },
+);
+codeEnvironmentSchema.index(
+  { setupAttemptId: 1, tenantId: 1 },
+  { unique: true, partialFilterExpression: { setupAttemptId: { $type: 'string' } } },
+);
+>>>>>>> upstream/main
 codeEnvironmentSchema.index({ updatedAt: -1, _id: 1 });
 
 export default codeEnvironmentSchema;

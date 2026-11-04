@@ -1,4 +1,13 @@
 const fetch = require('node-fetch');
+<<<<<<< HEAD
+=======
+const {
+  ToolInputError,
+  formatToolError,
+  formatToolHttpError,
+  toolRequestBudget,
+} = require('@librechat/api');
+>>>>>>> upstream/main
 const { Tool } = require('@librechat/agents/langchain/tools');
 const { getEnvironmentVariable } = require('@librechat/agents/langchain/utils/env');
 
@@ -121,6 +130,10 @@ class OpenWeather extends Tool {
     this.envVar = 'OPENWEATHER_API_KEY';
     this.override = fields.override ?? false;
     this.apiKey = fields[this.envVar] ?? this.getApiKey();
+<<<<<<< HEAD
+=======
+    this.timeouts = fields.timeouts;
+>>>>>>> upstream/main
   }
 
   getApiKey() {
@@ -135,10 +148,17 @@ class OpenWeather extends Tool {
     const geocodeUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(
       city,
     )}&limit=1&appid=${this.apiKey}`;
+<<<<<<< HEAD
     const res = await fetch(geocodeUrl);
     const data = await res.json();
     if (!res.ok || !Array.isArray(data) || data.length === 0) {
       throw new Error(`Could not find coordinates for city: ${city}`);
+=======
+    const res = await fetch(geocodeUrl, { signal: toolRequestBudget(this.timeouts).signal });
+    const data = await res.json();
+    if (!res.ok || !Array.isArray(data) || data.length === 0) {
+      throw new ToolInputError(`Could not find coordinates for city: ${city}`);
+>>>>>>> upstream/main
     }
     return { lat: data[0].lat, lon: data[0].lon };
   }
@@ -146,18 +166,30 @@ class OpenWeather extends Tool {
   convertDateToUnix(dateStr) {
     const parts = dateStr.split('-');
     if (parts.length !== 3) {
+<<<<<<< HEAD
       throw new Error('Invalid date format. Expected YYYY-MM-DD.');
+=======
+      throw new ToolInputError('Invalid date format. Expected YYYY-MM-DD.');
+>>>>>>> upstream/main
     }
     const year = parseInt(parts[0], 10);
     const month = parseInt(parts[1], 10);
     const day = parseInt(parts[2], 10);
     if (isNaN(year) || isNaN(month) || isNaN(day)) {
+<<<<<<< HEAD
       throw new Error('Invalid date format. Expected YYYY-MM-DD with valid numbers.');
+=======
+      throw new ToolInputError('Invalid date format. Expected YYYY-MM-DD with valid numbers.');
+>>>>>>> upstream/main
     }
 
     const dateObj = new Date(Date.UTC(year, month - 1, day, 0, 0, 0));
     if (isNaN(dateObj.getTime())) {
+<<<<<<< HEAD
       throw new Error('Invalid date provided. Cannot parse into a valid date.');
+=======
+      throw new ToolInputError('Invalid date provided. Cannot parse into a valid date.');
+>>>>>>> upstream/main
     }
 
     return Math.floor(dateObj.getTime() / 1000);
@@ -336,6 +368,7 @@ class OpenWeather extends Tool {
       }
 
       const url = `${baseUrl}${endpoint}?${params.toString()}`;
+<<<<<<< HEAD
       const response = await fetch(url);
       const json = await response.json();
       if (!response.ok) {
@@ -343,11 +376,22 @@ class OpenWeather extends Tool {
           json.message || JSON.stringify(json)
         }`;
       }
+=======
+      const response = await fetch(url, { signal: toolRequestBudget(this.timeouts).signal });
+      if (!response.ok) {
+        return formatToolHttpError('OpenWeather', response.status);
+      }
+      const json = await response.json();
+>>>>>>> upstream/main
 
       const roundedJson = roundTemperatures(json);
       return JSON.stringify(roundedJson);
     } catch (err) {
+<<<<<<< HEAD
       return `Error: ${err.message}`;
+=======
+      return formatToolError(err, 'OpenWeather');
+>>>>>>> upstream/main
     }
   }
 }

@@ -24,7 +24,11 @@ function mockDependencies() {
   mockOptionalModule('@librechat/api', () => ({
     isEnabled: (value) => value === true || value === 'true' || value === '1',
     isUserProvided: mockIsUserProvided,
+<<<<<<< HEAD
     loadServiceKey: mockLoadServiceKey,
+=======
+    isServiceKeyAvailable: mockLoadServiceKey,
+>>>>>>> upstream/main
   }));
 
   mockOptionalModule('@librechat/data-schemas', () => ({
@@ -82,9 +86,14 @@ describe('loadAsyncEndpoints', () => {
   });
 
   it('loads the default Google service key when the default file exists', async () => {
+<<<<<<< HEAD
     const serviceKey = { project_id: 'test-project' };
     mockAccess.mockResolvedValue();
     mockLoadServiceKey.mockResolvedValue(serviceKey);
+=======
+    mockAccess.mockResolvedValue();
+    mockLoadServiceKey.mockResolvedValue(true);
+>>>>>>> upstream/main
     const loadAsyncEndpoints = loadModule();
 
     const result = await loadAsyncEndpoints();
@@ -94,8 +103,12 @@ describe('loadAsyncEndpoints', () => {
   });
 
   it('loads an explicitly configured Google service key path without probing the default file', async () => {
+<<<<<<< HEAD
     const serviceKey = { project_id: 'test-project' };
     mockLoadServiceKey.mockResolvedValue(serviceKey);
+=======
+    mockLoadServiceKey.mockResolvedValue(true);
+>>>>>>> upstream/main
     const loadAsyncEndpoints = loadModule({
       GOOGLE_SERVICE_KEY_FILE: '/secrets/google-service-account.json',
     });

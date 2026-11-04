@@ -5,6 +5,10 @@ import { ThemeContext } from '@librechat/client';
 import type { ComponentType } from 'react';
 import type { TranslationKeys } from '~/hooks';
 import { ThemeSelector, LangSelector } from '~/components/Appearance';
+<<<<<<< HEAD
+=======
+import { BetaPill } from '~/components/SidePanel/Agents/Advanced/ui';
+>>>>>>> upstream/main
 import ToggleSwitch from '../SettingsTabs/ToggleSwitch';
 import store from '~/store';
 
@@ -13,6 +17,11 @@ export function toggleControl(opts: {
   localizationKey: TranslationKeys;
   switchId: string;
   hoverCardText?: TranslationKeys;
+<<<<<<< HEAD
+=======
+  beta?: boolean;
+  onCheckedChange?: (value: boolean) => void;
+>>>>>>> upstream/main
 }): ComponentType {
   const Control = () => (
     <ToggleSwitch
@@ -20,6 +29,11 @@ export function toggleControl(opts: {
       localizationKey={opts.localizationKey}
       switchId={opts.switchId}
       hoverCardText={opts.hoverCardText}
+<<<<<<< HEAD
+=======
+      badge={opts.beta === true ? <BetaPill /> : undefined}
+      onCheckedChange={opts.onCheckedChange}
+>>>>>>> upstream/main
     />
   );
   Control.displayName = `Toggle(${opts.switchId})`;
@@ -38,9 +52,12 @@ export function LangSetting() {
     (value: string) => {
       const userLang =
         value === 'auto' ? navigator.language || navigator.languages?.[0] || 'en-US' : value;
+<<<<<<< HEAD
       requestAnimationFrame(() => {
         document.documentElement.lang = userLang;
       });
+=======
+>>>>>>> upstream/main
       setLangcode(userLang);
       Cookies.set('lang', userLang, { expires: 365 });
     },

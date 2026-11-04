@@ -40,7 +40,10 @@ import {
   extractFileContent,
   extractStoredMessageContent,
 } from '../protection/adapters/submissions';
+<<<<<<< HEAD
 import { createLegacyPiiInspector, toLegacyPiiMatch } from '../protection/legacy';
+=======
+>>>>>>> upstream/main
 import { extractMessageContent } from '../protection/adapters/messages';
 import { extractChatContent } from '../protection/adapters/chat';
 import { contentFilterBlockResponse } from './contentFilter';
@@ -114,6 +117,7 @@ function isLegacyPiiConfigValid(config: MessageFilterPiiConfig): boolean {
   return valid;
 }
 
+<<<<<<< HEAD
 export interface PiiMatch {
   id: string;
   label: string;
@@ -142,11 +146,17 @@ export function findPiiMatchInMessages(
   return toLegacyPiiMatch(inspector?.inspect(fragments) ?? null);
 }
 
+=======
+>>>>>>> upstream/main
 export interface CreateMessageFilterPiiOptions {
   readonly onTraversalFailure?: LocatorTraversalReporter;
   getConfig: (req: ServerRequest) => MessageFilterPiiConfig | undefined;
   getFilters?: (req: ServerRequest) => FiltersConfig | undefined;
   getFiles?: GetCanonicalFilesForInspection;
+<<<<<<< HEAD
+=======
+  getPreinspectedText?: (req: ServerRequest) => string | undefined;
+>>>>>>> upstream/main
 }
 
 export function createMessageFilterPii(options: CreateMessageFilterPiiOptions): RequestHandler {
@@ -241,7 +251,22 @@ export function createMessageFilterPii(options: CreateMessageFilterPiiOptions): 
     if (filters != null && !collect(() => extractStoredMessageContent(req.body))) {
       return;
     }
+<<<<<<< HEAD
     const finding = inspectContent(fragments, { filters, legacyPii });
+=======
+    const preinspectedText = options.getPreinspectedText?.(req);
+    const inspectable =
+      preinspectedText == null
+        ? fragments
+        : fragments.filter(
+            (fragment) =>
+              fragment.source !== 'message' ||
+              fragment.field !== 'text' ||
+              fragment.path !== '/text' ||
+              fragment.text !== preinspectedText,
+          );
+    const finding = inspectContent(inspectable, { filters, legacyPii });
+>>>>>>> upstream/main
     if (finding != null) {
       if (finding.detectorId !== 'legacy-pattern') {
         res.status(400).json(contentFilterBlockResponse(finding));

@@ -1,6 +1,10 @@
 const mockSpendTokens = jest.fn().mockResolvedValue(undefined);
 
 jest.mock('~/models', () => ({
+<<<<<<< HEAD
+=======
+  initializeMessageBudget: jest.fn(),
+>>>>>>> upstream/main
   spendTokens: mockSpendTokens,
 }));
 

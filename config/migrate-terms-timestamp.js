@@ -11,7 +11,13 @@ const connect = require('./connect');
  * Migration script for Terms Acceptance Timestamp Tracking
  *
  * This script migrates existing users who have termsAccepted: true but no termsAcceptedAt timestamp.
+<<<<<<< HEAD
  * For these users, it sets termsAcceptedAt to their account creation date (createdAt) as a fallback.
+=======
+ * For these users, it sets termsAcceptedAt to their account creation date (createdAt) as a fallback
+ * and marks it with termsAcceptedSource: 'migration', so a backfilled date stays distinguishable
+ * from one recorded at the moment of acceptance.
+>>>>>>> upstream/main
  *
  * Usage: npm run migrate:terms-timestamp
  */
@@ -43,7 +49,11 @@ const connect = require('./connect');
     `Found ${usersToMigrate} user(s) with termsAccepted: true but no termsAcceptedAt timestamp.`,
   );
   console.yellow(
+<<<<<<< HEAD
     'These users will have their termsAcceptedAt set to their account creation date (createdAt).',
+=======
+    'These users will have their termsAcceptedAt set to their account creation date (createdAt), marked as backfilled.',
+>>>>>>> upstream/main
   );
 
   const confirm = await askQuestion('Are you sure you want to proceed? (y/n): ');
@@ -85,7 +95,11 @@ const connect = require('./connect');
               termsAccepted: true,
               $or: [{ termsAcceptedAt: null }, { termsAcceptedAt: { $exists: false } }],
             },
+<<<<<<< HEAD
             { $set: { termsAcceptedAt } },
+=======
+            { $set: { termsAcceptedAt, termsAcceptedSource: 'migration' } },
+>>>>>>> upstream/main
           );
 
           if (result.modifiedCount > 0) {

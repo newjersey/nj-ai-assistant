@@ -689,6 +689,10 @@ describe('OpenIDSessionRefresh', () => {
       expect(setOpenIDMarkerCookies).toHaveBeenCalledTimes(1);
       expect(setOpenIDMarkerCookies).toHaveBeenCalledWith(res, {
         userId: 'local-id-1',
+<<<<<<< HEAD
+=======
+        tenantId: 'tenant-1',
+>>>>>>> upstream/main
         expires: expect.any(Date),
         refreshExpiryMs: 1000 * 60 * 60 * 24 * 7,
         refreshToken: 'rt-rotated',

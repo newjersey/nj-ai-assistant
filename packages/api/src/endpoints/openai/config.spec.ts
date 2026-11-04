@@ -26,6 +26,17 @@ describe('getOpenAIConfig', () => {
     expect(result.tools).toEqual([]);
   });
 
+<<<<<<< HEAD
+=======
+  it('applies an explicit model transport timeout policy', () => {
+    const result = getOpenAIConfig(mockApiKey, {
+      transportTimeouts: { bodyTimeout: 900_000, headersTimeout: 300_000 },
+    });
+
+    expect(result.configOptions?.fetchOptions?.dispatcher).toBeDefined();
+  });
+
+>>>>>>> upstream/main
   it('should apply model options', () => {
     const modelOptions = {
       model: 'gpt-4',
@@ -369,7 +380,11 @@ describe('getOpenAIConfig', () => {
       'HTTP-Referer': 'https://librechat.ai',
       'X-Title': 'LibreChat',
       'X-OpenRouter-Title': 'LibreChat',
+<<<<<<< HEAD
       'X-OpenRouter-Categories': 'general-chat,personal-agent',
+=======
+      'X-OpenRouter-Categories': 'general-chat,personal-agent,programming-app',
+>>>>>>> upstream/main
     });
     expect(result.llmConfig.include_reasoning).toBe(true);
     expect(result.llmConfig.promptCache).toBe(true);
@@ -1185,11 +1200,31 @@ describe('getOpenAIConfig', () => {
         'HTTP-Referer': 'https://librechat.ai',
         'X-Title': 'LibreChat',
         'X-OpenRouter-Title': 'LibreChat',
+<<<<<<< HEAD
         'X-OpenRouter-Categories': 'general-chat,personal-agent',
+=======
+        'X-OpenRouter-Categories': 'general-chat,personal-agent,programming-app',
+>>>>>>> upstream/main
         'X-Custom-Header': 'custom-value',
         Authorization: 'Bearer custom-token',
       });
     });
+<<<<<<< HEAD
+=======
+
+    it('should allow custom OpenRouter categories to override attribution defaults', () => {
+      const result = getOpenAIConfig(mockApiKey, {
+        reverseProxyUrl: 'https://openrouter.ai/api/v1',
+        headers: {
+          'X-OpenRouter-Categories': 'general-chat',
+        },
+      });
+
+      expect(result.configOptions?.defaultHeaders).toMatchObject({
+        'X-OpenRouter-Categories': 'general-chat',
+      });
+    });
+>>>>>>> upstream/main
   });
 
   describe('Direct Endpoint Configuration', () => {
@@ -2199,3 +2234,33 @@ describe('getOpenAIConfig', () => {
     });
   });
 });
+<<<<<<< HEAD
+=======
+
+describe('Grok 4.7 xAI configuration', () => {
+  it.each([
+    ReasoningEffort.low,
+    ReasoningEffort.medium,
+    ReasoningEffort.high,
+    ReasoningEffort.xhigh,
+  ])('forwards %s effort through the existing Chat Completions path', (effort) => {
+    const result = getOpenAIConfig(
+      'test-xai-key',
+      {
+        reverseProxyUrl: 'https://api.x.ai/v1',
+        modelOptions: { model: 'grok-4.7', reasoning_effort: effort },
+      },
+      'xai',
+    );
+    expect(result.configOptions?.baseURL).toBe('https://api.x.ai/v1');
+    expect(result.llmConfig.model).toBe('grok-4.7');
+    expect(result.llmConfig.modelKwargs).toMatchObject({ reasoning_effort: effort });
+    expect(result.llmConfig.useResponsesApi).not.toBe(true);
+  });
+
+  it('leaves reasoning effort unset so xAI applies its default', () => {
+    const result = getOpenAIConfig('test-xai-key', { modelOptions: { model: 'grok-4.7' } }, 'xai');
+    expect(result.llmConfig.modelKwargs?.reasoning_effort).toBeUndefined();
+  });
+});
+>>>>>>> upstream/main

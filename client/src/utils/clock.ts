@@ -176,12 +176,21 @@ const FALLBACK_REGION_WEEK_START = new Map<string, WeekStartDay>([
   ['MV', 5],
 ]);
 
+<<<<<<< HEAD
 /** `Intl.Locale.prototype.getWeekInfo`/`.weekInfo` (Baseline 2024) predate this
  *  project's TS lib target, so neither member is declared on `Intl.Locale` yet. */
 interface LocaleWithWeekInfo extends Intl.Locale {
   getWeekInfo?: () => { firstDay: number };
   weekInfo?: { firstDay: number };
 }
+=======
+/** `Intl.Locale.prototype.getWeekInfo`/`.weekInfo` (Baseline 2024) are missing from
+ *  older TS libs and declared as always present by newer ones; both are optional here. */
+type LocaleWithWeekInfo = Omit<Intl.Locale, 'getWeekInfo' | 'weekInfo'> & {
+  getWeekInfo?: () => { firstDay: number };
+  weekInfo?: { firstDay: number };
+};
+>>>>>>> upstream/main
 
 /** `globalThis.navigator` rather than the bare global: this module is imported
  *  through `~/utils`, which server-side rendering and plain-node test runners

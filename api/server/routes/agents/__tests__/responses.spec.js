@@ -77,7 +77,13 @@ jest.mock('~/config', () => ({
   createMCPManager: jest.fn().mockResolvedValue({
     getAppToolFunctions: jest.fn().mockResolvedValue({}),
   }),
+<<<<<<< HEAD
   getMCPManager: jest.fn().mockReturnValue({}),
+=======
+  getMCPManager: jest.fn(() => ({
+    formatInstructionsForContext: jest.fn().mockResolvedValue(''),
+  })),
+>>>>>>> upstream/main
 }));
 
 const express = require('express');

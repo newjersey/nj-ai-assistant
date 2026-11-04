@@ -76,13 +76,39 @@ const mockSetMCPToolsChangedGenerationHandler = jest.fn();
 const mockSetMCPToolsChangedGenerationRenewalHandler = jest.fn();
 const mockSetMCPToolsChangedRevisionHandler = jest.fn();
 const mockRegisterShutdownTask = jest.fn();
+<<<<<<< HEAD
+=======
+const mockAppBindingCodec = { create: jest.fn(), verify: jest.fn() };
+>>>>>>> upstream/main
 const mockUpdateMCPServerTools = jest.fn();
 const mockGetMCPToolsCacheGeneration = jest.fn();
 const mockRenewMCPToolsCacheGeneration = jest.fn();
 const mockGetNextAppToolsPublicationRevision = jest.fn();
 const mockGetDeploymentPluginMcpServers = jest.fn(() => ({}));
+<<<<<<< HEAD
 
 jest.mock('@librechat/api', () => ({
+=======
+const mockPolicyResolver = jest.fn();
+const mockCreateMCPPolicyResolver = jest.fn(() => mockPolicyResolver);
+const mockReportStoredMCPTombstones = jest.fn();
+const mockListConfigTombstones = jest.fn();
+
+jest.mock('~/models', () => ({
+  get listConfigTombstones() {
+    return mockListConfigTombstones;
+  },
+}));
+
+jest.mock('@librechat/api', () => ({
+  createMCPAppBindingCodec: jest.fn(() => mockAppBindingCodec),
+  get createMCPPolicyResolver() {
+    return mockCreateMCPPolicyResolver;
+  },
+  get reportStoredMCPTombstones() {
+    return mockReportStoredMCPTombstones;
+  },
+>>>>>>> upstream/main
   get registerShutdownTask() {
     return mockRegisterShutdownTask;
   },
@@ -133,6 +159,55 @@ describe('initializeMCPs', () => {
     mockMCPManagerInstance.disconnectAppServers.mockResolvedValue(undefined);
     mockSyncStaticTools.mockResolvedValue(undefined);
     mockMergeAppTools.mockResolvedValue(undefined);
+<<<<<<< HEAD
+=======
+    mockReportStoredMCPTombstones.mockResolvedValue(undefined);
+  });
+
+  describe('stored MCP tombstones', () => {
+    it('reports the tombstoned profiles against the librechat.yaml servers once registry is ready', async () => {
+      const mcpConfig = { github: { type: 'streamable-http', url: 'https://github.example.com' } };
+      const profiles = [
+        { principalType: 'role', principalId: 'USER', tombstones: ['mcpServers.github'] },
+      ];
+      mockGetAppConfig.mockResolvedValue({ mcpConfig });
+      mockListConfigTombstones.mockResolvedValue(profiles);
+
+      await initializeMCPs();
+
+      expect(mockReportStoredMCPTombstones).toHaveBeenCalledWith(expect.any(Function), mcpConfig);
+      const [listProfiles] = mockReportStoredMCPTombstones.mock.calls[0];
+      await expect(listProfiles('mcpServers')).resolves.toBe(profiles);
+      expect(mockListConfigTombstones).toHaveBeenCalledWith('mcpServers');
+      expect(mockCreateMCPServersRegistry.mock.invocationCallOrder[0]).toBeLessThan(
+        mockReportStoredMCPTombstones.mock.invocationCallOrder[0],
+      );
+    });
+
+    it('connects the MCP servers without waiting for the report, and resolves once it is logged', async () => {
+      mockGetAppConfig.mockResolvedValue({
+        mcpConfig: { github: { type: 'streamable-http', url: 'https://github.example.com' } },
+      });
+      let finishReport;
+      mockReportStoredMCPTombstones.mockReturnValue(
+        new Promise((resolve) => {
+          finishReport = resolve;
+        }),
+      );
+      let settled = false;
+
+      const initialized = initializeMCPs().then(() => {
+        settled = true;
+      });
+      await new Promise((resolve) => setImmediate(resolve));
+
+      expect(mockMCPManagerInstance.connectAppServers).toHaveBeenCalledTimes(1);
+      expect(settled).toBe(false);
+      finishReport();
+      await initialized;
+      expect(settled).toBe(true);
+    });
+>>>>>>> upstream/main
   });
 
   describe('MCPServersRegistry initialization', () => {
@@ -150,6 +225,17 @@ describe('initializeMCPs', () => {
         ['localhost'],
         undefined,
         expect.any(Function), // per-request allowlist resolver
+<<<<<<< HEAD
+=======
+        {
+          enabled: false,
+          legacyHtmlEnabled: true,
+          maxPersistedAppBytes: 1048576,
+          maxAdmissionRequestsPerMinute: 240,
+          maxActiveViews: 3,
+          maxActionPreviewChars: 16384,
+        },
+>>>>>>> upstream/main
       );
     });
 
@@ -167,6 +253,17 @@ describe('initializeMCPs', () => {
         allowedDomains,
         undefined,
         expect.any(Function),
+<<<<<<< HEAD
+=======
+        {
+          enabled: false,
+          legacyHtmlEnabled: true,
+          maxPersistedAppBytes: 1048576,
+          maxAdmissionRequestsPerMinute: 240,
+          maxActiveViews: 3,
+          maxActionPreviewChars: 16384,
+        },
+>>>>>>> upstream/main
       );
     });
 
@@ -183,10 +280,79 @@ describe('initializeMCPs', () => {
         undefined,
         undefined,
         expect.any(Function),
+<<<<<<< HEAD
       );
     });
 
     it('wires a per-request resolver that reads the merged (non-baseOnly) config', async () => {
+=======
+        {
+          enabled: false,
+          legacyHtmlEnabled: true,
+          maxPersistedAppBytes: 1048576,
+          maxAdmissionRequestsPerMinute: 240,
+          maxActiveViews: 3,
+          maxActionPreviewChars: 16384,
+        },
+      );
+    });
+
+    it.each([
+      [
+        true,
+        {
+          enabled: true,
+          legacyHtmlEnabled: true,
+          maxPersistedAppBytes: 1048576,
+          maxAdmissionRequestsPerMinute: 240,
+          maxActiveViews: 3,
+          maxActionPreviewChars: 16384,
+        },
+      ],
+      [
+        false,
+        {
+          enabled: false,
+          legacyHtmlEnabled: false,
+          maxPersistedAppBytes: 1048576,
+          maxAdmissionRequestsPerMinute: 240,
+          maxActiveViews: 3,
+          maxActionPreviewChars: 16384,
+        },
+      ],
+    ])('normalizes the startup MCP Apps policy for apps=%s', async (apps, expected) => {
+      mockGetAppConfig.mockResolvedValue({ mcpConfig: null, mcpSettings: { apps } });
+
+      await initializeMCPs();
+
+      expect(mockCreateMCPServersRegistry.mock.calls[0][4]).toEqual(expected);
+    });
+
+    it('publishes the base admission ceiling once to the registry policy', async () => {
+      mockGetAppConfig.mockResolvedValue({
+        mcpConfig: null,
+        mcpSettings: { apps: true },
+        mcpAppSandbox: {
+          url: 'https://mcp-sandbox.example.com/api/mcp/sandbox',
+          maxAdmissionRequestsPerMinute: 480,
+        },
+      });
+
+      await initializeMCPs();
+
+      expect(mockCreateMCPServersRegistry.mock.calls[0][4]).toEqual({
+        enabled: true,
+        legacyHtmlEnabled: true,
+        maxPersistedAppBytes: 1048576,
+        maxAdmissionRequestsPerMinute: 480,
+        maxActiveViews: 3,
+        maxActionPreviewChars: 16384,
+        sandboxUrl: 'https://mcp-sandbox.example.com/api/mcp/sandbox',
+      });
+    });
+
+    it('wires the per-request policy resolver over the merged (non-baseOnly) config reader', async () => {
+>>>>>>> upstream/main
       mockGetAppConfig.mockResolvedValue({
         mcpConfig: null,
         mcpSettings: { allowedDomains: ['yaml.com'] },
@@ -194,6 +360,7 @@ describe('initializeMCPs', () => {
 
       await initializeMCPs();
 
+<<<<<<< HEAD
       const resolver = mockCreateMCPServersRegistry.mock.calls[0][3];
       expect(typeof resolver).toBe('function');
 
@@ -208,6 +375,10 @@ describe('initializeMCPs', () => {
         allowedDomains: ['merged.com'],
         allowedAddresses: ['10.0.0.0/8'],
       });
+=======
+      expect(mockCreateMCPPolicyResolver).toHaveBeenCalledWith(mockGetAppConfig);
+      expect(mockCreateMCPServersRegistry.mock.calls[0][3]).toBe(mockPolicyResolver);
+>>>>>>> upstream/main
     });
 
     it('should throw and log error if MCPServersRegistry initialization fails', async () => {
@@ -240,6 +411,10 @@ describe('initializeMCPs', () => {
         {
           catalogRecoveryMaxStateEntries: undefined,
           catalogRecoveryMaxDetachedDiscoveries: undefined,
+<<<<<<< HEAD
+=======
+          appBindingCodec: mockAppBindingCodec,
+>>>>>>> upstream/main
         },
       );
     });
@@ -256,6 +431,10 @@ describe('initializeMCPs', () => {
       expect(mockCreateMCPManager).toHaveBeenCalledWith(mcpServers, {
         catalogRecoveryMaxStateEntries: undefined,
         catalogRecoveryMaxDetachedDiscoveries: undefined,
+<<<<<<< HEAD
+=======
+        appBindingCodec: mockAppBindingCodec,
+>>>>>>> upstream/main
       });
     });
 
@@ -280,6 +459,10 @@ describe('initializeMCPs', () => {
         {
           catalogRecoveryMaxStateEntries: 2500,
           catalogRecoveryMaxDetachedDiscoveries: 8,
+<<<<<<< HEAD
+=======
+          appBindingCodec: mockAppBindingCodec,
+>>>>>>> upstream/main
         },
       );
       expect(mockStartMCPAuthorizationFenceRetryWorker).toHaveBeenCalledWith(
@@ -470,6 +653,10 @@ describe('initializeMCPs', () => {
         {
           catalogRecoveryMaxStateEntries: undefined,
           catalogRecoveryMaxDetachedDiscoveries: undefined,
+<<<<<<< HEAD
+=======
+          appBindingCodec: mockAppBindingCodec,
+>>>>>>> upstream/main
         },
       );
     });

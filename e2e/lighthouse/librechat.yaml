@@ -3,3 +3,8 @@ cache: true
 endpoints:
   openAI:
     titleConvo: false
+<<<<<<< HEAD
+=======
+openapi:
+  enabled: true
+>>>>>>> upstream/main

@@ -1,10 +1,18 @@
 import mongoose from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
+<<<<<<< HEAD
 import { PermissionTypes, Permissions } from 'librechat-data-provider';
 import type { IRole } from '..';
 import { createRoleMethods } from './role';
 import { createModels } from '../models';
 import { tenantStorage } from '../config/tenantContext';
+=======
+import { PermissionTypes, Permissions, SystemRoles } from 'librechat-data-provider';
+import type { IRole } from '..';
+import { runAsSystem, tenantStorage } from '../config/tenantContext';
+import { createRoleMethods } from './role';
+import { createModels } from '../models';
+>>>>>>> upstream/main
 
 jest.mock('~/config/winston', () => ({
   error: jest.fn(),
@@ -120,11 +128,51 @@ describe('getRoleByName cache is scoped to the active tenant', () => {
     findOneSpy.mockRestore();
   });
 
+<<<<<<< HEAD
+=======
+  it('serves the platform role outside a tenant when an older tenant role has its name', async () => {
+    await seedRole(TENANT_A, false);
+    await new Role({
+      name: ROLE_NAME,
+      permissions: { [PermissionTypes.PROMPTS]: { [Permissions.USE]: true } },
+    }).save();
+
+    const platform = await getRoleByName(ROLE_NAME);
+    const system = await runAsSystem(() => getRoleByName(ROLE_NAME));
+    const tenant = await runAs(TENANT_A, () => getRoleByName(ROLE_NAME));
+
+    expect(platform?.tenantId).toBeUndefined();
+    expect(usePromptsPermission(platform)).toBe(true);
+    expect(usePromptsPermission(system)).toBe(true);
+    expect(usePromptsPermission(cache.store.get(ROLE_NAME) as IRole)).toBe(true);
+    expect(usePromptsPermission(tenant)).toBe(false);
+  });
+
+  it('finds no role outside a tenant that only a tenant holds, and creates a missing system role at platform level', async () => {
+    await seedRole(TENANT_A, true);
+    await runAs(TENANT_A, () => new Role({ name: SystemRoles.USER }).save());
+
+    const tenantOnly = await getRoleByName(ROLE_NAME);
+    const user = await getRoleByName(SystemRoles.USER);
+
+    expect(tenantOnly).toBeNull();
+    expect(user?.tenantId).toBeUndefined();
+    expect(await Role.collection.countDocuments({ name: SystemRoles.USER })).toBe(2);
+  });
+
+>>>>>>> upstream/main
   it('uses the unscoped key when no tenant context is active (single-tenant)', async () => {
     const previousDefault = process.env.DEFAULT_TENANT_ID;
     delete process.env.DEFAULT_TENANT_ID;
     try {
+<<<<<<< HEAD
       await seedRole(TENANT_A, true);
+=======
+      await new Role({
+        name: ROLE_NAME,
+        permissions: { [PermissionTypes.PROMPTS]: { [Permissions.USE]: true } },
+      }).save();
+>>>>>>> upstream/main
 
       const role = await getRoleByName(ROLE_NAME);
       expect(usePromptsPermission(role)).toBe(true);

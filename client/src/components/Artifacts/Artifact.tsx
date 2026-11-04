@@ -7,6 +7,10 @@ import type { Pluggable } from 'unified';
 import type { Artifact } from '~/common';
 import { useMessageContext, useArtifactContext } from '~/Providers';
 import { logger, extractContent, isArtifactRoute } from '~/utils';
+<<<<<<< HEAD
+=======
+import { normalizeArtifactType } from '~/utils/artifacts';
+>>>>>>> upstream/main
 import { artifactsState } from '~/store/artifacts';
 import ArtifactButton from './ArtifactButton';
 
@@ -81,7 +85,11 @@ export function Artifact({
         id: artifactKey,
         identifier,
         title,
+<<<<<<< HEAD
         type,
+=======
+        type: normalizeArtifactType(type),
+>>>>>>> upstream/main
         content,
         messageId,
         index: artifactIndex,

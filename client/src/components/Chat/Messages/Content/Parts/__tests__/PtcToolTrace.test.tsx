@@ -1,8 +1,16 @@
 import React from 'react';
+<<<<<<< HEAD
 import { RecoilRoot, useSetRecoilState } from 'recoil';
 import { render, screen } from '@testing-library/react';
 import type { PtcTraceEntry } from '~/store/ptc';
 import { ptcTraceByToolCallId, ptcTraceKey } from '~/store/ptc';
+=======
+import { RecoilRoot } from 'recoil';
+import { render, screen } from '@testing-library/react';
+import { useSetAtom, Provider as JotaiProvider } from 'jotai';
+import type { PtcTraceEntry } from '~/common';
+import { ptcTraceByToolCallId, ptcTraceKey } from '~/hooks/SSE/ptc';
+>>>>>>> upstream/main
 import { MessageContext } from '~/Providers/MessageContext';
 import PtcToolTrace from '../PtcToolTrace';
 
@@ -39,7 +47,11 @@ const MESSAGE_ID = 'response-msg-1';
 
 function renderTrace(entries: PtcTraceEntry[], messageId = MESSAGE_ID, dropped = 0) {
   const Seed = () => {
+<<<<<<< HEAD
     const set = useSetRecoilState(ptcTraceByToolCallId(ptcTraceKey(MESSAGE_ID, TOOL_CALL_ID)));
+=======
+    const set = useSetAtom(ptcTraceByToolCallId(ptcTraceKey(MESSAGE_ID, TOOL_CALL_ID)));
+>>>>>>> upstream/main
     React.useEffect(() => {
       if (entries.length > 0) {
         set({ entries, dropped });
@@ -50,10 +62,19 @@ function renderTrace(entries: PtcTraceEntry[], messageId = MESSAGE_ID, dropped =
 
   return render(
     <RecoilRoot>
+<<<<<<< HEAD
       <Seed />
       <MessageContext.Provider value={{ messageId, isExpanded: false }}>
         <PtcToolTrace toolCallId={TOOL_CALL_ID} />
       </MessageContext.Provider>
+=======
+      <JotaiProvider>
+        <Seed />
+        <MessageContext.Provider value={{ messageId, isExpanded: false }}>
+          <PtcToolTrace toolCallId={TOOL_CALL_ID} />
+        </MessageContext.Provider>
+      </JotaiProvider>
+>>>>>>> upstream/main
     </RecoilRoot>,
   );
 }

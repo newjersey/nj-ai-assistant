@@ -3,7 +3,10 @@ import { useToastContext, TooltipAnchor, Button } from '@librechat/client';
 import { useDuplicateAgentMutation } from '~/data-provider';
 import { isEphemeralAgent } from '~/common';
 import { useLocalize } from '~/hooks';
+<<<<<<< HEAD
 import { logAgentDuplication } from '~/nj/analytics/logHelpers';
+=======
+>>>>>>> upstream/main
 
 export default function DuplicateAgent({ agent_id }: { agent_id: string }) {
   const localize = useLocalize();
@@ -30,7 +33,10 @@ export default function DuplicateAgent({ agent_id }: { agent_id: string }) {
   }
 
   const handleDuplicate = () => {
+<<<<<<< HEAD
     logAgentDuplication(agent_id);
+=======
+>>>>>>> upstream/main
     duplicateAgent.mutate({ agent_id });
   };
 

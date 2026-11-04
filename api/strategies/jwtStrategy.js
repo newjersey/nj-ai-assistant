@@ -1,8 +1,23 @@
+<<<<<<< HEAD
 const { AGENT_TRIGGER_SCOPE } = require('@librechat/api');
 const { logger, runAsSystem } = require('@librechat/data-schemas');
 const { SystemRoles } = require('librechat-data-provider');
 const { Strategy: JwtStrategy, ExtractJwt } = require('passport-jwt');
 const { getUserById, updateUser } = require('~/models');
+=======
+const { logger, runAsSystem } = require('@librechat/data-schemas');
+const { CacheKeys, SystemRoles } = require('librechat-data-provider');
+const { Strategy: JwtStrategy, ExtractJwt } = require('passport-jwt');
+const {
+  loadJwtUser,
+  isTokenRetired,
+  getAuthUserDocCacheMode,
+  AGENT_TRIGGER_SCOPE,
+  continueAfterBearerRetirement,
+} = require('@librechat/api');
+const { getUserById, updateUser } = require('~/models');
+const getLogStores = require('~/cache/getLogStores');
+>>>>>>> upstream/main
 
 const AGENT_TRIGGER_ADMISSION_PATHS = ['/api/agents/chat/agents', '/api/agents/chat/steer/deliver'];
 
@@ -34,6 +49,7 @@ const jwtLogin = () =>
           done(null, false, { message: 'Agent trigger token is not valid for this endpoint' });
           return;
         }
+<<<<<<< HEAD
         const user = await runAsSystem(() =>
           getUserById(
             payload?.id,
@@ -41,6 +57,14 @@ const jwtLogin = () =>
           ),
         );
         if (user?.agentTriggerDeletionStartedAt != null) {
+=======
+        const { user, deleting, remember } = await loadJwtUser(payload?.id, {
+          getUserById,
+          cacheMode: getAuthUserDocCacheMode(),
+          getCacheStore: () => getLogStores(CacheKeys.AUTH_USER_DOC),
+        });
+        if (deleting) {
+>>>>>>> upstream/main
           done(null, false, {
             message: 'Account deletion is in progress',
             code: 'ACCOUNT_DELETION_IN_PROGRESS',
@@ -48,6 +72,7 @@ const jwtLogin = () =>
           return;
         }
         if (user) {
+<<<<<<< HEAD
           user.id = user._id.toString();
           /** Absent on the full doc means local user; null skips getUserPrincipals' fallback lookup */
           user.idOnTheSource ??= null;
@@ -56,6 +81,29 @@ const jwtLogin = () =>
             await runAsSystem(() => updateUser(user.id, { role: user.role }));
           }
           done(null, user);
+=======
+          return await continueAfterBearerRetirement(
+            user,
+            { issuedAt: payload?.iat, issuedAtMs: payload?.issuedAtMs },
+            'jwt',
+            payload?.id,
+            done,
+            (message) => logger.warn(message),
+            async () => {
+              user.id = user._id.toString();
+              /** Absent on the full doc means local user; null skips getUserPrincipals' fallback lookup */
+              user.idOnTheSource ??= null;
+              const roleMissing = !user.role;
+              if (roleMissing) {
+                user.role = SystemRoles.USER;
+                await runAsSystem(() => updateUser(user.id, { role: user.role }));
+              }
+              await remember(roleMissing);
+              done(null, user);
+            },
+            isTokenRetired,
+          );
+>>>>>>> upstream/main
         } else {
           logger.warn('[jwtLogin] JwtStrategy => no user found: ' + payload?.id);
           done(null, false);

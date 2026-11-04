@@ -30,6 +30,7 @@ export enum PrincipalModel {
 }
 
 /**
+<<<<<<< HEAD
  * Source of the principal (local LibreChat or external Entra ID)
  */
 export type TPrincipalSource = 'local' | 'entra';
@@ -40,6 +41,8 @@ export type TPrincipalSource = 'local' | 'entra';
 export type TAccessLevel = 'none' | 'viewer' | 'editor' | 'owner';
 
 /**
+=======
+>>>>>>> upstream/main
  * Resource types for permission system
  */
 export enum ResourceType {
@@ -126,6 +129,7 @@ export const accessRoleSchema = z.object({
 });
 
 /**
+<<<<<<< HEAD
  * Permission entry schema - represents a single ACL entry
  */
 export const permissionEntrySchema = z.object({
@@ -150,6 +154,8 @@ export const resourcePermissionsResponseSchema = z.object({
 });
 
 /**
+=======
+>>>>>>> upstream/main
  * Update resource permissions request schema
  * This matches the user's requirement for the frontend DTO structure
  */
@@ -186,6 +192,7 @@ export type TPrincipal = z.infer<typeof principalSchema>;
 export type TAccessRole = z.infer<typeof accessRoleSchema>;
 
 /**
+<<<<<<< HEAD
  * Permission entry - represents a single ACL entry
  */
 export type TPermissionEntry = z.infer<typeof permissionEntrySchema>;
@@ -196,6 +203,8 @@ export type TPermissionEntry = z.infer<typeof permissionEntrySchema>;
 export type TResourcePermissionsResponse = z.infer<typeof resourcePermissionsResponseSchema>;
 
 /**
+=======
+>>>>>>> upstream/main
  * Update resource permissions request
  * This matches the user's requirement for the frontend DTO structure
  */
@@ -212,6 +221,7 @@ export type TUpdateResourcePermissionsResponse = z.infer<
 >;
 
 /**
+<<<<<<< HEAD
  * Principal search request parameters
  */
 export type TPrincipalSearchParams = {
@@ -221,6 +231,8 @@ export type TPrincipalSearchParams = {
 };
 
 /**
+=======
+>>>>>>> upstream/main
  * Principal search result item
  */
 export type TPrincipalSearchResult = {
@@ -254,6 +266,7 @@ export type TPrincipalSearchResponse = {
 };
 
 /**
+<<<<<<< HEAD
  * Available roles response
  */
 export type TAvailableRolesResponse = {
@@ -262,6 +275,8 @@ export type TAvailableRolesResponse = {
 };
 
 /**
+=======
+>>>>>>> upstream/main
  * Get resource permissions response schema
  * This matches the enhanced aggregation-based endpoint response format
  */
@@ -299,6 +314,7 @@ export type TEffectivePermissionsResponse = z.infer<typeof effectivePermissionsR
  */
 export type TAllEffectivePermissionsResponse = Record<string, number>;
 
+<<<<<<< HEAD
 // ===== UTILITY TYPES =====
 
 /**
@@ -360,6 +376,11 @@ export function accessRoleToPermBits(accessRoleId: string): number {
 }
 
 /**
+=======
+// ===== HELPER FUNCTIONS =====
+
+/**
+>>>>>>> upstream/main
  * Check if permission bitmask contains other bitmask
  * @param permissions - The permission bitmask to check
  * @param requiredPermission - The required permission bit(s)

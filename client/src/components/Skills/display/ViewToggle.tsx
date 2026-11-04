@@ -31,7 +31,11 @@ export default function ViewToggle({ viewMode, setViewMode }: ViewToggleProps) {
     <div
       role="group"
       aria-label={`${localize('com_ui_skill_view_rendered')} / ${localize('com_ui_skill_view_source')}`}
+<<<<<<< HEAD
       className="relative inline-flex h-7 rounded-lg bg-surface-tertiary p-0.5 text-sm font-medium"
+=======
+      className="bg-surface-tertiary relative inline-flex h-7 rounded-lg p-0.5 text-sm font-medium"
+>>>>>>> upstream/main
     >
       <span
         aria-hidden="true"
@@ -39,7 +43,11 @@ export default function ViewToggle({ viewMode, setViewMode }: ViewToggleProps) {
           /** Logical inset plus a mirrored translation: under RTL flex puts the
            *  first option on the right, so a physically-left thumb would sit
            *  under the wrong option in both states. */
+<<<<<<< HEAD
           'absolute start-0.5 top-0.5 h-6 w-7 rounded-md bg-surface-primary shadow-sm transition-transform duration-200 ease-out motion-reduce:transition-none',
+=======
+          'bg-surface-primary absolute start-0.5 top-0.5 h-6 w-7 rounded-md shadow-xs transition-transform duration-200 ease-out motion-reduce:transition-none',
+>>>>>>> upstream/main
           viewMode === 'source' && 'translate-x-7 rtl:-translate-x-7',
         )}
       />

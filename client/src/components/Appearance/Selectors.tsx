@@ -32,14 +32,22 @@ export const ThemeSelector = ({
   const labelId = 'theme-selector-label';
 
   return (
+<<<<<<< HEAD
     <div className="flex items-center justify-between">
+=======
+    <div className="flex flex-wrap items-center justify-between gap-2">
+>>>>>>> upstream/main
       <div id={labelId}>{localize('com_nav_theme')}</div>
 
       <Dropdown
         value={theme}
         onChange={onChange}
         options={themeOptions}
+<<<<<<< HEAD
         sizeClasses={cn('z-50 w-[180px]', popoverClassName)}
+=======
+        sizeClasses={cn('z-50 w-[min(11.25rem,90vw)]', popoverClassName)}
+>>>>>>> upstream/main
         testId="theme-selector"
         aria-labelledby={labelId}
         portal={portal}
@@ -80,6 +88,10 @@ export const LangSelector = ({
     { value: 'fa-IR', label: localize('com_nav_lang_persian') },
     { value: 'fr-FR', label: localize('com_nav_lang_french') },
     { value: 'he-HE', label: localize('com_nav_lang_hebrew') },
+<<<<<<< HEAD
+=======
+    { value: 'hi', label: localize('com_nav_lang_hindi') },
+>>>>>>> upstream/main
     { value: 'hu-HU', label: localize('com_nav_lang_hungarian') },
     { value: 'hy-AM', label: localize('com_nav_lang_armenian') },
     { value: 'is', label: localize('com_nav_lang_icelandic') },
@@ -95,9 +107,17 @@ export const LangSelector = ({
     { value: 'ka-GE', label: localize('com_nav_lang_georgian') },
     { value: 'cs-CZ', label: localize('com_nav_lang_czech') },
     { value: 'sv-SE', label: localize('com_nav_lang_swedish') },
+<<<<<<< HEAD
     { value: 'ko-KR', label: localize('com_nav_lang_korean') },
     { value: 'lt-LT', label: localize('com_nav_lang_lithuanian') },
     { value: 'lv-LV', label: localize('com_nav_lang_latvian') },
+=======
+    { value: 'ta', label: localize('com_nav_lang_tamil') },
+    { value: 'ko-KR', label: localize('com_nav_lang_korean') },
+    { value: 'lt-LT', label: localize('com_nav_lang_lithuanian') },
+    { value: 'lv-LV', label: localize('com_nav_lang_latvian') },
+    { value: 'mr', label: localize('com_nav_lang_marathi') },
+>>>>>>> upstream/main
     { value: 'vi-VN', label: localize('com_nav_lang_vietnamese') },
     { value: 'th-TH', label: localize('com_nav_lang_thai') },
     { value: 'tr-TR', label: localize('com_nav_lang_turkish') },
@@ -113,15 +133,26 @@ export const LangSelector = ({
   const labelId = 'language-selector-label';
 
   return (
+<<<<<<< HEAD
     <div className="flex items-center justify-between">
       <div id={labelId}>{localize('com_nav_language')}</div>
 
       <div className="flex items-center gap-2">
+=======
+    <div className="flex flex-wrap items-center justify-between gap-2">
+      <div id={labelId}>{localize('com_nav_language')}</div>
+
+      <div className="flex max-w-full min-w-0 items-center gap-2">
+>>>>>>> upstream/main
         {isLanguageLoading && (
           <span
             role="status"
             aria-label={localize('com_ui_loading')}
+<<<<<<< HEAD
             className="flex size-5 items-center justify-center text-text-secondary"
+=======
+            className="text-text-secondary flex size-5 items-center justify-center"
+>>>>>>> upstream/main
           >
             <Spinner className="size-4" />
           </span>
@@ -129,7 +160,11 @@ export const LangSelector = ({
         <Dropdown
           value={langcode}
           onChange={onChange}
+<<<<<<< HEAD
           sizeClasses={cn('z-50 w-[220px]', popoverClassName)}
+=======
+          sizeClasses={cn('z-50 w-[min(13.75rem,90vw)]', popoverClassName)}
+>>>>>>> upstream/main
           options={languageOptions}
           aria-labelledby={labelId}
           portal={portal}

@@ -20,6 +20,10 @@ export const supportedLocales = [
   'fi',
   'fr',
   'he',
+<<<<<<< HEAD
+=======
+  'hi',
+>>>>>>> upstream/main
   'hu',
   'hy',
   'id',
@@ -30,6 +34,10 @@ export const supportedLocales = [
   'ko',
   'lt',
   'lv',
+<<<<<<< HEAD
+=======
+  'mr',
+>>>>>>> upstream/main
   'nb',
   'nl',
   'nn',
@@ -40,6 +48,10 @@ export const supportedLocales = [
   'sk',
   'sl',
   'sv',
+<<<<<<< HEAD
+=======
+  'ta',
+>>>>>>> upstream/main
   'th',
   'tr',
   'ug',
@@ -73,6 +85,10 @@ const localeLoaders: Record<
   fi: () => import('./fi/translation.json'),
   fr: () => import('./fr/translation.json'),
   he: () => import('./he/translation.json'),
+<<<<<<< HEAD
+=======
+  hi: () => import('./hi/translation.json'),
+>>>>>>> upstream/main
   hu: () => import('./hu/translation.json'),
   hy: () => import('./hy/translation.json'),
   id: () => import('./id/translation.json'),
@@ -83,6 +99,10 @@ const localeLoaders: Record<
   ko: () => import('./ko/translation.json'),
   lt: () => import('./lt/translation.json'),
   lv: () => import('./lv/translation.json'),
+<<<<<<< HEAD
+=======
+  mr: () => import('./mr/translation.json'),
+>>>>>>> upstream/main
   nb: () => import('./nb/translation.json'),
   nl: () => import('./nl/translation.json'),
   nn: () => import('./nn/translation.json'),
@@ -93,6 +113,10 @@ const localeLoaders: Record<
   sk: () => import('./sk/translation.json'),
   sl: () => import('./sl/translation.json'),
   sv: () => import('./sv/translation.json'),
+<<<<<<< HEAD
+=======
+  ta: () => import('./ta/translation.json'),
+>>>>>>> upstream/main
   th: () => import('./th/translation.json'),
   tr: () => import('./tr/translation.json'),
   ug: () => import('./ug/translation.json'),

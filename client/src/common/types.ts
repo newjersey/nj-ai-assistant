@@ -1,4 +1,5 @@
 import { RefObject } from 'react';
+<<<<<<< HEAD
 import { FileSources, EModelEndpoint, isEphemeralAgentId } from 'librechat-data-provider';
 import type { UseMutationResult } from '@tanstack/react-query';
 import type * as InputNumberPrimitive from 'rc-input-number';
@@ -6,6 +7,21 @@ import type { SetterOrUpdater, RecoilState } from 'recoil';
 import type { ColumnDef } from '@tanstack/react-table';
 import type * as t from 'librechat-data-provider';
 import type { LucideIcon } from 'lucide-react';
+=======
+import { isEphemeralAgentId } from 'librechat-data-provider';
+import type {
+  TOptions,
+  TAskProps,
+  TAskFunction,
+  PaneOptionSettings,
+  NewConversationParams,
+} from '@librechat/chat/react';
+import type { UseMutationResult } from '@tanstack/react-query';
+import type { ExtendedFile } from '@librechat/chat';
+import type * as t from 'librechat-data-provider';
+import type { LucideIcon } from 'lucide-react';
+import type { SetterOrUpdater } from 'recoil';
+>>>>>>> upstream/main
 import type { TranslationKeys } from '~/hooks';
 import { MCPServerDefinition } from '~/hooks/MCP/useMCPServerManager';
 
@@ -44,6 +60,7 @@ export enum TTSEndpoints {
   external = 'external',
 }
 
+<<<<<<< HEAD
 export type AudioChunk = {
   audio: string;
   isFinal: boolean;
@@ -67,6 +84,8 @@ export type BadgeItem = {
   isAvailable: boolean;
 };
 
+=======
+>>>>>>> upstream/main
 export type AssistantListItem = {
   id: string;
   name: string;
@@ -74,6 +93,7 @@ export type AssistantListItem = {
   model: string;
 };
 
+<<<<<<< HEAD
 export type AgentListItem = {
   id: string;
   name: string;
@@ -82,6 +102,8 @@ export type AgentListItem = {
 
 export type TPluginMap = Record<string, t.TPlugin>;
 
+=======
+>>>>>>> upstream/main
 export type GenericSetter<T> = (value: T | ((currentValue: T) => T)) => void;
 
 export type LastSelectedModels = Record<t.EModelEndpoint, string>;
@@ -93,6 +115,7 @@ export type LocalizeFunction = (
 
 export type ChatFormValues = { text: string };
 
+<<<<<<< HEAD
 export const mainTextareaId = 'prompt-textarea';
 export const globalAudioId = 'global-audio';
 
@@ -103,6 +126,11 @@ export enum IconContext {
   message = 'message',
 }
 
+=======
+export { mainTextareaId } from '@librechat/chat';
+export const globalAudioId = 'global-audio';
+
+>>>>>>> upstream/main
 export type NavLink = {
   title: TranslationKeys;
   label?: string;
@@ -114,6 +142,7 @@ export type NavLink = {
   id: string;
 };
 
+<<<<<<< HEAD
 export interface DataColumnMeta {
   meta:
     | {
@@ -122,6 +151,8 @@ export interface DataColumnMeta {
     | undefined;
 }
 
+=======
+>>>>>>> upstream/main
 export enum Panel {
   advanced = 'advanced',
   builder = 'builder',
@@ -222,8 +253,11 @@ export type AgentPanelContextType = {
   mcpToolsLoading: boolean;
   availableMCPServers: MCPServerDefinition[];
   availableMCPServersMap: t.MCPServersListResponse | undefined;
+<<<<<<< HEAD
   /** NJ: Identifies which trigger button opened current subpanel for returning focus on back */
   returnFocusRef: React.MutableRefObject<Panel | null>;
+=======
+>>>>>>> upstream/main
 };
 
 export type AgentModelPanelProps = {
@@ -235,8 +269,11 @@ export type AgentModelPanelProps = {
   setActivePanel: React.Dispatch<React.SetStateAction<Panel>>;
 };
 
+<<<<<<< HEAD
 export type AugmentedColumnDef<TData, TValue> = ColumnDef<TData, TValue> & DataColumnMeta;
 
+=======
+>>>>>>> upstream/main
 export type TSetOption = t.TSetOption;
 
 export type TSetExample = (
@@ -245,8 +282,11 @@ export type TSetExample = (
   newValue: number | string | boolean | null,
 ) => void;
 
+<<<<<<< HEAD
 export type OnInputNumberChange = InputNumberPrimitive.InputNumberProps['onChange'];
 
+=======
+>>>>>>> upstream/main
 export const defaultDebouncedDelay = 450;
 
 export enum ESide {
@@ -306,6 +346,7 @@ export type TSetOptionsPayload = {
   setOptions?: TSetOptions;
 };
 
+<<<<<<< HEAD
 export type TPresetItemProps = {
   preset: t.TPreset;
   value: t.TPreset;
@@ -314,12 +355,15 @@ export type TPresetItemProps = {
   onDeletePreset: (preset: t.TPreset) => void;
 };
 
+=======
+>>>>>>> upstream/main
 export type TOnClick = (e: React.MouseEvent<HTMLButtonElement>) => void;
 
 export type TGenButtonProps = {
   onClick: TOnClick;
 };
 
+<<<<<<< HEAD
 export type TAskProps = {
   text: string;
   overrideConvoId?: string;
@@ -386,6 +430,8 @@ export type TOptions = {
 
 export type TAskFunction = (props: TAskProps, options?: TOptions) => false | void;
 
+=======
+>>>>>>> upstream/main
 /**
  * Stable context object passed from non-memo'd wrapper components (Message, MessageContent)
  * to memo'd inner components (MessageRender, ContentRender) via props.
@@ -401,8 +447,16 @@ export type TMessageChatContext = {
   index: number;
   regenerate: (message: t.TMessage, options?: { addedConvo?: t.TConversation | null }) => void;
   conversation: t.TConversation | null;
+<<<<<<< HEAD
   latestMessageId: string | undefined;
   latestMessageDepth: number | undefined;
+=======
+  /** Getter backed by a ref, for reads at call time. Rendering reads the row's
+   *  `latestMessageId` prop, which its comparator gates on the row's relation. */
+  readonly latestMessageId: string | undefined;
+  /** Getter backed by a ref, for reads at call time (see `latestMessageId`). */
+  readonly latestMessageDepth: number | undefined;
+>>>>>>> upstream/main
   handleContinue: (e: React.MouseEvent<HTMLButtonElement>) => void;
   /** Resolved once per chat from `interface.feedback`; false until the config loads */
   feedbackEnabled: boolean;
@@ -466,6 +520,7 @@ export type TConfigProps = {
   endpoint: t.EModelEndpoint | string;
 };
 
+<<<<<<< HEAD
 export type TDangerButtonProps = {
   id: string;
   confirmClear: boolean;
@@ -482,6 +537,8 @@ export type TDangerButtonProps = {
   confirmActionTextCode?: TranslationKeys;
 };
 
+=======
+>>>>>>> upstream/main
 export type TDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -505,6 +562,10 @@ export type TAuthContext = {
   error: string | undefined;
   login: (data: t.TLoginUser) => void;
   logout: (redirect?: string) => void;
+<<<<<<< HEAD
+=======
+  completeAuthentication: (token: string, user: t.TUser) => void;
+>>>>>>> upstream/main
   setError: React.Dispatch<React.SetStateAction<string | undefined>>;
   roles?: Record<string, t.TRole | null | undefined>;
 };
@@ -578,6 +639,7 @@ export type PromptOption = MentionOption & {
   id: string;
 };
 
+<<<<<<< HEAD
 export type TOptionSettings = {
   showExamples?: boolean;
   isCodeChat?: boolean;
@@ -618,6 +680,12 @@ export interface SwitcherProps {
   endpointKeyProvided: boolean;
   isCollapsed: boolean;
 }
+=======
+export type TOptionSettings = PaneOptionSettings;
+
+export type { ExtendedFile, TOptions, TAskProps, TAskFunction, NewConversationParams };
+
+>>>>>>> upstream/main
 export type TLoginLayoutContext = {
   startupConfig: t.TStartupConfig | null;
   startupConfigError: unknown;
@@ -628,6 +696,7 @@ export type TLoginLayoutContext = {
   setHeaderText: React.Dispatch<React.SetStateAction<string>>;
 };
 
+<<<<<<< HEAD
 export type NewConversationParams = {
   template?: Partial<t.TConversation>;
   preset?: Partial<t.TPreset>;
@@ -675,10 +744,20 @@ export type TVectorStore = {
 };
 
 export type TThread = { id: string; createdAt: string };
+=======
+export type ConvoGenerator = (params: NewConversationParams) => void | t.TConversation;
+
+export type { TResData, TBaseResData, TFinalResData } from '@librechat/chat';
+>>>>>>> upstream/main
 
 declare global {
   interface Window {
     google_tag_manager?: unknown;
+<<<<<<< HEAD
+=======
+    /** Google Tag Manager's command queue, present once the container has loaded. */
+    dataLayer?: unknown[];
+>>>>>>> upstream/main
     /** Answers the server emits with the document, ahead of the app's own
      *  scripts, for questions the first render must not guess at. */
     __LIBRECHAT_CONFIG__?: {
@@ -686,6 +765,12 @@ declare global {
       /** Whether this deployment configured footer content of its own, so the
        *  composer reserves the footer bar's band on its first frame. */
       hasConfiguredFooter?: boolean;
+<<<<<<< HEAD
+=======
+      /** The deployment's `interface.landingFooter`, so the welcome screen does
+       *  not paint a footer the config is about to remove. */
+      landingFooter?: boolean;
+>>>>>>> upstream/main
     };
   }
 }

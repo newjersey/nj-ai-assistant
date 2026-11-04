@@ -163,7 +163,11 @@ export const pluginHooksDocumentSchema: z.ZodType<PluginHooksDocument> = z
         }
         context.addIssue({
           code: z.ZodIssueCode.too_big,
+<<<<<<< HEAD
           type: 'array',
+=======
+          origin: 'array',
+>>>>>>> upstream/main
           maximum: MAX_TOTAL_HANDLERS,
           inclusive: true,
           path: ['hooks'],

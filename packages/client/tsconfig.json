@@ -21,7 +21,13 @@
       "~/*": ["./src/*"]
     },
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
+<<<<<<< HEAD
     "resolveJsonModule": true
+=======
+    "resolveJsonModule": true,
+    "types": ["node", "vite/client"],
+    "noUncheckedSideEffectImports": false
+>>>>>>> upstream/main
   },
   "include": ["src/**/*"],
   "exclude": [

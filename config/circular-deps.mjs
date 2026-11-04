@@ -54,6 +54,22 @@ const targets = [
     minModules: 100,
   },
   {
+<<<<<<< HEAD
+=======
+    name: '@librechat/chat',
+    dir: 'packages/chat',
+    entries: ['src/index.ts', 'src/react.ts', 'src/components.ts'],
+    /** A self-import through the package name crosses an entry; resolve it so the scan sees it. */
+    alias: {
+      '@librechat/chat/components': 'src/components.ts',
+      '@librechat/chat/react': 'src/react.ts',
+      '@librechat/chat': 'src/index.ts',
+    },
+    internal: ['@librechat/chat'],
+    minModules: 3,
+  },
+  {
+>>>>>>> upstream/main
     name: 'api server',
     dir: 'api',
     entries: ['server/index.js'],

@@ -1,6 +1,19 @@
 import React, { useMemo } from 'react';
 import { useAtomValue } from 'jotai';
 import { useRecoilValue } from 'recoil';
+<<<<<<< HEAD
+=======
+import {
+  getHeaderHoverLabel,
+  revealOnRowHoverClasses,
+  messageFooterClasses,
+  Elapsed,
+  shouldShowElapsed,
+  SiblingSwitch,
+  SubRow,
+  MessageRow,
+} from '@librechat/chat/components';
+>>>>>>> upstream/main
 import type { TMessageContentParts } from 'librechat-data-provider';
 import type { TMessageProps, TMessageIcon } from '~/common';
 import {
@@ -10,6 +23,7 @@ import {
   getHeaderPrefixForScreenReader,
 } from '~/utils';
 import { useLocalize, useAttachments, useMessageHelpers, useContentMetadata } from '~/hooks';
+<<<<<<< HEAD
 import AuthorHeader from '~/components/Chat/Messages/Content/Parts/AuthorHeader';
 import { ErrorSourceProvider } from '~/components/Messages/Content/Error/source';
 import { getHeaderHoverLabel } from '~/components/Chat/Messages/ui/HeaderLabel';
@@ -24,6 +38,23 @@ import HoverButtons from './HoverButtons';
 import SubRow from './SubRow';
 import store from '~/store';
 
+=======
+import ResumeAuthorHeader from '~/components/Chat/Messages/Content/Parts/ResumeAuthorHeader';
+import { ErrorSourceProvider } from '~/components/Messages/Content/Error/source';
+import MessageIcon from '~/components/Chat/Messages/MessageIcon';
+import { showThinkingAtom } from '~/store/showThinking';
+import ContentParts from './Content/ContentParts';
+import { AuthorContext } from '~/Providers';
+import HoverButtons from './HoverButtons';
+import store from '~/store';
+
+/**
+ * The one header every assistant message hands its parts. It reads the author from
+ * `AuthorContext`, so the author resolving after paint cannot break the parts' memo.
+ */
+const RESUME_AUTHOR_HEADER = <ResumeAuthorHeader />;
+
+>>>>>>> upstream/main
 function MessageParts(props: TMessageProps) {
   const localize = useLocalize();
   const { message, siblingIdx, siblingCount, setSiblingIdx } = props;
@@ -50,6 +81,10 @@ function MessageParts(props: TMessageProps) {
   } = useMessageHelpers(props, searchResults);
 
   const maximizeChatSpace = useRecoilValue(store.maximizeChatSpace);
+<<<<<<< HEAD
+=======
+  const autoExpandTools = useRecoilValue(store.autoExpandTools);
+>>>>>>> upstream/main
   const showThinking = useAtomValue(showThinkingAtom);
   const { messageId = null, isCreatedByUser } = message ?? {};
 
@@ -86,6 +121,7 @@ function MessageParts(props: TMessageProps) {
     ],
   );
 
+<<<<<<< HEAD
   const authorHeader = useMemo(
     () =>
       isCreatedByUser === true ? undefined : (
@@ -95,6 +131,14 @@ function MessageParts(props: TMessageProps) {
         />
       ),
     [isCreatedByUser, iconData, assistant, agent, name],
+=======
+  const author = useMemo(
+    () => ({
+      icon: <MessageIcon iconData={iconData} assistant={assistant} agent={agent} />,
+      label: name,
+    }),
+    [iconData, assistant, agent, name],
+>>>>>>> upstream/main
   );
 
   const { hasParallelContent } = useContentMetadata(message);
@@ -111,9 +155,16 @@ function MessageParts(props: TMessageProps) {
     >
       <div className="m-auto justify-center px-4 py-3 sm:px-0">
         <MessageRow
+<<<<<<< HEAD
           id={messageId ?? ''}
           icon={<MessageIcon iconData={iconData} assistant={assistant} agent={agent} />}
           label={name}
+=======
+          message={message}
+          id={messageId ?? ''}
+          icon={author.icon}
+          label={author.label}
+>>>>>>> upstream/main
           hoverLabel={getHeaderHoverLabel(
             hasConfiguredSender,
             agent?.model,
@@ -157,7 +208,10 @@ function MessageParts(props: TMessageProps) {
                 isEditing={edit}
                 message={message}
                 enterEdit={enterEdit}
+<<<<<<< HEAD
                 isSubmitting={isSubmitting}
+=======
+>>>>>>> upstream/main
                 conversation={conversation ?? null}
                 regenerate={() => regenerateMessage()}
                 copyToClipboard={copyToClipboard}
@@ -169,6 +223,7 @@ function MessageParts(props: TMessageProps) {
             </SubRow>
           }
         >
+<<<<<<< HEAD
           <ErrorSourceProvider message={message}>
             <ContentParts
               edit={edit}
@@ -189,6 +244,32 @@ function MessageParts(props: TMessageProps) {
               content={message.content as Array<TMessageContentParts | undefined>}
             />
           </ErrorSourceProvider>
+=======
+          <AuthorContext.Provider value={author}>
+            <ErrorSourceProvider message={message}>
+              <ContentParts
+                edit={edit}
+                isLast={isLast}
+                enterEdit={enterEdit}
+                siblingIdx={siblingIdx}
+                attachments={attachments}
+                isSubmitting={isSubmitting}
+                searchResults={searchResults}
+                manualSkills={message.manualSkills}
+                messageId={message.messageId}
+                renderOwnerId={message.clientQueueParentMessageId}
+                authorHeader={isCreatedByUser === true ? undefined : RESUME_AUTHOR_HEADER}
+                setSiblingIdx={setSiblingIdx}
+                isCreatedByUser={message.isCreatedByUser}
+                conversationId={conversation?.conversationId}
+                foldLiveActivity={!autoExpandTools}
+                showThinking={showThinking}
+                isLatestMessage={messageId === latestMessageId}
+                content={message.content as Array<TMessageContentParts | undefined>}
+              />
+            </ErrorSourceProvider>
+          </AuthorContext.Provider>
+>>>>>>> upstream/main
         </MessageRow>
       </div>
     </div>

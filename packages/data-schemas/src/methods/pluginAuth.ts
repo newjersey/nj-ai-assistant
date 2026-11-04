@@ -89,6 +89,7 @@ export function createPluginAuthMethods(mongoose: typeof import('mongoose')): {
   }: UpdatePluginAuthParams): Promise<IPluginAuth> {
     try {
       const PluginAuth: Model<IPluginAuth> = mongoose.models.PluginAuth;
+<<<<<<< HEAD
       const existingAuth = await PluginAuth.findOne({
         userId,
         pluginKey,
@@ -111,6 +112,14 @@ export function createPluginAuthMethods(mongoose: typeof import('mongoose')): {
         await newPluginAuth.save();
         return newPluginAuth.toObject();
       }
+=======
+      /** Single atomic upsert: a find-then-save let concurrent writers insert duplicates. */
+      return await PluginAuth.findOneAndUpdate(
+        { userId, pluginKey, authField },
+        { $set: { value } },
+        { new: true, upsert: true, setDefaultsOnInsert: true },
+      ).lean<IPluginAuth>();
+>>>>>>> upstream/main
     } catch (error) {
       throw new Error(
         `Failed to update plugin auth: ${error instanceof Error ? error.message : 'Unknown error'}`,

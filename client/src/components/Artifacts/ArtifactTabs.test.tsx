@@ -16,6 +16,10 @@ const mockUseGetSharedStartupConfig = jest.fn((_shareId?: unknown, _options?: un
   data: {},
 }));
 let mockCurrentCode: string | undefined;
+<<<<<<< HEAD
+=======
+let mockCodeArtifactId: string | undefined;
+>>>>>>> upstream/main
 
 jest.mock('./ArtifactCodeEditor', () => ({
   ArtifactCodeEditor: (props: EditorProps) => mockEditor(props),
@@ -52,7 +56,12 @@ jest.mock('~/components/Messages/Content/Mermaid/Mermaid', () => {
 });
 
 jest.mock('~/Providers/EditorContext', () => ({
+<<<<<<< HEAD
   useCodeState: () => ({ currentCode: mockCurrentCode, setCurrentCode: jest.fn() }),
+=======
+  useArtifactCode: (artifactId: string) =>
+    mockCodeArtifactId === artifactId ? mockCurrentCode : undefined,
+>>>>>>> upstream/main
 }));
 
 jest.mock('~/Providers', () => ({
@@ -87,6 +96,10 @@ describe('ArtifactTabs Mermaid editing', () => {
     mockUseGetStartupConfig.mockClear();
     mockUseGetSharedStartupConfig.mockClear();
     mockCurrentCode = undefined;
+<<<<<<< HEAD
+=======
+    mockCodeArtifactId = undefined;
+>>>>>>> upstream/main
   });
 
   it('renders Mermaid natively without loading startup config or Sandpack preview', () => {
@@ -139,9 +152,16 @@ describe('ArtifactTabs Mermaid editing', () => {
       </Tabs.Root>,
     );
 
+<<<<<<< HEAD
     /* Editor text only belongs to the preview once it was typed against the
      * artifact on screen, so it is applied on a later render, not on mount. */
     mockCurrentCode = 'graph TD\nA-->C';
+=======
+    /* Editor text belongs to the preview only while it is this artifact's
+     * buffer, so the ownership the editor recorded is what applies it. */
+    mockCurrentCode = 'graph TD\nA-->C';
+    mockCodeArtifactId = artifact.id;
+>>>>>>> upstream/main
     rerender(
       <Tabs.Root value="preview">
         <ArtifactTabs artifact={artifact} previewRef={previewRef} />
@@ -231,12 +251,20 @@ describe('ArtifactTabs Mermaid editing', () => {
     };
 
     mockCurrentCode = 'graph TD\nEDITED-->A';
+<<<<<<< HEAD
+=======
+    mockCodeArtifactId = first.id;
+>>>>>>> upstream/main
     const { rerender } = render(
       <Tabs.Root value="preview">
         <ArtifactTabs artifact={first} previewRef={previewRef} />
       </Tabs.Root>,
     );
+<<<<<<< HEAD
 
+=======
+    testGlobal.nativeMermaidRenderer?.mockClear();
+>>>>>>> upstream/main
     rerender(
       <Tabs.Root value="preview">
         <ArtifactTabs artifact={second} previewRef={previewRef} />

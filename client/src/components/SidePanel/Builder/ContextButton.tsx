@@ -1,16 +1,29 @@
 import {
+<<<<<<< HEAD
   Dialog,
   DialogTrigger,
   Label,
   DialogTemplate,
   useToastContext,
   TrashIcon,
+=======
+  Label,
+  Button,
+  OGDialog,
+  TrashIcon,
+  OGDialogTrigger,
+  useToastContext,
+  OGDialogTemplate,
+>>>>>>> upstream/main
 } from '@librechat/client';
 import type { Assistant, AssistantCreateParams, AssistantsEndpoint } from 'librechat-data-provider';
 import type { UseMutationResult } from '@tanstack/react-query';
 import { useDeleteAssistantMutation } from '~/data-provider';
 import { useLocalize, useSetIndexOptions } from '~/hooks';
+<<<<<<< HEAD
 import { cn, removeFocusOutlines } from '~/utils';
+=======
+>>>>>>> upstream/main
 import { useChatContext } from '~/Providers';
 
 export default function ContextButton({
@@ -85,6 +98,7 @@ export default function ContextButton({
   }
 
   return (
+<<<<<<< HEAD
     <Dialog>
       <DialogTrigger asChild>
         <button
@@ -102,11 +116,34 @@ export default function ContextButton({
       <DialogTemplate
         title={localize('com_ui_delete_assistant')}
         className="max-w-[450px]"
+=======
+    <OGDialog>
+      <OGDialogTrigger asChild>
+        <Button
+          size="sm"
+          variant="outline"
+          aria-label={localize('com_ui_delete_assistant')}
+          title={localize('com_ui_delete_assistant')}
+          type="button"
+        >
+          <div className="text-text-destructive flex w-full items-center justify-center gap-2">
+            <TrashIcon />
+          </div>
+        </Button>
+      </OGDialogTrigger>
+      <OGDialogTemplate
+        title={localize('com_ui_delete_assistant')}
+        className="max-w-[28.125rem]"
+>>>>>>> upstream/main
         main={
           <>
             <div className="flex w-full flex-col items-center gap-2">
               <div className="grid w-full items-center gap-2">
+<<<<<<< HEAD
                 <Label htmlFor="delete-assistant" className="text-left text-sm font-medium">
+=======
+                <Label htmlFor="delete-assistant" className="text-start text-sm font-medium">
+>>>>>>> upstream/main
                   {localize('com_ui_delete_assistant_confirm')}
                 </Label>
               </div>
@@ -121,6 +158,10 @@ export default function ContextButton({
           selectText: localize('com_ui_delete'),
         }}
       />
+<<<<<<< HEAD
     </Dialog>
+=======
+    </OGDialog>
+>>>>>>> upstream/main
   );
 }

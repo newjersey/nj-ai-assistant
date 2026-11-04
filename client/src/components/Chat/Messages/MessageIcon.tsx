@@ -3,6 +3,10 @@ import { getEndpointField } from 'librechat-data-provider';
 import type { Assistant, Agent } from 'librechat-data-provider';
 import type { TMessageIcon } from '~/common';
 import ConvoIconURL from '~/components/Endpoints/ConvoIconURL';
+<<<<<<< HEAD
+=======
+import { useShareContext } from '~/Providers/ShareContext';
+>>>>>>> upstream/main
 import { useGetEndpointsQuery } from '~/data-provider';
 import Icon from '~/components/Endpoints/Icon';
 import { isImageURL } from '~/utils/icons';
@@ -41,7 +45,12 @@ export function arePropsEqual(prev: MessageIconProps, next: MessageIconProps): b
 }
 
 const MessageIcon = memo(({ iconData, assistant, agent }: MessageIconProps) => {
+<<<<<<< HEAD
   const { data: endpointsConfig } = useGetEndpointsQuery();
+=======
+  const { isSharedConvo } = useShareContext();
+  const { data: endpointsConfig } = useGetEndpointsQuery({ enabled: isSharedConvo !== true });
+>>>>>>> upstream/main
 
   const agentName = agent?.name ?? '';
   const agentAvatar = agent?.avatar?.filepath ?? '';

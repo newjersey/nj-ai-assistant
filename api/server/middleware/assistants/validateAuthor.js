@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 const { logger, SystemCapabilities } = require('@librechat/data-schemas');
 const { hasCapability } = require('~/server/middleware/roles/capabilities');
 const { getAssistant } = require('~/models');
@@ -51,3 +52,10 @@ const validateAuthor = async ({ req, openai, overrideEndpoint, overrideAssistant
 };
 
 module.exports = validateAuthor;
+=======
+const { createAssistantAuthorValidator } = require('@librechat/api');
+const { hasCapability } = require('~/server/middleware/roles/capabilities');
+const { getAssistant } = require('~/models');
+
+module.exports = createAssistantAuthorValidator({ getAssistant, hasCapability });
+>>>>>>> upstream/main

@@ -1,4 +1,5 @@
 const { logger } = require('@librechat/data-schemas');
+<<<<<<< HEAD
 const { PermissionBits, hasPermissions, ResourceType } = require('librechat-data-provider');
 const { getEffectivePermissions } = require('~/server/services/PermissionService');
 const { getAgents, getFiles } = require('~/models');
@@ -68,6 +69,12 @@ const checkAgentBasedFileAccess = async ({ userId, role, fileId, fileOwner }) =>
   }
 };
 
+=======
+const { hasAgentBasedFileAccess } = require('@librechat/api');
+const { getResourcePermissionsMap } = require('~/server/services/PermissionService');
+const { getAgents, getFiles } = require('~/models');
+
+>>>>>>> upstream/main
 const getTenantId = (value) => value?.toString?.() ?? null;
 
 const denyFileAccess = (res) =>
@@ -124,12 +131,19 @@ const fileAccess = async (req, res, next) => {
     }
 
     /** Agent-based access (file inherits agent permissions) */
+<<<<<<< HEAD
     const hasAgentAccess = await checkAgentBasedFileAccess({
       userId,
       role: userRole,
       fileId,
       fileOwner: file.user,
     });
+=======
+    const hasAgentAccess = await hasAgentBasedFileAccess(
+      { userId, role: userRole, fileId, fileOwner: file.user },
+      { getAgents, getResourcePermissionsMap },
+    );
+>>>>>>> upstream/main
     if (hasAgentAccess) {
       req.fileAccess = { file };
       return next();

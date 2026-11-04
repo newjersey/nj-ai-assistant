@@ -1,7 +1,11 @@
 const path = require('path');
 const fs = require('fs/promises');
 const { logger } = require('@librechat/data-schemas');
+<<<<<<< HEAD
 const { loadServiceKey, isUserProvided } = require('@librechat/api');
+=======
+const { isServiceKeyAvailable, isUserProvided } = require('@librechat/api');
+>>>>>>> upstream/main
 const { config } = require('./EndpointService');
 
 const defaultServiceKeyPath = path.join(__dirname, '../../..', 'data', 'auth.json');
@@ -42,7 +46,11 @@ async function loadAsyncEndpoints() {
 
     if (serviceKeyPath) {
       try {
+<<<<<<< HEAD
         serviceKey = await loadServiceKey(serviceKeyPath);
+=======
+        serviceKey = await isServiceKeyAvailable(serviceKeyPath);
+>>>>>>> upstream/main
       } catch (error) {
         logger.warn('Error loading Google service key', error);
         serviceKey = null;

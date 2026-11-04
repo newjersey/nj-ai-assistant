@@ -1,7 +1,13 @@
 import { renderHook } from '@testing-library/react';
+<<<<<<< HEAD
 import useArtifactProps from '../useArtifactProps';
 import { TOOL_ARTIFACT_TYPES, wrapAsFencedCodeBlock } from '~/utils/artifacts';
 import type { Artifact } from '~/common';
+=======
+import type { Artifact } from '~/common';
+import { TOOL_ARTIFACT_TYPES, wrapAsFencedCodeBlock } from '~/utils/artifacts';
+import useArtifactProps from '../useArtifactProps';
+>>>>>>> upstream/main
 
 describe('useArtifactProps', () => {
   const createArtifact = (partial: Partial<Artifact>): Artifact => ({
@@ -184,6 +190,54 @@ describe('useArtifactProps', () => {
     });
   });
 
+<<<<<<< HEAD
+=======
+  describe('svg artifacts', () => {
+    const svg =
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600"><rect width="800" height="600" fill="#0f172a"/></svg>';
+
+    it('uses index.svg as the editor fileKey on the static template', () => {
+      const artifact = createArtifact({ type: 'image/svg+xml', content: svg });
+      const { result } = renderHook(() => useArtifactProps({ artifact }));
+      expect(result.current.fileKey).toBe('index.svg');
+      expect(result.current.template).toBe('static');
+    });
+
+    it('keeps the source on index.svg and wraps it in index.html for preview', () => {
+      const artifact = createArtifact({ type: 'image/svg+xml', content: svg });
+      const { result } = renderHook(() => useArtifactProps({ artifact }));
+      expect(result.current.files['index.svg']).toBe(svg);
+      expect(result.current.files['index.html']).toMatch(/<!DOCTYPE html>/i);
+      expect(result.current.files['index.html']).toContain(svg);
+    });
+
+    it('accepts the image/svg alias', () => {
+      const artifact = createArtifact({ type: 'image/svg', content: '<svg></svg>' });
+      const { result } = renderHook(() => useArtifactProps({ artifact }));
+      expect(result.current.fileKey).toBe('index.svg');
+      expect(result.current.files['index.html']).toContain('<svg></svg>');
+    });
+
+    it('exposes deriveFiles so edited source can rebuild the derived preview entry', () => {
+      const artifact = createArtifact({ type: 'image/svg+xml', content: svg });
+      const { result } = renderHook(() => useArtifactProps({ artifact }));
+
+      const edited = '<svg xmlns="http://www.w3.org/2000/svg"><circle cx="5" cy="5" r="4"/></svg>';
+      const rebuilt = result.current.deriveFiles?.(edited) ?? {};
+
+      expect(rebuilt['index.svg']).toBe(edited);
+      expect(rebuilt['index.html']).toContain(edited);
+      expect(rebuilt['index.html']).not.toContain('<rect');
+    });
+
+    it('leaves deriveFiles unset when the edited file is the preview entry', () => {
+      const artifact = createArtifact({ type: 'text/html', content: '<p>hi</p>' });
+      const { result } = renderHook(() => useArtifactProps({ artifact }));
+      expect(result.current.deriveFiles).toBeUndefined();
+    });
+  });
+
+>>>>>>> upstream/main
   describe('edge cases', () => {
     it('should handle artifact with language parameter', () => {
       const artifact = createArtifact({

@@ -1,6 +1,10 @@
 /* eslint-disable no-useless-escape */
 const axios = require('axios');
+<<<<<<< HEAD
 const { logger } = require('@librechat/data-schemas');
+=======
+const { formatToolError, toolRequestBudget, WOLFRAM_STATUS_TEXT } = require('@librechat/api');
+>>>>>>> upstream/main
 const { Tool } = require('@librechat/agents/langchain/tools');
 
 const wolframJsonSchema = {
@@ -19,6 +23,10 @@ class WolframAlphaAPI extends Tool {
     super();
     /* Used to initialize the Tool without necessary variables. */
     this.override = fields.override ?? false;
+<<<<<<< HEAD
+=======
+    this.timeouts = fields.timeouts;
+>>>>>>> upstream/main
 
     this.name = 'wolfram';
     this.apiKey = fields.WOLFRAM_APP_ID || this.getAppId();
@@ -59,6 +67,7 @@ class WolframAlphaAPI extends Tool {
   }
 
   async fetchRawText(url) {
+<<<<<<< HEAD
     try {
       const response = await axios.get(url, { responseType: 'text' });
       return response.data;
@@ -66,6 +75,13 @@ class WolframAlphaAPI extends Tool {
       logger.error('[WolframAlphaAPI] Error fetching raw text:', error);
       throw error;
     }
+=======
+    const response = await axios.get(url, {
+      responseType: 'text',
+      ...toolRequestBudget(this.timeouts),
+    });
+    return response.data;
+>>>>>>> upstream/main
   }
 
   getAppId() {
@@ -93,6 +109,7 @@ class WolframAlphaAPI extends Tool {
       const response = await this.fetchRawText(url);
       return response;
     } catch (error) {
+<<<<<<< HEAD
       if (error.response && error.response.data) {
         logger.error('[WolframAlphaAPI] Error data:', error);
         return error.response.data;
@@ -100,6 +117,9 @@ class WolframAlphaAPI extends Tool {
         logger.error('[WolframAlphaAPI] Error querying Wolfram Alpha', error);
         return 'There was an error querying Wolfram Alpha.';
       }
+=======
+      return formatToolError(error, 'Wolfram|Alpha', WOLFRAM_STATUS_TEXT);
+>>>>>>> upstream/main
     }
   }
 }

@@ -14,10 +14,18 @@
  * unrelated citations both show up.
  */
 
+<<<<<<< HEAD
 import { Tools } from 'librechat-data-provider';
 import { RecoilRoot, useRecoilValue } from 'recoil';
 import { QueryClient } from '@tanstack/react-query';
 import { renderHook, act } from '@testing-library/react';
+=======
+import { RecoilRoot } from 'recoil';
+import { Tools } from 'librechat-data-provider';
+import { QueryClient } from '@tanstack/react-query';
+import { renderHook, act } from '@testing-library/react';
+import { Provider as JotaiProvider, useAtomValue } from 'jotai';
+>>>>>>> upstream/main
 import type {
   TFile,
   TAttachment,
@@ -25,12 +33,25 @@ import type {
   TAttachmentMetadata,
 } from 'librechat-data-provider';
 import type { ReactNode } from 'react';
+<<<<<<< HEAD
 import useAttachmentHandler from '../useAttachmentHandler';
 import store from '~/store';
 
 type AttachmentFixture = TFile & TAttachmentMetadata;
 
 const wrapper = ({ children }: { children: ReactNode }) => <RecoilRoot>{children}</RecoilRoot>;
+=======
+import { messageAttachmentsMapAtom } from '~/hooks/SSE/atoms';
+import useAttachmentHandler from '../useAttachmentHandler';
+
+type AttachmentFixture = TFile & TAttachmentMetadata;
+
+const wrapper = ({ children }: { children: ReactNode }) => (
+  <RecoilRoot>
+    <JotaiProvider>{children}</JotaiProvider>
+  </RecoilRoot>
+);
+>>>>>>> upstream/main
 
 const submission = {} as EventSubmission;
 const messageId = 'msg-1';
@@ -70,7 +91,11 @@ function setup() {
   const { result } = renderHook(
     () => {
       const handler = useAttachmentHandler(queryClient);
+<<<<<<< HEAD
       const map = useRecoilValue(store.messageAttachmentsMap);
+=======
+      const map = useAtomValue(messageAttachmentsMapAtom);
+>>>>>>> upstream/main
       ref.current = map;
       return handler;
     },
@@ -363,7 +388,11 @@ describe('useAttachmentHandler upsert-by-file_id', () => {
       const { result } = renderHook(
         () => {
           const handler = useAttachmentHandler(queryClient);
+<<<<<<< HEAD
           const map = useRecoilValue(store.messageAttachmentsMap);
+=======
+          const map = useAtomValue(messageAttachmentsMapAtom);
+>>>>>>> upstream/main
           ref.current = map;
           return handler;
         },

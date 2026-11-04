@@ -1,7 +1,11 @@
 const { fetch } = require('undici');
 const { Tool } = require('@librechat/agents/langchain/tools');
 const { getEnvironmentVariable } = require('@librechat/agents/langchain/utils/env');
+<<<<<<< HEAD
 const { getEnvProxyDispatcher } = require('@librechat/api');
+=======
+const { getEnvProxyDispatcher, toolRequestBudget } = require('@librechat/api');
+>>>>>>> upstream/main
 
 const tavilySearchJsonSchema = {
   type: 'object',
@@ -81,6 +85,10 @@ class TavilySearchResults extends Tool {
     this.envVar = 'TAVILY_API_KEY';
     /* Used to initialize the Tool without necessary variables. */
     this.override = fields.override ?? false;
+<<<<<<< HEAD
+=======
+    this.timeouts = fields.timeouts;
+>>>>>>> upstream/main
     this.apiKey = fields[this.envVar] ?? this.getApiKey();
 
     this.kwargs = fields?.kwargs ?? {};
@@ -120,6 +128,10 @@ class TavilySearchResults extends Tool {
         'X-Client-Name': 'librechat',
       },
       body: JSON.stringify(requestBody),
+<<<<<<< HEAD
+=======
+      signal: toolRequestBudget(this.timeouts).signal,
+>>>>>>> upstream/main
     };
 
     const dispatcher = getEnvProxyDispatcher();

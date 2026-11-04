@@ -67,7 +67,11 @@ describe('localeWeekStartsOn', () => {
   /** Deletes the engine's week data for the duration, so the region heuristic
    *  is what answers, on every engine rather than only pre-Baseline-2024 ones. */
   const withoutEngineWeekData = (run: () => void) => {
+<<<<<<< HEAD
     const proto = Intl.Locale.prototype as Intl.Locale & {
+=======
+    const proto = Intl.Locale.prototype as Omit<Intl.Locale, 'getWeekInfo' | 'weekInfo'> & {
+>>>>>>> upstream/main
       getWeekInfo?: () => { firstDay: number };
       weekInfo?: { firstDay: number };
     };

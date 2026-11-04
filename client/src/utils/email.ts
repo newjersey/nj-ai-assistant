@@ -22,7 +22,11 @@ export const validateEmail = (email: string, errorMessage?: string): true | stri
   return (
     result.success ||
     errorMessage ||
+<<<<<<< HEAD
     result.error.errors[0]?.message ||
+=======
+    result.error.issues[0]?.message ||
+>>>>>>> upstream/main
     'Please enter a valid email address'
   );
 };
