@@ -4,7 +4,17 @@ import {
   isCodeWorkspaceSelectionErrorReason,
 } from 'librechat-data-provider';
 import type { ErrorRendererProps } from './parts';
+<<<<<<< HEAD
 import { getProviderName, readNumber, readString, useErrorEndpoint } from './parts';
+=======
+import {
+  ErrorWithDetail,
+  getProviderName,
+  readNumber,
+  readString,
+  useErrorEndpoint,
+} from './parts';
+>>>>>>> upstream/main
 import { codeWorkspaceErrorKeys } from '~/utils/errors';
 import { useLocalize } from '~/hooks';
 
@@ -50,9 +60,29 @@ export default function ModelError({ json, message }: ErrorRendererProps) {
       : localize('com_error_code_workspace_unavailable');
   }
 
+<<<<<<< HEAD
   /** Provider-neutral, matching the sentence the server persists as the failure's own text. */
   const status = readNumber(json, 'status');
   return status != null
     ? localize('com_error_upstream_model_status', { 0: status })
     : localize('com_error_upstream_model');
+=======
+  /**
+   * Provider-neutral headline, matching the sentence the server persists as the failure's own
+   * text. The provider's own message rides along in `message` when the deployment lets provider
+   * text through: a gateway or proxy rejection explains itself there, and nothing generic can.
+   */
+  const status = readNumber(json, 'status');
+  const headline =
+    status != null
+      ? localize('com_error_upstream_model_status', { 0: status })
+      : localize('com_error_upstream_model');
+  return (
+    <ErrorWithDetail
+      headline={headline}
+      detail={readString(json, 'message')}
+      label={localize('com_error_details_provider')}
+    />
+  );
+>>>>>>> upstream/main
 }

@@ -17,14 +17,22 @@ export default function WeekStartSelector() {
   const labelId = 'week-start-selector-label';
 
   return (
+<<<<<<< HEAD
     <div className="flex w-full items-center justify-between">
+=======
+    <div className="flex w-full flex-wrap items-center justify-between gap-2">
+>>>>>>> upstream/main
       <div id={labelId}>{localize('com_nav_week_start')}</div>
       <Dropdown
         value={weekStart}
         options={options}
         onChange={(value) => setWeekStart(value as WeekStartPreference)}
         testId="week-start-selector"
+<<<<<<< HEAD
         sizeClasses="z-50 w-[150px]"
+=======
+        sizeClasses="w-[150px]"
+>>>>>>> upstream/main
         className="z-50"
         aria-labelledby={labelId}
       />

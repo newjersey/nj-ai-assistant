@@ -1,7 +1,11 @@
 const { ATTACHMENT_ONLY_TEXT } = require('@librechat/api');
 const { Constants } = require('librechat-data-provider');
 const { HumanMessage, AIMessage, SystemMessage } = require('@librechat/agents/langchain/messages');
+<<<<<<< HEAD
 const { formatMessage, formatLangChainMessages, formatFromLangChain } = require('./formatMessages');
+=======
+const { formatMessage } = require('./formatMessages');
+>>>>>>> upstream/main
 
 describe('formatMessage', () => {
   it('formats user message', () => {
@@ -243,6 +247,7 @@ describe('formatMessage', () => {
     expect(result.content).toBe('');
   });
 });
+<<<<<<< HEAD
 
 describe('formatLangChainMessages', () => {
   it('formats an array of messages for LangChain', () => {
@@ -332,3 +337,5 @@ describe('formatLangChainMessages', () => {
     });
   });
 });
+=======
+>>>>>>> upstream/main

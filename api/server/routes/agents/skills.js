@@ -2,13 +2,21 @@ const express = require('express');
 const { createSkillManagementHandlers, mapAgentManagementError } = require('@librechat/api');
 const { createFileLimiters } = require('~/server/middleware/limiters/uploadLimiters');
 const { maybeRunGitHubSkillSyncForRequest } = require('~/server/services/Skills/sync');
+<<<<<<< HEAD
 const { checkBan, configMiddleware } = require('~/server/middleware');
+=======
+const { checkBan, configMiddleware, requireTermsAcceptance } = require('~/server/middleware');
+>>>>>>> upstream/main
 const { hasCapability } = require('~/server/middleware/roles/capabilities');
 const { checkPermission } = require('~/server/services/PermissionService');
 const { getSkillsHandlers } = require('~/server/services/Skills/handlers');
 const {
   getSkillDbMethods,
+<<<<<<< HEAD
   getSkillToolDeps,
+=======
+  getSkillManagementFileSaver,
+>>>>>>> upstream/main
 } = require('~/server/services/Endpoints/agents/skillDeps');
 const { getRoleByName } = require('~/models');
 const { requireAgentManagementAuth } = require('./middleware');
@@ -23,6 +31,7 @@ const handlers = createSkillManagementHandlers({
   getRoleByName,
   checkPermission,
   hasCapability,
+<<<<<<< HEAD
   saveFile: getSkillToolDeps().saveSkillFileContent,
 });
 router.use(requireAgentManagementAuth, checkBan, configMiddleware);
@@ -32,6 +41,20 @@ router.patch('/:id', handlers.update);
 router.get('/:id/files', handlers.listFiles);
 router.get('/:id/files/*relativePath', handlers.getFile);
 router.put('/:id/files/*relativePath', handlers.updateFile);
+=======
+  saveFile: getSkillManagementFileSaver(),
+});
+router.use(requireAgentManagementAuth, requireTermsAcceptance, checkBan, configMiddleware);
+router.get('/', handlers.list);
+router.post('/', handlers.create);
+router.get('/:id', handlers.get);
+router.patch('/:id', handlers.update);
+router.delete('/:id', handlers.delete);
+router.get('/:id/files', handlers.listFiles);
+router.get('/:id/files/*relativePath', handlers.getFile);
+router.put('/:id/files/*relativePath', handlers.updateFile);
+router.delete('/:id/files/*relativePath', handlers.deleteFile);
+>>>>>>> upstream/main
 router.use((_req, res) => {
   const { status, body } = mapAgentManagementError('not_found');
   body.error.message = 'Skill or file not found';

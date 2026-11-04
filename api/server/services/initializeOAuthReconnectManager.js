@@ -1,5 +1,12 @@
 const { logger, getTenantId } = require('@librechat/data-schemas');
+<<<<<<< HEAD
 const { prepareMCPAuthorizationMutation } = require('@librechat/api');
+=======
+const {
+  prepareMCPAuthorizationMutation,
+  createOAuthReconnectionTracker,
+} = require('@librechat/api');
+>>>>>>> upstream/main
 const { CacheKeys } = require('librechat-data-provider');
 const { createOAuthReconnectionManager, getFlowStateManager, getMCPManager } = require('~/config');
 const { findToken, updateToken, createToken, deleteTokens } = require('~/models');
@@ -22,10 +29,18 @@ async function initializeOAuthReconnectManager() {
       createToken,
       deleteTokens,
     };
+<<<<<<< HEAD
     await createOAuthReconnectionManager(
       flowManager,
       tokenMethods,
       undefined,
+=======
+    const startupConfig = await getAppConfig({ baseOnly: true });
+    await createOAuthReconnectionManager(
+      flowManager,
+      tokenMethods,
+      createOAuthReconnectionTracker(startupConfig),
+>>>>>>> upstream/main
       undefined,
       async (scope) => {
         const appConfig = await getAppConfig({ tenantId: getTenantId(), userId: scope.userId });

@@ -1,12 +1,21 @@
+<<<<<<< HEAD
 import { memo, useState } from 'react';
 import { Ellipsis } from 'lucide-react';
 import { Button, useMediaQuery } from '@librechat/client';
 import type { MouseEvent } from 'react';
+=======
+import { memo, useState, useEffect } from 'react';
+import { Ellipsis } from 'lucide-react';
+import { Button } from '@librechat/client';
+import type { MouseEvent } from 'react';
+import useDrawerViewport from '~/hooks/Nav/useDrawerViewport';
+>>>>>>> upstream/main
 import { ConvoOptions } from './ConvoOptions';
 import { useLocalize } from '~/hooks';
 
 export type ConvoActionsProps = {
   conversationId: string | null;
+<<<<<<< HEAD
   chatProjectId?: string | null;
   title: string | null;
   isPinned?: boolean;
@@ -14,6 +23,18 @@ export type ConvoActionsProps = {
   isActiveConvo: boolean;
   isShiftHeld?: boolean;
   isPopoverActive: boolean;
+=======
+  title: string | null;
+  canRename?: boolean;
+  isPinned?: boolean;
+  isArchived?: boolean;
+  isUnseen?: boolean;
+  isActiveConvo: boolean;
+  isShiftHeld?: boolean;
+  isPopoverActive: boolean;
+  isGenerating?: boolean;
+  contextMenuPosition?: { x: number; y: number };
+>>>>>>> upstream/main
   /** True once the pointer or focus has reached the row. */
   hasInteracted: boolean;
   retainView: () => void;
@@ -25,12 +46,21 @@ export type ConvoActionsProps = {
  * Owns the row's overflow control: which control is rendered, when it is
  * visible, and where focus lives across the swap between them.
  *
+<<<<<<< HEAD
  * Two controls can represent this menu — `ConvoOptions`, which carries six
  * mutations and its own menu store, and a cheap placeholder that stands in
  * until the menu is wanted. Mounting the real one for every overscanned row is
  * wasteful, but the two must agree about identity, visibility, focus and
  * lifecycle, and splitting those decisions across the row is what made them
  * disagree. They are settled together here:
+=======
+ * Two controls can represent this menu: `ConvoOptions`, whose trigger and menu
+ * store mount here while its mutations wait until the menu is used, and a cheap
+ * placeholder that stands in until the menu is wanted. Mounting the real one
+ * for every overscanned row is wasteful, but the two must agree about
+ * identity, visibility, focus and lifecycle, and splitting those decisions
+ * across the row is what made them disagree. They are settled together here:
+>>>>>>> upstream/main
  *
  * - **Which.** A pointer device reveals the menu on hover, so hovering is
  *   enough to mount the real one. Touch has no hover, so the placeholder is
@@ -52,13 +82,29 @@ function ConvoActions({
   hasInteracted,
   isActiveConvo,
   isPopoverActive,
+<<<<<<< HEAD
+=======
+  isGenerating = false,
+>>>>>>> upstream/main
   onOpenChange,
   ...options
 }: ConvoActionsProps) {
   const localize = useLocalize();
+<<<<<<< HEAD
   const isSmallScreen = useMediaQuery('(max-width: 768px)');
   const [hasOpenedMenu, setHasOpenedMenu] = useState(false);
 
+=======
+  const isSmallScreen = useDrawerViewport();
+  const [hasOpenedMenu, setHasOpenedMenu] = useState(false);
+
+  useEffect(() => {
+    if (isPopoverActive) {
+      setHasOpenedMenu(true);
+    }
+  }, [isPopoverActive]);
+
+>>>>>>> upstream/main
   const handleOpenChange = (open: boolean) => {
     if (open) {
       setHasOpenedMenu(true);
@@ -68,12 +114,20 @@ function ConvoActions({
 
   const showMenu = isSmallScreen
     ? isPopoverActive || isActiveConvo || hasOpenedMenu
+<<<<<<< HEAD
     : hasInteracted || isActiveConvo;
+=======
+    : isPopoverActive || hasOpenedMenu || hasInteracted || isActiveConvo;
+>>>>>>> upstream/main
 
   if (showMenu) {
     return (
       <ConvoOptions
         {...options}
+<<<<<<< HEAD
+=======
+        isGenerating={isGenerating}
+>>>>>>> upstream/main
         isActiveConvo={isActiveConvo}
         isPopoverActive={isPopoverActive}
         setIsPopoverActive={handleOpenChange}
@@ -81,7 +135,11 @@ function ConvoActions({
     );
   }
 
+<<<<<<< HEAD
   if (!isSmallScreen) {
+=======
+  if (!isSmallScreen && !isGenerating) {
+>>>>>>> upstream/main
     return null;
   }
 
@@ -91,7 +149,11 @@ function ConvoActions({
       variant="ghost"
       aria-label={localize('com_nav_convo_menu_options')}
       data-testid="convo-options-trigger"
+<<<<<<< HEAD
       className="size-9 text-text-secondary"
+=======
+      className="size-9"
+>>>>>>> upstream/main
       onClick={(event) => {
         event.stopPropagation();
         handleOpenChange(true);

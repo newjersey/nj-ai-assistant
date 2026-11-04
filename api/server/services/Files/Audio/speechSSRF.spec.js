@@ -65,6 +65,10 @@ describe('TTS textToSpeech SSRF guard (real agent)', () => {
       headersSent: false,
       status: jest.fn(() => ({ end: jest.fn(), send: jest.fn() })),
       end: jest.fn(),
+<<<<<<< HEAD
+=======
+      once: jest.fn(),
+>>>>>>> upstream/main
     };
     return { req, res };
   }

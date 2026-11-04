@@ -72,6 +72,7 @@ export default function Badge({
   const badgeClassName = cn(
     'group relative inline-flex items-center gap-1.5 rounded-full px-4 py-1.5',
     'border border-border-medium text-sm font-medium transition-shadow',
+<<<<<<< HEAD
     '@container-[600px]:w-full size-9 p-2',
     isActive
       ? 'bg-surface-active shadow-md'
@@ -79,10 +80,25 @@ export default function Badge({
     'active:scale-95 active:shadow-inner',
     isMoveable && 'cursor-move',
     isDisabled && 'cursor-not-allowed opacity-50 hover:shadow-sm',
+=======
+    'size-9 p-2',
+    /** A resting badge takes the badge label ink; a hovered or selected one moves to the primary
+     *  ink, which holds AA on the hover and active fills where a muted label may not. */
+    isActive
+      ? 'bg-surface-active text-text-primary shadow-md'
+      : 'bg-surface-chat text-badge-label shadow-xs hover:bg-surface-hover hover:text-text-primary hover:shadow-md',
+    'active:scale-95 active:shadow-inner',
+    isMoveable && 'cursor-move',
+    isDisabled && 'cursor-not-allowed opacity-50 hover:shadow-xs',
+    /** A disabled badge keeps its resting ink on hover; a selected one already rests in the
+     *  primary ink. */
+    isDisabled && !isActive && 'hover:text-badge-label',
+>>>>>>> upstream/main
     className,
   );
   const badgeContent = (
     <>
+<<<<<<< HEAD
       {Icon && (
         <Icon
           className={cn(
@@ -93,11 +109,19 @@ export default function Badge({
         />
       )}
       <span className="@container-[600px]:inline relative hidden">{label}</span>
+=======
+      {Icon && <Icon className={cn('relative h-5 w-5', !label && 'mx-auto')} aria-hidden="true" />}
+      <span className="relative hidden">{label}</span>
+>>>>>>> upstream/main
 
       {isEditing && !isDragging && (
         <motion.button
           type="button"
+<<<<<<< HEAD
           className="@container-[600px]:h-5 @container-[600px]:w-5 absolute -right-1 -top-1 flex h-6 w-6 items-center justify-center rounded-full bg-surface-secondary-alt text-text-primary shadow-sm"
+=======
+          className="bg-surface-secondary-alt text-text-primary absolute -inset-e-1 -top-1 flex h-6 w-6 items-center justify-center rounded-full shadow-xs"
+>>>>>>> upstream/main
           aria-label={isAvailable ? `Remove ${label}` : `Restore ${label}`}
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -123,7 +147,11 @@ export default function Badge({
         className={badgeClassName}
         animate={{
           scale: isDragging ? 1.1 : 1,
+<<<<<<< HEAD
           boxShadow: isDragging ? '0 10px 25px rgba(0,0,0,0.1)' : undefined,
+=======
+          boxShadow: isDragging ? 'var(--theme-elevation-drag)' : undefined,
+>>>>>>> upstream/main
         }}
         whileTap={{ scale: getWhileTapScale() }}
         transition={{ type: 'tween', duration: 0.1, ease: 'easeOut' }}
@@ -140,7 +168,11 @@ export default function Badge({
       className={badgeClassName}
       animate={{
         scale: isDragging ? 1.1 : 1,
+<<<<<<< HEAD
         boxShadow: isDragging ? '0 10px 25px rgba(0,0,0,0.1)' : undefined,
+=======
+        boxShadow: isDragging ? 'var(--theme-elevation-drag)' : undefined,
+>>>>>>> upstream/main
       }}
       whileTap={{ scale: getWhileTapScale() }}
       transition={{ type: 'tween', duration: 0.1, ease: 'easeOut' }}

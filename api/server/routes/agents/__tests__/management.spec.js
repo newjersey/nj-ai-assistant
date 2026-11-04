@@ -106,6 +106,10 @@ jest.mock('~/server/middleware', () => ({
   configMiddleware: mockConfigMiddleware,
   createFileLimiters: mockCreateFileLimiters,
   uaParser: mockUaParser,
+<<<<<<< HEAD
+=======
+  requireTermsAcceptance: (_req, _res, next) => next(),
+>>>>>>> upstream/main
 }));
 jest.mock('~/server/routes/files/multer', () => ({
   createMulterInstance: mockCreateMulterInstance,

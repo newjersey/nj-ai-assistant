@@ -7,6 +7,12 @@ import {
   getProps,
   getTemplate,
   getArtifactFilename,
+<<<<<<< HEAD
+=======
+  normalizeArtifactType,
+  getSvgFiles,
+  isSvgArtifactType,
+>>>>>>> upstream/main
   languageForFilename,
   wrapAsFencedCodeBlock,
   TOOL_ARTIFACT_TYPES,
@@ -20,8 +26,13 @@ export default function useArtifactProps({ artifact }: { artifact: Artifact }) {
   const isDarkMode = resolvedMode === 'dark';
 
   const [fileKey, files] = useMemo(() => {
+<<<<<<< HEAD
     const key = getKey(artifact.type ?? '', artifact.language);
     const type = artifact.type ?? '';
+=======
+    const type = normalizeArtifactType(artifact.type ?? '');
+    const key = getKey(type, artifact.language);
+>>>>>>> upstream/main
 
     if (key.includes('mermaid')) {
       return ['diagram.mmd', getMermaidFiles(artifact.content ?? '', isDarkMode, highContrast)];
@@ -42,7 +53,11 @@ export default function useArtifactProps({ artifact }: { artifact: Artifact }) {
       return ['content.md', getMarkdownFiles(wrapped, isDarkMode, highContrast)];
     }
 
+<<<<<<< HEAD
     if (type === 'text/markdown' || type === 'text/md' || type === 'text/plain') {
+=======
+    if (type === TOOL_ARTIFACT_TYPES.MARKDOWN || type === TOOL_ARTIFACT_TYPES.PLAIN_TEXT) {
+>>>>>>> upstream/main
       return ['content.md', getMarkdownFiles(artifact.content ?? '', isDarkMode, highContrast)];
     }
 
@@ -67,7 +82,15 @@ export default function useArtifactProps({ artifact }: { artifact: Artifact }) {
       ];
     }
 
+<<<<<<< HEAD
     const fileKey = getArtifactFilename(artifact.type ?? '', artifact.language);
+=======
+    if (isSvgArtifactType(type)) {
+      return [getArtifactFilename(type), getSvgFiles(artifact.content ?? '')];
+    }
+
+    const fileKey = getArtifactFilename(type, artifact.language);
+>>>>>>> upstream/main
     const files = removeNullishValues({
       [fileKey]: artifact.content,
     });
@@ -88,10 +111,26 @@ export default function useArtifactProps({ artifact }: { artifact: Artifact }) {
 
   const sharedProps = useMemo(() => getProps(artifact.type ?? ''), [artifact.type]);
 
+<<<<<<< HEAD
+=======
+  /* SVG previews render a *derived* `index.html`, not the edited file itself,
+   * so swapping `fileKey` alone would leave the preview on the original
+   * source while the code tab shows the new one. Consumers that hold editor
+   * text rebuild the whole set through this instead. */
+  const deriveFiles = useMemo(
+    () => (isSvgArtifactType(artifact.type ?? '') ? getSvgFiles : undefined),
+    [artifact.type],
+  );
+
+>>>>>>> upstream/main
   return {
     files,
     fileKey,
     template,
     sharedProps,
+<<<<<<< HEAD
+=======
+    deriveFiles,
+>>>>>>> upstream/main
   };
 }

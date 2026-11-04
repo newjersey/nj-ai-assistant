@@ -6,7 +6,13 @@ import {
   OGDialogTrigger,
   TooltipAnchor,
   OGDialogTemplate,
+<<<<<<< HEAD
 } from '@librechat/client';
+=======
+  useToastContext,
+} from '@librechat/client';
+import { getPromptMutationErrorKey } from '~/utils';
+>>>>>>> upstream/main
 import { useDeletePrompt } from '~/data-provider';
 import { useLocalize } from '~/hooks';
 
@@ -29,7 +35,11 @@ const DeleteConfirmDialog = ({
           side="bottom"
           render={
             <Button
+<<<<<<< HEAD
               variant="destructive"
+=======
+              variant="destructive-soft"
+>>>>>>> upstream/main
               size="icon"
               aria-label={localize('com_ui_delete')}
               disabled={disabled}
@@ -45,11 +55,19 @@ const DeleteConfirmDialog = ({
       <OGDialogTemplate
         showCloseButton={false}
         title={localize('com_ui_delete_prompt')}
+<<<<<<< HEAD
         className="max-w-[450px]"
         main={
           <div className="flex w-full flex-col items-center gap-2">
             <div className="grid w-full items-center gap-2">
               <p className="text-left text-sm text-text-primary">
+=======
+        className="max-w-[28.125rem]"
+        main={
+          <div className="flex w-full flex-col items-center gap-2">
+            <div className="grid w-full items-center gap-2">
+              <p className="text-text-primary text-start text-sm">
+>>>>>>> upstream/main
                 {localize('com_ui_delete_confirm_prompt_version_var', { 0: name })}
               </p>
             </div>
@@ -75,7 +93,20 @@ interface DeletePromptProps {
 
 const DeletePrompt = React.memo(
   ({ promptId, groupId, promptName, disabled }: DeletePromptProps) => {
+<<<<<<< HEAD
     const deletePromptMutation = useDeletePrompt();
+=======
+    const localize = useLocalize();
+    const { showToast } = useToastContext();
+    const deletePromptMutation = useDeletePrompt({
+      onError: (error) => {
+        showToast({
+          status: 'error',
+          message: localize(getPromptMutationErrorKey(error, 'com_ui_prompt_delete_error')),
+        });
+      },
+    });
+>>>>>>> upstream/main
 
     const handleDelete = useCallback(() => {
       if (!promptId) {

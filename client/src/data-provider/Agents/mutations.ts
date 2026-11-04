@@ -9,6 +9,11 @@ import type * as t from 'librechat-data-provider';
 export const allAgentViewAndEditQueryKeys: t.AgentListParams[] = [
   { requiredPermission: PermissionBits.VIEW },
   { requiredPermission: PermissionBits.EDIT },
+<<<<<<< HEAD
+=======
+  { requiredPermission: PermissionBits.VIEW, mine: 1 },
+  { requiredPermission: PermissionBits.EDIT, mine: 1 },
+>>>>>>> upstream/main
 ];
 
 const edgeEndpointIncludesAgent = (endpoint: string | string[], agentId: string): boolean =>
@@ -82,7 +87,11 @@ export const useCreateAgentMutation = (
         keys.forEach((key) => {
           const listRes = queryClient.getQueryData<t.AgentListResponse>([QueryKeys.agents, key]);
           if (!listRes) {
+<<<<<<< HEAD
             return options?.onSuccess?.(newAgent, variables, context);
+=======
+            return;
+>>>>>>> upstream/main
           }
           /** The create succeeded, so the caller can edit it. Mutation responses carry no
            *  `isEditable`; without this the cached row loses the field the list sets. */
@@ -129,7 +138,11 @@ export const useUpdateAgentMutation = (
             const listRes = queryClient.getQueryData<t.AgentListResponse>([QueryKeys.agents, key]);
 
             if (!listRes) {
+<<<<<<< HEAD
               return options?.onSuccess?.(updatedAgent, variables, context);
+=======
+              return;
+>>>>>>> upstream/main
             }
 
             queryClient.setQueryData<t.AgentListResponse>([QueryKeys.agents, key], {
@@ -171,24 +184,44 @@ export const useDeleteAgentMutation = (
     {
       onMutate: (variables) => options?.onMutate?.(variables),
       onError: (error, variables, context) => options?.onError?.(error, variables, context),
+<<<<<<< HEAD
       onSuccess: (_data, variables, context) => {
+=======
+      onSuccess: (_data, variables) => {
+>>>>>>> upstream/main
         const data = ((keys: t.AgentListParams[]) => {
           let data: t.Agent[] = [];
           keys.forEach((key) => {
             const listRes = queryClient.getQueryData<t.AgentListResponse>([QueryKeys.agents, key]);
 
             if (!listRes) {
+<<<<<<< HEAD
               return options?.onSuccess?.(_data, variables, context);
             }
 
             data = listRes.data
+=======
+              return;
+            }
+
+            const remainingAgents = listRes.data
+>>>>>>> upstream/main
               .filter((agent) => agent.id !== variables.agent_id)
               .map((agent) => pruneAgentEdges(agent, variables.agent_id));
 
             queryClient.setQueryData<t.AgentListResponse>([QueryKeys.agents, key], {
               ...listRes,
+<<<<<<< HEAD
               data,
             });
+=======
+              data: remainingAgents,
+            });
+            // Filtered lists are updated, but never drive post-delete selection.
+            if (key.mine !== 1) {
+              data = remainingAgents;
+            }
+>>>>>>> upstream/main
           });
           return data;
         })(allAgentViewAndEditQueryKeys);
@@ -331,7 +364,11 @@ export const useUpdateAgentAction = (
           const listRes = queryClient.getQueryData<t.AgentListResponse>([QueryKeys.agents, key]);
 
           if (!listRes) {
+<<<<<<< HEAD
             return options?.onSuccess?.(updateAgentActionResponse, variables, context);
+=======
+            return;
+>>>>>>> upstream/main
           }
           queryClient.setQueryData<t.AgentListResponse>([QueryKeys.agents, key], {
             ...listRes,

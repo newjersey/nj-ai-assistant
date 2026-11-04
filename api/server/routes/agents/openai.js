@@ -30,7 +30,15 @@ const {
   ListModelsController,
   GetModelController,
 } = require('~/server/controllers/agents/openai');
+<<<<<<< HEAD
 const { agentEventUserLimiter, configMiddleware } = require('~/server/middleware');
+=======
+const {
+  configMiddleware,
+  agentEventUserLimiter,
+  requireTermsAcceptance,
+} = require('~/server/middleware');
+>>>>>>> upstream/main
 const {
   enqueueAgentTrigger,
   getAgentTriggerDeliveryStatus,
@@ -60,6 +68,10 @@ const eventBindingHandlers = createAgentEventBindingHandlers({
 
 router.use(preAuthTenantMiddleware);
 router.use(requireRemoteAgentAuth);
+<<<<<<< HEAD
+=======
+router.use(requireTermsAcceptance);
+>>>>>>> upstream/main
 router.use(configMiddleware);
 router.use(checkRemoteAgentsFeature);
 

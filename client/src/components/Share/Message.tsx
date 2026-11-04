@@ -1,7 +1,20 @@
+<<<<<<< HEAD
+=======
+import { useMemo } from 'react';
+import { parseWakeupMessage } from '@librechat/chat';
+import {
+  SubRow,
+  MessageRow,
+  AuthorHeader,
+  SiblingSwitch,
+  getHeaderHoverLabel,
+} from '@librechat/chat/components';
+>>>>>>> upstream/main
 import type { TMessageProps } from '~/common';
 import SearchContent, {
   rendersMarkdownLite,
 } from '~/components/Chat/Messages/Content/SearchContent';
+<<<<<<< HEAD
 import AuthorHeader from '~/components/Chat/Messages/Content/Parts/AuthorHeader';
 import MinimalHoverButtons from '~/components/Chat/Messages/MinimalHoverButtons';
 import { getHeaderHoverLabel } from '~/components/Chat/Messages/ui/HeaderLabel';
@@ -11,6 +24,14 @@ import SiblingSwitch from '~/components/Chat/Messages/SiblingSwitch';
 import MessageRow from '~/components/Chat/Messages/ui/MessageRow';
 import { MessageContext, useShareContext } from '~/Providers';
 import SubRow from '~/components/Chat/Messages/SubRow';
+=======
+import MinimalHoverButtons from '~/components/Chat/Messages/MinimalHoverButtons';
+import MessageContent from '~/components/Chat/Messages/Content/MessageContent';
+import { getHeaderPrefixForScreenReader, getMessageAriaLabel } from '~/utils';
+import WakeupRow from '~/components/Chat/Messages/ui/WakeupRow';
+import Wakeup from '~/components/Chat/Messages/Content/Wakeup';
+import { MessageContext, useShareContext } from '~/Providers';
+>>>>>>> upstream/main
 import { useAttachments, useLocalize } from '~/hooks';
 import MultiMessage from './MultiMessage';
 import Icon from './MessageIcon';
@@ -32,6 +53,10 @@ export default function Message(props: TMessageProps) {
     messageId: message?.messageId,
     attachments: message?.attachments,
   });
+<<<<<<< HEAD
+=======
+  const wakeupDisplay = useMemo(() => parseWakeupMessage(message), [message]);
+>>>>>>> upstream/main
 
   if (!message) {
     return null;
@@ -51,12 +76,27 @@ export default function Message(props: TMessageProps) {
    *  view and wrong here: it is the screen-reader heading for the user turn, and it
    *  would credit every prompt the sharer wrote to the person reading the transcript. */
   const messageLabel = isCreatedByUser ? localize('com_ui_user') : (message.sender ?? '');
+<<<<<<< HEAD
 
   return (
     <>
       <div className="w-full border-0 bg-transparent text-text-primary">
         <div className="m-auto justify-center px-4 py-3 sm:px-0">
           <MessageRow
+=======
+  const subagentWakeup = wakeupDisplay?.kind === 'subagent' ? wakeupDisplay.tasks[0] : undefined;
+  const Row = subagentWakeup == null ? MessageRow : WakeupRow;
+  const isUserSide = isCreatedByUser && (wakeupDisplay == null || subagentWakeup != null);
+
+  return (
+    <>
+      <div className="text-text-primary w-full border-0 bg-transparent">
+        <div className="m-auto justify-center px-4 py-3 sm:px-0">
+          <Row
+            task={subagentWakeup}
+            conversationId={message.conversationId ?? conversation?.conversationId ?? ''}
+            message={wakeupDisplay == null ? message : undefined}
+>>>>>>> upstream/main
             id={messageId}
             icon={<Icon message={message} conversation={conversation} />}
             label={messageLabel}
@@ -65,9 +105,20 @@ export default function Message(props: TMessageProps) {
             ariaLabel={getMessageAriaLabel(message, localize)}
             headerPrefix={getHeaderPrefixForScreenReader(message, localize)}
             isCreatedByUser={isCreatedByUser}
+<<<<<<< HEAD
             className="final-completion"
             footer={
               <SubRow classes={isCreatedByUser ? 'justify-end text-xs' : 'text-xs'}>
+=======
+            systemLabel={
+              wakeupDisplay != null && subagentWakeup == null
+                ? localize('com_ui_system_event')
+                : undefined
+            }
+            className="final-completion"
+            footer={
+              <SubRow classes={isUserSide ? 'justify-end text-xs' : 'text-xs'}>
+>>>>>>> upstream/main
                 <SiblingSwitch
                   siblingIdx={siblingIdx}
                   siblingCount={siblingCount}
@@ -90,6 +141,7 @@ export default function Message(props: TMessageProps) {
                 isLatestMessage: false,
               }}
             >
+<<<<<<< HEAD
               {message.content ? (
                 <SearchContent
                   message={message}
@@ -122,6 +174,44 @@ export default function Message(props: TMessageProps) {
               )}
             </MessageContext.Provider>
           </MessageRow>
+=======
+              {wakeupDisplay != null && (
+                <Wakeup display={wakeupDisplay} conversationId={message.conversationId} />
+              )}
+              {wakeupDisplay == null &&
+                (message.content ? (
+                  <SearchContent
+                    message={message}
+                    attachments={attachments}
+                    searchResults={searchResults}
+                    authorHeader={
+                      isCreatedByUser ? undefined : (
+                        <AuthorHeader
+                          icon={<Icon message={message} conversation={conversation} />}
+                          label={messageLabel}
+                        />
+                      )
+                    }
+                  />
+                ) : (
+                  <MessageContent
+                    edit={false}
+                    error={error}
+                    isLast={false}
+                    ask={() => {}}
+                    text={text || ''}
+                    message={message}
+                    isSubmitting={false}
+                    enterEdit={() => ({})}
+                    unfinished={unfinished}
+                    siblingIdx={siblingIdx ?? 0}
+                    isCreatedByUser={isCreatedByUser}
+                    setSiblingIdx={setSiblingIdx ?? (() => ({}))}
+                  />
+                ))}
+            </MessageContext.Provider>
+          </Row>
+>>>>>>> upstream/main
         </div>
       </div>
       <MultiMessage

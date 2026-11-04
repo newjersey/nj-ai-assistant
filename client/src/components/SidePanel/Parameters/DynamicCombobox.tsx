@@ -77,6 +77,7 @@ function DynamicCombobox({
       )}
     >
       <HoverCard openDelay={300}>
+<<<<<<< HEAD
         <HoverCardTrigger className="grid w-full items-center gap-2">
           {showLabel === true && (
             <div className="flex w-full justify-between">
@@ -112,6 +113,45 @@ function DynamicCombobox({
             items={items}
             SelectIcon={SelectIcon}
           />
+=======
+        <HoverCardTrigger asChild>
+          <div className="grid h-full w-full content-between items-center gap-2">
+            {showLabel === true && (
+              <div className="flex w-full justify-between">
+                <Label
+                  htmlFor={`${settingKey}-dynamic-combobox`}
+                  className="text-start text-xs font-medium"
+                >
+                  {labelCode ? (localize(label as TranslationKeys) ?? label) : label || settingKey}
+                  {showDefault && (
+                    <small className="high-contrast:opacity-100 opacity-40">
+                      ({localize('com_endpoint_default')}: {defaultValue})
+                    </small>
+                  )}
+                </Label>
+              </div>
+            )}
+            <ControlCombobox
+              displayValue={selectedValue}
+              selectPlaceholder={
+                selectPlaceholderCode === true
+                  ? localize(selectPlaceholder as TranslationKeys)
+                  : selectPlaceholder
+              }
+              searchPlaceholder={
+                searchPlaceholderCode === true
+                  ? localize(searchPlaceholder as TranslationKeys)
+                  : searchPlaceholder
+              }
+              isCollapsed={isCollapsed}
+              ariaLabel={settingKey}
+              selectedValue={selectedValue ?? ''}
+              setValue={handleChange}
+              items={items}
+              SelectIcon={SelectIcon}
+            />
+          </div>
+>>>>>>> upstream/main
         </HoverCardTrigger>
         {description && (
           <OptionHover

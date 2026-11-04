@@ -1,6 +1,10 @@
 import { useMemo } from 'react';
 import {
   isAgentsEndpoint,
+<<<<<<< HEAD
+=======
+  resolveEffectiveUseResponsesApi,
+>>>>>>> upstream/main
   resolveEndpointType,
   resolveUseResponsesApi,
 } from 'librechat-data-provider';
@@ -55,6 +59,7 @@ export default function useAgentUploadTarget(
   );
 
   const useResponsesApi = useMemo(() => {
+<<<<<<< HEAD
     if (!isAgents || agentId == null || agentId === '') {
       return conversation?.useResponsesApi;
     }
@@ -64,6 +69,45 @@ export default function useAgentUploadTarget(
       conversation?.useResponsesApi,
     );
   }, [isAgents, agentId, conversation?.useResponsesApi, agentData, agentsMap]);
+=======
+    const mappedAgent = agentId ? agentsMap?.[agentId] : undefined;
+    const savedValue =
+      isAgents && agentId != null && agentId !== ''
+        ? resolveUseResponsesApi(
+            agentData?.model_parameters?.useResponsesApi ??
+              mappedAgent?.model_parameters?.useResponsesApi,
+            conversation?.useResponsesApi,
+          )
+        : conversation?.useResponsesApi;
+    const model = isAgents
+      ? (agentData?.model_parameters?.model ??
+        mappedAgent?.model_parameters?.model ??
+        agentData?.model ??
+        mappedAgent?.model)
+      : conversation?.model;
+    return resolveEffectiveUseResponsesApi({
+      value: savedValue,
+      endpoint: endpointType,
+      model,
+      webSearch: isAgents
+        ? (agentData?.model_parameters?.web_search ?? mappedAgent?.model_parameters?.web_search)
+        : conversation?.web_search,
+      routing: endpointsConfig?.[agentProvider ?? endpoint ?? '']?.responsesApiRouting,
+    });
+  }, [
+    isAgents,
+    agentId,
+    endpointType,
+    endpoint,
+    agentProvider,
+    endpointsConfig,
+    conversation?.model,
+    conversation?.useResponsesApi,
+    conversation?.web_search,
+    agentData,
+    agentsMap,
+  ]);
+>>>>>>> upstream/main
 
   return { agentProvider, endpointType, useResponsesApi };
 }

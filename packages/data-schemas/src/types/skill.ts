@@ -82,6 +82,12 @@ export interface ISkill {
   sourceMetadata?: Record<string, unknown>;
   /** Denormalized count of associated `SkillFile` rows. Kept in sync by skill methods. */
   fileCount: number;
+<<<<<<< HEAD
+=======
+  deletingAt?: Date;
+  deletionNeedsJournal?: boolean;
+  deletionJournalAttemptAt?: Date;
+>>>>>>> upstream/main
   /**
    * When `true`, the skill is auto-primed into every turn — no user `$`
    * invocation or model discretion required. Mirrors the `always-apply` YAML

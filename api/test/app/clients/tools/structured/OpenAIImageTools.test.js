@@ -1,6 +1,17 @@
+<<<<<<< HEAD
 const OpenAI = require('openai');
 const createOpenAIImageTools = require('~/app/clients/tools/structured/OpenAIImageTools');
 
+=======
+const axios = require('axios');
+const OpenAI = require('openai');
+const FormData = require('form-data');
+const { Readable } = require('stream');
+const createOpenAIImageTools = require('~/app/clients/tools/structured/OpenAIImageTools');
+const { getStrategyFunctions } = require('~/server/services/Files/strategies');
+
+jest.mock('axios');
+>>>>>>> upstream/main
 jest.mock('openai');
 jest.mock('@librechat/data-schemas', () => ({
   logger: {
@@ -45,6 +56,19 @@ describe('OpenAIImageTools - IMAGE_GEN_OAI_MODEL environment variable', () => {
     originalEnv = { ...process.env };
 
     process.env.IMAGE_GEN_OAI_API_KEY = 'test-api-key';
+<<<<<<< HEAD
+=======
+    delete process.env.IMAGE_GEN_OAI_MODEL;
+    delete process.env.IMAGE_GEN_OAI_BASEURL;
+    delete process.env.IMAGE_GEN_OAI_AZURE_API_VERSION;
+
+    axios.post.mockResolvedValue({
+      data: { data: [{ b64_json: 'base64-encoded-image-data' }] },
+    });
+    getStrategyFunctions.mockReturnValue({
+      getDownloadStream: jest.fn(async () => Readable.from([Buffer.from('image-data')])),
+    });
+>>>>>>> upstream/main
 
     OpenAI.mockImplementation(() => ({
       images: {
@@ -60,11 +84,38 @@ describe('OpenAIImageTools - IMAGE_GEN_OAI_MODEL environment variable', () => {
   });
 
   afterEach(() => {
+<<<<<<< HEAD
     process.env = originalEnv;
   });
 
   it('should use default model "gpt-image-1" when IMAGE_GEN_OAI_MODEL is not set', async () => {
     delete process.env.IMAGE_GEN_OAI_MODEL;
+=======
+    jest.restoreAllMocks();
+    process.env = originalEnv;
+  });
+
+  const createTools = () =>
+    createOpenAIImageTools({
+      isAgent: true,
+      override: false,
+      req: { user: { id: 'test-user' } },
+      imageFiles: [
+        {
+          file_id: 'source-image',
+          source: 'local',
+          filepath: 'source-image.png',
+          filename: 'source-image.png',
+          type: 'image/png',
+        },
+      ],
+    });
+
+  it.each([undefined, ''])('defaults generation when IMAGE_GEN_OAI_MODEL=%j', async (model) => {
+    if (model !== undefined) {
+      process.env.IMAGE_GEN_OAI_MODEL = model;
+    }
+>>>>>>> upstream/main
 
     const [imageGenTool] = createOpenAIImageTools({
       isAgent: true,
@@ -90,12 +141,17 @@ describe('OpenAIImageTools - IMAGE_GEN_OAI_MODEL environment variable', () => {
 
     expect(mockGenerate).toHaveBeenCalledWith(
       expect.objectContaining({
+<<<<<<< HEAD
         model: 'gpt-image-1',
+=======
+        model: 'gpt-image-2.5-flare',
+>>>>>>> upstream/main
       }),
       expect.any(Object),
     );
   });
 
+<<<<<<< HEAD
   it('should use "gpt-image-1.5" when IMAGE_GEN_OAI_MODEL is set to "gpt-image-1.5"', async () => {
     process.env.IMAGE_GEN_OAI_MODEL = 'gpt-image-1.5';
 
@@ -128,6 +184,43 @@ describe('OpenAIImageTools - IMAGE_GEN_OAI_MODEL environment variable', () => {
       expect.any(Object),
     );
   });
+=======
+  it.each(['gpt-image-1', 'gpt-image-1.5', 'gpt-image-2.5-flare', 'gpt-image-2.5-sunburst', ' '])(
+    'should preserve the configured generation model %j',
+    async (model) => {
+      process.env.IMAGE_GEN_OAI_MODEL = model;
+
+      const mockGenerate = jest.fn().mockResolvedValue({
+        data: [
+          {
+            b64_json: 'base64-encoded-image-data',
+          },
+        ],
+      });
+
+      OpenAI.mockImplementation(() => ({
+        images: {
+          generate: mockGenerate,
+        },
+      }));
+
+      const [imageGenTool] = createOpenAIImageTools({
+        isAgent: true,
+        override: false,
+        req: { user: { id: 'test-user' } },
+      });
+
+      await imageGenTool.func({ prompt: 'test prompt' });
+
+      expect(mockGenerate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          model,
+        }),
+        expect.any(Object),
+      );
+    },
+  );
+>>>>>>> upstream/main
 
   it('should use custom model name from IMAGE_GEN_OAI_MODEL environment variable', async () => {
     process.env.IMAGE_GEN_OAI_MODEL = 'custom-image-model';
@@ -161,4 +254,73 @@ describe('OpenAIImageTools - IMAGE_GEN_OAI_MODEL environment variable', () => {
       expect.any(Object),
     );
   });
+<<<<<<< HEAD
+=======
+
+  it.each([
+    [undefined, 'gpt-image-2.5-flare'],
+    ['', 'gpt-image-2.5-flare'],
+    ['gpt-image-1', 'gpt-image-1'],
+    ['gpt-image-1.5', 'gpt-image-1.5'],
+    ['gpt-image-2.5-flare', 'gpt-image-2.5-flare'],
+    ['gpt-image-2.5-sunburst', 'gpt-image-2.5-sunburst'],
+    ['custom-image-model', 'custom-image-model'],
+    [' ', ' '],
+  ])('preserves the editing model for IMAGE_GEN_OAI_MODEL=%j', async (model, expectedModel) => {
+    if (model !== undefined) {
+      process.env.IMAGE_GEN_OAI_MODEL = model;
+    }
+    const append = jest.spyOn(FormData.prototype, 'append');
+    const [, imageEditTool] = createTools();
+
+    await imageEditTool.func({ prompt: 'test prompt', image_ids: ['source-image'] });
+
+    expect(append).toHaveBeenCalledWith('model', expectedModel);
+    expect(axios.post).toHaveBeenCalledWith(
+      '/images/edits',
+      expect.any(FormData),
+      expect.any(Object),
+    );
+  });
+
+  it('should preserve the configured Azure deployment for generation and editing', async () => {
+    const model = 'azure-image-deployment';
+    const baseURL = 'https://azure.test/openai/deployments/azure-image-deployment';
+    const apiVersion = '2025-04-01-preview';
+    process.env.IMAGE_GEN_OAI_MODEL = model;
+    process.env.IMAGE_GEN_OAI_BASEURL = baseURL;
+    process.env.IMAGE_GEN_OAI_AZURE_API_VERSION = apiVersion;
+
+    const mockGenerate = jest.fn().mockResolvedValue({
+      data: [{ b64_json: 'base64-encoded-image-data' }],
+    });
+    OpenAI.mockImplementation(() => ({ images: { generate: mockGenerate } }));
+    const append = jest.spyOn(FormData.prototype, 'append');
+    const [imageGenTool, imageEditTool] = createTools();
+
+    await imageGenTool.func({ prompt: 'test prompt' });
+    await imageEditTool.func({ prompt: 'test prompt', image_ids: ['source-image'] });
+
+    expect(mockGenerate).toHaveBeenCalledWith(
+      expect.objectContaining({ model }),
+      expect.any(Object),
+    );
+    expect(OpenAI).toHaveBeenCalledWith(
+      expect.objectContaining({
+        baseURL,
+        defaultQuery: { 'api-version': apiVersion },
+      }),
+    );
+    expect(append).toHaveBeenCalledWith('model', model);
+    expect(axios.post).toHaveBeenCalledWith(
+      '/images/edits',
+      expect.any(FormData),
+      expect.objectContaining({
+        baseURL,
+        params: { 'api-version': apiVersion },
+        headers: expect.objectContaining({ 'api-key': 'test-api-key' }),
+      }),
+    );
+  });
+>>>>>>> upstream/main
 });

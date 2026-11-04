@@ -1,5 +1,9 @@
 import { ScrollText } from 'lucide-react';
+<<<<<<< HEAD
 import { ROW_GLYPH_SLOT, TOOL_ROW_CLASSES } from '../rows';
+=======
+import { ROW_GLYPH_SLOT, TOOL_ROW_CLASSES } from '@librechat/chat/components';
+>>>>>>> upstream/main
 import { useLocalize } from '~/hooks';
 import { cn } from '~/utils';
 
@@ -35,17 +39,26 @@ export default function PendingSkillCall({
 
   return (
     <div className={TOOL_ROW_CLASSES}>
+<<<<<<< HEAD
       <div className="progress-text-wrapper text-token-text-secondary relative -mt-[0.75px] h-5 w-full leading-5">
         <div
           className="progress-text-content absolute left-0 right-0 top-0 max-w-full overflow-visible whitespace-nowrap"
           style={{ opacity: 1, transform: 'none' }}
         >
+=======
+      <div className="progress-text-wrapper text-text-secondary relative -mt-[0.046875rem] h-5 w-full leading-5">
+        <div className="progress-text-content absolute top-0 right-0 left-0 max-w-full overflow-visible whitespace-nowrap">
+>>>>>>> upstream/main
           <div className="inline-flex w-full items-center gap-2">
             {/** The real `SkillCall` replaces this row in place once the skill
              *   finalizes; sharing its glyph slot keeps that swap still. */}
             <span className={ROW_GLYPH_SLOT} aria-hidden="true">
               <ScrollText
+<<<<<<< HEAD
                 className={cn('size-4 shrink-0 text-text-secondary', !loaded && 'animate-pulse')}
+=======
+                className={cn('text-text-secondary size-4 shrink-0', !loaded && 'animate-pulse')}
+>>>>>>> upstream/main
               />
             </span>
             <span className={cn(!loaded && 'shimmer', 'min-w-0 truncate font-medium')}>{text}</span>

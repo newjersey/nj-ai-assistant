@@ -4,8 +4,30 @@ import supersub from 'remark-supersub';
 import ReactMarkdown from 'react-markdown';
 import rehypeHighlight from 'rehype-highlight';
 import type { PluggableList } from 'unified';
+<<<<<<< HEAD
 import { code, codeNoExecution, a, p, img, table } from './MarkdownComponents';
 import { langSubset, remarkApproxTilde } from '~/utils';
+=======
+import {
+  code,
+  codeNoExecution,
+  a,
+  p,
+  img,
+  table,
+  ul,
+  ol,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  blockquote,
+} from './MarkdownComponents';
+import { langSubset, remarkApproxTilde } from '~/utils';
+import { reportBoundaryError } from '~/lib/rum/logs';
+>>>>>>> upstream/main
 import { CodeBlockProvider } from '~/Providers';
 
 interface ErrorBoundaryState {
@@ -34,6 +56,10 @@ class MarkdownErrorBoundary extends React.Component<
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     console.error('Markdown rendering error:', error, errorInfo);
+<<<<<<< HEAD
+=======
+    reportBoundaryError('markdown', error);
+>>>>>>> upstream/main
   }
 
   componentDidUpdate(prevProps: MarkdownErrorBoundaryProps) {
@@ -78,6 +104,18 @@ class MarkdownErrorBoundary extends React.Component<
                  *  `![chart](chart.png)` to a page-relative URL. */
                 img,
                 table,
+<<<<<<< HEAD
+=======
+                ul,
+                ol,
+                h1,
+                h2,
+                h3,
+                h4,
+                h5,
+                h6,
+                blockquote,
+>>>>>>> upstream/main
               } as {
                 [nodeType: string]: React.ElementType;
               }

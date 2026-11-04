@@ -2,6 +2,7 @@ const express = require('express');
 const { logger } = require('@librechat/data-schemas');
 const {
   createMessageFilterPii,
+<<<<<<< HEAD
   reportLocatorTraversalFailure,
   generateCheckAccess,
   skipAgentCheck,
@@ -9,6 +10,16 @@ const {
   applyResumeModelParameters,
   GenerationJobManager,
   getSafeErrorMetadata,
+=======
+  getPreinspectedPrivateText,
+  reportLocatorTraversalFailure,
+  generateCheckAccess,
+  skipAgentCheck,
+  applyResumeRequest,
+  GenerationJobManager,
+  getSafeErrorMetadata,
+  validateChatMessageIds,
+>>>>>>> upstream/main
 } = require('@librechat/api');
 const { PermissionTypes, Permissions, PermissionBits } = require('librechat-data-provider');
 const {
@@ -53,6 +64,7 @@ const restoreResumeContext = async (req, res, next) => {
     const streamId = req.body?.conversationId;
     if (streamId) {
       const job = await GenerationJobManager.getJob(streamId);
+<<<<<<< HEAD
       const resumeContext = job?.metadata?.pendingAction?.resumeContext;
       applyResumeContext(req.body, resumeContext);
       // Replay the paused turn's resolved model parameters. Ephemeral agents derive these
@@ -63,6 +75,9 @@ const restoreResumeContext = async (req, res, next) => {
       // Generation params are authoritative, but routing, graph identity, and resume-action
       // fields remain owned by the restored context/request envelope.
       applyResumeModelParameters(req.body, resumeContext?.model_parameters);
+=======
+      applyResumeRequest(req, job?.metadata?.pendingAction?.resumeContext);
+>>>>>>> upstream/main
     }
   } catch (err) {
     logger.warn('[agents/chat] Failed to restore resume context', getSafeErrorMetadata(err));
@@ -70,12 +85,20 @@ const restoreResumeContext = async (req, res, next) => {
   next();
 };
 
+<<<<<<< HEAD
+=======
+router.use(validateChatMessageIds);
+>>>>>>> upstream/main
 router.use(restoreResumeContext);
 router.use(
   createMessageFilterPii({
     onTraversalFailure: reportLocatorTraversalFailure,
     getConfig: (req) => req.config?.messageFilter?.pii,
     getFilters: (req) => req.config?.filters,
+<<<<<<< HEAD
+=======
+    getPreinspectedText: getPreinspectedPrivateText,
+>>>>>>> upstream/main
     getFiles,
   }),
 );

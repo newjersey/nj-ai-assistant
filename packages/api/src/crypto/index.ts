@@ -5,7 +5,14 @@ export {
   decryptV2,
   encryptV3,
   decryptV3,
+<<<<<<< HEAD
   hashBackupCode,
   getRandomValues,
 } from '@librechat/data-schemas';
 export * from './jwt';
+=======
+  getRandomValues,
+} from '@librechat/data-schemas';
+export * from './jwt';
+export * from './credentials';
+>>>>>>> upstream/main

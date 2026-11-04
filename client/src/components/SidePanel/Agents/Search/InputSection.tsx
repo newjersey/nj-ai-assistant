@@ -62,15 +62,26 @@ export default function InputSection({
             trigger={
               <Menu.MenuButton
                 onClick={() => setDropdownOpen(!dropdownOpen)}
+<<<<<<< HEAD
                 className="flex items-center rounded-md border border-border-light px-3 py-1 text-sm text-text-secondary"
               >
                 {selectedOption?.label}
                 <ChevronDown className="ml-1 h-4 w-4" />
+=======
+                className="border-border-light text-text-secondary flex items-center rounded-md border px-3 py-1 text-sm"
+              >
+                {selectedOption?.label}
+                <ChevronDown className="ms-1 h-4 w-4" />
+>>>>>>> upstream/main
               </Menu.MenuButton>
             }
           />
         ) : (
+<<<<<<< HEAD
           <div className="text-sm text-text-secondary">{selectedOption?.label}</div>
+=======
+          <div className="text-text-secondary text-sm">{selectedOption?.label}</div>
+>>>>>>> upstream/main
         )}
       </div>
       {selectedOption?.inputs &&
@@ -98,12 +109,20 @@ export default function InputSection({
               )}
             </div>
             {config.link && (
+<<<<<<< HEAD
               <div className="mt-1 text-xs text-text-secondary">
+=======
+              <div className="text-text-secondary mt-1 text-xs">
+>>>>>>> upstream/main
                 <a
                   href={config.link.url}
                   target="_blank"
                   rel="noopener noreferrer"
+<<<<<<< HEAD
                   className="text-link underline hover:text-link-hover"
+=======
+                  className="text-link hover:text-link-hover underline"
+>>>>>>> upstream/main
                 >
                   {config.link.text}
                 </a>

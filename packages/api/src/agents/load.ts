@@ -6,6 +6,10 @@ import {
   isEphemeralAgentId,
   getEphemeralSender,
   encodeEphemeralAgentId,
+<<<<<<< HEAD
+=======
+  resolveMCPAppsPolicy,
+>>>>>>> upstream/main
 } from 'librechat-data-provider';
 import type {
   AgentModelParameters,
@@ -15,6 +19,10 @@ import type {
   Agent,
 } from 'librechat-data-provider';
 import type { AppConfig } from '@librechat/data-schemas';
+<<<<<<< HEAD
+=======
+import type { MCPClientCapabilityProfile } from '~/mcp/capabilities';
+>>>>>>> upstream/main
 import type { ParsedServerConfig } from '~/mcp/types';
 import {
   requiresEphemeralUserConnection,
@@ -22,20 +30,41 @@ import {
   validateMCPServerConfig,
 } from '~/mcp/utils';
 import { ASK_USER_QUESTION_TOOL_NAME } from '~/agents/hitl/askUserQuestionTool';
+<<<<<<< HEAD
 import { synthesizeBackgroundToolOptions } from '~/agents/background';
 import { mergeSynthesizedToolOptions } from '~/agents/selection';
 import { synthesizeIntentToolOptions } from '~/agents/intent';
 import { getCustomEndpointConfig } from '~/app/config';
+=======
+import { resolveMCPClientCapabilityProfile } from '~/mcp/capabilities';
+import { synthesizeBackgroundToolOptions } from '~/agents/background';
+import { mergeSynthesizedToolOptions } from '~/agents/selection';
+import { synthesizeIntentToolOptions } from '~/agents/intent';
+import { getLookupConcurrency } from '~/utils/concurrency';
+import { getCustomEndpointConfig } from '~/app/config';
+import { mapWithConcurrency } from '~/utils/promise';
+>>>>>>> upstream/main
 
 const { mcp_all, mcp_delimiter } = Constants;
 type ModelParametersWithPromptPrefix = AgentModelParameters & { promptPrefix?: string | null };
 
 export interface LoadAgentDeps {
+<<<<<<< HEAD
   getAgent: (searchParameter: { id: string }) => Promise<Agent | null>;
+=======
+  /** Resolves the agent without its `versions` history; `version` carries the count. */
+  getAgent: (searchParameter: {
+    id: string;
+  }) => Promise<(Agent & { version?: number; versions?: { length: number } }) | null>;
+>>>>>>> upstream/main
   getMCPServerTools: (
     userId: string,
     serverName: string,
     serverConfig?: ParsedServerConfig,
+<<<<<<< HEAD
+=======
+    capabilityProfile?: MCPClientCapabilityProfile,
+>>>>>>> upstream/main
   ) => Promise<Record<string, unknown> | null>;
   /** The MCP servers this user can reach, with the registry's tier precedence
    *  already applied — the resolution behind the client's catalog. Omitted, the
@@ -76,6 +105,12 @@ export async function loadEphemeralAgent(
   }
   const ephemeralAgent: TEphemeralAgent | undefined = req.body?.ephemeralAgent;
   const userId = req.user?.id ?? '';
+<<<<<<< HEAD
+=======
+  const capabilityProfile = resolveMCPClientCapabilityProfile(
+    resolveMCPAppsPolicy(req.config?.mcpSettings?.apps),
+  );
+>>>>>>> upstream/main
   /** The picker's own selection is narrowed to what the picker may offer; a
    *  spec's servers are the operator's choice and are added after, so pinning a
    *  chat-hidden server to a spec keeps working. */
@@ -118,6 +153,7 @@ export async function loadEphemeralAgent(
     tools.push(ASK_USER_QUESTION_TOOL_NAME);
   }
 
+<<<<<<< HEAD
   const addedServers = new Set<string>();
   if (mcpServers.size > 0) {
     for (const mcpServer of mcpServers) {
@@ -141,6 +177,28 @@ export async function loadEphemeralAgent(
       }
       tools.push(...Object.keys(serverTools));
       addedServers.add(mcpServer);
+=======
+  if (mcpServers.size > 0) {
+    const serverToolKeys = await mapWithConcurrency(
+      [...mcpServers],
+      getLookupConcurrency(req.config, 'mcpCatalogLookups'),
+      async (mcpServer): Promise<string[]> => {
+        /** Address durable catalogs by the effective request overlay; request-scoped
+         *  overlays still expand fresh through `mcp_all`. */
+        const rawOverlayConfig = req.config?.mcpConfig?.[mcpServer];
+        const overlayConfig = rawOverlayConfig
+          ? validateMCPServerConfig(rawOverlayConfig)
+          : undefined;
+        const serverTools =
+          overlayConfig && requiresEphemeralUserConnection(overlayConfig)
+            ? null
+            : await deps.getMCPServerTools(userId, mcpServer, overlayConfig, capabilityProfile);
+        return serverTools ? Object.keys(serverTools) : [`${mcp_all}${mcp_delimiter}${mcpServer}`];
+      },
+    );
+    for (const keys of serverToolKeys) {
+      tools.push(...keys);
+>>>>>>> upstream/main
     }
   }
 
@@ -242,8 +300,12 @@ export async function loadAgent(
     return null;
   }
 
+<<<<<<< HEAD
   // Set version count from versions array length
   const agentWithVersion = agent as Agent & { versions?: unknown[]; version?: number };
   agentWithVersion.version = agentWithVersion.versions ? agentWithVersion.versions.length : 0;
+=======
+  agent.version ??= agent.versions?.length ?? 0;
+>>>>>>> upstream/main
   return agent;
 }

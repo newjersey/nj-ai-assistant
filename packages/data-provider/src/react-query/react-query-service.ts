@@ -5,7 +5,10 @@ import type {
   QueryObserverResult,
 } from '@tanstack/react-query';
 import type { MCPReinitializeResponse } from '../types/mcpServers';
+<<<<<<< HEAD
 import { MCPServerConnectionStatusResponse } from '../types/queries';
+=======
+>>>>>>> upstream/main
 import { Constants, initialModelsConfig } from '../config';
 import { defaultOrderQuery } from '../types/assistants';
 import * as permissions from '../accessPermissions';
@@ -75,6 +78,7 @@ export const useGetConversationByIdQuery = (
   );
 };
 
+<<<<<<< HEAD
 //This isn't ideal because its just a query and we're using mutation, but it was the only way
 //to make it work with how the Chat component is structured
 export const useGetConversationByIdMutation = (id: string): UseMutationResult<s.TConversation> => {
@@ -87,6 +91,8 @@ export const useGetConversationByIdMutation = (id: string): UseMutationResult<s.
   });
 };
 
+=======
+>>>>>>> upstream/main
 export const useUpdateMessageMutation = (
   id: string,
 ): UseMutationResult<unknown, unknown, t.TUpdateMessageRequest, unknown> => {
@@ -228,6 +234,7 @@ export const useDeletePresetMutation = (): UseMutationResult<
   });
 };
 
+<<<<<<< HEAD
 export const useUpdateTokenCountMutation = (): UseMutationResult<
   t.TUpdateTokenCountResponse,
   unknown,
@@ -242,6 +249,8 @@ export const useUpdateTokenCountMutation = (): UseMutationResult<
   });
 };
 
+=======
+>>>>>>> upstream/main
 export const useRegisterUserMutation = (
   options?: m.RegistrationOptions,
 ): UseMutationResult<t.TError, unknown, t.TRegisterUser, unknown> => {
@@ -302,6 +311,7 @@ export const useResetPasswordMutation = (): UseMutationResult<
   return useMutation((payload: t.TResetPassword) => dataService.resetPassword(payload));
 };
 
+<<<<<<< HEAD
 export const useAvailablePluginsQuery = <TData = s.TPlugin[]>(
   config?: UseQueryOptions<s.TPlugin[], unknown, TData>,
 ): QueryObserverResult<TData> => {
@@ -317,6 +327,8 @@ export const useAvailablePluginsQuery = <TData = s.TPlugin[]>(
   );
 };
 
+=======
+>>>>>>> upstream/main
 export const useUpdateUserPluginsMutation = (
   _options?: m.UpdatePluginAuthOptions,
 ): UseMutationResult<t.TUser, unknown, t.TUpdateUserPlugins, unknown> => {
@@ -475,6 +487,13 @@ export const useUpdateResourcePermissionsMutation = (): UseMutationResult<
       queryClient.invalidateQueries({
         queryKey: [QueryKeys.effectivePermissions, variables.resourceType, variables.resourceId],
       });
+<<<<<<< HEAD
+=======
+
+      queryClient.invalidateQueries({
+        queryKey: [QueryKeys.effectivePermissions, 'all', variables.resourceType],
+      });
+>>>>>>> upstream/main
     },
   });
 };
@@ -508,6 +527,7 @@ export const useGetAllEffectivePermissionsQuery = (
   });
 };
 
+<<<<<<< HEAD
 export const useMCPServerConnectionStatusQuery = (
   serverName: string,
   config?: UseQueryOptions<MCPServerConnectionStatusResponse>,
@@ -526,6 +546,8 @@ export const useMCPServerConnectionStatusQuery = (
   );
 };
 
+=======
+>>>>>>> upstream/main
 export const useGetAgentApiKeysQuery = (
   config?: UseQueryOptions<t.TAgentApiKeyListResponse>,
 ): QueryObserverResult<t.TAgentApiKeyListResponse> => {

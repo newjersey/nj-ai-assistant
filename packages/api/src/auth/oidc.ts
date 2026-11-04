@@ -9,9 +9,17 @@ import { normalizeOpenIdIssuer } from './openid';
 import { isEnabled, math } from '~/utils';
 
 export interface OidcAccessTokenConfig {
+<<<<<<< HEAD
   audience: string;
   issuer: string;
   jwksUri?: string;
+=======
+  audience?: string;
+  issuer: string;
+  jwksUri?: string;
+  requiredScopes?: string[];
+  tokenUse?: 'access';
+>>>>>>> upstream/main
 }
 
 export interface OidcAccessTokenOptions {
@@ -208,11 +216,39 @@ function getVerifyOptions(oidcConfig: OidcAccessTokenConfig): VerifyOptions {
       ? [oidcConfig.issuer, normalizedIssuer]
       : oidcConfig.issuer;
 
+<<<<<<< HEAD
   return {
     algorithms: JWT_ALGORITHMS,
     audience: oidcConfig.audience,
     issuer,
   };
+=======
+  const options: VerifyOptions = {
+    algorithms: JWT_ALGORITHMS,
+    issuer,
+  };
+  if (oidcConfig.audience) options.audience = oidcConfig.audience;
+  return options;
+}
+
+function verifyAccessTokenClaims(
+  payload: JwtPayload,
+  oidcConfig: OidcAccessTokenConfig,
+): JwtPayload {
+  if (oidcConfig.tokenUse && payload.token_use !== oidcConfig.tokenUse) {
+    throw new Error('Invalid JWT token use');
+  }
+
+  if (oidcConfig.requiredScopes?.length) {
+    const scope = typeof payload.scope === 'string' ? payload.scope.trim().split(/\s+/) : [];
+    const grantedScopes = new Set(scope.filter(Boolean));
+    if (!oidcConfig.requiredScopes.every((requiredScope) => grantedScopes.has(requiredScope))) {
+      throw new Error('Invalid JWT scope');
+    }
+  }
+
+  return payload;
+>>>>>>> upstream/main
 }
 
 function verifyJwt(
@@ -224,7 +260,15 @@ function verifyJwt(
     jwt.verify(token, signingKey.getPublicKey(), getVerifyOptions(oidcConfig), (err, payload) => {
       if (err != null || payload == null) return reject(err ?? new Error('Empty payload'));
       if (typeof payload === 'string') return reject(new Error('Invalid JWT payload'));
+<<<<<<< HEAD
       resolve(payload);
+=======
+      try {
+        resolve(verifyAccessTokenClaims(payload, oidcConfig));
+      } catch (claimError) {
+        reject(claimError);
+      }
+>>>>>>> upstream/main
     });
   });
 }

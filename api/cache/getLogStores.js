@@ -1,4 +1,8 @@
 const { Keyv } = require('keyv');
+<<<<<<< HEAD
+=======
+const { logger } = require('@librechat/data-schemas');
+>>>>>>> upstream/main
 const { Time, CacheKeys, ViolationTypes } = require('librechat-data-provider');
 const {
   logFile,
@@ -9,6 +13,12 @@ const {
   violationCache,
   userPrincipalsCache,
   registerShutdownTask,
+<<<<<<< HEAD
+=======
+  auditCacheStores,
+  formatMemoryUsage,
+  createSingleFlight,
+>>>>>>> upstream/main
 } = require('@librechat/api');
 
 /** No-op store for cache namespaces that are deliberately disabled. */
@@ -49,7 +59,13 @@ const namespaces = {
   [CacheKeys.USER_PRINCIPALS]: userPrincipalsCache() ?? disabledCache,
   /** Authorization IDs stay uncached because a failed shared invalidation cannot fail closed. */
   [CacheKeys.PROMPT_GROUPS_ACCESS]: disabledCache,
+<<<<<<< HEAD
   [CacheKeys.APP_CONFIG]: standardCache(CacheKeys.APP_CONFIG),
+=======
+  [CacheKeys.APP_CONFIG]: standardCache(CacheKeys.APP_CONFIG, undefined, undefined, {
+    throwOnErrors: true,
+  }),
+>>>>>>> upstream/main
   [CacheKeys.CONFIG_STORE]: standardCache(CacheKeys.CONFIG_STORE),
   [CacheKeys.TOOL_CACHE]: standardCache(CacheKeys.TOOL_CACHE),
   [CacheKeys.PENDING_REQ]: standardCache(CacheKeys.PENDING_REQ),
@@ -66,11 +82,25 @@ const namespaces = {
     CacheKeys.OPENID_EXCHANGED_TOKENS,
     Time.TEN_MINUTES,
   ),
+<<<<<<< HEAD
   [CacheKeys.AUTH_USER_DOC]: standardCache(CacheKeys.AUTH_USER_DOC),
+=======
+  [CacheKeys.AUTH_USER_DOC]: standardCache(CacheKeys.AUTH_USER_DOC, undefined, undefined, {
+    throwOnErrors: true,
+  }),
+>>>>>>> upstream/main
   [CacheKeys.ADMIN_OAUTH_EXCHANGE]: standardCache(
     CacheKeys.ADMIN_OAUTH_EXCHANGE,
     Time.THIRTY_SECONDS,
   ),
+<<<<<<< HEAD
+=======
+  [CacheKeys.PASSKEY_CHALLENGE]: standardCache(CacheKeys.PASSKEY_CHALLENGE, Time.FIVE_MINUTES),
+  [CacheKeys.AGENT_LINKED_INSTRUCTIONS]: standardCache(
+    CacheKeys.AGENT_LINKED_INSTRUCTIONS,
+    Time.FIVE_MINUTES,
+  ),
+>>>>>>> upstream/main
 };
 
 /**
@@ -100,7 +130,11 @@ async function clearExpiredFromCache(cache) {
     return;
   }
 
+<<<<<<< HEAD
   const expiryTime = Date.now() - ttl;
+=======
+  const expiryTime = Date.now();
+>>>>>>> upstream/main
   let cleared = 0;
 
   // Get all keys first to avoid modification during iteration
@@ -114,23 +148,41 @@ async function clearExpiredFromCache(cache) {
       }
 
       const data = cache.opts.deserialize(raw);
+<<<<<<< HEAD
       // Check if the entry is older than TTL
+=======
+      // Check if the entry has expired
+>>>>>>> upstream/main
       if (data?.expires && data.expires <= expiryTime) {
         const deleted = await cache.opts.store.delete(key);
         if (!deleted) {
           cacheConfig.DEBUG_MEMORY_CACHE &&
+<<<<<<< HEAD
             console.warn(`[Cache] Error deleting entry: ${key} from ${cache.opts.namespace}`);
+=======
+            logger.warn(`[Cache] Error deleting entry from ${cache.opts.namespace}`);
+>>>>>>> upstream/main
           continue;
         }
         cleared++;
       }
     } catch (error) {
       cacheConfig.DEBUG_MEMORY_CACHE &&
+<<<<<<< HEAD
         console.log(`[Cache] Error processing entry from ${cache.opts.namespace}:`, error);
       const deleted = await cache.opts.store.delete(key);
       if (!deleted) {
         cacheConfig.DEBUG_MEMORY_CACHE &&
           console.warn(`[Cache] Error deleting entry: ${key} from ${cache.opts.namespace}`);
+=======
+        logger.info(`[Cache] Error processing entry from ${cache.opts.namespace}`, {
+          error: error?.name,
+        });
+      const deleted = await cache.opts.store.delete(key);
+      if (!deleted) {
+        cacheConfig.DEBUG_MEMORY_CACHE &&
+          logger.warn(`[Cache] Error deleting entry from ${cache.opts.namespace}`);
+>>>>>>> upstream/main
         continue;
       }
       cleared++;
@@ -139,6 +191,7 @@ async function clearExpiredFromCache(cache) {
 
   if (cleared > 0) {
     cacheConfig.DEBUG_MEMORY_CACHE &&
+<<<<<<< HEAD
       console.log(
         `[Cache] Cleared ${cleared} entries older than ${ttl}ms from ${cache.opts.namespace}`,
       );
@@ -165,6 +218,13 @@ const auditCache = () => {
     });
   });
 };
+=======
+      logger.info(`[Cache] Cleared ${cleared} expired entries from ${cache.opts.namespace}`);
+  }
+}
+
+const auditCache = () => auditCacheStores(getTTLStores(), logger);
+>>>>>>> upstream/main
 
 /**
  * Clears expired entries from all TTL-enabled stores
@@ -184,9 +244,16 @@ if (!cacheConfig.USE_REDIS && !cacheConfig.CI) {
   const cleanupIntervals = new Set();
 
   // Clear expired entries every 30 seconds
+<<<<<<< HEAD
   const cleanup = setInterval(() => {
     clearAllExpiredFromCache();
   }, Time.THIRTY_SECONDS);
+=======
+  const cleanup = setInterval(
+    createSingleFlight(clearAllExpiredFromCache, logger, '[Cache] Expired entry sweep'),
+    Time.THIRTY_SECONDS,
+  );
+>>>>>>> upstream/main
 
   cleanupIntervals.add(cleanup);
 
@@ -196,6 +263,7 @@ if (!cacheConfig.USE_REDIS && !cacheConfig.CI) {
       const memory = process.memoryUsage();
       const totalSize = ttlStores.reduce((sum, store) => sum + (store.opts?.store?.size ?? 0), 0);
 
+<<<<<<< HEAD
       console.log('[Cache] Memory usage:', {
         heapUsed: `${(memory.heapUsed / 1024 / 1024).toFixed(2)} MB`,
         heapTotal: `${(memory.heapTotal / 1024 / 1024).toFixed(2)} MB`,
@@ -203,6 +271,9 @@ if (!cacheConfig.USE_REDIS && !cacheConfig.CI) {
         external: `${(memory.external / 1024 / 1024).toFixed(2)} MB`,
         totalCacheEntries: totalSize,
       });
+=======
+      logger.info(formatMemoryUsage(memory, totalSize));
+>>>>>>> upstream/main
 
       auditCache();
     }, Time.ONE_MINUTE);
@@ -214,11 +285,19 @@ if (!cacheConfig.USE_REDIS && !cacheConfig.CI) {
   // (see packages/api/src/app/shutdown.ts) rather than attaching a direct
   // signal handler — multiple competing handlers race the HTTP drain.
   registerShutdownTask('cache cleanup', async () => {
+<<<<<<< HEAD
     cacheConfig.DEBUG_MEMORY_CACHE && console.log('[Cache] Cleaning up and shutting down...');
     cleanupIntervals.forEach((interval) => clearInterval(interval));
     cleanupIntervals.clear();
     await clearAllExpiredFromCache();
     cacheConfig.DEBUG_MEMORY_CACHE && console.log('[Cache] Final cleanup completed');
+=======
+    cacheConfig.DEBUG_MEMORY_CACHE && logger.info('[Cache] Cleaning up and shutting down...');
+    cleanupIntervals.forEach((interval) => clearInterval(interval));
+    cleanupIntervals.clear();
+    await clearAllExpiredFromCache();
+    cacheConfig.DEBUG_MEMORY_CACHE && logger.info('[Cache] Final cleanup completed');
+>>>>>>> upstream/main
   });
 }
 
@@ -238,3 +317,7 @@ const getLogStores = (key) => {
 };
 
 module.exports = getLogStores;
+<<<<<<< HEAD
+=======
+module.exports.auditCache = auditCache;
+>>>>>>> upstream/main

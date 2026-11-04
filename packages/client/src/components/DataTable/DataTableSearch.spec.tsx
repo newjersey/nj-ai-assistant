@@ -131,7 +131,11 @@ describe('DataTableSearch', () => {
        its own and leaves room for the leading search icon. */
     expect(input.className).toContain('bg-transparent');
     expect(input.className).toContain('border-0');
+<<<<<<< HEAD
     expect(input.className).toContain('pl-9');
+=======
+    expect(input.className).toContain('ps-9');
+>>>>>>> upstream/main
   });
 
   it('should have correct id for label association', () => {

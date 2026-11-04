@@ -5,6 +5,10 @@ import type {
   GeneratedReasoningLabel,
   GenerateReasoningLabelPayload,
   ReasoningLabelAttemptEvent,
+<<<<<<< HEAD
+=======
+  ReasoningLabelResetEvent,
+>>>>>>> upstream/main
   ReasoningLabelEvent,
   ReasoningLabelHostDeps,
   ReasoningLabelStatus,
@@ -89,7 +93,14 @@ export interface ReasoningLabelHostScope {
   detach?: () => void;
 }
 
+<<<<<<< HEAD
 type ReasoningLabelDurableEvent = ReasoningLabelAttemptEvent | ReasoningLabelEvent;
+=======
+type ReasoningLabelDurableEvent =
+  | ReasoningLabelAttemptEvent
+  | ReasoningLabelEvent
+  | (ReasoningLabelResetEvent & { reset: true });
+>>>>>>> upstream/main
 
 export interface CreateReasoningLabelHostWiringOptions {
   config: ResolvedReasoningLabelConfig;
@@ -197,6 +208,11 @@ export function createReasoningLabelHostWiring({
     getStepIndex,
     emitAttemptEvent: (event) => emitEvent(ReasoningLabelEvents.ON_REASONING_LABEL_ATTEMPT, event),
     emitLabelEvent: (event) => emitEvent(ReasoningLabelEvents.ON_REASONING_LABEL, event),
+<<<<<<< HEAD
+=======
+    emitResetEvent: (event) =>
+      emitEvent(ReasoningLabelEvents.ON_REASONING_LABEL, { ...event, reset: true }),
+>>>>>>> upstream/main
     trackPendingFill,
     generateLabel,
   });

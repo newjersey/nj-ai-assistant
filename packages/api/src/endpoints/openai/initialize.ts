@@ -12,6 +12,11 @@ import {
   checkUserKeyExpiry,
   getAzureCredentials,
 } from '~/utils';
+<<<<<<< HEAD
+=======
+import { resolveModelTransportTimeouts } from '~/agents/config';
+import { getOpenAIEndpointParameters } from './parameters';
+>>>>>>> upstream/main
 import { resolveEndpointRuntime } from '~/types';
 import { validateEndpointURL } from '~/auth';
 import { getOpenAIConfig } from './config';
@@ -94,7 +99,13 @@ export async function initializeOpenAI(
     reverseProxyUrl: baseURL || undefined,
     baseURLIsUserProvided: userProvidesURL,
     allowedAddresses: appConfig?.endpoints?.allowedAddresses,
+<<<<<<< HEAD
     streaming: true,
+=======
+    transportTimeouts: resolveModelTransportTimeouts(appConfig?.endpoints?.agents),
+    streaming: true,
+    ...getOpenAIEndpointParameters(appConfig, endpoint, modelName),
+>>>>>>> upstream/main
   };
 
   /**
@@ -112,7 +123,10 @@ export async function initializeOpenAI(
   let isServerless = false;
 
   if (isAzureOpenAI && azureConfig && mappedAzureConfig) {
+<<<<<<< HEAD
     const { modelGroupMap, groupMap } = azureConfig;
+=======
+>>>>>>> upstream/main
     const { azureOptions, baseURL: configBaseURL, headers = {}, serverless } = mappedAzureConfig;
     isServerless = serverless === true;
 
@@ -132,12 +146,15 @@ export async function initializeOpenAI(
       clientOptions.headers = mergeHeaders(globalHeaders, clientOptions.headers);
     }
 
+<<<<<<< HEAD
     const groupName = modelGroupMap[modelName || '']?.group;
     if (groupName && groupMap[groupName]) {
       clientOptions.addParams = groupMap[groupName]?.addParams;
       clientOptions.dropParams = groupMap[groupName]?.dropParams;
     }
 
+=======
+>>>>>>> upstream/main
     apiKey = azureOptions.azureOpenAIApiKey;
     clientOptions.azure = !isServerless ? azureOptions : undefined;
 

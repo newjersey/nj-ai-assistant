@@ -11,17 +11,37 @@ import {
 import type { IAgent, IAssistant, AssistantQuery, SystemCapability } from '@librechat/data-schemas';
 import type { Request, Response, NextFunction, RequestHandler } from 'express';
 import type { FilterQuery, ProjectionType, Types } from 'mongoose';
+<<<<<<< HEAD
+=======
+import type { TokenIssuance, TwoFactorAccount, TwoFactorTokenCredential } from '~/auth/twoFactor';
+import {
+  isTokenRetired,
+  isTwoFactorEnrollmentRequired,
+  TOKEN_RETIREMENT_FIELDS,
+} from '~/auth/twoFactor';
+>>>>>>> upstream/main
 
 const MAX_URL_LENGTH = 2048;
 const OBJECT_ID_PATTERN = /^[0-9a-f]{24}$/i;
 const AGENT_AVATAR_PATTERN = /^agent-(.+)-avatar-\d+\.[^/]+$/;
+<<<<<<< HEAD
+=======
+const IMAGE_USER_PROJECTION = `role tenantId idOnTheSource avatar provider twoFactorEnabled ${TOKEN_RETIREMENT_FIELDS}`;
+>>>>>>> upstream/main
 
 type Principal = {
   principalType: PrincipalType;
   principalId?: string | Types.ObjectId;
 };
 
+<<<<<<< HEAD
 type ImageUser = {
+=======
+type ImageUser = Pick<
+  TwoFactorAccount,
+  'provider' | 'twoFactorEnabled' | 'twoFactorEnrolledAt' | 'credentialsChangedAt'
+> & {
+>>>>>>> upstream/main
   role?: string | null;
   tenantId?: string;
   idOnTheSource?: string | null;
@@ -44,6 +64,10 @@ type ImagePath = {
 
 type AssistantImageRecord = Pick<IAssistant, '_id' | 'assistant_id'> & {
   endpoint?: string;
+<<<<<<< HEAD
+=======
+  user?: IAssistant['user'];
+>>>>>>> upstream/main
 };
 
 type ResolvedImageConfig = {
@@ -54,12 +78,21 @@ type ResolvedImageConfig = {
 type CookieAuthResult =
   | { status: 'missing' }
   | { status: 'invalid' }
+<<<<<<< HEAD
   | { status: 'authenticated'; userId: string };
 
 type OpenIdCookieAuthResult =
   | { status: 'invalid' }
   | { status: 'legacy'; userId: string }
   | { status: 'authenticated'; userId: string };
+=======
+  | ({ status: 'authenticated' } & TwoFactorTokenCredential);
+
+type OpenIdCookieAuthResult =
+  | { status: 'invalid' }
+  | ({ status: 'legacy'; userId: string } & TokenIssuance)
+  | ({ status: 'authenticated'; userId: string } & TokenIssuance);
+>>>>>>> upstream/main
 
 export interface ImageAuthorizationDeps {
   parseCookies: (cookieHeader: string) => Record<string, string | undefined>;
@@ -117,18 +150,32 @@ function parseImagePath(originalUrl: string, basePath: string): ImagePath | null
     return null;
   }
 
+<<<<<<< HEAD
   let decodedUrl: string;
   try {
     decodedUrl = decodeURIComponent(originalUrl);
+=======
+  const rawPath = originalUrl.split(/[?#]/, 1)[0];
+  let decodedPath: string;
+  try {
+    decodedPath = decodeURIComponent(rawPath);
+>>>>>>> upstream/main
   } catch {
     return null;
   }
 
+<<<<<<< HEAD
   if (decodedUrl.includes('\0')) {
     return null;
   }
 
   const cleanPath = decodedUrl.split(/[?#]/, 1)[0];
+=======
+  if (decodedPath.includes('\0')) {
+    return null;
+  }
+
+>>>>>>> upstream/main
   let decodedBasePath: string;
   try {
     decodedBasePath = decodeURIComponent(basePath);
@@ -137,9 +184,15 @@ function parseImagePath(originalUrl: string, basePath: string): ImagePath | null
   }
   const imagesPath = `${decodedBasePath}/images`;
   const imagesPrefix = `${imagesPath}/`;
+<<<<<<< HEAD
   const normalizedPath = cleanPath.startsWith(imagesPrefix)
     ? `${imagesPrefix}${cleanPath.slice(imagesPrefix.length).replace(/^\/+/, '')}`
     : cleanPath;
+=======
+  const normalizedPath = decodedPath.startsWith(imagesPrefix)
+    ? `${imagesPrefix}${decodedPath.slice(imagesPrefix.length).replace(/^\/+/, '')}`
+    : decodedPath;
+>>>>>>> upstream/main
   const match = normalizedPath.match(
     new RegExp(`^${escapeRegExp(imagesPath)}/([a-f0-9]{24})/([^/]+)$`, 'i'),
   );
@@ -154,19 +207,33 @@ function parseImagePath(originalUrl: string, basePath: string): ImagePath | null
   return {
     ownerId,
     filename,
+<<<<<<< HEAD
     canonicalPath: `/images/${ownerId}/${filename}`,
+=======
+    canonicalPath: `/images/${ownerId}/${encodeURIComponent(filename)}`,
+>>>>>>> upstream/main
     agentId: filename.match(AGENT_AVATAR_PATTERN)?.[1],
   };
 }
 
+<<<<<<< HEAD
 function getSignedUserId(token: string | undefined): string | null {
+=======
+function getSignedCredential(token: string | undefined): TwoFactorTokenCredential | null {
+>>>>>>> upstream/main
   const secret = process.env.JWT_REFRESH_SECRET;
   if (!token || !secret) {
     return null;
   }
   try {
     const payload = jwt.verify(token, secret) as JwtPayload;
+<<<<<<< HEAD
     return typeof payload.id === 'string' && OBJECT_ID_PATTERN.test(payload.id) ? payload.id : null;
+=======
+    return typeof payload.id === 'string' && OBJECT_ID_PATTERN.test(payload.id)
+      ? { userId: payload.id, issuedAt: payload.iat, issuedAtMs: payload.issuedAtMs }
+      : null;
+>>>>>>> upstream/main
   } catch (error) {
     logger.warn('[imageAuthorization] Invalid signed user token', error);
     return null;
@@ -187,11 +254,29 @@ function getSignedOpenIdUserId(
       return { status: 'invalid' };
     }
     if (typeof payload.refreshTokenHash !== 'string') {
+<<<<<<< HEAD
       return { status: 'legacy', userId: payload.id };
     }
     const refreshTokenHash = createHash('sha256').update(refreshToken).digest('base64url');
     return payload.refreshTokenHash === refreshTokenHash
       ? { status: 'authenticated', userId: payload.id }
+=======
+      return {
+        status: 'legacy',
+        userId: payload.id,
+        issuedAt: payload.iat,
+        issuedAtMs: payload.issuedAtMs,
+      };
+    }
+    const refreshTokenHash = createHash('sha256').update(refreshToken).digest('base64url');
+    return payload.refreshTokenHash === refreshTokenHash
+      ? {
+          status: 'authenticated',
+          userId: payload.id,
+          issuedAt: payload.iat,
+          issuedAtMs: payload.issuedAtMs,
+        }
+>>>>>>> upstream/main
       : { status: 'invalid' };
   } catch (error) {
     logger.warn('[imageAuthorization] Invalid signed OpenID user token', error);
@@ -199,8 +284,24 @@ function getSignedOpenIdUserId(
   }
 }
 
+<<<<<<< HEAD
 function getStoredPathCandidates(canonicalPath: string): string[] {
   return [canonicalPath, `${canonicalPath}?manual=false`, `${canonicalPath}?manual=true`];
+=======
+function getStoredPathCandidates(imagePath: ImagePath): string[] {
+  const { canonicalPath, ownerId, filename } = imagePath;
+  const candidates = [
+    canonicalPath,
+    `${canonicalPath}?manual=false`,
+    `${canonicalPath}?manual=true`,
+  ];
+  const storedPath = `/images/${ownerId}/${filename}`;
+  // Legacy raw filenames are aliases only when URL parsing cannot change their identity.
+  if (storedPath !== canonicalPath && !/[?#%]/.test(filename)) {
+    candidates.push(storedPath, `${storedPath}?manual=false`, `${storedPath}?manual=true`);
+  }
+  return candidates;
+>>>>>>> upstream/main
 }
 
 async function authenticateRequest(
@@ -231,7 +332,11 @@ async function authenticateRequest(
     }
     if (openIdAuth.status === 'legacy') {
       return refreshToken === req.session?.openidTokens?.refreshToken
+<<<<<<< HEAD
         ? { status: 'authenticated', userId: openIdAuth.userId }
+=======
+        ? { ...openIdAuth, status: 'authenticated' }
+>>>>>>> upstream/main
         : { status: 'invalid' };
     }
     const session = await runAsSystem(() =>
@@ -240,12 +345,23 @@ async function authenticateRequest(
     return session ? openIdAuth : { status: 'invalid' };
   }
 
+<<<<<<< HEAD
   const userId = getSignedUserId(refreshToken);
   if (!userId) {
     return { status: 'invalid' };
   }
   const session = await runAsSystem(() => deps.findSession({ userId, refreshToken }));
   return session ? { status: 'authenticated', userId } : { status: 'invalid' };
+=======
+  const credential = getSignedCredential(refreshToken);
+  if (!credential) {
+    return { status: 'invalid' };
+  }
+  const session = await runAsSystem(() =>
+    deps.findSession({ userId: credential.userId, refreshToken }),
+  );
+  return session ? { status: 'authenticated', ...credential } : { status: 'invalid' };
+>>>>>>> upstream/main
 }
 
 function isSharedAssistant(assistant: AssistantImageRecord, configs: AssistantConfig[]): boolean {
@@ -285,13 +401,21 @@ async function loadPrincipals(
 async function canViewAgentAvatar(
   imagePath: ImagePath,
   viewerId: string | undefined,
+<<<<<<< HEAD
+=======
+  viewer: ImageUser | null,
+>>>>>>> upstream/main
   owner: ImageUser,
   deps: ImageAuthorizationDeps,
 ): Promise<boolean> {
   const agent = await deps.getAgent(
     {
       id: imagePath.agentId,
+<<<<<<< HEAD
       'avatar.filepath': { $in: getStoredPathCandidates(imagePath.canonicalPath) },
+=======
+      'avatar.filepath': { $in: getStoredPathCandidates(imagePath) },
+>>>>>>> upstream/main
     },
     { _id: 1 },
   );
@@ -304,7 +428,10 @@ async function canViewAgentAvatar(
     return deps.hasPermission(publicPrincipal, ResourceType.AGENT, agent._id, PermissionBits.VIEW);
   }
 
+<<<<<<< HEAD
   const viewer = await runAsSystem(() => deps.getUserById(viewerId, 'role tenantId idOnTheSource'));
+=======
+>>>>>>> upstream/main
   if (!viewer || viewer.tenantId !== owner.tenantId) {
     return deps.hasPermission(publicPrincipal, ResourceType.AGENT, agent._id, PermissionBits.VIEW);
   }
@@ -329,13 +456,22 @@ async function canViewAgentAvatar(
 async function canViewAssistantAvatar(
   imagePath: ImagePath,
   viewerId: string | undefined,
+<<<<<<< HEAD
+=======
+  viewer: ImageUser | null,
+>>>>>>> upstream/main
   owner: ImageUser,
   configs: AssistantConfig[],
   deps: ImageAuthorizationDeps,
 ): Promise<boolean> {
   const assistant = await deps.getAssistant(
+<<<<<<< HEAD
     { avatarFilepath: getStoredPathCandidates(imagePath.canonicalPath) },
     { _id: 1, assistant_id: 1, endpoint: 1 },
+=======
+    { avatarFilepath: getStoredPathCandidates(imagePath) },
+    { _id: 1, assistant_id: 1, endpoint: 1, user: 1 },
+>>>>>>> upstream/main
   );
   if (!assistant) {
     return false;
@@ -344,11 +480,18 @@ async function canViewAssistantAvatar(
     return false;
   }
 
+<<<<<<< HEAD
   const viewer = await runAsSystem(() => deps.getUserById(viewerId, 'role tenantId idOnTheSource'));
   if (!viewer || viewer.tenantId !== owner.tenantId) {
     return false;
   }
   if (isSharedAssistant(assistant, configs)) {
+=======
+  if (!viewer || viewer.tenantId !== owner.tenantId) {
+    return false;
+  }
+  if (assistant.user?.toString() === viewerId || isSharedAssistant(assistant, configs)) {
+>>>>>>> upstream/main
     return true;
   }
   const principals = await loadPrincipals(viewerId, viewer, deps);
@@ -401,6 +544,7 @@ function isStoredUserAvatar(
   return storedAvatar?.canonicalPath === imagePath.canonicalPath;
 }
 
+<<<<<<< HEAD
 async function canViewUserAvatar(
   viewerId: string | undefined,
   owner: ImageUser,
@@ -413,6 +557,8 @@ async function canViewUserAvatar(
   return viewer != null && viewer.tenantId === owner.tenantId;
 }
 
+=======
+>>>>>>> upstream/main
 function denyRequest(res: Response, auth: CookieAuthResult): void {
   if (auth.status === 'missing') {
     res.status(401).send('Unauthorized');
@@ -447,7 +593,11 @@ export function createImageAuthorizationMiddleware(
       }
 
       const owner = await runAsSystem(() =>
+<<<<<<< HEAD
         deps.getUserById(imagePath.ownerId, 'role tenantId idOnTheSource avatar'),
+=======
+        deps.getUserById(imagePath.ownerId, IMAGE_USER_PROJECTION),
+>>>>>>> upstream/main
       );
       if (!owner) {
         if (options.secureImageLinks === false) {
@@ -474,8 +624,27 @@ export function createImageAuthorizationMiddleware(
         return;
       }
 
+<<<<<<< HEAD
       res.locals.privateImageCache = true;
       const auth = await authPromise;
+=======
+      // Static serving must receive the same single-decoded pathname that was authorized.
+      req.url = imagePath.canonicalPath.slice('/images'.length);
+      res.locals.privateImageCache = true;
+      let auth = await authPromise;
+      let viewer: ImageUser | null = null;
+      if (auth.status === 'authenticated') {
+        const { userId } = auth;
+        viewer =
+          userId === imagePath.ownerId
+            ? owner
+            : await runAsSystem(() => deps.getUserById(userId, IMAGE_USER_PROJECTION));
+        if (!viewer || isTokenRetired(auth, viewer) || isTwoFactorEnrollmentRequired(viewer)) {
+          auth = { status: 'invalid' };
+          viewer = null;
+        }
+      }
+>>>>>>> upstream/main
       const viewerId = auth.status === 'authenticated' ? auth.userId : undefined;
       if (viewerId === imagePath.ownerId) {
         next();
@@ -484,15 +653,26 @@ export function createImageAuthorizationMiddleware(
 
       const authorizeSpecialAvatar = async (): Promise<boolean> => {
         if (imagePath.agentId) {
+<<<<<<< HEAD
           return canViewAgentAvatar(imagePath, viewerId, owner, deps);
         }
         if (isStoredUserAvatar(imagePath, owner, deps)) {
           return canViewUserAvatar(viewerId, owner, deps);
+=======
+          return canViewAgentAvatar(imagePath, viewerId, viewer, owner, deps);
+        }
+        if (isStoredUserAvatar(imagePath, owner, deps)) {
+          return viewer != null && viewer.tenantId === owner.tenantId;
+>>>>>>> upstream/main
         }
         if (imageConfig.assistantEndpoints.length > 0) {
           const canViewAssistant = await canViewAssistantAvatar(
             imagePath,
             viewerId,
+<<<<<<< HEAD
+=======
+            viewer,
+>>>>>>> upstream/main
             owner,
             imageConfig.assistantEndpoints,
             deps,

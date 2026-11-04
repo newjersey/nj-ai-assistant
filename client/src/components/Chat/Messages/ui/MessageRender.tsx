@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo, memo } from 'react';
 import { useRecoilValue } from 'recoil';
+<<<<<<< HEAD
 import type { TMessage } from 'librechat-data-provider';
 import type { TMessageProps, TMessageIcon, TMessageChatContext } from '~/common';
 import {
@@ -21,6 +22,36 @@ import MessageIcon from '~/components/Chat/Messages/MessageIcon';
 import Wakeup from '~/components/Chat/Messages/Content/Wakeup';
 import SubRow from '~/components/Chat/Messages/SubRow';
 import { MessageContext } from '~/Providers';
+=======
+import { parseWakeupMessage } from '@librechat/chat';
+import {
+  revealOnRowHoverClasses,
+  messageFooterClasses,
+  Elapsed,
+  shouldShowElapsed,
+  getHeaderHoverLabel,
+  SiblingSwitch,
+  SubRow,
+  MessageRow,
+} from '@librechat/chat/components';
+import type { TMessage } from 'librechat-data-provider';
+import type { TMessageProps, TMessageIcon, TMessageChatContext } from '~/common';
+import {
+  cn,
+  isSameTailRelation,
+  getMessageAriaLabel,
+  areMessageFieldsEqual,
+  getHeaderPrefixForScreenReader,
+} from '~/utils';
+import MessageContent from '~/components/Chat/Messages/Content/MessageContent';
+import { useLocalize, useMessageActions, useContentMetadata } from '~/hooks';
+import { PrivateText } from '~/components/Chat/Messages/PrivateText';
+import HoverButtons from '~/components/Chat/Messages/HoverButtons';
+import MessageIcon from '~/components/Chat/Messages/MessageIcon';
+import Wakeup from '~/components/Chat/Messages/Content/Wakeup';
+import { MessageContext } from '~/Providers';
+import WakeupRow from './WakeupRow';
+>>>>>>> upstream/main
 import store from '~/store';
 
 type MessageRenderProps = {
@@ -33,6 +64,12 @@ type MessageRenderProps = {
   isSubmitting?: boolean;
   /** Stable context object from wrapper — avoids ChatContext subscription inside memo */
   chatContext: TMessageChatContext;
+<<<<<<< HEAD
+=======
+  /** The thread's tail; the comparator re-renders only when this row's relation to it changes */
+  latestMessageId?: string;
+  latestMessageDepth?: number;
+>>>>>>> upstream/main
 } & Pick<
   TMessageProps,
   'currentEditId' | 'setCurrentEditId' | 'siblingIdx' | 'setSiblingIdx' | 'siblingCount'
@@ -66,7 +103,11 @@ function areMessageRenderPropsEqual(prev: MessageRenderProps, next: MessageRende
     return false;
   }
 
+<<<<<<< HEAD
   return areMessageFieldsEqual(prev.message, next.message);
+=======
+  return areMessageFieldsEqual(prev.message, next.message) && isSameTailRelation(prev, next);
+>>>>>>> upstream/main
 }
 
 const MessageRender = memo(function MessageRender({
@@ -78,6 +119,11 @@ const MessageRender = memo(function MessageRender({
   setCurrentEditId,
   isSubmitting = false,
   chatContext,
+<<<<<<< HEAD
+=======
+  latestMessageId,
+  latestMessageDepth,
+>>>>>>> upstream/main
 }: MessageRenderProps) {
   const localize = useLocalize();
   const {
@@ -91,11 +137,17 @@ const MessageRender = memo(function MessageRender({
     messageLabel,
     handleFeedback,
     handleContinue,
+<<<<<<< HEAD
     latestMessageId,
     copyToClipboard,
     getCanCopy,
     regenerateMessage,
     latestMessageDepth,
+=======
+    copyToClipboard,
+    getCanCopy,
+    regenerateMessage,
+>>>>>>> upstream/main
     hasConfiguredSender,
   } = useMessageActions({
     message: msg,
@@ -106,6 +158,10 @@ const MessageRender = memo(function MessageRender({
   const maximizeChatSpace = useRecoilValue(store.maximizeChatSpace);
 
   const handleRegenerateMessage = useCallback(() => regenerateMessage(), [regenerateMessage]);
+<<<<<<< HEAD
+=======
+  const getLatestMessageId = useCallback(() => chatContext.latestMessageId, [chatContext]);
+>>>>>>> upstream/main
   const hasNoChildren = !(msg?.children?.length ?? 0);
   const isLast = useMemo(
     () => hasNoChildren && (msg?.depth === latestMessageDepth || msg?.depth === -1),
@@ -133,10 +189,14 @@ const MessageRender = memo(function MessageRender({
   );
 
   const { hasParallelContent } = useContentMetadata(msg);
+<<<<<<< HEAD
   const wakeupDisplay = useMemo(
     () => (msg?.isCreatedByUser === true ? parseWakeupText(msg.text) : null),
     [msg?.isCreatedByUser, msg?.text],
   );
+=======
+  const wakeupDisplay = useMemo(() => parseWakeupMessage(msg), [msg]);
+>>>>>>> upstream/main
   const messageId = msg?.messageId ?? '';
   const messageContextValue = useMemo(
     () => ({
@@ -153,8 +213,23 @@ const MessageRender = memo(function MessageRender({
     return null;
   }
 
+<<<<<<< HEAD
   return (
     <MessageRow
+=======
+  const showOwnerText = !edit && msg.isCreatedByUser && Boolean(msg.privacyRevision);
+  const subagentWakeup =
+    !edit && wakeupDisplay?.kind === 'subagent' ? wakeupDisplay.tasks[0] : undefined;
+  const Row = subagentWakeup == null ? MessageRow : WakeupRow;
+  const isUserSide =
+    msg.isCreatedByUser === true && (edit || wakeupDisplay == null || subagentWakeup != null);
+
+  return (
+    <Row
+      task={subagentWakeup}
+      conversationId={msg.conversationId ?? conversation?.conversationId ?? ''}
+      message={wakeupDisplay != null ? undefined : msg}
+>>>>>>> upstream/main
       id={msg.messageId}
       icon={<MessageIcon iconData={iconData} assistant={assistant} agent={agent} />}
       label={messageLabel ?? ''}
@@ -172,9 +247,19 @@ const MessageRender = memo(function MessageRender({
       hasParallelContent={hasParallelContent}
       fullWidth={maximizeChatSpace}
       isEditing={edit}
+<<<<<<< HEAD
       plain={wakeupDisplay != null && !edit}
       footer={
         <SubRow classes={cn(messageFooterClasses, msg.isCreatedByUser && 'justify-end')}>
+=======
+      systemLabel={
+        wakeupDisplay != null && subagentWakeup == null && !edit
+          ? localize('com_ui_system_event')
+          : undefined
+      }
+      footer={
+        <SubRow classes={cn(messageFooterClasses, isUserSide && 'justify-end')}>
+>>>>>>> upstream/main
           {/* The reading holds the column start: it takes over the slot the streaming
               dot vacates, so the retry navigation beside it — whose width the footer
               reserves whether or not hover has revealed it — must never push the
@@ -197,7 +282,11 @@ const MessageRender = memo(function MessageRender({
             siblingCount={siblingCount}
             setSiblingIdx={setSiblingIdx}
             className={cn(
+<<<<<<< HEAD
               msg.isCreatedByUser === true && 'order-last',
+=======
+              isUserSide && 'order-last',
+>>>>>>> upstream/main
               isSubmitting && isLatestMessage && revealOnRowHoverClasses,
             )}
           />
@@ -206,13 +295,20 @@ const MessageRender = memo(function MessageRender({
             isEditing={edit}
             message={msg}
             enterEdit={enterEdit}
+<<<<<<< HEAD
             isSubmitting={chatContext.isSubmitting}
+=======
+>>>>>>> upstream/main
             conversation={conversation ?? null}
             regenerate={handleRegenerateMessage}
             copyToClipboard={copyToClipboard}
             getCanCopy={getCanCopy}
             handleContinue={handleContinue}
             latestMessageId={latestMessageId}
+<<<<<<< HEAD
+=======
+            getLatestMessageId={getLatestMessageId}
+>>>>>>> upstream/main
             handleFeedback={handleFeedback}
             isLast={isLast}
           />
@@ -220,6 +316,7 @@ const MessageRender = memo(function MessageRender({
       }
     >
       <MessageContext.Provider value={messageContextValue}>
+<<<<<<< HEAD
         {wakeupDisplay != null && !edit ? (
           <Wakeup display={wakeupDisplay} conversationId={conversation?.conversationId} />
         ) : (
@@ -240,6 +337,30 @@ const MessageRender = memo(function MessageRender({
         )}
       </MessageContext.Provider>
     </MessageRow>
+=======
+        {showOwnerText && <PrivateText message={msg} />}
+        {!showOwnerText &&
+          (wakeupDisplay != null && !edit ? (
+            <Wakeup display={wakeupDisplay} conversationId={conversation?.conversationId} />
+          ) : (
+            <MessageContent
+              ask={ask}
+              edit={edit}
+              isLast={isLast}
+              text={msg.text || ''}
+              message={msg}
+              enterEdit={enterEdit}
+              error={!!(msg.error ?? false)}
+              isSubmitting={isSubmitting}
+              unfinished={msg.unfinished ?? false}
+              isCreatedByUser={msg.isCreatedByUser ?? true}
+              siblingIdx={siblingIdx ?? 0}
+              setSiblingIdx={setSiblingIdx ?? (() => ({}))}
+            />
+          ))}
+      </MessageContext.Provider>
+    </Row>
+>>>>>>> upstream/main
   );
 }, areMessageRenderPropsEqual);
 MessageRender.displayName = 'MessageRender';

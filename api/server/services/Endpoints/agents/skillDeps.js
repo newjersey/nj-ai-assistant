@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 const crypto = require('crypto');
+=======
+>>>>>>> upstream/main
 const { getStrategyFunctions } = require('~/server/services/Files/strategies');
 const { batchUploadCodeEnvFiles } = require('~/server/services/Files/Code/crud');
 const {
@@ -17,17 +20,29 @@ const {
 const {
   checkAccess,
   isMemoryEnabled,
+<<<<<<< HEAD
   getStorageMetadata,
+=======
+>>>>>>> upstream/main
   resolveRequestTenantId,
   enrichWithSkillConfigurable,
   mergeDeploymentSkillIds,
   createDeploymentSkillMethods,
+<<<<<<< HEAD
+=======
+  createSkillFileSaver,
+  createSkillManagementFileSaver,
+  createSkillStorageResolver,
+>>>>>>> upstream/main
   isDeploymentSkillFileSource,
   getDeploymentSkillDownloadStream,
 } = require('@librechat/api');
 const {
   Permissions,
+<<<<<<< HEAD
   FileContext,
+=======
+>>>>>>> upstream/main
   ResourceType,
   PermissionBits,
   AccessRoleIds,
@@ -39,6 +54,10 @@ const {
 const { checkPermission, grantPermission } = require('~/server/services/PermissionService');
 const { getFileStrategy } = require('~/server/utils/getFileStrategy');
 const db = require('~/models');
+<<<<<<< HEAD
+=======
+const { deleteSkillForLegacy } = require('~/server/services/Skills/deletion');
+>>>>>>> upstream/main
 
 const deploymentSkillMethods = createDeploymentSkillMethods({
   getSkillById: db.getSkillById,
@@ -68,6 +87,7 @@ function getSkillStrategyFunctions(source) {
   return getStrategyFunctions(source);
 }
 
+<<<<<<< HEAD
 function resolveSkillStorage(req, { isImage = false } = {}) {
   const source = getFileStrategy(req.config, { context: FileContext.skill_file, isImage });
   const strategy = getStrategyFunctions(source);
@@ -142,6 +162,27 @@ async function saveSkillFileContent({ req, skillId, relativePath, content, mimeT
   }
 
   return { bytes: result.bytes, relativePath: result.relativePath };
+=======
+const resolveSkillStorageForConfig = createSkillStorageResolver({
+  getFileStrategy,
+  getStrategyFunctions,
+});
+const resolveSkillStorage = (req, options) => resolveSkillStorageForConfig(req.config, options);
+
+const skillFileSaveDeps = {
+  getSkillFileByPath: db.getSkillFileByPath,
+  upsertSkillFile: db.upsertSkillFile,
+  resolveStorage: resolveSkillStorage,
+  getStrategyFunctions,
+  reserveSkillUploadIntent: db.reserveSkillUploadIntent,
+  transitionSkillUploadIntent: db.transitionSkillUploadIntent,
+};
+const saveSkillFileContent = createSkillFileSaver(skillFileSaveDeps);
+const saveSkillManagementFileContent = createSkillManagementFileSaver(skillFileSaveDeps);
+
+function getSkillManagementFileSaver() {
+  return saveSkillManagementFileContent;
+>>>>>>> upstream/main
 }
 
 function canCreateSkill({ req }) {
@@ -382,7 +423,11 @@ const skillToolDeps = {
   getAuthorSkillByName,
   createSkill: db.createSkill,
   updateSkill: db.updateSkill,
+<<<<<<< HEAD
   deleteSkill: db.deleteSkill,
+=======
+  deleteSkill: deleteSkillForLegacy,
+>>>>>>> upstream/main
   canCreateSkill,
   canEditSkill,
   grantSkillOwner,
@@ -425,6 +470,7 @@ function getSkillToolDeps() {
 
 module.exports = {
   getSkillToolDeps,
+<<<<<<< HEAD
   canAuthorSkillFiles,
   isAgentSkillAuthoringEnabledForRun,
   getSkillDbMethods,
@@ -432,6 +478,13 @@ module.exports = {
   getSkillStrategyFunctions,
   enrichWithSkillConfigurable,
   buildSkillPrimedIdsByName,
+=======
+  getSkillManagementFileSaver,
+  canAuthorSkillFiles,
+  getSkillDbMethods,
+  withDeploymentSkillIds,
+  getSkillStrategyFunctions,
+>>>>>>> upstream/main
   buildAgentToolContext,
   resolveMemoryAvailability,
   enrichLoadedToolsWithAgentContext,

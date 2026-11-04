@@ -15,9 +15,13 @@ describe('MinimalIcon', () => {
   it('resolves a custom endpoint by name', () => {
     render(<MinimalIcon endpoint="Ollama" isCreatedByUser={false} />);
 
+<<<<<<< HEAD
     const src = screen.getByRole('img', { name: 'Ollama', hidden: true }).getAttribute('src');
     expect(src).toBeTruthy();
     expect(src).not.toBe('');
+=======
+    expect(screen.getByRole('img', { name: 'Ollama', hidden: true })).toBeInTheDocument();
+>>>>>>> upstream/main
   });
 
   it('keeps the agent art out of the provider registry', () => {

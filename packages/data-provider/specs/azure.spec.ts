@@ -1,5 +1,9 @@
 import type { TAzureGroups } from '../src/config';
+<<<<<<< HEAD
 import { validateAzureGroups, mapModelToAzureConfig, mapGroupToAzureConfig } from '../src/azure';
+=======
+import { validateAzureGroups, mapModelToAzureConfig } from '../src/azure';
+>>>>>>> upstream/main
 
 describe('validateAzureGroups', () => {
   it('should validate a correct configuration', () => {
@@ -788,6 +792,7 @@ describe('validateAzureGroups with modelGroupMap and groupMap', () => {
     });
   });
 });
+<<<<<<< HEAD
 
 describe('mapGroupToAzureConfig', () => {
   // Test setup for a basic config with 2 groups
@@ -842,3 +847,5 @@ describe('mapGroupToAzureConfig', () => {
     }).toThrow(`Group named "${groupName}" not found in configuration.`);
   });
 });
+=======
+>>>>>>> upstream/main

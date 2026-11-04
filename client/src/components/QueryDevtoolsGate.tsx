@@ -1,4 +1,9 @@
+<<<<<<< HEAD
 import { lazy, Suspense } from 'react';
+=======
+import { Suspense } from 'react';
+import { importWithRecovery, lazyWithRecovery } from '~/lib/assets/lazy';
+>>>>>>> upstream/main
 
 interface QueryDevtoolsConfig {
   enableQueryDevtools?: boolean;
@@ -9,10 +14,17 @@ interface QueryDevtoolsGateProps {
   isDevelopment?: boolean;
 }
 
+<<<<<<< HEAD
 const LazyReactQueryDevtools = lazy(() =>
   import('@tanstack/react-query-devtools/production').then(({ ReactQueryDevtools }) => ({
     default: ReactQueryDevtools,
   })),
+=======
+const LazyReactQueryDevtools = lazyWithRecovery(() =>
+  importWithRecovery(() => import('@tanstack/react-query-devtools/production')).then(
+    ({ ReactQueryDevtools }) => ({ default: ReactQueryDevtools }),
+  ),
+>>>>>>> upstream/main
 );
 
 export const shouldEnableQueryDevtools = ({

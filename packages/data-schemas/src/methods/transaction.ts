@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { getRefillEligibilityDate } from 'librechat-data-provider';
+=======
+import { isBalanceRefillDue } from 'librechat-data-provider';
+>>>>>>> upstream/main
 import type { AnyBulkWriteOperation, FilterQuery, Model, Types } from 'mongoose';
 import type {
   BalanceReservationRequest,
@@ -29,7 +33,11 @@ type MultiplierParams = {
 };
 
 type CacheMultiplierParams = {
+<<<<<<< HEAD
   cacheType?: 'write' | 'read';
+=======
+  cacheType?: 'write' | 'read' | 'write1h';
+>>>>>>> upstream/main
   model?: string;
   endpointTokenConfig?: Record<string, Record<string, number>>;
   inputTokenCount?: number;
@@ -49,6 +57,11 @@ interface InternalTxDoc {
   rateDetail?: Record<string, number>;
   inputTokens?: number;
   writeTokens?: number;
+<<<<<<< HEAD
+=======
+  /** Subset of `writeTokens` written to the 1-hour cache */
+  write1hTokens?: number;
+>>>>>>> upstream/main
   readTokens?: number;
 }
 
@@ -65,6 +78,11 @@ export interface TxData {
   inputTokenCount?: number;
   inputTokens?: number;
   writeTokens?: number;
+<<<<<<< HEAD
+=======
+  /** Subset of `writeTokens` written to the 1-hour cache */
+  write1hTokens?: number;
+>>>>>>> upstream/main
   readTokens?: number;
   balance?: { enabled?: boolean };
   transactions?: { enabled?: boolean };
@@ -99,7 +117,11 @@ export function createTransactionMethods(
   bulkInsertTransactions: (docs: TransactionData[]) => Promise<void>;
   findBalanceByUser: (
     user: string,
+<<<<<<< HEAD
     options?: { includeReservedCredits?: boolean },
+=======
+    options?: { includeReservedCredits?: boolean; applyReset?: boolean },
+>>>>>>> upstream/main
   ) => Promise<IBalance | null>;
   upsertBalanceFields: (
     user: string,
@@ -169,10 +191,28 @@ export function createTransactionMethods(
           inputTokenCount,
         }) ?? inputMultiplier;
 
+<<<<<<< HEAD
+=======
+      const inputAbs = Math.abs(txn.inputTokens ?? 0);
+      const writeAbs = Math.abs(txn.writeTokens ?? 0);
+      const write1hAbs = Math.min(Math.abs(txn.write1hTokens ?? 0), writeAbs);
+      const readAbs = Math.abs(txn.readTokens ?? 0);
+      const write1hMultiplier =
+        write1hAbs > 0
+          ? (txMethods.getCacheMultiplier({
+              cacheType: 'write1h',
+              model,
+              endpointTokenConfig: etConfig,
+              inputTokenCount,
+            }) ?? writeMultiplier)
+          : writeMultiplier;
+
+>>>>>>> upstream/main
       txn.rateDetail = {
         input: inputMultiplier,
         write: writeMultiplier,
         read: readMultiplier,
+<<<<<<< HEAD
       };
 
       const totalPromptTokens =
@@ -194,6 +234,26 @@ export function createTransactionMethods(
         Math.abs(txn.inputTokens ?? 0) * inputMultiplier +
         Math.abs(txn.writeTokens ?? 0) * writeMultiplier +
         Math.abs(txn.readTokens ?? 0) * readMultiplier
+=======
+        ...(write1hAbs > 0 && { write1h: write1hMultiplier }),
+      };
+
+      const totalPromptTokens = inputAbs + writeAbs + readAbs;
+      const promptValue =
+        inputAbs * Math.abs(inputMultiplier) +
+        (writeAbs - write1hAbs) * Math.abs(writeMultiplier) +
+        write1hAbs * Math.abs(write1hMultiplier) +
+        readAbs * Math.abs(readMultiplier);
+
+      txn.rate =
+        totalPromptTokens > 0 ? promptValue / totalPromptTokens : Math.abs(inputMultiplier);
+
+      txn.tokenValue = -(
+        inputAbs * inputMultiplier +
+        (writeAbs - write1hAbs) * writeMultiplier +
+        write1hAbs * write1hMultiplier +
+        readAbs * readMultiplier
+>>>>>>> upstream/main
       );
 
       txn.rawAmount = -totalPromptTokens;
@@ -292,6 +352,7 @@ export function createTransactionMethods(
     );
   }
 
+<<<<<<< HEAD
   function isAutoRefillDue(record: IBalance, now: Date): boolean {
     if (!record.autoRefillEnabled || !(record.refillAmount > 0)) {
       return false;
@@ -310,6 +371,8 @@ export function createTransactionMethods(
     );
   }
 
+=======
+>>>>>>> upstream/main
   function isDuplicateKeyError(error: unknown): boolean {
     return error instanceof Error && 'code' in error && (error as { code: number }).code === 11000;
   }
@@ -322,7 +385,11 @@ export function createTransactionMethods(
   async function settleAutoRefill(
     balanceId: unknown,
     user: Types.ObjectId,
+<<<<<<< HEAD
     { transactionId, rawAmount }: IBalancePendingRefill,
+=======
+    { transactionId, rawAmount, context }: IBalancePendingRefill,
+>>>>>>> upstream/main
   ): Promise<boolean> {
     try {
       const Transaction = mongoose.models.Transaction;
@@ -330,7 +397,11 @@ export function createTransactionMethods(
         _id: transactionId,
         user,
         tokenType: 'credits',
+<<<<<<< HEAD
         context: 'autoRefill',
+=======
+        context: context ?? 'autoRefill',
+>>>>>>> upstream/main
         rawAmount,
       });
       calculateTokenValue(transaction);
@@ -361,9 +432,20 @@ export function createTransactionMethods(
    */
   async function applyAutoRefill(record: IBalance, now: Date): Promise<boolean> {
     const Balance = mongoose.models.Balance as Model<IBalance>;
+<<<<<<< HEAD
     const pendingRefill: IBalancePendingRefill = {
       transactionId: new mongoose.Types.ObjectId(),
       rawAmount: record.refillAmount,
+=======
+    const reset = record.refillMode === 'reset';
+    const credits = reset
+      ? record.refillAmount
+      : Math.max(0, (record.tokenCredits ?? 0) + record.refillAmount);
+    const pendingRefill: IBalancePendingRefill = {
+      transactionId: new mongoose.Types.ObjectId(),
+      rawAmount: reset ? credits - (record.tokenCredits ?? 0) : record.refillAmount,
+      ...(reset ? { context: 'balanceReset' as const } : {}),
+>>>>>>> upstream/main
     };
     const result = await Balance.updateOne(
       {
@@ -374,12 +456,20 @@ export function createTransactionMethods(
         pendingRefill: null,
         autoRefillEnabled: record.autoRefillEnabled,
         refillAmount: record.refillAmount,
+<<<<<<< HEAD
+=======
+        refillMode: record.refillMode ?? null,
+>>>>>>> upstream/main
         refillIntervalValue: record.refillIntervalValue ?? null,
         refillIntervalUnit: record.refillIntervalUnit ?? null,
       },
       {
         $set: {
+<<<<<<< HEAD
           tokenCredits: Math.max(0, (record.tokenCredits ?? 0) + record.refillAmount),
+=======
+          tokenCredits: credits,
+>>>>>>> upstream/main
           lastRefill: now,
           pendingRefill,
         },
@@ -471,7 +561,13 @@ export function createTransactionMethods(
    * the value read and `reservedCredits` still leaves room for the amount, so concurrent
    * admissions of a funded balance all commit, and an admission that lost the credits re-reads.
    * A due auto-refill is applied first by its own fenced write, at most once per admission, so a
+<<<<<<< HEAD
    * refill interval that is due again the instant it is applied still refills once. Returns null
+=======
+   * refill interval that is due again the instant it is applied still refills once. Reset mode
+   * replaces the allowance whenever due, even before exhaustion, while retaining reservations.
+   * Returns null
+>>>>>>> upstream/main
    * when the user has no balance record and no `initialBalance` was given.
    */
   async function reserveBalance({
@@ -480,6 +576,10 @@ export function createTransactionMethods(
     amount,
     expiresAt,
     initialBalance,
+<<<<<<< HEAD
+=======
+    refillPolicy,
+>>>>>>> upstream/main
   }: BalanceReservationRequest): Promise<BalanceReservationResult | null> {
     const Balance = mongoose.models.Balance as Model<IBalance>;
     let delay = 10;
@@ -498,6 +598,22 @@ export function createTransactionMethods(
         continue;
       }
 
+<<<<<<< HEAD
+=======
+      if (
+        refillPolicy != null &&
+        (record.autoRefillEnabled !== refillPolicy.autoRefillEnabled ||
+          (refillPolicy.autoRefillEnabled === true &&
+            ((record.refillMode ?? 'add') !== (refillPolicy.refillMode ?? 'add') ||
+              record.refillAmount !== refillPolicy.refillAmount ||
+              record.refillIntervalValue !== refillPolicy.refillIntervalValue ||
+              record.refillIntervalUnit !== refillPolicy.refillIntervalUnit)))
+      ) {
+        await upsertBalanceRecord(user, refillPolicy);
+        continue;
+      }
+
+>>>>>>> upstream/main
       const now = new Date();
       const refillSettled =
         record.pendingRefill == null ||
@@ -513,7 +629,16 @@ export function createTransactionMethods(
 
       const credits = record.tokenCredits ?? 0;
       const balance = credits - (record.reservedCredits ?? 0);
+<<<<<<< HEAD
       if (refillSettled && !refilled && balance - amount <= 0 && isAutoRefillDue(record, now)) {
+=======
+      if (
+        refillSettled &&
+        !refilled &&
+        (record.refillMode === 'reset' || balance - amount <= 0) &&
+        isBalanceRefillDue(record, now)
+      ) {
+>>>>>>> upstream/main
         refilled = await applyAutoRefill(record, now);
         continue;
       }
@@ -645,6 +770,10 @@ export function createTransactionMethods(
     const transaction = new Transaction(txData);
     transaction.endpointTokenConfig = txData.endpointTokenConfig;
     transaction.inputTokenCount = txData.inputTokenCount;
+<<<<<<< HEAD
+=======
+    transaction.write1hTokens = txData.write1hTokens;
+>>>>>>> upstream/main
 
     calculateStructuredTokenValue(transaction);
 
@@ -685,6 +814,7 @@ export function createTransactionMethods(
   /**
    * Retrieves a user's balance record. With `includeReservedCredits`, `reservedCredits` is the
    * total of the reservations that have not expired, so a reservation left by a crashed request
+<<<<<<< HEAD
    * stops counting at its expiry even before a reservation write prunes it.
    */
   async function findBalanceByUser(
@@ -702,6 +832,42 @@ export function createTransactionMethods(
     }
     const now = new Date();
     const { reservations, ...balance } = record;
+=======
+   * stops counting at its expiry even before a reservation write prunes it. A due reset is
+   * applied before returning the reading; inactive periods do not accumulate allowances.
+   */
+  async function findBalanceByUser(
+    user: string,
+    options?: { includeReservedCredits?: boolean; applyReset?: boolean },
+  ): Promise<IBalance | null> {
+    const Balance = mongoose.models.Balance as Model<IBalance>;
+    const read = () =>
+      Balance.findOne({ user })
+        .sort(oldestFirst)
+        .select(options?.includeReservedCredits ? '+reservations +pendingRefill' : '+pendingRefill')
+        .lean<IBalance>();
+    let record = await read();
+    if (!record) {
+      return null;
+    }
+    if (
+      options?.applyReset !== false &&
+      record.refillMode === 'reset' &&
+      (record.pendingRefill != null || isBalanceRefillDue(record, new Date()))
+    ) {
+      // Reuse the fenced admission path without holding any credits for a balance read.
+      await reserveBalance({ user, reservationId: '', amount: 0, expiresAt: new Date() });
+      record = await read();
+      if (!record) {
+        return null;
+      }
+    }
+    const now = new Date();
+    const { reservations, reservedCredits: _held, pendingRefill: _pending, ...balance } = record;
+    if (!options?.includeReservedCredits) {
+      return balance as IBalance;
+    }
+>>>>>>> upstream/main
     const reservedCredits = (reservations ?? []).reduce(
       (sum, reservation) => (reservation.expiresAt > now ? sum + reservation.amount : sum),
       0,
@@ -715,7 +881,15 @@ export function createTransactionMethods(
     fields: IBalanceUpdate,
     insertOnly?: IBalanceUpdate,
   ): Promise<IBalance | null> {
+<<<<<<< HEAD
     return upsertBalanceRecord(user, fields, insertOnly);
+=======
+    const record = await upsertBalanceRecord(user, fields, insertOnly);
+    if (record?.refillMode === 'reset' && isBalanceRefillDue(record, new Date())) {
+      return findBalanceByUser(user);
+    }
+    return record;
+>>>>>>> upstream/main
   }
 
   /** Deletes transactions matching a filter. */

@@ -1,9 +1,17 @@
+<<<<<<< HEAD
+=======
+import { StepEvents } from 'librechat-data-provider';
+>>>>>>> upstream/main
 import type { StandardGraph } from '@librechat/agents';
 import type { Agents } from 'librechat-data-provider';
 import type { ServerSentEvent } from '~/types';
 import { InMemoryEventTransport } from '~/stream/implementations/InMemoryEventTransport';
 import { InMemoryJobStore } from '~/stream/implementations/InMemoryJobStore';
 import { GenerationJobManagerClass } from '~/stream/GenerationJobManager';
+<<<<<<< HEAD
+=======
+import { createToolTimingTracker } from '~/agents/toolTiming';
+>>>>>>> upstream/main
 
 jest.spyOn(console, 'log').mockImplementation();
 
@@ -83,6 +91,49 @@ describe('GenerationJobManager resume replay events', () => {
     });
   });
 
+<<<<<<< HEAD
+=======
+  test('replays bounded first-fragment and dispatch evidence without tool arguments', async () => {
+    manager = createInMemoryManager();
+    const streamId = `tool-timing-resume-${Date.now()}`;
+    await manager.createJob(streamId, 'user-1', streamId);
+    const first = {
+      event: StepEvents.ON_TOOL_PREPARATION,
+      data: {
+        id: 'step-1',
+        index: 0,
+        observed_at: 100,
+      },
+    };
+    const named = {
+      event: StepEvents.ON_TOOL_PREPARATION,
+      data: {
+        id: 'step-1',
+        index: 0,
+        toolCallId: 'call-1',
+        observed_at: 200,
+      },
+    };
+    const dispatched = {
+      event: StepEvents.ON_TOOL_CALLS_DISPATCHED,
+      data: {
+        dispatched_at: 500,
+        toolCalls: [{ id: 'call-1', name: 'query', stepId: 'step-1' }],
+      },
+    };
+    for (const event of [first, named, dispatched, named]) await manager.emitChunk(streamId, event);
+    const state = await manager.getResumeState(streamId);
+    expect(state?.replayEvents).toEqual([first, named, dispatched]);
+    expect(JSON.stringify(state?.replayEvents)).not.toContain('args');
+    const rebuilt = createToolTimingTracker(state?.replayEvents ?? []);
+    rebuilt.completed('step-1', 'call-1', 560);
+    expect(rebuilt.take('call-1', 'step-1')).toEqual({
+      toolPreparationDurationMs: 400,
+      toolExecutionDurationMs: 60,
+    });
+  });
+
+>>>>>>> upstream/main
   test('includes OAuth run step and delta replay events in resume state', async () => {
     manager = createInMemoryManager();
     const streamId = `oauth-delta-resume-${Date.now()}`;
@@ -616,3 +667,29 @@ describe('GenerationJobManager resume replay events', () => {
     expect(resumeState?.replayEvents).toEqual(expect.arrayContaining(events));
   });
 });
+<<<<<<< HEAD
+=======
+
+it('projects private completion authority for a freshly reconstructed approval job', async () => {
+  const store = new InMemoryJobStore();
+  const manager = createManagerWithStore(store);
+  const identity = {
+    scheduleId: 'schedule',
+    ownerId: 'owner',
+    tenantId: 'tenant',
+    agentId: 'original-root',
+    invocationMode: 'delegated' as const,
+  };
+  try {
+    const job = await manager.createJob('completion', 'owner', 'completion', {
+      initialMetadata: { scheduleMCPCompletion: identity },
+    });
+    const rebuilt = await manager.getJob('completion');
+    expect(rebuilt?.metadata.scheduleMCPCompletion).toEqual(identity);
+    expect(rebuilt?.metadata.scheduleId).toBeUndefined();
+    expect(rebuilt?.createdAt).toBe(job.createdAt);
+  } finally {
+    await manager.destroy();
+  }
+});
+>>>>>>> upstream/main

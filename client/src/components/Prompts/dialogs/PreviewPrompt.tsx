@@ -5,11 +5,22 @@ import { useLocalize } from '~/hooks';
 
 const PreviewPrompt = ({
   group,
+<<<<<<< HEAD
+=======
+  chatIndex,
+>>>>>>> upstream/main
   open,
   onOpenChange,
   onCloseAutoFocus,
 }: {
   group: TPromptGroup;
+<<<<<<< HEAD
+=======
+  /** The chat composer's index, forwarded to `PromptDetails` so its Use
+   *  button can close a variable dialog opened from this preview on a
+   *  chat change; undefined when this preview has no associated chat. */
+  chatIndex?: number;
+>>>>>>> upstream/main
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onCloseAutoFocus?: () => void;
@@ -22,7 +33,15 @@ const PreviewPrompt = ({
         onCloseAutoFocus={onCloseAutoFocus}
       >
         <OGDialogTitle className="sr-only">{localize('com_ui_preview')}</OGDialogTitle>
+<<<<<<< HEAD
         <PromptDetails group={group} onUsePrompt={() => onOpenChange(false)} />
+=======
+        <PromptDetails
+          group={group}
+          chatIndex={chatIndex}
+          onUsePrompt={() => onOpenChange(false)}
+        />
+>>>>>>> upstream/main
       </OGDialogContent>
     </OGDialog>
   );

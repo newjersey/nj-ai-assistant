@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { createMethods } from '@librechat/data-schemas';
 import { ResourceType, PermissionBits, hasPermissions } from 'librechat-data-provider';
 import type {
@@ -17,12 +18,18 @@ export interface ApiKeyServiceDependencies {
   findUser: (query: { _id: string | Types.ObjectId }) => Promise<IUser | null>;
 }
 
+=======
+import { ResourceType, PermissionBits, hasPermissions } from 'librechat-data-provider';
+import type { Types } from 'mongoose';
+
+>>>>>>> upstream/main
 export interface RemoteAgentAccessResult {
   hasAccess: boolean;
   permissions: number;
   agent: { _id: Types.ObjectId; [key: string]: unknown } | null;
 }
 
+<<<<<<< HEAD
 export class AgentApiKeyService {
   private deps: ApiKeyServiceDependencies;
 
@@ -87,6 +94,8 @@ export function createApiKeyServiceDependencies(
   };
 }
 
+=======
+>>>>>>> upstream/main
 export interface GetRemoteAgentPermissionsDeps {
   getEffectivePermissions: (params: {
     userId: string;

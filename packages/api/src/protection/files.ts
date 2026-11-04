@@ -229,6 +229,7 @@ export function hasActiveFileFieldPolicy(
   return true;
 }
 
+<<<<<<< HEAD
 export function isFileFilterFieldEnabled(
   filters: FiltersConfig | undefined,
   field: FileFilterField,
@@ -237,6 +238,8 @@ export function isFileFilterFieldEnabled(
   return pii != null && (pii.fields == null || pii.fields.includes(field));
 }
 
+=======
+>>>>>>> upstream/main
 export function getBlockedUninspectableFileField(
   filters: FiltersConfig | undefined,
   fields: readonly FileFilterField[],
@@ -260,6 +263,7 @@ function isAgentContextUpload(input: {
   return !isAssistantsEndpoint(input.endpoint) && input.toolResource === EToolResources.context;
 }
 
+<<<<<<< HEAD
 /** Whether a context upload has a downstream STT step that can inspect its transcript. */
 export function canInspectUploadTranscriptAfterProcessing(input: {
   readonly endpoint?: string;
@@ -274,6 +278,8 @@ export function canInspectUploadTranscriptAfterProcessing(input: {
   );
 }
 
+=======
+>>>>>>> upstream/main
 /** Resolves upload-time transcript fail-close after accounting for downstream STT. */
 export function getBlockedUploadTranscriptField(input: {
   readonly filters?: FiltersConfig;

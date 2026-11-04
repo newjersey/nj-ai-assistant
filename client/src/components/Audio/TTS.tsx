@@ -27,6 +27,7 @@ export function BrowserTTS({
 
   const renderIcon = () => {
     if (isLoading === true) {
+<<<<<<< HEAD
       return <Spinner className="icon-md-heavy h-[18px] w-[18px]" />;
     }
 
@@ -35,6 +36,16 @@ export function BrowserTTS({
     }
 
     return <VolumeIcon className="icon-md-heavy h-[18px] w-[18px]" />;
+=======
+      return <Spinner className="icon-md-heavy h-[1.125rem] w-[1.125rem]" />;
+    }
+
+    if (isSpeaking === true) {
+      return <VolumeMuteIcon className="icon-md-heavy h-[1.125rem] w-[1.125rem]" />;
+    }
+
+    return <VolumeIcon className="icon-md-heavy h-[1.125rem] w-[1.125rem]" />;
+>>>>>>> upstream/main
   };
 
   useEffect(() => {
@@ -82,6 +93,7 @@ export function BrowserTTS({
         controls
         preload="none"
         controlsList="nodownload nofullscreen noremoteplayback"
+<<<<<<< HEAD
         style={{
           position: 'absolute',
           overflow: 'hidden',
@@ -89,6 +101,9 @@ export function BrowserTTS({
           height: '0px',
           width: '0px',
         }}
+=======
+        className="hidden"
+>>>>>>> upstream/main
         src={audioRef.current?.src}
         onError={(error) => {
           logger.error('Error fetching audio:', error);
@@ -120,6 +135,7 @@ export function ExternalTTS({
 
   const renderIcon = () => {
     if (isLoading === true) {
+<<<<<<< HEAD
       return <Spinner className="icon-md-heavy h-[18px] w-[18px]" />;
     }
 
@@ -128,6 +144,16 @@ export function ExternalTTS({
     }
 
     return <VolumeIcon className="icon-md-heavy h-[18px] w-[18px]" />;
+=======
+      return <Spinner className="icon-md-heavy h-[1.125rem] w-[1.125rem]" />;
+    }
+
+    if (isSpeaking === true) {
+      return <VolumeMuteIcon className="icon-md-heavy h-[1.125rem] w-[1.125rem]" />;
+    }
+
+    return <VolumeIcon className="icon-md-heavy h-[1.125rem] w-[1.125rem]" />;
+>>>>>>> upstream/main
   };
 
   useEffect(() => {
@@ -180,6 +206,7 @@ export function ExternalTTS({
         controls
         preload="none"
         controlsList="nodownload nofullscreen noremoteplayback"
+<<<<<<< HEAD
         style={{
           position: 'absolute',
           overflow: 'hidden',
@@ -187,6 +214,9 @@ export function ExternalTTS({
           height: '0px',
           width: '0px',
         }}
+=======
+        className="hidden"
+>>>>>>> upstream/main
         src={audioRef.current?.src}
         onError={(error) => {
           logger.error('Error fetching audio:', error);

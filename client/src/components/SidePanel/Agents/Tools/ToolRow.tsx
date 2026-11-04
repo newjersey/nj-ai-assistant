@@ -15,7 +15,10 @@ interface Props {
 }
 
 function getSuffix(item: AgentItem): string | null {
+<<<<<<< HEAD
   if (item.kind === 'mcp' && item.toolCount > 0) return `· ${item.toolCount}`;
+=======
+>>>>>>> upstream/main
   if (item.kind === 'action' && item.endpointCount > 0) return `· ${item.endpointCount}`;
   return null;
 }
@@ -27,7 +30,11 @@ function RowIcon({ item }: { item: AgentItem }) {
   if (iconUrl && !imgError) {
     return (
       <span
+<<<<<<< HEAD
         className="flex size-7 shrink-0 items-center justify-center overflow-hidden rounded-md bg-white"
+=======
+        className="bg-surface-fixed flex size-7 shrink-0 items-center justify-center overflow-hidden rounded-md"
+>>>>>>> upstream/main
         aria-hidden="true"
       >
         <img
@@ -59,24 +66,40 @@ function ToolRowImpl({ item, onInfo, onRemove }: Props) {
   const DetailIcon = configurable ? Settings : Info;
 
   return (
+<<<<<<< HEAD
     <div className="group relative flex w-full items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-surface-secondary">
       <div className="flex min-w-0 flex-1 items-center gap-2.5">
         <RowIcon item={item} />
         <span className="flex min-w-0 items-center gap-1 truncate text-sm text-text-primary">
+=======
+    <div className="group hover:bg-surface-secondary relative flex w-full items-center gap-2 rounded-lg px-2 py-1.5">
+      <div className="flex min-w-0 flex-1 items-center gap-2.5">
+        <RowIcon item={item} />
+        <span className="text-text-primary flex min-w-0 items-center gap-1 truncate text-sm">
+>>>>>>> upstream/main
           <span className="truncate font-medium">{displayName}</span>
           {suffix && <span className="text-text-secondary">{suffix}</span>}
         </span>
       </div>
       {item.status === 'needs_setup' && (
         <span role="status" className="flex shrink-0 items-center">
+<<<<<<< HEAD
           <span className="size-1.5 rounded-full bg-red-500" aria-hidden="true" />
+=======
+          <span className="bg-status-error size-1.5 rounded-full" aria-hidden="true" />
+>>>>>>> upstream/main
           <span className="sr-only">{localize('com_ui_tools_needs_setup')}</span>
         </span>
       )}
       <div
         className={cn(
+<<<<<<< HEAD
           'flex shrink-0 items-center gap-0.5 opacity-0',
           'group-focus-within:opacity-100 group-hover:opacity-100',
+=======
+          'flex shrink-0 items-center gap-0.5',
+          'no-touch:opacity-0 group-focus-within:opacity-100 group-hover:opacity-100',
+>>>>>>> upstream/main
         )}
       >
         <Button
@@ -87,7 +110,11 @@ function ToolRowImpl({ item, onInfo, onRemove }: Props) {
             configurable ? localize('com_ui_tools_configure') : localize('com_ui_tools_info')
           }
           className={cn(
+<<<<<<< HEAD
             'rounded-md text-text-secondary',
+=======
+            'text-text-secondary rounded-md',
+>>>>>>> upstream/main
             'hover:text-text-secondary focus-visible:opacity-100',
           )}
         >
@@ -99,7 +126,11 @@ function ToolRowImpl({ item, onInfo, onRemove }: Props) {
           onClick={() => onRemove(item)}
           aria-label={localize('com_ui_tools_remove')}
           className={cn(
+<<<<<<< HEAD
             'rounded-md text-text-secondary',
+=======
+            'text-text-secondary rounded-md',
+>>>>>>> upstream/main
             'hover:text-text-secondary focus-visible:opacity-100',
           )}
         >

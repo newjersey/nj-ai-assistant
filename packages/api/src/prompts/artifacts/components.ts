@@ -175,6 +175,7 @@ import {
   </AlertDescription>
 </Alert>`,
   },
+<<<<<<< HEAD
   aspectRatio: {
     componentName: 'AspectRatio',
     importDocs: 'import { AspectRatio } from "/components/ui/aspect-ratio"',
@@ -183,6 +184,8 @@ import {
   <Image src="..." alt="Image" className="rounded-md object-cover" />
 </AspectRatio>`,
   },
+=======
+>>>>>>> upstream/main
   badge: {
     componentName: 'Badge',
     importDocs: 'import { Badge } from "/components/ui/badge"',
@@ -355,6 +358,7 @@ import {
     importDocs: 'import { Separator } from "/components/ui/separator"',
     usageDocs: '<Separator />',
   },
+<<<<<<< HEAD
   sheet: {
     componentName: 'Sheet',
     importDocs: `
@@ -379,6 +383,8 @@ import {
   </SheetContent>
 </Sheet>`,
   },
+=======
+>>>>>>> upstream/main
   skeleton: {
     componentName: 'Skeleton',
     importDocs: 'import { Skeleton } from "/components/ui/skeleton"',
@@ -494,6 +500,7 @@ import {
   },
 };
 
+<<<<<<< HEAD
 /** Extra Components continued */
 const moreExtraComponents: Record<string, ShadcnComponent> = {
   calendar: {
@@ -708,4 +715,9 @@ export const components: Record<string, ShadcnComponent> = {
   ...essentialComponents,
   ...extraComponents,
   ...moreExtraComponents,
+=======
+export const components: Record<string, ShadcnComponent> = {
+  ...essentialComponents,
+  ...extraComponents,
+>>>>>>> upstream/main
 };

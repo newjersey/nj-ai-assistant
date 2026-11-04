@@ -17,6 +17,12 @@ import type {
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
 import type { Types } from 'mongoose';
 import type { GitHubSkillSyncRunner } from '~/skills/sync';
+<<<<<<< HEAD
+=======
+import type { ServerRequest } from '~/types/http';
+import type { RecordAuditEntry } from './audit';
+import { createAdminAuditEmitter } from './audit';
+>>>>>>> upstream/main
 
 export type AdminSkillsRequest = Request & {
   user?: {
@@ -61,6 +67,12 @@ export type AdminSkillSyncDeps = {
     provider: SkillSyncProvider,
     credentialKey: string,
   ) => Promise<{ deleted: boolean }>;
+<<<<<<< HEAD
+=======
+  /** Optional audit emission for credential changes; fail-open unless `auditFailClosed`. */
+  recordAuditEntry?: RecordAuditEntry;
+  auditFailClosed?: boolean;
+>>>>>>> upstream/main
 };
 
 export type AdminSkillSyncAccessDeps = {
@@ -359,6 +371,15 @@ export function createAdminSkillsSyncAccess(deps: AdminSkillSyncAccessDeps): Adm
 }
 
 export function createAdminSkillsSyncHandlers(deps: AdminSkillSyncDeps): AdminSkillsSyncHandlers {
+<<<<<<< HEAD
+=======
+  const emitAudit = createAdminAuditEmitter({
+    recordAuditEntry: deps.recordAuditEntry,
+    failClosed: deps.auditFailClosed,
+    logPrefix: '[adminSkills]',
+  });
+
+>>>>>>> upstream/main
   function getRunner(req: Request): GitHubSkillSyncRunner {
     const runner = deps.getRunner?.(req) ?? deps.runner;
     if (!runner) {
@@ -411,6 +432,16 @@ export function createAdminSkillsSyncHandlers(deps: AdminSkillSyncDeps): AdminSk
       token: token.trim(),
       userId: getUserObjectId(req),
     });
+<<<<<<< HEAD
+=======
+    /** Credentials are platform-level, so entries go to the platform chain. */
+    await emitAudit(req as unknown as ServerRequest, {
+      action: 'skill_credential.set',
+      severity: 'warning',
+      target: { type: 'skill_credential', id: credentialKey, name: 'github' },
+      tenantId: undefined,
+    });
+>>>>>>> upstream/main
     return res.status(200).json(serializeCredential(credential));
   }
 
@@ -420,6 +451,17 @@ export function createAdminSkillsSyncHandlers(deps: AdminSkillSyncDeps): AdminSk
       return res.status(400).json({ error: 'Invalid credential key' });
     }
     const result = await deps.deleteCredential('github', credentialKey);
+<<<<<<< HEAD
+=======
+    if (result.deleted) {
+      await emitAudit(req as unknown as ServerRequest, {
+        action: 'skill_credential.deleted',
+        severity: 'warning',
+        target: { type: 'skill_credential', id: credentialKey, name: 'github' },
+        tenantId: undefined,
+      });
+    }
+>>>>>>> upstream/main
     return res.status(200).json({ credentialKey, deleted: result.deleted });
   }
 

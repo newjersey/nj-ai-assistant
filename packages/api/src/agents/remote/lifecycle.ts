@@ -1,6 +1,10 @@
 import type { GenerationJobManagerClass } from '~/stream';
 import type { GenerationJob } from '~/types/stream';
+<<<<<<< HEAD
 import { GenerationJobManager } from '~/stream';
+=======
+import { GenerationJobManager, GenerationAdmissionDeniedError } from '~/stream';
+>>>>>>> upstream/main
 
 const ACCOUNT_DELETION_ERROR = 'Account deletion is in progress';
 const REMOTE_EXECUTION_ERROR = 'Remote agent execution failed';
@@ -190,6 +194,7 @@ export class AgentExecutionEnrollment {
   }
 }
 
+<<<<<<< HEAD
 async function retireRejectedEnrollment(
   manager: GenerationJobManagerClass,
   job: GenerationJob,
@@ -197,11 +202,14 @@ async function retireRejectedEnrollment(
   await manager.completeJob(job.streamId, ACCOUNT_DELETION_ERROR, job.createdAt);
 }
 
+=======
+>>>>>>> upstream/main
 export async function enrollAgentExecution(
   params: AgentExecutionEnrollmentParams,
   deps: AgentExecutionEnrollmentDeps = { manager: GenerationJobManager },
 ): Promise<AgentExecutionEnrollment> {
   const { runId, userId, conversationId, agentId, protocol, isPrincipalActive } = params;
+<<<<<<< HEAD
   const job = await deps.manager.createJob(runId, userId, conversationId, {
     initialMetadata: {
       agent_id: agentId,
@@ -222,6 +230,30 @@ export async function enrollAgentExecution(
     await retireRejectedEnrollment(deps.manager, job);
     throw new AgentExecutionAdmissionError(ACCOUNT_DELETION_ERROR, 'ACCOUNT_DELETION_IN_PROGRESS');
   }
+=======
+  let job: GenerationJob;
+  try {
+    /** The principal predicate replaces the default guard, so admission is one post-commit read
+     * and a refused run takes the manager's retire-and-purge path. */
+    job = await deps.manager.createJob(runId, userId, conversationId, {
+      admissionCheck: isPrincipalActive,
+      initialMetadata: {
+        agent_id: agentId,
+        endpoint: protocol,
+        model: agentId,
+        responseMessageId: runId,
+      },
+    });
+  } catch (error) {
+    if (error instanceof GenerationAdmissionDeniedError) {
+      throw new AgentExecutionAdmissionError(
+        ACCOUNT_DELETION_ERROR,
+        'ACCOUNT_DELETION_IN_PROGRESS',
+      );
+    }
+    throw error;
+  }
+>>>>>>> upstream/main
 
   return new AgentExecutionEnrollment(deps.manager, job);
 }

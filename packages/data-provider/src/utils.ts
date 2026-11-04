@@ -15,6 +15,10 @@ const SENSITIVE_ENV_VARS = new Set([
   'CREDS_IV',
   'MEILI_MASTER_KEY',
   'MONGO_URI',
+<<<<<<< HEAD
+=======
+  'MONGODB_ROOT_PASSWORD',
+>>>>>>> upstream/main
   'REDIS_URI',
   'REDIS_PASSWORD',
 ]);

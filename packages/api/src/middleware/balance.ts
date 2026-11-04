@@ -1,4 +1,8 @@
 import { logger } from '@librechat/data-schemas';
+<<<<<<< HEAD
+=======
+import { isBalanceRefillDue } from 'librechat-data-provider';
+>>>>>>> upstream/main
 import type {
   IBalanceUpdate,
   BalanceConfig,
@@ -18,7 +22,14 @@ export interface BalanceMiddlewareOptions {
     tenantId?: string;
     refresh?: boolean;
   }) => Promise<AppConfig>;
+<<<<<<< HEAD
   findBalanceByUser: (userId: string) => Promise<IBalance | null>;
+=======
+  findBalanceByUser: (
+    userId: string,
+    options?: { applyReset?: boolean },
+  ) => Promise<IBalance | null>;
+>>>>>>> upstream/main
   upsertBalanceFields: (
     userId: string,
     fields: IBalanceUpdate,
@@ -80,9 +91,20 @@ export function buildBalanceUpdateFields(
     config.autoRefillEnabled &&
     config.refillIntervalValue != null &&
     config.refillIntervalUnit != null &&
+<<<<<<< HEAD
     config.refillAmount != null;
 
   if (!isAutoRefillConfigValid) {
+=======
+    config.refillAmount != null &&
+    (config.refillMode !== 'reset' ||
+      (Number.isInteger(config.refillIntervalValue) && config.refillIntervalValue > 0));
+
+  if (!isAutoRefillConfigValid) {
+    if (userRecord?.autoRefillEnabled === true) {
+      updateFields.autoRefillEnabled = false;
+    }
+>>>>>>> upstream/main
     return updateFields;
   }
 
@@ -98,6 +120,14 @@ export function buildBalanceUpdateFields(
     updateFields.refillIntervalUnit = config.refillIntervalUnit;
   }
 
+<<<<<<< HEAD
+=======
+  const refillMode = config.refillMode ?? 'add';
+  if ((userRecord?.refillMode ?? 'add') !== refillMode) {
+    updateFields.refillMode = refillMode;
+  }
+
+>>>>>>> upstream/main
   if (userRecord?.refillAmount !== config.refillAmount) {
     updateFields.refillAmount = config.refillAmount;
   }
@@ -147,11 +177,24 @@ export function createSetBalanceConfig({
       }
       const userId = typeof user._id === 'string' ? user._id : user._id.toString();
       await runBalanceUpdate(userId, async () => {
+<<<<<<< HEAD
         const userBalanceRecord = await findBalanceByUser(userId);
         const updateFields = buildBalanceUpdateFields(balanceConfig, userBalanceRecord, userId);
 
         if (Object.keys(updateFields).length === 0) {
           balanceLocals.balanceData = userBalanceRecord;
+=======
+        const userBalanceRecord = await findBalanceByUser(userId, { applyReset: false });
+        const updateFields = buildBalanceUpdateFields(balanceConfig, userBalanceRecord, userId);
+
+        if (Object.keys(updateFields).length === 0) {
+          balanceLocals.balanceData =
+            balanceConfig.autoRefillEnabled === true &&
+            userBalanceRecord?.refillMode === 'reset' &&
+            isBalanceRefillDue(userBalanceRecord, new Date())
+              ? await findBalanceByUser(userId)
+              : userBalanceRecord;
+>>>>>>> upstream/main
           return;
         }
 

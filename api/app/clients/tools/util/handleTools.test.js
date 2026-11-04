@@ -47,11 +47,19 @@ jest.mock('~/server/services/Config', () => ({
   }),
   getCachedTools: jest.fn().mockResolvedValue({
     // Default cached tools for tests
+<<<<<<< HEAD
     dalle: {
       type: 'function',
       function: {
         name: 'dalle',
         description: 'DALL-E image generation',
+=======
+    flux: {
+      type: 'function',
+      function: {
+        name: 'flux',
+        description: 'Flux image generation',
+>>>>>>> upstream/main
         parameters: {},
       },
     },
@@ -94,19 +102,34 @@ jest.mock('~/config', () => ({
 
 const { Calculator } = require('@librechat/agents');
 const { Tools, Constants } = require('librechat-data-provider');
+<<<<<<< HEAD
 const { ASK_USER_QUESTION_TOOL_NAME } = require('@librechat/api');
 
 const { User } = require('~/db/models');
 const PluginService = require('~/server/services/PluginService');
 const { validateTools, loadTools, loadToolWithAuth } = require('./handleTools');
 const { StructuredSD, availableTools, DALLE3 } = require('../');
+=======
+const { ASK_USER_QUESTION_TOOL_NAME, STANDARD_MCP_CAPABILITY_PROFILE } = require('@librechat/api');
+
+const { User } = require('~/db/models');
+const PluginService = require('~/server/services/PluginService');
+const { loadTools, loadToolWithAuth } = require('./handleTools');
+const { StructuredSD, availableTools, FluxAPI } = require('../');
+>>>>>>> upstream/main
 
 describe('Tool Handlers', () => {
   let mongoServer;
   let fakeUser;
+<<<<<<< HEAD
   const pluginKey = 'dalle';
   const pluginKey2 = 'wolfram';
   const ToolClass = DALLE3;
+=======
+  const pluginKey = 'flux';
+  const pluginKey2 = 'wolfram';
+  const ToolClass = FluxAPI;
+>>>>>>> upstream/main
   const initialTools = [pluginKey, pluginKey2];
   const mockCredential = 'mock-credential';
   const mainPlugin = availableTools.find((tool) => tool.pluginKey === pluginKey);
@@ -189,6 +212,7 @@ describe('Tool Handlers', () => {
     }
   });
 
+<<<<<<< HEAD
   describe('validateTools', () => {
     it('returns valid tools given input tools and user authentication', async () => {
       const validTools = await validateTools(fakeUser._id, initialTools);
@@ -221,6 +245,8 @@ describe('Tool Handlers', () => {
     });
   });
 
+=======
+>>>>>>> upstream/main
   describe('loadTools', () => {
     let toolFunctions;
     let loadTool1;
@@ -273,6 +299,7 @@ describe('Tool Handlers', () => {
       expect(tool).toBeInstanceOf(ToolClass2);
     });
 
+<<<<<<< HEAD
     it('should initialize an authenticated tool with primary auth field', async () => {
       process.env.DALLE3_API_KEY = 'mocked_api_key';
       const initToolFunction = loadToolWithAuth(
@@ -283,10 +310,25 @@ describe('Tool Handlers', () => {
       const authTool = await initToolFunction();
 
       expect(authTool).toBeInstanceOf(ToolClass);
+=======
+    class AuthTool {}
+
+    it('should initialize an authenticated tool with primary auth field', async () => {
+      process.env.PRIMARY_API_KEY = 'mocked_api_key';
+      const initToolFunction = loadToolWithAuth(
+        'userId',
+        ['PRIMARY_API_KEY||ALTERNATE_API_KEY'],
+        AuthTool,
+      );
+      const authTool = await initToolFunction();
+
+      expect(authTool).toBeInstanceOf(AuthTool);
+>>>>>>> upstream/main
       expect(mockPluginService.getUserPluginAuthValue).not.toHaveBeenCalled();
     });
 
     it('should initialize an authenticated tool with alternate auth field when primary is missing', async () => {
+<<<<<<< HEAD
       delete process.env.DALLE3_API_KEY; // Ensure the primary key is not set
       process.env.DALLE_API_KEY = 'mocked_alternate_api_key';
       const initToolFunction = loadToolWithAuth(
@@ -301,11 +343,28 @@ describe('Tool Handlers', () => {
       expect(mockPluginService.getUserPluginAuthValue).toHaveBeenCalledWith(
         'userId',
         'DALLE3_API_KEY',
+=======
+      delete process.env.PRIMARY_API_KEY; // Ensure the primary key is not set
+      process.env.ALTERNATE_API_KEY = 'mocked_alternate_api_key';
+      const initToolFunction = loadToolWithAuth(
+        'userId',
+        ['PRIMARY_API_KEY||ALTERNATE_API_KEY'],
+        AuthTool,
+      );
+      const authTool = await initToolFunction();
+
+      expect(authTool).toBeInstanceOf(AuthTool);
+      expect(mockPluginService.getUserPluginAuthValue).toHaveBeenCalledTimes(1);
+      expect(mockPluginService.getUserPluginAuthValue).toHaveBeenCalledWith(
+        'userId',
+        'PRIMARY_API_KEY',
+>>>>>>> upstream/main
         true,
       );
     });
 
     it('should fallback to getUserPluginAuthValue when env vars are missing', async () => {
+<<<<<<< HEAD
       mockPluginService.updateUserPluginAuth('userId', 'DALLE_API_KEY', 'dalle', 'mocked_api_key');
       const initToolFunction = loadToolWithAuth(
         'userId',
@@ -315,6 +374,22 @@ describe('Tool Handlers', () => {
       const authTool = await initToolFunction();
 
       expect(authTool).toBeInstanceOf(ToolClass);
+=======
+      mockPluginService.updateUserPluginAuth(
+        'userId',
+        'ALTERNATE_API_KEY',
+        'custom-tool',
+        'mocked_api_key',
+      );
+      const initToolFunction = loadToolWithAuth(
+        'userId',
+        ['PRIMARY_API_KEY||ALTERNATE_API_KEY'],
+        AuthTool,
+      );
+      const authTool = await initToolFunction();
+
+      expect(authTool).toBeInstanceOf(AuthTool);
+>>>>>>> upstream/main
       expect(mockPluginService.getUserPluginAuthValue).toHaveBeenCalledTimes(2);
     });
 
@@ -348,12 +423,19 @@ describe('Tool Handlers', () => {
       });
       expect(toolFunctions).toEqual({});
     });
+<<<<<<< HEAD
     it('should return the StructuredTool version when using functions', async () => {
+=======
+    it('should return the StructuredTool version', async () => {
+>>>>>>> upstream/main
       process.env.SD_WEBUI_URL = mockCredential;
       toolFunctions = await loadTools({
         user: fakeUser._id,
         tools: ['stable-diffusion'],
+<<<<<<< HEAD
         functions: true,
+=======
+>>>>>>> upstream/main
         returnMap: true,
         useSpecs: true,
       });
@@ -401,6 +483,148 @@ describe('Tool Handlers', () => {
       );
     });
 
+<<<<<<< HEAD
+=======
+    describe('MCP credential failure propagation', () => {
+      const {
+        OpenIDReauthRequiredError,
+        MCPAuthenticationRejectedError,
+        MCPAuthenticationRefreshError,
+        OboTokenResolutionError,
+      } = require('@librechat/api');
+      const failures = [
+        new OpenIDReauthRequiredError('Please sign in again'),
+        new MCPAuthenticationRejectedError('private-mcp', false),
+        new MCPAuthenticationRejectedError('private-mcp', true),
+        new MCPAuthenticationRefreshError(new Error('temporarily unavailable')),
+        new OboTokenResolutionError('session_refresh_failed', 'Please sign in again', false),
+        new OboTokenResolutionError('session_refresh_failed', 'Retry later', true),
+      ];
+      const toolKey = (name, server = 'private-mcp') =>
+        `${name}${Constants.mcp_delimiter}${server}`;
+      const load = (tools, signal) =>
+        loadTools({
+          user: fakeUser._id.toString(),
+          tools,
+          signal,
+          options: { req: { user: { id: fakeUser._id.toString(), role: 'USER' }, body: {} } },
+        });
+
+      beforeEach(() => {
+        mockGetServerConfig.mockResolvedValue({
+          type: 'streamable-http',
+          url: 'https://example.com/mcp',
+          source: 'yaml',
+        });
+        mockGetMCPServerTools.mockResolvedValue({});
+        mockCreateMCPTool.mockReset();
+        mockCreateMCPTools.mockReset();
+      });
+
+      it.each(failures)('preserves an all-tools credential failure: %s', async (error) => {
+        mockCreateMCPTools.mockRejectedValueOnce(error);
+        await expect(load([toolKey(Constants.mcp_all)])).rejects.toBe(error);
+      });
+
+      it.each(failures)('preserves a selected-tool credential failure: %s', async (error) => {
+        mockCreateMCPTool.mockRejectedValueOnce(error);
+        await expect(load([toolKey('search')])).rejects.toBe(error);
+      });
+
+      it('keeps ordinary unavailable servers optional and loads healthy tools', async () => {
+        mockCreateMCPTools.mockRejectedValueOnce(new Error('server offline'));
+        const healthyTool = { name: toolKey('search', 'healthy') };
+        mockCreateMCPTool.mockResolvedValueOnce(healthyTool);
+        await expect(load([toolKey(Constants.mcp_all), healthyTool.name])).resolves.toMatchObject({
+          loadedTools: [healthyTool],
+        });
+      });
+
+      it('preserves owned cancellation but not a dependency abort of a live run', async () => {
+        const controller = new AbortController();
+        const error = new DOMException('Stopped', 'AbortError');
+        mockCreateMCPTool.mockRejectedValueOnce(error);
+        await expect(load([toolKey('search')], controller.signal)).resolves.toMatchObject({
+          loadedTools: [],
+        });
+        mockCreateMCPTool.mockRejectedValueOnce(error);
+        controller.abort(error);
+        await expect(load([toolKey('search')], controller.signal)).rejects.toBe(error);
+      });
+
+      it('observes early bulk rejection while a selected tool is still loading', async () => {
+        const error = failures[0];
+        mockCreateMCPTools.mockRejectedValueOnce(error);
+        mockCreateMCPTool.mockImplementationOnce(
+          () => new Promise((resolve) => setImmediate(() => resolve({ name: 'healthy' }))),
+        );
+        await expect(load([toolKey(Constants.mcp_all), toolKey('search', 'healthy')])).rejects.toBe(
+          error,
+        );
+      });
+
+      it('settles outstanding bulk loads before surfacing a selected-tool failure', async () => {
+        const error = failures[0];
+        let bulkSettled = false;
+        mockCreateMCPTools.mockImplementationOnce(
+          () =>
+            new Promise((resolve) =>
+              setImmediate(() => {
+                bulkSettled = true;
+                resolve([{ name: 'healthy' }]);
+              }),
+            ),
+        );
+        mockCreateMCPTool.mockRejectedValueOnce(error);
+        await expect(load([toolKey(Constants.mcp_all, 'healthy'), toolKey('search')])).rejects.toBe(
+          error,
+        );
+        expect(bulkSettled).toBe(true);
+      });
+
+      it.each([false, true])(
+        'lets cancellation supersede an auth failure after sibling settlement: authFailure=%s',
+        async (authFailure) => {
+          const controller = new AbortController();
+          const stopped = new Error('request cancelled');
+          let siblingSettled = false;
+          mockCreateMCPTools.mockImplementationOnce(async () => {
+            if (authFailure) {
+              throw failures[0];
+            }
+            return [{ name: 'first' }];
+          });
+          mockCreateMCPTools.mockImplementationOnce(
+            () =>
+              new Promise((resolve) =>
+                setImmediate(() => {
+                  controller.abort(stopped);
+                  siblingSettled = true;
+                  resolve([{ name: 'sibling' }]);
+                }),
+              ),
+          );
+          await expect(
+            load(
+              [toolKey(Constants.mcp_all), toolKey(Constants.mcp_all, 'healthy')],
+              controller.signal,
+            ),
+          ).rejects.toBe(stopped);
+          expect(siblingSettled).toBe(true);
+        },
+      );
+
+      it('allows a later request to recover after re-authentication', async () => {
+        mockCreateMCPTools.mockRejectedValueOnce(failures[0]);
+        await expect(load([toolKey(Constants.mcp_all)])).rejects.toBe(failures[0]);
+        mockCreateMCPTools.mockResolvedValueOnce([{ name: 'search' }]);
+        await expect(load([toolKey(Constants.mcp_all)])).resolves.toMatchObject({
+          loadedTools: [{ name: 'search' }],
+        });
+      });
+    });
+
+>>>>>>> upstream/main
     it('passes request body to chat MCP tool creation and skips stale cache for BODY-scoped servers', async () => {
       const serverName = 'body-scoped';
       const toolKey = `search${Constants.mcp_delimiter}${serverName}`;
@@ -432,6 +656,10 @@ describe('Tool Handlers', () => {
         fakeUser._id.toString(),
         serverName,
         serverConfig,
+<<<<<<< HEAD
+=======
+        STANDARD_MCP_CAPABILITY_PROFILE,
+>>>>>>> upstream/main
       );
       expect(mockCreateMCPTool).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -474,8 +702,21 @@ describe('Tool Handlers', () => {
         tools: [normalizedKey],
         options: {
           req: {
+<<<<<<< HEAD
             user: { id: fakeUser._id.toString(), role: 'USER' },
             body: {},
+=======
+            user: { id: fakeUser._id.toString(), role: 'USER', idOnTheSource: null },
+            body: {},
+            config: {
+              mcpSettings: { apps: true },
+              mcpAppSandbox: {
+                maxPersistedAppBytes: 2048,
+                maxAdmissionRequestsPerMinute: 12,
+                url: 'https://sandbox.example.com',
+              },
+            },
+>>>>>>> upstream/main
           },
         },
       });
@@ -483,13 +724,30 @@ describe('Tool Handlers', () => {
       expect(result.loadedTools).toEqual([{ name: normalizedKey }]);
       expect(mockGetServerConfig).toHaveBeenCalledWith(
         rawServerName,
+<<<<<<< HEAD
         expect.anything(),
         expect.anything(),
+=======
+        fakeUser._id.toString(),
+        expect.anything(),
+        'USER',
+        { idOnTheSource: null },
+>>>>>>> upstream/main
       );
       expect(mockCreateMCPTool).toHaveBeenCalledWith(
         expect.objectContaining({
           toolKey: normalizedKey,
           serverName: rawServerName,
+<<<<<<< HEAD
+=======
+          mcpApps: expect.objectContaining({
+            enabled: true,
+            legacyHtmlEnabled: true,
+            maxPersistedAppBytes: 2048,
+            maxAdmissionRequestsPerMinute: 12,
+            sandboxUrl: 'https://sandbox.example.com',
+          }),
+>>>>>>> upstream/main
         }),
       );
     });
@@ -716,6 +974,11 @@ describe('Tool Handlers', () => {
         rawServerName,
         expect.anything(),
         expect.anything(),
+<<<<<<< HEAD
+=======
+        expect.anything(),
+        expect.anything(),
+>>>>>>> upstream/main
       );
       expect(mockCreateMCPTool).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -726,7 +989,11 @@ describe('Tool Handlers', () => {
     });
 
     it('resolves an MCP tool whose raw name itself contains the delimiter substring', async () => {
+<<<<<<< HEAD
       // Regression test for https://github.com/danny-avila/LibreChat/issues/14440:
+=======
+      // Regression test for https://github.com/LibreChat-AI/LibreChat/issues/14440:
+>>>>>>> upstream/main
       // gateways that prefix aggregated tool names by server (e.g. LiteLLM's
       // MCP proxy) can produce a raw tool name that already contains "_mcp_"
       // (e.g. GitLab's own "get_mcp_server_version" tool becomes
@@ -761,6 +1028,11 @@ describe('Tool Handlers', () => {
         serverName,
         expect.anything(),
         expect.anything(),
+<<<<<<< HEAD
+=======
+        expect.anything(),
+        expect.anything(),
+>>>>>>> upstream/main
       );
       expect(mockCreateMCPTool).toHaveBeenCalledWith(
         expect.objectContaining({

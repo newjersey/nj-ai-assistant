@@ -115,7 +115,11 @@ function PluginAuthForm({
 
   return (
     <form className="flex w-full flex-col" method="POST" onSubmit={submit}>
+<<<<<<< HEAD
       <div className="flex max-h-[40vh] flex-col gap-4 overflow-y-auto pr-1">
+=======
+      <div className="flex max-h-[40vh] flex-col gap-4 overflow-y-auto pe-1">
+>>>>>>> upstream/main
         {authConfig.map((config: TPluginAuthConfig, i: number) => {
           const authField = config.authField.split('||')[0];
           const isOptional = config.optional === true;
@@ -156,7 +160,11 @@ function PluginAuthForm({
           };
           return (
             <div key={`${authField}-${i}`} className="flex w-full flex-col gap-1.5">
+<<<<<<< HEAD
               <Label htmlFor={authField} className="text-sm font-medium text-text-secondary">
+=======
+              <Label htmlFor={authField} variant="secondary" className="text-sm font-medium">
+>>>>>>> upstream/main
                 {config.label}
               </Label>
               <HoverCard openDelay={300}>

@@ -1,8 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import filenamify from 'filenamify';
 import exportFromJSON from 'export-from-json';
+<<<<<<< HEAD
 import { useToastContext } from '@librechat/client';
 import { QueryKeys } from 'librechat-data-provider';
+=======
+import { useAtomValue, useSetAtom } from 'jotai';
+import { useToastContext } from '@librechat/client';
+import { QueryKeys } from 'librechat-data-provider';
+import { presetFamily } from '@librechat/chat/react';
+>>>>>>> upstream/main
 import { useQueryClient } from '@tanstack/react-query';
 import { useRecoilState, useSetRecoilState, useRecoilValue } from 'recoil';
 import { useCreatePresetMutation, useGetModelsQuery } from 'librechat-data-provider/react-query';
@@ -41,8 +48,13 @@ export default function usePresets(index = 0) {
   const setPresetModalVisible = useSetRecoilState(store.presetModalVisible);
   const [_defaultPreset, setDefaultPreset] = useRecoilState(store.defaultPreset);
   const presetsQuery = useGetPresetsQuery({ enabled: !!user && isAuthenticated });
+<<<<<<< HEAD
   const preset = useRecoilValue(store.presetByIndex(index));
   const setPreset = useSetRecoilState(store.presetByIndex(index));
+=======
+  const preset = useAtomValue(presetFamily(index));
+  const setPreset = useSetAtom(presetFamily(index));
+>>>>>>> upstream/main
   const conversationId = useRecoilValue(store.conversationIdByIndex(index));
   const { data: modelsData } = useGetModelsQuery();
   const { newConversation } = useNewConvo(index);

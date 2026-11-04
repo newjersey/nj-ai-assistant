@@ -26,7 +26,11 @@ describe('CustomIcon', () => {
       const el = screen.getByRole('img', { name: 'My Server' });
       expect(el.tagName).toBe('SPAN');
       expect(el).not.toHaveAttribute('aria-hidden');
+<<<<<<< HEAD
       expect(el.style.backgroundColor).toBe('currentcolor');
+=======
+      expect(el).toHaveClass('bg-current');
+>>>>>>> upstream/main
       expect(el).toHaveClass('custom-icon-tint');
     });
 
@@ -43,14 +47,22 @@ describe('CustomIcon', () => {
       const { container } = render(<CustomIcon src={'/a".svg'} alt="" monochrome />);
 
       const span = container.querySelector('span');
+<<<<<<< HEAD
       expect(span?.style.maskImage).toBe('url("/a%22.svg")');
+=======
+      expect(span?.style.getPropertyValue('--custom-icon-mask')).toBe('url("/a%22.svg")');
+>>>>>>> upstream/main
     });
 
     it('escapes backslashes and newlines in the mask URL', () => {
       const { container } = render(<CustomIcon src={'/a\\b\nc.svg'} alt="" monochrome />);
 
       const span = container.querySelector('span');
+<<<<<<< HEAD
       expect(span?.style.maskImage).toBe('url("/a%5Cb%0Ac.svg")');
+=======
+      expect(span?.style.getPropertyValue('--custom-icon-mask')).toBe('url("/a%5Cb%0Ac.svg")');
+>>>>>>> upstream/main
     });
 
     it('letterboxes with mask-size contain by default', () => {
@@ -59,7 +71,11 @@ describe('CustomIcon', () => {
       );
 
       const span = container.querySelector('span');
+<<<<<<< HEAD
       expect(span?.style.maskSize).toBe('contain');
+=======
+      expect(span).toHaveClass('mask-contain');
+>>>>>>> upstream/main
     });
 
     it('keeps object-cover sizing semantics via mask-size cover', () => {
@@ -68,7 +84,11 @@ describe('CustomIcon', () => {
       );
 
       const span = container.querySelector('span');
+<<<<<<< HEAD
       expect(span?.style.maskSize).toBe('cover');
+=======
+      expect(span).toHaveClass('mask-cover');
+>>>>>>> upstream/main
     });
 
     it('does not render a probe image on the tinted path without an onError handler', () => {

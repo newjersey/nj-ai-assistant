@@ -231,7 +231,11 @@ describe('generateCapabilityCheck', () => {
 
       expect(mockNext).not.toHaveBeenCalled();
       expect(statusMock).toHaveBeenCalledWith(403);
+<<<<<<< HEAD
       expect(jsonMock).toHaveBeenCalledWith({ message: 'Forbidden' });
+=======
+      expect(jsonMock).toHaveBeenCalledWith({ message: 'Forbidden', code: 'FORBIDDEN' });
+>>>>>>> upstream/main
     });
 
     it('returns 401 when no user is present', async () => {
@@ -242,7 +246,14 @@ describe('generateCapabilityCheck', () => {
 
       expect(mockNext).not.toHaveBeenCalled();
       expect(statusMock).toHaveBeenCalledWith(401);
+<<<<<<< HEAD
       expect(jsonMock).toHaveBeenCalledWith({ message: 'Authentication required' });
+=======
+      expect(jsonMock).toHaveBeenCalledWith({
+        message: 'Authentication required',
+        code: 'AUTH_REQUIRED',
+      });
+>>>>>>> upstream/main
     });
 
     it('returns 500 on unexpected error', async () => {

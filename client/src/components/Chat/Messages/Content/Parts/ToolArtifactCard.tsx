@@ -1,4 +1,5 @@
 import { memo, useEffect, useId, useLayoutEffect, useRef } from 'react';
+<<<<<<< HEAD
 import {
   useRecoilCallback,
   useRecoilState,
@@ -8,11 +9,19 @@ import {
 } from 'recoil';
 import type { TAttachment, TFile, TAttachmentMetadata } from 'librechat-data-provider';
 import type { Artifact } from '~/common';
+=======
+import type { TAttachment, TFile, TAttachmentMetadata } from 'librechat-data-provider';
+import type { Artifact } from '~/common';
+import { useMessagePartsHost } from '~/Providers/MessagePartsHostContext';
+>>>>>>> upstream/main
 import { artifactRowKind, isCodeOnlyArtifact } from '~/utils/artifacts';
 import { displayFilename } from './attachmentTypes';
 import { useAttachmentLink } from './LogLink';
 import ArtifactRow from './ArtifactRow';
+<<<<<<< HEAD
 import store from '~/store';
+=======
+>>>>>>> upstream/main
 
 interface ToolArtifactCardProps {
   attachment: TAttachment;
@@ -46,8 +55,13 @@ interface ToolArtifactCardProps {
  *     Without that guard, both cards would observe each other's write
  *     and trade overwrites in a loop.
  *
+<<<<<<< HEAD
  *  3. **Focus + open on mount** (deps: artifact.id, artifact.type) —
  *     gated on `isSubmitting` captured at first render via a ref AND
+=======
+ *  3. **Focus + open on ownership change** (deps: artifact.id, artifact.type, ownerMessageId) —
+ *     gated on this message's `isSubmitting` captured on mount AND
+>>>>>>> upstream/main
  *     on `artifact.type !== CODE`. A card mounted *during* streaming
  *     for a rich-preview bucket (HTML, React, Markdown, plain text)
  *     steals panel focus and forces `artifactsVisibility = true` so
@@ -66,6 +80,7 @@ interface ToolArtifactCardProps {
  */
 const ToolArtifactCard = memo(({ attachment, artifact }: ToolArtifactCardProps) => {
   const claimKey = useId();
+<<<<<<< HEAD
   const file = attachment as TFile & TAttachmentMetadata;
   const fileId = file.file_id;
   const setVisible = useSetRecoilState(store.artifactsVisibility);
@@ -116,6 +131,32 @@ const ToolArtifactCard = memo(({ attachment, artifact }: ToolArtifactCardProps) 
   const mountedDuringStreamRef = useRef<boolean | null>(null);
   if (mountedDuringStreamRef.current === null) {
     mountedDuringStreamRef.current = readInitialIsSubmitting();
+=======
+  const { useMessage, useArtifactPanel, useToolArtifactClaim } = useMessagePartsHost();
+  const { isSubmitting, messageId } = useMessage();
+  const ownerMessageId = messageId || attachment.messageId || '';
+  const file = attachment as TFile & TAttachmentMetadata;
+  const fileId = file.file_id;
+  const {
+    currentArtifactId,
+    registered: existingEntry,
+    register,
+    open,
+    close,
+    consumeJustResolved,
+  } = useArtifactPanel(artifact.id);
+  const [claim, setClaim] = useToolArtifactClaim(artifact.id);
+  const isSelected = artifact.id === currentArtifactId;
+  const isMyClaim = claim === claimKey;
+  /* `consumeJustResolved` reads and resets only this response's flag, without
+   * subscribing to other file or message flags. The deferred-preview hook flips
+   * it to `true` on the pending→ready edge; we consume it once, so repeat mounts
+   * (panel close then reopen, history scroll) don't auto-open a second time. */
+  /** Positional reconciliation can reuse this card for another response with the same file ID. */
+  const mountedDuringStreamRef = useRef({ ownerMessageId, isSubmitting: isSubmitting === true });
+  if (mountedDuringStreamRef.current.ownerMessageId !== ownerMessageId) {
+    mountedDuringStreamRef.current = { ownerMessageId, isSubmitting: isSubmitting === true };
+>>>>>>> upstream/main
   }
 
   useLayoutEffect(() => {
@@ -146,8 +187,13 @@ const ToolArtifactCard = memo(({ attachment, artifact }: ToolArtifactCardProps) 
     ) {
       return;
     }
+<<<<<<< HEAD
     setArtifacts((prev) => ({ ...(prev ?? {}), [artifact.id]: artifact }));
   }, [artifact, existingEntry, isMyClaim, setArtifacts]);
+=======
+    register(artifact);
+  }, [artifact, existingEntry, isMyClaim, register]);
+>>>>>>> upstream/main
 
   useEffect(() => {
     if (isCodeOnlyArtifact(artifact.type)) {
@@ -161,8 +207,13 @@ const ToolArtifactCard = memo(({ attachment, artifact }: ToolArtifactCardProps) 
       return;
     }
     /* Two paths qualify the card for auto-open:
+<<<<<<< HEAD
      *   1. Streaming-time mount — ref captured `isSubmitting === true`
      *      at first render. The card is part of the live response, so
+=======
+     *   1. Streaming-time ownership — ref captured `isSubmitting === true`
+     *      when this message became the owner. The card is part of the live response, so
+>>>>>>> upstream/main
      *      the legacy "panel pops open as artifacts arrive" UX applies.
      *   2. Just-resolved deferred preview — `useAttachmentPreviewSync`
      *      sets a one-shot flag on the pending→ready edge. The
@@ -174,6 +225,7 @@ const ToolArtifactCard = memo(({ attachment, artifact }: ToolArtifactCardProps) 
      * History mounts (file already resolved on page load) hit neither
      * path, so the panel stays closed on navigation — no jarring
      * auto-open just from scrolling past an old artifact. */
+<<<<<<< HEAD
     const justResolved = fileId ? consumeJustResolved(fileId) : false;
     if (!mountedDuringStreamRef.current && !justResolved) {
       return;
@@ -186,6 +238,20 @@ const ToolArtifactCard = memo(({ attachment, artifact }: ToolArtifactCardProps) 
     setCurrentArtifactId(artifact.id);
     setVisible(true);
   }, [artifact.id, artifact.type, fileId, consumeJustResolved, setCurrentArtifactId, setVisible]);
+=======
+    const justResolved =
+      fileId && ownerMessageId ? consumeJustResolved(ownerMessageId, fileId) : false;
+    if (!mountedDuringStreamRef.current.isSubmitting && !justResolved) {
+      return;
+    }
+    // Streaming arrival or just-resolved preview: focus the new artifact
+    // AND force the panel visible. Without revealing it, a session
+    // where the user had previously closed the panel (visibility=false)
+    // would surface the selection in the chip ("click to close") but
+    // never actually open: `Presentation` gates rendering on visibility.
+    open(artifact.id);
+  }, [artifact.id, artifact.type, fileId, ownerMessageId, consumeJustResolved, open]);
+>>>>>>> upstream/main
 
   const { handleDownload } = useAttachmentLink({
     href: attachment.filepath ?? '',
@@ -197,14 +263,22 @@ const ToolArtifactCard = memo(({ attachment, artifact }: ToolArtifactCardProps) 
 
   const handleOpen = () => {
     if (isSelected) {
+<<<<<<< HEAD
       resetCurrentArtifactId();
       setVisible(false);
+=======
+      close();
+>>>>>>> upstream/main
       return;
     }
     // Registration already happened in the mount effect; the click only
     // needs to focus + reveal the panel for users who have closed it.
+<<<<<<< HEAD
     setCurrentArtifactId(artifact.id);
     setVisible(true);
+=======
+    open(artifact.id);
+>>>>>>> upstream/main
   };
 
   // Another card with the same artifact id has the active claim — render

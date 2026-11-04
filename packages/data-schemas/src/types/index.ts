@@ -8,9 +8,17 @@ export * from './user';
 export * from './token';
 export * from './refreshTokenBridge';
 export * from './openidRefreshFlight';
+<<<<<<< HEAD
 export * from './convo';
 export * from './chatProject';
 export * from './session';
+=======
+export * from './resourceLock';
+export * from './convo';
+export * from './chatProject';
+export * from './session';
+export * from './passkey';
+>>>>>>> upstream/main
 export * from './balance';
 export * from './banner';
 export * from './transaction';
@@ -34,6 +42,10 @@ export * from './prompts';
 /* Skills */
 export * from './skill';
 export * from './skillSync';
+<<<<<<< HEAD
+=======
+export * from './skillDeletion';
+>>>>>>> upstream/main
 export * from './triggerDelivery';
 export * from './queuedTurn';
 export * from './schedule';

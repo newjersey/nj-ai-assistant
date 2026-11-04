@@ -41,6 +41,7 @@ describe('Environment Variable Extraction', () => {
     test('should handle strings without variable format', () => {
       expect(extractEnvVariable('no_var_here')).toBe('no_var_here');
     });
+<<<<<<< HEAD
 
     /** No longer the expected behavior; keeping for reference */
     test.skip('should not process multiple variable formats', () => {
@@ -50,6 +51,8 @@ describe('Environment Variable Extraction', () => {
         '${FIRST_VAR} and ${SECOND_VAR}',
       );
     });
+=======
+>>>>>>> upstream/main
   });
 
   describe('extractEnvVariable function', () => {
@@ -135,6 +138,10 @@ describe('Environment Variable Extraction', () => {
       expect(isSensitiveEnvVar('CREDS_IV')).toBe(true);
       expect(isSensitiveEnvVar('MEILI_MASTER_KEY')).toBe(true);
       expect(isSensitiveEnvVar('MONGO_URI')).toBe(true);
+<<<<<<< HEAD
+=======
+      expect(isSensitiveEnvVar('MONGODB_ROOT_PASSWORD')).toBe(true);
+>>>>>>> upstream/main
       expect(isSensitiveEnvVar('REDIS_URI')).toBe(true);
       expect(isSensitiveEnvVar('REDIS_PASSWORD')).toBe(true);
     });

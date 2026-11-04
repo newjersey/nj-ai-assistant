@@ -5,8 +5,73 @@ import type {
   FileContext,
   RunFileProvenance,
   TFile,
+<<<<<<< HEAD
 } from 'librechat-data-provider';
 
+=======
+  TFileWorkspaceImports,
+} from 'librechat-data-provider';
+
+export type FileStorageScope = {
+  file_id: string;
+  userId: string;
+  tenantId?: string | null;
+};
+
+export type FileStorageClaim = FileStorageScope & {
+  token: string;
+};
+
+export type FileProvisionCommit = {
+  claim: FileStorageClaim;
+  code?: { routeKey: string; ref: CodeEnvRef; legacyRef?: CodeEnvRef };
+  entityId?: string;
+  embedded?: boolean;
+  output?: { file: CodeFileCommitData; sourceDispatchedAt?: number };
+  releaseOnly?: boolean;
+};
+
+export type FileStorageDeleteClaim = FileStorageClaim & {
+  updatedAt?: Date | string;
+};
+
+/** Content snapshot whose primary and secondary storage cleanup must agree. */
+export type FileStorageCleanupParams = {
+  file_id: string;
+  userId: string;
+  tenantId?: string | null;
+  updatedAt?: Date | string;
+  source?: string;
+  embedded?: boolean;
+  embeddedEntities?: string[];
+  /** Authorized provider-only assistant files have no persisted local snapshot. */
+  allowMissingFileRecord?: boolean;
+};
+
+export type FileDeletionSnapshot = Omit<FileStorageCleanupParams, 'userId' | 'embeddedEntities'> & {
+  user?: { toString(): string };
+  metadata?: { embeddedEntities?: string[] };
+};
+
+export type DeleteFilesResult = {
+  deletedCount?: number;
+  deletedFileIds?: string[];
+  failedFileIds?: string[];
+};
+
+export type DeleteFilesOptions = {
+  files: FileDeletionSnapshot[];
+  userId: string;
+};
+
+export type ClearFileCodeEnvRefsParams = {
+  file_id: string;
+  userId: string;
+  tenantId?: string;
+  refs: Array<{ routeKey: string; ref: CodeEnvRef }>;
+};
+
+>>>>>>> upstream/main
 export type RunArtifactRunScope = {
   userId: string;
   tenantId?: string | null;
@@ -134,8 +199,21 @@ export interface IMongoFile extends Omit<Document, 'model'> {
   filepath: string;
   storageKey?: string;
   storageRegion?: string;
+<<<<<<< HEAD
   object: 'file';
   embedded?: boolean;
+=======
+  storageOperations?: {
+    provisioning?: string[];
+    deleting?: string;
+    deletionPending?: boolean;
+  };
+  object: 'file';
+  embedded?: boolean;
+  /** Absent on legacy records, including partially adopted namespace lists. */
+  embeddingOwnersComplete?: boolean;
+  embeddingOwnersTrackedAt?: Date;
+>>>>>>> upstream/main
   type: string;
   context?: string;
   usage: number;
@@ -157,10 +235,22 @@ export interface IMongoFile extends Omit<Document, 'model'> {
     sourceDispatchedAt?: number;
     /** Vector namespaces this file has been embedded into. */
     embeddedEntities?: string[];
+<<<<<<< HEAD
+=======
+    /** Code remains a destination even after its remote pointers are cleared. */
+    codeDestination?: boolean;
+    /** Search remains a destination even after its vectors are cleared. */
+    searchDestination?: boolean;
+>>>>>>> upstream/main
     /** The user named this destination, so absent ones were declined. */
     destinationChosen?: boolean;
     /** The type the delivery route was resolved against, when conversion changed it. */
     routingMimeType?: string;
+<<<<<<< HEAD
+=======
+    /** Copies placed in attached workspaces. */
+    workspaceImports?: TFileWorkspaceImports;
+>>>>>>> upstream/main
   };
   /** Upload-time inference, not a durable contract. See the schema field for why. */
   llmDeliveryPath?: string;
@@ -182,5 +272,8 @@ export interface IMongoFile extends Omit<Document, 'model'> {
   createdAt?: Date;
   updatedAt?: Date;
   tenantId?: string;
+<<<<<<< HEAD
   pinned?: boolean;
+=======
+>>>>>>> upstream/main
 }

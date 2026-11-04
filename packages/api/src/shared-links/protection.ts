@@ -33,6 +33,10 @@ import {
   extractFileContent,
   extractStoredMessageContent,
 } from '../protection/adapters/submissions';
+<<<<<<< HEAD
+=======
+import { getPrivateTextInspectionTokens } from '../protection/private/submission';
+>>>>>>> upstream/main
 import { assertModelBoundContent } from '../middleware/modelBoundContent';
 import { getUserSubmittedPathState } from '../protection/provenance';
 import { assertConversationImportContentAllowed } from '../imports';
@@ -69,6 +73,10 @@ interface SerializedSharedMessagePart {
 }
 
 export interface SerializedSharedMessage {
+<<<<<<< HEAD
+=======
+  readonly privacyRevision?: string;
+>>>>>>> upstream/main
   readonly isCreatedByUser?: boolean;
   readonly isUserSubmitted?: boolean;
   readonly userSubmittedPaths?: readonly string[];
@@ -111,7 +119,21 @@ export interface ShareContentPreflightOptions {
   readonly sharedFileMetadataFiles?: boolean;
 }
 
+<<<<<<< HEAD
 export type ShareContentPreflight = (input: ShareContentPreflightInput) => Promise<void>;
+=======
+export type ShareContentPreflight = (
+  input: ShareContentPreflightInput,
+  context?: {
+    readonly canonicalMessages: readonly {
+      readonly text?: string;
+      readonly isCreatedByUser?: boolean;
+      readonly privacyRevision?: string;
+      readonly privateTextTokens?: readonly string[];
+    }[];
+  },
+) => Promise<void>;
+>>>>>>> upstream/main
 
 function omitUnsharedMessageFiles(
   messages: readonly ShareContentPreflightMessage[],
@@ -142,11 +164,18 @@ export function createShareContentPreflight(
     return undefined;
   }
 
+<<<<<<< HEAD
   const inspectSharedContent = async ({
     title,
     messages,
     shareId,
   }: ShareContentPreflightInput): Promise<void> => {
+=======
+  const inspectSharedContent = async (
+    { title, messages, shareId }: ShareContentPreflightInput,
+    context?: Parameters<ShareContentPreflight>[1],
+  ): Promise<void> => {
+>>>>>>> upstream/main
     const inspectSharedFileMetadata = options.sharedFileMetadata === true;
     const inspectSharedFiles =
       inspectSharedFileMetadata && options.sharedFileMetadataFiles !== false;
@@ -165,6 +194,12 @@ export function createShareContentPreflight(
         user: options.user,
         getFiles: options.getFiles,
         onTraversalFailure: options.onTraversalFailure,
+<<<<<<< HEAD
+=======
+        privateTextTokens: getPrivateTextInspectionTokens(
+          context?.canonicalMessages ?? snapshotMessages,
+        ),
+>>>>>>> upstream/main
       },
     );
     if (!inspectSharedFileMetadata) {
@@ -178,7 +213,11 @@ export function createShareContentPreflight(
     });
   };
 
+<<<<<<< HEAD
   return (input) => aggregateAuditFindings(() => inspectSharedContent(input));
+=======
+  return (input, context) => aggregateAuditFindings(() => inspectSharedContent(input, context));
+>>>>>>> upstream/main
 }
 
 const SERIALIZED_LOCATOR_KEYS = [

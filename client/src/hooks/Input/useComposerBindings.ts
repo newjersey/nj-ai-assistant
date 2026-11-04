@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { useRecoilValue } from 'recoil';
+<<<<<<< HEAD
 import type { ShortcutActionId } from '~/hooks/useKeyboardShortcuts';
 import type { ShortcutBinding } from '~/utils/shortcuts';
 import { EDITING_ALLOWED_SHORTCUTS, resolveShortcutBindings } from '~/hooks/useKeyboardShortcuts';
@@ -27,6 +28,16 @@ export type ComposerBindings = {
    */
   yieldedChords: ReadonlySet<string>;
 };
+=======
+import { bindingHash } from '@librechat/chat';
+import type { ComposerBindings } from '@librechat/chat';
+import type { ShortcutActionId } from '~/hooks/useKeyboardShortcuts';
+import { EDITING_ALLOWED_SHORTCUTS, resolveShortcutBindings } from '~/hooks/useKeyboardShortcuts';
+import store from '~/store';
+
+export { NO_HOST_BINDINGS } from '@librechat/chat';
+export type { ComposerBindings } from '@librechat/chat';
+>>>>>>> upstream/main
 
 /** The user's effective composer-relevant shortcut bindings, shared by the
  * composer keydown handler and the during-run hovercard hints. */

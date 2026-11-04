@@ -1,7 +1,10 @@
 const manifest = require('./manifest');
 
 // Structured Tools
+<<<<<<< HEAD
 const DALLE3 = require('./structured/DALLE3');
+=======
+>>>>>>> upstream/main
 const FluxAPI = require('./structured/FluxAPI');
 const OpenWeather = require('./structured/OpenWeather');
 const StructuredWolfram = require('./structured/Wolfram');
@@ -16,7 +19,10 @@ const createGeminiImageTool = require('./structured/GeminiImageGen');
 module.exports = {
   ...manifest,
   // Structured Tools
+<<<<<<< HEAD
   DALLE3,
+=======
+>>>>>>> upstream/main
   FluxAPI,
   OpenWeather,
   StructuredSD,

@@ -19,6 +19,11 @@ jest.mock('@librechat/api', () => ({
   refreshS3FileUrls: jest.fn(),
   resolveUploadErrorMessage: jest.fn(),
   verifyAgentUploadPermission: jest.fn(),
+<<<<<<< HEAD
+=======
+  hasAgentBasedFileAccess: (...args) =>
+    jest.requireActual('@librechat/api').hasAgentBasedFileAccess(...args),
+>>>>>>> upstream/main
 }));
 
 const mockFindFileById = jest.fn();
@@ -55,10 +60,14 @@ jest.mock('~/server/middleware/roles/capabilities', () => ({
 jest.mock('~/server/services/PermissionService', () => ({
   checkPermission: jest.fn(() => (_req, _res, next) => next()),
   getEffectivePermissions: jest.fn().mockResolvedValue(0),
+<<<<<<< HEAD
 }));
 
 jest.mock('~/server/services/Files', () => ({
   hasAccessToFilesViaAgent: jest.fn(),
+=======
+  getResourcePermissionsMap: jest.fn().mockResolvedValue(new Map()),
+>>>>>>> upstream/main
 }));
 
 jest.mock('~/server/utils/files', () => ({

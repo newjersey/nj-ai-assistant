@@ -1,8 +1,14 @@
+<<<<<<< HEAD
 import mongoose from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import type { TenantRow, TenantEngineHarness } from './conformance';
 import { applyTenantIsolation } from '~/models/plugins/tenantIsolation';
 import { describeTenantIsolationConformance } from './conformance';
+=======
+import { MongoMemoryServer } from 'mongodb-memory-server';
+import { describeTenantIsolationConformance } from './conformance';
+import { createMongooseTenantHarness } from './harness';
+>>>>>>> upstream/main
 
 /**
  * The Mongoose binding's answer to the portable contract. A PostgreSQL engine
@@ -10,6 +16,7 @@ import { describeTenantIsolationConformance } from './conformance';
  * the seam real rather than hypothetical.
  */
 
+<<<<<<< HEAD
 interface ConformanceDocument {
   name: string;
   tenantId?: string;
@@ -81,3 +88,19 @@ const harness: TenantEngineHarness = {
 };
 
 describeTenantIsolationConformance(harness);
+=======
+let server: MongoMemoryServer;
+
+describeTenantIsolationConformance(
+  createMongooseTenantHarness({
+    name: 'mongoose',
+    async connect() {
+      server = await MongoMemoryServer.create();
+      return server.getUri();
+    },
+    async release() {
+      await server.stop();
+    },
+  }),
+);
+>>>>>>> upstream/main

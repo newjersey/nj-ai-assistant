@@ -4,10 +4,19 @@ import {
   TOOL_APPROVAL_EXECUTION_SCOPE_CONFIG_KEY,
 } from '@librechat/agents';
 import type { TToolApprovalPolicy } from 'librechat-data-provider';
+<<<<<<< HEAD
+=======
+import type { HookCallback } from '@librechat/agents';
+>>>>>>> upstream/main
 import type { ResolvedToolApprovalHook, ToolApprovalHookContext } from './hooks';
 import type { MCPToolAlias } from '~/tools/classification';
 import { isHITLEnabled, mapToolApprovalPolicy } from './policy';
 import { buildToolApprovalHooks } from './hooks';
+<<<<<<< HEAD
+=======
+import { EDIT_FILE_TOOL_NAME } from '../tools';
+import { normalizeEditArgs } from '../edits';
+>>>>>>> upstream/main
 
 /** Stable across resumes; the job epoch separates edits that reuse a response id. */
 export function buildToolApprovalExecutionConfig(
@@ -25,10 +34,17 @@ export function buildToolApprovalExecutionConfig(
 /**
  * The HITL fragment spread onto a `RunConfig` when tool approval is enabled.
  *
+<<<<<<< HEAD
  * Kept as one object so the run seam attaches the opt-in switch and the policy
  * hook together — they're meaningless apart. The checkpointer is resolved
  * separately (it's an async, process-wide singleton) and merged into
  * `graphConfig.compileOptions` at the call site.
+=======
+ * The policy hooks apply to every caller. Only callers that support pause/resume
+ * also attach the `humanInTheLoop` switch and the durable checkpointer.
+ * The checkpointer is resolved separately (it's an async, process-wide singleton)
+ * and merged into `graphConfig.compileOptions` at the call site.
+>>>>>>> upstream/main
  */
 export interface HITLRunWiring {
   humanInTheLoop: { enabled: true };
@@ -41,9 +57,15 @@ export interface HITLRunWiring {
 }
 
 /**
+<<<<<<< HEAD
  * Assemble the run-level HITL wiring for a tool-approval policy, or `undefined`
  * when HITL is disabled (the default) — in which case the run attaches nothing
  * and behaves exactly as it did before this feature.
+=======
+ * Assemble tool-approval policy hooks and optional interactive HITL wiring, or
+ * `undefined` when the policy is disabled. Non-resumable callers attach only
+ * `hooks`; the SDK denies `ask` rather than pausing without a resume surface.
+>>>>>>> upstream/main
  *
  * The returned `hooks` registry carries the static-config `PreToolUse` policy hook built
  * from {@link mapToolApprovalPolicy} (an enabled policy with no allow/deny/ask lists falls
@@ -58,11 +80,51 @@ export function buildHITLRunWiring(
   context: ToolApprovalHookContext = {},
   mcpToolAliases: readonly MCPToolAlias[] = [],
   resolvedProgrammaticHooks?: readonly ResolvedToolApprovalHook[],
+<<<<<<< HEAD
+=======
+  nativeEditFileAgentIds: ReadonlySet<string> = new Set(),
+>>>>>>> upstream/main
 ): HITLRunWiring | undefined {
   if (!isHITLEnabled(policy)) {
     return undefined;
   }
 
+<<<<<<< HEAD
+=======
+  const normalizeInput = (input: Parameters<HookCallback<'PreToolUse'>>[0]['toolInput']) => {
+    if (typeof input.path !== 'string' || input.path.length === 0) return 'path is required';
+    const edits = normalizeEditArgs(input);
+    if (typeof edits === 'string') return edits;
+    const normalized: typeof input = { ...input, edits };
+    delete normalized.old_text;
+    delete normalized.new_text;
+    delete normalized.replace_all;
+    return normalized;
+  };
+  const withNormalizedEdits =
+    (hook: HookCallback<'PreToolUse'>): HookCallback<'PreToolUse'> =>
+    async (input, signal) => {
+      if (
+        input.toolName !== EDIT_FILE_TOOL_NAME ||
+        input.executingAgentId == null ||
+        !nativeEditFileAgentIds.has(input.executingAgentId)
+      ) {
+        return hook(input, signal);
+      }
+      const normalized = normalizeInput(input.toolInput);
+      if (typeof normalized === 'string') return { decision: 'deny', reason: normalized };
+      /** A fresh updatedInput would supersede the checkpointed proposal on approval replay. */
+      Object.assign(input.toolInput, normalized);
+      delete input.toolInput.old_text;
+      delete input.toolInput.new_text;
+      delete input.toolInput.replace_all;
+      const result = await hook(input, signal);
+      if (result?.updatedInput == null) return result;
+      const updatedInput = normalizeInput(result.updatedInput);
+      if (typeof updatedInput === 'string') return { decision: 'deny', reason: updatedInput };
+      return { ...result, updatedInput };
+    };
+>>>>>>> upstream/main
   const registry = new HookRegistry();
   let activePolicy: TToolApprovalPolicy | undefined = policy;
   const aliases = [...mcpToolAliases];
@@ -72,8 +134,14 @@ export function buildHITLRunWiring(
   // Static config-driven policy (mode/allow/deny/ask) — the baseline.
   registry.register('PreToolUse', {
     hooks: [
+<<<<<<< HEAD
       async (input, signal) =>
         createToolPolicyHook(mapToolApprovalPolicy(activePolicy) ?? {})(input, signal),
+=======
+      withNormalizedEdits(async (input, signal) =>
+        createToolPolicyHook(mapToolApprovalPolicy(activePolicy) ?? {})(input, signal),
+      ),
+>>>>>>> upstream/main
     ],
   });
 
@@ -81,6 +149,7 @@ export function buildHITLRunWiring(
   const programmaticHooks = resolvedProgrammaticHooks ?? buildToolApprovalHooks(context);
   for (const { hook, matcher } of programmaticHooks) {
     if (matcher == null) {
+<<<<<<< HEAD
       registry.register('PreToolUse', { hooks: [hook] });
       continue;
     }
@@ -95,19 +164,46 @@ export function buildHITLRunWiring(
           }
           regex.lastIndex = 0;
           if (regex.test(input.toolName)) {
+=======
+      registry.register('PreToolUse', { hooks: [withNormalizedEdits(hook)] });
+      continue;
+    }
+    let regex: RegExp | null = null;
+    try {
+      regex = new RegExp(matcher);
+    } catch {
+      regex = null;
+    }
+    const compiled = regex;
+    registry.register('PreToolUse', {
+      hooks: [
+        withNormalizedEdits(async (input, signal) => {
+          if (compiled == null) {
+            return {};
+          }
+          if (compiled.test(input.toolName)) {
+>>>>>>> upstream/main
             return hook(input, signal);
           }
           for (const { name, aliasName } of aliases) {
             if (name !== input.toolName) {
               continue;
             }
+<<<<<<< HEAD
             regex.lastIndex = 0;
             if (regex.test(aliasName)) {
+=======
+            if (compiled.test(aliasName)) {
+>>>>>>> upstream/main
               return hook(input, signal);
             }
           }
           return {};
+<<<<<<< HEAD
         },
+=======
+        }),
+>>>>>>> upstream/main
       ],
     });
   }

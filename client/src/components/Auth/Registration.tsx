@@ -4,11 +4,27 @@ import { loginPage } from 'librechat-data-provider';
 import { Turnstile } from '@marsidev/react-turnstile';
 import { useNavigate, useOutletContext, useLocation } from 'react-router-dom';
 import { useRegisterUserMutation } from 'librechat-data-provider/react-query';
+<<<<<<< HEAD
 import { ThemeContext, SecretInput, Spinner, Button, Input, isDark } from '@librechat/client';
+=======
+import {
+  ThemeContext,
+  SecretInput,
+  Spinner,
+  Button,
+  Input,
+  isDark,
+  floatingLabel,
+} from '@librechat/client';
+>>>>>>> upstream/main
 import type { TRegisterUser, TError } from 'librechat-data-provider';
 import type { TLoginLayoutContext } from '~/common';
 import { useLocalize, TranslationKeys } from '~/hooks';
 import { ErrorMessage } from './ErrorMessage';
+<<<<<<< HEAD
+=======
+import LegalConsent from './LegalConsent';
+>>>>>>> upstream/main
 
 const Registration: React.FC = () => {
   const navigate = useNavigate();
@@ -36,6 +52,7 @@ const Registration: React.FC = () => {
 
   // only require captcha if we have a siteKey
   const requireCaptcha = Boolean(startupConfig?.turnstile?.siteKey);
+<<<<<<< HEAD
   const authInputClassName =
     'webkit-dark-styles transition-color peer h-auto w-full rounded-2xl border border-border-light bg-surface-primary px-3.5 pb-2.5 pt-3 text-text-primary duration-200 hover:border-border-light focus:border-accent-primary focus:outline-none focus-visible:border-accent-primary';
   const authSecretInputClassName = `${authInputClassName} pr-12`;
@@ -43,6 +60,8 @@ const Registration: React.FC = () => {
     'absolute start-3 top-1.5 z-10 origin-[0] -translate-y-4 scale-75 transform bg-surface-primary px-2 text-sm text-text-secondary-alt duration-200 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:scale-100 peer-focus:top-1.5 peer-focus:-translate-y-4 peer-focus:scale-75 peer-focus:px-2 peer-focus:text-accent-primary rtl:peer-focus:left-auto rtl:peer-focus:translate-x-1/4';
   const authSecretButtonClassName =
     'size-9 rounded-xl text-text-secondary-alt hover:bg-transparent hover:text-text-primary';
+=======
+>>>>>>> upstream/main
 
   const registerUser = useRegisterUserMutation({
     onMutate: () => {
@@ -83,11 +102,16 @@ const Registration: React.FC = () => {
         <div className="relative">
           {type === 'password' ? (
             <SecretInput
+<<<<<<< HEAD
+=======
+              colorTransition
+>>>>>>> upstream/main
               id={id}
               autoComplete={id}
               aria-label={fieldLabel}
               {...field}
               aria-invalid={!!errors[id]}
+<<<<<<< HEAD
               className={authSecretInputClassName}
               placeholder=" "
               data-testid={id}
@@ -95,28 +119,50 @@ const Registration: React.FC = () => {
               labelClassName={authLabelClassName}
               controlsClassName="right-2"
               buttonClassName={authSecretButtonClassName}
+=======
+              variant="floating"
+              placeholder=" "
+              data-testid={id}
+              label={fieldLabel}
+>>>>>>> upstream/main
             />
           ) : (
             <>
               <Input
+<<<<<<< HEAD
+=======
+                colorTransition
+>>>>>>> upstream/main
                 id={id}
                 type={type}
                 autoComplete={id}
                 aria-label={fieldLabel}
                 {...field}
                 aria-invalid={!!errors[id]}
+<<<<<<< HEAD
                 className={authInputClassName}
                 placeholder=" "
                 data-testid={id}
               />
               <label htmlFor={id} className={authLabelClassName}>
+=======
+                variant="floating"
+                placeholder=" "
+                data-testid={id}
+              />
+              <label htmlFor={id} className={floatingLabel}>
+>>>>>>> upstream/main
                 {fieldLabel}
               </label>
             </>
           )}
         </div>
         {errors[id] && (
+<<<<<<< HEAD
           <span role="alert" className="mt-1 text-sm text-text-destructive">
+=======
+          <span role="alert" className="text-text-destructive mt-1 text-sm">
+>>>>>>> upstream/main
             {String(errors[id]?.message) ?? ''}
           </span>
         )}
@@ -133,7 +179,11 @@ const Registration: React.FC = () => {
       )}
       {registerUser.isSuccess && countdown > 0 && (
         <div
+<<<<<<< HEAD
           className="rounded-md border border-status-success-border bg-status-success-subtle px-3 py-2 text-sm text-text-secondary"
+=======
+          className="border-status-success-border bg-status-success-subtle text-text-secondary rounded-md border px-3 py-2 text-sm"
+>>>>>>> upstream/main
           role="alert"
         >
           {localize(
@@ -232,19 +282,39 @@ const Registration: React.FC = () => {
                 type="submit"
                 aria-label="Submit registration"
                 variant="submit"
+<<<<<<< HEAD
                 className="h-12 w-full rounded-2xl"
+=======
+                shape="soft"
+                size="auth"
+                className="w-full"
+>>>>>>> upstream/main
               >
                 {isSubmitting ? <Spinner /> : localize('com_auth_continue')}
               </Button>
             </div>
+<<<<<<< HEAD
           </form>
 
           <p className="my-4 text-center text-sm font-light text-text-secondary">
+=======
+
+            {/* Under the button it is agreed to, and read before the account is
+                created; the auth layout drops its footer bar in exchange. */}
+            <LegalConsent startupConfig={startupConfig} />
+          </form>
+
+          <p className="text-text-secondary my-4 text-center text-sm font-light">
+>>>>>>> upstream/main
             {localize('com_auth_already_have_account')}{' '}
             <a
               href={loginPage()}
               aria-label="Login"
+<<<<<<< HEAD
               className="inline-flex p-1 text-sm font-medium text-accent-primary transition-colors hover:text-accent-primary-hover"
+=======
+              className="text-accent-primary hover:text-accent-primary-hover inline-flex p-1 text-sm font-medium transition-colors"
+>>>>>>> upstream/main
             >
               {localize('com_auth_login')}
             </a>

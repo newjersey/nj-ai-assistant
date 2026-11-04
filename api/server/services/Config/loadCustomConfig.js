@@ -1,4 +1,5 @@
 const path = require('path');
+<<<<<<< HEAD
 const axios = require('axios');
 const yaml = require('js-yaml');
 const keyBy = require('lodash/keyBy');
@@ -14,10 +15,19 @@ const {
   agentParamSettings,
   validateSettingDefinitions,
 } = require('librechat-data-provider');
+=======
+const {
+  loadYaml,
+  recordLoadedConfig,
+  redactConfigSecretMaps,
+  createCustomConfigLoader,
+} = require('@librechat/api');
+>>>>>>> upstream/main
 
 const projectRoot = path.resolve(__dirname, '..', '..', '..', '..');
 const defaultConfigPath = path.resolve(projectRoot, 'librechat.yaml');
 
+<<<<<<< HEAD
 let i = 0;
 
 const OPENROUTER_PROMPT_CACHE_DEFAULT = {
@@ -235,3 +245,11 @@ function parseCustomParams(endpointName, customParams) {
 }
 
 module.exports = loadCustomConfig;
+=======
+module.exports = createCustomConfigLoader({
+  loadLocal: loadYaml,
+  defaultConfigPath,
+  redactConfig: redactConfigSecretMaps,
+  onLoad: recordLoadedConfig,
+});
+>>>>>>> upstream/main

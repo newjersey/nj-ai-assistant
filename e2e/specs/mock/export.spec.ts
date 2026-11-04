@@ -51,7 +51,11 @@ async function startMockConversation(page: Page): Promise<string> {
 }
 
 async function openExportModal(page: Page): Promise<Locator> {
+<<<<<<< HEAD
   await page.getByRole('button', { name: 'Export/Share' }).click();
+=======
+  await page.getByRole('button', { name: 'Chat options' }).click();
+>>>>>>> upstream/main
   await page.getByRole('menuitem', { name: 'Export' }).click();
   const dialog = page.getByRole('dialog', { name: 'Export conversation' });
   await expect(dialog).toBeVisible();

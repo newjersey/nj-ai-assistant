@@ -5,6 +5,10 @@ import { defineConfig } from 'tsdown';
 
 const require = createRequire(import.meta.url);
 const rootPkg = require('../../package.json');
+<<<<<<< HEAD
+=======
+const pkg = require('./package.json');
+>>>>>>> upstream/main
 
 export default defineConfig({
   entry: ['src/index.ts', 'src/react-query/index.ts'],
@@ -32,6 +36,10 @@ export default defineConfig({
       values: {
         __IS_DEV__: process.env.NODE_ENV === 'development',
         __LIBRECHAT_VERSION__: rootPkg.version,
+<<<<<<< HEAD
+=======
+        __DATA_PROVIDER_VERSION__: pkg.version,
+>>>>>>> upstream/main
       },
     }),
   ],

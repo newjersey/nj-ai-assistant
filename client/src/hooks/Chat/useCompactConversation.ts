@@ -1,8 +1,15 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { atom, useAtom } from 'jotai';
+<<<<<<< HEAD
 import { Constants, isCompactedLeaf, isAssistantsEndpoint } from 'librechat-data-provider';
 import { useLatestMessage } from '~/hooks/Messages/useLatestMessage';
 import { useChatContext } from '~/Providers';
+=======
+import { useChatActions } from '@librechat/chat/react';
+import { Constants, isCompactedLeaf, isAssistantsEndpoint } from 'librechat-data-provider';
+import { useLatestMessage } from '~/hooks/Messages/useLatestMessage';
+import { useChatContext } from '~/Providers/ChatContext';
+>>>>>>> upstream/main
 
 /** Conversation whose compaction this client submitted and is still streaming. */
 export const compactingConversationAtom = atom<string | null>(null);
@@ -21,7 +28,13 @@ export const supportsCompaction = (endpoint?: string | null): boolean =>
  * and is persisted as the boundary every later turn starts from.
  */
 export default function useCompactConversation() {
+<<<<<<< HEAD
   const { ask, index, conversation, isSubmitting } = useChatContext();
+=======
+  const { index, conversation } = useChatContext();
+  const { sendMessage, status } = useChatActions();
+  const isSubmitting = status === 'submitted' || status === 'streaming';
+>>>>>>> upstream/main
   const latestMessage = useLatestMessage(index);
   const [compactingConversation, setCompactingConversation] = useAtom(compactingConversationAtom);
 
@@ -61,7 +74,11 @@ export default function useCompactConversation() {
     setCompactingConversation(conversationId);
     /** The leaf is both the placeholder's parent and the server-side anchor
      *  (`parentMessageId` is what the controller compacts up to). */
+<<<<<<< HEAD
     const accepted = ask(
+=======
+    const accepted = sendMessage(
+>>>>>>> upstream/main
       {
         text: '',
         conversationId,
@@ -73,7 +90,11 @@ export default function useCompactConversation() {
     if (accepted === false) {
       setCompactingConversation(null);
     }
+<<<<<<< HEAD
   }, [ask, canCompact, conversationId, latestMessage, setCompactingConversation]);
+=======
+  }, [sendMessage, canCompact, conversationId, latestMessage, setCompactingConversation]);
+>>>>>>> upstream/main
 
   return { compact, canCompact, isCompacting };
 }

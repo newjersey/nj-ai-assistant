@@ -1,11 +1,25 @@
 import { Types } from 'mongoose';
 import { createHash } from 'crypto';
+<<<<<<< HEAD
 import { ResourceType } from 'librechat-data-provider';
 import type { CodeEnvironmentUserSettings } from 'librechat-data-provider';
 import type { Model } from 'mongoose';
 import type { CodeEnvironmentDocument } from '~/types';
 import type { IAclEntry } from '~/types';
 import { getTenantId, SYSTEM_TENANT_ID } from '~/config/tenantContext';
+=======
+import { ResourceType, MAX_AGENT_CODE_ENVIRONMENT_CHOICES } from 'librechat-data-provider';
+import type { CodeEnvironmentUserSettings } from 'librechat-data-provider';
+import type { Model } from 'mongoose';
+import type {
+  CodeEnvironmentSetupBinding,
+  CodeEnvironmentSetupRecord,
+} from '~/types/codeEnvironmentSetup';
+import type { CodeEnvironmentDocument } from '~/types';
+import type { IAclEntry } from '~/types';
+import { getTenantId, SYSTEM_TENANT_ID } from '~/config/tenantContext';
+import { createIndexesWithRetry } from '~/utils/retry';
+>>>>>>> upstream/main
 import logger from '~/config/winston';
 
 const CODE_ENVIRONMENT_TOMBSTONES = 'code_environment_tombstones';
@@ -18,6 +32,11 @@ type CodeEnvironmentTombstone = {
   tenantId: string;
   environmentId: string;
   deletedAt: Date;
+<<<<<<< HEAD
+=======
+  setupBinding?: string;
+  setupResourceId?: string;
+>>>>>>> upstream/main
 };
 
 function tenantScope(tenantId?: string): string {
@@ -31,6 +50,15 @@ function tombstoneId(environmentId: string, tenantId?: string): string {
     .digest('hex');
 }
 
+<<<<<<< HEAD
+=======
+function setupTombstoneId(attemptId: string, tenantId?: string): string {
+  return createHash('sha256')
+    .update(`librechat-code-environment-setup-tombstone\0${tenantScope(tenantId)}\0${attemptId}`)
+    .digest('hex');
+}
+
+>>>>>>> upstream/main
 function tombstones(mongoose: typeof import('mongoose')) {
   const db = mongoose.connection.db;
   if (db == null) {
@@ -49,7 +77,11 @@ function ownerSlotId(ownerId: Types.ObjectId, slot: number): Types.ObjectId {
 
 function agentReferenceFilter(environmentId: string, tenantId?: string) {
   return {
+<<<<<<< HEAD
     code_environment_id: environmentId,
+=======
+    $or: [{ code_environment_id: environmentId }, { code_environment_ids: environmentId }],
+>>>>>>> upstream/main
     ...(tenantId == null ? { tenantId: { $exists: false } } : { tenantId }),
   };
 }
@@ -142,6 +174,34 @@ async function renewCodeEnvironmentReference(
   }
 }
 
+<<<<<<< HEAD
+=======
+/** Hold every machine reference until the write settles. Nesting the existing
+ * guards renews already-acquired leases and releases them if a later acquisition fails. */
+export async function withCodeEnvironmentReferences<T>(
+  mongoose: typeof import('mongoose'),
+  environmentIds: string[],
+  operation: () => Promise<T>,
+  onReferenceLoss?: (result: T, environmentId: string) => Promise<void>,
+): Promise<T> {
+  if (environmentIds.length > MAX_AGENT_CODE_ENVIRONMENT_CHOICES + 1) {
+    throw new Error('Agent code environment references exceed the storage safety ceiling');
+  }
+  const ids = [...new Set(environmentIds.filter(Boolean))];
+  const run = (index: number): Promise<T> =>
+    index === ids.length
+      ? operation()
+      : withCodeEnvironmentReference(
+          mongoose,
+          ids[index],
+          () => run(index + 1),
+          undefined,
+          (result) => onReferenceLoss?.(result, ids[index]) ?? Promise.resolve(),
+        );
+  return await run(0);
+}
+
+>>>>>>> upstream/main
 export async function withCodeEnvironmentReference<T>(
   mongoose: typeof import('mongoose'),
   environmentId: string | undefined,
@@ -190,9 +250,37 @@ type CreateCodeEnvironmentInput = Pick<
   CodeEnvironmentDocument,
   'environmentId' | 'name' | 'type' | 'baseURL' | 'controlPlaneId' | 'createdBy'
 > &
+<<<<<<< HEAD
   Pick<Partial<CodeEnvironmentDocument>, 'workerId' | 'revocationTokenEnv' | 'workerPrincipal'>;
 
 export function createCodeEnvironmentMethods(mongoose: typeof import('mongoose')): {
+=======
+  Pick<
+    Partial<CodeEnvironmentDocument>,
+    'workerId' | 'revocationTokenEnv' | 'workerPrincipal' | 'setupAttemptId' | 'setupRequestHash'
+  >;
+
+export function createCodeEnvironmentMethods(mongoose: typeof import('mongoose')): {
+  ensureSetupEnvironmentIndexes: () => Promise<void>;
+  reserveSetupEnvironment: (
+    binding: CodeEnvironmentSetupBinding,
+    maxOwned?: number,
+  ) => Promise<CodeEnvironmentSetupRecord | null>;
+  findSetupEnvironment: (
+    binding: CodeEnvironmentSetupBinding,
+  ) => Promise<CodeEnvironmentSetupRecord | null>;
+  completeSetupEnvironment: (
+    binding: CodeEnvironmentSetupBinding,
+    resourceId: string,
+  ) => Promise<CodeEnvironmentSetupRecord>;
+  beginDiscardSetupEnvironment: (
+    binding: CodeEnvironmentSetupBinding,
+  ) => Promise<CodeEnvironmentSetupRecord | null>;
+  finishDiscardSetupEnvironment: (
+    binding: CodeEnvironmentSetupBinding,
+    resourceId: string,
+  ) => Promise<void>;
+>>>>>>> upstream/main
   createCodeEnvironment: (input: CreateCodeEnvironmentInput) => Promise<CodeEnvironmentDocument>;
   createCodeEnvironmentWithinOwnerLimit: (
     input: CreateCodeEnvironmentInput,
@@ -225,6 +313,274 @@ export function createCodeEnvironmentMethods(mongoose: typeof import('mongoose')
   deleteUserCodeEnvironments: (userId: string | Types.ObjectId) => Promise<number>;
 } {
   const model = () => mongoose.models.CodeEnvironment as Model<CodeEnvironmentDocument>;
+<<<<<<< HEAD
+=======
+  let setupIndexInitialization: Promise<void> | undefined;
+  async function ensureSetupEnvironmentIndexes(): Promise<void> {
+    const current = (setupIndexInitialization ??= createIndexesWithRetry(model()));
+    try {
+      await current;
+    } catch (error) {
+      if (setupIndexInitialization === current) setupIndexInitialization = undefined;
+      throw error;
+    }
+  }
+
+  function setupFilter(binding: CodeEnvironmentSetupBinding) {
+    return {
+      environmentId: binding.environmentId,
+      tenantId: tenantScope() === '' ? { $exists: false } : tenantScope(),
+      setupAttemptId: binding.setupAttemptId,
+      setupRequestHash: binding.requestHash,
+      createdBy: new Types.ObjectId(binding.ownerId),
+      name: binding.name,
+      type: binding.type,
+      baseURL: binding.baseURL,
+      controlPlaneId: binding.controlPlaneId,
+      workerId: binding.workerId ?? { $exists: false },
+      revocationTokenEnv: binding.revocationTokenEnv ?? { $exists: false },
+      ...(binding.workerPrincipal == null
+        ? { workerPrincipal: { $exists: false } }
+        : {
+            'workerPrincipal.type': binding.workerPrincipal.type,
+            'workerPrincipal.id': binding.workerPrincipal.id,
+          }),
+    };
+  }
+
+  function setupIdentity(
+    binding: CodeEnvironmentSetupBinding,
+    tenantId: string = tenantScope(),
+  ): string {
+    return JSON.stringify([
+      tenantId,
+      binding.setupAttemptId,
+      binding.requestHash,
+      binding.ownerId,
+      binding.environmentId,
+      binding.name,
+      binding.type,
+      binding.baseURL,
+      binding.controlPlaneId,
+      binding.workerId ?? null,
+      binding.revocationTokenEnv ?? null,
+      binding.workerPrincipal?.type ?? null,
+      binding.workerPrincipal?.id ?? null,
+    ]);
+  }
+
+  function rowSetupBinding(environment: CodeEnvironmentDocument): string | undefined {
+    if (environment.setupAttemptId == null || environment.setupRequestHash == null)
+      return undefined;
+    return setupIdentity(
+      {
+        setupAttemptId: environment.setupAttemptId,
+        requestHash: environment.setupRequestHash,
+        ownerId: environment.createdBy.toString(),
+        environmentId: environment.environmentId,
+        name: environment.name,
+        type: environment.type,
+        baseURL: environment.baseURL,
+        controlPlaneId: environment.controlPlaneId,
+        workerId: environment.workerId,
+        revocationTokenEnv: environment.revocationTokenEnv,
+        workerPrincipal: environment.workerPrincipal,
+      },
+      tenantScope(environment.tenantId),
+    );
+  }
+
+  async function retireEnvironment(environment: CodeEnvironmentDocument): Promise<void> {
+    const setupBinding = rowSetupBinding(environment);
+    const metadata =
+      setupBinding == null ? {} : { setupBinding, setupResourceId: environment._id.toString() };
+    const ids = [tombstoneId(environment.environmentId, environment.tenantId)];
+    if (setupBinding != null)
+      ids.push(setupTombstoneId(environment.setupAttemptId!, environment.tenantId));
+    await Promise.all(
+      ids.map(async (_id) =>
+        tombstones(mongoose).updateOne(
+          {
+            _id,
+            ...(setupBinding == null
+              ? {}
+              : { $or: [{ setupBinding: { $exists: false } }, { setupBinding }] }),
+          },
+          {
+            $setOnInsert: {
+              tenantId: tenantScope(environment.tenantId),
+              environmentId: environment.environmentId,
+              deletedAt: new Date(),
+            },
+            ...(setupBinding == null ? {} : { $set: metadata }),
+          },
+          { upsert: true },
+        ),
+      ),
+    );
+  }
+
+  function retiredSetupFilter(binding: CodeEnvironmentSetupBinding) {
+    return {
+      _id: { $in: [tombstoneId(binding.environmentId), setupTombstoneId(binding.setupAttemptId)] },
+    };
+  }
+
+  function setupRecord(environment: CodeEnvironmentDocument): CodeEnvironmentSetupRecord {
+    return {
+      resourceId: environment._id.toString(),
+      id: environment.environmentId,
+      name: environment.name,
+      type: environment.type,
+      pending: environment.registrationPendingAt != null,
+    };
+  }
+
+  function setupLiveFilter(binding: CodeEnvironmentSetupBinding) {
+    return {
+      ...setupFilter(binding),
+      setupDiscardedAt: { $exists: false },
+      deletionStartedAt: { $exists: false },
+      deletionCommittedAt: { $exists: false },
+      revocationPendingAt: { $exists: false },
+    };
+  }
+
+  async function findSetupEnvironment(
+    binding: CodeEnvironmentSetupBinding,
+  ): Promise<CodeEnvironmentSetupRecord | null> {
+    const environment = await model()
+      .findOne(setupLiveFilter(binding))
+      .lean<CodeEnvironmentDocument>();
+    if (environment != null) return setupRecord(environment);
+    const [collision, retired] = await Promise.all([
+      model().exists({
+        tenantId: tenantScope() === '' ? { $exists: false } : tenantScope(),
+        $or: [{ environmentId: binding.environmentId }, { setupAttemptId: binding.setupAttemptId }],
+      }),
+      tombstones(mongoose).findOne(retiredSetupFilter(binding)),
+    ]);
+    if (collision != null || retired != null)
+      throw new Error('Browser setup registry binding is unavailable');
+    return null;
+  }
+
+  async function reserveSetupEnvironment(
+    binding: CodeEnvironmentSetupBinding,
+    maxOwned?: number,
+  ): Promise<CodeEnvironmentSetupRecord | null> {
+    await ensureSetupEnvironmentIndexes();
+    const replay = await findSetupEnvironment(binding);
+    if (replay != null) return replay;
+    const input: CreateCodeEnvironmentInput = {
+      ...binding,
+      createdBy: new Types.ObjectId(binding.ownerId),
+      setupRequestHash: binding.requestHash,
+    };
+    let created: CodeEnvironmentDocument | null;
+    try {
+      created =
+        maxOwned == null
+          ? await createCodeEnvironment(input)
+          : await createCodeEnvironmentWithinOwnerLimit(input, maxOwned);
+    } catch (error) {
+      const duplicate =
+        typeof error === 'object' && error != null && 'code' in error && error.code === 11000;
+      if (!duplicate) throw error;
+      const replayed = await findSetupEnvironment(binding);
+      if (replayed != null) return replayed;
+      throw error;
+    }
+    if (created == null) return await findSetupEnvironment(binding);
+    // A concurrent retirement can win between the initial lookup and insertion.
+    if ((await tombstones(mongoose).findOne(retiredSetupFilter(binding))) != null) {
+      await model().updateOne(
+        { _id: created._id, ...setupFilter(binding) },
+        { $set: { setupDiscardedAt: new Date() } },
+      );
+      throw new Error('Browser setup registry binding is retired');
+    }
+    return setupRecord(created);
+  }
+
+  async function completeSetupEnvironment(
+    binding: CodeEnvironmentSetupBinding,
+    resourceId: string,
+  ): Promise<CodeEnvironmentSetupRecord> {
+    const updated = await model()
+      .findOneAndUpdate(
+        { _id: new Types.ObjectId(resourceId), ...setupLiveFilter(binding) },
+        { $unset: { registrationPendingAt: 1, registrationReconcileAfter: 1 } },
+        { new: true },
+      )
+      .lean<CodeEnvironmentDocument>();
+    if (updated == null) throw new Error('Browser setup registration could not be committed');
+    return setupRecord(updated);
+  }
+
+  async function beginDiscardSetupEnvironment(
+    binding: CodeEnvironmentSetupBinding,
+  ): Promise<CodeEnvironmentSetupRecord | null> {
+    const updated = await model()
+      .findOneAndUpdate(
+        setupFilter(binding),
+        { $set: { setupDiscardedAt: new Date(), registrationPendingAt: new Date() } },
+        { new: true },
+      )
+      .lean<CodeEnvironmentDocument>();
+    if (updated != null) {
+      await retireEnvironment(updated);
+      return setupRecord(updated);
+    }
+    const [collision, retired] = await Promise.all([
+      model().exists({
+        $or: [{ environmentId: binding.environmentId }, { setupAttemptId: binding.setupAttemptId }],
+        tenantId: tenantScope() === '' ? { $exists: false } : tenantScope(),
+      }),
+      tombstones(mongoose).findOne(retiredSetupFilter(binding)),
+    ]);
+    if (collision != null || (retired != null && retired.setupBinding !== setupIdentity(binding)))
+      throw new Error('Browser setup registry binding does not match');
+    // Fence an absent reservation, including compensation racing its first insertion.
+    if (retired == null)
+      await Promise.all(
+        retiredSetupFilter(binding)._id.$in.map(async (_id) =>
+          tombstones(mongoose).updateOne(
+            { _id },
+            {
+              $setOnInsert: {
+                tenantId: tenantScope(),
+                environmentId: binding.environmentId,
+                deletedAt: new Date(),
+                setupBinding: setupIdentity(binding),
+              },
+            },
+            { upsert: true },
+          ),
+        ),
+      );
+    return retired?.setupResourceId == null
+      ? null
+      : {
+          resourceId: retired.setupResourceId,
+          id: binding.environmentId,
+          name: binding.name,
+          type: binding.type,
+          pending: true,
+        };
+  }
+
+  async function finishDiscardSetupEnvironment(
+    binding: CodeEnvironmentSetupBinding,
+    resourceId: string,
+  ): Promise<void> {
+    await model().deleteOne({
+      _id: new Types.ObjectId(resourceId),
+      ...setupFilter(binding),
+      setupDiscardedAt: { $exists: true },
+    });
+  }
+>>>>>>> upstream/main
 
   async function createCodeEnvironment(
     input: CreateCodeEnvironmentInput,
@@ -266,7 +622,14 @@ export function createCodeEnvironmentMethods(mongoose: typeof import('mongoose')
         return (
           await model().create({
             ...input,
+<<<<<<< HEAD
             _id: ownerSlotId(input.createdBy, ownerSlot),
+=======
+            _id:
+              input.setupAttemptId == null
+                ? ownerSlotId(input.createdBy, ownerSlot)
+                : new Types.ObjectId(),
+>>>>>>> upstream/main
             ownerSlot,
             registrationPendingAt: new Date(),
           })
@@ -349,6 +712,7 @@ export function createCodeEnvironmentMethods(mongoose: typeof import('mongoose')
   ): Promise<CodeEnvironmentDocument | null> {
     const environment = await model().findById(id).lean<CodeEnvironmentDocument>();
     if (environment == null) return null;
+<<<<<<< HEAD
     await tombstones(mongoose).updateOne(
       { _id: tombstoneId(environment.environmentId, environment.tenantId) },
       {
@@ -360,11 +724,18 @@ export function createCodeEnvironmentMethods(mongoose: typeof import('mongoose')
       },
       { upsert: true },
     );
+=======
+    await retireEnvironment(environment);
+>>>>>>> upstream/main
     return await model().findByIdAndDelete(id).lean<CodeEnvironmentDocument>();
   }
 
   async function discardCodeEnvironmentById(id: string | Types.ObjectId): Promise<void> {
+<<<<<<< HEAD
     await model().deleteOne({ _id: id });
+=======
+    await model().deleteOne({ _id: id, setupAttemptId: { $exists: false } });
+>>>>>>> upstream/main
   }
 
   async function completeCodeEnvironmentRegistration(id: string | Types.ObjectId): Promise<void> {
@@ -372,6 +743,10 @@ export function createCodeEnvironmentMethods(mongoose: typeof import('mongoose')
       {
         _id: id,
         registrationPendingAt: { $exists: true },
+<<<<<<< HEAD
+=======
+        setupAttemptId: { $exists: false },
+>>>>>>> upstream/main
         registrationLeaseId: { $exists: false },
       },
       { $unset: { registrationPendingAt: 1, registrationReconcileAfter: 1 } },
@@ -484,6 +859,7 @@ export function createCodeEnvironmentMethods(mongoose: typeof import('mongoose')
         await cancelCodeEnvironmentRemoval(candidate._id, claimed.deletionLeaseId);
         continue;
       }
+<<<<<<< HEAD
       await tombstones(mongoose).updateOne(
         { _id: tombstoneId(claimed.environmentId, claimed.tenantId) },
         {
@@ -495,6 +871,9 @@ export function createCodeEnvironmentMethods(mongoose: typeof import('mongoose')
         },
         { upsert: true },
       );
+=======
+      await retireEnvironment(claimed);
+>>>>>>> upstream/main
       await AclEntry.deleteMany({
         resourceType: ResourceType.CODE_ENVIRONMENT,
         resourceId: candidate._id,
@@ -509,6 +888,15 @@ export function createCodeEnvironmentMethods(mongoose: typeof import('mongoose')
   }
 
   return {
+<<<<<<< HEAD
+=======
+    ensureSetupEnvironmentIndexes,
+    reserveSetupEnvironment,
+    findSetupEnvironment,
+    completeSetupEnvironment,
+    beginDiscardSetupEnvironment,
+    finishDiscardSetupEnvironment,
+>>>>>>> upstream/main
     createCodeEnvironment,
     createCodeEnvironmentWithinOwnerLimit,
     findCodeEnvironmentsByIds,

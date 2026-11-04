@@ -28,3 +28,29 @@ it('opens the exact descendant that owns an immediate MCP failure', async () => 
   );
   expect(onOpenAgent).toHaveBeenCalledWith('research-agent');
 });
+<<<<<<< HEAD
+=======
+
+it('explains missing unattended credentials without suggesting interactive reconnection', () => {
+  const onOpenAgent = jest.fn();
+  render(
+    <ScheduleMCPRecovery
+      outcomes={[
+        {
+          server: 'Company Graph',
+          status: 'mcp_configuration_missing',
+          detail: 'unattended_auth_required',
+        },
+      ]}
+      fallbackAgentId="root-agent"
+      onOpenAgent={onOpenAgent}
+    />,
+  );
+
+  expect(screen.getByRole('alert')).toHaveTextContent(
+    'Company Graph (root-agent): com_ui_schedule_mcp_unattended_auth',
+  );
+  expect(screen.queryByRole('button')).not.toBeInTheDocument();
+  expect(onOpenAgent).not.toHaveBeenCalled();
+});
+>>>>>>> upstream/main

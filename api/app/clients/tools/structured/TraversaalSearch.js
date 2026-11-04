@@ -1,4 +1,8 @@
 const { logger } = require('@librechat/data-schemas');
+<<<<<<< HEAD
+=======
+const { toolRequestBudget } = require('@librechat/api');
+>>>>>>> upstream/main
 const { Tool } = require('@librechat/agents/langchain/tools');
 const { getEnvironmentVariable } = require('@librechat/agents/langchain/utils/env');
 
@@ -23,6 +27,10 @@ class TraversaalSearch extends Tool {
   }
   constructor(fields) {
     super(fields);
+<<<<<<< HEAD
+=======
+    this.timeouts = fields.timeouts;
+>>>>>>> upstream/main
     this.name = 'traversaal_search';
     this.description = `An AI search engine optimized for comprehensive, accurate, and trusted results.
     Useful for when you need to answer questions about current events. Input should be a search query.`;
@@ -59,6 +67,10 @@ class TraversaalSearch extends Tool {
           'x-api-key': this.apiKey,
         },
         body: JSON.stringify({ ...body }),
+<<<<<<< HEAD
+=======
+        signal: toolRequestBudget(this.timeouts).signal,
+>>>>>>> upstream/main
       });
       const json = await response.json();
       if (!response.ok) {

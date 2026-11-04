@@ -5,30 +5,56 @@ import {
   isEphemeralAgentId,
 } from 'librechat-data-provider';
 import {
+<<<<<<< HEAD
+=======
+  logger,
+>>>>>>> upstream/main
   AgentQueuedTurnCapacityError,
   AgentQueuedTurnConflictError,
   AgentQueuedTurnLaneRetiredError,
 } from '@librechat/data-schemas';
 import type {
+<<<<<<< HEAD
+=======
+  CodeApprovalMode,
+  TAgentQueuedTurnFileRef,
+  TAgentQueuedTurnReceipt,
+  TFile,
+  TReasoningOverride,
+} from 'librechat-data-provider';
+import type {
+>>>>>>> upstream/main
   AgentQueuedTurnActiveRecord,
   AgentQueuedTurnMethods,
   AgentQueuedTurnRecord,
   IMongoFile,
 } from '@librechat/data-schemas';
+<<<<<<< HEAD
 import type {
   TAgentQueuedTurnFileRef,
   TAgentQueuedTurnReceipt,
   TFile,
 } from 'librechat-data-provider';
+=======
+import type { Request, RequestHandler } from 'express';
+>>>>>>> upstream/main
 import type { AgentQueuedTurnLifecycle } from './queuedTurns';
 import type { SteerFileFetcher } from './steering/request';
 import type { SteerRequestUser } from './steering/refs';
 import { buildOwnerFilter, collectFileIds, toSteerFileRef } from './steering/refs';
+<<<<<<< HEAD
+=======
+import { createQueuedTurnDeliveryReservation } from './queuedTurns';
+>>>>>>> upstream/main
 import { getReferencedQuotes } from '~/utils';
 
 const MAX_QUEUED_TURN_LENGTH = 16_000;
 const MAX_QUEUED_TURN_FILES = 10;
+<<<<<<< HEAD
 const CAPABILITY = { supported: true, durability: 'durable' } as const;
+=======
+const CAPABILITY = { supported: true, durability: 'durable', protocolVersion: 2 } as const;
+>>>>>>> upstream/main
 
 interface QueuedTurnConversation {
   agent_id?: string;
@@ -41,6 +67,10 @@ interface QueuedTurnHttpMethods extends AgentQueuedTurnMethods {
 }
 
 export interface AgentQueuedTurnHttpDeps {
+<<<<<<< HEAD
+=======
+  protocolVersion?: 2;
+>>>>>>> upstream/main
   methods: QueuedTurnHttpMethods;
   lifecycle: Pick<AgentQueuedTurnLifecycle, 'schedule' | 'cancel'>;
   getFiles?: SteerFileFetcher;
@@ -86,6 +116,11 @@ function receipt(
     ...(turn.files != null && { files: turn.files }),
     ...(turn.quotes != null && { quotes: turn.quotes }),
     ...(turn.manualSkills != null && { manualSkills: turn.manualSkills }),
+<<<<<<< HEAD
+=======
+    ...(turn.codeApprovalMode != null && { codeApprovalMode: turn.codeApprovalMode }),
+    ...(turn.reasoningOverride != null && { reasoningOverride: turn.reasoningOverride }),
+>>>>>>> upstream/main
     priority: turn.priority,
     ...(turn.expectedPredecessorCreatedAt != null && {
       expectedPredecessorCreatedAt: turn.expectedPredecessorCreatedAt,
@@ -132,6 +167,16 @@ function uniqueStrings(values: readonly string[] | undefined): string[] | undefi
   return values == null ? undefined : [...new Set(values)];
 }
 
+<<<<<<< HEAD
+=======
+function sameReasoningOverride(
+  left: TReasoningOverride | undefined,
+  right: TReasoningOverride | undefined,
+): boolean {
+  return left?.key === right?.key && left?.value === right?.value;
+}
+
+>>>>>>> upstream/main
 function matchesReplayIntent(
   turn: AgentQueuedTurnRecord,
   input: {
@@ -139,6 +184,11 @@ function matchesReplayIntent(
     clientRequestId: string;
     files?: readonly TAgentQueuedTurnFileRef[];
     manualSkills?: readonly string[];
+<<<<<<< HEAD
+=======
+    codeApprovalMode?: CodeApprovalMode;
+    reasoningOverride?: TReasoningOverride;
+>>>>>>> upstream/main
     expectedPredecessorCreatedAt?: number;
   },
   text: string,
@@ -154,6 +204,11 @@ function matchesReplayIntent(
     ) &&
     sameStrings(turn.quotes, quotes) &&
     sameStrings(turn.manualSkills, uniqueStrings(input.manualSkills)) &&
+<<<<<<< HEAD
+=======
+    turn.codeApprovalMode === input.codeApprovalMode &&
+    sameReasoningOverride(turn.reasoningOverride, input.reasoningOverride) &&
+>>>>>>> upstream/main
     turn.expectedPredecessorCreatedAt === input.expectedPredecessorCreatedAt
   );
 }
@@ -260,6 +315,12 @@ export async function handleAgentQueuedTurnEnqueue(
     return { status: 400, body: { code: 'INVALID_QUEUED_TURN' } };
   }
   const input = parsed.data;
+<<<<<<< HEAD
+=======
+  if (input.codeApprovalMode != null && deps.protocolVersion !== 2) {
+    return { status: 409, body: { code: 'QUEUED_TURN_PROTOCOL_REQUIRED' } };
+  }
+>>>>>>> upstream/main
   const text = input.text.replace(/\0/g, '').trim();
   if (text.length === 0) {
     return { status: 400, body: { code: 'EMPTY_TEXT' } };
@@ -328,7 +389,11 @@ export async function handleAgentQueuedTurnEnqueue(
     return resolvedFiles.error;
   }
   try {
+<<<<<<< HEAD
     const queued = await deps.methods.enqueueAgentQueuedTurn({
+=======
+    const enqueueInput = {
+>>>>>>> upstream/main
       ...scope,
       conversationId: input.conversationId,
       agentId: authorized.conversation.agent_id,
@@ -338,10 +403,24 @@ export async function handleAgentQueuedTurnEnqueue(
       ...(resolvedFiles.files != null && { files: resolvedFiles.files }),
       ...(quotes != null && { quotes }),
       ...(input.manualSkills != null && { manualSkills: input.manualSkills }),
+<<<<<<< HEAD
+=======
+      ...(input.codeApprovalMode != null && { codeApprovalMode: input.codeApprovalMode }),
+      ...(input.reasoningOverride != null && { reasoningOverride: input.reasoningOverride }),
+>>>>>>> upstream/main
       priority: false,
       ...(input.expectedPredecessorCreatedAt != null && {
         expectedPredecessorCreatedAt: input.expectedPredecessorCreatedAt,
       }),
+<<<<<<< HEAD
+=======
+    };
+    const queued = await deps.methods.enqueueAgentQueuedTurn({
+      ...enqueueInput,
+      ...(input.codeApprovalMode != null && {
+        deliveryReservation: createQueuedTurnDeliveryReservation(enqueueInput),
+      }),
+>>>>>>> upstream/main
     });
     /** A same-body replay is the transport-independent receipt lookup. It can
      * arrive after the original row already settled, in which case no new
@@ -456,3 +535,27 @@ export async function handleAgentQueuedTurnCancel(
   }
   return { status: 200, body: { receipt: receipt(cancelled.turn) } };
 }
+<<<<<<< HEAD
+=======
+
+/** Keep protocol selection and error handling in the TypeScript backend. */
+export function createAgentQueuedTurnEnqueueHandlers(
+  getDependencies: (req: Request) => AgentQueuedTurnHttpDeps,
+): { enqueue: RequestHandler; enqueueV2: RequestHandler } {
+  const create =
+    (protocolVersion?: 2): RequestHandler =>
+    async (req, res) => {
+      try {
+        const result = await handleAgentQueuedTurnEnqueue(req.user ?? {}, req.body ?? {}, {
+          ...getDependencies(req),
+          protocolVersion,
+        });
+        res.status(result.status).json(result.body);
+      } catch (error) {
+        logger.error('[AgentQueuedTurns] Failed to enqueue turn', error);
+        res.status(500).json({ code: 'QUEUED_TURN_ENQUEUE_FAILED' });
+      }
+    };
+  return { enqueue: create(), enqueueV2: create(2) };
+}
+>>>>>>> upstream/main

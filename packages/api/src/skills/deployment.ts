@@ -188,6 +188,10 @@ export type DeploymentSkillBaseMethods = {
     skillId: SkillId,
     relativePath: string,
     update: { content?: string; isBinary?: boolean },
+<<<<<<< HEAD
+=======
+    expectedFileId?: string,
+>>>>>>> upstream/main
   ) => Promise<void>;
   updateSkillFileCodeEnvIds?: (
     updates: Array<{ skillId: SkillId; relativePath: string; codeEnvRef: CodeEnvRef }>,
@@ -354,10 +358,13 @@ export class DeploymentSkillRegistry {
 let registry = new DeploymentSkillRegistry(null, []);
 const warnedDeploymentNameCollisions = new Set<string>();
 
+<<<<<<< HEAD
 export function getDeploymentSkillRegistry(): DeploymentSkillRegistry {
   return registry;
 }
 
+=======
+>>>>>>> upstream/main
 export function getDeploymentSkillIds(): Types.ObjectId[] {
   return registry.ids();
 }
@@ -389,10 +396,13 @@ export function getDeploymentSkillById(id: SkillId): DeploymentSkill | null {
   return registry.getById(id);
 }
 
+<<<<<<< HEAD
 export function isDeploymentSkillFilePath(filepath: string): boolean {
   return registry.hasFilePath(filepath);
 }
 
+=======
+>>>>>>> upstream/main
 export async function getDeploymentSkillDownloadStream(
   filepath: string,
 ): Promise<NodeJS.ReadableStream> {
@@ -402,12 +412,15 @@ export async function getDeploymentSkillDownloadStream(
   return fs.createReadStream(filepath);
 }
 
+<<<<<<< HEAD
 export function updateDeploymentSkillFileCodeEnvRefs(
   updates: Array<{ skillId: SkillId; relativePath: string; codeEnvRef: CodeEnvRef }>,
 ): Array<{ skillId: SkillId; relativePath: string; codeEnvRef: CodeEnvRef }> {
   return registry.updateFileCodeEnvRefs(updates);
 }
 
+=======
+>>>>>>> upstream/main
 export function resolveDeploymentSkillDirectory(
   options: LoadDeploymentSkillsOptions = {},
 ): DirectoryResolution {
@@ -604,6 +617,10 @@ export function createDeploymentSkillMethods<T extends DeploymentSkillBaseMethod
       skillId: SkillId,
       relativePath: string,
       update: { content?: string; isBinary?: boolean },
+<<<<<<< HEAD
+=======
+      expectedFileId?: string,
+>>>>>>> upstream/main
     ): Promise<void> => {
       const deploymentFile = registry.getFileByPath(skillId, relativePath);
       if (deploymentFile) {
@@ -616,7 +633,11 @@ export function createDeploymentSkillMethods<T extends DeploymentSkillBaseMethod
         return;
       }
       if (base.updateSkillFileContent) {
+<<<<<<< HEAD
         await base.updateSkillFileContent(skillId, relativePath, update);
+=======
+        await base.updateSkillFileContent(skillId, relativePath, update, expectedFileId);
+>>>>>>> upstream/main
       }
     },
     updateSkillFileCodeEnvIds: async (

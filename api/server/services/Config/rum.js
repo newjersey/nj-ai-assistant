@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 const { getRumProxyClientUrl, isEnabled, isRumProxyEnabled } = require('@librechat/api');
 const { logger } = require('@librechat/data-schemas');
 
@@ -149,3 +150,6 @@ function getRumConfig() {
 }
 
 module.exports = { getRumConfig };
+=======
+module.exports = { getRumConfig: require('@librechat/api').getRumConfig };
+>>>>>>> upstream/main

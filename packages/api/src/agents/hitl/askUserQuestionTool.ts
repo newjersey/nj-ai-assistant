@@ -58,6 +58,7 @@ const ASK_USER_QUESTION_DESCRIPTION = [
  * `askUserQuestions()` unchanged, so this schema is the wire shape inside the
  * pending-action payload.
  */
+<<<<<<< HEAD
 const askUserQuestionItemSchema: z.ZodObject<
   {
     id: z.ZodString;
@@ -71,6 +72,16 @@ const askUserQuestionItemSchema: z.ZodObject<
   },
   'strip'
 > = z.object({
+=======
+const askUserQuestionItemSchema: z.ZodObject<{
+  id: z.ZodString;
+  header: z.ZodOptional<z.ZodString>;
+  question: z.ZodString;
+  description: z.ZodOptional<z.ZodString>;
+  options: z.ZodOptional<z.ZodArray<z.ZodObject<{ label: z.ZodString; value: z.ZodString }>>>;
+  multiSelect: z.ZodOptional<z.ZodBoolean>;
+}> = z.object({
+>>>>>>> upstream/main
   id: z
     .string()
     .regex(ASK_USER_QUESTION_ID_PATTERN)
@@ -117,7 +128,11 @@ const askUserQuestionItemSchema: z.ZodObject<
     .describe('Allow the user to pick several options; their values are returned joined by ", ".'),
 });
 
+<<<<<<< HEAD
 const askUserQuestionsArraySchema: z.ZodEffects<z.ZodArray<typeof askUserQuestionItemSchema>> = z
+=======
+const askUserQuestionsArraySchema: z.ZodArray<typeof askUserQuestionItemSchema> = z
+>>>>>>> upstream/main
   .array(askUserQuestionItemSchema)
   .min(1)
   .max(MAX_ASK_USER_QUESTIONS)
@@ -131,10 +146,16 @@ const askUserQuestionsArraySchema: z.ZodEffects<z.ZodArray<typeof askUserQuestio
 
 const legacyAskUserQuestionToolSchema = askUserQuestionItemSchema.omit({ id: true, header: true });
 
+<<<<<<< HEAD
 export const askUserQuestionToolSchema: z.ZodObject<
   { questions: typeof askUserQuestionsArraySchema },
   'strip'
 > = z.object({
+=======
+export const askUserQuestionToolSchema: z.ZodObject<{
+  questions: typeof askUserQuestionsArraySchema;
+}> = z.object({
+>>>>>>> upstream/main
   questions: askUserQuestionsArraySchema,
 });
 

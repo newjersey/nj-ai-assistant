@@ -1,4 +1,5 @@
 import React from 'react';
+<<<<<<< HEAD
 import { Tools } from 'librechat-data-provider';
 import { UIResourceRenderer } from '@mcp-ui/client';
 import { render, screen, fireEvent } from '@testing-library/react';
@@ -7,6 +8,11 @@ import UIResourceCarousel from '~/components/Chat/Messages/Content/UIResourceCar
 import ToolCallInfo from '~/components/Chat/Messages/Content/ToolCallInfo';
 
 // Mock the dependencies
+=======
+import { render, screen, fireEvent } from '@testing-library/react';
+import ToolCallInfo from '~/components/Chat/Messages/Content/ToolCallInfo';
+
+>>>>>>> upstream/main
 jest.mock('~/hooks', () => ({
   useLocalize: () => (key: string) => {
     const translations: Record<string, string> = {
@@ -24,6 +30,7 @@ jest.mock('~/hooks', () => ({
   }),
 }));
 
+<<<<<<< HEAD
 jest.mock('~/Providers', () => ({
   useOptionalMessagesOperations: () => ({
     ask: jest.fn(),
@@ -39,11 +46,14 @@ jest.mock('../UIResourceCarousel', () => ({
   default: jest.fn(() => null),
 }));
 
+=======
+>>>>>>> upstream/main
 jest.mock('../ToolOutput', () => ({
   OutputRenderer: ({ text }: { text: string }) => <div data-testid="output-renderer">{text}</div>,
 }));
 
 jest.mock('~/utils', () => ({
+<<<<<<< HEAD
   handleUIAction: jest.fn(),
   cn: (...classes: any[]) => classes.filter(Boolean).join(' '),
 }));
@@ -56,11 +66,23 @@ describe('ToolCallInfo', () => {
   const mockProps = {
     input: '{"test": "input"}',
   };
+=======
+  cn: (...classes: string[]) => classes.filter(Boolean).join(' '),
+}));
+
+jest.mock('lucide-react', () => ({
+  ChevronDown: () => <span aria-hidden="true" />,
+}));
+
+describe('ToolCallInfo', () => {
+  const baseProps = { input: '{"query": "test"}' };
+>>>>>>> upstream/main
 
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
+<<<<<<< HEAD
   describe('ui_resources from attachments', () => {
     it('should render single ui_resource from attachments', () => {
       const uiResource = {
@@ -356,6 +378,62 @@ describe('ToolCallInfo', () => {
         }),
         expect.any(Object),
       );
+=======
+  describe('output rendering', () => {
+    it('renders output text', () => {
+      render(<ToolCallInfo {...baseProps} output="Some output" />);
+      expect(screen.getByTestId('output-renderer').textContent).toBe('Some output');
+    });
+
+    it('renders nothing when output is absent', () => {
+      render(<ToolCallInfo {...baseProps} />);
+      expect(screen.queryByTestId('output-renderer')).not.toBeInTheDocument();
+    });
+
+    it('renders null output without crashing', () => {
+      render(<ToolCallInfo {...baseProps} output={null} />);
+      expect(screen.queryByTestId('output-renderer')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('parameters toggle', () => {
+    it('shows toggle when input has JSON content', () => {
+      render(<ToolCallInfo {...baseProps} output="output" />);
+      expect(screen.getByText('Parameters')).toBeInTheDocument();
+    });
+
+    it('hides toggle when input is empty', () => {
+      render(<ToolCallInfo input="" output="output" />);
+      expect(screen.queryByText('Parameters')).not.toBeInTheDocument();
+    });
+
+    it('hides toggle when input is whitespace only', () => {
+      render(<ToolCallInfo input="   " output="output" />);
+      expect(screen.queryByText('Parameters')).not.toBeInTheDocument();
+    });
+
+    it('toggles expanded state when clicked', () => {
+      render(<ToolCallInfo {...baseProps} output="output" />);
+      const button = screen.getByText('Parameters').closest('button')!;
+      expect(button).toHaveAttribute('aria-expanded', 'false');
+      fireEvent.click(button);
+      expect(button).toHaveAttribute('aria-expanded', 'true');
+      fireEvent.click(button);
+      expect(button).toHaveAttribute('aria-expanded', 'false');
+    });
+  });
+
+  describe('edge cases', () => {
+    it('renders with only input and no output', () => {
+      render(<ToolCallInfo {...baseProps} />);
+      expect(screen.getByText('Parameters')).toBeInTheDocument();
+    });
+
+    it('renders with empty props', () => {
+      render(<ToolCallInfo input="" />);
+      expect(screen.queryByTestId('output-renderer')).not.toBeInTheDocument();
+      expect(screen.queryByText('Parameters')).not.toBeInTheDocument();
+>>>>>>> upstream/main
     });
   });
 });

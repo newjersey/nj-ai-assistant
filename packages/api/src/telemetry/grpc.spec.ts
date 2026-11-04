@@ -3,6 +3,10 @@ import { logger } from '@librechat/data-schemas';
 import { Server, ServerCredentials } from '@grpc/grpc-js';
 import type { sendUnaryData, ServerUnaryCall, ServiceDefinition } from '@grpc/grpc-js';
 import { initializeTelemetry, resetTelemetryForTests, shutdownTelemetry } from './sdk';
+<<<<<<< HEAD
+=======
+import { resetConfigDigestForTests, setConfigDigest } from './digest';
+>>>>>>> upstream/main
 
 const LOGS_EXPORT_PATH = '/opentelemetry.proto.collector.logs.v1.LogsService/Export';
 const TRACES_EXPORT_PATH = '/opentelemetry.proto.collector.trace.v1.TraceService/Export';
@@ -11,6 +15,11 @@ const SPAN_NAME = 'grpc-spec-span';
 const INFO_MESSAGE = 'grpc-spec-info-message';
 const DEBUG_MESSAGE = 'grpc-spec-debug-message';
 const SECRET_SUFFIX = 'GRPCSPECSECRET1234567890';
+<<<<<<< HEAD
+=======
+const BUILD_COMMIT = 'c0ffee0123456789abcdef0123456789abcdef01';
+const CONFIG_DIGEST = 'feedc0de4321';
+>>>>>>> upstream/main
 const EXPORTER_ENV_KEYS = [
   'OTEL_EXPORTER_OTLP_ENDPOINT',
   'OTEL_EXPORTER_OTLP_PROTOCOL',
@@ -89,7 +98,13 @@ describe('OTLP/gRPC export', () => {
     process.env.OTEL_METRICS_EXPORTER = 'none';
     process.env.OTEL_NODE_RESOURCE_DETECTORS = 'none';
 
+<<<<<<< HEAD
     const controller = initializeTelemetry({
+=======
+    setConfigDigest(CONFIG_DIGEST);
+    const controller = initializeTelemetry({
+      BUILD_COMMIT,
+>>>>>>> upstream/main
       OTEL_LOGS_ENABLED: 'true',
       OTEL_SERVICE_NAME: SERVICE_NAME,
       OTEL_TRACING_ENABLED: 'true',
@@ -108,6 +123,10 @@ describe('OTLP/gRPC export', () => {
 
   afterAll(async () => {
     await resetTelemetryForTests();
+<<<<<<< HEAD
+=======
+    resetConfigDigestForTests();
+>>>>>>> upstream/main
     for (const key of EXPORTER_ENV_KEYS) {
       const value = previousEnv[key];
       if (value === undefined) {
@@ -134,6 +153,19 @@ describe('OTLP/gRPC export', () => {
     expect(payload.includes(DEBUG_MESSAGE)).toBe(false);
   });
 
+<<<<<<< HEAD
+=======
+  it('names the build in the resource and the loaded config on each record', () => {
+    const logs = Buffer.concat(receivedLogs);
+    const traces = Buffer.concat(receivedTraces);
+
+    expect(logs.includes(BUILD_COMMIT)).toBe(true);
+    expect(traces.includes(BUILD_COMMIT)).toBe(true);
+    expect(logs.includes('librechat.config.digest')).toBe(true);
+    expect(logs.includes(CONFIG_DIGEST)).toBe(true);
+  });
+
+>>>>>>> upstream/main
   it('exports spans over gRPC', () => {
     const payload = Buffer.concat(receivedTraces);
 

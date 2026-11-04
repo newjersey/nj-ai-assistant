@@ -9,13 +9,23 @@ export { default as useAgentFileConfig } from './useAgentFileConfig';
 export { default as useAgentUploadTarget } from './useAgentUploadTarget';
 export type { AgentUploadTarget } from './useAgentUploadTarget';
 export { default as useAgentToolPermissions } from './useAgentToolPermissions';
+<<<<<<< HEAD
+=======
+export { withSubmittedCodeDecision } from './codeDecision';
+>>>>>>> upstream/main
 export { default as useCodeApprovalMode } from './useCodeApprovalMode';
 export { default as useCodeWorkspace } from './useCodeWorkspace';
 export type {
   CodeWorkspaceEnvironmentResult,
+<<<<<<< HEAD
   CodeWorkspaceRelocation,
   CodeWorkspaceResult,
   CodeWorkspaceState,
+=======
+  CodeWorkspaceResult,
+  CodeWorkspaceState,
+  CodeWorkspaceTransition,
+>>>>>>> upstream/main
 } from './useCodeWorkspace';
 export { default as useMCPToolOptions } from './useMCPToolOptions';
 export * from './useApplyModelSpecAgents';

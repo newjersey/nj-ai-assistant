@@ -7,5 +7,8 @@ export { default as useHandleKeyUp } from './useHandleKeyUp';
 export { default as useRequiresKey } from './useRequiresKey';
 export { default as useMultipleKeys } from './useMultipleKeys';
 export { default as useSpeechToText } from './useSpeechToText';
+<<<<<<< HEAD
 export { default as useTextToSpeech } from './useTextToSpeech';
+=======
+>>>>>>> upstream/main
 export { default as useGetAudioSettings } from './useGetAudioSettings';

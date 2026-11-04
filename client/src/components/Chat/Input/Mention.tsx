@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { memo, useState, useRef, useEffect } from 'react';
 import { AutoSizer, List } from 'react-virtualized';
 import { EModelEndpoint } from 'librechat-data-provider';
@@ -14,6 +15,17 @@ import { removeCharIfLast } from '~/utils';
 import MentionItem from './MentionItem';
 
 const ROW_HEIGHT = 44;
+=======
+import { memo } from 'react';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { MentionPopover } from '@librechat/chat/components';
+import type { RecoilState } from 'recoil';
+import type { ConvoGenerator } from '~/common';
+import { useGetConversation, useLocalize, TranslationKeys } from '~/hooks';
+import useSelectMention from '~/hooks/Input/useSelectMention';
+import { useAssistantsMapContext } from '~/Providers';
+import useMentions from '~/hooks/Input/useMentions';
+>>>>>>> upstream/main
 
 type MentionProps = {
   index: number;
@@ -56,6 +68,7 @@ function MentionContent({
     newConversation,
   });
 
+<<<<<<< HEAD
   const [activeIndex, setActiveIndex] = useState(0);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -258,6 +271,21 @@ function MentionContent({
         )}
       </div>
     </div>
+=======
+  return (
+    <MentionPopover
+      textAreaRef={textAreaRef}
+      commandChar={commandChar}
+      placeholder={localize(placeholder)}
+      options={options}
+      isLoading={isLoading}
+      agentsList={agentsList}
+      assistantListMap={assistantListMap}
+      modelsConfig={modelsConfig}
+      onSelectMention={(option) => onSelectMention?.(option)}
+      onClose={() => setShowPopover(false)}
+    />
+>>>>>>> upstream/main
   );
 }
 

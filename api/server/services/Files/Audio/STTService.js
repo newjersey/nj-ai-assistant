@@ -9,6 +9,10 @@ const {
   hasActiveFileFieldPolicy,
   genAzureEndpoint,
   getSafeErrorMetadata,
+<<<<<<< HEAD
+=======
+  configuredRequestBudget,
+>>>>>>> upstream/main
   applyAxiosProxyConfig,
   resolveConfigSecret,
   applySSRFSafeAgentIfDirect,
@@ -293,10 +297,24 @@ class STTService {
    * @param {Object} requestData.audioFile - The audio file object containing originalname, mimetype, and size.
    * @param {string} requestData.language - The language code for the transcription.
    * @param {string[]} [allowedAddresses] - Section-level SSRF exemption list of host:port pairs.
+<<<<<<< HEAD
    * @returns {Promise<string>} A promise that resolves to the transcribed text.
    * @throws {Error} If the provider is invalid, the response status is not 200, or the response data is missing.
    */
   async sttRequest(provider, sttSchema, { audioBuffer, audioFile, language }, allowedAddresses) {
+=======
+   * @param {import('axios').AxiosRequestConfig} [requestOptions] - Timeout and abort options for the request.
+   * @returns {Promise<string>} A promise that resolves to the transcribed text.
+   * @throws {Error} If the provider is invalid, the response status is not 200, or the response data is missing.
+   */
+  async sttRequest(
+    provider,
+    sttSchema,
+    { audioBuffer, audioFile, language },
+    allowedAddresses,
+    requestOptions,
+  ) {
+>>>>>>> upstream/main
     const strategy = this.providerStrategies[provider];
     if (!strategy) {
       throw new Error('Invalid provider');
@@ -315,7 +333,11 @@ class STTService {
       language,
     );
 
+<<<<<<< HEAD
     const options = { headers };
+=======
+    const options = { headers, ...requestOptions };
+>>>>>>> upstream/main
 
     applyAxiosProxyConfig(options, url);
     applySSRFSafeAgentIfDirect(options, url, allowedAddresses);
@@ -383,6 +405,10 @@ class STTService {
           sttSchema,
           { audioBuffer, audioFile, language },
           allowedAddresses,
+<<<<<<< HEAD
+=======
+          configuredRequestBudget(req.config, 'speechMs'),
+>>>>>>> upstream/main
         );
       } catch (error) {
         const uninspectableField = getBlockedUninspectableFileField(req.config?.filters, [

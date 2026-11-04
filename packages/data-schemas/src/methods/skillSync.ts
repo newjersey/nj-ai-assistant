@@ -85,11 +85,14 @@ export type SkillSyncMethods = {
     credentialKey: string,
   ) => Promise<SkillSyncCredentialSummary | null>;
   listSkillSyncStatuses: (provider: SkillSyncProvider) => Promise<ISkillSyncStatus[]>;
+<<<<<<< HEAD
   getSkillSyncStatus: (
     provider: SkillSyncProvider,
     sourceId: string,
     tenantId?: string,
   ) => Promise<ISkillSyncStatus | null>;
+=======
+>>>>>>> upstream/main
   upsertSkillSyncStatus: (input: SkillSyncStatusInput) => Promise<ISkillSyncStatus>;
   tryAcquireSkillSyncLock: (params: SkillSyncLockInput) => Promise<boolean>;
   refreshSkillSyncLock: (params: SkillSyncLockInput) => Promise<boolean>;
@@ -205,6 +208,7 @@ export function createSkillSyncMethods(mongoose: typeof import('mongoose')): Ski
     return rows;
   }
 
+<<<<<<< HEAD
   async function getSkillSyncStatus(
     provider: SkillSyncProvider,
     sourceId: string,
@@ -219,6 +223,8 @@ export function createSkillSyncMethods(mongoose: typeof import('mongoose')): Ski
     return row ?? null;
   }
 
+=======
+>>>>>>> upstream/main
   async function upsertSkillSyncStatus(input: SkillSyncStatusInput): Promise<ISkillSyncStatus> {
     const Status = mongoose.models.SkillSyncStatus as Model<ISkillSyncStatusDocument>;
     const now = new Date();
@@ -385,7 +391,10 @@ export function createSkillSyncMethods(mongoose: typeof import('mongoose')): Ski
     getSkillSyncCredentialToken,
     getSkillSyncCredentialSummary,
     listSkillSyncStatuses,
+<<<<<<< HEAD
     getSkillSyncStatus,
+=======
+>>>>>>> upstream/main
     upsertSkillSyncStatus,
     tryAcquireSkillSyncLock,
     refreshSkillSyncLock,

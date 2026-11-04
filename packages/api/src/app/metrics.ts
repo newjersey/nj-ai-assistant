@@ -9,6 +9,10 @@ import type { LocatorTraversalFailure } from '../protection/diagnostics';
 import { agentStartupMilestones, agentStartupResults } from '~/agents/phases';
 
 const PATH_NORMALIZATIONS: [RegExp, string][] = [
+<<<<<<< HEAD
+=======
+  [/^(\/api\/insights(?:\/access)?)\/?$/, '$1'],
+>>>>>>> upstream/main
   [/^\/api\/agents\/chat\/stream\/[^/]+(?=\/|$)/, '/api/agents/chat/stream/#id'],
   [/^\/api\/agents\/chat\/status\/[^/]+(?=\/|$)/, '/api/agents/chat/status/#id'],
   [/^\/api\/files\/code\/download\/[^/]+\/[^/]+(?=\/|$)/, '/api/files/code/download/#id/#id'],
@@ -39,6 +43,11 @@ const STATIC_PATHS = new Set([
   '/metrics',
   '/api/auth/login',
   '/api/config',
+<<<<<<< HEAD
+=======
+  '/api/insights',
+  '/api/insights/access',
+>>>>>>> upstream/main
   '/api/agents/chat/abort',
   '/api/agents/chat/active',
   '/api/agents/v1/chat/completions',
@@ -168,9 +177,18 @@ export type GenerationStreamAttachmentOutcome =
 export type RumProxyEndpoint = 'traces' | 'logs' | 'unknown';
 export type RumProxyResult =
   | 'success'
+<<<<<<< HEAD
   | 'auth_drop'
   | 'auth_error'
   | 'bad_request'
+=======
+  | 'replay_disabled'
+  | 'auth_drop'
+  | 'auth_error'
+  | 'bad_request'
+  | 'rate_limited'
+  | 'unsupported_media_type'
+>>>>>>> upstream/main
   | 'not_configured'
   | 'collector_4xx'
   | 'collector_5xx'

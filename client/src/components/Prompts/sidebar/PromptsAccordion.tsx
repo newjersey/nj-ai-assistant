@@ -19,8 +19,14 @@ export default function PromptsAccordion() {
         ) : null
       }
     >
+<<<<<<< HEAD
       <FilterPrompts />
       <AutoSendPrompt />
+=======
+      <FilterPrompts>
+        <AutoSendPrompt />
+      </FilterPrompts>
+>>>>>>> upstream/main
     </PromptSidePanel>
   );
 }

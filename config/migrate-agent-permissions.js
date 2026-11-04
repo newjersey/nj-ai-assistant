@@ -1,6 +1,11 @@
 const path = require('path');
+<<<<<<< HEAD
 const { logger } = require('@librechat/data-schemas');
 const { ensureRequiredCollectionsExist } = require('@librechat/api');
+=======
+const { logger, runAsSystem } = require('@librechat/data-schemas');
+const { ensureRequiredCollectionsExist, runResourceMigration } = require('@librechat/api');
+>>>>>>> upstream/main
 const { AccessRoleIds, ResourceType, PrincipalType } = require('librechat-data-provider');
 
 require('module-alias')({ base: path.resolve(__dirname, '..', 'api') });
@@ -53,7 +58,11 @@ async function migrateAgentPermissionsEnhanced({ dryRun = true, batchSize = 100 
     _id: { $nin: migratedAgentIds },
     author: { $exists: true, $ne: null },
   })
+<<<<<<< HEAD
     .select('_id id name author isCollaborative')
+=======
+    .select('_id id name author isCollaborative tenantId')
+>>>>>>> upstream/main
     .lean();
 
   const categories = {
@@ -143,6 +152,7 @@ async function migrateAgentPermissionsEnhanced({ dryRun = true, batchSize = 100 
 
     for (const agent of batch) {
       try {
+<<<<<<< HEAD
         const isGlobal = globalAgentIds.has(agent.id);
         const isCollab = agent.isCollaborative;
 
@@ -187,6 +197,54 @@ async function migrateAgentPermissionsEnhanced({ dryRun = true, batchSize = 100 
           isGlobal,
           isCollab,
           publicRole: publicRoleId,
+=======
+        await runResourceMigration(agent, async () => {
+          const isGlobal = globalAgentIds.has(agent.id);
+          const isCollab = agent.isCollaborative;
+
+          await grantPermission({
+            principalType: PrincipalType.USER,
+            principalId: agent.author,
+            resourceType: ResourceType.AGENT,
+            resourceId: agent._id,
+            accessRoleId: AccessRoleIds.AGENT_OWNER,
+            grantedBy: agent.author,
+          });
+          results.ownerGrants++;
+
+          let publicRoleId = null;
+          let description = 'Private';
+
+          if (isGlobal) {
+            if (isCollab) {
+              publicRoleId = AccessRoleIds.AGENT_EDITOR;
+              description = 'Global Edit';
+              results.publicEditGrants++;
+            } else {
+              publicRoleId = AccessRoleIds.AGENT_VIEWER;
+              description = 'Global View';
+              results.publicViewGrants++;
+            }
+
+            await grantPermission({
+              principalType: PrincipalType.PUBLIC,
+              principalId: null,
+              resourceType: ResourceType.AGENT,
+              resourceId: agent._id,
+              accessRoleId: publicRoleId,
+              grantedBy: agent.author,
+            });
+          }
+
+          results.migrated++;
+          logger.debug(`Migrated agent "${agent.name}" [${description}]`, {
+            agentId: agent.id,
+            author: agent.author,
+            isGlobal,
+            isCollab,
+            publicRole: publicRoleId,
+          });
+>>>>>>> upstream/main
         });
       } catch (error) {
         results.errors++;
@@ -210,7 +268,11 @@ if (require.main === module) {
   const batchSize =
     parseInt(process.argv.find((arg) => arg.startsWith('--batch-size='))?.split('=')[1]) || 100;
 
+<<<<<<< HEAD
   migrateAgentPermissionsEnhanced({ dryRun, batchSize })
+=======
+  runAsSystem(() => migrateAgentPermissionsEnhanced({ dryRun, batchSize }))
+>>>>>>> upstream/main
     .then((result) => {
       if (dryRun) {
         console.log('\n=== DRY RUN RESULTS ===');
@@ -250,4 +312,11 @@ if (require.main === module) {
     });
 }
 
+<<<<<<< HEAD
 module.exports = { migrateAgentPermissionsEnhanced };
+=======
+module.exports = {
+  migrateAgentPermissionsEnhanced: (options) =>
+    runAsSystem(() => migrateAgentPermissionsEnhanced(options)),
+};
+>>>>>>> upstream/main

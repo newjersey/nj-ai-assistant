@@ -1,9 +1,15 @@
 import React from 'react';
 import { RecoilRoot } from 'recoil';
 import { renderHook } from '@testing-library/react';
+<<<<<<< HEAD
 import type { MutableSnapshot } from 'recoil';
 import type { ReactNode } from 'react';
 import { resolveComposerKeyDown } from '~/utils/shortcuts';
+=======
+import { resolveComposerKeyDown } from '@librechat/chat';
+import type { MutableSnapshot } from 'recoil';
+import type { ReactNode } from 'react';
+>>>>>>> upstream/main
 import useComposerBindings from './useComposerBindings';
 import store from '~/store';
 

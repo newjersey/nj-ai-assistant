@@ -1,14 +1,25 @@
 jest.mock('@librechat/data-schemas', () => ({
+<<<<<<< HEAD
   logger: { error: jest.fn(), debug: jest.fn() },
 }));
 jest.mock('@librechat/api', () => {
   const { getModelRefusalInfo } = jest.requireActual('@librechat/api');
+=======
+  logger: { error: jest.fn(), debug: jest.fn(), info: jest.fn() },
+}));
+jest.mock('@librechat/api', () => {
+  const { getModelRefusalInfo, getModelEndUsage } = jest.requireActual('@librechat/api');
+>>>>>>> upstream/main
   return {
     sendEvent: jest.fn(),
     emitEvent: jest.fn(),
     createToolExecuteHandler: jest.fn(),
     markSummarizationUsage: (usage) => usage,
     getModelRefusalInfo,
+<<<<<<< HEAD
+=======
+    getModelEndUsage,
+>>>>>>> upstream/main
   };
 });
 jest.mock('~/server/services/Files/Citations', () => ({
@@ -235,6 +246,47 @@ describe('ModelEndHandler — Vertex thoughtSignature capture (issue #13006 foll
     expect(emitUsage).toHaveBeenCalledWith(expect.objectContaining({ agentId: undefined }));
   });
 
+<<<<<<< HEAD
+=======
+  it('carries the Anthropic 1-hour cache write count into collected and emitted usage', async () => {
+    const collectedUsage = [];
+    const emitUsage = jest.fn();
+    const handler = new ModelEndHandler(collectedUsage, null, emitUsage);
+
+    await handler.handle(
+      'on_chat_model_end',
+      {
+        output: {
+          usage_metadata: {
+            input_tokens: 3510,
+            output_tokens: 40,
+            total_tokens: 3550,
+            input_token_details: { cache_creation: 3000, cache_read: 500 },
+          },
+          response_metadata: {
+            usage: {
+              cache_creation: { ephemeral_5m_input_tokens: 1000, ephemeral_1h_input_tokens: 2000 },
+            },
+          },
+        },
+      },
+      { ls_model_name: 'claude-sonnet-5-5', run_id: 'r1', user_id: 'u1' },
+      buildGraph(),
+    );
+
+    expect(collectedUsage[0].input_token_details).toEqual({
+      cache_creation: 3000,
+      cache_creation_1h: 2000,
+      cache_read: 500,
+    });
+    expect(emitUsage).toHaveBeenCalledWith(
+      expect.objectContaining({
+        input_token_details: { cache_creation: 3000, cache_creation_1h: 2000, cache_read: 500 },
+      }),
+    );
+  });
+
+>>>>>>> upstream/main
   it('throws when collectedUsage is not an array (existing contract)', () => {
     expect(() => new ModelEndHandler(null)).toThrow('collectedUsage must be an array');
   });

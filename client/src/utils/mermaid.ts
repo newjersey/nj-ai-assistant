@@ -383,7 +383,11 @@ const btnHover = {
 const toolbarStyle = {
   position: "absolute",
   bottom: "12px",
+<<<<<<< HEAD
   right: "12px",
+=======
+  insetInlineEnd: "12px",
+>>>>>>> upstream/main
   display: "flex",
   alignItems: "center",
   gap: "2px",

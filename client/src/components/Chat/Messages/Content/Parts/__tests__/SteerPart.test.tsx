@@ -1,14 +1,33 @@
 import React from 'react';
+<<<<<<< HEAD
 import { RecoilRoot, useRecoilValue } from 'recoil';
 import { render, screen, fireEvent } from '@testing-library/react';
 import type { TMessage } from 'librechat-data-provider';
 import { STEER_ICON } from '~/components/Chat/Steering/identity';
+=======
+import { RecoilRoot } from 'recoil';
+import { QueryKeys } from 'librechat-data-provider';
+import { STEER_ICON } from '@librechat/chat/components';
+import { Provider, createStore, useAtomValue } from 'jotai';
+import { liveAppliedSteerIdsAtom } from '@librechat/chat/react';
+import { render, screen, fireEvent } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import type { TMessage } from 'librechat-data-provider';
+>>>>>>> upstream/main
 import SteerPart from '../SteerPart';
 import store from '~/store';
 
 let mockShareContext: { isSharedConvo?: boolean; shareId?: string } = {};
 let mockFileMap: Record<string, { llmDeliveryPath?: 'provider' | 'text' | 'none' }> = {};
 
+<<<<<<< HEAD
+=======
+jest.mock('@librechat/client', () => ({
+  ...jest.requireActual('@librechat/client'),
+  useLocalize: () => (key: string) => key,
+}));
+
+>>>>>>> upstream/main
 jest.mock('~/hooks', () => ({
   useLocalize: () => (key: string) => key,
 }));
@@ -18,9 +37,20 @@ jest.mock('~/Providers', () => ({
   useFileMapContext: () => mockFileMap,
 }));
 
+<<<<<<< HEAD
 jest.mock('~/components/Chat/Messages/ui/MessageTimestamp', () => ({
   __esModule: true,
   default: () => <time data-testid="steer-timestamp" />,
+=======
+jest.mock('@librechat/chat/components', () => ({
+  ...jest.requireActual('@librechat/chat/components'),
+  MessageTimestamp: () => <time data-testid="steer-timestamp" />,
+  FileContainer: ({ file, onClick }: { file: { filename?: string }; onClick?: () => void }) => (
+    <button type="button" data-testid="steer-file" onClick={onClick}>
+      {file.filename}
+    </button>
+  ),
+>>>>>>> upstream/main
 }));
 
 jest.mock('~/components/Chat/Messages/Content/MarkdownLite', () => ({
@@ -28,6 +58,7 @@ jest.mock('~/components/Chat/Messages/Content/MarkdownLite', () => ({
   default: ({ content }: { content: string }) => <span>{content}</span>,
 }));
 
+<<<<<<< HEAD
 jest.mock('~/components/Chat/Input/Files/FileContainer', () => ({
   __esModule: true,
   default: ({ file, onClick }: { file: { filename?: string }; onClick?: () => void }) => (
@@ -37,6 +68,8 @@ jest.mock('~/components/Chat/Input/Files/FileContainer', () => ({
   ),
 }));
 
+=======
+>>>>>>> upstream/main
 jest.mock('~/components/Chat/Messages/Content/FilePreviewDialog', () => ({
   __esModule: true,
   default: ({
@@ -70,10 +103,22 @@ function renderPart(
    *  silently test the signed-in state instead of the anonymous share route. */
   user: { name: string; username: string } | null = SEEDED_USER,
 ) {
+<<<<<<< HEAD
   return render(
     <RecoilRoot initializeState={({ set }) => user && set(store.user, user as never)}>
       <SteerPart steer="steered words" steerId="s1" createdAt={1} files={files} />
     </RecoilRoot>,
+=======
+  const queryClient = new QueryClient();
+  queryClient.setQueryData([QueryKeys.endpoints], {});
+
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <RecoilRoot initializeState={({ set }) => user && set(store.user, user as never)}>
+        <SteerPart steer="steered words" steerId="s1" createdAt={1} files={files} />
+      </RecoilRoot>
+    </QueryClientProvider>,
+>>>>>>> upstream/main
   );
 }
 
@@ -160,7 +205,11 @@ describe('SteerPart presentation', () => {
     renderPart();
     const message = screen.getByText('steered words');
 
+<<<<<<< HEAD
     expect(message.closest('.bg-surface-tertiary')).toHaveClass('rounded-theme-surface');
+=======
+    expect(message.closest('.bg-surface-user-message')).toHaveClass('rounded-theme-surface');
+>>>>>>> upstream/main
     expect(screen.getByRole('heading', { name: 'Danny' })).toHaveClass('sr-only');
     expect(screen.queryByTitle('Danny')).not.toBeInTheDocument();
   });
@@ -169,7 +218,11 @@ describe('SteerPart presentation', () => {
     renderPart();
     const part = screen.getByTestId('steer-part');
     expect(part).toHaveAttribute('id', 'steer-s1');
+<<<<<<< HEAD
     expect(part).toHaveClass('steer-render');
+=======
+    expect(part).toHaveAttribute('data-steer-render');
+>>>>>>> upstream/main
   });
 
   it('stays on the message content edge instead of outdenting', () => {
@@ -179,6 +232,7 @@ describe('SteerPart presentation', () => {
     expect(part).not.toHaveClass('md:-ml-9', '-ml-9');
   });
 
+<<<<<<< HEAD
   it('renders steer attachments', () => {
     renderPart([
       { file_id: 'f1', filename: 'notes.pdf', type: 'application/pdf' },
@@ -186,6 +240,23 @@ describe('SteerPart presentation', () => {
     ]);
     expect(screen.getByTestId('steer-file')).toHaveTextContent('notes.pdf');
     expect(screen.getByTestId('steer-image')).toBeInTheDocument();
+=======
+  it('keeps multiple steer images together at the right while file chips stay at the start', () => {
+    renderPart([
+      { file_id: 'f1', filename: 'notes.pdf', type: 'application/pdf' },
+      { file_id: 'f2', filename: 'shot.png', type: 'image/png', filepath: '/images/shot.png' },
+      { file_id: 'f3', filename: 'second.png', type: 'image/png', filepath: '/images/second.png' },
+    ]);
+    const images = screen.getAllByTestId('steer-image');
+    const imageGroup = images[0].parentElement;
+
+    expect(images).toHaveLength(2);
+    expect(imageGroup).toContainElement(images[1]);
+    expect(imageGroup).toHaveClass('ms-auto', 'flex-wrap', 'justify-end');
+    expect(imageGroup?.parentElement).toHaveClass('w-full');
+    expect(imageGroup).not.toContainElement(screen.getByTestId('steer-file'));
+    expect(screen.getByTestId('steer-file')).toHaveTextContent('notes.pdf');
+>>>>>>> upstream/main
   });
 
   it.each(['application/pdf', 'image/png'])(
@@ -217,7 +288,11 @@ describe('SteerPart presentation', () => {
     );
     const quotes = screen.getByTestId('message-quotes');
     expect(quotes).toHaveTextContent('the selected excerpt');
+<<<<<<< HEAD
     expect(quotes.closest('.bg-surface-tertiary')).not.toBeNull();
+=======
+    expect(quotes.closest('.bg-surface-user-message')).not.toBeNull();
+>>>>>>> upstream/main
   });
 
   it('renders no quote block when the steer carried none', () => {
@@ -228,6 +303,7 @@ describe('SteerPart presentation', () => {
 
 describe('SteerPart live receipt draw-in', () => {
   function LiveIdsProbe() {
+<<<<<<< HEAD
     const ids = useRecoilValue(store.liveAppliedSteerIds);
     return <div data-testid="live-ids">{ids.join(',')}</div>;
   }
@@ -243,6 +319,26 @@ describe('SteerPart live receipt draw-in', () => {
         <SteerPart steer="steered words" steerId="s1" createdAt={1} />
         <LiveIdsProbe />
       </RecoilRoot>,
+=======
+    const ids = useAtomValue(liveAppliedSteerIdsAtom);
+    return <div data-testid="live-ids">{ids.join(',')}</div>;
+  }
+
+  function seededStore(liveIds: string[]) {
+    const jotaiStore = createStore();
+    jotaiStore.set(liveAppliedSteerIdsAtom, liveIds);
+    return jotaiStore;
+  }
+
+  function renderLive(liveIds: string[]) {
+    return render(
+      <Provider store={seededStore(liveIds)}>
+        <RecoilRoot initializeState={({ set }) => set(store.user, SEEDED_USER as never)}>
+          <SteerPart steer="steered words" steerId="s1" createdAt={1} />
+          <LiveIdsProbe />
+        </RecoilRoot>
+      </Provider>,
+>>>>>>> upstream/main
     );
   }
 
@@ -271,6 +367,7 @@ describe('SteerPart live receipt draw-in', () => {
         <LiveIdsProbe />
       </>
     );
+<<<<<<< HEAD
     const { rerender } = render(
       <RecoilRoot
         initializeState={({ set }) => {
@@ -280,11 +377,21 @@ describe('SteerPart live receipt draw-in', () => {
       >
         {partFor('s1')}
       </RecoilRoot>,
+=======
+    const jotaiStore = seededStore(['s2']);
+    const { rerender } = render(
+      <Provider store={jotaiStore}>
+        <RecoilRoot initializeState={({ set }) => set(store.user, SEEDED_USER as never)}>
+          {partFor('s1')}
+        </RecoilRoot>
+      </Provider>,
+>>>>>>> upstream/main
     );
     expect(appliedChecks()).not.toHaveClass('animate-in');
     expect(screen.getByTestId('live-ids')).toHaveTextContent('s2');
 
     rerender(
+<<<<<<< HEAD
       <RecoilRoot
         initializeState={({ set }) => {
           set(store.user, SEEDED_USER as never);
@@ -293,6 +400,13 @@ describe('SteerPart live receipt draw-in', () => {
       >
         {partFor('s2')}
       </RecoilRoot>,
+=======
+      <Provider store={jotaiStore}>
+        <RecoilRoot initializeState={({ set }) => set(store.user, SEEDED_USER as never)}>
+          {partFor('s2')}
+        </RecoilRoot>
+      </Provider>,
+>>>>>>> upstream/main
     );
     expect(appliedChecks()).toHaveClass('animate-in');
     expect(screen.getByTestId('live-ids').textContent).toBe('');
@@ -320,3 +434,27 @@ describe('SteerPart receipt settling', () => {
     expect(checks()).not.toHaveClass(STEER_ICON);
   });
 });
+<<<<<<< HEAD
+=======
+
+it('keeps an unsuccessful guidance body and timestamp without a waiting or applied receipt', () => {
+  const queryClient = new QueryClient();
+  queryClient.setQueryData([QueryKeys.endpoints], {});
+  render(
+    <QueryClientProvider client={queryClient}>
+      <RecoilRoot>
+        <SteerPart
+          steer="unsuccessful guidance"
+          steerId="failed"
+          createdAt={1}
+          receiptState={null}
+        />
+      </RecoilRoot>
+    </QueryClientProvider>,
+  );
+  expect(screen.getByText('unsuccessful guidance')).toBeVisible();
+  expect(screen.getByTestId('steer-timestamp')).toBeInTheDocument();
+  expect(screen.queryByTestId('steer-receipt')).not.toBeInTheDocument();
+  queryClient.clear();
+});
+>>>>>>> upstream/main

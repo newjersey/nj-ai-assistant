@@ -1,8 +1,14 @@
 import { logger } from '@librechat/data-schemas';
 import { AccessRoleIds, ResourceType, PrincipalType } from 'librechat-data-provider';
+<<<<<<< HEAD
 import { ensureRequiredCollectionsExist } from '../db/utils';
 import type { AccessRoleMethods, IPromptGroupDocument } from '@librechat/data-schemas';
 import type { Model, Mongoose } from 'mongoose';
+=======
+import type { AccessRoleMethods, IPromptGroupDocument } from '@librechat/data-schemas';
+import type { Model, Mongoose } from 'mongoose';
+import { ensureRequiredCollectionsExist } from '../db/utils';
+>>>>>>> upstream/main
 
 const GLOBAL_PROJECT_NAME = 'instance';
 
@@ -51,9 +57,17 @@ export async function checkPromptPermissionsMigration({
       await ensureRequiredCollectionsExist(db);
     }
 
+<<<<<<< HEAD
     const ownerRole = await methods.findRoleByIdentifier(AccessRoleIds.PROMPTGROUP_OWNER);
     const viewerRole = await methods.findRoleByIdentifier(AccessRoleIds.PROMPTGROUP_VIEWER);
     const editorRole = await methods.findRoleByIdentifier(AccessRoleIds.PROMPTGROUP_EDITOR);
+=======
+    const [ownerRole, viewerRole, editorRole] = await Promise.all([
+      methods.findRoleByIdentifier(AccessRoleIds.PROMPTGROUP_OWNER),
+      methods.findRoleByIdentifier(AccessRoleIds.PROMPTGROUP_VIEWER),
+      methods.findRoleByIdentifier(AccessRoleIds.PROMPTGROUP_EDITOR),
+    ]);
+>>>>>>> upstream/main
 
     if (!ownerRole || !viewerRole || !editorRole) {
       logger.warn(
@@ -66,6 +80,7 @@ export async function checkPromptPermissionsMigration({
       };
     }
 
+<<<<<<< HEAD
     let globalPromptGroupIds = new Set<string>();
     if (db) {
       const project = await db
@@ -81,10 +96,31 @@ export async function checkPromptPermissionsMigration({
       resourceType: ResourceType.PROMPTGROUP,
       principalType: PrincipalType.USER,
     });
+=======
+    const AclEntry = mongoose.model('AclEntry');
+    const [project, migratedGroupIds] = await Promise.all([
+      db
+        ? db
+            .collection('projects')
+            .findOne({ name: GLOBAL_PROJECT_NAME }, { projection: { promptGroupIds: 1 } })
+        : Promise.resolve(null),
+      AclEntry.distinct('resourceId', {
+        resourceType: ResourceType.PROMPTGROUP,
+        principalType: PrincipalType.USER,
+      }),
+    ]);
+    const globalPromptGroupIds = new Set<string>(
+      (project?.promptGroupIds || []).map((id: { toString(): string }) => id.toString()),
+    );
+>>>>>>> upstream/main
 
     const promptGroupsToMigrate = (await PromptGroupModel.find({
       _id: { $nin: migratedGroupIds },
       author: { $exists: true, $ne: null },
+<<<<<<< HEAD
+=======
+      source: { $in: [null, 'native'] },
+>>>>>>> upstream/main
     })
       .select('_id name author authorName category')
       .lean()) as unknown as PromptGroupMigrationData[];

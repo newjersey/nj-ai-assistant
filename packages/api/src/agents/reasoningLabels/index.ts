@@ -10,6 +10,10 @@ export type {
   ReasoningLabelAttemptEvent,
   ReasoningLabelEvent,
   ReasoningLabelHostDeps,
+<<<<<<< HEAD
+=======
+  ReasoningLabelResetEvent,
+>>>>>>> upstream/main
   ReasoningLabelStatus,
   ReasoningLabelWiring,
 } from './runtime';

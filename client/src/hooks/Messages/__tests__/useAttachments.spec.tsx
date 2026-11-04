@@ -11,18 +11,31 @@
  */
 
 import { useEffect } from 'react';
+<<<<<<< HEAD
 import { Tools } from 'librechat-data-provider';
 import { renderHook } from '@testing-library/react';
 import { RecoilRoot, useSetRecoilState } from 'recoil';
 import type { TAttachment, TFile, TAttachmentMetadata } from 'librechat-data-provider';
 import type { ReactNode } from 'react';
 import store from '~/store';
+=======
+import { RecoilRoot } from 'recoil';
+import { Tools } from 'librechat-data-provider';
+import { renderHook } from '@testing-library/react';
+import { Provider as JotaiProvider, useSetAtom } from 'jotai';
+import type { TAttachment, TFile, TAttachmentMetadata } from 'librechat-data-provider';
+import type { ReactNode } from 'react';
+>>>>>>> upstream/main
 
 type AttachmentFixture = TFile & TAttachmentMetadata;
 
 jest.mock('~/hooks/useLocalize', () => () => (key: string) => key);
 
 import useAttachments from '../useAttachments';
+<<<<<<< HEAD
+=======
+import { messageAttachmentsMapAtom } from '~/hooks/SSE/atoms';
+>>>>>>> upstream/main
 
 const messageId = 'msg-1';
 
@@ -46,6 +59,22 @@ function makeAttachment(overrides: Partial<AttachmentFixture> = {}): AttachmentF
   };
 }
 
+<<<<<<< HEAD
+=======
+function makeNonFileAttachment(
+  overrides: Partial<TAttachment & { agentId?: string; stepId?: string }> = {},
+): AttachmentFixture {
+  return {
+    type: Tools.ui_resources,
+    toolCallId: 'call_0',
+    agentId: 'agent-a',
+    stepId: 'step-1',
+    messageId,
+    ...overrides,
+  } as unknown as AttachmentFixture;
+}
+
+>>>>>>> upstream/main
 function setup({
   attachments,
   liveMap,
@@ -54,7 +83,11 @@ function setup({
   liveMap?: Record<string, TAttachment[]>;
 }) {
   const Seed = () => {
+<<<<<<< HEAD
     const setMap = useSetRecoilState(store.messageAttachmentsMap);
+=======
+    const setMap = useSetAtom(messageAttachmentsMapAtom);
+>>>>>>> upstream/main
     useEffect(() => {
       if (liveMap) {
         setMap(liveMap);
@@ -66,8 +99,15 @@ function setup({
   return renderHook(() => useAttachments({ messageId, attachments }), {
     wrapper: ({ children }: { children: ReactNode }) => (
       <RecoilRoot>
+<<<<<<< HEAD
         <Seed />
         {children}
+=======
+        <JotaiProvider>
+          <Seed />
+          {children}
+        </JotaiProvider>
+>>>>>>> upstream/main
       </RecoilRoot>
     ),
   });
@@ -217,6 +257,111 @@ describe('useAttachments', () => {
     expect(result.current.attachments).toHaveLength(1);
   });
 
+<<<<<<< HEAD
+=======
+  it('dedupes an agent-less replay of an agent-owned non-file row', () => {
+    const db = makeNonFileAttachment();
+    const replay = makeNonFileAttachment({ agentId: undefined });
+
+    const { result } = setup({
+      attachments: [db],
+      liveMap: { [messageId]: [replay] },
+    });
+
+    expect(result.current.attachments).toEqual([db]);
+  });
+
+  it('keeps a non-file row owned by a different live agent', () => {
+    const db = makeNonFileAttachment();
+    const sibling = makeNonFileAttachment({ agentId: 'agent-b' });
+
+    const { result } = setup({
+      attachments: [db],
+      liveMap: { [messageId]: [sibling] },
+    });
+
+    expect(result.current.attachments).toEqual([db, sibling]);
+  });
+
+  it('dedupes a non-file replay with the same known agent and step', () => {
+    const db = makeNonFileAttachment();
+    const replay = makeNonFileAttachment();
+
+    const { result } = setup({
+      attachments: [db],
+      liveMap: { [messageId]: [replay] },
+    });
+
+    expect(result.current.attachments).toEqual([db]);
+  });
+
+  it('keeps non-file rows with distinct known steps', () => {
+    const db = makeNonFileAttachment({ stepId: 'step-1' });
+    const sibling = makeNonFileAttachment({ stepId: 'step-2' });
+
+    const { result } = setup({
+      attachments: [db],
+      liveMap: { [messageId]: [sibling] },
+    });
+
+    expect(result.current.attachments).toEqual([db, sibling]);
+  });
+
+  it('keeps a known step conflict when the live agent is missing', () => {
+    const db = makeNonFileAttachment({ stepId: 'step-1' });
+    const sibling = makeNonFileAttachment({ agentId: undefined, stepId: 'step-2' });
+
+    const { result } = setup({
+      attachments: [db],
+      liveMap: { [messageId]: [sibling] },
+    });
+
+    expect(result.current.attachments).toEqual([db, sibling]);
+  });
+
+  it('keeps a known agent conflict when the live step is missing', () => {
+    const db = makeNonFileAttachment({ agentId: 'agent-a' });
+    const sibling = makeNonFileAttachment({ agentId: 'agent-b', stepId: undefined });
+
+    const { result } = setup({
+      attachments: [db],
+      liveMap: { [messageId]: [sibling] },
+    });
+
+    expect(result.current.attachments).toEqual([db, sibling]);
+  });
+
+  it.each([
+    [
+      'DB-specific / live missing step',
+      makeNonFileAttachment(),
+      makeNonFileAttachment({ stepId: undefined }),
+    ],
+    [
+      'DB-missing / live specific step',
+      makeNonFileAttachment({ stepId: undefined }),
+      makeNonFileAttachment(),
+    ],
+    [
+      'DB-specific / live missing agent',
+      makeNonFileAttachment(),
+      makeNonFileAttachment({ agentId: undefined }),
+    ],
+    [
+      'DB-missing / live specific agent',
+      makeNonFileAttachment({ agentId: undefined }),
+      makeNonFileAttachment(),
+    ],
+  ])('dedupes compatible non-file ownership: %s', (_label, db, replay) => {
+    const { result } = setup({
+      attachments: [db],
+      liveMap: { [messageId]: [replay] },
+    });
+
+    expect(result.current.attachments).toEqual([db]);
+  });
+
+>>>>>>> upstream/main
   it('drops live entries with no stable identity at all', () => {
     const db = makeAttachment({ file_id: 'fid-A' });
     const anonymous = { messageId } as unknown as AttachmentFixture;

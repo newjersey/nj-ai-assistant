@@ -9,7 +9,11 @@ const listUsers = async () => {
     await connect();
     const users = await User.find(
       {},
+<<<<<<< HEAD
       'email provider avatar username name createdAt termsAccepted termsAcceptedAt',
+=======
+      'email provider avatar username name createdAt termsAccepted termsAcceptedAt termsAcceptedSource',
+>>>>>>> upstream/main
     );
 
     console.log('\nUser List:');
@@ -23,7 +27,13 @@ const listUsers = async () => {
       console.log(`Created: ${user.createdAt}`);
       console.log(`Terms Accepted: ${user.termsAccepted ? 'Yes' : 'No'}`);
       console.log(
+<<<<<<< HEAD
         `Terms Accepted At: ${user.termsAcceptedAt ? user.termsAcceptedAt.toISOString() : 'N/A'}`,
+=======
+        `Terms Accepted At: ${user.termsAcceptedAt ? user.termsAcceptedAt.toISOString() : 'N/A'}${
+          user.termsAcceptedSource === 'migration' ? ' (backfilled)' : ''
+        }`,
+>>>>>>> upstream/main
       );
       console.log('----------------------------------------');
     });

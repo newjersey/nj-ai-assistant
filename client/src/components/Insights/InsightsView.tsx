@@ -2,6 +2,7 @@ import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useSearchParams } from 'react-router-dom';
 import { AlertCircle, Check, Info, Minus, Search } from 'lucide-react';
+<<<<<<< HEAD
 import {
   Button,
   Input,
@@ -10,6 +11,9 @@ import {
   TooltipAnchor,
   useMediaQuery,
 } from '@librechat/client';
+=======
+import { Button, Input, MultiSelect, Spinner, TooltipAnchor } from '@librechat/client';
+>>>>>>> upstream/main
 import {
   INSIGHTS_MAX_RANGE_DAYS,
   INSIGHTS_SEARCH_MAX_LENGTH,
@@ -27,6 +31,10 @@ import { clearAgentFilters, shouldRecoverAgentFilters } from './agentFilters';
 import { useGetStartupConfig, useInsightsQuery } from '~/data-provider';
 import { useAuthContext, useDocumentTitle, useLocalize } from '~/hooks';
 import OpenSidebar from '~/components/Chat/Menus/OpenSidebar';
+<<<<<<< HEAD
+=======
+import useDrawerViewport from '~/hooks/Nav/useDrawerViewport';
+>>>>>>> upstream/main
 import { LocalizedDateRangePicker } from '~/components/ui';
 import { getRollingDateRange } from './dateRange';
 import { cn } from '~/utils';
@@ -113,11 +121,17 @@ function Panel({ children, className }: { children: React.ReactNode; className?:
   return (
     <section
       className={cn(
+<<<<<<< HEAD
         'min-w-0 rounded-lg border border-border-light bg-surface-primary p-5',
         /** Dark mode only: Click UI gives dashboard widgets their own surface and
          *  stroke, a step lighter than the page behind them. Light mode keeps the
          *  shared surface/border tokens. */
         'dark:border-chart-widget-stroke dark:bg-chart-widget-surface',
+=======
+        /** Click UI gives dashboard widgets their own surface and stroke, a step lighter
+         *  than the page in dark mode; in light they match the page surface and light rule. */
+        'border-chart-widget-stroke bg-chart-widget-surface min-w-0 rounded-lg border p-5',
+>>>>>>> upstream/main
         className,
       )}
     >
@@ -128,7 +142,11 @@ function Panel({ children, className }: { children: React.ReactNode; className?:
 
 function EmptyState({ message }: { message: string }) {
   return (
+<<<<<<< HEAD
     <div className="flex min-h-40 items-center justify-center text-sm text-text-secondary">
+=======
+    <div className="text-text-secondary flex min-h-40 items-center justify-center text-sm">
+>>>>>>> upstream/main
       {message}
     </div>
   );
@@ -137,8 +155,13 @@ function EmptyState({ message }: { message: string }) {
 function LoadingState({ message }: { message: string }) {
   return (
     <Panel className="flex min-h-52 flex-col items-center justify-center gap-3">
+<<<<<<< HEAD
       <Spinner className="size-7 text-text-secondary" />
       <span className="text-sm text-text-secondary">{message}</span>
+=======
+      <Spinner tone="secondary" className="size-7" />
+      <span className="text-text-secondary text-sm">{message}</span>
+>>>>>>> upstream/main
     </Panel>
   );
 }
@@ -182,7 +205,12 @@ function Sparkline({
 
   return (
     <div
+<<<<<<< HEAD
       className="relative mt-2 h-14 w-full text-status-info outline-none"
+=======
+      dir="ltr"
+      className="text-status-info relative mt-2 h-14 w-full outline-hidden"
+>>>>>>> upstream/main
       role="img"
       tabIndex={0}
       aria-label={label}
@@ -223,18 +251,30 @@ function Sparkline({
       {activePoint && (
         <>
           <span
+<<<<<<< HEAD
             className="pointer-events-none absolute top-0 h-full w-px bg-border-medium"
             style={{ left: `${(activePoint.x / 300) * 100}%` }}
           />
           <span
             className="pointer-events-none absolute size-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-status-info ring-2 ring-surface-primary"
+=======
+            className="bg-border-medium pointer-events-none absolute top-0 h-full w-px"
+            style={{ left: `${(activePoint.x / 300) * 100}%` }}
+          />
+          <span
+            className="bg-status-info ring-surface-primary pointer-events-none absolute size-2 -translate-x-1/2 -translate-y-1/2 rounded-full ring-2"
+>>>>>>> upstream/main
             style={{
               left: `${(activePoint.x / 300) * 100}%`,
               top: `${(activePoint.y / 56) * 100}%`,
             }}
           />
           <span
+<<<<<<< HEAD
             className="pointer-events-none absolute bottom-full mb-2 -translate-x-1/2 whitespace-nowrap rounded-lg border border-border-light bg-surface-primary px-2.5 py-1.5 text-xs text-text-primary shadow-lg"
+=======
+            className="border-border-light bg-surface-primary text-text-primary pointer-events-none absolute bottom-full mb-2 -translate-x-1/2 rounded-lg border px-2.5 py-1.5 text-xs whitespace-nowrap shadow-lg"
+>>>>>>> upstream/main
             style={{ left: `${Math.max(14, Math.min(86, (activePoint.x / 300) * 100))}%` }}
           >
             {formatter.format(new Date(activePoint.date))}{' '}
@@ -250,7 +290,11 @@ function KpiCard({ card, locale }: { card: KpiCardData; locale: string }) {
   const localize = useLocalize();
   return (
     <Panel>
+<<<<<<< HEAD
       <h2 className="inline-flex items-center gap-1.5 text-sm font-normal text-text-muted">
+=======
+      <h2 className="text-text-muted inline-flex items-center gap-1.5 text-sm font-normal">
+>>>>>>> upstream/main
         {card.title}
         {card.description && (
           <TooltipAnchor
@@ -267,7 +311,11 @@ function KpiCard({ card, locale }: { card: KpiCardData; locale: string }) {
           />
         )}
       </h2>
+<<<<<<< HEAD
       <div className="mt-3 text-4xl font-semibold tabular-nums leading-none text-text-primary">
+=======
+      <div className="text-text-primary mt-3 text-4xl leading-none font-semibold tabular-nums">
+>>>>>>> upstream/main
         {formatValue(card.value, locale)}
       </div>
       <Sparkline
@@ -282,7 +330,11 @@ function KpiCard({ card, locale }: { card: KpiCardData; locale: string }) {
 function TablePanel({ title, children }: { title: React.ReactNode; children: React.ReactNode }) {
   return (
     <Panel className="overflow-hidden">
+<<<<<<< HEAD
       <h2 className="mb-3 text-base font-semibold text-text-primary">{title}</h2>
+=======
+      <h2 className="text-text-primary mb-3 text-base font-semibold">{title}</h2>
+>>>>>>> upstream/main
       {children}
     </Panel>
   );
@@ -291,8 +343,13 @@ function TablePanel({ title, children }: { title: React.ReactNode; children: Rea
 function UserCell({ name, email, localize }: { name: string; email: string; localize: Localize }) {
   return (
     <div className="min-w-0">
+<<<<<<< HEAD
       <div className="truncate text-text-primary">{displayUserName(name, localize)}</div>
       <div className="truncate text-xs text-text-secondary">{email}</div>
+=======
+      <div className="text-text-primary truncate">{displayUserName(name, localize)}</div>
+      <div className="text-text-secondary truncate text-xs">{email}</div>
+>>>>>>> upstream/main
     </div>
   );
 }
@@ -312,6 +369,7 @@ function TopUsersTable({
         <EmptyState message={localize('com_insights_no_data')} />
       ) : (
         <div className="overflow-x-auto">
+<<<<<<< HEAD
           <table className="w-full min-w-[420px] text-left text-sm">
             <thead className="border-b border-border-medium text-xs text-text-secondary">
               <tr>
@@ -325,15 +383,35 @@ function TopUsersTable({
               </tr>
             </thead>
             <tbody className="divide-y divide-border-light">
+=======
+          <table className="w-full min-w-[26.25rem] text-start text-sm">
+            <thead className="border-border-medium text-text-secondary border-b text-xs">
+              <tr>
+                <th className="px-2 py-2 font-medium">{localize('com_insights_user')}</th>
+                <th className="px-2 py-2 text-end font-medium">
+                  {localize('com_insights_messages')}
+                </th>
+                <th className="px-2 py-2 text-end font-medium">{localize('com_insights_chats')}</th>
+              </tr>
+            </thead>
+            <tbody className="divide-border-light divide-y">
+>>>>>>> upstream/main
               {rows.map((entry) => (
                 <tr key={entry.userId} className="hover:bg-surface-hover">
                   <td className="px-2 py-3">
                     <UserCell {...entry} localize={localize} />
                   </td>
+<<<<<<< HEAD
                   <td className="px-2 py-3 text-right tabular-nums">
                     {formatExactValue(entry.messages, locale)}
                   </td>
                   <td className="px-2 py-3 text-right tabular-nums">
+=======
+                  <td className="px-2 py-3 text-end tabular-nums">
+                    {formatExactValue(entry.messages, locale)}
+                  </td>
+                  <td className="px-2 py-3 text-end tabular-nums">
+>>>>>>> upstream/main
                     {formatExactValue(entry.conversations, locale)}
                   </td>
                 </tr>
@@ -380,6 +458,7 @@ function ChurnedUsersTable({
         <EmptyState message={localize('com_insights_no_data')} />
       ) : (
         <div className="overflow-x-auto">
+<<<<<<< HEAD
           <table className="w-full min-w-[560px] table-fixed text-left text-sm">
             <thead className="border-b border-border-medium text-xs text-text-secondary">
               <tr>
@@ -394,16 +473,37 @@ function ChurnedUsersTable({
                   {localize('com_insights_first_seen')}
                 </th>
                 <th className="w-[21%] px-2 py-2 text-right font-medium">
+=======
+          <table className="w-full min-w-[35rem] table-fixed text-start text-sm">
+            <thead className="border-border-medium text-text-secondary border-b text-xs">
+              <tr>
+                <th className="w-[34%] px-2 py-2 font-medium">{localize('com_insights_user')}</th>
+                <th className="w-[12%] px-2 py-2 text-end font-medium">
+                  {localize('com_insights_messages')}
+                </th>
+                <th className="w-[12%] px-2 py-2 text-end font-medium">
+                  {localize('com_insights_chats')}
+                </th>
+                <th className="w-[21%] px-2 py-2 text-end font-medium">
+                  {localize('com_insights_first_seen')}
+                </th>
+                <th className="w-[21%] px-2 py-2 text-end font-medium">
+>>>>>>> upstream/main
                   {localize('com_insights_last_seen')}
                 </th>
               </tr>
             </thead>
+<<<<<<< HEAD
             <tbody className="divide-y divide-border-light">
+=======
+            <tbody className="divide-border-light divide-y">
+>>>>>>> upstream/main
               {rows.map((entry) => (
                 <tr key={entry.userId} className="hover:bg-surface-hover">
                   <td className="overflow-hidden px-2 py-3">
                     <UserCell {...entry} localize={localize} />
                   </td>
+<<<<<<< HEAD
                   <td className="px-2 py-3 text-right tabular-nums">
                     {formatExactValue(entry.messages, locale)}
                   </td>
@@ -414,6 +514,18 @@ function ChurnedUsersTable({
                     {formatDate(entry.firstSeen, locale)}
                   </td>
                   <td className="whitespace-nowrap px-2 py-3 text-right text-text-secondary">
+=======
+                  <td className="px-2 py-3 text-end tabular-nums">
+                    {formatExactValue(entry.messages, locale)}
+                  </td>
+                  <td className="px-2 py-3 text-end tabular-nums">
+                    {formatExactValue(entry.conversations, locale)}
+                  </td>
+                  <td className="text-text-secondary px-2 py-3 text-end whitespace-nowrap">
+                    {formatDate(entry.firstSeen, locale)}
+                  </td>
+                  <td className="text-text-secondary px-2 py-3 text-end whitespace-nowrap">
+>>>>>>> upstream/main
                     {formatDate(entry.lastSeen, locale)}
                   </td>
                 </tr>
@@ -456,11 +568,19 @@ function LatestConversations({
           <h2 className="text-base font-semibold">
             {localize('com_insights_latest_conversations')}
           </h2>
+<<<<<<< HEAD
           {isFetching && <Spinner className="size-4 text-text-secondary" />}
         </div>
         <div className="relative w-full sm:max-w-md">
           <Search
             className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-text-secondary"
+=======
+          {isFetching && <Spinner tone="secondary" className="size-4" />}
+        </div>
+        <div className="relative w-full sm:max-w-md">
+          <Search
+            className="text-text-secondary pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2"
+>>>>>>> upstream/main
             aria-hidden="true"
           />
           <Input
@@ -474,6 +594,7 @@ function LatestConversations({
         </div>
       </div>
       <div className="overflow-x-auto">
+<<<<<<< HEAD
         <table className="w-full min-w-[900px] table-fixed text-left text-sm">
           <thead className="border-b border-border-medium text-xs text-text-secondary">
             <tr>
@@ -485,32 +606,64 @@ function LatestConversations({
                 {localize('com_insights_messages')}
               </th>
               <th className="w-20 px-2 py-2 text-right font-medium">
+=======
+        <table className="w-full min-w-[56.25rem] table-fixed text-start text-sm">
+          <thead className="border-border-medium text-text-secondary border-b text-xs">
+            <tr>
+              <th className="w-[7.5rem] px-2 py-2 font-medium">{localize('com_insights_date')}</th>
+              <th className="w-[12rem] px-2 py-2 font-medium">{localize('com_insights_user')}</th>
+              <th className="w-[10rem] px-2 py-2 font-medium">{localize('com_insights_agent')}</th>
+              <th className="px-2 py-2 font-medium">{localize('com_insights_first_message')}</th>
+              <th className="w-20 px-2 py-2 text-end font-medium">
+                {localize('com_insights_messages')}
+              </th>
+              <th className="w-20 px-2 py-2 text-end font-medium">
+>>>>>>> upstream/main
                 {localize('com_insights_total_tokens')}
               </th>
             </tr>
           </thead>
+<<<<<<< HEAD
           <tbody className="divide-y divide-border-light">
+=======
+          <tbody className="divide-border-light divide-y">
+>>>>>>> upstream/main
             {rows.map((conversation) => (
               <tr
                 key={`${conversation.conversationId}:${conversation.userId}`}
                 className="hover:bg-surface-hover"
               >
+<<<<<<< HEAD
                 <td className="whitespace-nowrap px-2 py-3 text-text-secondary">
+=======
+                <td className="text-text-secondary px-2 py-3 whitespace-nowrap">
+>>>>>>> upstream/main
                   {formatRecentChatDate(conversation.date, locale)}
                 </td>
                 <td className="px-2 py-3">
                   <UserCell {...conversation} localize={localize} />
                 </td>
+<<<<<<< HEAD
                 <td className="truncate px-2 py-3 text-text-secondary">{conversation.agentName}</td>
+=======
+                <td className="text-text-secondary truncate px-2 py-3">{conversation.agentName}</td>
+>>>>>>> upstream/main
                 <td className="max-w-xl px-2 py-3">
                   <span className="line-clamp-2">
                     {conversation.firstMessage || localize('com_insights_no_message')}
                   </span>
                 </td>
+<<<<<<< HEAD
                 <td className="px-2 py-3 text-right tabular-nums">
                   {formatExactValue(conversation.messages, locale)}
                 </td>
                 <td className="px-2 py-3 text-right tabular-nums">
+=======
+                <td className="px-2 py-3 text-end tabular-nums">
+                  {formatExactValue(conversation.messages, locale)}
+                </td>
+                <td className="px-2 py-3 text-end tabular-nums">
+>>>>>>> upstream/main
                   {formatValue(conversation.totalTokens, locale)}
                 </td>
               </tr>
@@ -527,7 +680,11 @@ function LatestConversations({
           }
         />
       )}
+<<<<<<< HEAD
       <div className="mt-3 flex items-center justify-between gap-3 border-t border-border-light pt-3 text-sm text-text-secondary">
+=======
+      <div className="border-border-light text-text-secondary mt-3 flex items-center justify-between gap-3 border-t pt-3 text-sm">
+>>>>>>> upstream/main
         <span>{localize('com_insights_page_of', { page, pages })}</span>
         <div className="flex gap-2">
           <Button
@@ -567,7 +724,11 @@ export default function InsightsView() {
   const [page, setPage] = useState(1);
   const [pendingAgentIds, setPendingAgentIds] = useState<string[] | null>(null);
   const dateRangeSelectionTimeout = useRef<number>();
+<<<<<<< HEAD
   const isSmallScreen = useMediaQuery('(max-width: 768px)');
+=======
+  const isSmallScreen = useDrawerViewport();
+>>>>>>> upstream/main
   const insightsFeatureEnabled = startupConfig?.insightsEnabled === true;
   const selectedAgentIds = useMemo(
     () => [...new Set(urlSearchParams.getAll('agentIds').filter(Boolean))].sort(),
@@ -733,7 +894,11 @@ export default function InsightsView() {
     (insightsFeatureEnabled && (insights.isLoading || isRecoveringAgentFilters))
   ) {
     return (
+<<<<<<< HEAD
       <div className="h-full w-full bg-presentation p-4">
+=======
+      <div className="bg-surface-primary-alt h-full w-full p-4">
+>>>>>>> upstream/main
         <LoadingState message={localize('com_insights_loading')} />
       </div>
     );
@@ -743,8 +908,13 @@ export default function InsightsView() {
   }
 
   return (
+<<<<<<< HEAD
     <div className="flex h-full w-full min-w-0 flex-col bg-presentation text-text-primary">
       <header className="z-20 flex min-h-14 w-full flex-shrink-0 flex-col gap-3 border-b border-border-light bg-presentation px-4 py-3 sm:px-5 md:flex-row md:items-center md:justify-between md:px-6 lg:px-8">
+=======
+    <div className="bg-surface-primary-alt text-text-primary flex h-full w-full min-w-0 flex-col">
+      <header className="bg-surface-primary-alt z-20 flex min-h-14 w-full shrink-0 flex-col gap-3 px-4 py-3 sm:px-5 md:flex-row md:items-center md:justify-between md:px-6 lg:px-8">
+>>>>>>> upstream/main
         <div className="flex min-w-0 items-center gap-3">
           {isSmallScreen && <OpenSidebar />}
           <h1 className="text-base font-semibold">{localize('com_insights_title')}</h1>
@@ -771,7 +941,12 @@ export default function InsightsView() {
               className="w-full min-w-0 sm:w-72"
               selectClassName="h-8 w-full rounded border border-border-medium bg-surface-tertiary px-3 py-1 shadow-none hover:border-border-heavy data-[state=open]:border-border-heavy dark:hover:bg-chart-widget-stroke dark:data-[state=open]:bg-chart-widget-stroke"
               itemClassName="rounded-none px-4 py-1.5"
+<<<<<<< HEAD
               popoverClassName="max-h-80 rounded border-border-medium bg-surface-primary px-0 py-2 dark:bg-chart-widget-surface"
+=======
+              popoverClassName="max-h-80 rounded border-border-medium px-0 py-2"
+              surface="widget"
+>>>>>>> upstream/main
               renderSelectedValues={(values) => {
                 if (values.length === 0) {
                   return localize('com_insights_no_agents_selected');
@@ -785,7 +960,11 @@ export default function InsightsView() {
                 return localize('com_insights_agents_selected', { count: values.length });
               }}
               popoverHeader={
+<<<<<<< HEAD
                 <div className="border-b border-border-light">
+=======
+                <div className="border-border-light border-b">
+>>>>>>> upstream/main
                   <Button
                     type="button"
                     size="sm"
@@ -795,7 +974,11 @@ export default function InsightsView() {
                         ? localize('com_ui_clear_all')
                         : localize('com_insights_select_all_agents')
                     }
+<<<<<<< HEAD
                     className="h-10 w-full justify-start gap-2 rounded-none px-4 font-medium text-text-primary hover:bg-surface-hover"
+=======
+                    className="text-text-primary h-10 w-full justify-start rounded-none px-4 font-medium"
+>>>>>>> upstream/main
                     onClick={() =>
                       handleAgentSelection(
                         displayedAgentIds.length > 0 ? [] : agentItems.map((agent) => agent.value),
@@ -805,7 +988,11 @@ export default function InsightsView() {
                     <span
                       aria-hidden="true"
                       className={cn(
+<<<<<<< HEAD
                         'flex size-4 shrink-0 items-center justify-center rounded-sm border border-border-xheavy',
+=======
+                        'border-border-xheavy flex size-4 shrink-0 items-center justify-center rounded-sm border',
+>>>>>>> upstream/main
                         displayedAgentIds.length > 0 && 'bg-surface-inverted text-text-inverted',
                       )}
                     >
@@ -824,7 +1011,11 @@ export default function InsightsView() {
               }
             />
           )}
+<<<<<<< HEAD
           <div className="inline-flex rounded-lg border border-border-light p-0.5">
+=======
+          <div className="border-border-light inline-flex rounded-lg border p-0.5">
+>>>>>>> upstream/main
             {ranges.map((item) => (
               <Button
                 key={item.value}
@@ -832,7 +1023,11 @@ export default function InsightsView() {
                 variant="ghost"
                 aria-pressed={!customDateRange && range === item.value}
                 className={cn(
+<<<<<<< HEAD
                   'h-8 rounded-md px-3',
+=======
+                  'h-8 rounded-md',
+>>>>>>> upstream/main
                   !customDateRange && range === item.value && 'bg-surface-active-alt',
                 )}
                 onClick={() => {
@@ -849,7 +1044,11 @@ export default function InsightsView() {
               </Button>
             ))}
           </div>
+<<<<<<< HEAD
           <div className="w-full min-w-0 sm:w-[340px]">
+=======
+          <div className="w-full min-w-0 sm:w-[21.25rem]">
+>>>>>>> upstream/main
             <LocalizedDateRangePicker
               endDate={displayDateRange.endDate}
               futureDatesDisabled
@@ -871,12 +1070,21 @@ export default function InsightsView() {
           </div>
         </div>
       </header>
+<<<<<<< HEAD
       <main className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
         <div className="flex w-full min-w-0 flex-col gap-3 px-8 pb-4 pt-8">
           {insights.isLoading && <LoadingState message={localize('com_insights_loading')} />}
           {insights.isError && (
             <Panel className="flex items-center gap-2">
               <AlertCircle className="size-4 text-status-error" />
+=======
+      <main className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto">
+        <div className="flex w-full min-w-0 flex-col gap-3 px-8 pt-8 pb-4">
+          {insights.isLoading && <LoadingState message={localize('com_insights_loading')} />}
+          {insights.isError && (
+            <Panel className="flex items-center gap-2">
+              <AlertCircle className="text-status-error size-4" />
+>>>>>>> upstream/main
               <span className="text-sm">
                 {insightsStatus === 403
                   ? localize('com_insights_forbidden')
@@ -894,7 +1102,11 @@ export default function InsightsView() {
                   <KpiCard key={card.id} card={card} locale={locale} />
                 ))}
               </div>
+<<<<<<< HEAD
               <div className="grid w-full grid-cols-[repeat(auto-fit,minmax(min(100%,580px),1fr))] gap-3">
+=======
+              <div className="grid w-full grid-cols-[repeat(auto-fit,minmax(min(100%,36.25rem),1fr))] gap-3">
+>>>>>>> upstream/main
                 <TopUsersTable rows={data.topUsers} localize={localize} locale={locale} />
                 <ChurnedUsersTable rows={data.churnedUsers} localize={localize} locale={locale} />
               </div>

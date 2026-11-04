@@ -29,8 +29,14 @@ interface UnpinButtonProps {
  * for in JS rather than through an `@media (hover: hover)` variant, the way the
  * row's overflow trigger does it: a variant only ever loses or wins the cascade
  * against the `group-hover` rules it has to override, and which way it goes
+<<<<<<< HEAD
  * differs per property. A pointer with no hover gets no gating at all, which is
  * the only thing that makes the badge reachable by touch.
+=======
+ * differs per property. A device with any coarse pointer gets no gating at all,
+ * which is the only thing that makes the badge reachable by touch, including on
+ * a 2-in-1 whose trackpad answers `(hover: hover)`.
+>>>>>>> upstream/main
  */
 export default function UnpinButton({
   onClick,
@@ -41,6 +47,10 @@ export default function UnpinButton({
 }: UnpinButtonProps) {
   const localize = useLocalize();
   const hasHoverPointer = useMediaQuery('(hover: hover)');
+<<<<<<< HEAD
+=======
+  const hasCoarsePointer = useMediaQuery('(any-pointer: coarse)');
+>>>>>>> upstream/main
 
   return (
     <TooltipAnchor
@@ -55,10 +65,18 @@ export default function UnpinButton({
           onClick={onClick}
           onKeyDown={onKeyDown}
           className={cn(
+<<<<<<< HEAD
             'shrink-0 text-text-secondary',
             hasHoverPointer &&
               !keepVisible &&
               'pointer-events-none opacity-0 focus-visible:pointer-events-auto focus-visible:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100',
+=======
+            'text-text-secondary shrink-0',
+            hasHoverPointer &&
+              !hasCoarsePointer &&
+              !keepVisible &&
+              'pointer-events-none opacity-0 group-focus-within:pointer-events-auto group-focus-within:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100 focus-visible:pointer-events-auto focus-visible:opacity-100',
+>>>>>>> upstream/main
             className,
           )}
         >

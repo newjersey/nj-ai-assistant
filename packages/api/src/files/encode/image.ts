@@ -11,8 +11,15 @@ import type { IMongoFile } from '@librechat/data-schemas';
 import type { Agents } from 'librechat-data-provider';
 import type { AxiosInstance } from 'axios';
 import type { ServerRequest, StrategyFunctions } from '~/types';
+<<<<<<< HEAD
 import { getFileStream, isAttachmentObjectNotFoundError } from './utils';
 import { validateImage } from '~/files/validation';
+=======
+import { getOutboundTimeoutMs, outboundRequestBudget } from '~/utils/timeouts';
+import { getFileStream, isAttachmentObjectNotFoundError } from './utils';
+import { validateImage } from '~/files/validation';
+import { sniffImageMimeType } from '~/files/mime';
+>>>>>>> upstream/main
 import { runGuardedEncode } from './memoryGuard';
 import { logAxiosError } from '~/utils/axios';
 
@@ -101,6 +108,15 @@ export async function encodeAndFormatImages(
     return result;
   }
 
+<<<<<<< HEAD
+=======
+  /** A later synchronous throw abandons earlier in-flight reads; keep their rejections handled. */
+  const track = (entry: Promise<ImageEntry>): Promise<ImageEntry> => {
+    entry.catch(() => undefined);
+    return entry;
+  };
+
+>>>>>>> upstream/main
   for (const file of files) {
     const source = file.source ?? FileSources.local;
     if (!file.height) {
@@ -109,6 +125,7 @@ export async function encodeAndFormatImages(
     }
 
     if (blobStorageSources.has(source)) {
+<<<<<<< HEAD
       try {
         const processedFile = await runGuardedEncode(file.bytes ?? 0, () =>
           getFileStream(req, file, encodingMethods, getStrategyFunctions),
@@ -123,6 +140,26 @@ export async function encodeAndFormatImages(
         }
         throw new AttachmentStorageError();
       }
+=======
+      promises.push(
+        track(
+          runGuardedEncode(file.bytes ?? 0, () =>
+            getFileStream(req, file, encodingMethods, getStrategyFunctions),
+          ).then(
+            (processedFile): ImageEntry => [file, processedFile?.content ?? null],
+            (error: unknown): never => {
+              if (isAttachmentObjectNotFoundError(error)) {
+                throw error;
+              }
+              if (typeof error === 'object' && error != null && 'bufferedData' in error) {
+                delete (error as { bufferedData?: unknown }).bufferedData;
+              }
+              throw new AttachmentStorageError();
+            },
+          ),
+        ),
+      );
+>>>>>>> upstream/main
       continue;
     }
 
@@ -135,11 +172,21 @@ export async function encodeAndFormatImages(
     }
 
     if (source !== FileSources.local && effectiveEndpoint && base64Only.has(effectiveEndpoint)) {
+<<<<<<< HEAD
       const entry = await runGuardedEncode<ImageEntry>(file.bytes ?? 0, async () => {
         const [preparedFile, imageURL] = await preparePayload(req, file);
         try {
           const response = await httpClient.get<ArrayBuffer>(imageURL, {
             responseType: 'arraybuffer',
+=======
+      const entry = runGuardedEncode<ImageEntry>(file.bytes ?? 0, async () => {
+        const [preparedFile, imageURL] = await preparePayload(req, file);
+        const fetchTimeoutMs = getOutboundTimeoutMs(req.config, 'imageFetchMs');
+        try {
+          const response = await httpClient.get<ArrayBuffer>(imageURL, {
+            responseType: 'arraybuffer',
+            ...outboundRequestBudget(fetchTimeoutMs, 'imageFetchMs'),
+>>>>>>> upstream/main
           });
           return [preparedFile, Buffer.from(response.data).toString('base64')];
         } catch (error) {
@@ -147,10 +194,17 @@ export async function encodeAndFormatImages(
           throw new Error(logAxiosError({ message, error }));
         }
       });
+<<<<<<< HEAD
       promises.push(entry);
       continue;
     }
     promises.push(preparePayload(req, file));
+=======
+      promises.push(track(entry));
+      continue;
+    }
+    promises.push(track(preparePayload(req, file)));
+>>>>>>> upstream/main
   }
 
   const detail = params.imageDetail ?? req.body.imageDetail ?? ImageDetail.auto;
@@ -185,6 +239,7 @@ export async function encodeAndFormatImages(
     }
 
     const isURL = imageContent.startsWith('http');
+<<<<<<< HEAD
     if (file.height && file.width && !isURL) {
       const imageBuffer = Buffer.from(imageContent, 'base64');
       const validation = await validateImage(
@@ -199,19 +254,48 @@ export async function encodeAndFormatImages(
     }
 
     const url = isURL ? imageContent : `data:${file.type};base64,${imageContent}`;
+=======
+    // Historical uploads may have a stored type that disagrees with their bytes.
+    let mediaType = file.type;
+    if (!isURL) {
+      const imageBuffer = Buffer.from(imageContent, 'base64');
+      mediaType = sniffImageMimeType(imageBuffer) ?? file.type;
+      if (file.height && file.width) {
+        const validation = await validateImage(
+          imageBuffer,
+          imageBuffer.length,
+          effectiveEndpoint ?? '',
+          configuredFileSizeLimit,
+        );
+        if (!validation.isValid) {
+          throw new Error(`Image validation failed for ${file.filename}: ${validation.error}`);
+        }
+      }
+    }
+
+    const url = isURL ? imageContent : `data:${mediaType};base64,${imageContent}`;
+>>>>>>> upstream/main
     if (mode === VisionModes.agents) {
       result.image_urls.push({ type: ContentTypes.IMAGE_URL, image_url: { url, detail } });
     } else if (effectiveEndpoint === EModelEndpoint.google && mode === VisionModes.generative) {
       result.image_urls.push({
         type: ContentTypes.IMAGE_URL,
+<<<<<<< HEAD
         inlineData: { mimeType: file.type, data: imageContent },
+=======
+        inlineData: { mimeType: mediaType, data: imageContent },
+>>>>>>> upstream/main
       });
     } else if (effectiveEndpoint === EModelEndpoint.google) {
       result.image_urls.push({ type: ContentTypes.IMAGE_URL, image_url: url });
     } else if (effectiveEndpoint === EModelEndpoint.anthropic) {
       result.image_urls.push({
         type: 'image',
+<<<<<<< HEAD
         source: { type: 'base64', media_type: file.type, data: imageContent },
+=======
+        source: { type: 'base64', media_type: mediaType, data: imageContent },
+>>>>>>> upstream/main
       });
     } else {
       result.image_urls.push({ type: ContentTypes.IMAGE_URL, image_url: { url, detail } });

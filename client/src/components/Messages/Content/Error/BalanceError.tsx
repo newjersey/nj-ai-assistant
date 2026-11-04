@@ -1,4 +1,5 @@
 import type { ErrorRendererProps, JsonValue } from './parts';
+<<<<<<< HEAD
 import {
   ErrorBody,
   ErrorDetails,
@@ -7,6 +8,11 @@ import {
   readNumber,
   readString,
 } from './parts';
+=======
+import { ErrorBody, ErrorDetails, formatNumber, readNumber, readString } from './parts';
+import { useBalanceDisplay } from '~/hooks/useBalanceSummary';
+import { formatBalanceAmount } from '~/utils';
+>>>>>>> upstream/main
 import { useLocalize } from '~/hooks';
 
 type GenerationRow = {
@@ -42,6 +48,10 @@ function readGeneration(generation: JsonValue): GenerationRow | null {
 
 export default function BalanceError({ json }: ErrorRendererProps) {
   const localize = useLocalize();
+<<<<<<< HEAD
+=======
+  const { display, currency } = useBalanceDisplay();
+>>>>>>> upstream/main
   const balance = readNumber(json, 'balance');
   const tokenCost = readNumber(json, 'tokenCost');
   const promptTokens = readNumber(json, 'promptTokens');
@@ -49,6 +59,7 @@ export default function BalanceError({ json }: ErrorRendererProps) {
     ? json.generations.map(readGeneration).filter((row): row is GenerationRow => row != null)
     : [];
 
+<<<<<<< HEAD
   const summary =
     tokenCost != null && balance != null
       ? localize('com_error_token_balance', {
@@ -56,6 +67,23 @@ export default function BalanceError({ json }: ErrorRendererProps) {
           1: formatCredits(balance),
         })
       : localize('com_error_limit_reached');
+=======
+  /** Same figures the balance summary shows: money for `currency`, none at all for `percent` */
+  let summary = localize('com_error_limit_reached');
+  if (tokenCost != null && balance != null) {
+    if (display === 'percent') {
+      summary = localize('com_error_token_balance_hidden');
+    } else {
+      summary = localize(
+        display === 'currency' ? 'com_error_token_balance_currency' : 'com_error_token_balance',
+        {
+          0: formatBalanceAmount(tokenCost, display, currency),
+          1: formatBalanceAmount(balance, display, currency),
+        },
+      );
+    }
+  }
+>>>>>>> upstream/main
 
   return (
     <ErrorBody>

@@ -1,6 +1,11 @@
 import { atom, atomFamily, selectorFamily } from 'recoil';
+<<<<<<< HEAD
 import { logger } from '~/utils';
 import type { Artifact } from '~/common';
+=======
+import type { Artifact } from '~/common';
+import { logger } from '~/utils';
+>>>>>>> upstream/main
 
 export const artifactsState = atom<Record<string, Artifact | undefined> | null>({
   key: 'artifactsState',
@@ -91,6 +96,7 @@ export const artifactByIdSelector = selectorFamily<Artifact | undefined, string>
 /**
  * One-shot signal that an attachment's deferred preview just transitioned
  * from `pending` to `ready` during the current session — keyed by
+<<<<<<< HEAD
  * `file_id` (raw, NOT the `tool-artifact-${file_id}` form).
  *
  * The preview-sync hook flips this to `true` on the pending→ready edge.
@@ -98,6 +104,15 @@ export const artifactByIdSelector = selectorFamily<Artifact | undefined, string>
  * (even when no submission is in flight) and then resets the flag, so
  * subsequent re-mounts (panel close/reopen, re-render of the same card
  * from history) do not steal focus a second time.
+=======
+ * `[messageId, file_id]`. The same file can appear in more than one response;
+ * a historical card must not consume a live response's pending signal.
+ *
+ * The preview-sync hook flips this to `true` on the pending→ready edge.
+ * `ToolArtifactCard` reads it for the same owning message; if set, it
+ * auto-opens the panel (even when no submission is in flight) and then
+ * resets the flag, so later mounts of that response do not steal focus.
+>>>>>>> upstream/main
  *
  * Why a separate signal rather than reusing `mountedDuringStreamRef`:
  * the deferred render can complete *after* the SSE stream has closed,
@@ -109,7 +124,11 @@ export const artifactByIdSelector = selectorFamily<Artifact | undefined, string>
  * scrolling through history doesn't get the panel popping open every
  * time a previously resolved chip enters the viewport.
  */
+<<<<<<< HEAD
 export const previewJustResolved = atomFamily<boolean, string>({
+=======
+export const previewJustResolved = atomFamily<boolean, [messageId: string, fileId: string]>({
+>>>>>>> upstream/main
   key: 'previewJustResolved',
   default: false,
 });

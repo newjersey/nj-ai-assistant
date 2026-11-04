@@ -1,7 +1,11 @@
 import React from 'react';
 import { Provider, createStore } from 'jotai';
 import { act, render, screen } from '@testing-library/react';
+<<<<<<< HEAD
 import { composerOverlayCountFamily } from '~/components/Chat/Input/overlay';
+=======
+import { composerOverlayCountFamily } from '@librechat/chat/react';
+>>>>>>> upstream/main
 import ScrollButton from '../ScrollButton';
 
 jest.mock('~/hooks', () => ({

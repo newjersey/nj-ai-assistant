@@ -125,6 +125,7 @@ function filterVertexHeaders(headers?: Record<string, string>): Record<string, s
   return Object.keys(filteredHeaders).length > 0 ? filteredHeaders : undefined;
 }
 
+<<<<<<< HEAD
 /**
  * Gets the deployment name for a given model name from the Vertex AI configuration.
  * Maps visible model names to actual deployment names (model IDs).
@@ -163,6 +164,9 @@ export function getVertexDeploymentName(
   // Model has its own deployment name
   return modelConfig.deploymentName || vertexConfig.deploymentName || modelName;
 }
+=======
+export { getVertexDeploymentName } from 'librechat-data-provider';
+>>>>>>> upstream/main
 
 /**
  * Creates and configures a Vertex AI client for Anthropic.

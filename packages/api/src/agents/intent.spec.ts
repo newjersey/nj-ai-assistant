@@ -5,7 +5,10 @@ import {
   NATIVE_INTENT_TOOL_NAMES,
   isIntentEligibleToolName,
   hasIntentArg,
+<<<<<<< HEAD
   readIntentArg,
+=======
+>>>>>>> upstream/main
   stripIntentArg,
   injectIntentParam,
   stripIntentFromToolDefinitions,
@@ -71,6 +74,7 @@ describe('isIntentEligibleToolName', () => {
   });
 });
 
+<<<<<<< HEAD
 describe('hasIntentArg / readIntentArg / stripIntentArg', () => {
   it('detects and reads the arg on object and stringified args', () => {
     expect(hasIntentArg({ [INTENT_ARG]: 'Searching for OAuth handling' })).toBe(true);
@@ -82,6 +86,13 @@ describe('hasIntentArg / readIntentArg / stripIntentArg', () => {
     expect(readIntentArg({ [INTENT_ARG]: '   ' })).toBeUndefined();
     expect(readIntentArg({ [INTENT_ARG]: 42 })).toBeUndefined();
     expect(readIntentArg('not json')).toBeUndefined();
+=======
+describe('hasIntentArg / stripIntentArg', () => {
+  it('detects the arg on object and stringified args', () => {
+    expect(hasIntentArg({ [INTENT_ARG]: 'Searching for OAuth handling' })).toBe(true);
+    expect(hasIntentArg({})).toBe(false);
+    expect(hasIntentArg('{"intent":"Searching"}')).toBe(true);
+>>>>>>> upstream/main
   });
 
   it('strips the arg without mutating the original', () => {

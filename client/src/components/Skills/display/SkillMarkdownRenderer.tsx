@@ -156,8 +156,12 @@ function SkillMarkdownRenderer({
       components={components as unknown as Record<string, React.ElementType>}
       urlTransform={skillUrlTransform}
       className={
+<<<<<<< HEAD
         className ??
         'markdown prose dark:prose-invert light w-full break-words leading-[1.65rem] text-text-primary'
+=======
+        className ?? 'markdown prose light text-text-primary w-full leading-[1.65rem] break-words'
+>>>>>>> upstream/main
       }
     >
       {content}

@@ -23,7 +23,11 @@ const PluginPagination: React.FC<TPluginPaginationProps> = ({
   };
 
   return (
+<<<<<<< HEAD
     <div className="flex gap-2 text-sm text-text-secondary">
+=======
+    <div className="text-text-secondary flex gap-2 text-sm">
+>>>>>>> upstream/main
       <div
         role="button"
         tabIndex={0}
@@ -34,12 +38,19 @@ const PluginPagination: React.FC<TPluginPaginationProps> = ({
             onChangePage(currentPage - 1);
           }
         }}
+<<<<<<< HEAD
         className={`flex cursor-default items-center text-sm ${
+=======
+        className={`flex cursor-default items-center text-sm select-none ${
+>>>>>>> upstream/main
           currentPage === 1
             ? 'text-text-secondary opacity-50'
             : 'text-text-secondary hover:text-text-primary'
         }`}
+<<<<<<< HEAD
         style={{ userSelect: 'none' }}
+=======
+>>>>>>> upstream/main
       >
         <svg
           stroke="currentColor"
@@ -62,12 +73,19 @@ const PluginPagination: React.FC<TPluginPaginationProps> = ({
           role="button"
           key={page}
           tabIndex={0}
+<<<<<<< HEAD
           className={`flex h-5 w-5 items-center justify-center text-sm ${
+=======
+          className={`flex h-5 w-5 items-center justify-center text-sm select-none ${
+>>>>>>> upstream/main
             currentPage === page
               ? 'text-link hover:text-link'
               : 'text-text-secondary hover:text-text-primary'
           }`}
+<<<<<<< HEAD
           style={{ userSelect: 'none' }}
+=======
+>>>>>>> upstream/main
           onClick={() => onChangePage(page)}
           onKeyDown={(e) => {
             if (e.key === 'Enter' || e.key === ' ') {
@@ -88,12 +106,19 @@ const PluginPagination: React.FC<TPluginPaginationProps> = ({
             onChangePage(currentPage + 1);
           }
         }}
+<<<<<<< HEAD
         className={`flex cursor-default items-center text-sm ${
+=======
+        className={`flex cursor-default items-center text-sm select-none ${
+>>>>>>> upstream/main
           currentPage === maxPage
             ? 'text-text-secondary opacity-50'
             : 'text-text-secondary hover:text-text-primary'
         }`}
+<<<<<<< HEAD
         style={{ userSelect: 'none' }}
+=======
+>>>>>>> upstream/main
       >
         {localize('com_ui_next')}
         <svg

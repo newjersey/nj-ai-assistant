@@ -561,6 +561,10 @@ describe('MCP reinitialize recovery – integration (issue #12143)', () => {
       async (ctx) => ({
         allowedDomains: ctx?.userId === 'user-b' ? ['127.0.0.1', 'localhost'] : ['127.0.0.1'],
         allowedAddresses: null,
+<<<<<<< HEAD
+=======
+        mcpApps: { enabled: false, legacyHtmlEnabled: false },
+>>>>>>> upstream/main
       }),
     );
     server = await createMCPServerOnPort(await getFreePort());

@@ -1,12 +1,19 @@
 import fs from 'node:fs';
 import path from 'node:path';
+<<<<<<< HEAD
 import { promisify } from 'node:util';
 import { execFile } from 'node:child_process';
+=======
+>>>>>>> upstream/main
 import { expect } from '@playwright/test';
 import type Result from 'lighthouse/types/lhr/lhr';
 import type { Cookie } from '@playwright/test';
 
+<<<<<<< HEAD
 const exec = promisify(execFile);
+=======
+import { runLighthouse } from './process.mts';
+>>>>>>> upstream/main
 
 /** Median budgets keyed by Lighthouse audit id. */
 export type MedianBudgets = Record<string, number>;
@@ -15,9 +22,12 @@ const REPORTS_DIRECTORY = '.lighthouse';
 
 const DEFAULT_RUNS = 3;
 
+<<<<<<< HEAD
 /** Attempts per run before a crashed Lighthouse process fails the audit. */
 const RUN_ATTEMPTS = 2;
 
+=======
+>>>>>>> upstream/main
 const DEFAULT_BUDGETS: MedianBudgets = {
   'largest-contentful-paint': 4500,
   'cumulative-layout-shift': 0.1,
@@ -82,6 +92,7 @@ export async function auditPage({
   try {
     for (let run = 1; run <= runs; run++) {
       const output = path.join(directory, `lhr-${run}`);
+<<<<<<< HEAD
       for (let attempt = 1; ; attempt++) {
         try {
           const { stdout } = await exec(process.execPath, [
@@ -110,6 +121,9 @@ export async function auditPage({
           );
         }
       }
+=======
+      await runLighthouse({ cli, flags, output, run, runs });
+>>>>>>> upstream/main
     }
   } finally {
     // Lighthouse embeds extraHeaders in reports; keep disposable session cookies out of artifacts.

@@ -1,11 +1,17 @@
 import {
+<<<<<<< HEAD
   genAzureChatCompletion,
+=======
+>>>>>>> upstream/main
   getAzureCredentials,
   constructAzureURL,
   sanitizeModelName,
   genAzureEndpoint,
 } from './azure';
+<<<<<<< HEAD
 import type { GenericClient } from '~/types';
+=======
+>>>>>>> upstream/main
 
 describe('sanitizeModelName', () => {
   test('removes periods from the model name', () => {
@@ -29,6 +35,7 @@ describe('genAzureEndpoint', () => {
   });
 });
 
+<<<<<<< HEAD
 describe('genAzureChatCompletion', () => {
   // Test with both deployment name and model name provided
   test('prefers model name over deployment name when both are provided and feature enabled', () => {
@@ -177,6 +184,8 @@ describe('genAzureChatCompletion', () => {
   });
 });
 
+=======
+>>>>>>> upstream/main
 describe('getAzureCredentials', () => {
   beforeEach(() => {
     process.env.AZURE_API_KEY = 'testApiKey';

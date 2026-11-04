@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { apiBaseUrl } from 'librechat-data-provider';
+=======
+import { apiBaseUrl, getClientLimit } from 'librechat-data-provider';
+>>>>>>> upstream/main
 import type { TStartupConfig } from 'librechat-data-provider';
 
 type CloudFrontCookieRefreshConfig = NonNullable<
@@ -108,6 +112,7 @@ async function postCloudFrontCookieRefresh(endpoint: string): Promise<boolean> {
     headers.Authorization = authorization;
   }
 
+<<<<<<< HEAD
   const response = await fetch(endpoint, {
     method: 'POST',
     credentials: 'include',
@@ -121,6 +126,28 @@ async function postCloudFrontCookieRefresh(endpoint: string): Promise<boolean> {
 
   const payload = (await response.json()) as CloudFrontCookieRefreshResponse;
   return payload.ok === true;
+=======
+  const controller = new AbortController();
+  const abortTimer = setTimeout(() => controller.abort(), getClientLimit('cloudfrontMs'));
+  try {
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      credentials: 'include',
+      headers,
+      body: '{}',
+      signal: controller.signal,
+    });
+
+    if (!response.ok) {
+      return false;
+    }
+
+    const payload = (await response.json()) as CloudFrontCookieRefreshResponse;
+    return payload.ok === true;
+  } finally {
+    clearTimeout(abortTimer);
+  }
+>>>>>>> upstream/main
 }
 
 export function refreshCloudFrontCookiesOnce(): Promise<boolean> {

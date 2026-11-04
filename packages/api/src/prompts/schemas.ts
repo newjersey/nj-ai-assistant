@@ -1,6 +1,34 @@
 import { z } from 'zod';
 import { Constants } from 'librechat-data-provider';
 
+<<<<<<< HEAD
+=======
+export type TPromptPayloadSchema = {
+  prompt: string;
+  type: 'text' | 'chat';
+};
+
+const PROMPT_TEXT_MESSAGE = 'Prompt text is required and must be a non-empty string';
+const PROMPT_TYPE_MESSAGE = 'Prompt type must be "text" or "chat"';
+
+/** Validates a new revision. Unknown keys, such as the editor's `groupId`, are removed. */
+const promptPayloadSchema: z.ZodType<TPromptPayloadSchema> = z.object(
+  {
+    prompt: z
+      .string({ error: PROMPT_TEXT_MESSAGE })
+      .refine((value) => value.trim().length > 0, { message: PROMPT_TEXT_MESSAGE }),
+    type: z.enum(['text', 'chat'], { error: PROMPT_TYPE_MESSAGE }),
+  },
+  { error: PROMPT_TEXT_MESSAGE },
+);
+
+export function safeValidatePromptPayload(
+  data: unknown,
+): z.ZodSafeParseResult<TPromptPayloadSchema> {
+  return promptPayloadSchema.safeParse(data);
+}
+
+>>>>>>> upstream/main
 /**
  * Schema for validating prompt group update payloads.
  * Only allows fields that users should be able to modify.
@@ -17,7 +45,11 @@ export const updatePromptGroupSchema: z.ZodObject<
     /** Command shortcut for the prompt group */
     command: z.ZodNullable<z.ZodOptional<z.ZodString>>;
   },
+<<<<<<< HEAD
   'strict'
+=======
+  z.core.$strict
+>>>>>>> upstream/main
 > = z
   .object({
     /** The name of the prompt group */
@@ -41,6 +73,7 @@ export const updatePromptGroupSchema: z.ZodObject<
 export type TUpdatePromptGroupSchema = z.infer<typeof updatePromptGroupSchema>;
 
 /**
+<<<<<<< HEAD
  * Validates and sanitizes a prompt group update payload.
  * Returns only the allowed fields, stripping any sensitive fields.
  * @param data - The raw request body to validate
@@ -52,10 +85,13 @@ export function validatePromptGroupUpdate(data: unknown): TUpdatePromptGroupSche
 }
 
 /**
+=======
+>>>>>>> upstream/main
  * Safely validates a prompt group update payload without throwing.
  * @param data - The raw request body to validate
  * @returns A SafeParseResult with either the validated data or validation errors
  */
+<<<<<<< HEAD
 export function safeValidatePromptGroupUpdate(data: unknown): z.SafeParseReturnType<
   {
     name?: string | undefined;
@@ -70,5 +106,10 @@ export function safeValidatePromptGroupUpdate(data: unknown): z.SafeParseReturnT
     oneliner?: string | undefined;
   }
 > {
+=======
+export function safeValidatePromptGroupUpdate(
+  data: unknown,
+): z.ZodSafeParseResult<TUpdatePromptGroupSchema> {
+>>>>>>> upstream/main
   return updatePromptGroupSchema.safeParse(data);
 }

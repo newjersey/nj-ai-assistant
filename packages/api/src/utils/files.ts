@@ -527,6 +527,7 @@ export async function readFileAsBuffer(
   const content = await readFile(filePath);
   return { content, bytes };
 }
+<<<<<<< HEAD
 
 /**
  * Reads a JSON file asynchronously
@@ -543,3 +544,5 @@ export async function readJsonFile<T = unknown>(
   const { content } = await readFileAsString(filePath, { ...options, encoding: 'utf8' });
   return JSON.parse(content);
 }
+=======
+>>>>>>> upstream/main

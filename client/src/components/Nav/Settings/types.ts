@@ -17,6 +17,10 @@ export type SettingsTab =
 export type SectionId =
   | 'appearance'
   | 'layout'
+<<<<<<< HEAD
+=======
+  | 'notifications'
+>>>>>>> upstream/main
   | 'accessibility'
   | 'admin'
   | 'sending'
@@ -34,6 +38,10 @@ export type SectionId =
   | 'danger'
   | 'profile'
   | 'security'
+<<<<<<< HEAD
+=======
+  | 'connections'
+>>>>>>> upstream/main
   | 'billing'
   | 'about';
 
@@ -47,12 +55,32 @@ export interface SettingsContextValue {
   hasMultiConvo: boolean;
   hasPrompts: boolean;
   isLocalProvider: boolean;
+<<<<<<< HEAD
   twoFactorEnabled: boolean;
   allowAccountDeletion: boolean;
   aboutEnabled: boolean;
   engineTTS: string;
   langfuseConnectionAccess: boolean;
   adminPanelURL: string;
+=======
+  emailEnabled: boolean;
+  allowEmailChange: boolean;
+  passkeyLoginEnabled: boolean;
+  hasPullRequestConnect: boolean;
+  isTwoFactorPolicyProvider: boolean;
+  twoFactorEnabled: boolean;
+  allowAccountDeletion: boolean;
+  aboutEnabled: boolean;
+  mascotAllowed: boolean;
+  engineTTS: string;
+  langfuseConnectionAccess: boolean;
+  langfusePromptSyncAccess?: boolean;
+  adminPanelURL: string;
+  replyTabBadgeAllowed: boolean;
+  replyNotificationsAllowed: boolean;
+  replyNotificationSoundAllowed: boolean;
+  analyticsConfigured: boolean;
+>>>>>>> upstream/main
 }
 
 export interface SettingEntry {
@@ -99,6 +127,10 @@ export const TABS: TabMeta[] = [
     sections: [
       { id: 'appearance', labelKey: 'com_ui_settings_section_appearance' },
       { id: 'layout', labelKey: 'com_ui_settings_section_layout' },
+<<<<<<< HEAD
+=======
+      { id: 'notifications', labelKey: 'com_ui_settings_section_notifications' },
+>>>>>>> upstream/main
       { id: 'accessibility', labelKey: 'com_ui_settings_section_accessibility' },
       { id: 'admin', labelKey: 'com_ui_settings_section_admin' },
     ],
@@ -135,7 +167,11 @@ export const TABS: TabMeta[] = [
         icon: createLangfuseIcon('h-3.5 w-3.5'),
       },
     ],
+<<<<<<< HEAD
     show: (ctx) => ctx.langfuseConnectionAccess,
+=======
+    show: (ctx) => ctx.langfuseConnectionAccess || ctx.langfusePromptSyncAccess === true,
+>>>>>>> upstream/main
   },
   {
     id: SettingsTabValues.DATA,
@@ -156,6 +192,10 @@ export const TABS: TabMeta[] = [
     sections: [
       { id: 'profile', labelKey: 'com_ui_settings_section_profile' },
       { id: 'security', labelKey: 'com_ui_settings_section_security' },
+<<<<<<< HEAD
+=======
+      { id: 'connections', labelKey: 'com_ui_settings_section_connections' },
+>>>>>>> upstream/main
       { id: 'billing', labelKey: 'com_ui_settings_section_billing' },
       { id: 'danger', labelKey: 'com_ui_settings_section_danger_zone', danger: true },
     ],

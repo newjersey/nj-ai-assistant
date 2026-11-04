@@ -135,6 +135,7 @@ const cacheConfig: {
    */
   REDIS_DELETE_CHUNK_SIZE: number;
   /**
+<<<<<<< HEAD
    * Number of keys to update in each batch during Redis SET operations.
    * In cluster mode, keys are updated individually in parallel chunks to avoid CROSSSLOT errors.
    * In single-node mode, keys are updated in batches using transactions (multi/exec).
@@ -143,6 +144,8 @@ const cacheConfig: {
    */
   REDIS_UPDATE_CHUNK_SIZE: number;
   /**
+=======
+>>>>>>> upstream/main
    * COUNT hint for Redis SCAN operations when scanning keys by pattern.
    * This is a hint to Redis about how many keys to scan in each iteration.
    * Higher values can reduce round trips but increase memory usage and latency per call.
@@ -217,6 +220,7 @@ const cacheConfig: {
   REDIS_DELETE_CHUNK_SIZE: math(process.env.REDIS_DELETE_CHUNK_SIZE, 1000),
 
   /**
+<<<<<<< HEAD
    * Number of keys to update in each batch during Redis SET operations.
    * In cluster mode, keys are updated individually in parallel chunks to avoid CROSSSLOT errors.
    * In single-node mode, keys are updated in batches using transactions (multi/exec).
@@ -226,6 +230,8 @@ const cacheConfig: {
   REDIS_UPDATE_CHUNK_SIZE: math(process.env.REDIS_UPDATE_CHUNK_SIZE, 1000),
 
   /**
+=======
+>>>>>>> upstream/main
    * COUNT hint for Redis SCAN operations when scanning keys by pattern.
    * This is a hint to Redis about how many keys to scan in each iteration.
    * Higher values can reduce round trips but increase memory usage and latency per call.

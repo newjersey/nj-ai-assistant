@@ -30,9 +30,17 @@ const artSize = 20;
 const artClassName = 'text-text-primary shrink-0 icon-md';
 const providerArtClassName = 'icon-md shrink-0';
 
+<<<<<<< HEAD
 const createEndpointIcon = (
   endpoint: string,
   { provider, imageURL }: ProviderIconResolution,
+=======
+/** With a model, provider art shows the model's maker when the endpoint only hosts it. */
+export const createEndpointIcon = (
+  endpoint: string,
+  { provider, imageURL }: ProviderIconResolution,
+  model?: string,
+>>>>>>> upstream/main
 ): React.ReactNode => {
   if (endpoint === EModelEndpoint.agents) {
     return React.createElement(Feather, { size: artSize, className: artClassName });
@@ -52,6 +60,10 @@ const createEndpointIcon = (
 
   return React.createElement(ProviderIcon, {
     provider,
+<<<<<<< HEAD
+=======
+    model,
+>>>>>>> upstream/main
     size: artSize,
     className: providerArtClassName,
   });
@@ -104,10 +116,13 @@ export const useEndpoints = ({
       if (includedEndpoints.size > 0 && !includedEndpoints.has(endpoints[i])) {
         continue;
       }
+<<<<<<< HEAD
       // NJ: We only want to show the "agents" endpoints; no customizing direct LLM endpoints
       if (endpoints[i] !== EModelEndpoint.agents) {
         continue;
       }
+=======
+>>>>>>> upstream/main
       result.push(endpoints[i]);
     }
 

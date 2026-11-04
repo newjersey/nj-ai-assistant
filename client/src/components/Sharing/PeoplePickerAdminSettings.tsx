@@ -29,7 +29,11 @@ const PeoplePickerAdminSettings = () => {
     <Button
       type="button"
       variant="outline"
+<<<<<<< HEAD
       className="gap-2 rounded-lg font-medium"
+=======
+      className="font-medium"
+>>>>>>> upstream/main
       aria-label={localize('com_ui_admin_settings')}
     >
       <ShieldEllipsis className="size-4" aria-hidden="true" />

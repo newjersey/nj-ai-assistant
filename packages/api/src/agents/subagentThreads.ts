@@ -1,11 +1,30 @@
 import { randomUUID } from 'node:crypto';
+<<<<<<< HEAD
 import { InMemorySubagentTaskStore } from '@librechat/agents';
 import { logger, tenantStorage } from '@librechat/data-schemas';
 import { EModelEndpoint, Constants } from 'librechat-data-provider';
+=======
+import { logger, tenantStorage } from '@librechat/data-schemas';
+import {
+  EModelEndpoint,
+  Constants,
+  ContentTypes,
+  subagentActivityConfigSchema,
+} from 'librechat-data-provider';
+>>>>>>> upstream/main
 import {
   mapChatMessagesToStoredMessages,
   mapStoredMessagesToChatMessages,
 } from '@librechat/agents/langchain/messages';
+<<<<<<< HEAD
+=======
+import {
+  createContentAggregator,
+  GraphEvents,
+  InMemorySubagentTaskStore,
+  SubagentResolutionError,
+} from '@librechat/agents';
+>>>>>>> upstream/main
 import type {
   InMemorySubagentTaskStoreOptions,
   SubagentTaskClaim,
@@ -28,7 +47,13 @@ import type {
   ConversationMethods,
   SubagentTaskResultClaim,
 } from '@librechat/data-schemas';
+<<<<<<< HEAD
 import type { BaseMessage, StoredMessage } from '@librechat/agents/langchain/messages';
+=======
+import type { TSubagentActivityConfig, TSteerAppliedEvent, Agents } from 'librechat-data-provider';
+import type { BaseMessage, StoredMessage } from '@librechat/agents/langchain/messages';
+import type { ScheduledMCPIdentity } from 'librechat-data-provider';
+>>>>>>> upstream/main
 import type {
   SubagentActivityUpdateEvent,
   SubagentActivitySubscriber,
@@ -36,8 +61,22 @@ import type {
   SubagentActivityTerminalStatus,
 } from './subagentActivity';
 import type { SubagentTaskControlTransport } from './subagentTaskRouting';
+<<<<<<< HEAD
 import type { UsageMetadata } from '~/stream/interfaces/IJobStore';
 import type { HostSubagentTaskConfig } from './subagentDelivery';
+=======
+import type { RequestScopedMCPConnectionStore } from '~/mcp/types';
+import type { UsageMetadata } from '~/stream/interfaces/IJobStore';
+import type { HostSubagentTaskConfig } from './subagentDelivery';
+import type { ActivitySnapshot, ActivityTree } from './digest';
+import type { AppliedSubagentSteer } from './activity';
+import {
+  SubagentPublicRecorder,
+  SUBAGENT_ACTIVITY_LIMITS,
+  projectSubagentActivity,
+  projectPersistedMessageActivityJson,
+} from './activity';
+>>>>>>> upstream/main
 import {
   boundedClaim,
   boundedTaskList,
@@ -46,10 +85,21 @@ import {
 } from './subagentTaskRouting';
 import { boundSubagentActivityUpdate, SubagentActivityStream } from './subagentActivity';
 import { createSubagentAttemptKey, createSubagentThreadId } from './subagentThreadIds';
+<<<<<<< HEAD
 import { runWithDetachedSubagentUsage } from './subagentTaskContext';
 import { SUBAGENT_COMPLETION_DELIVERY } from './subagentDelivery';
 import { createConcurrencyLimiter } from '~/utils/promise';
 import { projectSubagentActivity } from './activity';
+=======
+import { describeErrorCauses, describeStackFrames } from './failures/subagent';
+import { ActivityRecorder, activityTreeFromProjection } from './digest';
+import { runWithDetachedSubagentUsage } from './subagentTaskContext';
+import { SUBAGENT_COMPLETION_DELIVERY } from './subagentDelivery';
+import { createConcurrencyLimiter } from '~/utils/promise';
+import { SubagentContentJournal } from './subagentContent';
+import { retainMCPRequestContext } from '~/mcp/request';
+import { getSafeErrorMetadata } from '~/utils/errors';
+>>>>>>> upstream/main
 import { InMemoryEventTransport } from '~/stream';
 import { aggregateEmittedUsage } from './usage';
 
@@ -76,9 +126,17 @@ const DEFAULT_CONTROL_RECEIPT_RETRY_MS = 5_000;
 const SHUTDOWN_CONTROL_RECEIPT_FLUSH_ATTEMPTS = 4;
 const DEFAULT_SHUTDOWN_CONTROL_RECEIPT_BACKOFF_MS = 1_000;
 /** Bounds retained live-only updates while an event transport is unavailable. */
+<<<<<<< HEAD
 const MAX_PENDING_ACTIVITY_EVENTS = 32;
 /** Live activity must never delay terminal notification indefinitely. */
 const ACTIVITY_PUBLICATION_TIMEOUT_MS = 1_000;
+=======
+const MAX_PENDING_ACTIVITY_EVENTS = SUBAGENT_ACTIVITY_LIMITS.items;
+/** Matches the SDK's default retention of a settled task's result. */
+const ACTIVITY_TREE_RETENTION_MS = 60 * 60_000;
+/** Each tree is capped at a few dozen kilobytes; this caps the process total. */
+const MAX_ACTIVITY_TREES = 512;
+>>>>>>> upstream/main
 
 /** A cancellation target set resolved before the conversations are removed. */
 export interface SubagentCancellationPlan {
@@ -95,7 +153,11 @@ const MAX_TRANSCRIPT_BYTES = 12 * 1024 * 1024;
 const TRANSCRIPT_SELECT =
   'messageId parentMessageId text createdAt +subagentTranscript +subagentTask';
 const DURABLE_RESULT_SELECT =
+<<<<<<< HEAD
   'messageId conversationId sender text createdAt updatedAt +subagentTask';
+=======
+  'messageId conversationId sender text createdAt updatedAt +subagentTask +subagentActivityProjection';
+>>>>>>> upstream/main
 
 class SubagentThreadPublicError extends Error {}
 class SubagentThreadDeletedError extends SubagentThreadPublicError {}
@@ -118,7 +180,14 @@ type SubagentThreadMethods = Pick<
   | 'renewSubagentThreadLease'
   | 'saveConvo'
   | 'saveMessage'
+<<<<<<< HEAD
 >;
+=======
+> &
+  Partial<
+    Pick<AllMethods, 'getAgentName' | 'appendSubagentContentBatch' | 'reconcileSubagentContent'>
+  >;
+>>>>>>> upstream/main
 
 interface SubagentThreadScope {
   version: typeof SCOPE_VERSION;
@@ -140,10 +209,20 @@ interface PreparedThread {
     content: string;
     taskId: string;
     parentRunId: string;
+<<<<<<< HEAD
+=======
+    /** Original running task closed by a retry under a new terminal message id. */
+    previousTaskId?: string;
+>>>>>>> upstream/main
   };
 }
 
 interface HostSubagentTaskStartRequest extends SubagentTaskStartRequest {
+<<<<<<< HEAD
+=======
+  requestScopedConnections?: RequestScopedMCPConnectionStore;
+  scheduleMCPIdentity?: ScheduledMCPIdentity | null;
+>>>>>>> upstream/main
   completionDelivery?: typeof SUBAGENT_COMPLETION_DELIVERY;
 }
 
@@ -173,6 +252,11 @@ type ControlInvocationRecord = {
   fingerprint: string;
   command: SubagentTaskControlCommand;
   commandMessageTruncated: boolean;
+<<<<<<< HEAD
+=======
+  /** Original SDK-accepted body, released at the authoritative terminal transition. */
+  pendingMessage?: string;
+>>>>>>> upstream/main
   result: SubagentTaskControlResult;
   createdAt: number;
   /** Last authoritative SDK transition, retained for idempotent retries even
@@ -197,6 +281,7 @@ interface TaskThreadLease {
   settling: boolean;
   /** Resolves only after child persistence and lease cleanup finish. */
   execution?: Promise<void>;
+<<<<<<< HEAD
   /** Ordered observational tail; canonical child settlement never awaits it. */
   activityTail?: Promise<void>;
   activityPending?: number;
@@ -204,6 +289,22 @@ interface TaskThreadLease {
   activityAdmissionClosed?: boolean;
   /** A failed observational publication suppresses the remainder of this task's queue. */
   activityCircuitOpen?: boolean;
+=======
+  content?: SubagentContentJournal;
+  publishAppliedSteer?: (data: Omit<TSteerAppliedEvent, 'index'>, timestamp: string) => void;
+  /** Ordered observational tail; canonical child settlement never awaits it. */
+  activityTail?: Promise<void>;
+  activityWorkerActive?: boolean;
+  activityQueue?: Array<{
+    event: SubagentActivityUpdateEvent;
+    bytes: number;
+    droppedCount?: number;
+  }>;
+  activityQueuedBytes?: number;
+  activityDropped?: { event: SubagentActivityUpdateEvent; count: number };
+  /** Terminal settlement stops new admission but must not discard admitted events. */
+  activityAdmissionClosed?: boolean;
+>>>>>>> upstream/main
   shared?: {
     token: string;
     lost: boolean;
@@ -221,7 +322,11 @@ class SubagentActivityPublicationTimeoutError extends Error {
   }
 }
 
+<<<<<<< HEAD
 async function settleActivityWithin(operation: Promise<void>): Promise<void> {
+=======
+async function settleActivityWithin(operation: Promise<void>, timeoutMs: number): Promise<void> {
+>>>>>>> upstream/main
   let timeout: ReturnType<typeof setTimeout> | undefined;
   try {
     await Promise.race([
@@ -229,7 +334,11 @@ async function settleActivityWithin(operation: Promise<void>): Promise<void> {
       new Promise<void>((_, reject) => {
         timeout = setTimeout(
           () => reject(new SubagentActivityPublicationTimeoutError()),
+<<<<<<< HEAD
           ACTIVITY_PUBLICATION_TIMEOUT_MS,
+=======
+          timeoutMs,
+>>>>>>> upstream/main
         );
         timeout.unref?.();
       }),
@@ -240,6 +349,10 @@ async function settleActivityWithin(operation: Promise<void>): Promise<void> {
 }
 
 export interface SubagentThreadTaskStoreOptions extends InMemorySubagentTaskStoreOptions {
+<<<<<<< HEAD
+=======
+  activity?: Partial<TSubagentActivityConfig>;
+>>>>>>> upstream/main
   maxThreadDepth?: number;
   leaseTtlMs?: number;
   leaseHeartbeatMs?: number;
@@ -262,10 +375,26 @@ export interface SubagentThreadTaskStoreOptions extends InMemorySubagentTaskStor
     taskId: string;
     tenantId?: string;
   }) => Promise<boolean>;
+<<<<<<< HEAD
   onTaskPrepared?: (registration: SubagentTaskWakeupRegistration) => Promise<void> | void;
 }
 
 export interface SubagentTaskWakeupRegistration {
+=======
+  onTaskPrepared?: (
+    registration: SubagentTaskWakeupRegistration,
+  ) => Promise<boolean | void> | boolean | void;
+  /** Called once a child's terminal message is durable, with the parent conversation its
+   * completion wake-up resumes. The child generation settles before that write, so the
+   * wake-up is ready only from here. Task ids include the original abandoned
+   * attempt when a retry persisted its result under a new id. */
+  onTaskSettled?: (userId: string, parentConversationId: string, taskIds: string[]) => void;
+}
+
+export interface SubagentTaskWakeupRegistration {
+  /** Host-captured generation origin, never inferred from conversation history. */
+  scheduleMCPIdentity?: ScheduledMCPIdentity | null;
+>>>>>>> upstream/main
   userId: string;
   parentConversationId: string;
   parentMessageId: string;
@@ -427,6 +556,12 @@ function serializeTranscript(
   taskId: string,
   initialMessages: StoredMessage[],
   resultMessages: BaseMessage[] | undefined,
+<<<<<<< HEAD
+=======
+  appliedSteers?: readonly AppliedSubagentSteer[],
+  expectedTaskInput?: string,
+  observation?: { steersMatched: boolean },
+>>>>>>> upstream/main
 ): IMessage['subagentTranscript'] {
   if (resultMessages == null) {
     return undefined;
@@ -443,7 +578,59 @@ function serializeTranscript(
   if (messages.length === 0) {
     return undefined;
   }
+<<<<<<< HEAD
   const messagesJson = append ? JSON.stringify(messages) : storedResultJson;
+=======
+  let start = 0;
+  if (!append) {
+    start = -1;
+    for (let index = messages.length - 1; index >= 0; index--) {
+      const message = messages[index];
+      if (
+        (message.type === 'human' || message.type === 'user') &&
+        message.data.additional_kwargs?.injected !== true
+      ) {
+        if (message.data.content === expectedTaskInput) start = index + 1;
+        break;
+      }
+    }
+  }
+  if (appliedSteers != null && start >= 0) {
+    const injectedIndices: number[] = [];
+    for (let index = start; index < messages.length; index++) {
+      const message = messages[index];
+      const metadata = message.data.additional_kwargs;
+      if (
+        (message.type === 'human' || message.type === 'user') &&
+        metadata?.injected === true &&
+        metadata.source === 'steer'
+      )
+        injectedIndices.push(index);
+    }
+    if (injectedIndices.length === appliedSteers.length) {
+      if (observation != null) observation.steersMatched = true;
+      injectedIndices.forEach((messageIndex, controlIndex) => {
+        const message = messages[messageIndex];
+        messages[messageIndex] = {
+          ...message,
+          data: {
+            ...message.data,
+            additional_kwargs: {
+              ...message.data.additional_kwargs,
+              ...appliedSteers[controlIndex],
+            },
+          },
+        };
+      });
+    }
+  }
+  const messagesJson = JSON.stringify(messages);
+  if (Buffer.byteLength(messagesJson, 'utf8') > MAX_TRANSCRIPT_BYTES) {
+    throw new SubagentThreadPublicError(
+      'Subagent thread transcript is too large to persist safely.',
+    );
+  }
+>>>>>>> upstream/main
   return {
     taskId,
     mode: append ? 'append' : 'replace',
@@ -479,8 +666,14 @@ function childAgentId(request: SubagentTaskStartRequest): string | undefined {
   return request.subagentType === 'self' ? request.parentAgentId : request.subagentType;
 }
 
+<<<<<<< HEAD
 function publicFailureDetail(error: unknown): string {
   return error instanceof SubagentThreadPublicError
+=======
+/** A subagent that could not start says why in the SDK's fixed, model-facing wording. */
+function publicFailureDetail(error: unknown): string {
+  return error instanceof SubagentThreadPublicError || error instanceof SubagentResolutionError
+>>>>>>> upstream/main
     ? error.message.slice(0, 2_000)
     : 'The child run could not be completed.';
 }
@@ -549,6 +742,40 @@ function boundedControlCommand(command: SubagentTaskControlCommand): SubagentTas
   };
 }
 
+<<<<<<< HEAD
+=======
+/**
+ * The settlement-time public projection is the only progress that outlives the
+ * owning process. It is scoped to the task it was written for, and is read only
+ * after the caller has re-established the child's parent lineage.
+ */
+function durableActivity(
+  message: IMessage,
+  taskId: string,
+  startedAt: number,
+  settledAt: number,
+): ActivityTree | undefined {
+  const projection = message.subagentActivityProjection;
+  if (projection == null || projection.taskId !== taskId) {
+    return undefined;
+  }
+  const { activity, truncated } = projectPersistedMessageActivityJson(
+    projection.activityJson,
+    projection.truncated,
+  );
+  return activityTreeFromProjection(activity, { startedAt, settledAt, truncated });
+}
+
+/** Progress is observational: a recording failure must never fail the child. */
+function recordActivity(recorder: ActivityRecorder, event: SubagentUpdateEvent): void {
+  try {
+    recorder.record(event);
+  } catch (error) {
+    logger.warn('[subagentThreads] Failed to record child progress', error);
+  }
+}
+
+>>>>>>> upstream/main
 function safeErrorMessage(error: unknown): string {
   return `Subagent task failed: ${publicFailureDetail(error).slice(0, 2_000)}`;
 }
@@ -616,14 +843,31 @@ export class SubagentThreadTaskStore extends InMemorySubagentTaskStore {
   private readonly releaseOwnerAdmission?: (userId: string, token: string) => Promise<void>;
   private readonly cancelUnroutedTask?: SubagentThreadTaskStoreOptions['cancelUnroutedTask'];
   private readonly onTaskPrepared?: SubagentThreadTaskStoreOptions['onTaskPrepared'];
+<<<<<<< HEAD
   private taskControlTransport?: SubagentTaskControlTransport;
   private activityStream = new SubagentActivityStream(new InMemoryEventTransport());
+=======
+  private readonly onTaskSettled?: SubagentThreadTaskStoreOptions['onTaskSettled'];
+  /** Tasks whose completion wake-up was registered; only they announce settlement. */
+  private readonly wakeupTaskIds = new Set<string>();
+  private taskControlTransport?: SubagentTaskControlTransport;
+  private activityOptions: TSubagentActivityConfig = subagentActivityConfigSchema.parse({});
+  private activityStream = new SubagentActivityStream(new InMemoryEventTransport());
+  private readonly activityTrees = new Map<
+    string,
+    { recorder: ActivityRecorder; settledAt?: number }
+  >();
+>>>>>>> upstream/main
 
   constructor(
     private readonly methods: SubagentThreadMethods,
     options: SubagentThreadTaskStoreOptions = {},
   ) {
     super(options);
+<<<<<<< HEAD
+=======
+    this.configureActivity(options.activity);
+>>>>>>> upstream/main
     this.maxThreadDepth =
       Number.isSafeInteger(options.maxThreadDepth) && (options.maxThreadDepth ?? 0) > 0
         ? (options.maxThreadDepth as number)
@@ -658,6 +902,10 @@ export class SubagentThreadTaskStore extends InMemorySubagentTaskStore {
     this.releaseOwnerAdmission = options.releaseOwnerAdmission;
     this.cancelUnroutedTask = options.cancelUnroutedTask;
     this.onTaskPrepared = options.onTaskPrepared;
+<<<<<<< HEAD
+=======
+    this.onTaskSettled = options.onTaskSettled;
+>>>>>>> upstream/main
   }
 
   /** Receives payload-free authoritative transitions from the SDK task store. */
@@ -685,8 +933,15 @@ export class SubagentThreadTaskStore extends InMemorySubagentTaskStore {
       durable,
       this.get(scopeId, taskId)?.pendingControls,
     );
+<<<<<<< HEAD
     if (receipt.status !== 'accepted') {
       this.controlInvocationByReceipt.delete(controlReceiptKey(scopeId, taskId, receipt.controlId));
+=======
+    const message = receipt.status === 'accepted' ? undefined : invocation.pendingMessage;
+    if (receipt.status !== 'accepted') {
+      this.controlInvocationByReceipt.delete(controlReceiptKey(scopeId, taskId, receipt.controlId));
+      invocation.pendingMessage = undefined;
+>>>>>>> upstream/main
     }
     invocation.receiptPersisted = false;
     const persistence = this.queueControlReceipt(scopeId, taskId, threadId, durable).then(() => {
@@ -696,6 +951,37 @@ export class SubagentThreadTaskStore extends InMemorySubagentTaskStore {
       if (invocation.receiptPersistence === tracked) invocation.receiptPersistence = undefined;
     });
     invocation.receiptPersistence = tracked;
+<<<<<<< HEAD
+=======
+    try {
+      if (receipt.status === 'applied' && message != null) {
+        const lease = this.activeThreads.get(`${scopeId}\u0000${threadId}`);
+        if (lease?.taskId === taskId) {
+          lease.publishAppliedSteer?.(
+            {
+              steerId: receipt.controlId,
+              clientSteerId: invocation.invocationId,
+              part: {
+                type: ContentTypes.STEER,
+                steer: message,
+                steerId: receipt.controlId,
+                clientSteerId: invocation.invocationId,
+                createdAt: receipt.createdAt,
+              },
+              responseMessageId: `${taskId}:assistant`,
+              conversationId: threadId,
+            },
+            new Date(receipt.updatedAt).toISOString(),
+          );
+        }
+      }
+    } catch (error) {
+      logger.warn(
+        '[subagentThreads] Failed to publish applied child guidance',
+        getSafeErrorMetadata(error),
+      );
+    }
+>>>>>>> upstream/main
     return tracked;
   }
 
@@ -1045,10 +1331,17 @@ export class SubagentThreadTaskStore extends InMemorySubagentTaskStore {
       throw new Error('Subagent task control transport is already configured.');
     }
     await transport.bind({
+<<<<<<< HEAD
       claim: (scopeId, taskId) => super.claim(scopeId, taskId),
       control: (scopeId, taskId, command, invocationId) =>
         this.controlInvocationAndPersist(scopeId, taskId, command, invocationId),
       list: (scopeId) => super.list(scopeId),
+=======
+      claim: (scopeId, taskId) => this.withActivity(scopeId, super.claim(scopeId, taskId)),
+      control: (scopeId, taskId, command, invocationId) =>
+        this.controlInvocationAndPersist(scopeId, taskId, command, invocationId),
+      list: (scopeId) => this.withActivitySummaries(scopeId, super.list(scopeId)),
+>>>>>>> upstream/main
       cancelScope: (scopeId, threadIds, removedConversationIds = []) => {
         const cancelled = this.cancelForScope(scopeId, threadIds);
         if (removedConversationIds.length > 0) {
@@ -1150,6 +1443,32 @@ export class SubagentThreadTaskStore extends InMemorySubagentTaskStore {
     }
   }
 
+<<<<<<< HEAD
+=======
+  get contentPageBytes(): number {
+    return this.activityOptions.contentPageBytes;
+  }
+
+  get contentRecoveryGraceMs(): number {
+    return this.activityOptions.contentRecoveryGraceMs;
+  }
+
+  /** Host injects the base configuration before task admission. */
+  configureActivity(options: Partial<TSubagentActivityConfig> = {}): TSubagentActivityConfig {
+    this.activityOptions = subagentActivityConfigSchema.parse(options);
+    this.configureActivityStream(
+      new SubagentActivityStream(
+        new InMemoryEventTransport({
+          maxStreams: this.activityOptions.memoryMaxStreams,
+          maxBytes: this.activityOptions.memoryMaxBytes,
+        }),
+        this.activityOptions,
+      ),
+    );
+    return this.activityOptions;
+  }
+
+>>>>>>> upstream/main
   /** Replaces the process-local activity bus after the host's Redis service is ready. */
   configureActivityStream(stream: SubagentActivityStream): void {
     const previous = this.activityStream;
@@ -1181,10 +1500,70 @@ export class SubagentThreadTaskStore extends InMemorySubagentTaskStore {
     return this.activityStream.publish(threadId, taskId, boundSubagentActivityUpdate(event));
   }
 
+<<<<<<< HEAD
+=======
+  /**
+   * Starts the bounded progress tree for one locally executing child. Trees outlive
+   * settlement so a finished, undelivered result can still be navigated, and are
+   * released by age and count rather than by the SDK's own result retention.
+   */
+  private trackActivity(scopeId: string, taskId: string): ActivityRecorder {
+    const now = Date.now();
+    for (const [key, entry] of this.activityTrees) {
+      if (entry.settledAt != null && now - entry.settledAt > ACTIVITY_TREE_RETENTION_MS) {
+        this.activityTrees.delete(key);
+      }
+    }
+    if (this.activityTrees.size >= MAX_ACTIVITY_TREES) {
+      const oldest =
+        [...this.activityTrees].find(([, entry]) => entry.settledAt != null) ??
+        this.activityTrees.entries().next().value;
+      if (oldest != null) {
+        this.activityTrees.delete(oldest[0]);
+      }
+    }
+    const recorder = new ActivityRecorder(now);
+    this.activityTrees.set(controlTaskKey(scopeId, taskId), { recorder });
+    return recorder;
+  }
+
+  private settleActivity(
+    scopeId: string,
+    taskId: string,
+    terminal: SubagentActivityTerminalStatus,
+  ): void {
+    const entry = this.activityTrees.get(controlTaskKey(scopeId, taskId));
+    if (entry == null) return;
+    entry.recorder.settle(terminal === 'failed' ? 'error' : terminal);
+    entry.settledAt = Date.now();
+  }
+
+  /** Attaches this process's progress tree to a claim the poll tool will render. */
+  private withActivity(scopeId: string, claim: SubagentTaskClaim): SubagentTaskClaim {
+    if (claim.status === 'not_found') return claim;
+    const entry = this.activityTrees.get(controlTaskKey(scopeId, claim.task.taskId));
+    if (entry == null) return claim;
+    const task: ActivitySnapshot = { ...claim.task, activity: entry.recorder.snapshot() };
+    return { ...claim, task };
+  }
+
+  /** Lists carry only counts and the node in flight, never whole trees. */
+  private withActivitySummaries(
+    scopeId: string,
+    snapshots: SubagentTaskSnapshot[],
+  ): SubagentTaskSnapshot[] {
+    return snapshots.map((snapshot): ActivitySnapshot => {
+      const entry = this.activityTrees.get(controlTaskKey(scopeId, snapshot.taskId));
+      return entry == null ? snapshot : { ...snapshot, activitySummary: entry.recorder.summary() };
+    });
+  }
+
+>>>>>>> upstream/main
   private publishActivity(
     lease: TaskThreadLease,
     threadId: string,
     taskId: string,
+<<<<<<< HEAD
     event: SubagentUpdateEvent,
   ): void {
     if (
@@ -1211,6 +1590,114 @@ export class SubagentThreadTaskStore extends InMemorySubagentTaskStore {
         lease.activityPending = Math.max(0, (lease.activityPending ?? 1) - 1);
       });
     lease.activityTail = publication;
+=======
+    event: SubagentActivityUpdateEvent,
+  ): void {
+    if (lease.activityAdmissionClosed === true) return;
+    const boundedEvent = boundSubagentActivityUpdate(event);
+    const bytes = Buffer.byteLength(JSON.stringify(boundedEvent), 'utf8');
+    const queue = (lease.activityQueue ??= []);
+    if (
+      queue.length >= MAX_PENDING_ACTIVITY_EVENTS ||
+      (lease.activityQueuedBytes ?? 0) + bytes > SUBAGENT_ACTIVITY_LIMITS.bytes
+    ) {
+      lease.activityDropped = {
+        event: boundedEvent,
+        count: (lease.activityDropped?.count ?? 0) + 1,
+      };
+      return;
+    }
+    if (lease.activityDropped != null) {
+      /** Preserve ordering: an overflow suffix stays a gap until the worker has drained it. */
+      lease.activityDropped = { event: boundedEvent, count: lease.activityDropped.count + 1 };
+      return;
+    }
+    queue.push({ event: boundedEvent, bytes });
+    lease.activityQueuedBytes = (lease.activityQueuedBytes ?? 0) + bytes;
+    this.startActivityWorker(lease, threadId, taskId);
+  }
+
+  private hasPendingActivity(lease: TaskThreadLease): boolean {
+    return (lease.activityQueue?.length ?? 0) > 0 || lease.activityDropped != null;
+  }
+
+  private startActivityWorker(lease: TaskThreadLease, threadId: string, taskId: string): void {
+    if (
+      lease.activityWorkerActive === true ||
+      lease.activityAdmissionClosed === true ||
+      !this.hasPendingActivity(lease)
+    )
+      return;
+    lease.activityWorkerActive = true;
+    const worker = this.drainActivity(lease, threadId, taskId).finally(() => {
+      lease.activityWorkerActive = false;
+      if (lease.activityTail === worker) lease.activityTail = undefined;
+      if (this.hasPendingActivity(lease)) this.startActivityWorker(lease, threadId, taskId);
+    });
+    lease.activityTail = worker;
+  }
+
+  private async retryActivity(operation: () => Promise<void>): Promise<boolean> {
+    for (let attempt = 0; attempt < this.activityOptions.retryAttempts; attempt++) {
+      try {
+        await settleActivityWithin(operation(), this.activityOptions.publicationTimeoutMs);
+        return true;
+      } catch (error) {
+        if (attempt + 1 === this.activityOptions.retryAttempts) {
+          logger.warn(
+            '[subagentThreads] Failed to publish child activity after bounded retries',
+            error,
+          );
+          return false;
+        }
+        await new Promise<void>((resolve) =>
+          setTimeout(
+            resolve,
+            Math.min(
+              this.activityOptions.recoveryDelayMs,
+              this.activityOptions.retryBaseDelayMs * 2 ** attempt,
+            ),
+          ),
+        );
+      }
+    }
+    return false;
+  }
+
+  private async drainActivity(
+    lease: TaskThreadLease,
+    threadId: string,
+    taskId: string,
+  ): Promise<void> {
+    const queue = lease.activityQueue!;
+    while (queue.length > 0 || lease.activityDropped != null) {
+      const next = queue.shift();
+      if (next != null) lease.activityQueuedBytes = (lease.activityQueuedBytes ?? 0) - next.bytes;
+      const dropped = next == null ? lease.activityDropped : undefined;
+      if (dropped != null) lease.activityDropped = undefined;
+      const event =
+        next?.event ?? (dropped == null ? undefined : { ...dropped.event, data: undefined });
+      if (event == null) continue;
+      const droppedCount = next?.droppedCount ?? dropped?.count ?? 0;
+      const published = await this.retryActivity(() =>
+        this.activityStream.publish(threadId, taskId, event, droppedCount),
+      );
+      if (!published) {
+        /** Keep the failed suffix visible on recovery without retrying an unbounded number of events. */
+        const pending = queue.splice(0);
+        const last = lease.activityDropped?.event ?? pending[pending.length - 1]?.event ?? event;
+        lease.activityDropped = {
+          event: last,
+          count: (lease.activityDropped?.count ?? 0) + pending.length + Math.max(1, droppedCount),
+        };
+        lease.activityQueuedBytes = 0;
+        if (lease.activityAdmissionClosed === true) break;
+        await new Promise<void>((resolve) =>
+          setTimeout(resolve, this.activityOptions.recoveryDelayMs),
+        );
+      }
+    }
+>>>>>>> upstream/main
   }
 
   private completeActivity(
@@ -1221,7 +1708,14 @@ export class SubagentThreadTaskStore extends InMemorySubagentTaskStore {
   ): void {
     lease.activityAdmissionClosed = true;
     const terminal = (lease.activityTail ?? Promise.resolve())
+<<<<<<< HEAD
       .then(() => settleActivityWithin(this.activityStream.complete(threadId, taskId, status)))
+=======
+      .then(async () => {
+        if (this.hasPendingActivity(lease)) await this.drainActivity(lease, threadId, taskId);
+        await this.retryActivity(() => this.activityStream.complete(threadId, taskId, status));
+      })
+>>>>>>> upstream/main
       .catch((error) => {
         logger.warn('[subagentThreads] Failed to close child activity stream', error);
       });
@@ -1281,16 +1775,36 @@ export class SubagentThreadTaskStore extends InMemorySubagentTaskStore {
     }
 
     let started: SubagentTaskStartResult;
+<<<<<<< HEAD
     try {
+=======
+    let executionStarted = false;
+    let releaseContext: (() => void) | undefined;
+    try {
+      const context = (request as HostSubagentTaskStartRequest).requestScopedConnections;
+      if (context) releaseContext = retainMCPRequestContext(context);
+>>>>>>> upstream/main
       started = super.start({
         ...request,
         threadId,
         run: (runtime: SubagentTaskRuntime) => {
+<<<<<<< HEAD
+=======
+          executionStarted = true;
+          if (releaseContext) {
+            runtime.signal.addEventListener('abort', releaseContext, { once: true });
+          }
+>>>>>>> upstream/main
           const execution = this.runWithOwnerContext(scope, async () => {
             lease.taskId = runtime.taskId;
             lease.running = true;
             const detachedUsage: UsageMetadata[] = [];
             let prepared: PreparedThread | undefined;
+<<<<<<< HEAD
+=======
+            let appliedSteers: AppliedSubagentSteer[] | undefined = [];
+            const publicRecorder = new SubagentPublicRecorder();
+>>>>>>> upstream/main
             let activityTerminal: SubagentActivityTerminalStatus = 'failed';
             try {
               if (runtime.signal.aborted) {
@@ -1320,6 +1834,16 @@ export class SubagentThreadTaskStore extends InMemorySubagentTaskStore {
                 parentRunId: prepared.replay?.parentRunId ?? request.parentRunId,
                 createdAt: prepared.taskCreatedAt,
               });
+<<<<<<< HEAD
+=======
+              if (prepared.replay != null) {
+                this.notifyTaskSettled(
+                  scope,
+                  prepared.replay.taskId,
+                  prepared.replay.previousTaskId,
+                );
+              }
+>>>>>>> upstream/main
               if (runtime.signal.aborted) {
                 throw runtime.signal.reason ?? new Error('Subagent task was cancelled.');
               }
@@ -1335,6 +1859,7 @@ export class SubagentThreadTaskStore extends InMemorySubagentTaskStore {
                 );
               }
               const preparedThread = prepared;
+<<<<<<< HEAD
               let activitySequence = 0;
               const activityRuntime: SubagentTaskRuntime = {
                 ...runtime,
@@ -1352,6 +1877,193 @@ export class SubagentThreadTaskStore extends InMemorySubagentTaskStore {
                     runtime.taskId,
                     activityEvent,
                   );
+=======
+              const recorder = this.trackActivity(request.scopeId, runtime.taskId);
+              let activitySequence = 0;
+              const append = this.methods.appendSubagentContentBatch;
+              if (append != null && this.activityOptions.contentRecoveryEnabled) {
+                lease.content = new SubagentContentJournal({
+                  scope: {
+                    user: scope.userId,
+                    tenantId: scope.tenantId,
+                    parentConversationId: scope.parentConversationId,
+                    conversationId: preparedThread.conversation.conversationId,
+                    taskId: runtime.taskId,
+                  },
+                  leaseToken: lease.shared?.token,
+                  flushMs: this.activityOptions.contentFlushMs,
+                  batchBytes: this.activityOptions.contentBatchBytes,
+                  maxPendingBytes: this.activityOptions.contentPendingBytes,
+                  settlementTimeoutMs: this.activityOptions.contentSettlementTimeoutMs,
+                  append,
+                  reconcile: this.methods.reconcileSubagentContent,
+                  cleanupRetry: {
+                    retryAttempts: this.activityOptions.retryAttempts,
+                    retryBaseDelayMs: this.activityOptions.retryBaseDelayMs,
+                    recoveryDelayMs: this.activityOptions.recoveryDelayMs,
+                  },
+                  notify: (watermark) =>
+                    this.activityStream.publishContent(
+                      preparedThread.conversation.conversationId,
+                      runtime.taskId,
+                      watermark,
+                    ),
+                  onError: (error) =>
+                    logger.warn(
+                      '[subagentThreads] Public child content persistence unavailable',
+                      getSafeErrorMetadata(error),
+                    ),
+                });
+              }
+              let maxContentIndex = -1;
+              let contentOffset = 0;
+              const stepIndices = new Map<string, number>();
+              const slots = createContentAggregator();
+              let identity: Omit<
+                SubagentActivityUpdateEvent,
+                'phase' | 'data' | 'label' | 'timestamp'
+              > = {
+                runId: request.parentRunId,
+                parentRunId: request.parentRunId,
+                subagentRunId: runtime.taskId,
+                parentToolCallId: request.parentToolCallId,
+                parentAgentId: request.parentAgentId,
+                subagentType: request.subagentType,
+                subagentKind: request.subagentKind,
+                subagentAgentId: request.subagentType,
+              };
+              const stamp = <T extends SubagentActivityUpdateEvent>(
+                event: T,
+              ): T & { activitySequence: number } => {
+                const sequence = activitySequence++;
+                return {
+                  ...event,
+                  activityEventId: `${runtime.taskId}:${sequence}`,
+                  activitySequence: sequence,
+                };
+              };
+              // The SDK observes the envelope; host steering extends its phase union.
+              const forwardProgress = runtime.reportProgress as (
+                event: SubagentActivityUpdateEvent,
+              ) => void;
+              const publish = (
+                activityEvent: SubagentActivityUpdateEvent & { activitySequence: number },
+              ): void => {
+                forwardProgress(activityEvent);
+                const sequence = activityEvent.activitySequence;
+                lease.content?.record(activityEvent, sequence);
+                if (activityEvent.phase === 'steer_applied') {
+                  publicRecorder.steer(activityEvent.data as TSteerAppliedEvent);
+                } else {
+                  publicRecorder.record(activityEvent as SubagentUpdateEvent);
+                }
+                this.publishActivity(
+                  lease,
+                  preparedThread.conversation.conversationId,
+                  runtime.taskId,
+                  activityEvent,
+                );
+              };
+              lease.publishAppliedSteer = (data, timestamp) => {
+                if (appliedSteers != null) {
+                  if (appliedSteers.length >= MAX_CONTROL_INVOCATIONS) {
+                    appliedSteers = undefined;
+                  } else {
+                    appliedSteers.push({
+                      steerId: data.steerId,
+                      clientSteerId: data.clientSteerId!,
+                      createdAt: data.part.createdAt!,
+                    });
+                  }
+                }
+                const index = ++maxContentIndex;
+                slots.contentParts[index] = { type: ContentTypes.STEER, steer: '' };
+                contentOffset++;
+                publish(
+                  stamp({
+                    ...identity,
+                    phase: 'steer_applied',
+                    data: { ...data, index },
+                    timestamp,
+                  }),
+                );
+              };
+              const activityRuntime: SubagentTaskRuntime = {
+                ...runtime,
+                reportProgress: (event) => {
+                  const {
+                    phase: _phase,
+                    data: _data,
+                    label: _label,
+                    timestamp: _timestamp,
+                    ...metadata
+                  } = event;
+                  identity = metadata;
+                  let normalized = event;
+                  if (event.phase === 'run_step') {
+                    const step = event.data as Agents.RunStep | undefined;
+                    if (step != null && Number.isSafeInteger(step.index) && step.index >= 0) {
+                      let index = stepIndices.get(step.id);
+                      if (index == null) {
+                        index = Math.max(step.index + contentOffset, maxContentIndex + 1);
+                        stepIndices.set(step.id, index);
+                        const width =
+                          step.stepDetails.type === 'tool_calls'
+                            ? Math.max(1, step.stepDetails.tool_calls?.length ?? 0)
+                            : 1;
+                        maxContentIndex = Math.max(maxContentIndex, index + width - 1);
+                      }
+                      normalized = { ...event, data: { ...step, index } };
+                      // Reuse SDK slot allocation without retaining arguments, deltas or output.
+                      slots.aggregateContent({
+                        event: GraphEvents.ON_RUN_STEP,
+                        data: {
+                          id: step.id,
+                          index,
+                          stepDetails:
+                            step.stepDetails.type === 'tool_calls'
+                              ? {
+                                  type: 'tool_calls',
+                                  tool_calls: step.stepDetails.tool_calls?.map(({ id }) => ({
+                                    id,
+                                    name: 'tool',
+                                    args: {},
+                                    type: 'tool_call',
+                                  })),
+                                }
+                              : {
+                                  type: 'message_creation',
+                                  message_creation: { message_id: step.id },
+                                },
+                        } as Parameters<typeof slots.aggregateContent>[0]['data'],
+                      });
+                    }
+                  }
+                  if (event.phase === 'run_step_delta') {
+                    const delta = event.data as Agents.RunStepDeltaEvent | undefined;
+                    if (delta != null && slots.stepMap.has(delta.id)) {
+                      slots.aggregateContent({
+                        event: GraphEvents.ON_RUN_STEP_DELTA,
+                        data: {
+                          id: delta.id,
+                          delta: {
+                            type: 'tool_calls',
+                            tool_calls: delta.delta.tool_calls?.map(({ id, index }) => ({
+                              id,
+                              index,
+                              name: 'tool',
+                              args: '',
+                            })),
+                          },
+                        } as Parameters<typeof slots.aggregateContent>[0]['data'],
+                      });
+                    }
+                  }
+                  maxContentIndex = Math.max(maxContentIndex, slots.contentParts.length - 1);
+                  const activityEvent = stamp(normalized);
+                  recordActivity(recorder, activityEvent);
+                  publish(activityEvent);
+>>>>>>> upstream/main
                 },
               };
               const result = await runWithDetachedSubagentUsage(detachedUsage, () =>
@@ -1366,6 +2078,10 @@ export class SubagentThreadTaskStore extends InMemorySubagentTaskStore {
                 );
               }
               lease.settling = true;
+<<<<<<< HEAD
+=======
+              await this.closeContent(lease);
+>>>>>>> upstream/main
               await this.persistResult(
                 scope,
                 request,
@@ -1373,6 +2089,12 @@ export class SubagentThreadTaskStore extends InMemorySubagentTaskStore {
                 prepared,
                 result,
                 detachedUsage,
+<<<<<<< HEAD
+=======
+                lease.content?.throughSequence,
+                appliedSteers,
+                publicRecorder.snapshot(),
+>>>>>>> upstream/main
               );
               activityTerminal = 'completed';
               return result;
@@ -1384,6 +2106,10 @@ export class SubagentThreadTaskStore extends InMemorySubagentTaskStore {
               }
               const mayPersist =
                 lease.shared == null || (await this.renewSharedLease(scope, threadId, lease));
+<<<<<<< HEAD
+=======
+              await this.closeContent(lease);
+>>>>>>> upstream/main
               const terminalTask = this.get(request.scopeId, runtime.taskId);
               if (runtime.signal.aborted && terminalTask?.status === 'cancelled') {
                 activityTerminal = 'cancelled';
@@ -1394,6 +2120,11 @@ export class SubagentThreadTaskStore extends InMemorySubagentTaskStore {
                     request,
                     runtime.taskId,
                     detachedUsage,
+<<<<<<< HEAD
+=======
+                    lease.content?.throughSequence,
+                    publicRecorder.snapshot(),
+>>>>>>> upstream/main
                   ).catch((persistError) => {
                     logger.error(
                       '[subagentThreads] Failed to persist child-thread cancellation',
@@ -1404,9 +2135,20 @@ export class SubagentThreadTaskStore extends InMemorySubagentTaskStore {
                 throw error;
               }
               logger.error('[subagentThreads] Child-thread execution failed', {
+<<<<<<< HEAD
                 detail: publicFailureDetail(error),
                 errorName: error instanceof Error ? error.name : typeof error,
                 ...(error instanceof Error && error.stack != null ? { stack: error.stack } : {}),
+=======
+                taskId: runtime.taskId,
+                detail: publicFailureDetail(error),
+                errorName: error instanceof Error ? error.name : typeof error,
+                ...(error instanceof SubagentResolutionError
+                  ? { phase: error.phase, resolutionCause: error.resolutionCause }
+                  : {}),
+                causes: describeErrorCauses(error),
+                frames: describeStackFrames(error),
+>>>>>>> upstream/main
               });
               if (mayPersist) {
                 await this.persistFailure(
@@ -1416,6 +2158,11 @@ export class SubagentThreadTaskStore extends InMemorySubagentTaskStore {
                   runtime.taskId,
                   error,
                   detachedUsage,
+<<<<<<< HEAD
+=======
+                  lease.content?.throughSequence,
+                  publicRecorder.snapshot(),
+>>>>>>> upstream/main
                 ).catch((persistError) => {
                   logger.error(
                     '[subagentThreads] Failed to persist child-thread failure',
@@ -1425,7 +2172,15 @@ export class SubagentThreadTaskStore extends InMemorySubagentTaskStore {
               }
               throw new Error(publicFailureDetail(error));
             } finally {
+<<<<<<< HEAD
               if (prepared != null && prepared.replay == null) {
+=======
+              if (prepared != null) {
+                this.wakeupTaskIds.delete(prepared.replay?.taskId ?? runtime.taskId);
+              }
+              if (prepared != null && prepared.replay == null) {
+                this.settleActivity(request.scopeId, runtime.taskId, activityTerminal);
+>>>>>>> upstream/main
                 this.completeActivity(
                   lease,
                   prepared.conversation.conversationId,
@@ -1433,6 +2188,10 @@ export class SubagentThreadTaskStore extends InMemorySubagentTaskStore {
                   activityTerminal,
                 );
               }
+<<<<<<< HEAD
+=======
+              lease.publishAppliedSteer = undefined;
+>>>>>>> upstream/main
               await this.stopAndReleaseSharedLease(scope, threadId, lease);
               if (this.activeThreads.get(lockKey) === lease) {
                 this.activeThreads.delete(lockKey);
@@ -1444,10 +2203,22 @@ export class SubagentThreadTaskStore extends InMemorySubagentTaskStore {
             () => undefined,
           );
           lease.execution = settlement;
+<<<<<<< HEAD
           return execution;
         },
       });
     } catch (error) {
+=======
+          if (!releaseContext) return execution;
+          return execution.finally(() => {
+            if (releaseContext) runtime.signal.removeEventListener('abort', releaseContext);
+            releaseContext?.();
+          });
+        },
+      });
+    } catch (error) {
+      releaseContext?.();
+>>>>>>> upstream/main
       if (ownsLease && this.activeThreads.get(lockKey) === lease) {
         this.activeThreads.delete(lockKey);
       }
@@ -1456,8 +2227,22 @@ export class SubagentThreadTaskStore extends InMemorySubagentTaskStore {
 
     if (started.accepted && started.isNew) {
       lease.taskId = started.task.taskId;
+<<<<<<< HEAD
     } else if (ownsLease && this.activeThreads.get(lockKey) === lease) {
       this.activeThreads.delete(lockKey);
+=======
+      if (releaseContext) {
+        // The SDK skips run() if cancellation wins before its launch microtask.
+        queueMicrotask(() => {
+          if (!executionStarted) releaseContext?.();
+        });
+      }
+    } else {
+      releaseContext?.();
+      if (ownsLease && this.activeThreads.get(lockKey) === lease) {
+        this.activeThreads.delete(lockKey);
+      }
+>>>>>>> upstream/main
     }
     return started;
   }
@@ -1490,7 +2275,11 @@ export class SubagentThreadTaskStore extends InMemorySubagentTaskStore {
     taskId: string,
     invocationId?: string,
   ): Promise<SubagentTaskClaim> {
+<<<<<<< HEAD
     const local = super.claim(scopeId, taskId);
+=======
+    const local = this.withActivity(scopeId, super.claim(scopeId, taskId));
+>>>>>>> upstream/main
     const claim =
       local.status !== 'not_found'
         ? local
@@ -1592,7 +2381,12 @@ export class SubagentThreadTaskStore extends InMemorySubagentTaskStore {
     if (createdAt == null || updatedAt == null) {
       return { status: 'not_found' };
     }
+<<<<<<< HEAD
     const task: SubagentTaskSnapshot = {
+=======
+    const activity = durableActivity(message, taskId, createdAt, updatedAt);
+    const task: ActivitySnapshot = {
+>>>>>>> upstream/main
       taskId,
       threadId,
       subagentType: lineage.subagentType,
@@ -1603,6 +2397,10 @@ export class SubagentThreadTaskStore extends InMemorySubagentTaskStore {
       resultClaimed: true,
       pendingControls: 0,
       ...(status === 'completed' ? {} : { error: message.text ?? '' }),
+<<<<<<< HEAD
+=======
+      ...(activity == null ? {} : { activity }),
+>>>>>>> upstream/main
     };
     const collected = await this.assignResultClaim(scope.userId, threadId, taskId, invocationId);
     if (collected.status === 'not_found') {
@@ -1886,6 +2684,10 @@ export class SubagentThreadTaskStore extends InMemorySubagentTaskStore {
       invocationId,
       fingerprint,
       command: boundedControlCommand(command),
+<<<<<<< HEAD
+=======
+      ...('message' in command ? { pendingMessage: command.message } : {}),
+>>>>>>> upstream/main
       commandMessageTruncated:
         'message' in command && command.message.length > MAX_DURABLE_CONTROL_MESSAGE_CHARS,
       result,
@@ -2091,7 +2893,11 @@ export class SubagentThreadTaskStore extends InMemorySubagentTaskStore {
 
   /** Returns this process's tasks plus tasks reported by registered remote owners. */
   async listTasks(scopeId: string): Promise<SubagentTaskSnapshot[]> {
+<<<<<<< HEAD
     const local = super.list(scopeId);
+=======
+    const local = this.withActivitySummaries(scopeId, super.list(scopeId));
+>>>>>>> upstream/main
     const remote = (await this.taskControlTransport?.list(scopeId)) ?? [];
     const byId = new Map(local.map((task) => [task.taskId, task]));
     for (const task of remote) {
@@ -2752,9 +3558,22 @@ export class SubagentThreadTaskStore extends InMemorySubagentTaskStore {
     if (!(await this.isOwnerActive(scope.userId))) {
       throw new SubagentThreadPublicError('The thread owner is unavailable.');
     }
+<<<<<<< HEAD
     const [parent, existing] = await Promise.all([
       this.methods.getConvo(scope.userId, scope.parentConversationId),
       this.methods.getConvo(scope.userId, threadId),
+=======
+    const agentId = childAgentId(request);
+    const [parent, existing, agentName] = await Promise.all([
+      this.methods.getConvo(scope.userId, scope.parentConversationId),
+      this.methods.getConvo(scope.userId, threadId),
+      isContinuation || agentId == null
+        ? undefined
+        : this.methods.getAgentName?.(agentId, scope.tenantId).catch((error) => {
+            logger.warn('[subagentThreads] Failed to resolve child display name', error);
+            return undefined;
+          }),
+>>>>>>> upstream/main
     ]);
     if (parent == null || !matchesTenant(parent.tenantId, scope.tenantId)) {
       throw new SubagentThreadPublicError('Parent thread is unavailable.');
@@ -2777,7 +3596,10 @@ export class SubagentThreadTaskStore extends InMemorySubagentTaskStore {
           );
         }
         const depth = parentDepth + 1;
+<<<<<<< HEAD
         const agentId = childAgentId(request);
+=======
+>>>>>>> upstream/main
         const reserved = await this.methods.reserveSubagentThread({
           user: scope.userId,
           conversationId: threadId,
@@ -2785,7 +3607,11 @@ export class SubagentThreadTaskStore extends InMemorySubagentTaskStore {
           conversation: {
             conversationId: threadId,
             endpoint: EModelEndpoint.agents,
+<<<<<<< HEAD
             title: `Subagent: ${request.subagentType}`.slice(0, 120),
+=======
+            title: (agentName || agentId || request.subagentType).slice(0, 120),
+>>>>>>> upstream/main
             ...(agentId == null ? {} : { agent_id: agentId }),
             ...retentionFields(parent),
             subagentThread: {
@@ -2902,6 +3728,13 @@ export class SubagentThreadTaskStore extends InMemorySubagentTaskStore {
             replay: {
               status: terminal.subagentTask.status as 'completed' | 'error' | 'cancelled',
               taskId: canonicalTaskId,
+<<<<<<< HEAD
+=======
+              ...(terminal.parentMessageId?.endsWith(':user') === true &&
+                terminal.parentMessageId !== `${canonicalTaskId}:user` && {
+                  previousTaskId: terminal.parentMessageId.slice(0, -':user'.length),
+                }),
+>>>>>>> upstream/main
               parentRunId: terminal.subagentTask.parentRunId ?? request.parentRunId,
               content:
                 terminal.text ??
@@ -2956,6 +3789,12 @@ export class SubagentThreadTaskStore extends InMemorySubagentTaskStore {
             status: 'error',
             content: abandonedMessage,
             taskId,
+<<<<<<< HEAD
+=======
+            ...(abandoned.messageId.endsWith(':user') && {
+              previousTaskId: abandoned.messageId.slice(0, -':user'.length),
+            }),
+>>>>>>> upstream/main
             parentRunId: request.parentRunId,
           },
         };
@@ -2988,6 +3827,15 @@ export class SubagentThreadTaskStore extends InMemorySubagentTaskStore {
             text: request.input,
             endpoint: EModelEndpoint.agents,
             isCreatedByUser: true,
+<<<<<<< HEAD
+=======
+            ...(this.methods.appendSubagentContentBatch == null ||
+            !this.activityOptions.contentRecoveryEnabled
+              ? {}
+              : {
+                  subagentContent: { version: 1 as const },
+                }),
+>>>>>>> upstream/main
             subagentTask: {
               attemptKey,
               parentRunId: request.parentRunId,
@@ -3063,6 +3911,25 @@ export class SubagentThreadTaskStore extends InMemorySubagentTaskStore {
     );
   }
 
+<<<<<<< HEAD
+=======
+  private async closeContent(lease: TaskThreadLease): Promise<void> {
+    const result = await lease.content?.close().catch((error) => {
+      /** The terminal row records the expected watermark, so a failed final
+       * flush exposes a partial prefix instead of pretending history is complete. */
+      logger.warn(
+        '[subagentThreads] Public child content handoff incomplete',
+        getSafeErrorMetadata(error),
+      );
+    });
+    if (result != null && !result.ok) {
+      logger.warn('[subagentThreads] Public child content handoff unavailable', {
+        code: result.error.code,
+      });
+    }
+  }
+
+>>>>>>> upstream/main
   private async persistResult(
     scope: SubagentThreadScope,
     request: SubagentTaskStartRequest,
@@ -3070,32 +3937,72 @@ export class SubagentThreadTaskStore extends InMemorySubagentTaskStore {
     prepared: PreparedThread,
     result: { content: string; messages?: BaseMessage[] },
     detachedUsage: UsageMetadata[],
+<<<<<<< HEAD
+=======
+    contentThroughSequence?: number,
+    appliedSteers?: readonly AppliedSubagentSteer[],
+    observedActivity?: ReturnType<SubagentPublicRecorder['snapshot']>,
+>>>>>>> upstream/main
   ): Promise<void> {
     if (prepared.userMessageId == null) {
       throw new Error('The child-thread input was not prepared.');
     }
     await this.flushControlReceiptsForSettlement(request.scopeId, taskId);
+<<<<<<< HEAD
+=======
+    const transcriptObservation = { steersMatched: false };
+>>>>>>> upstream/main
     const subagentTranscript = serializeTranscript(
       taskId,
       prepared.initialStoredMessages,
       result.messages,
+<<<<<<< HEAD
     );
     const activityProjection =
+=======
+      appliedSteers,
+      request.input,
+      transcriptObservation,
+    );
+    const sourceProjection =
+>>>>>>> upstream/main
       subagentTranscript == null
         ? undefined
         : projectSubagentActivity(
             subagentTranscript.messagesJson,
             subagentTranscript.mode,
             request.input,
+<<<<<<< HEAD
           );
+=======
+            appliedSteers,
+          );
+    // A complete transcript is richer than a bounded observation window. Missing
+    // applied controls make it incomplete even when its JSON is otherwise valid.
+    const sourceTrusted =
+      sourceProjection != null &&
+      transcriptObservation.steersMatched &&
+      (sourceProjection.activity.length > 0 || !sourceProjection.truncated);
+    const activityProjection = sourceTrusted
+      ? sourceProjection
+      : (observedActivity ?? sourceProjection);
+>>>>>>> upstream/main
     const subagentActivityProjection =
       activityProjection == null
         ? undefined
         : {
             taskId,
+<<<<<<< HEAD
             version: 1 as const,
             activityJson: JSON.stringify(activityProjection.activity),
             truncated: activityProjection.truncated,
+=======
+            version: 2 as const,
+            activityJson: JSON.stringify(activityProjection.activity),
+            truncated:
+              activityProjection.truncated ||
+              (!sourceTrusted && activityProjection.activity.length === 0),
+>>>>>>> upstream/main
           };
     const conversation = await this.requireCurrentConversation(
       scope,
@@ -3114,6 +4021,14 @@ export class SubagentThreadTaskStore extends InMemorySubagentTaskStore {
         endpoint: EModelEndpoint.agents,
         isCreatedByUser: false,
         unfinished: false,
+<<<<<<< HEAD
+=======
+        ...(contentThroughSequence == null
+          ? {}
+          : {
+              subagentContent: { version: 1 as const, throughSequence: contentThroughSequence },
+            }),
+>>>>>>> upstream/main
         ...(subagentTranscript == null ? {} : { subagentTranscript }),
         ...(subagentActivityProjection == null ? {} : { subagentActivityProjection }),
         subagentTask: {
@@ -3142,6 +4057,11 @@ export class SubagentThreadTaskStore extends InMemorySubagentTaskStore {
     taskId: string,
     error: unknown,
     detachedUsage: UsageMetadata[],
+<<<<<<< HEAD
+=======
+    contentThroughSequence?: number,
+    observedActivity?: ReturnType<SubagentPublicRecorder['snapshot']>,
+>>>>>>> upstream/main
   ): Promise<void> {
     await this.flushControlReceiptsForSettlement(request.scopeId, taskId);
     const conversation = await this.currentConversation(scope, request, threadId);
@@ -3160,7 +4080,25 @@ export class SubagentThreadTaskStore extends InMemorySubagentTaskStore {
         endpoint: EModelEndpoint.agents,
         isCreatedByUser: false,
         unfinished: false,
+<<<<<<< HEAD
         error: true,
+=======
+        ...(contentThroughSequence == null
+          ? {}
+          : {
+              subagentContent: { version: 1 as const, throughSequence: contentThroughSequence },
+            }),
+        error: true,
+        subagentActivityProjection: {
+          taskId,
+          version: 2 as const,
+          activityJson: JSON.stringify(observedActivity?.activity ?? []),
+          truncated:
+            observedActivity == null ||
+            observedActivity.truncated ||
+            observedActivity.activity.length === 0,
+        },
+>>>>>>> upstream/main
         subagentTask: {
           attemptKey: createSubagentAttemptKey(request.scopeId, request.idempotencyKey),
           parentRunId: request.parentRunId,
@@ -3192,7 +4130,12 @@ export class SubagentThreadTaskStore extends InMemorySubagentTaskStore {
     ) {
       return;
     }
+<<<<<<< HEAD
     await this.onTaskPrepared({
+=======
+    const admitted = await this.onTaskPrepared({
+      scheduleMCPIdentity: (request as HostSubagentTaskStartRequest).scheduleMCPIdentity ?? null,
+>>>>>>> upstream/main
       userId: scope.userId,
       parentConversationId: scope.parentConversationId,
       parentMessageId: task.parentRunId,
@@ -3203,6 +4146,12 @@ export class SubagentThreadTaskStore extends InMemorySubagentTaskStore {
       subagentType: request.subagentType,
       createdAt: task.createdAt,
     });
+<<<<<<< HEAD
+=======
+    if (admitted !== false) {
+      this.wakeupTaskIds.add(task.taskId);
+    }
+>>>>>>> upstream/main
   }
 
   private async persistCancellation(
@@ -3211,6 +4160,11 @@ export class SubagentThreadTaskStore extends InMemorySubagentTaskStore {
     request: SubagentTaskStartRequest,
     taskId: string,
     detachedUsage: UsageMetadata[],
+<<<<<<< HEAD
+=======
+    contentThroughSequence?: number,
+    observedActivity?: ReturnType<SubagentPublicRecorder['snapshot']>,
+>>>>>>> upstream/main
   ): Promise<void> {
     await this.flushControlReceiptsForSettlement(request.scopeId, taskId);
     const conversation = await this.currentConversation(scope, request, threadId);
@@ -3229,6 +4183,23 @@ export class SubagentThreadTaskStore extends InMemorySubagentTaskStore {
         endpoint: EModelEndpoint.agents,
         isCreatedByUser: false,
         unfinished: false,
+<<<<<<< HEAD
+=======
+        ...(contentThroughSequence == null
+          ? {}
+          : {
+              subagentContent: { version: 1 as const, throughSequence: contentThroughSequence },
+            }),
+        subagentActivityProjection: {
+          taskId,
+          version: 2 as const,
+          activityJson: JSON.stringify(observedActivity?.activity ?? []),
+          truncated:
+            observedActivity == null ||
+            observedActivity.truncated ||
+            observedActivity.activity.length === 0,
+        },
+>>>>>>> upstream/main
         subagentTask: {
           attemptKey: createSubagentAttemptKey(request.scopeId, request.idempotencyKey),
           parentRunId: request.parentRunId,
@@ -3375,6 +4346,29 @@ export class SubagentThreadTaskStore extends InMemorySubagentTaskStore {
       }
       logger.error(`[subagentThreads] Failed to refresh ${outcome} child thread`, error);
     }
+<<<<<<< HEAD
+=======
+    this.notifyTaskSettled(scope, taskId);
+  }
+
+  private notifyTaskSettled(
+    scope: SubagentThreadScope,
+    taskId: string,
+    previousTaskId?: string,
+  ): void {
+    if (!this.wakeupTaskIds.delete(taskId)) {
+      return;
+    }
+    try {
+      this.onTaskSettled?.(
+        scope.userId,
+        scope.parentConversationId,
+        previousTaskId == null ? [taskId] : [taskId, previousTaskId],
+      );
+    } catch (error) {
+      logger.warn('[subagentThreads] Settled-task listener failed', error);
+    }
+>>>>>>> upstream/main
   }
 
   private aggregateDetachedUsage(detachedUsage: UsageMetadata[]) {
@@ -3423,7 +4417,12 @@ export function createSubagentThreadTaskStore(
       | 'getMessages'
       | 'recordSubagentTaskControlReceipt'
       | 'saveMessage'
+<<<<<<< HEAD
     >,
+=======
+    > &
+    Partial<Pick<AllMethods, 'getAgentName'>>,
+>>>>>>> upstream/main
   options?: SubagentThreadTaskStoreOptions,
 ): SubagentThreadTaskStore {
   /** The host wires this from JavaScript, where the parameter type checks nothing. A
@@ -3443,8 +4442,20 @@ type CompletionWakeupStore = SubagentTaskStore &
 
 const completionWakeupStores = new WeakMap<SubagentThreadTaskStore, CompletionWakeupStore>();
 
+<<<<<<< HEAD
 function completionWakeupStore(store: SubagentThreadTaskStore): CompletionWakeupStore {
   const existing = completionWakeupStores.get(store);
+=======
+function completionWakeupStore(
+  store: SubagentThreadTaskStore,
+  identity?: ScheduledMCPIdentity,
+  requestScopedConnections?: RequestScopedMCPConnectionStore,
+  completionWakeups = true,
+): CompletionWakeupStore {
+  const captured = identity && Object.freeze(structuredClone(identity));
+  const cacheable = !captured && !requestScopedConnections && completionWakeups;
+  const existing = cacheable ? completionWakeupStores.get(store) : undefined;
+>>>>>>> upstream/main
   if (existing != null) {
     return existing;
   }
@@ -3453,7 +4464,13 @@ function completionWakeupStore(store: SubagentThreadTaskStore): CompletionWakeup
     start: (request) => {
       const hostRequest: HostSubagentTaskStartRequest = {
         ...request,
+<<<<<<< HEAD
         completionDelivery: SUBAGENT_COMPLETION_DELIVERY,
+=======
+        completionDelivery: completionWakeups ? SUBAGENT_COMPLETION_DELIVERY : undefined,
+        requestScopedConnections,
+        scheduleMCPIdentity: captured ?? null,
+>>>>>>> upstream/main
       };
       return store.start(hostRequest);
     },
@@ -3467,16 +4484,38 @@ function completionWakeupStore(store: SubagentThreadTaskStore): CompletionWakeup
     hasTasks: (scopeId) => store.hasTasks(scopeId),
     listTasks: (scopeId) => store.listTasks(scopeId),
   };
+<<<<<<< HEAD
   completionWakeupStores.set(store, adapter);
+=======
+  if (cacheable) completionWakeupStores.set(store, adapter);
+>>>>>>> upstream/main
   return adapter;
 }
 
 export function buildSubagentThreadTaskConfig(
   store: SubagentThreadTaskStore,
   scope: Omit<SubagentThreadScope, 'version'>,
+<<<<<<< HEAD
   options: { completionWakeups?: boolean } = {},
 ): HostSubagentTaskConfig {
   const taskStore = options.completionWakeups === true ? completionWakeupStore(store) : store;
+=======
+  options: {
+    completionWakeups?: boolean;
+    scheduleMCPIdentity?: ScheduledMCPIdentity;
+    requestScopedConnections?: RequestScopedMCPConnectionStore;
+  } = {},
+): HostSubagentTaskConfig {
+  const taskStore =
+    options.completionWakeups === true || options.requestScopedConnections
+      ? completionWakeupStore(
+          store,
+          options.scheduleMCPIdentity,
+          options.requestScopedConnections,
+          options.completionWakeups === true,
+        )
+      : store;
+>>>>>>> upstream/main
   return {
     store: taskStore,
     scopeId: serializeScope(scope),

@@ -297,7 +297,11 @@ describe('TokenUsage Breakdown', () => {
 
       const estimate = screen.getByTestId('context-estimate');
       const peerTotal = Array.from(estimate.children)
+<<<<<<< HEAD
         .filter((child) => !child.className.includes('pl-6'))
+=======
+        .filter((child) => !child.className.includes('ps-6'))
+>>>>>>> upstream/main
         .reduce((sum, child) => sum + Number(child.lastElementChild?.textContent ?? 0), 0);
 
       /** 300 input + 200 output + 100 estimated = 600 used. The tool share is a
@@ -307,7 +311,11 @@ describe('TokenUsage Breakdown', () => {
 
       const toolRow = within(estimate).getByText('com_ui_context_tool_calls').parentElement
         ?.parentElement as HTMLElement;
+<<<<<<< HEAD
       expect(toolRow.parentElement?.className).toContain('pl-6');
+=======
+      expect(toolRow.parentElement?.className).toContain('ps-6');
+>>>>>>> upstream/main
       expect(toolRow.textContent).toContain('150');
     });
     it('splits tool-call usage out of the messages row when reported', async () => {
@@ -346,7 +354,11 @@ describe('TokenUsage Breakdown', () => {
       const peerTotal = Array.from(breakdown.children)
         .filter(
           (child) =>
+<<<<<<< HEAD
             !child.className.includes('pl-6') &&
+=======
+            !child.className.includes('ps-6') &&
+>>>>>>> upstream/main
             !child.textContent?.includes('com_ui_context_free'),
         )
         .reduce(
@@ -454,14 +466,23 @@ describe('TokenUsage Breakdown', () => {
        *  above, so these may only appear indented — as peer rows a fully cached
        *  prompt would show its tokens twice and the visible rows would sum past
        *  the meter. */
+<<<<<<< HEAD
       expect(cachedRow.parentElement?.className).toContain('pl-6');
+=======
+      expect(within(breakdown).getByText('com_ui_context_cache_last_call')).toBeInTheDocument();
+      expect(cachedRow.parentElement?.className).toContain('ps-6');
+>>>>>>> upstream/main
       expect(cachedRow.textContent).toContain('30');
       /** The share column is keyed to the window, like every row above: without
        *  it the cached row reads as a bare number beside rows that all carry a
        *  percentage, with the cell left blank. */
       expect(cachedRow.textContent).toContain('(2%)');
       const peers = Array.from(breakdown.children).filter(
+<<<<<<< HEAD
         (child) => !child.className.includes('pl-6'),
+=======
+        (child) => !child.className.includes('ps-6'),
+>>>>>>> upstream/main
       );
       expect(peers.some((peer) => peer.textContent?.includes('com_ui_context_cache_write'))).toBe(
         false,
@@ -469,8 +490,12 @@ describe('TokenUsage Breakdown', () => {
       expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '50');
     });
 
+<<<<<<< HEAD
     // NJ: We hide the ⓘ insights card, so there is nothing to open here
     it.skip('hides the compaction hint when the operation is unavailable', async () => {
+=======
+    it('hides the compaction hint when the operation is unavailable', async () => {
+>>>>>>> upstream/main
       renderBreakdown({
         view: { ...toolSplitView, runwayTurns: 2, compactionReclaim: 90000 },
         compactionAvailable: false,
@@ -500,7 +525,10 @@ describe('TokenUsage Breakdown', () => {
       expect(screen.getByText('com_ui_context_pressure_warn')).toBeInTheDocument();
       expect(screen.queryByTestId('context-hints')).toBeNull();
 
+<<<<<<< HEAD
       /* NJ: The ⓘ insights card is hidden, so only the inline warning is asserted
+=======
+>>>>>>> upstream/main
       const info = screen.getByTestId('context-insights-toggle');
       await userEvent.click(info);
       const hints = await screen.findByTestId('context-hints');
@@ -510,7 +538,10 @@ describe('TokenUsage Breakdown', () => {
 
       await userEvent.keyboard('{Escape}');
       await waitFor(() => expect(screen.queryByTestId('context-hints')).toBeNull());
+<<<<<<< HEAD
       */
+=======
+>>>>>>> upstream/main
     });
 
     it('shows the danger tint at the hard threshold', async () => {
@@ -530,8 +561,14 @@ describe('TokenUsage Breakdown', () => {
       await userEvent.click(toggle());
 
       expect(
+<<<<<<< HEAD
         // NJ: Updated header to a plain span with different text
         within(screen.getByTestId('token-usage-totals')).getByText('nj_ui_last_prompt_and_reply'),
+=======
+        within(screen.getByTestId('token-usage-totals')).getByRole('heading', {
+          name: 'com_ui_context_totals',
+        }),
+>>>>>>> upstream/main
       ).toBeInTheDocument();
     });
 
@@ -556,9 +593,215 @@ describe('TokenUsage Breakdown', () => {
       await userEvent.click(toggle());
 
       const totals = within(screen.getByTestId('token-usage-totals'));
+<<<<<<< HEAD
       expect(
         totals.getByText('com_ui_context_subagents_all').parentElement?.nextElementSibling,
       ).toHaveTextContent('1K');
+=======
+      expect(totals.getByText('com_ui_context_subagents_all').nextElementSibling).toHaveTextContent(
+        '1K',
+      );
+    });
+  });
+
+  describe('last turn', () => {
+    it.each([true, false])(
+      'shows sibling totals on an unrecorded branch, showCost=%s',
+      async (showCost) => {
+        renderBreakdown({
+          view: {
+            ...view,
+            hasUsage: false,
+            branchUsage: {
+              input: 0,
+              output: 0,
+              cacheRead: 0,
+              cacheWrite: 0,
+              cost: 0,
+              costKnown: false,
+            },
+            branchCost: 0,
+            totalUsage: {
+              input: 40,
+              output: 5,
+              cacheRead: 800,
+              cacheWrite: 30,
+              cost: 0.02,
+              costKnown: true,
+            },
+            totalCost: 0.02,
+          },
+          showCost,
+        });
+        await userEvent.click(toggle());
+        expect(screen.queryByTestId('token-usage-totals')).not.toBeInTheDocument();
+        expect(screen.getByTestId('token-usage-all-branches')).toHaveTextContent('800');
+        if (showCost) {
+          expect(
+            within(screen.getByTestId('token-usage-all-branches')).getByTestId('usage-cost'),
+          ).toHaveTextContent('com_ui_context_cost_total');
+        } else {
+          expect(screen.queryByTestId('usage-cost')).not.toBeInTheDocument();
+        }
+      },
+    );
+
+    it('distinguishes a recorded turn from branch and all-branches cache usage', async () => {
+      renderBreakdown({
+        view: {
+          ...view,
+          lastTurnUsage: {
+            input: 20,
+            output: 5,
+            cacheRead: 700,
+            cacheWrite: 90,
+            cost: 0.004,
+            costKnown: true,
+          },
+          branchUsage: {
+            input: 120,
+            output: 15,
+            cacheRead: 800,
+            cacheWrite: 90,
+            cost: 0.01,
+            costKnown: true,
+          },
+          totalUsage: {
+            input: 140,
+            output: 20,
+            cacheRead: 900,
+            cacheWrite: 90,
+            cost: 0.02,
+            costKnown: true,
+          },
+          branchCost: 0.01,
+          totalCost: 0.02,
+        },
+        showCost: true,
+      });
+      await userEvent.click(toggle());
+
+      const last = within(screen.getByTestId('token-usage-last-turn'));
+      expect(last.getByRole('heading', { name: 'com_ui_context_last_turn' })).toBeInTheDocument();
+      expect(last.getByText('com_ui_cache_read').parentElement?.parentElement).toHaveTextContent(
+        '700',
+      );
+      expect(last.getByText('com_ui_cache_write').parentElement?.parentElement).toHaveTextContent(
+        '90',
+      );
+      const totals = within(screen.getByTestId('token-usage-totals'));
+      expect(totals.getByText('com_ui_context_this_branch')).toBeInTheDocument();
+      expect(totals.getByText('com_ui_cache_read').parentElement?.parentElement).toHaveTextContent(
+        '800',
+      );
+      const all = within(screen.getByTestId('token-usage-all-branches'));
+      expect(all.getByText('com_ui_cache_read').parentElement?.parentElement).toHaveTextContent(
+        '900',
+      );
+      expect(last.getByTestId('usage-cost')).toHaveTextContent('com_ui_context_cost_last_turn');
+      expect(totals.getByTestId('usage-cost')).toHaveTextContent('com_ui_context_cost_branch');
+      expect(all.getByTestId('usage-cost')).toHaveTextContent('com_ui_context_cost_total');
+    });
+
+    it('exposes all-branches token differences without requiring cost coverage', async () => {
+      renderBreakdown({
+        view: {
+          ...view,
+          lastTurnUsage: {
+            input: 1,
+            output: 0,
+            cacheRead: 0,
+            cacheWrite: 0,
+            cost: 0,
+            costKnown: true,
+          },
+          branchUsage: { ...view.branchUsage, costKnown: false },
+          totalUsage: { ...view.totalUsage, cacheWrite: 25, costKnown: false },
+        },
+        showCost: true,
+      });
+      await userEvent.click(toggle());
+      expect(screen.getByTestId('token-usage-all-branches')).toHaveTextContent('25');
+      expect(
+        within(screen.getByTestId('token-usage-last-turn')).getByTestId('usage-cost'),
+      ).toHaveTextContent('com_ui_context_cost_last_turn');
+      expect(
+        within(screen.getByTestId('token-usage-totals')).queryByTestId('usage-cost'),
+      ).not.toBeInTheDocument();
+    });
+
+    it('shows waiting and unavailable states without presenting old totals as the current turn', async () => {
+      const { rerender } = render(
+        <Provider>
+          <Breakdown view={{ ...view, lastTurnUsage: undefined, turnInProgress: true }} showCost />
+        </Provider>,
+      );
+      await userEvent.click(toggle());
+      expect(screen.getByTestId('token-usage-last-turn')).toHaveTextContent(
+        'com_ui_context_waiting_usage',
+      );
+      rerender(
+        <Provider>
+          <Breakdown view={{ ...view, lastTurnUsage: undefined, turnInProgress: false }} showCost />
+        </Provider>,
+      );
+      expect(screen.getByTestId('token-usage-last-turn')).toHaveTextContent(
+        'com_ui_context_unavailable_usage',
+      );
+    });
+
+    it('labels recorded in-flight cost as a partial current-turn figure', async () => {
+      renderBreakdown({
+        view: {
+          ...view,
+          turnInProgress: true,
+          lastTurnUsage: {
+            input: 10,
+            output: 0,
+            cacheRead: 20,
+            cacheWrite: 0,
+            cost: 0.01,
+            costKnown: true,
+          },
+        },
+        showCost: true,
+      });
+      await userEvent.click(toggle());
+      expect(screen.getByTestId('token-usage-last-turn')).toHaveTextContent(
+        'com_ui_context_current_turn',
+      );
+      expect(
+        within(screen.getByTestId('token-usage-last-turn')).getByTestId('usage-cost'),
+      ).toHaveTextContent('com_ui_context_cost_current_turn');
+    });
+
+    it('keeps a known zero cost and hides a missing cost', async () => {
+      renderBreakdown({
+        view: {
+          ...view,
+          lastTurnUsage: {
+            input: 0,
+            output: 0,
+            cacheRead: 0,
+            cacheWrite: 0,
+            cost: 0,
+            costKnown: true,
+          },
+          branchUsage: { ...view.branchUsage, costKnown: false },
+        },
+        showCost: true,
+      });
+      await userEvent.click(toggle());
+      expect(screen.getByTestId('token-usage-last-turn')).toHaveTextContent(
+        'com_ui_context_last_turn',
+      );
+      expect(
+        within(screen.getByTestId('token-usage-last-turn')).getByTestId('usage-cost'),
+      ).toHaveTextContent('com_ui_context_cost_last_turn');
+      expect(
+        within(screen.getByTestId('token-usage-totals')).queryByTestId('usage-cost'),
+      ).not.toBeInTheDocument();
+>>>>>>> upstream/main
     });
   });
 

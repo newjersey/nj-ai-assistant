@@ -47,12 +47,24 @@ const CLASSIFIED = {
    *  comment. */
   'packages/api/src/agents/openai/service.ts': 3,
 
+<<<<<<< HEAD
   // -- Not gates ---------------------------------------------------------------
   /** The upload-resource map entry, and one mention in a doc comment. */
   'packages/api/src/tools/rolePermissions.ts': 2,
   /** `recordCapabilityToolNames` bookkeeping — describes what was built, does
    *  not decide whether to build it. */
   'packages/api/src/agents/initialize.ts': 2,
+=======
+  /** Two gates for the project file corpus (`addProjectFilesToFileSearch` and
+   *  `canUseProjectFileSearch`), each paired with the `fileSearchAvailable`
+   *  grant resolved by the caller, plus two `recordCapabilityToolNames`
+   *  bookkeeping reads that describe what was built. */
+  'packages/api/src/agents/initialize.ts': 4,
+
+  // -- Not gates ---------------------------------------------------------------
+  /** The upload-resource map entry, and one mention in a doc comment. */
+  'packages/api/src/tools/rolePermissions.ts': 2,
+>>>>>>> upstream/main
   /** Default capability list shipped in config. */
   'packages/data-provider/src/config.ts': 2,
   /** Config normalization only: strips stale `tool_options` when the capability

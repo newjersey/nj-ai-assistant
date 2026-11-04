@@ -25,9 +25,17 @@ const balance = require('./balance');
 const actions = require('./actions');
 const apiKeys = require('./apiKeys');
 const banner = require('./banner');
+<<<<<<< HEAD
 const search = require('./search');
 const models = require('./models');
 const convos = require('./convos');
+=======
+const openapi = require('./openapi');
+const search = require('./search');
+const models = require('./models');
+const convos = require('./convos');
+const pullRequests = require('./pullRequests');
+>>>>>>> upstream/main
 const traces = require('./traces');
 const config = require('./config');
 const agents = require('./agents');
@@ -44,6 +52,10 @@ const rum = require('./rum');
 const insights = require('./insights');
 
 module.exports = {
+<<<<<<< HEAD
+=======
+  pullRequests,
+>>>>>>> upstream/main
   insights,
   rum,
   mcp,
@@ -68,6 +80,10 @@ module.exports = {
   files,
   share,
   banner,
+<<<<<<< HEAD
+=======
+  openapi,
+>>>>>>> upstream/main
   agents,
   convos,
   traces,

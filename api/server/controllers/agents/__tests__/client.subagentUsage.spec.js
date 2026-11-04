@@ -2,6 +2,10 @@ const mockGetMultiplier = jest.fn(() => 1);
 const mockGetCacheMultiplier = jest.fn(() => 1);
 
 jest.mock('~/models', () => ({
+<<<<<<< HEAD
+=======
+  initializeMessageBudget: jest.fn(),
+>>>>>>> upstream/main
   getMultiplier: (...args) => mockGetMultiplier(...args),
   getCacheMultiplier: (...args) => mockGetCacheMultiplier(...args),
 }));

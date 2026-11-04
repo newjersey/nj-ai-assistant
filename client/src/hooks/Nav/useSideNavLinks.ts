@@ -1,5 +1,9 @@
 import { useMemo } from 'react';
+<<<<<<< HEAD
 import { MCPIcon, AttachmentIcon, OpenAIMinimalIcon } from '@librechat/client';
+=======
+import { MCPIcon, OpenAIMinimalIcon } from '@librechat/client';
+>>>>>>> upstream/main
 import {
   Bot,
   Brain,
@@ -33,7 +37,10 @@ import PanelSwitch from '~/components/SidePanel/Builder/PanelSwitch';
 import { SchedulePanel } from '~/components/SidePanel/Schedules';
 import Parameters from '~/components/SidePanel/Parameters/Panel';
 import { MemoryPanel } from '~/components/SidePanel/Memories';
+<<<<<<< HEAD
 import FilesPanel from '~/components/SidePanel/Files/Panel';
+=======
+>>>>>>> upstream/main
 import { PromptsAccordion } from '~/components/Prompts';
 import { SkillsAccordion } from '~/components/Skills';
 
@@ -196,6 +203,7 @@ export default function useSideNavLinks({
       });
     }
 
+<<<<<<< HEAD
     links.push({
       title: 'com_sidepanel_attach_files',
       label: '',
@@ -204,6 +212,8 @@ export default function useSideNavLinks({
       Component: FilesPanel,
     });
 
+=======
+>>>>>>> upstream/main
     if (
       interfaceConfig.parameters === true &&
       isParamEndpoint(endpoint ?? '', endpointType ?? '') === true &&
@@ -219,7 +229,10 @@ export default function useSideNavLinks({
       });
     }
 
+<<<<<<< HEAD
     /* NJ - Disable for now so we can set mcp permission without showing the UI panel
+=======
+>>>>>>> upstream/main
     if (
       (hasAccessToUseMCPSettings && availableMCPServers && availableMCPServers.length > 0) ||
       hasAccessToCreateMCP
@@ -232,7 +245,10 @@ export default function useSideNavLinks({
         Component: MCPBuilderPanel,
       });
     }
+<<<<<<< HEAD
     */
+=======
+>>>>>>> upstream/main
 
     if (includeHidePanel && hidePanel) {
       links.push({

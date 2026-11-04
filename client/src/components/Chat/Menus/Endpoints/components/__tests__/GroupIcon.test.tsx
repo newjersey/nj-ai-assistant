@@ -22,6 +22,7 @@ describe('GroupIcon', () => {
   it('resolves known endpoint asset aliases case-insensitively', () => {
     render(<GroupIcon iconURL="OpenRouter" groupName="OpenRouter" />);
 
+<<<<<<< HEAD
     const src = screen.getByRole('img', { name: 'OpenRouter' }).getAttribute('src');
     expect(src).toBeTruthy();
     expect(src).not.toBe('');
@@ -31,6 +32,17 @@ describe('GroupIcon', () => {
     render(<GroupIcon iconURL="Helicone" groupName="Helicone" />);
 
     expect(screen.getByRole('img', { name: 'Helicone' })).toHaveAttribute('alt', 'Helicone');
+=======
+    expect(screen.getByRole('img', { name: 'OpenRouter' })).toBeInTheDocument();
+  });
+
+  it('resolves the Lemonade alias to its mark', () => {
+    render(<GroupIcon iconURL="Lemonade" groupName="Lemonade" />);
+
+    const icon = screen.getByRole('img', { name: 'AMD Lemonade' });
+    expect(icon).not.toHaveAttribute('src');
+    expect(icon.querySelector('svg')).toHaveAttribute('fill', 'currentColor');
+>>>>>>> upstream/main
   });
 
   it('renders known endpoint aliases backed by components', () => {

@@ -2,7 +2,11 @@ const { Keyv } = require('keyv');
 const uap = require('ua-parser-js');
 const { logger } = require('@librechat/data-schemas');
 const { ErrorTypes, ViolationTypes } = require('librechat-data-provider');
+<<<<<<< HEAD
 const { isEnabled, keyvMongo, removePorts } = require('@librechat/api');
+=======
+const { isEnabled, keyvMongo, removePorts, getBanIp } = require('@librechat/api');
+>>>>>>> upstream/main
 const { getLogStores } = require('~/cache');
 const { isOAuthNavigation, redirectOAuthFailure } = require('./oauthNavigation');
 const denyRequest = require('./denyRequest');
@@ -88,19 +92,32 @@ const checkBan = async (req, res, next = () => {}) => {
     }
 
     req.ip = removePorts(req);
+<<<<<<< HEAD
     let userId = req.user?.id ?? req.user?._id ?? null;
+=======
+    const banIp = getBanIp(req);
+    let userId = req.user?.id ?? req.user?._id?.toString() ?? null;
+>>>>>>> upstream/main
 
     if (!userId && req?.body?.email) {
       const user = await findUser({ email: req.body.email }, '_id');
       userId = user?._id ? user._id.toString() : userId;
     }
 
+<<<<<<< HEAD
     if (!userId && !req.ip) {
+=======
+    if (!userId && !banIp) {
+>>>>>>> upstream/main
       return next();
     }
 
     const useRedis = isEnabled(process.env.USE_REDIS);
+<<<<<<< HEAD
     const ipKey = getBanCacheKey('ip', req.ip, useRedis);
+=======
+    const ipKey = getBanCacheKey('ip', banIp, useRedis);
+>>>>>>> upstream/main
     const userKey = getBanCacheKey('user', userId, useRedis);
 
     const [cachedIPBan, cachedUserBan] = await Promise.all([
@@ -121,7 +138,11 @@ const checkBan = async (req, res, next = () => {}) => {
     }
 
     const [ipBan, userBan] = await Promise.all([
+<<<<<<< HEAD
       req.ip ? banLogs.get(req.ip) : undefined,
+=======
+      banIp ? banLogs.get(banIp) : undefined,
+>>>>>>> upstream/main
       userId ? banLogs.get(userId) : undefined,
     ]);
 
@@ -142,7 +163,11 @@ const checkBan = async (req, res, next = () => {}) => {
     if (timeLeft <= 0) {
       const cleanups = [];
       if (ipBan) {
+<<<<<<< HEAD
         cleanups.push(banLogs.delete(req.ip));
+=======
+        cleanups.push(banLogs.delete(banIp));
+>>>>>>> upstream/main
       }
       if (userBan) {
         cleanups.push(banLogs.delete(userId));

@@ -45,6 +45,7 @@ RAG Selector labels
 app.kubernetes.io/name: {{ include "rag.fullname" . }}-rag
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
+<<<<<<< HEAD
 
 {{/*
 Create the name of the service account to use
@@ -63,3 +64,5 @@ Create the name of the service account to use
 {{- $key := "password" -}}
 {{- printf "%s" (include "exec" (dict "command" "kubectl" "args" (list "get" "secret" $secret "-o=jsonpath={.data." $key "}"))) | b64enc -}}
 {{- end -}}
+=======
+>>>>>>> upstream/main

@@ -12,6 +12,10 @@ const mockRetainView = jest.fn();
 const mockSetIsPopoverActive = jest.fn();
 const mockAnnouncePolite = jest.fn();
 const mockSetConversation = jest.fn();
+<<<<<<< HEAD
+=======
+const mockMutationHook = jest.fn();
+>>>>>>> upstream/main
 
 jest.mock('@ariakit/react', () => ({
   MenuButton: jest
@@ -29,6 +33,10 @@ jest.mock('@ariakit/react', () => ({
 }));
 jest.mock('~/utils', () => ({
   cn: (...classes: Array<string | false | null | undefined>) => classes.filter(Boolean).join(' '),
+<<<<<<< HEAD
+=======
+  rowActionClasses: () => 'row-action',
+>>>>>>> upstream/main
 }));
 jest.mock('librechat-data-provider', () => ({
   QueryKeys: { messages: 'messages' },
@@ -58,15 +66,39 @@ jest.mock('@librechat/client', () => ({
   buttonVariants: () => '',
   useToastContext: () => ({ showToast: jest.fn() }),
   useMediaQuery: () => false,
+<<<<<<< HEAD
+=======
+  useRemScale: () => 1,
+>>>>>>> upstream/main
 }));
 
 jest.mock('~/data-provider', () => ({
   useDuplicateConversationMutation: () => ({ mutate: jest.fn(), isLoading: false }),
   useAssignConversationToProjectMutation: () => ({ mutate: jest.fn(), isLoading: false }),
+<<<<<<< HEAD
   useDeleteConversationMutation: () => ({ mutate: jest.fn(), isLoading: false }),
   useGetStartupConfig: () => ({ data: { sharedLinksEnabled: false } }),
   useArchiveConvoMutation: () => ({ mutate: mockArchiveMutate, isLoading: false }),
   usePinConversationMutation: () => ({ mutate: jest.fn(), isLoading: false }),
+=======
+  useDeleteConversationMutation: () => {
+    mockMutationHook('delete');
+    return { mutate: jest.fn(), isLoading: false };
+  },
+  useGetStartupConfig: () => ({ data: { sharedLinksEnabled: false } }),
+  useArchiveConvoMutation: () => {
+    mockMutationHook('archive');
+    return { mutate: mockArchiveMutate, isLoading: false };
+  },
+  usePinConversationMutation: () => {
+    mockMutationHook('pin');
+    return { mutate: jest.fn(), isLoading: false };
+  },
+  useMarkConversationUnreadMutation: () => {
+    mockMutationHook('markUnread');
+    return { mutate: jest.fn(), isLoading: false };
+  },
+>>>>>>> upstream/main
 }));
 
 jest.mock('~/hooks', () => ({
@@ -96,7 +128,10 @@ jest.mock('react-router-dom', () => {
   };
 });
 
+<<<<<<< HEAD
 jest.mock('../ProjectButton', () => () => null);
+=======
+>>>>>>> upstream/main
 jest.mock('../DeleteButton', () => () => null);
 jest.mock('../ShareButton', () => () => null);
 
@@ -115,7 +150,11 @@ const renderOptions = (isArchived: boolean, isActiveConvo = false) => {
                 isArchived={isArchived}
                 retainView={mockRetainView}
                 renameHandler={jest.fn()}
+<<<<<<< HEAD
                 isPopoverActive={false}
+=======
+                isPopoverActive={true}
+>>>>>>> upstream/main
                 setIsPopoverActive={mockSetIsPopoverActive}
                 isActiveConvo={active}
               />
@@ -212,3 +251,70 @@ describe('ConvoOptions archive action', () => {
     expect(mockNavigate).not.toHaveBeenCalled();
   });
 });
+<<<<<<< HEAD
+=======
+
+describe('ConvoOptions mount cost', () => {
+  const ROWS = 30;
+  const renderRows = (openIndex: number | null) => {
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    const tree = (open: number | null) => (
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter initialEntries={['/c/conversation-0']}>
+          <Routes>
+            <Route
+              path="/c/:conversationId"
+              element={
+                <>
+                  {Array.from({ length: ROWS }, (_, index) => (
+                    <ConvoOptions
+                      key={index}
+                      conversationId={`conversation-${index}`}
+                      title={`Chat ${index}`}
+                      retainView={mockRetainView}
+                      renameHandler={jest.fn()}
+                      isPopoverActive={index === open}
+                      setIsPopoverActive={mockSetIsPopoverActive}
+                      isActiveConvo={false}
+                    />
+                  ))}
+                </>
+              }
+            />
+          </Routes>
+        </MemoryRouter>
+      </QueryClientProvider>
+    );
+    const view = render(tree(openIndex));
+    return { open: (index: number | null) => view.rerender(tree(index)) };
+  };
+
+  beforeEach(() => {
+    mockMutationHook.mockReset();
+  });
+
+  /** A Pinned section mounts every row at once, and every row the pointer crossed keeps its
+   *  trigger: those triggers must not each carry the menu's mutations and route subscriptions. */
+  it('runs no menu mutations for triggers whose menu was never used', () => {
+    renderRows(null);
+
+    expect(screen.getAllByRole('button', { name: 'com_nav_convo_menu_options' })).toHaveLength(
+      ROWS,
+    );
+    expect(mockMutationHook).not.toHaveBeenCalled();
+  });
+
+  it('mounts the menu actions for the one row whose menu opens, and keeps them after it closes', () => {
+    const rows = renderRows(null);
+
+    act(() => rows.open(4));
+    const hooksWhileOpen = new Set(mockMutationHook.mock.calls.map(([name]) => name));
+    expect(hooksWhileOpen).toEqual(new Set(['delete', 'archive', 'pin', 'markUnread']));
+
+    mockMutationHook.mockReset();
+    act(() => rows.open(null));
+    /* Only the row that was opened renders again, and it keeps its actions mounted. */
+    expect(mockMutationHook).toHaveBeenCalledTimes(4);
+  });
+});
+>>>>>>> upstream/main

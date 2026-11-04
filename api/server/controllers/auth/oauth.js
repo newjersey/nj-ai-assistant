@@ -66,7 +66,11 @@ function createOAuthHandler(redirectUri = domains.client) {
           expiresAt,
         );
         callbackUrl.searchParams.set('code', exchangeCode);
+<<<<<<< HEAD
         logger.info(`[OAuth] Admin panel redirect with exchange code for user: ${req.user.email}`);
+=======
+        logger.info(`[OAuth] Admin panel redirect with exchange code for user: ${req.user._id}`);
+>>>>>>> upstream/main
         return res.redirect(callbackUrl.toString());
       }
 

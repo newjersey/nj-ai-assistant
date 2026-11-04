@@ -9,6 +9,12 @@ export type CodeEnvironment = {
   controlPlaneId: string;
   createdBy: Types.ObjectId;
   ownerSlot?: number;
+<<<<<<< HEAD
+=======
+  setupAttemptId?: string;
+  setupRequestHash?: string;
+  setupDiscardedAt?: Date;
+>>>>>>> upstream/main
   pendingAgentReferences?: Array<{
     reservationId: string;
     expiresAt: Date;

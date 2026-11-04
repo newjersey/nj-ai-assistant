@@ -8,12 +8,43 @@ jest.mock('~/Providers', () => ({
   useFileMapContext: () => ({}),
   useShareContext: () => ({}),
 }));
+<<<<<<< HEAD
 jest.mock(
   '~/components/Chat/Input/Files/FileContainer',
   () =>
     ({ onClick }: { onClick: () => void }) => <button onClick={onClick}>file action</button>,
 );
 jest.mock('../Image', () => () => <div>image preview</div>);
+=======
+jest.mock('@librechat/chat/components', () => ({
+  ...jest.requireActual('@librechat/chat/components'),
+  FileContainer: ({
+    onClick,
+    buttonClassName,
+  }: {
+    onClick: () => void;
+    buttonClassName?: string;
+  }) => (
+    <button className={buttonClassName} onClick={onClick}>
+      file action
+    </button>
+  ),
+}));
+
+jest.mock(
+  '../Image',
+  () =>
+    ({ alignRight, className }: { alignRight?: boolean; className?: string }) => (
+      <div
+        data-testid="image-preview"
+        data-aligned-right={String(alignRight)}
+        className={className}
+      >
+        image preview
+      </div>
+    ),
+);
+>>>>>>> upstream/main
 jest.mock(
   '../FilePreviewDialog',
   () =>
@@ -35,6 +66,20 @@ it('exposes extracted image text without changing ordinary image previews', () =
     />,
   );
   expect(screen.getAllByText('image preview')).toHaveLength(1);
+<<<<<<< HEAD
+=======
+  expect(screen.getByTestId('image-preview')).toHaveAttribute('data-aligned-right', 'true');
+  expect(screen.getByText('file action')).toHaveClass(
+    'border-surface-user-message',
+    'max-w-full',
+    'bg-transparent',
+  );
+  expect(screen.getByTestId('image-preview')).toHaveClass(
+    'border-surface-user-message',
+    'mt-0',
+    'shadow-none',
+  );
+>>>>>>> upstream/main
   fireEvent.click(screen.getByText('file action'));
   expect(screen.getByText('preview: text')).toBeInTheDocument();
 });

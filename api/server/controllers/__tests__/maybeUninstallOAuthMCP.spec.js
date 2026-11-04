@@ -31,6 +31,14 @@ jest.mock('@librechat/data-schemas', () => ({
 jest.mock('@librechat/api', () => {
   return {
     ...jest.requireActual('@librechat/api'),
+<<<<<<< HEAD
+=======
+    createEmailChangeService: jest.fn(() => ({
+      requestEmailChange: jest.fn(),
+      confirmEmailChange: jest.fn(),
+    })),
+    createEmailChangeDeps: jest.fn(() => ({})),
+>>>>>>> upstream/main
     MCPOAuthHandler: {
       revokeOAuthToken: (...args) => mockRevokeOAuthToken(...args),
       deleteFlowAndStateMapping: (...args) => mockDeleteFlowAndStateMapping(...args),
@@ -61,7 +69,15 @@ jest.mock('@librechat/api', () => {
 jest.mock('librechat-data-provider', () => ({
   ...jest.requireActual('librechat-data-provider'),
   Tools: {},
+<<<<<<< HEAD
   Constants: { mcp_delimiter: '::', mcp_prefix: 'mcp_' },
+=======
+  Constants: {
+    ...jest.requireActual('librechat-data-provider').Constants,
+    mcp_delimiter: '::',
+    mcp_prefix: 'mcp_',
+  },
+>>>>>>> upstream/main
   FileSources: {},
   ResourceType: {},
 }));
@@ -152,6 +168,11 @@ jest.mock('~/models', () => ({
   removeUserFromAllGroups: jest.fn(),
   deleteAclEntries: jest.fn(),
   getSoleOwnedResourceIds: jest.fn().mockResolvedValue([]),
+<<<<<<< HEAD
+=======
+  findUserErasableMCPServers: jest.fn().mockResolvedValue([]),
+  deleteMCPServersWithAcl: jest.fn(),
+>>>>>>> upstream/main
 }));
 
 const { maybeUninstallOAuthMCP } = require('~/server/controllers/UserController');
@@ -248,6 +269,21 @@ describe('maybeUninstallOAuthMCP', () => {
     expect(mockDeleteFlowAndStateMapping).toHaveBeenCalledTimes(1);
   });
 
+<<<<<<< HEAD
+=======
+  test('resolves the server past a profile hide, so revocation still reaches it', async () => {
+    setupOAuthServerFound();
+    mockGetClientInfoAndMetadata.mockResolvedValue(null);
+
+    await maybeUninstallOAuthMCP(userId, pluginKey, appConfig);
+
+    expect(mockGetServerConfig).toHaveBeenCalledWith(serverName, userId, undefined, undefined, {
+      includeHidden: true,
+    });
+    expect(mockGetOAuthServers).toHaveBeenCalledWith(userId, { includeHidden: true });
+  });
+
+>>>>>>> upstream/main
   test('scopes metadata-missing cleanup to token records snapshotted before flow cancellation', async () => {
     setupOAuthServerFound();
     mockGetClientInfoAndMetadata.mockResolvedValue(null);

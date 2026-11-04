@@ -650,6 +650,7 @@ describe('GraphApiService', () => {
       expect(result).toEqual([]);
     });
   });
+<<<<<<< HEAD
 
   describe('testGraphApiAccess', () => {
     beforeEach(() => {
@@ -802,4 +803,6 @@ describe('GraphApiService', () => {
       });
     });
   });
+=======
+>>>>>>> upstream/main
 });

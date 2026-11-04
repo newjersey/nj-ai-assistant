@@ -90,11 +90,20 @@ export async function encryptV2(value: string): Promise<string> {
  * Decrypts an encrypted value using AES-CBC with random IV
  * @param encryptedValue - The encrypted string in iv:ciphertext format
  * @returns The decrypted plaintext
+<<<<<<< HEAD
+=======
+ * @throws If the value has no `iv:ciphertext` delimiter. Undelimited input is never returned
+ *   as plaintext; callers holding legacy plaintext rows must detect and handle them explicitly.
+>>>>>>> upstream/main
  */
 export async function decryptV2(encryptedValue: string): Promise<string> {
   const parts = encryptedValue.split(':');
   if (parts.length === 1) {
+<<<<<<< HEAD
     return parts[0];
+=======
+    throw new Error('Invalid encrypted value: expected iv:ciphertext format');
+>>>>>>> upstream/main
   }
   const gen_iv = Buffer.from(parts.shift() ?? '', 'hex');
   const encrypted = parts.join(':');
@@ -160,6 +169,7 @@ export async function getRandomValues(length: number): Promise<string> {
   webcrypto.getRandomValues(randomValues);
   return Buffer.from(randomValues).toString('hex');
 }
+<<<<<<< HEAD
 
 /**
  * Computes SHA-256 hash for the given input.
@@ -173,3 +183,5 @@ export async function hashBackupCode(input: string): Promise<string> {
   const hashArray = Array.from(new Uint8Array(hashBuffer));
   return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
 }
+=======
+>>>>>>> upstream/main

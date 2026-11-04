@@ -1,10 +1,17 @@
 import { Types } from 'mongoose';
 import { logger } from '@librechat/data-schemas';
+<<<<<<< HEAD
 
 import type { IUser } from '@librechat/data-schemas';
 import type { FilterQuery } from 'mongoose';
 import type { AdminExchangeResponse } from '~/auth/exchange';
 
+=======
+import type { IUser } from '@librechat/data-schemas';
+import type { FilterQuery } from 'mongoose';
+import type { AdminExchangeResponse } from '~/auth/exchange';
+import { SERVICE_REQUEST_TIMEOUT_MS } from '~/utils/timeouts';
+>>>>>>> upstream/main
 import { serializeUserForExchange } from '~/auth/exchange';
 import { AdminRefreshError } from '~/auth/refresh';
 
@@ -69,6 +76,10 @@ async function resolveSubFromUserinfo(accessToken: string): Promise<string | und
   try {
     const response = await fetch(GOOGLE_USERINFO_ENDPOINT, {
       headers: { Authorization: `Bearer ${accessToken}` },
+<<<<<<< HEAD
+=======
+      signal: AbortSignal.timeout(SERVICE_REQUEST_TIMEOUT_MS),
+>>>>>>> upstream/main
     });
     if (!response.ok) {
       logger.warn('[admin/oauth/refresh] userinfo fallback returned non-OK', {
@@ -100,6 +111,10 @@ async function fetchGoogleTokenset(
   try {
     response = await fetch(GOOGLE_TOKEN_ENDPOINT, {
       method: 'POST',
+<<<<<<< HEAD
+=======
+      signal: AbortSignal.timeout(SERVICE_REQUEST_TIMEOUT_MS),
+>>>>>>> upstream/main
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({
         client_id: options.clientId,
@@ -218,7 +233,11 @@ async function resolveAdminUser(
   });
   if (matches.length > 1) {
     logger.error('[admin/oauth/refresh] ambiguous googleId match', {
+<<<<<<< HEAD
       googleId,
+=======
+      matchCount: matches.length,
+>>>>>>> upstream/main
       tenantId: options.tenantId,
     });
     throw new AdminRefreshError('USER_ID_MISMATCH', 401, 'Ambiguous identity');

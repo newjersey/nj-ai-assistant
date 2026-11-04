@@ -1,5 +1,6 @@
 const { ATTACHMENT_ONLY_TEXT } = require('@librechat/api');
 const { EModelEndpoint, ContentTypes } = require('librechat-data-provider');
+<<<<<<< HEAD
 const {
   AIMessage,
   ToolMessage,
@@ -12,6 +13,9 @@ const {
  * being resent, so the turn stays valid without inventing content it never had.
  */
 const EMPTY_MESSAGE_PLACEHOLDER = '(no text)';
+=======
+const { AIMessage, HumanMessage, SystemMessage } = require('@librechat/agents/langchain/messages');
+>>>>>>> upstream/main
 
 /**
  * Formats a message to OpenAI Vision API payload format.
@@ -128,6 +132,7 @@ const formatMessage = ({ message, userName, assistantName, endpoint, langChain =
   }
 };
 
+<<<<<<< HEAD
 /**
  * Formats an array of messages for LangChain.
  *
@@ -371,4 +376,8 @@ module.exports = {
   formatFromLangChain,
   formatAgentMessages,
   formatLangChainMessages,
+=======
+module.exports = {
+  formatMessage,
+>>>>>>> upstream/main
 };

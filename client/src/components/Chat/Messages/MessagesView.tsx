@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { useState } from 'react';
 import { useAtomValue } from 'jotai';
 import { useRecoilValue } from 'recoil';
@@ -12,20 +13,67 @@ import { steerOverlayHeightFamily } from '~/store/steer';
 import { autoScrollAtom } from '~/store/autoScroll';
 import { FLAT_THREAD, ThreadList } from './Thread';
 import { fontSizeAtom } from '~/store/fontSize';
+=======
+import { MessagesView as MessagesList } from '@librechat/chat/components';
+import type { MessagesThreadProps } from '@librechat/chat/components';
+import type { TMessage } from 'librechat-data-provider';
+import { MessagePartsHostProvider, appMessagePartsHost } from '~/Providers/MessagePartsHostContext';
+import { MessagesViewProvider, useFileMapContext } from '~/Providers';
+import { useChatSurface } from '~/components/Chat/Subagents/surface';
+import useThreadRows from '~/hooks/Messages/useThreadRows';
+import PendingSteers from './Content/Parts/PendingSteers';
+import { FLAT_THREAD, ThreadList } from './Thread';
+>>>>>>> upstream/main
 import MultiMessage from './MultiMessage';
 import ScrollButton from './ScrollButton';
 import PendingTurn from './PendingTurn';
 import MessageNav from './MessageNav';
+<<<<<<< HEAD
 import { cn } from '~/utils';
 import store from '~/store';
 
 function MessagesViewContent({
   messagesTree: _messagesTree,
+=======
+
+/** The flat thread renderer by default, the recursive one when the flag turns it off. */
+function Thread({
+  messagesTree,
+  messages,
+  conversationId,
+  currentEditId,
+  setCurrentEditId,
+}: MessagesThreadProps) {
+  const fileMap = useFileMapContext();
+  const threadRows = useThreadRows(FLAT_THREAD ? messages : null, conversationId, fileMap);
+  if (FLAT_THREAD && threadRows) {
+    return (
+      <ThreadList
+        rows={threadRows}
+        setCurrentEditId={setCurrentEditId}
+        currentEditId={currentEditId ?? null}
+      />
+    );
+  }
+  return (
+    <MultiMessage
+      messagesTree={messagesTree}
+      messageId={conversationId ?? null}
+      setCurrentEditId={setCurrentEditId}
+      currentEditId={currentEditId ?? null}
+    />
+  );
+}
+
+function MessagesViewContent({
+  messagesTree,
+>>>>>>> upstream/main
   messages,
 }: {
   messagesTree?: TMessage[] | null;
   messages?: TMessage[] | null;
 }) {
+<<<<<<< HEAD
   const localize = useLocalize();
   const fontSize = useAtomValue(fontSizeAtom);
   const { screenshotTargetRef } = useScreenshot();
@@ -158,6 +206,27 @@ function MessagesViewContent({
         </div>
       </div>
     </>
+=======
+  const { showScrollButton, maximizeChatSpace } = useChatSurface();
+  return (
+    <MessagesList
+      messagesTree={messagesTree}
+      messages={messages}
+      showScrollButton={showScrollButton}
+      maximizeChatSpace={maximizeChatSpace}
+      renderThread={(props) => <Thread {...props} />}
+      renderPendingTurn={(props) => <PendingTurn {...props} />}
+      renderPendingSteers={(props) => <PendingSteers {...props} />}
+      renderScrollButton={(props) => <ScrollButton {...props} />}
+      renderNav={({ conversationId, scrollableRef }) => (
+        <MessageNav
+          key={conversationId}
+          conversationId={conversationId}
+          scrollableRef={scrollableRef}
+        />
+      )}
+    />
+>>>>>>> upstream/main
   );
 }
 
@@ -170,7 +239,13 @@ export default function MessagesView({
 }) {
   return (
     <MessagesViewProvider>
+<<<<<<< HEAD
       <MessagesViewContent messagesTree={messagesTree} messages={messages} />
+=======
+      <MessagePartsHostProvider host={appMessagePartsHost}>
+        <MessagesViewContent messagesTree={messagesTree} messages={messages} />
+      </MessagePartsHostProvider>
+>>>>>>> upstream/main
     </MessagesViewProvider>
   );
 }

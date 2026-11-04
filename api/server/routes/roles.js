@@ -13,8 +13,14 @@ const {
   remoteAgentsPermissionsSchema,
   skillPermissionsSchema,
 } = require('librechat-data-provider');
+<<<<<<< HEAD
 const { hasCapability, requireCapability } = require('~/server/middleware/roles/capabilities');
 const { updateRoleByName, getRoleByName } = require('~/models');
+=======
+const { createRolePermissionsUpdateHandler } = require('@librechat/api');
+const { hasCapability, requireCapability } = require('~/server/middleware/roles/capabilities');
+const { updateRoleByName, getRoleByName, recordAuditEntry } = require('~/models');
+>>>>>>> upstream/main
 const { requireJwtAuth } = require('~/server/middleware');
 
 const router = express.Router();
@@ -73,6 +79,7 @@ const permissionConfigs = {
  * @param {string} permissionKey - The key from permissionConfigs
  * @returns {Function} Express route handler
  */
+<<<<<<< HEAD
 const createPermissionUpdateHandler = (permissionKey) => {
   const config = permissionConfigs[permissionKey];
 
@@ -108,6 +115,18 @@ const createPermissionUpdateHandler = (permissionKey) => {
     }
   };
 };
+=======
+const createPermissionUpdateHandler = (permissionKey) =>
+  createRolePermissionsUpdateHandler(
+    {
+      getRoleByName,
+      updateRoleByName,
+      recordAuditEntry,
+      auditFailClosed: process.env.AUDIT_LOG_FAIL_CLOSED === 'true',
+    },
+    permissionConfigs[permissionKey],
+  );
+>>>>>>> upstream/main
 
 /**
  * GET /api/roles/:roleName

@@ -7,12 +7,20 @@ import {
   configSchema,
 } from 'librechat-data-provider';
 import type { Agent, CodeEnvRef, TFile } from 'librechat-data-provider';
+<<<<<<< HEAD
+=======
+import type { FileProvisionCommit } from '@librechat/data-schemas';
+>>>>>>> upstream/main
 import type { SubagentExecutionContext } from '@librechat/agents';
 import type { ProvisionCallbackDeps } from '~/files/provision/callback';
 import type { RunFileSessionDeps } from './session';
 import type { RunFileToolContext } from './host';
 import type { ServerRequest } from '~/types';
 import { createRunFileHost, resolveRunFileCodeExecutionContext } from './host';
+<<<<<<< HEAD
+=======
+import { createFileProvisionRecovery } from '../../files/operations';
+>>>>>>> upstream/main
 import * as sessionModule from './session';
 
 jest.mock('@librechat/data-schemas', () => ({
@@ -68,7 +76,18 @@ function deferred<T>() {
   return { promise, resolve, reject };
 }
 
+<<<<<<< HEAD
 function harness(options: { inputs?: TFile[]; setup?: TFile[] } = {}) {
+=======
+function harness(
+  options: {
+    inputs?: TFile[];
+    setup?: TFile[];
+    hasEntityEmbeddings?: jest.Mock;
+    adoptLegacySearchEmbeddings?: jest.Mock;
+  } = {},
+) {
+>>>>>>> upstream/main
   const input = options.inputs ?? [file('input')];
   const setup = options.setup ?? [file('worker-setup', { context: FileContext.agents })];
   const parsed = configSchema.parse({
@@ -151,7 +170,13 @@ function harness(options: { inputs?: TFile[]; setup?: TFile[] } = {}) {
       id: entity_id ?? 'user',
       file_id: `remote-${candidate.file_id}`,
       storage_session_id: `storage-${entity_id ?? 'user'}`,
+<<<<<<< HEAD
       sandboxFilename,
+=======
+      executionProfile: route?.executionProfile ?? 'default',
+      executionRouteKey: routeKey,
+      sandboxFilename: sandboxFilename ?? candidate.filename,
+>>>>>>> upstream/main
     };
     return {
       referenceSet: { codeEnvRefs: { [routeKey]: ref } },
@@ -169,8 +194,23 @@ function harness(options: { inputs?: TFile[]; setup?: TFile[] } = {}) {
     embedded: true,
     fileUpdate: { file_id: candidate.file_id, embedded: true },
   }));
+<<<<<<< HEAD
   const updateCodeEnvRef = jest.fn(async () => undefined);
   const addEmbeddedEntity = jest.fn(async () => undefined);
+=======
+  const updateCodeEnvRef = jest.fn(
+    async (_update: Parameters<ProvisionCallbackDeps['updateCodeEnvRef']>[0]): Promise<unknown> =>
+      undefined,
+  );
+  const addEmbeddedEntity = jest.fn(
+    async (_update: Parameters<ProvisionCallbackDeps['addEmbeddedEntity']>[0]): Promise<unknown> =>
+      undefined,
+  );
+  const updateFile = jest.fn(
+    async (_update: Parameters<ProvisionCallbackDeps['updateFile']>[0]): Promise<unknown> =>
+      undefined,
+  );
+>>>>>>> upstream/main
   const emit = jest.fn(async () => undefined);
   const encodeMessages = jest.fn(async () => []);
   const spy = jest.spyOn(sessionModule, 'createRunFileSession');
@@ -193,11 +233,36 @@ function harness(options: { inputs?: TFile[]; setup?: TFile[] } = {}) {
     validateMessages: jest.fn(),
     encodeMessages,
     provisioning: {
+<<<<<<< HEAD
       provisionToCodeEnv,
       provisionToVectorDB,
       updateCodeEnvRef,
       updateFile: jest.fn(async () => undefined),
       addEmbeddedEntity,
+=======
+      fileStorage: {
+        recovery: createFileProvisionRecovery(),
+        acquireFileProvision: jest.fn(async () => true),
+        releaseFileProvision: jest.fn(async () => true),
+        commitFileProvision: jest.fn(
+          async ({ claim, code, entityId, embedded }: FileProvisionCommit) => {
+            let result: unknown;
+            if (code) result = await updateCodeEnvRef({ file_id: claim.file_id, ...code });
+            else if (entityId != null)
+              result = await addEmbeddedEntity({ file_id: claim.file_id, entityId });
+            else result = await updateFile({ file_id: claim.file_id, embedded });
+            return result !== null && result !== false;
+          },
+        ),
+      },
+      provisionToCodeEnv,
+      provisionToVectorDB,
+      updateCodeEnvRef,
+      updateFile,
+      addEmbeddedEntity,
+      hasEntityEmbeddings: options.hasEntityEmbeddings,
+      adoptLegacySearchEmbeddings: options.adoptLegacySearchEmbeddings,
+>>>>>>> upstream/main
     },
   });
   const deps = spy.mock.calls[spy.mock.calls.length - 1][0];
@@ -387,6 +452,71 @@ describe('run file execution host', () => {
     ).toEqual(['historical']);
   });
 
+<<<<<<< HEAD
+=======
+  it('confirms an unrecorded setup embedding instead of embedding it again', async () => {
+    /* A worker's File Search setup file embedded before namespaces were tracked already has
+     * vectors in the worker's namespace; a shared-file run must not store a second copy. */
+    const hasEntityEmbeddings = jest.fn().mockResolvedValue(true);
+    const adoptLegacySearchEmbeddings = jest.fn().mockResolvedValue(['worker-setup']);
+    const h = harness({
+      setup: [file('worker-setup', { context: FileContext.agents, embedded: true })],
+      hasEntityEmbeddings,
+      adoptLegacySearchEmbeddings,
+    });
+    await h.prepare();
+    await h.host.provision(['file_search'], 'worker', h.signal, identity());
+
+    expect(hasEntityEmbeddings).toHaveBeenCalledWith(
+      expect.objectContaining({ file_id: 'worker-setup', entity_id: 'worker' }),
+    );
+    expect(h.provisionToVectorDB.mock.calls.map(([params]) => params.file.file_id)).not.toContain(
+      'worker-setup',
+    );
+  });
+
+  it('retains only admitted advertised paths when preparing isolated child queues', async () => {
+    const current = file('input', { filename: 'data.csv' });
+    const h = harness({ inputs: [current] });
+    const source = h.contexts.get('worker')!;
+    source.provisionState = {
+      codeEnvFiles: [current],
+      vectorDBFiles: [],
+      aliveFileIds: new Set(),
+      agentScopedFileIds: new Set(['worker-setup']),
+      codeEnvDestinations: new Map([
+        ['input', 'data-shared.csv'],
+        ['worker-setup', 'setup-advertised.csv'],
+        ['historical', 'private-history.csv'],
+      ]),
+    };
+    const executions = [identity('first'), identity('second')];
+    await Promise.all(executions.map((execution) => h.prepare(execution)));
+    for (const execution of executions) {
+      const destinations = h.host.getContext('worker', execution)?.provisionState
+        ?.codeEnvDestinations;
+      expect(destinations).toEqual(
+        new Map([
+          ['input', 'data-shared.csv'],
+          ['worker-setup', 'setup-advertised.csv'],
+        ]),
+      );
+      expect(destinations).not.toBe(source.provisionState.codeEnvDestinations);
+      await h.host.provision([Constants.EXECUTE_CODE], 'worker', h.signal, execution);
+    }
+    expect(h.provisionToCodeEnv).toHaveBeenCalledTimes(4);
+    for (const [params] of h.provisionToCodeEnv.mock.calls) {
+      expect(params.sandboxFilename).toBe(
+        source.provisionState.codeEnvDestinations?.get(params.file.file_id),
+      );
+    }
+    expect(source.provisionState.codeEnvDestinations?.has('historical')).toBe(true);
+    expect(
+      h.host.getContext('worker', executions[0])?.provisionState?.codeEnvDestinations,
+    ).not.toBe(h.host.getContext('worker', executions[1])?.provisionState?.codeEnvDestinations);
+  });
+
+>>>>>>> upstream/main
   it('isolates concurrent executions of the same agent without broadening storage grants', async () => {
     const h = harness();
     const first = identity('first');
@@ -607,7 +737,20 @@ describe('run file execution host', () => {
     const h = harness({ setup: [] });
     const first = identity('first');
     const second = identity('second');
+<<<<<<< HEAD
     await Promise.all([h.prepare(first), h.prepare(second)]);
+=======
+    const same = identity('same');
+    await Promise.all([h.prepare(first), h.prepare(second), h.prepare(same)]);
+    const secondContext = h.host.getContext('worker', second)!;
+    await h.deps.prepareAgent({
+      actor: h.host.session.actorFor('worker', second),
+      files: [file('independent')],
+      sessionKey: secondContext.codeExecutionContext!.codeSessionKey,
+      revision: 100,
+      signal: h.signal,
+    });
+>>>>>>> upstream/main
     const entered = deferred<void>();
     const finish = deferred<void>();
     h.provisionToCodeEnv.mockImplementationOnce(async (params) => {
@@ -630,14 +773,54 @@ describe('run file execution host', () => {
       .then(() => {
         refreshed = true;
       });
+<<<<<<< HEAD
     await h.host.provision([Constants.EXECUTE_CODE], 'worker', h.signal, second);
     expect(refreshed).toBe(false);
     finish.resolve();
     await Promise.all([upload, refresh]);
+=======
+    let sharedSettled = false;
+    const shared = h.host
+      .provisionPrepared([Constants.EXECUTE_CODE], 'worker', h.signal, same)
+      .then((result) => {
+        sharedSettled = true;
+        return result;
+      });
+    try {
+      const independent = await h.host.provisionPrepared(
+        [Constants.EXECUTE_CODE],
+        'worker',
+        h.signal,
+        second,
+      );
+      expect(independent?.map((entry) => entry.id)).toEqual(['remote-independent']);
+      expect(refreshed).toBe(false);
+      expect(sharedSettled).toBe(false);
+    } finally {
+      finish.resolve();
+      await Promise.all([upload, refresh, shared]);
+    }
+    expect((await shared)?.map((entry) => entry.id)).toEqual(['remote-input']);
+    expect(
+      h.provisionToCodeEnv.mock.calls.filter(([params]) => params.file.file_id === 'input'),
+    ).toHaveLength(1);
+>>>>>>> upstream/main
     expect(h.host.getContext('worker', first)).toBe(before);
     expect(before.tool_resources?.execute_code?.files?.map((entry) => entry.file_id)).toEqual([
       'input',
     ]);
+<<<<<<< HEAD
+=======
+    const provisionedInput = before.tool_resources?.execute_code?.files?.find(
+      (entry) => entry.file_id === 'input',
+    );
+    expect(provisionedInput?.metadata?.codeEnvRefs?.['managed-worker']).toMatchObject({
+      file_id: 'remote-input',
+      executionProfile: 'stateful',
+      executionRouteKey: 'managed-worker',
+      sandboxFilename: 'input.csv',
+    });
+>>>>>>> upstream/main
     expect(before.provisionState?.codeEnvFiles.map((entry) => entry.file_id)).toEqual(['new']);
   });
 

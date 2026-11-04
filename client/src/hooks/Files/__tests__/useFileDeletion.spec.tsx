@@ -41,8 +41,14 @@ jest.mock('../useSetFilesToDelete', () => ({
   default: () => jest.fn(),
 }));
 
+<<<<<<< HEAD
 jest.mock('~/components/Chat/Input/Files/FileContainer', () => {
   return function MockFileContainer({
+=======
+jest.mock('@librechat/chat/components', () => ({
+  ...jest.requireActual('@librechat/chat/components'),
+  FileContainer: function MockFileContainer({
+>>>>>>> upstream/main
     file,
     onDelete,
   }: {
@@ -50,6 +56,7 @@ jest.mock('~/components/Chat/Input/Files/FileContainer', () => {
     onDelete: () => void;
   }) {
     return <button data-testid={`del-${file.file_id}`} onClick={onDelete} />;
+<<<<<<< HEAD
   };
 });
 
@@ -58,6 +65,13 @@ jest.mock('~/components/Chat/Input/Files/Image', () => {
     return null;
   };
 });
+=======
+  },
+  AttachmentImage: function MockImage() {
+    return null;
+  },
+}));
+>>>>>>> upstream/main
 
 const mockClearUploadRecovery = jest.requireMock('../useFileHandling').clearUploadRecovery;
 

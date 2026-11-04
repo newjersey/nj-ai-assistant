@@ -57,6 +57,7 @@ export function createMemoryMethods(mongoose: typeof import('mongoose')): {
       }
 
       const MemoryEntry = mongoose.models.MemoryEntry;
+<<<<<<< HEAD
       const existingMemory = await MemoryEntry.findOne({
         userId,
         key,
@@ -75,6 +76,25 @@ export function createMemoryMethods(mongoose: typeof import('mongoose')): {
         updated_at: new Date(),
       });
 
+=======
+      /** Insert-only upsert: one round trip decides existence, unlike a find-then-create. */
+      const result = await MemoryEntry.updateOne(
+        { userId, key, ...partitionFilter(agentId) },
+        {
+          $setOnInsert: {
+            value,
+            tokenCount,
+            ...(agentId ? { agentId } : {}),
+            updated_at: new Date(),
+          },
+        },
+        { upsert: true },
+      );
+      if (!result.upsertedCount) {
+        throw new Error('Memory with this key already exists');
+      }
+
+>>>>>>> upstream/main
       return { ok: true };
     } catch (error) {
       throw new Error(
@@ -311,11 +331,22 @@ export function createMemoryMethods(mongoose: typeof import('mongoose')): {
       return { withKeys, withoutKeys, totalTokens, tokenCountsByKey };
     } catch (error) {
       logger.error('Failed to get formatted memories:', error);
+<<<<<<< HEAD
       return {
         withKeys: '',
         withoutKeys: '',
         totalTokens: 0,
         tokenCountsByKey: new Map<string, number>(),
+=======
+      /** Keep the current error handling without presenting a read failure
+       *  as an eligible, empty memory partition to prompt consumers. */
+      return {
+        withKeys: undefined,
+        withoutKeys: undefined,
+        totalTokens: 0,
+        tokenCountsByKey: new Map<string, number>(),
+        readFailed: true,
+>>>>>>> upstream/main
       };
     }
   }

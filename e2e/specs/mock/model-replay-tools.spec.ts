@@ -58,6 +58,7 @@ const TOOL_PROMPT =
 
 /** Enable the ephemeral MCP server whose tools this turn calls. */
 async function selectEphemeralMCP(page: Page) {
+<<<<<<< HEAD
   await page.getByRole('button', { name: 'MCP Servers', exact: true }).click();
   const serverItem = page.getByRole('menuitemcheckbox', { name: new RegExp(MCP_SERVER_TITLE) });
   await expect(serverItem).toBeVisible();
@@ -65,6 +66,17 @@ async function selectEphemeralMCP(page: Page) {
   await expect(serverItem).toHaveAttribute('aria-checked', 'true');
   await page.keyboard.press('Escape');
   await expect(page.getByRole('button', { name: new RegExp(MCP_SERVER_TITLE) })).toBeVisible();
+=======
+  await page.getByRole('button', { name: 'Attach and tools' }).click();
+  const serverItem = page
+    .getByRole('dialog', { name: 'Attach and tools' })
+    .getByRole('button', { name: new RegExp(`^${MCP_SERVER_TITLE}\\b`) });
+  await expect(serverItem).toBeVisible();
+  await serverItem.click();
+  await expect(serverItem).toHaveAttribute('aria-pressed', 'true');
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('listitem', { name: MCP_SERVER_TITLE, exact: true })).toBeVisible();
+>>>>>>> upstream/main
 }
 
 test.describe('recorded tool-call fixture replay', () => {

@@ -10,6 +10,10 @@ import {
 } from 'librechat-data-provider';
 import type { UseMutationResult } from '@tanstack/react-query';
 import type * as t from 'librechat-data-provider';
+<<<<<<< HEAD
+=======
+import { invalidateRecentFiles } from '~/utils/files';
+>>>>>>> upstream/main
 import { useGetStartupConfig } from '../Endpoints';
 import { useLocalize } from '~/hooks';
 
@@ -58,6 +62,10 @@ export const useUploadFileMutation = (
         file,
         ...(_files ?? []),
       ]);
+<<<<<<< HEAD
+=======
+      invalidateRecentFiles(queryClient);
+>>>>>>> upstream/main
 
       const endpoint = formData.get('endpoint');
       const message_file = formData.get('message_file');
@@ -211,6 +219,10 @@ export const useDeleteFilesMutation = (
           (file) => !requested.has(file.file_id) || failed.has(file.file_id),
         );
       });
+<<<<<<< HEAD
+=======
+      invalidateRecentFiles(queryClient);
+>>>>>>> upstream/main
 
       /** A storage failure still answers 200, so reporting success off the status alone would
        * tell the user a file is gone while it is sitting on disk and back in their list. */

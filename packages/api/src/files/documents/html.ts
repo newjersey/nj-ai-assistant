@@ -1007,6 +1007,7 @@ function renderPptxSlidesHtml(slides: PptxSlide[]): string {
   return wrapAsDocument(renderPptxSlidesBody(slides), PPTX_SLIDE_LIST_CSS);
 }
 
+<<<<<<< HEAD
 /**
  * Convert a `.pptx` buffer to a slide-list HTML document — text-only
  * preview rendering each slide as a card (slide number, title, body
@@ -1028,6 +1029,8 @@ export async function pptxToSlideListHtml(buffer: Buffer): Promise<string> {
   return renderPptxSlidesHtml(slides);
 }
 
+=======
+>>>>>>> upstream/main
 /* =============================================================================
  * PPTX CDN renderer (high-fidelity path)
  *
@@ -1460,8 +1463,12 @@ export async function pptxToHtml(buffer: Buffer): Promise<string> {
 /**
  * Slide-list path that skips its own `assertSafeZipSize` call — used
  * by `pptxToHtml` after the dispatcher has already validated the
+<<<<<<< HEAD
  * buffer. `pptxToSlideListHtml` (public, validating) stays the entry
  * point for tests and direct callers.
+=======
+ * buffer.
+>>>>>>> upstream/main
  */
 async function pptxToSlideListHtmlInternal(buffer: Buffer): Promise<string> {
   const rawSlides = await extractPptxSlideXml(buffer);

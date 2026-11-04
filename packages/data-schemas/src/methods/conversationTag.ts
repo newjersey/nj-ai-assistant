@@ -411,7 +411,11 @@ export function createConversationTagMethods(mongoose: typeof import('mongoose')
       const ConversationTag = mongoose.models.ConversationTag as Model<IConversationTag>;
       const Conversation = mongoose.models.Conversation;
 
+<<<<<<< HEAD
       const conversation = await Conversation.findOne({ user, conversationId }).lean();
+=======
+      const conversation = await Conversation.findOne({ user, conversationId }, 'tags').lean();
+>>>>>>> upstream/main
       if (!conversation) {
         throw new Error('Conversation not found');
       }
@@ -455,6 +459,7 @@ export function createConversationTagMethods(mongoose: typeof import('mongoose')
         await tenantSafeBulkWrite(ConversationTag, bulkOps);
       }
 
+<<<<<<< HEAD
       const updatedConversation = (
         await Conversation.findOneAndUpdate(
           { user, conversationId },
@@ -464,6 +469,15 @@ export function createConversationTagMethods(mongoose: typeof import('mongoose')
       ).toObject();
 
       return updatedConversation.tags;
+=======
+      const updatedConversation = await Conversation.findOneAndUpdate(
+        { user, conversationId },
+        { $set: { tags: [...newTags] } },
+        { new: true, projection: { tags: 1 } },
+      ).lean<{ tags: string[] }>();
+
+      return (updatedConversation as { tags: string[] }).tags;
+>>>>>>> upstream/main
     } catch (error) {
       logger.error('[updateTagsForConversation] Error updating tags', error);
       throw new Error('Error updating tags for conversation');

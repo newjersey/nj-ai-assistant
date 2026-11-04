@@ -8,6 +8,25 @@ import remarkDirective from 'remark-directive';
 import type { PluggableList } from 'unified';
 import type { ElementType } from 'react';
 import {
+<<<<<<< HEAD
+=======
+  code,
+  a,
+  p,
+  img,
+  table,
+  ul,
+  ol,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  blockquote,
+} from './MarkdownComponents';
+import {
+>>>>>>> upstream/main
   mcpUIResourcePlugin,
   MCPUIResource,
   MCPUIResourceCarousel,
@@ -15,7 +34,10 @@ import {
 import { Citation, CompositeCitation, HighlightedText } from '~/components/Web/Citation';
 import { langSubset, remarkApproxTilde, remarkSingleDollarMath } from '~/utils';
 import { Artifact, artifactPlugin } from '~/components/Artifacts/Artifact';
+<<<<<<< HEAD
 import { code, a, p, img, table } from './MarkdownComponents';
+=======
+>>>>>>> upstream/main
 import { unicodeCitation } from '~/components/Web';
 
 /**
@@ -59,6 +81,18 @@ export const getMarkdownComponents = (): { [nodeType: string]: ElementType } => 
   p,
   img,
   table,
+<<<<<<< HEAD
+=======
+  ul,
+  ol,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  blockquote,
+>>>>>>> upstream/main
   artifact: Artifact,
   citation: Citation,
   'highlighted-text': HighlightedText,

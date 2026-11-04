@@ -1,7 +1,14 @@
 import { useCallback } from 'react';
+<<<<<<< HEAD
 import { useSetRecoilState } from 'recoil';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
+=======
+import { useNavigate } from 'react-router-dom';
+import { useSetAtom, getDefaultStore } from 'jotai';
+import { submissionByIndex } from '@librechat/chat/react';
+import { useQueryClient, isCancelledError } from '@tanstack/react-query';
+>>>>>>> upstream/main
 import {
   QueryKeys,
   Constants,
@@ -25,6 +32,10 @@ import {
   updateConvoInAllQueries,
   logger,
 } from '~/utils';
+<<<<<<< HEAD
+=======
+import { navigationGenerationAtom } from '~/store/navigation';
+>>>>>>> upstream/main
 import { useApplyModelSpecEffects } from '~/hooks/Agents';
 import { startupConfigKey } from '~/data-provider';
 import store from '~/store';
@@ -65,11 +76,29 @@ const currentRoute = () => window.location.pathname + window.location.search;
  * subsumes the other — the generation says "a newer intent replaced this one",
  * the route says "the user left by some means this hook never saw".
  *
+<<<<<<< HEAD
  * Module-scoped for the same reason the route is read from the browser: every
  * sidebar row mounts its own `useNavigateToConvo`, so a ref would be private
  * to the row that was clicked and blind to the click that superseded it.
  */
 let navigationGeneration = 0;
+=======
+ * Lives in `navigationGenerationAtom` (`~/store/navigation`), not a hook-local
+ * ref, for the same reason the route is read from the browser: every sidebar
+ * row mounts its own `useNavigateToConvo`, so a ref would be private to the
+ * row that was clicked and blind to the click that superseded it. The same
+ * atom lets a component outside this hook — a prompt card or the slash
+ * command, cancelling its own pending Langfuse resolve — treat a navigation
+ * that has only just started as supersession too, before the target
+ * conversation commits and its own identity changes.
+ */
+const bumpNavigationGeneration = () => {
+  const defaultStore = getDefaultStore();
+  const generation = defaultStore.get(navigationGenerationAtom) + 1;
+  defaultStore.set(navigationGenerationAtom, generation);
+  return generation;
+};
+>>>>>>> upstream/main
 
 /**
  * Records that the user has asked for a different conversation, so a first
@@ -87,7 +116,11 @@ let navigationGeneration = 0;
  * is not.
  */
 export const supersedeNavigation = () => {
+<<<<<<< HEAD
   navigationGeneration++;
+=======
+  bumpNavigationGeneration();
+>>>>>>> upstream/main
 };
 
 const useNavigateToConvo = (index = 0) => {
@@ -95,7 +128,11 @@ const useNavigateToConvo = (index = 0) => {
   const queryClient = useQueryClient();
   const clearAllConversations = store.useClearConvoState();
   const applyModelSpecEffects = useApplyModelSpecEffects();
+<<<<<<< HEAD
   const setSubmission = useSetRecoilState(store.submissionByIndex(index));
+=======
+  const setSubmission = useSetAtom(submissionByIndex(index));
+>>>>>>> upstream/main
   const { hasSetConversation, setConversation: setConvo } = store.useSetConversationAtom(index);
 
   const setConversation = useCallback(
@@ -167,6 +204,12 @@ const useNavigateToConvo = (index = 0) => {
         spec: data.spec,
       }));
     } catch (error) {
+<<<<<<< HEAD
+=======
+      if (isCancelledError(error)) {
+        return;
+      }
+>>>>>>> upstream/main
       logger.error('conversation', 'Error refreshing conversation record on navigation', error);
       /** Only a conversation that is confirmed GONE invalidates what is on
        * screen. The messages query is already mounted by now, so dropping its
@@ -205,6 +248,7 @@ const useNavigateToConvo = (index = 0) => {
       record = await fetchConversationRecord(conversationId);
       logger.log('conversation', 'Fetched fresh conversation data', record);
     } catch (error) {
+<<<<<<< HEAD
       logger.error('conversation', 'Error fetching conversation data on navigation', error);
       /** Nothing is mounted for this conversation yet, so clearing a warm
        * cache here still predates the route change: the target mounts a fresh
@@ -212,6 +256,27 @@ const useNavigateToConvo = (index = 0) => {
       queryClient.removeQueries([QueryKeys.messages, conversationId]);
     }
     if (generation !== navigationGeneration || currentRoute() !== routeAtStart) {
+=======
+      if (isCancelledError(error)) {
+        const committed = queryClient.getQueryData<TConversation>([
+          QueryKeys.conversation,
+          conversationId,
+        ]);
+        if (!committed) {
+          return;
+        }
+        record = committed;
+      } else {
+        logger.error('conversation', 'Error fetching conversation data on navigation', error);
+        /** Nothing is mounted for this conversation yet, so clearing a warm
+         * cache here still predates the route change: the target mounts a fresh
+         * query rather than rendering contents that may no longer exist. */
+        queryClient.removeQueries([QueryKeys.messages, conversationId]);
+      }
+    }
+    const isSuperseded = generation !== getDefaultStore().get(navigationGenerationAtom);
+    if (isSuperseded || currentRoute() !== routeAtStart) {
+>>>>>>> upstream/main
       logger.log('conversation', 'Discarding superseded navigation', conversationId);
       return;
     }
@@ -234,7 +299,11 @@ const useNavigateToConvo = (index = 0) => {
     hasSetConversation.current = true;
     /** Claim this click's place in the order before any await, so a request
      * still in flight for an earlier one cannot land on top of it. */
+<<<<<<< HEAD
     const generation = ++navigationGeneration;
+=======
+    const generation = bumpNavigationGeneration();
+>>>>>>> upstream/main
     setSubmission(null);
 
     let convo = { ...conversation };

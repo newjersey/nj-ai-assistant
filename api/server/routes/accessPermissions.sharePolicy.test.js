@@ -9,6 +9,13 @@ jest.mock('~/server/middleware', () => ({
   checkBan: (_req, _res, next) => next(),
   uaParser: (_req, _res, next) => next(),
   canAccessResource: jest.fn(() => (_req, _res, next) => next()),
+<<<<<<< HEAD
+=======
+  configMiddleware: (req, _res, next) => {
+    req.config = { config: { permissions: { leaseTtlMs: 45000 } } };
+    next();
+  },
+>>>>>>> upstream/main
 }));
 
 jest.mock('~/server/middleware/checkPeoplePickerAccess', () => ({
@@ -207,6 +214,25 @@ describe('Access permissions share policy', () => {
     expect(updateResourcePermissions).toHaveBeenCalledTimes(1);
   });
 
+<<<<<<< HEAD
+=======
+  it('loads the app config before the update so permissions.lease* values reach the controller', async () => {
+    getRoleByName.mockResolvedValue({
+      permissions: {
+        [PermissionTypes.SKILLS]: { [Permissions.SHARE]: true, [Permissions.SHARE_PUBLIC]: false },
+      },
+    });
+
+    await request(app)
+      .put(`/api/permissions/${ResourceType.SKILL}/${resourceId}`)
+      .send({ updated: [createUpdatedPrincipal(AccessRoleIds.SKILL_VIEWER)], public: false });
+
+    expect(updateResourcePermissions.mock.calls[0][0].config.config.permissions.leaseTtlMs).toBe(
+      45000,
+    );
+  });
+
+>>>>>>> upstream/main
   it('preserves resource management capability bypass for non-public skill sharing', async () => {
     hasCapability.mockResolvedValue(true);
 

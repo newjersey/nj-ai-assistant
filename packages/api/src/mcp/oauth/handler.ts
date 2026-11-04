@@ -33,10 +33,20 @@ import {
   inferClientAuthMethod,
 } from './methods';
 import { isSSRFTarget, resolveHostnameSSRF, isOAuthUrlAllowed } from '~/auth';
+<<<<<<< HEAD
 import { probeResourceMetadataHint } from './resourceHint';
 import { createHardenedOAuthFetch } from './hardenedFetch';
 import { sanitizeUrlForLogging } from '~/mcp/utils';
 import { MCPTokenStorage } from './tokens';
+=======
+import { MCPTokenStorage, MCPTokenRefreshUnavailableError } from './tokens';
+import { probeResourceMetadataHint } from './resourceHint';
+import { createHardenedOAuthFetch } from './hardenedFetch';
+import { getSafeErrorMetadata } from '~/utils/errors';
+import { sanitizeUrlForLogging } from '~/mcp/utils';
+import { getOAuthCallbackUrl } from '~/oauth/url';
+import { getSafeOAuthError } from './errors';
+>>>>>>> upstream/main
 import { getOAuthUrlPort } from './url';
 
 /** Type for the OAuth metadata from the SDK */
@@ -267,7 +277,11 @@ export class MCPOAuthHandler {
       } catch (error) {
         logger.warn(
           `[MCPOAuth] Rejecting untrusted resource_metadata hint from ${sanitizeUrlForLogging(serverUrl)}; falling back to path-aware discovery`,
+<<<<<<< HEAD
           { error },
+=======
+          { error: getSafeErrorMetadata(error) },
+>>>>>>> upstream/main
         );
       }
     }
@@ -283,7 +297,11 @@ export class MCPOAuthHandler {
       );
     } catch (error) {
       logger.debug('[MCPOAuth] Resource metadata discovery failed, continuing with server URL', {
+<<<<<<< HEAD
         error,
+=======
+        error: getSafeErrorMetadata(error),
+>>>>>>> upstream/main
       });
     }
 
@@ -309,7 +327,11 @@ export class MCPOAuthHandler {
         );
         const authServerUrl = new URL(discoveredAuthServer);
         logger.debug(
+<<<<<<< HEAD
           `[MCPOAuth] Found authorization server from resource metadata: ${authServerUrl}`,
+=======
+          `[MCPOAuth] Found authorization server from resource metadata: ${sanitizeUrlForLogging(authServerUrl)}`,
+>>>>>>> upstream/main
         );
         return { resourceMetadata, authServerUrl };
       } else {
@@ -414,7 +436,11 @@ export class MCPOAuthHandler {
           } catch (error) {
             logger.warn(
               `[MCPOAuth] Authorization server metadata discovery failed for pre-configured client; using configured endpoints and defaults`,
+<<<<<<< HEAD
               { error },
+=======
+              { error: getSafeErrorMetadata(error) },
+>>>>>>> upstream/main
             );
             return partialResult;
           }
@@ -451,7 +477,11 @@ export class MCPOAuthHandler {
       const baseUrl = new URL(serverUrl.origin);
       logger.debug(
         `[MCPOAuth] Discovery threw for path URL, trying base URL: ${sanitizeUrlForLogging(baseUrl)}`,
+<<<<<<< HEAD
         { error: err },
+=======
+        { error: getSafeErrorMetadata(err) },
+>>>>>>> upstream/main
       );
       return discoverAuthorizationServerMetadata(baseUrl, { fetchFn });
     }
@@ -589,8 +619,99 @@ export class MCPOAuthHandler {
     }
   }
 
+<<<<<<< HEAD
   private static appendResourceParameter(body: URLSearchParams, resource?: string): void {
     if (!resource) {
+=======
+  /**
+   * RFC 8707 makes `resource` OPTIONAL, and authorization servers that reject it cannot
+   * complete a flow that sends it — Entra ID v2.0 answers `AADSTS9010010` when `resource`
+   * accompanies `scope`. Opting out suppresses the parameter without weakening the
+   * RFC 9728 §3.3 binding, which {@link discoverResourceMetadata} asserts at discovery and
+   * {@link completeOAuthFlow} re-asserts at token exchange regardless of this setting.
+   * See `OAuthOptionsSchema.send_resource_parameter`.
+   */
+  private static shouldSendResourceParameter(config?: MCPOptions['oauth']): boolean {
+    return config?.send_resource_parameter !== false;
+  }
+
+  /**
+   * Removes a `resource` parameter that came from the authorization endpoint itself.
+   * {@link startAuthorization} copies the endpoint's query string verbatim, so a `resource`
+   * an admin left in `authorization_url` — or one present on a discovered endpoint —
+   * survives into the generated request. Opting out has to delete it rather than merely
+   * decline to add one, or the parameter still reaches the provider that rejects it and
+   * the flow this option exists to repair keeps failing.
+   */
+  /**
+   * Returns `endpoint` without its `resource` query parameter.
+   *
+   * The MCP SDK uses `token_endpoint` verbatim and the refresh paths post to the resolved
+   * token URL as-is, so a `resource` an admin left in `token_url` — or one present on a
+   * discovered token endpoint — still reaches the provider even though every place
+   * LibreChat *adds* the parameter is gated. Only the outbound URL is rewritten: stored
+   * metadata keeps its configured form, so {@link assertStoredClientBinding} still matches
+   * and changing the option does not force re-authentication.
+   */
+  private static withoutResourceParameter(
+    endpoint: string | URL,
+    shouldSend: boolean,
+    serverName: string,
+  ): string | URL {
+    if (shouldSend) {
+      return endpoint;
+    }
+    try {
+      const url = new URL(typeof endpoint === 'string' ? endpoint : endpoint.href);
+      if (!url.searchParams.has('resource')) {
+        return endpoint;
+      }
+      url.searchParams.delete('resource');
+      logger.debug(
+        `[MCPOAuth] Removed inherited resource parameter from the token endpoint for ${serverName}; disabled by send_resource_parameter`,
+      );
+      return typeof endpoint === 'string' ? url.href : url;
+    } catch {
+      /** Endpoints are validated absolute URLs; never fail a refresh over sanitization. */
+      return endpoint;
+    }
+  }
+
+  private static stripInheritedResourceParameter(authorizationUrl: URL, serverName: string): void {
+    if (!authorizationUrl.searchParams.has('resource')) {
+      return;
+    }
+    authorizationUrl.searchParams.delete('resource');
+    logger.debug(
+      `[MCPOAuth] Removed inherited resource parameter from the authorization URL for ${serverName}; disabled by send_resource_parameter`,
+    );
+  }
+
+  /**
+   * Whether a pending flow's captured RFC 8707 decision still matches the live config.
+   *
+   * {@link assertStoredClientBinding} deliberately ignores this setting so that flipping it
+   * does not invalidate stored tokens. A pending flow cannot be treated the same way: its
+   * authorization URL was already built with or without `resource`, so replaying it would
+   * reissue exactly the request the operator just reconfigured away from. A flow initiated
+   * before this field existed carries no flag and reads as "sending", which is what it did.
+   */
+  public static matchesResourceParameterDecision(
+    flowMetadata: Pick<MCPOAuthFlowMetadata, 'sendResourceParameter'> | undefined,
+    config?: MCPOptions['oauth'],
+  ): boolean {
+    return (
+      (flowMetadata?.sendResourceParameter !== false) === this.shouldSendResourceParameter(config)
+    );
+  }
+
+  private static appendResourceParameter(
+    body: URLSearchParams,
+    resource?: string,
+    config?: MCPOptions['oauth'],
+  ): void {
+    if (!resource || !this.shouldSendResourceParameter(config)) {
+>>>>>>> upstream/main
       return;
     }
     body.set('resource', resource);
@@ -650,7 +771,11 @@ export class MCPOAuthHandler {
     if (supportedGrantTypes.includes('refresh_token')) {
       requestedGrantTypes.push('refresh_token');
       logger.debug(
+<<<<<<< HEAD
         `[MCPOAuth] Server ${serverUrl} supports \`refresh_token\` grant type, adding to request`,
+=======
+        `[MCPOAuth] Server ${sanitizeUrlForLogging(serverUrl)} supports \`refresh_token\` grant type, adding to request`,
+>>>>>>> upstream/main
       );
     } else {
       logger.debug(
@@ -726,10 +851,18 @@ export class MCPOAuthHandler {
     const flowId = this.generateFlowId(userId, serverName, tenantId);
     const state = this.generateState();
 
+<<<<<<< HEAD
     logger.debug(`[MCPOAuth] Generated flowId: ${flowId}, state: ${state}`);
 
     try {
       this.assertNoUnpinnedClientSecret(config);
+=======
+    logger.debug(`[MCPOAuth] Generated flowId: ${flowId}`);
+
+    try {
+      this.assertNoUnpinnedClientSecret(config);
+      const sendResourceParameter = this.shouldSendResourceParameter(config);
+>>>>>>> upstream/main
 
       if (config?.authorization_url && config?.token_url && config?.client_id) {
         logger.debug(`[MCPOAuth] Using pre-configured OAuth settings for ${serverName}`);
@@ -794,7 +927,11 @@ export class MCPOAuthHandler {
           /** Preserve compatibility with OAuth providers that do not publish metadata. */
           logger.warn(
             `[MCPOAuth] OAuth metadata discovery failed for pre-configured client ${serverName}; using configured endpoints and defaults`,
+<<<<<<< HEAD
             { error },
+=======
+            { error: getSafeErrorMetadata(error) },
+>>>>>>> upstream/main
           );
         }
 
@@ -861,7 +998,11 @@ export class MCPOAuthHandler {
             config.revocation_endpoint_auth_methods_supported ??
             discoveredMetadata?.revocation_endpoint_auth_methods_supported,
         };
+<<<<<<< HEAD
         logger.debug(`[MCPOAuth] metadata for "${serverName}": ${JSON.stringify(metadata)}`);
+=======
+        logger.debug(`[MCPOAuth] OAuth metadata resolved for "${serverName}"`);
+>>>>>>> upstream/main
         const redirectUri = this.getDefaultRedirectUri(serverName);
         const clientInfo: OAuthClientInformation = {
           client_id: config.client_id,
@@ -883,7 +1024,16 @@ export class MCPOAuthHandler {
         authorizationUrl.searchParams.set('state', state);
         logger.debug(`[MCPOAuth] Added state parameter to authorization URL`);
 
+<<<<<<< HEAD
         if (resourceMetadata?.resource) {
+=======
+        if (!sendResourceParameter) {
+          this.stripInheritedResourceParameter(authorizationUrl, serverName);
+          logger.debug(
+            `[MCPOAuth] Omitting resource parameter from pre-configured authorization URL for ${serverName}; disabled by send_resource_parameter`,
+          );
+        } else if (resourceMetadata?.resource) {
+>>>>>>> upstream/main
           const canonicalResource = new URL(resourceMetadata.resource).href;
           authorizationUrl.searchParams.set('resource', canonicalResource);
           logger.debug(
@@ -911,9 +1061,16 @@ export class MCPOAuthHandler {
           clientSource: 'configured',
           metadata,
           resourceMetadata,
+<<<<<<< HEAD
           ...(allowedDomains !== undefined && { allowedDomains }),
           ...(allowedAddresses !== undefined && { allowedAddresses }),
           ...(Object.keys(oauthHeaders).length > 0 && { oauthHeaders }),
+=======
+          ...(!sendResourceParameter && { sendResourceParameter: false }),
+          ...(allowedDomains !== undefined && { allowedDomains }),
+          ...(allowedAddresses !== undefined && { allowedAddresses }),
+          oauthHeaders,
+>>>>>>> upstream/main
           ...(tenantId && { tenantId }),
         };
 
@@ -1067,7 +1224,16 @@ export class MCPOAuthHandler {
         authorizationUrl.searchParams.set('state', state);
         logger.debug(`[MCPOAuth] Added state parameter to authorization URL`);
 
+<<<<<<< HEAD
         if (resourceMetadata?.resource) {
+=======
+        if (!sendResourceParameter) {
+          this.stripInheritedResourceParameter(authorizationUrl, serverName);
+          logger.debug(
+            `[MCPOAuth] Omitting resource parameter from authorization URL for ${serverName}; disabled by send_resource_parameter`,
+          );
+        } else if (resourceMetadata?.resource) {
+>>>>>>> upstream/main
           /**
            * `resource` was already canonicalized and bound to `serverUrl` inside
            * {@link discoverMetadata} via {@link assertResourceBoundToServer}, so `new URL`
@@ -1103,7 +1269,11 @@ export class MCPOAuthHandler {
           logger.debug(`[MCPOAuth] Added audience parameter (discovered flow): ${config.audience}`);
         }
       } catch (error) {
+<<<<<<< HEAD
         logger.error(`[MCPOAuth] startAuthorization failed:`, error);
+=======
+        logger.error(`[MCPOAuth] startAuthorization failed:`, getSafeErrorMetadata(error));
+>>>>>>> upstream/main
         throw error;
       }
 
@@ -1117,16 +1287,27 @@ export class MCPOAuthHandler {
         clientSource,
         metadata,
         resourceMetadata,
+<<<<<<< HEAD
         ...(allowedDomains !== undefined && { allowedDomains }),
         ...(allowedAddresses !== undefined && { allowedAddresses }),
         ...(Object.keys(oauthHeaders).length > 0 && { oauthHeaders }),
+=======
+        ...(!sendResourceParameter && { sendResourceParameter: false }),
+        ...(allowedDomains !== undefined && { allowedDomains }),
+        ...(allowedAddresses !== undefined && { allowedAddresses }),
+        oauthHeaders,
+>>>>>>> upstream/main
         ...(reusedStoredClient && { reusedStoredClient }),
         ...(reusedClientCredentialSetId && { reusedClientCredentialSetId }),
         ...(tenantId && { tenantId }),
       };
 
       logger.debug(
+<<<<<<< HEAD
         `[MCPOAuth] Authorization URL generated for ${serverName}: ${authorizationUrl.toString()}`,
+=======
+        `[MCPOAuth] Authorization URL generated for ${serverName}: ${sanitizeUrlForLogging(authorizationUrl.toString())}`,
+>>>>>>> upstream/main
       );
 
       const result = {
@@ -1137,11 +1318,22 @@ export class MCPOAuthHandler {
 
       logger.debug(
         `[MCPOAuth] Returning from initiateOAuthFlow with result ${flowId} for ${serverName}`,
+<<<<<<< HEAD
         result,
       );
       return result;
     } catch (error) {
       logger.error('[MCPOAuth] Failed to initiate OAuth flow', { error, serverName, userId });
+=======
+      );
+      return result;
+    } catch (error) {
+      logger.error('[MCPOAuth] Failed to initiate OAuth flow', {
+        error: getSafeErrorMetadata(error),
+        serverName,
+        userId,
+      });
+>>>>>>> upstream/main
       throw error;
     }
   }
@@ -1194,6 +1386,10 @@ export class MCPOAuthHandler {
       }
 
       let resource: URL | undefined;
+<<<<<<< HEAD
+=======
+      const sendResourceParameter = metadata.sendResourceParameter !== false;
+>>>>>>> upstream/main
       if (metadata.resourceMetadata) {
         /**
          * Defense-in-depth: re-assert the RFC 9728 §3.3 binding against the flow's stored
@@ -1203,15 +1399,41 @@ export class MCPOAuthHandler {
          * teams to flush flow state on deploy (GHSA-gvpj-vm2f-2m23).
          */
         this.assertResourceBoundToServer(metadata.serverUrl, metadata.resourceMetadata);
+<<<<<<< HEAD
         if (metadata.resourceMetadata.resource) {
+=======
+        if (!sendResourceParameter) {
+          logger.debug(
+            `[MCPOAuth] Omitting resource parameter from token exchange for flow ${flowId}; disabled by send_resource_parameter`,
+          );
+        } else if (metadata.resourceMetadata.resource) {
+>>>>>>> upstream/main
           resource = new URL(metadata.resourceMetadata.resource);
           logger.debug(`[MCPOAuth] Resource URL for flow ${flowId}: ${resource.toString()}`);
         }
       }
 
+<<<<<<< HEAD
       const tokens = await exchangeAuthorization(metadata.serverUrl, {
         redirectUri: metadata.clientInfo.redirect_uris?.[0] || this.getDefaultRedirectUri(),
         metadata: metadata.metadata as unknown as SDKOAuthMetadata,
+=======
+      const exchangeMetadata =
+        sendResourceParameter || typeof metadata.metadata.token_endpoint !== 'string'
+          ? metadata.metadata
+          : {
+              ...metadata.metadata,
+              token_endpoint: this.withoutResourceParameter(
+                metadata.metadata.token_endpoint,
+                false,
+                metadata.serverName,
+              ) as string,
+            };
+
+      const tokens = await exchangeAuthorization(metadata.serverUrl, {
+        redirectUri: metadata.clientInfo.redirect_uris?.[0] || this.getDefaultRedirectUri(),
+        metadata: exchangeMetadata as unknown as SDKOAuthMetadata,
+>>>>>>> upstream/main
         clientInformation: metadata.clientInfo,
         codeVerifier: metadata.codeVerifier,
         authorizationCode,
@@ -1222,6 +1444,11 @@ export class MCPOAuthHandler {
           metadata.allowedDomains,
           metadata.allowedAddresses,
         ),
+<<<<<<< HEAD
+=======
+      }).catch((error: unknown) => {
+        throw getSafeOAuthError(error, 'OAuth token exchange failed');
+>>>>>>> upstream/main
       });
 
       logger.debug('[MCPOAuth] Token exchange successful', {
@@ -1237,7 +1464,14 @@ export class MCPOAuthHandler {
         ...tokens,
         credential_set_id: randomBytes(16).toString('hex'),
         obtained_at: Date.now(),
+<<<<<<< HEAD
         expires_at: tokens.expires_in ? Date.now() + tokens.expires_in * 1000 : undefined,
+=======
+        expires_at:
+          typeof tokens.expires_in === 'number' && Number.isFinite(tokens.expires_in)
+            ? Date.now() + tokens.expires_in * 1000
+            : undefined,
+>>>>>>> upstream/main
       };
 
       /**
@@ -1281,7 +1515,14 @@ export class MCPOAuthHandler {
 
       return mcpTokens;
     } catch (error) {
+<<<<<<< HEAD
       logger.error('[MCPOAuth] Failed to complete OAuth flow', { error, flowId });
+=======
+      logger.error('[MCPOAuth] Failed to complete OAuth flow', {
+        error: getSafeErrorMetadata(error),
+        flowId,
+      });
+>>>>>>> upstream/main
       if (observedFlowState) {
         const observedMetadata = observedFlowState.metadata as MCPOAuthFlowMetadata | undefined;
         await flowManager.failFlowIfCurrent(
@@ -1360,9 +1601,19 @@ export class MCPOAuthHandler {
     };
   }
 
+<<<<<<< HEAD
   /** Same shape as `generateFlowId`; kept distinct so token-fetch flows can diverge from OAuth flows */
   public static generateTokenFlowId(userId: string, serverName: string, tenantId?: string): string {
     return this.generateFlowId(userId, serverName, tenantId);
+=======
+  /**
+   * Token readers using typed retryable outcomes cannot share pending work with legacy readers,
+   * which reconstruct every serialized failure as an untyped Error and initiate consent. Keep
+   * OAuth callback IDs stable, but isolate this version of the token-read protocol in its own key.
+   */
+  public static generateTokenFlowId(userId: string, serverName: string, tenantId?: string): string {
+    return `tokens-v2:${this.generateFlowId(userId, serverName, tenantId)}`;
+>>>>>>> upstream/main
   }
 
   /**
@@ -1557,9 +1808,16 @@ export class MCPOAuthHandler {
    */
   private static getDefaultRedirectUri(serverName?: string): string {
     const baseUrl = process.env.DOMAIN_SERVER || 'http://localhost:3080';
+<<<<<<< HEAD
     return serverName
       ? `${baseUrl}/api/mcp/${serverName}/oauth/callback`
       : `${baseUrl}/api/mcp/oauth/callback`;
+=======
+    const callbackPath = serverName
+      ? `/api/mcp/${serverName}/oauth/callback`
+      : '/api/mcp/oauth/callback';
+    return getOAuthCallbackUrl(baseUrl, callbackPath);
+>>>>>>> upstream/main
   }
 
   /**
@@ -1591,10 +1849,36 @@ export class MCPOAuthHandler {
       ...tokens,
       obtained_at: Date.now(),
       expires_at:
+<<<<<<< HEAD
         typeof tokens.expires_in === 'number' ? Date.now() + tokens.expires_in * 1000 : undefined,
     } as MCPOAuthTokens;
   }
 
+=======
+        typeof tokens.expires_in === 'number' && Number.isFinite(tokens.expires_in)
+          ? Date.now() + tokens.expires_in * 1000
+          : undefined,
+    } as MCPOAuthTokens;
+  }
+
+  /** HTTP outage/rate-limit status is authoritative, even if a proxy body names a bad grant. */
+  private static async assertRefreshEndpointAvailable(
+    response: Response,
+    serverName: string,
+  ): Promise<void> {
+    if (!(response.status === 408 || response.status === 429 || response.status >= 500)) {
+      return;
+    }
+    // Do not feed an outage body into the legacy invalid_client/invalid_grant message classifiers,
+    // or log provider-controlled text that may contain credentials. No automatic redemption retry.
+    await response.body?.cancel().catch(() => undefined);
+    throw new MCPTokenRefreshUnavailableError(
+      serverName,
+      new Error(`Token refresh temporarily unavailable (HTTP ${response.status})`),
+    );
+  }
+
+>>>>>>> upstream/main
   /**
    * Posts a `refresh_token` grant, transparently retrying without the `scope`
    * parameter when — and only when — the authorization server rejects the request
@@ -1614,8 +1898,20 @@ export class MCPOAuthHandler {
     body: URLSearchParams,
     serverName: string,
     signal?: AbortSignal,
+<<<<<<< HEAD
   ): Promise<Response> {
     const response = await oauthFetch(tokenUrl, { method: 'POST', headers, body, signal });
+=======
+    config?: MCPOptions['oauth'],
+  ): Promise<Response> {
+    tokenUrl = this.withoutResourceParameter(
+      tokenUrl,
+      this.shouldSendResourceParameter(config),
+      serverName,
+    );
+    const response = await oauthFetch(tokenUrl, { method: 'POST', headers, body, signal });
+    await this.assertRefreshEndpointAvailable(response, serverName);
+>>>>>>> upstream/main
     if (response.ok || !body.has('scope')) {
       return response;
     }
@@ -1632,7 +1928,13 @@ export class MCPOAuthHandler {
       `[MCPOAuth] ${serverName} rejected the scope parameter on token refresh (HTTP ${response.status}); retrying without scope per RFC 6749 §6`,
     );
     body.delete('scope');
+<<<<<<< HEAD
     return oauthFetch(tokenUrl, { method: 'POST', headers, body, signal });
+=======
+    const retried = await oauthFetch(tokenUrl, { method: 'POST', headers, body, signal });
+    await this.assertRefreshEndpointAvailable(retried, serverName);
+    return retried;
+>>>>>>> upstream/main
   }
 
   /**
@@ -1819,7 +2121,11 @@ export class MCPOAuthHandler {
         if (metadata.clientInfo.scope) {
           body.append('scope', metadata.clientInfo.scope);
         }
+<<<<<<< HEAD
         this.appendResourceParameter(body, metadata.resource);
+=======
+        this.appendResourceParameter(body, metadata.resource, config);
+>>>>>>> upstream/main
 
         /**
          * Forward Auth0-style `audience` on refresh by default — Auth0 strips the
@@ -1892,6 +2198,10 @@ export class MCPOAuthHandler {
           body,
           metadata.serverName,
           signal,
+<<<<<<< HEAD
+=======
+          config,
+>>>>>>> upstream/main
         );
 
         if (!response.ok) {
@@ -1924,7 +2234,11 @@ export class MCPOAuthHandler {
         if (config.scope) {
           body.append('scope', config.scope);
         }
+<<<<<<< HEAD
         this.appendResourceParameter(body, metadata.resource);
+=======
+        this.appendResourceParameter(body, metadata.resource, config);
+>>>>>>> upstream/main
 
         const headers: HeadersInit = {
           Accept: 'application/json',
@@ -1980,6 +2294,10 @@ export class MCPOAuthHandler {
           body,
           metadata.serverName,
           signal,
+<<<<<<< HEAD
+=======
+          config,
+>>>>>>> upstream/main
         );
 
         if (!response.ok) {
@@ -2029,7 +2347,11 @@ export class MCPOAuthHandler {
         grant_type: 'refresh_token',
         refresh_token: refreshToken,
       });
+<<<<<<< HEAD
       this.appendResourceParameter(body, metadata.resource);
+=======
+      this.appendResourceParameter(body, metadata.resource, config);
+>>>>>>> upstream/main
 
       const headers: HeadersInit = {
         Accept: 'application/json',
@@ -2038,6 +2360,7 @@ export class MCPOAuthHandler {
       };
 
       const oauthFetch = createHardenedOAuthFetch({ allowedDomains, allowedAddresses });
+<<<<<<< HEAD
       const response = await oauthFetch(tokenUrl, {
         method: 'POST',
         headers,
@@ -2045,6 +2368,23 @@ export class MCPOAuthHandler {
         signal,
       });
 
+=======
+      const response = await oauthFetch(
+        this.withoutResourceParameter(
+          tokenUrl,
+          this.shouldSendResourceParameter(config),
+          metadata.serverName,
+        ),
+        {
+          method: 'POST',
+          headers,
+          body,
+          signal,
+        },
+      );
+
+      await this.assertRefreshEndpointAvailable(response, metadata.serverName);
+>>>>>>> upstream/main
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(
@@ -2055,7 +2395,14 @@ export class MCPOAuthHandler {
       const tokens = await response.json();
       return this.processRefreshResponse(tokens, metadata.serverName, 'auto-discovered OAuth');
     } catch (error) {
+<<<<<<< HEAD
       logger.error(`[MCPOAuth] Failed to refresh tokens for ${metadata.serverName}`, error);
+=======
+      logger.error(
+        `[MCPOAuth] Failed to refresh tokens for ${metadata.serverName}`,
+        getSafeErrorMetadata(error),
+      );
+>>>>>>> upstream/main
       throw error;
     }
   }

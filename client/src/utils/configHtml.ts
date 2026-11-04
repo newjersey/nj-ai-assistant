@@ -71,7 +71,10 @@ export function createConfigHtmlTextSanitizer() {
     return (fragment.textContent ?? '').replace(/\s+/g, ' ').trim();
   };
 }
+<<<<<<< HEAD
 
 export function sanitizeConfigHtml(html?: string | null, options?: ConfigHtmlSanitizerOptions) {
   return createConfigHtmlSanitizer(options)(html);
 }
+=======
+>>>>>>> upstream/main

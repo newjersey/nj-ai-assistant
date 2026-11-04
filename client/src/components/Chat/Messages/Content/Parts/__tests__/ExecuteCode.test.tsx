@@ -1,8 +1,14 @@
 import React from 'react';
 import { RecoilRoot } from 'recoil';
 import { render } from '@testing-library/react';
+<<<<<<< HEAD
 import type { PtcTraceEntry } from '~/store/ptc';
 import { ptcTraceByToolCallId, ptcTraceKey } from '~/store/ptc';
+=======
+import { createStore, Provider as JotaiProvider } from 'jotai';
+import type { PtcTraceEntry } from '~/common';
+import { ptcTraceByToolCallId, ptcTraceKey } from '~/hooks/SSE/ptc';
+>>>>>>> upstream/main
 import { MessageContext } from '~/Providers/MessageContext';
 import ExecuteCode from '../ExecuteCode';
 import store from '~/store';
@@ -37,9 +43,15 @@ jest.mock('../Attachment', () => ({
   AttachmentGroup: () => <div data-testid="attachment-group" />,
 }));
 
+<<<<<<< HEAD
 jest.mock('../Stdout', () => ({
   __esModule: true,
   default: () => <div data-testid="stdout" />,
+=======
+jest.mock('@librechat/chat/components', () => ({
+  ...jest.requireActual('@librechat/chat/components'),
+  Stdout: () => <div data-testid="stdout" />,
+>>>>>>> upstream/main
 }));
 
 jest.mock('../useLazyHighlight', () => {
@@ -147,6 +159,7 @@ describe('ExecuteCode programmatic tool trace', () => {
   const TOOL_CALL_ID = 'call_ptc_1';
   const MESSAGE_ID = 'response-msg-1';
 
+<<<<<<< HEAD
   const renderWithTrace = (entries: PtcTraceEntry[]) =>
     render(
       <RecoilRoot
@@ -166,6 +179,30 @@ describe('ExecuteCode programmatic tool trace', () => {
         </MessageContext.Provider>
       </RecoilRoot>,
     );
+=======
+  const renderWithTrace = (entries: PtcTraceEntry[]) => {
+    const traceStore = createStore();
+    traceStore.set(ptcTraceByToolCallId(ptcTraceKey(MESSAGE_ID, TOOL_CALL_ID)), {
+      entries,
+      dropped: 0,
+    });
+    return render(
+      <RecoilRoot initializeState={({ set }) => set(store.autoExpandTools, true)}>
+        <JotaiProvider store={traceStore}>
+          <MessageContext.Provider value={{ messageId: MESSAGE_ID, isExpanded: true }}>
+            <ExecuteCode
+              initialProgress={0.5}
+              isSubmitting={true}
+              toolCallId={TOOL_CALL_ID}
+              args={{ lang: 'py', code: 'print(1)' }}
+              output=""
+            />
+          </MessageContext.Provider>
+        </JotaiProvider>
+      </RecoilRoot>,
+    );
+  };
+>>>>>>> upstream/main
 
   it('lists the inner tool calls the running program has made', () => {
     const { getByText } = renderWithTrace([

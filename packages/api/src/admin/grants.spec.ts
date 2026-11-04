@@ -1,6 +1,13 @@
+<<<<<<< HEAD
 import { Types } from 'mongoose';
 import { PrincipalType } from 'librechat-data-provider';
 import { SystemCapabilities, expandImplications } from '@librechat/data-schemas';
+=======
+import { inspect } from 'util';
+import { Types } from 'mongoose';
+import { PrincipalType } from 'librechat-data-provider';
+import { SystemCapabilities, expandImplications, logger } from '@librechat/data-schemas';
+>>>>>>> upstream/main
 import type { ISystemGrant } from '@librechat/data-schemas';
 import type { Response } from 'express';
 import type { ServerRequest } from '~/types/http';
@@ -1245,12 +1252,24 @@ describe('createAdminGrantsHandlers', () => {
       expect(status).toHaveBeenCalledWith(201);
     });
 
+<<<<<<< HEAD
     it('does not audit re-assigning a capability the role already holds', async () => {
       const recordAuditEntry = jest.fn().mockResolvedValue(undefined);
       const deps = createDeps({
         recordAuditEntry,
         // the upsert reports created:false → idempotent re-assert, no change
         grantCapability: jest.fn().mockResolvedValue({ grant: mockGrant(), created: false }),
+=======
+    it('audits re-assigning a held capability, marked as a re-assert', async () => {
+      const recordAuditEntry = jest.fn().mockResolvedValue(undefined);
+      const deps = createDeps({
+        recordAuditEntry,
+        auditFailClosed: true,
+        getCapabilitiesForPrincipal: jest
+          .fn()
+          .mockResolvedValue([mockGrant({ tenantId: 'tenant-1' })]),
+        grantCapability: jest.fn().mockResolvedValue({ grant: mockGrant(), created: true }),
+>>>>>>> upstream/main
       });
       const handlers = createAdminGrantsHandlers(deps);
       const { req, res, status } = createReqRes({ body: assignBody, user: reqUser() });
@@ -1258,7 +1277,46 @@ describe('createAdminGrantsHandlers', () => {
       await handlers.assignGrant(req, res);
 
       expect(status).toHaveBeenCalledWith(201);
+<<<<<<< HEAD
       expect(recordAuditEntry).not.toHaveBeenCalled();
+=======
+      expect(recordAuditEntry).toHaveBeenCalledTimes(1);
+      expect(recordAuditEntry.mock.calls[0][0]).toMatchObject({
+        action: 'grant.assigned',
+        metadata: { reassert: true },
+      });
+    });
+
+    it('logs a failed fail-open audit write without the raw error', async () => {
+      const recordAuditEntry = jest
+        .fn()
+        .mockRejectedValue(new Error('SELECT secret FROM audit WHERE token=abc'));
+      const deps = createDeps({ recordAuditEntry });
+      const handlers = createAdminGrantsHandlers(deps);
+      const { req, res } = createReqRes({ body: assignBody, user: reqUser() });
+      (logger.error as jest.Mock).mockClear();
+
+      await handlers.assignGrant(req, res);
+
+      const args = (logger.error as jest.Mock).mock.calls.flat();
+      expect(args.some((arg) => arg instanceof Error)).toBe(false);
+      expect(inspect(args, { depth: 5 })).not.toContain('SELECT secret');
+    });
+
+    it('fail-closed: an audit outage answers with the stable audit code', async () => {
+      const recordAuditEntry = jest.fn().mockRejectedValue(new Error('audit down'));
+      const deps = createDeps({ recordAuditEntry, auditFailClosed: true });
+      const handlers = createAdminGrantsHandlers(deps);
+      const { req, res, status, json } = createReqRes({ body: assignBody, user: reqUser() });
+
+      await handlers.assignGrant(req, res);
+
+      expect(status).toHaveBeenCalledWith(500);
+      expect(json).toHaveBeenCalledWith(
+        expect.objectContaining({ code: 'PERMISSION_AUDIT_UNAVAILABLE' }),
+      );
+      expect(deps.grantCapability).not.toHaveBeenCalled();
+>>>>>>> upstream/main
     });
 
     it('fail-open: a failed audit write does not fail the grant', async () => {
@@ -1272,7 +1330,11 @@ describe('createAdminGrantsHandlers', () => {
       expect(status).toHaveBeenCalledWith(201);
     });
 
+<<<<<<< HEAD
     it('fail-closed: a failed assign audit rolls back the grant and 500s', async () => {
+=======
+    it('fail-closed: an audit outage blocks an assign and nothing is granted', async () => {
+>>>>>>> upstream/main
       const recordAuditEntry = jest.fn().mockRejectedValue(new Error('audit down'));
       const deps = createDeps({ recordAuditEntry, auditFailClosed: true });
       const handlers = createAdminGrantsHandlers(deps);
@@ -1281,6 +1343,7 @@ describe('createAdminGrantsHandlers', () => {
       await handlers.assignGrant(req, res);
 
       expect(recordAuditEntry).toHaveBeenCalledWith(
+<<<<<<< HEAD
         expect.anything(),
         expect.objectContaining({ failClosed: true }),
       );
@@ -1298,6 +1361,39 @@ describe('createAdminGrantsHandlers', () => {
     it('fail-closed: a failed revoke audit restores the grant and 500s', async () => {
       const recordAuditEntry = jest.fn().mockRejectedValue(new Error('audit down'));
       const grantCapability = jest.fn().mockResolvedValue({ grant: { id: 'g1' }, created: true });
+=======
+        expect.objectContaining({ action: 'grant.assigned', outcome: 'success' }),
+        expect.objectContaining({ failClosed: true }),
+      );
+      expect(deps.grantCapability).not.toHaveBeenCalled();
+      expect(deps.revokeCapability).not.toHaveBeenCalled();
+      expect(status).toHaveBeenCalledWith(500);
+    });
+
+    it('a failed grant write leaves a failure entry and surfaces the error', async () => {
+      const recordAuditEntry = jest.fn().mockResolvedValue(undefined);
+      const deps = createDeps({
+        recordAuditEntry,
+        auditFailClosed: true,
+        grantCapability: jest.fn().mockRejectedValue(new Error('write failed')),
+      });
+      const handlers = createAdminGrantsHandlers(deps);
+      const { req, res, status } = createReqRes({ body: assignBody, user: reqUser() });
+
+      await handlers.assignGrant(req, res);
+
+      expect(recordAuditEntry.mock.calls.map(([input]) => input.outcome)).toEqual([
+        'success',
+        'failure',
+      ]);
+      expect(deps.revokeCapability).not.toHaveBeenCalled();
+      expect(status).toHaveBeenCalledWith(500);
+    });
+
+    it('fail-closed: a failed revoke audit keeps the revoke, retries the entry and returns 200', async () => {
+      const recordAuditEntry = jest.fn().mockRejectedValue(new Error('audit down'));
+      const grantCapability = jest.fn();
+>>>>>>> upstream/main
       const deps = createDeps({
         recordAuditEntry,
         auditFailClosed: true,
@@ -1309,6 +1405,7 @@ describe('createAdminGrantsHandlers', () => {
 
       await handlers.revokeGrant(req, res);
 
+<<<<<<< HEAD
       // compensating re-grant restores access removed before the audit failed
       expect(grantCapability).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -1318,6 +1415,119 @@ describe('createAdminGrantsHandlers', () => {
         }),
       );
       expect(status).toHaveBeenCalledWith(500);
+=======
+      expect(grantCapability).not.toHaveBeenCalled();
+      expect(recordAuditEntry).toHaveBeenCalledTimes(2);
+      expect(status).toHaveBeenCalledWith(200);
+    });
+
+    describe('grant lease', () => {
+      function memoryLease() {
+        const held = new Map<string, string>();
+        return {
+          acquireResourceLock: jest.fn(async ({ key, ownerId }) => {
+            if (held.has(key)) return false;
+            held.set(key, ownerId);
+            return true;
+          }),
+          renewResourceLock: jest.fn(async ({ key, ownerId }) => held.get(key) === ownerId),
+          releaseResourceLock: jest.fn(async ({ key, ownerId }) => {
+            if (held.get(key) !== ownerId) return false;
+            held.delete(key);
+            return true;
+          }),
+          held,
+        };
+      }
+
+      it('ends with the state named by the last audit entry when a reassert races a revoke', async () => {
+        const lease = memoryLease();
+        const log: string[] = [];
+        let active = true;
+        const delay = () => new Promise((resolve) => setTimeout(resolve, 20));
+        const deps = createDeps({
+          lease,
+          auditFailClosed: true,
+          recordAuditEntry: jest.fn(async (input) => {
+            await delay();
+            log.push(input.action);
+          }),
+          getCapabilitiesForPrincipal: jest.fn(async () => (active ? [mockGrant()] : [])),
+          grantCapability: jest.fn(async () => {
+            active = true;
+            return { grant: mockGrant(), created: false };
+          }),
+          revokeCapability: jest.fn(async () => {
+            const deletedCount = active ? 1 : 0;
+            active = false;
+            return { deletedCount };
+          }),
+        });
+        const handlers = createAdminGrantsHandlers(deps);
+        const assign = createReqRes({ body: assignBody, user: reqUser() });
+        const revoke = createReqRes({
+          params: { ...assignBody },
+          user: reqUser(),
+        });
+
+        await Promise.all([
+          handlers.assignGrant(assign.req, assign.res),
+          handlers.revokeGrant(revoke.req, revoke.res),
+        ]);
+
+        const last = log[log.length - 1];
+        expect(active).toBe(last === 'grant.assigned');
+        expect(lease.held.size).toBe(0);
+      });
+
+      it('uses the lease limits from the loaded librechat.yaml config', async () => {
+        const lease = memoryLease();
+        const deps = createDeps({ lease });
+        const handlers = createAdminGrantsHandlers(deps);
+        const { req, res } = createReqRes({ body: assignBody, user: reqUser() });
+        (req as unknown as { config: unknown }).config = {
+          config: { permissions: { leaseTtlMs: 45_000, leaseWaitMs: 1_500 } },
+        };
+
+        await handlers.assignGrant(req, res);
+
+        expect(lease.acquireResourceLock).toHaveBeenCalledWith(
+          expect.objectContaining({ ttlMs: 45_000 }),
+        );
+      });
+
+      it('answers 409 with the busy code and writes nothing when the lease stays taken', async () => {
+        const lease = memoryLease();
+        lease.acquireResourceLock.mockResolvedValue(false);
+        const deps = createDeps({ lease, auditFailClosed: true });
+        const handlers = createAdminGrantsHandlers(deps);
+        const { req, res, status, json } = createReqRes({ body: assignBody, user: reqUser() });
+
+        await handlers.assignGrant(req, res);
+
+        expect(status).toHaveBeenCalledWith(409);
+        expect(json).toHaveBeenCalledWith(
+          expect.objectContaining({ code: 'RESOURCE_PERMISSIONS_BUSY' }),
+        );
+        expect(deps.grantCapability).not.toHaveBeenCalled();
+      });
+
+      it('aborts the revoke without deleting when the lease was lost', async () => {
+        const lease = memoryLease();
+        lease.renewResourceLock.mockResolvedValue(false);
+        const deps = createDeps({ lease });
+        const handlers = createAdminGrantsHandlers(deps);
+        const { req, res, status } = createReqRes({
+          params: { ...assignBody },
+          user: reqUser(),
+        });
+
+        await handlers.revokeGrant(req, res);
+
+        expect(status).toHaveBeenCalledWith(409);
+        expect(deps.revokeCapability).not.toHaveBeenCalled();
+      });
+>>>>>>> upstream/main
     });
   });
 });

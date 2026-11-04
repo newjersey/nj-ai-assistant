@@ -1,3 +1,8 @@
+<<<<<<< HEAD
+=======
+import { gptPointReleaseFamily } from 'librechat-data-provider';
+
+>>>>>>> upstream/main
 /**
  * Inlined utility functions previously imported from @librechat/api.
  * These are used only by test files in data-schemas.
@@ -37,6 +42,21 @@ export function findMatchingPattern(
   modelName: string,
   tokensMap: Record<string, number | Record<string, number>>,
 ): string | undefined {
+<<<<<<< HEAD
+=======
+  const direct = findVendorAwarePattern(modelName, tokensMap);
+  if (direct != null) {
+    return direct;
+  }
+  const family = gptPointReleaseFamily(modelName);
+  return family == null ? undefined : findVendorAwarePattern(family, tokensMap);
+}
+
+function findVendorAwarePattern(
+  modelName: string,
+  tokensMap: Record<string, number | Record<string, number>>,
+): string | undefined {
+>>>>>>> upstream/main
   const lowerModelName = modelName.toLowerCase();
   const slashIndex = lowerModelName.lastIndexOf('/');
   if (slashIndex === -1) {

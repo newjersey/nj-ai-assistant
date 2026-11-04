@@ -195,6 +195,7 @@ describe('UserGroup Methods - Detailed Tests', () => {
     });
   });
 
+<<<<<<< HEAD
   describe('findGroupsByMemberId', () => {
     let user1: mongoose.HydratedDocument<t.IUser>;
 
@@ -253,6 +254,8 @@ describe('UserGroup Methods - Detailed Tests', () => {
     });
   });
 
+=======
+>>>>>>> upstream/main
   describe('createGroup', () => {
     test('should create a group with all fields', async () => {
       const groupData: Partial<t.IGroup> = {
@@ -412,6 +415,47 @@ describe('UserGroup Methods - Detailed Tests', () => {
       expect(result.group?.memberIds).toContain((user._id as mongoose.Types.ObjectId).toString());
     });
 
+<<<<<<< HEAD
+=======
+    test('reports a change only for the call that altered membership', async () => {
+      const groupId = group._id as mongoose.Types.ObjectId;
+      const userId = user._id as mongoose.Types.ObjectId;
+
+      const [first, second] = await Promise.all([
+        methods.addUserToGroup(userId, groupId),
+        methods.addUserToGroup(userId, groupId),
+      ]);
+      expect([first.changed, second.changed].filter(Boolean)).toHaveLength(1);
+      expect(first.group?.memberIds).toHaveLength(1);
+
+      const removed = await methods.removeUserFromGroup(userId, groupId);
+      expect(removed.changed).toBe(true);
+      const again = await methods.removeUserFromGroup(userId, groupId);
+      expect(again.changed).toBe(false);
+      expect(again.group).toBeDefined();
+    });
+
+    test('reports a field change only for the call that altered it', async () => {
+      const groupId = group._id as mongoose.Types.ObjectId;
+
+      const [first, second] = await Promise.all([
+        methods.updateGroupFieldsTracked(groupId, { name: 'Renamed' }),
+        methods.updateGroupFieldsTracked(groupId, { name: 'Renamed' }),
+      ]);
+
+      expect([first?.changed, second?.changed].filter(Boolean)).toHaveLength(1);
+      expect(first?.group.name).toBe('Renamed');
+      expect(await methods.updateGroupFieldsTracked(groupId, { name: 'Renamed' })).toMatchObject({
+        changed: false,
+      });
+      const mixed = await methods.updateGroupFieldsTracked(groupId, {
+        name: 'Renamed',
+        description: 'new description',
+      });
+      expect(mixed).toMatchObject({ changed: true, changedFields: ['description'] });
+    });
+
+>>>>>>> upstream/main
     test('should remove user from group', async () => {
       // First add user
       await methods.addUserToGroup(
@@ -441,6 +485,7 @@ describe('UserGroup Methods - Detailed Tests', () => {
     });
   });
 
+<<<<<<< HEAD
   describe('getUserGroups', () => {
     let user: mongoose.HydratedDocument<t.IUser>;
 
@@ -600,6 +645,8 @@ describe('UserGroup Methods - Detailed Tests', () => {
     });
   });
 
+=======
+>>>>>>> upstream/main
   describe('listGroups', () => {
     beforeEach(async () => {
       await Group.create([
@@ -708,6 +755,27 @@ describe('UserGroup Methods - Detailed Tests', () => {
     });
   });
 
+<<<<<<< HEAD
+=======
+  describe('removeMemberByIdTracked', () => {
+    test('reports whether the member was actually removed', async () => {
+      const group = await Group.create({ name: 'Test', source: 'local', memberIds: ['m1', 'm2'] });
+      const groupId = group._id as mongoose.Types.ObjectId;
+
+      const removed = await methods.removeMemberByIdTracked(groupId, 'm1');
+      expect(removed.changed).toBe(true);
+      expect(removed.group?.memberIds).toEqual(['m2']);
+
+      const absent = await methods.removeMemberByIdTracked(groupId, 'm1');
+      expect(absent.changed).toBe(false);
+      expect(absent.group?.memberIds).toEqual(['m2']);
+
+      const missing = await methods.removeMemberByIdTracked(new mongoose.Types.ObjectId(), 'm1');
+      expect(missing).toEqual({ group: null, changed: false });
+    });
+  });
+
+>>>>>>> upstream/main
   describe('removeMemberById', () => {
     test('removes member from memberIds array', async () => {
       const group = await Group.create({

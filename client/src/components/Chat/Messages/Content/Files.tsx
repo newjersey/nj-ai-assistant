@@ -1,4 +1,5 @@
 import { useMemo, useState, useCallback, memo } from 'react';
+<<<<<<< HEAD
 import type { TFile, TMessage } from 'librechat-data-provider';
 import FileContainer from '~/components/Chat/Input/Files/FileContainer';
 import { usesImagePreview, hydrateFileDeliveryMetadata } from '~/utils';
@@ -8,6 +9,18 @@ import Image from './Image';
 
 const Files = ({ message }: { message?: TMessage }) => {
   const fileMap = useFileMapContext();
+=======
+import { FileContainer } from '@librechat/chat/components';
+import type { TFile, TMessage } from 'librechat-data-provider';
+import { useMessagePartsHost } from '~/Providers/MessagePartsHostContext';
+import { usesImagePreview, hydrateFileDeliveryMetadata } from '~/utils';
+import FilePreviewDialog from './FilePreviewDialog';
+import { useShareContext } from '~/Providers';
+import Image from './Image';
+
+const Files = ({ message }: { message?: TMessage }) => {
+  const fileMap = useMessagePartsHost().useFileMap();
+>>>>>>> upstream/main
   const { shareId } = useShareContext();
   const files = useMemo(
     () => hydrateFileDeliveryMetadata(message?.files, undefined, shareId ? undefined : fileMap),
@@ -36,6 +49,11 @@ const Files = ({ message }: { message?: TMessage }) => {
           <FileContainer
             key={file.file_id}
             file={file as TFile}
+<<<<<<< HEAD
+=======
+            buttonClassName="border-surface-user-message max-w-full bg-transparent"
+            containerClassName="max-w-full"
+>>>>>>> upstream/main
             onClick={() => setSelectedFile(file)}
           />
         ))}
@@ -43,6 +61,11 @@ const Files = ({ message }: { message?: TMessage }) => {
         imageFiles.map((file) => (
           <Image
             key={file.file_id}
+<<<<<<< HEAD
+=======
+            alignRight
+            className="border-surface-user-message mt-0 shadow-none"
+>>>>>>> upstream/main
             imagePath={file.preview ?? file.filepath ?? ''}
             height={file.height ?? 1920}
             width={file.width ?? 1080}

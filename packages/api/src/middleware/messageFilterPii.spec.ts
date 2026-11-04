@@ -5,11 +5,15 @@ import type { Request, Response, NextFunction } from 'express';
 jest.mock('@librechat/data-schemas', () => ({
   logger: { warn: jest.fn(), error: jest.fn(), info: jest.fn(), debug: jest.fn() },
 }));
+<<<<<<< HEAD
 import {
   createMessageFilterPii,
   findPiiMatchInMessages,
   configureMessageFilterRegexValidator,
 } from './messageFilterPii';
+=======
+import { createMessageFilterPii, configureMessageFilterRegexValidator } from './messageFilterPii';
+>>>>>>> upstream/main
 
 type CapturedResponse = { status?: number; body?: unknown };
 
@@ -741,6 +745,7 @@ describe('messageFilterPii middleware', () => {
     expect(capturedRes.status).toBe(400);
     expect(capturedRes.body).toMatchObject({ error: 'message_filter_pii_block' });
   });
+<<<<<<< HEAD
 
   it('findPiiMatchInMessages flags misconfigured on a dropped pattern under default starters', () => {
     const config: MessageFilterPiiConfig = {
@@ -822,6 +827,8 @@ describe('findPiiMatchInMessages', () => {
     });
     expect(hit).toEqual({ id: 'org', label: 'Org token' });
   });
+=======
+>>>>>>> upstream/main
 });
 
 describe('configureMessageFilterRegexValidator (RE2 config-load validation)', () => {
@@ -890,6 +897,7 @@ describe('configureMessageFilterRegexValidator (RE2 config-load validation)', ()
     expect(capturedRes.status).toBe(400);
     expect(capturedRes.body).toMatchObject({ error: 'message_filter_pii_block' });
   });
+<<<<<<< HEAD
 
   it('findPiiMatchInMessages returns a misconfigured match when every pattern fails to compile', () => {
     const hit = findPiiMatchInMessages([{ role: 'user', content: 'hello' }], {
@@ -898,4 +906,6 @@ describe('configureMessageFilterRegexValidator (RE2 config-load validation)', ()
     });
     expect(hit?.misconfigured).toBe(true);
   });
+=======
+>>>>>>> upstream/main
 });

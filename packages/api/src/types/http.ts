@@ -2,11 +2,21 @@ import type {
   CodeApprovalMode,
   CodeEnvironmentMode,
   CodeWorkspaceSelection,
+<<<<<<< HEAD
   TEndpointOption,
+=======
+  TFile,
+  TEndpointOption,
+  TReasoningOverride,
+>>>>>>> upstream/main
   Agents,
 } from 'librechat-data-provider';
 import type { IUser, AppConfig, IConversation } from '@librechat/data-schemas';
 import type { Request } from 'express';
+<<<<<<< HEAD
+=======
+import type { ResolvedChatProjectContext } from '../projects/context';
+>>>>>>> upstream/main
 
 /**
  * LibreChat-specific request body type that extends Express Request body
@@ -22,7 +32,13 @@ export type RequestBody = {
   model?: string;
   imageDetail?: Agents.ImageDetail;
   key?: string;
+<<<<<<< HEAD
   endpointOption?: Partial<TEndpointOption>;
+=======
+  chatProjectId?: string | null;
+  endpointOption?: Partial<TEndpointOption>;
+  reasoningOverride?: TReasoningOverride;
+>>>>>>> upstream/main
   /** Browser IANA timezone used to resolve local-time prompt variables (e.g. `{{current_datetime}}`). */
   timezone?: string;
   codeApprovalMode?: CodeApprovalMode;
@@ -35,11 +51,40 @@ export type ServerRequest = Request<unknown, unknown, RequestBody> & {
   config?: AppConfig;
   /** Server-captured generation start time used to anchor dynamic prompt variables. */
   turnStartedAt?: number;
+<<<<<<< HEAD
   /** Server-captured conversation creation time used when inserting conversation metadata. */
+=======
+  /** Server-captured original conversation creation timestamp. */
+>>>>>>> upstream/main
   conversationCreatedAt?: string;
   /** Conversation read by request middleware (`null` = looked up, absent), reused by the
    *  subagent guard, agent initialization, and the first save instead of re-reading it. */
   resolvedConversation?: Partial<IConversation> | null;
+<<<<<<< HEAD
   /** Passport strategy that populated req.user for this request. */
   authStrategy?: string;
+=======
+  /** Authoritative server-only project context for the current turn. */
+  chatProjectContext?: ResolvedChatProjectContext | null;
+  /** Metadata-only project files hydrated once per request. */
+  chatProjectFiles?: TFile[];
+  /** Request-scoped in-flight project-context resource hydration. */
+  chatProjectContextResourcesPromise?: Promise<ResolvedChatProjectContext>;
+  /** Request-scoped in-flight hydration shared by connected graph agents. */
+  chatProjectFilesPromise?: Promise<TFile[]>;
+  /** Internal opt-in marker for conversation graph agent initialization. */
+  chatProjectContextEnabled?: boolean;
+  /** Subagents that run on their parent's attached machine this turn, keyed by saved agent ID.
+   *  Derived per request from the sealed decision and never persisted. */
+  codeWorkspaceInheritance?: ReadonlyMap<string, string>;
+  authStrategy?: string;
+  /** Trusted snapshot used to keep a request-scoped override out of saved conversation defaults. */
+  reasoningOverrideBase?: {
+    key: TReasoningOverride['key'];
+    hadValue: boolean;
+    value?: unknown;
+    thinkingHadValue?: boolean;
+    thinkingValue?: unknown;
+  };
+>>>>>>> upstream/main
 };

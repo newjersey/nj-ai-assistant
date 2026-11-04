@@ -1,9 +1,13 @@
+<<<<<<< HEAD
 import {
   getEndpointField,
   isAssistantsEndpoint,
   isAgentsEndpoint,
   ProviderId,
 } from 'librechat-data-provider';
+=======
+import { getEndpointField, isAssistantsEndpoint, isAgentsEndpoint } from 'librechat-data-provider';
+>>>>>>> upstream/main
 import type {
   TPreset,
   TConversation,
@@ -11,8 +15,13 @@ import type {
   TAssistantsMap,
   TEndpointsConfig,
 } from 'librechat-data-provider';
+<<<<<<< HEAD
 import { getAgentAvatarUrl, getIconEndpoint, cn } from '~/utils';
 import ConvoIconURL from '~/components/Endpoints/ConvoIconURL';
+=======
+import ConvoIconURL from '~/components/Endpoints/ConvoIconURL';
+import { getAgentAvatarUrl, getIconEndpoint } from '~/utils';
+>>>>>>> upstream/main
 import MinimalIcon from '~/components/Endpoints/MinimalIcon';
 import { resolveProviderIcon } from '~/hooks/Endpoint';
 import { isImageURL } from '~/utils/icons';
@@ -22,7 +31,11 @@ const emptyEndpointsConfig = {} as TEndpointsConfig;
 export default function EndpointIcon({
   conversation,
   endpointsConfig = emptyEndpointsConfig,
+<<<<<<< HEAD
   className = 'mr-0',
+=======
+  className = 'me-0',
+>>>>>>> upstream/main
   assistantMap,
   agentsMap,
   context,
@@ -82,7 +95,11 @@ export default function EndpointIcon({
       endpointsConfig={endpointsConfig}
       model={conversation?.model}
       error={false}
+<<<<<<< HEAD
       className={cn(className, context === 'landing' && provider === ProviderId.cohere && 'p-2')}
+=======
+      className={className}
+>>>>>>> upstream/main
       size={size}
       isCreatedByUser={false}
       chatGptLabel={undefined}

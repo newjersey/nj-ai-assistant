@@ -10,7 +10,10 @@ const {
 } = require('librechat-data-provider');
 const {
   bulkUpdateResourcePermissions,
+<<<<<<< HEAD
   restoreInsightsPermissionChanges,
+=======
+>>>>>>> upstream/main
   syncUserEntraGroupMemberships,
   getEffectivePermissions,
   findAccessibleResources,
@@ -1062,9 +1065,15 @@ describe('PermissionService', () => {
           );
         }
 
+<<<<<<< HEAD
         const originalBulkWriteAclEntries = db.bulkWriteAclEntries;
         const bulkWriteSpy = jest
           .spyOn(db, 'bulkWriteAclEntries')
+=======
+        const originalBulkWriteAclEntries = AclEntry.bulkWrite.bind(AclEntry);
+        const bulkWriteSpy = jest
+          .spyOn(AclEntry, 'bulkWrite')
+>>>>>>> upstream/main
           .mockImplementationOnce(async (...args) => {
             await AclEntry.updateOne(
               {
@@ -1091,6 +1100,10 @@ describe('PermissionService', () => {
             ],
             grantedBy: grantedById,
           });
+<<<<<<< HEAD
+=======
+          expect(bulkWriteSpy).toHaveBeenCalled();
+>>>>>>> upstream/main
         } finally {
           bulkWriteSpy.mockRestore();
         }
@@ -1106,6 +1119,7 @@ describe('PermissionService', () => {
       },
     );
 
+<<<<<<< HEAD
     test('removes a stale-read upsert after a concurrent deletion and audit failure', async () => {
       const originalBulkWriteAclEntries = db.bulkWriteAclEntries;
       const bulkWriteSpy = jest
@@ -1360,6 +1374,8 @@ describe('PermissionService', () => {
       expect(entries[0].roleId.accessRoleId).toBe(AccessRoleIds.AGENT_EDITOR);
     });
 
+=======
+>>>>>>> upstream/main
     test('should revoke specified permissions', async () => {
       const revokedPrincipals = [
         {

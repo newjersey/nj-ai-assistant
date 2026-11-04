@@ -15,6 +15,10 @@ jest.mock('@tanstack/react-query', () => ({
 }));
 
 jest.mock('librechat-data-provider', () => ({
+<<<<<<< HEAD
+=======
+  ...jest.requireActual('librechat-data-provider'),
+>>>>>>> upstream/main
   QueryKeys: { agentQueuedTurns: 'agentQueuedTurns' },
   MutationKeys: {
     enqueueAgentQueuedTurn: 'enqueueAgentQueuedTurn',

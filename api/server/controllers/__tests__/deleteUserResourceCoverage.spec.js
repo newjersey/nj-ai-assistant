@@ -15,7 +15,11 @@ const HANDLED_RESOURCE_TYPES = {
   [ResourceType.CODE_ENVIRONMENT]: 'deleteUserCodeEnvironments',
   [ResourceType.REMOTE_AGENT]: 'deleteUserAgents',
   [ResourceType.PROMPTGROUP]: 'deleteUserPrompts',
+<<<<<<< HEAD
   [ResourceType.MCPSERVER]: 'deleteUserMcpServers',
+=======
+  [ResourceType.MCPSERVER]: 'deleteUserMCPServers',
+>>>>>>> upstream/main
   [ResourceType.SKILL]: 'deleteUserSkills',
   [ResourceType.SHARED_LINK]: 'deleteAllSharedLinksWithCleanup',
 };
@@ -33,7 +37,17 @@ describe('deleteUserController - resource type coverage guard', () => {
   let controllerSource;
 
   beforeAll(() => {
+<<<<<<< HEAD
     controllerSource = fs.readFileSync(path.resolve(__dirname, '../UserController.js'), 'utf-8');
+=======
+    /** The controller delegates the data cascade to the shared erasure service. */
+    controllerSource = [
+      path.resolve(__dirname, '../UserController.js'),
+      path.resolve(__dirname, '../../../../packages/api/src/user/erasure.ts'),
+    ]
+      .map((file) => fs.readFileSync(file, 'utf-8'))
+      .join('\n');
+>>>>>>> upstream/main
   });
 
   test('every ResourceType must have a documented cleanup handler or explicit exclusion', () => {

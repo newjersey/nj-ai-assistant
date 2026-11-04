@@ -7,6 +7,7 @@ export type Spec = {
   domain: string;
 };
 
+<<<<<<< HEAD
 export const fakeData: Spec[] = [
   {
     name: 'listPets',
@@ -28,6 +29,8 @@ export const fakeData: Spec[] = [
   },
 ];
 
+=======
+>>>>>>> upstream/main
 export const columns: ColumnDef<Spec>[] = [
   {
     header: 'Name',
@@ -41,6 +44,7 @@ export const columns: ColumnDef<Spec>[] = [
     header: 'Path',
     accessorKey: 'path',
   },
+<<<<<<< HEAD
   // {
   //   header: '',
   //   accessorKey: 'action',
@@ -51,4 +55,6 @@ export const columns: ColumnDef<Spec>[] = [
   //     </button>
   //   ),
   // },
+=======
+>>>>>>> upstream/main
 ];

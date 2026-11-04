@@ -21,7 +21,12 @@ import { resetTenantStrictCache } from './policy';
 /** A row as the engine stores it. */
 export interface TenantRow {
   readonly name: string;
+<<<<<<< HEAD
   readonly tenantId?: string;
+=======
+  /** Absent, `null` or `''` marks a tenantless (deployment or pre-tenancy) row. */
+  readonly tenantId?: string | null;
+>>>>>>> upstream/main
 }
 
 /**
@@ -45,6 +50,11 @@ export interface TenantEngineHarness {
 
   insert(row: TenantRow): Promise<void>;
   findNames(): Promise<readonly string[]>;
+<<<<<<< HEAD
+=======
+  /** Reads through the engine's binding of `tenantPartition`, as merged reads do. */
+  findNamesInPartition(): Promise<readonly string[]>;
+>>>>>>> upstream/main
   count(): Promise<number>;
   rename(from: string, to: string): Promise<void>;
   /** Applies an update that also attempts to set `tenantId`. */
@@ -122,6 +132,52 @@ export function describeTenantIsolationConformance(harness: TenantEngineHarness)
       });
     });
 
+<<<<<<< HEAD
+=======
+    /**
+     * A read that merges rows into one answer, such as config resolution, must never mix
+     * tenants: unlike plain reads, unscoped and system contexts see only tenantless rows.
+     */
+    describe('single-partition reads', () => {
+      const partitionRows: readonly TenantRow[] = [
+        { name: 'mine', tenantId: A },
+        { name: 'theirs', tenantId: B },
+        { name: 'deployment' },
+        { name: 'legacy-null', tenantId: null },
+        { name: 'legacy-empty', tenantId: '' },
+      ];
+      const tenantless = ['deployment', 'legacy-empty', 'legacy-null'];
+
+      it('sees only the active tenant when scoped', async () => {
+        await harness.seed(partitionRows);
+
+        expect(await asA(() => harness.findNamesInPartition())).toEqual(['mine']);
+      });
+
+      it('sees only tenantless rows with no context', async () => {
+        await harness.seed(partitionRows);
+
+        expect([...(await harness.findNamesInPartition())].sort()).toEqual(tenantless);
+      });
+
+      it('sees only tenantless rows under the system sentinel', async () => {
+        await harness.seed(partitionRows);
+
+        expect([...(await asSystem(() => harness.findNamesInPartition()))].sort()).toEqual(
+          tenantless,
+        );
+      });
+
+      it('refuses a read with no tenant context in strict mode', async () => {
+        await harness.seed(partitionRows);
+
+        await withStrict(true, async () => {
+          await expect(harness.findNamesInPartition()).rejects.toThrow('[TenantIsolation]');
+        });
+      });
+    });
+
+>>>>>>> upstream/main
     describe('writes', () => {
       it('stamps the active tenant onto an insert', async () => {
         await asA(() => harness.insert({ name: 'fresh' }));

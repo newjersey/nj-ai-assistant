@@ -30,6 +30,10 @@ jest.mock('@librechat/data-schemas', () => ({
 
 jest.mock('@librechat/api', () => ({
   createAdminCodeEnvironmentHandlers: jest.fn(() => mockHandlers),
+<<<<<<< HEAD
+=======
+  isAuditFailClosed: jest.fn(() => true),
+>>>>>>> upstream/main
 }));
 
 jest.mock('~/server/middleware/roles/capabilities', () => ({
@@ -44,6 +48,13 @@ jest.mock('~/server/services/Config', () => ({
   getAppConfig: mockGetAppConfig,
 }));
 
+<<<<<<< HEAD
+=======
+jest.mock('~/models', () => ({
+  recordAuditEntry: jest.fn(),
+}));
+
+>>>>>>> upstream/main
 function createApp() {
   delete require.cache[require.resolve('./code')];
   const router = require('./code');

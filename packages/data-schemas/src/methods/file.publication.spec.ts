@@ -104,6 +104,10 @@ describe('Run artifact persistence', () => {
     expect(file.metadata.codeEnvRef).toBeUndefined();
     expect(file.metadata.codeEnvRefs).toBeUndefined();
     expect(file.metadata.embeddedEntities).toBeUndefined();
+<<<<<<< HEAD
+=======
+    expect(file.embeddingOwnersComplete).toBe(true);
+>>>>>>> upstream/main
     expect(await methods.claimRunArtifactFile(scope)).toEqual({ file_id: file.file_id, file });
     expect(await methods.listRunArtifacts(scope)).toEqual([file]);
     expect(await methods.getRunFileCandidates([file.file_id], scope.tenantId)).toEqual([file]);

@@ -1,7 +1,13 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
+<<<<<<< HEAD
 import type { TableColumn } from './DataTable.types';
 import { SelectionCheckbox, SkeletonRows } from './DataTableComponents';
+=======
+import type { Row } from '@tanstack/react-table';
+import type { TableColumn } from './DataTable.types';
+import { MemoizedTableRow, SelectionCheckbox, SkeletonRows } from './DataTableComponents';
+>>>>>>> upstream/main
 
 // Mock the cn utility
 jest.mock('~/utils', () => ({
@@ -235,6 +241,7 @@ describe('DataTableComponents', () => {
       expect(skeletons).toHaveLength(2); // One per column
     });
 
+<<<<<<< HEAD
     it('should apply desktopOnly class to column cells', () => {
       const columns = [
         { accessorKey: 'name', header: 'Name' },
@@ -255,6 +262,8 @@ describe('DataTableComponents', () => {
       expect(cells[1]).toHaveClass('md:table-cell');
     });
 
+=======
+>>>>>>> upstream/main
     it('should apply custom className from column meta', () => {
       const columns = [
         { accessorKey: 'name', header: 'Name', meta: { className: 'custom-class' } },
@@ -335,3 +344,26 @@ describe('DataTableComponents', () => {
     });
   });
 });
+<<<<<<< HEAD
+=======
+
+describe('MemoizedTableRow', () => {
+  it('takes a new height when the theme changes the row height of a mounted row', () => {
+    const row = { original: {}, getVisibleCells: () => [] } as unknown as Row<
+      Record<string, unknown>
+    >;
+    const renderRow = (height: number) => (
+      <table>
+        <tbody>
+          <MemoizedTableRow row={row} selected={false} style={{ height }} />
+        </tbody>
+      </table>
+    );
+    const { container, rerender } = render(renderRow(40));
+
+    rerender(renderRow(37));
+
+    expect((container.querySelector('tr') as HTMLElement).style.height).toBe('37px');
+  });
+});
+>>>>>>> upstream/main

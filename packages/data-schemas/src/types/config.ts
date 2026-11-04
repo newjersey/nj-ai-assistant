@@ -24,6 +24,11 @@ export type Config = {
   isActive: boolean;
   /** Version number for cache invalidation, auto-increments on overrides change */
   configVersion: number;
+<<<<<<< HEAD
+=======
+  /** Storage detail of the Mongoose binding: set when `overrides` keys are stored encoded */
+  keyEncoding?: number;
+>>>>>>> upstream/main
   /** Tenant identifier for multi-tenancy isolation */
   tenantId?: string;
   /** When this config was created */

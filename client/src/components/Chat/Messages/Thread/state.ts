@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { useCallback, useMemo, useRef, useSyncExternalStore } from 'react';
 import { atom, useStore } from 'jotai';
 import { atomFamily } from 'jotai/utils';
@@ -67,3 +68,12 @@ export function useSiblingIndexes(parentKeys: readonly string[]): Record<string,
   const read = useCallback(() => jotaiStore.get(indexesAtom), [jotaiStore, indexesAtom]);
   return useSyncExternalStore(subscribe, read, read);
 }
+=======
+export {
+  siblingKey,
+  siblingIdxFamily,
+  NULL_SIBLING_KEY,
+  useSiblingIndexes,
+  siblingIndexesAtom,
+} from '@librechat/chat/react';
+>>>>>>> upstream/main
