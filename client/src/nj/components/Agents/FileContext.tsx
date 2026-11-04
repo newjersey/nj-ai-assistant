@@ -81,7 +81,7 @@ export default function FileContext({
           files={files}
           setFiles={setFiles}
           agent_id={agent_id}
-          tool_resource={EToolResources.file_search}
+          tool_resource={EToolResources.context}
           Wrapper={({ children }) => <div className="flex flex-wrap gap-2">{children}</div>}
         />
 
