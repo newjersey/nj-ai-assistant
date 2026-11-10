@@ -19,14 +19,14 @@ Currently, these are meant to be run by hand, not imported or executed as a scri
 ## Queries
 
 | File                            | What it reports                                                            | Edit before running             |
-| ------------------------------- |----------------------------------------------------------------------------|---------------------------------|
+| ------------------------------- | -------------------------------------------------------------------------- | ------------------------------- |
+| `activeConversationsPerWeek.js` | Conversations with ≥1 message, per week                                    | n/a                             |
+| `conversationsWithAgents.js`    | Percent of conversations that use a Platform Agent, since launch           | `AGENTS_LAUNCH_DATE` (set once) |
 | `countAgents.js`                | Total saved agents                                                         | n/a                             |
 | `countConversations.js`         | Total / archived / non-archived conversations                              | n/a                             |
 | `countUsers.js`                 | **All users** by email domain, and **active users** by domain for one week | `WEEK_START` (a Sunday)         |
-| `activeConversationsPerWeek.js` | Conversations with ≥1 message, per week                                    | n/a                             |
-| `conversationsWithAgents.js`    | Percent of conversations that use a Platform Agent, since launch           | `AGENTS_LAUNCH_DATE` (set once) |
-| `platformAgentUsage.js`         | Per Platform Agent: conversation count + distinct users                    | `AGENT_CREATOR` (admin User ID) |
 | `fileSizeHistogram.js`          | File counts bucketed by size (MB), plus a zero/null-byte count datapoint   | n/a                             |
+| `platformAgentUsage.js`         | Per Platform Agent: conversation count + distinct users                    | `AGENT_CREATOR` (admin User ID) |
 
 ## Things to know
 
