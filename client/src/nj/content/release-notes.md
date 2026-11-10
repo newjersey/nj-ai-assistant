@@ -6,6 +6,18 @@ is updated as needed.
 
 # Release notes
 
+## November 10, 2026
+
+Features released:
+
+- **Finished the upgrade to Sonnet 5.5** — We have migrated all existing chats and agents to Sonnet 5.5, so everything on the app uses the newest model.
+
+Bugs & Improvements:
+
+- File truncation — The app was truncating (or cutting off) large files that were uploaded in the chat window. We looked into this and fixed it, so that large files can be uploaded again.
+  - Note: We will make more improvements to this in the next release, so stay tuned.
+- Delete files from agents — There was a bug that stopped users from deleting files from the agents they made. We have fixed this bug, so you can delete unwanted files from existing agents (and new agents moving forward).
+
 ## October 26, 2026
 
 Features released:

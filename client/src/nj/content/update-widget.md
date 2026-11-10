@@ -1,19 +1,19 @@
 # Date (as month/day/year)
 
-6/29/26
+11/10/26
 
 # Title
 
-Use agents for repeated tasks and skills!
+Sonnet 5.5 & Resolved Bug Fixes
 
 # Description
 
-Save time with agents for repetitive tasks and specialized skills\! Agents remember your prompts and attached files, so they are perfect for tasks that you do regularly.
+Use Sonnet 5.5 across the site for existing and new chats\! We also fixed several bugs around uploading documents, working with agents.
 
 # Release notes link text
 
-Learn how to build and use agents
+Learn more about recent changes
 
 # Release notes link
 
-https://ai-assistant.nj.gov/nj/agent-guide   
+https://ai-assistant.nj.gov/nj/agent-guide
