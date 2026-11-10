@@ -1,9 +1,3 @@
-<!--
-REMINDER: When updating release notes, also review
-update-widget.md to ensure the New Updates widget
-is updated as needed.
--->
-
 # Release notes
 
 ## November 10, 2026
