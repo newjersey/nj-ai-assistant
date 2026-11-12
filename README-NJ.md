@@ -163,6 +163,10 @@ Here are some tips on successfully merging from upstream:
 - Whenever upstream adds new features, check in with product to see if we want to adopt them or not. (It's okay to merge
   them as long as we have a plan to remove them if we don't want them before the next release.)
 
+If you ever find that there are confusing merge conflicts or you are not confident you have enough context to merge
+certain files or validate the code after an upstream merge, use the
+[`upstream-merge` Claude skill](/.claude/skills/upstream-merge/SKILL.md) to run the merge with AI.
+
 ### Contributing Upstream
 
 Sometimes, we make changes that would benefit any user of LibreChat (such as fixing core bugs or adding
