@@ -1,8 +1,9 @@
 name: Sync Upstream LibreChat
 
 on:
-  schedule:
-    - cron: '0 9 * * 3' # Every Wednesday at 9:00 AM UTC
+  # NOTE: Stopping the automatic upstream merge PR for maintenance mode
+  # schedule:
+  #  - cron: '0 9 * * 3' # Every Wednesday at 9:00 AM UTC
   workflow_dispatch:
 
 permissions:
@@ -99,5 +100,4 @@ jobs:
             --base newjersey \
             --head "${{ steps.vars.outputs.branch }}" \
             --title "chore: sync upstream LibreChat main (${{ steps.vars.outputs.date }})" \
-            --reviewer casewalker --reviewer AnJuHyppolite \
             --body "$BODY"
