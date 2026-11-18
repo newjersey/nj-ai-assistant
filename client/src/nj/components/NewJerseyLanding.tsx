@@ -177,18 +177,23 @@ export function NewJerseyLanding() {
 
                   <div className="mb-5 flex gap-3">
                     <p>
-                      Join weekly AI Office Hours to discuss AI, a project you’re working on, or
-                      feedback about the NJ AI Assistant.{' '}
+                      For questions, support, or feedback about the AI Assistant, use the{' '}
                       <a
-                        href="https://outlook.office365.com/book/AIOfficeHours1@SoNJ.onmicrosoft.com/s/5Hx9mVbMJUK8H1YcXwEr6A2?ismsaljsauthenabled"
+                        href="https://forms.cloud.microsoft/pages/responsepage.aspx?id=0cN2UAI4n0uzauCkG9ZCp1twTiQNDpJJvmPRcdiEIL9UMEJaT0lJQUxJNVpBTlpXVUs3Ujk4M0pONy4u&route=shorturl"
                         className="inline-flex items-center gap-1 underline hover:decoration-2"
                         target="_blank"
                         rel="noreferrer"
-                        aria-label="Book time on any Thursday (opens in new window)"
+                        aria-label="Contact Form (opens in new window)"
                       >
-                        Book time on any Thursday
+                        contact form
                       </a>{' '}
-                      with the team.
+                      or email{' '}
+                      <a
+                        href="mailto:AI.Assistant@innovation.nj.gov"
+                        className="inline-flex items-center gap-1 underline hover:decoration-2"
+                      >
+                        AI.Assistant@innovation.nj.gov.
+                      </a>
                     </p>
                   </div>
 
