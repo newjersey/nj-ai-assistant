@@ -22,7 +22,7 @@ The NJ AI Assistant was built using government-friendly terms of service and top
 
 ## Principles for Building the NJ AI Assistant
 
-The team will continue to enhance the NJ AI Assistant by developing new features, collaborating with users to understand key needs, and making important decisions along the way. These are the principles we use:
+The NJ AI Assistant was built alongside New Jersey state employees, working closely with them to understand their core needs and guide product decisions. These are the principles that shaped that process:
 
 * **Be the safe, go-to AI tool for state employees** — integrated into daily work for learning and getting things done, with clear information about state approval and capabilities.
 * **Help users learn and practice responsible AI use** — make AI accessible at any skill level through practical, bite-sized guidance.
