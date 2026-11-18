@@ -38,9 +38,9 @@ export function getGuideContent(): GuideContent {
               'Our team created [this prompting guide](https://innovation.nj.gov/skills/ai-how-tos/prompts-and-context) to walk through how to use prompts and context to improve AI results. This covers how to think about AI tools, general prompt tips, concrete actions to improve the AI response quality and reduce hallucinations, a checklist to review AI outputs, and a troubleshooting guide.',
           },
           {
-            question: 'Are there AI Office Hours to support my AI work?',
+            question: 'What support or guidance is available for my AI work?',
             answer:
-              'Join weekly AI Office Hours to discuss AI, a project you’re working on, or feedback about the NJ AI Assistant. [Book time on any Thursday](https://outlook.office365.com/book/AIOfficeHours1@SoNJ.onmicrosoft.com/s/5Hx9mVbMJUK8H1YcXwEr6A2?ismsaljsauthenabled) with the team.',
+              'You can see our guides on [how to write effective prompts](https://innovation.nj.gov/skills/ai-how-tos/prompts-and-context), [writing agents](https://ai-assistant.nj.gov/nj/agent-guide), or [general AI resources](https://innovation.nj.gov/skills/ai-how-tos/). You can also use the [contact form ](https://forms.cloud.microsoft/pages/responsepage.aspx?id=0cN2UAI4n0uzauCkG9ZCp1twTiQNDpJJvmPRcdiEIL9UMEJaT0lJQUxJNVpBTlpXVUs3Ujk4M0pONy4u&route=shorturl) or email [AI.Assistant@innovation.nj.gov](mailto:AI.Assistant@innovation.nj.gov) for questions, support, or feedback about your work or the AI Assistant.',
           },
           {
             question: 'How can I use agents for repetitive tasks?',
@@ -155,7 +155,7 @@ You will see the new name in the selector, which is how you know switching agent
             question: "What's coming next for NJ AI Assistant?",
             answer: `* To stay updated on new features, learning resources, and all things AI, join [our newsletter about the NJ AI Assistant](https://public.govdelivery.com/accounts/NJGOV/signup/45878).   
 * To hear specifically about release features, check out our [Release Notes](https://ai-assistant.nj.gov/nj/release-notes) page.   
-* In the immediate future, the team is thinking about more features to support responsible and safe AI use. We are also writing how-to guides for effective prompting and sharing AI use cases.`,
+* The NJ AI Assistant team will continue to support users by fixing bugs and critical errors and upgrading the AI model as new versions become available. New feature development is paused for now. If you have suggestions about new features, reach out and let us know. We will be revisiting our feature roadmap in 2027.`,
           },
         ],
       },
