@@ -4,15 +4,13 @@
 
 Note to users:
 
-The New Jersey AI Assistant team is actively managing the tool including upgrades and bug fixes and critical errors. WIth that, we will be pausing active feature development for the near future. We will continue to support users by responding within 2-3 business days to questions and comments that come in through the [contact form](https://forms.cloud.microsoft/pages/responsepage.aspx?id=0cN2UAI4n0uzauCkG9ZCp1twTiQNDpJJvmPRcdiEIL9UMEJaT0lJQUxJNVpBTlpXVUs3Ujk4M0pONy4u&route=shorturl) or email [AI.Assistant@innovation.nj.gov.](mailto:AI.Assistant@innovation.nj.gov) 
+The New Jersey AI Assistant team is actively managing the tool including upgrades and bug fixes and critical errors. With that, we will be pausing active feature development for the near future. We will continue to support users by responding within 2-3 business days to questions and comments that come in through the [contact form](https://forms.cloud.microsoft/pages/responsepage.aspx?id=0cN2UAI4n0uzauCkG9ZCp1twTiQNDpJJvmPRcdiEIL9UMEJaT0lJQUxJNVpBTlpXVUs3Ujk4M0pONy4u&route=shorturl) or email [AI.Assistant@innovation.nj.gov.](mailto:AI.Assistant@innovation.nj.gov)
 
-Please continue to reach out to us with questions, ideas, and bug reports. 
+Please continue to reach out to us with questions, ideas, and bug reports.
 
-Thank you,   
+Thank you,
+
 NJ AI Assistant Team
-
-
-
 
 ## November 10, 2026
 
