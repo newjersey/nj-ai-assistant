@@ -1,5 +1,6 @@
 import { megabyte } from 'librechat-data-provider';
 import type { FiltersConfig } from 'librechat-data-provider';
+import type { TokenCountFn } from '~/utils/text';
 import {
   getBlockedUninspectableFileField,
   hasActiveFilePolicy,
@@ -57,6 +58,29 @@ export function assertExtractedTextInspectable(input: {
   if (blockedField != null && !isInspectableText(input.text)) {
     throw new UninspectableFileError(blockedField);
   }
+}
+
+// NJ: Rejects files exceeding the configured token limit at upload.
+export async function assertWithinFileTokenLimit(input: {
+  readonly text: string;
+  readonly filename: string;
+  readonly fileTokenLimit?: number;
+  readonly tokenCountFn: TokenCountFn;
+}): Promise<void> {
+  const { text, filename, fileTokenLimit, tokenCountFn } = input;
+  if (!fileTokenLimit || Buffer.byteLength(text, 'utf8') <= fileTokenLimit) {
+    return;
+  }
+  const tokenCount = await tokenCountFn(text);
+  if (tokenCount <= fileTokenLimit) {
+    return;
+  }
+  throw Object.assign(
+    new Error(
+      `"${filename}" exceeds token limit (maximum ${fileTokenLimit.toLocaleString('en-US')} tokens). Split the document into smaller files and try again.`,
+    ),
+    { userErrorStatusCode: 400 },
+  );
 }
 
 /** Converts extraction failures and empty results into the stable fail-close policy error. */

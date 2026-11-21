@@ -1,10 +1,14 @@
 import type { FiltersConfig } from 'librechat-data-provider';
 import {
+  assertWithinFileTokenLimit,
   assertExtractedTextInspectable,
   extractInspectableFileText,
   getFileExtractionLogDetails,
 } from './extract';
 import { UninspectableFileError } from '~/protection/files';
+import { resolveUploadErrorMessage } from '~/utils/files';
+import { processTextWithTokenLimit } from '~/utils/text';
+import { countTokens } from '~/utils/tokenizer';
 
 const strictExtractedTextFilters = {
   files: {
@@ -135,5 +139,114 @@ describe('extracted file text inspection boundary', () => {
         text: 'inspectable text',
       }),
     ).not.toThrow();
+  });
+});
+
+// NJ: Upload-time file token limit tests.
+describe('assertWithinFileTokenLimit', () => {
+  const NJ_FILE_TOKEN_LIMIT = 175_000;
+  const oversizedText = 'x'.repeat(NJ_FILE_TOKEN_LIMIT + 1);
+
+  const getTokenLimitError = async (tokenCount: number) => {
+    try {
+      await assertWithinFileTokenLimit({
+        text: oversizedText,
+        filename: 'report.pdf',
+        fileTokenLimit: NJ_FILE_TOKEN_LIMIT,
+        tokenCountFn: () => tokenCount,
+      });
+    } catch (error) {
+      return error as Error & { userErrorStatusCode?: number };
+    }
+    return undefined;
+  };
+
+  it.each([174_999, 175_000])('accepts text counted at %i tokens', async (tokenCount) => {
+    await expect(getTokenLimitError(tokenCount)).resolves.toBeUndefined();
+  });
+
+  it('rejects text over the token limit with a 400 error', async () => {
+    const error = await getTokenLimitError(175_001);
+
+    expect(error?.message).toBe(
+      '"report.pdf" exceeds token limit (maximum 175,000 tokens). Split the document into smaller files and try again.',
+    );
+    expect(error?.userErrorStatusCode).toBe(400);
+  });
+
+  it('reaches the user through the existing upload error allowlist', async () => {
+    const error = await getTokenLimitError(240_000);
+
+    expect(resolveUploadErrorMessage(error)).toBe(error?.message);
+    expect(resolveUploadErrorMessage(error, 'Error processing file', true)).toBe(
+      'File content exceeds token limit',
+    );
+  });
+
+  it('skips counting text whose UTF-8 size cannot exceed the limit', async () => {
+    const tokenCountFn = jest.fn(() => Number.MAX_SAFE_INTEGER);
+
+    await assertWithinFileTokenLimit({
+      text: 'x'.repeat(NJ_FILE_TOKEN_LIMIT),
+      filename: 'notes.txt',
+      fileTokenLimit: NJ_FILE_TOKEN_LIMIT,
+      tokenCountFn,
+    });
+
+    expect(tokenCountFn).not.toHaveBeenCalled();
+  });
+
+  it('counts multi-byte text whose UTF-8 size exceeds the limit', async () => {
+    const tokenCountFn = jest.fn(() => 1);
+
+    await assertWithinFileTokenLimit({
+      text: 'é'.repeat(6),
+      filename: 'accents.txt',
+      fileTokenLimit: 10,
+      tokenCountFn,
+    });
+
+    expect(tokenCountFn).toHaveBeenCalledTimes(1);
+  });
+
+  it.each([undefined, 0])('does not check when the limit is %p', async (fileTokenLimit) => {
+    const tokenCountFn = jest.fn(() => Number.MAX_SAFE_INTEGER);
+
+    await expect(
+      assertWithinFileTokenLimit({
+        text: oversizedText,
+        filename: 'report.pdf',
+        fileTokenLimit,
+        tokenCountFn,
+      }),
+    ).resolves.toBeUndefined();
+    expect(tokenCountFn).not.toHaveBeenCalled();
+  });
+
+  it('rejects exactly the text that turn-time file context would truncate', async () => {
+    const text = 'The quick brown fox jumps over the lazy dog. '.repeat(50);
+    const tokenCount = await countTokens(text);
+    const truncatedAt = async (tokenLimit: number) =>
+      (await processTextWithTokenLimit({ text, tokenLimit, tokenCountFn: countTokens }))
+        .wasTruncated;
+
+    expect(await truncatedAt(tokenCount)).toBe(false);
+    expect(await truncatedAt(tokenCount - 1)).toBe(true);
+    await expect(
+      assertWithinFileTokenLimit({
+        text,
+        filename: 'fox.txt',
+        fileTokenLimit: tokenCount,
+        tokenCountFn: countTokens,
+      }),
+    ).resolves.toBeUndefined();
+    await expect(
+      assertWithinFileTokenLimit({
+        text,
+        filename: 'fox.txt',
+        fileTokenLimit: tokenCount - 1,
+        tokenCountFn: countTokens,
+      }),
+    ).rejects.toThrow('exceeds token limit');
   });
 });

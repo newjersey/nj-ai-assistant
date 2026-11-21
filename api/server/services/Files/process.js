@@ -30,10 +30,12 @@ const {
 const { logger, runAsSystem } = require('@librechat/data-schemas');
 const {
   sanitizeFilename,
+  countTokens,
   parseText,
   processAudioFile,
   extractInspectableFileText,
   assertExtractedTextInspectable,
+  assertWithinFileTokenLimit,
   getFileExtractionLogDetails,
   getUploadExtractedTextPlan,
   resolveUploadFallbackText,
@@ -949,6 +951,13 @@ const processAgentFileUpload = async ({ req, res, metadata, sseStream }) => {
           `Extracted text from "${file.originalname}" exceeds the ${MAX_STORED_EXTRACTED_TEXT_BYTES / megabyte}MB storage limit (${Math.round(textBytes / megabyte)}MB). Try a shorter document.`,
         );
       }
+      // NJ: Validate the file token limit before storing the upload.
+      await assertWithinFileTokenLimit({
+        text,
+        filename: file.originalname,
+        fileTokenLimit: fileConfig.fileTokenLimit,
+        tokenCountFn: countTokens,
+      });
       if (
         hasActiveFileFieldPolicy(appConfig?.filters, [
           isTranscript ? 'transcript' : 'extracted_text',
