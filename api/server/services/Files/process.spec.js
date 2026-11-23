@@ -131,6 +131,9 @@ jest.mock('@librechat/api', () => {
     processAudioFile: jest.fn(),
     extractInspectableFileText: jest.fn(async ({ extract }) => extract()),
     assertExtractedTextInspectable: jest.fn(),
+    // NJ: Mock accepts uploads; token limit validation is tested in packages/api.
+    assertWithinFileTokenLimit: jest.fn(async () => {}),
+    countTokens: jest.fn(),
     getUploadExtractedTextPlan,
     UPLOAD_EXTRACTED_TEXT_PLANS,
     getFileExtractionLogDetails,
@@ -285,6 +288,8 @@ const {
   processAudioFile,
   extractInspectableFileText,
   assertExtractedTextInspectable,
+  assertWithinFileTokenLimit,
+  countTokens,
   contentFilterBlockResponse,
   createCodeApiRateLimitBudget,
   getCodeApiUploadOptions,
@@ -1086,6 +1091,94 @@ describe('processAgentFileUpload', () => {
       await expect(
         processAgentFileUpload({ req, res: mockRes, metadata: makeMetadata() }),
       ).resolves.not.toThrow();
+    });
+
+    // NJ: File token limit validation.
+    test('does not count tokens for text already over the 15MB storage limit', async () => {
+      const oversizedText = 'x'.repeat(15 * 1024 * 1024 + 1);
+      getStrategyFunctions.mockReturnValue({
+        handleFileUpload: jest.fn().mockResolvedValue({ text: oversizedText, bytes: 1 }),
+      });
+      const req = makeReq({ mimetype: PDF_MIME, ocrConfig: null });
+
+      await expect(
+        processAgentFileUpload({ req, res: mockRes, metadata: makeMetadata() }),
+      ).rejects.toThrow(/storage limit/);
+
+      expect(assertWithinFileTokenLimit).not.toHaveBeenCalled();
+    });
+  });
+
+  // NJ: File token limit validation.
+  describe('per-file token limit', () => {
+    const tokenLimitError = Object.assign(
+      new Error(
+        '"upload.bin" exceeds token limit (maximum 175,000 tokens). Split the document into smaller files and try again.',
+      ),
+      { userErrorStatusCode: 400 },
+    );
+
+    const setupExtractedText = (text) => {
+      const handleFileUpload = jest.fn().mockResolvedValue({
+        text,
+        bytes: Buffer.byteLength(text, 'utf8'),
+        filepath: 'doc://result',
+      });
+      getStrategyFunctions.mockReturnValue({ handleFileUpload });
+      return handleFileUpload;
+    };
+
+    test('validates extracted text using the configured token limit', async () => {
+      mergeFileConfig.mockReturnValue({ ...makeFileConfig(), fileTokenLimit: 175_000 });
+      setupExtractedText('document text');
+      const req = makeReq({ mimetype: PDF_MIME, ocrConfig: null });
+
+      await processAgentFileUpload({ req, res: mockRes, metadata: makeMetadata() });
+
+      expect(assertWithinFileTokenLimit).toHaveBeenCalledTimes(1);
+      expect(assertWithinFileTokenLimit).toHaveBeenCalledWith({
+        text: 'document text',
+        filename: 'upload.bin',
+        fileTokenLimit: 175_000,
+        tokenCountFn: countTokens,
+      });
+      expect(db.createFile).toHaveBeenCalledWith(
+        expect.objectContaining({ text: 'document text', llmDeliveryPath: 'text' }),
+        true,
+      );
+    });
+
+    test('rejects an over-limit document before storing it or writing to MongoDB', async () => {
+      assertWithinFileTokenLimit.mockRejectedValueOnce(tokenLimitError);
+      const handleFileUpload = setupExtractedText('over the limit');
+      const req = makeReq({ mimetype: PDF_MIME, ocrConfig: null });
+
+      await expect(
+        processAgentFileUpload({ req, res: mockRes, metadata: makeMetadata() }),
+      ).rejects.toBe(tokenLimitError);
+
+      expect(handleFileUpload).toHaveBeenCalledTimes(1);
+      expect(db.addAgentResourceFile).not.toHaveBeenCalled();
+      expect(db.createFile).not.toHaveBeenCalled();
+      expect(mockRes.json).not.toHaveBeenCalled();
+    });
+
+    test('rejects an over-limit audio transcript before writing to MongoDB', async () => {
+      mergeFileConfig.mockReturnValue(makeFileConfig({ sttSupportedMimeTypes: ['audio/webm'] }));
+      const { STTService } = require('~/server/services/Files/Audio/STTService');
+      STTService.getInstance.mockResolvedValueOnce({});
+      processAudioFile.mockResolvedValueOnce({ text: 'long transcript', bytes: 15 });
+      assertWithinFileTokenLimit.mockRejectedValueOnce(tokenLimitError);
+      const req = makeReq({ mimetype: 'audio/webm' });
+
+      await expect(
+        processAgentFileUpload({ req, res: mockRes, metadata: makeMetadata() }),
+      ).rejects.toBe(tokenLimitError);
+
+      expect(assertWithinFileTokenLimit).toHaveBeenCalledWith(
+        expect.objectContaining({ text: 'long transcript' }),
+      );
+      expect(db.createFile).not.toHaveBeenCalled();
     });
   });
 

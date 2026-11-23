@@ -51,6 +51,8 @@ jest.mock('sharp', () =>
 jest.mock('@librechat/api', () => ({
   ...jest.requireActual('@librechat/api'),
   refreshS3FileUrls: jest.fn(),
+  // Mock the tokenizer because Jest doesn't support its dynamic import.
+  countTokens: jest.fn(async (text) => Math.ceil(text.length / 4)),
 }));
 
 jest.mock('~/cache', () => ({
@@ -73,7 +75,7 @@ jest.mock('fs', () => {
 });
 
 const { processAgentFileUpload } = require('~/server/services/Files/process');
-const { UninspectableFileError } = require('@librechat/api');
+const { UninspectableFileError, countTokens } = require('@librechat/api');
 
 // Import the router
 const router = require('~/server/routes/files/files');
@@ -797,6 +799,102 @@ describe('File Routes - Agent Files Endpoint', () => {
       expect(JSON.stringify(response.body)).not.toContain('PRIVATE');
       expect(await File.countDocuments()).toBe(filesBefore);
       readFile.mockRestore();
+    });
+
+    // NJ: File token limit validation.
+    describe('per-file token limit', () => {
+      const documentText = 'The quick brown fox jumps over the lazy dog. '.repeat(50);
+      const originalSseEnabled = process.env.FILE_UPLOAD_SSE_ENABLED;
+      const tokenCount = Math.ceil(documentText.length / 4);
+
+      beforeEach(async () => {
+        await createAgent({
+          id: agentCustomId,
+          name: 'Test Agent',
+          provider: 'openai',
+          model: 'gpt-4',
+          author: authorId,
+        });
+        const { getStrategyFunctions } = require('~/server/services/Files/strategies');
+        getStrategyFunctions.mockReturnValue({
+          handleFileUpload: jest.fn().mockResolvedValue({
+            text: documentText,
+            bytes: Buffer.byteLength(documentText, 'utf8'),
+            filepath: '/uploads/report.pdf',
+          }),
+        });
+        const { processAgentFileUpload: processAgentFileUploadActual } = jest.requireActual(
+          '~/server/services/Files/process',
+        );
+        processAgentFileUpload.mockImplementationOnce(processAgentFileUploadActual);
+      });
+
+      afterEach(() => {
+        const { getStrategyFunctions } = require('~/server/services/Files/strategies');
+        getStrategyFunctions.mockReturnValue({});
+        if (originalSseEnabled === undefined) {
+          delete process.env.FILE_UPLOAD_SSE_ENABLED;
+        } else {
+          process.env.FILE_UPLOAD_SSE_ENABLED = originalSseEnabled;
+        }
+      });
+
+      const uploadWithLimit = (fileTokenLimit, accept = 'application/json') => {
+        const testApp = createAppWithUser(
+          authorId,
+          SystemRoles.USER,
+          { fileConfig: { fileTokenLimit } },
+          { originalname: 'report.pdf', mimetype: 'application/pdf' },
+        );
+        return request(testApp).post('/files').set('Accept', accept).send({
+          endpoint: 'agents',
+          agent_id: agentCustomId,
+          tool_resource: 'context',
+          file_id: uuidv4(),
+        });
+      };
+
+      it('uploads a document whose token count equals the limit', async () => {
+        const filesBefore = await File.countDocuments();
+
+        const response = await uploadWithLimit(tokenCount);
+
+        expect(response.status).toBe(200);
+        expect(response.body.text).toBe(documentText);
+        expect(await File.countDocuments()).toBe(filesBefore + 1);
+      });
+
+      it('rejects a document that exceeds the token limit', async () => {
+        const filesBefore = await File.countDocuments();
+
+        const response = await uploadWithLimit(tokenCount - 1);
+
+        expect(response.status).toBe(400);
+        expect(response.body).toEqual({
+          message: `"report.pdf" exceeds token limit (maximum ${(tokenCount - 1).toLocaleString('en-US')} tokens). Split the document into smaller files and try again.`,
+        });
+        expect(countTokens).toHaveBeenCalledWith(documentText);
+        expect(await File.countDocuments()).toBe(filesBefore);
+        expect(fs.unlink).toHaveBeenCalledWith('/tmp/test.txt');
+      });
+
+      it('reports the rejection as a displayable error event on streamed uploads', async () => {
+        process.env.FILE_UPLOAD_SSE_ENABLED = 'true';
+        const filesBefore = await File.countDocuments();
+
+        const response = await uploadWithLimit(tokenCount - 1, 'text/event-stream');
+
+        const errorEvent = response.text
+          .split('\n\n')
+          .find((event) => event.startsWith('event:error'));
+        const payload = JSON.parse(errorEvent.slice(errorEvent.indexOf('data:') + 5));
+        expect(payload).toMatchObject({
+          message: expect.stringContaining('"report.pdf" exceeds token limit'),
+          code: 400,
+          display_to_user: true,
+        });
+        expect(await File.countDocuments()).toBe(filesBefore);
+      });
     });
 
     it('does not defer raw content fail-close when extracted text is also selected', async () => {
