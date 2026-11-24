@@ -1,15 +1,20 @@
-# Release notes
+# **Release notes**
+
+## November 25, 2026
+
+Bugs & Improvements:
+
+- Additional improvements to file truncation — In a previous update, we added a fix to ensure large files can be uploaded without truncation. In some cases, an uploaded large file may exceed the configured token limit and render your chat unusable. We've added a notification that lets you know before that happens and cancels the upload.
 
 ## November 18, 2026
 
 Note to users:
 
-The New Jersey AI Assistant team is actively managing the tool including upgrades and bug fixes and critical errors. With that, we will be pausing active feature development for the near future. We will continue to support users by responding within 2-3 business days to questions and comments that come in through the [contact form](https://forms.cloud.microsoft/pages/responsepage.aspx?id=0cN2UAI4n0uzauCkG9ZCp1twTiQNDpJJvmPRcdiEIL9UMEJaT0lJQUxJNVpBTlpXVUs3Ujk4M0pONy4u&route=shorturl) or email [AI.Assistant@innovation.nj.gov.](mailto:AI.Assistant@innovation.nj.gov)
+The New Jersey AI Assistant team is actively managing the tool including upgrades and bug fixes and critical errors. WIth that, we will be pausing active feature development for the near future. We will continue to support users by responding within 2-3 business days to questions and comments that come in through the [contact form](https://forms.cloud.microsoft/pages/responsepage.aspx?id=0cN2UAI4n0uzauCkG9ZCp1twTiQNDpJJvmPRcdiEIL9UMEJaT0lJQUxJNVpBTlpXVUs3Ujk4M0pONy4u&route=shorturl) or email [AI.Assistant@innovation.nj.gov.](mailto:AI.Assistant@innovation.nj.gov)
 
 Please continue to reach out to us with questions, ideas, and bug reports.
 
-Thank you,
-
+Thank you,  
 NJ AI Assistant Team
 
 ## November 10, 2026
@@ -61,7 +66,7 @@ See more details about agents in the ["How to Build & Use Agents" guide](https:/
 
 Features Released:
 
-- **Chat management** \- We have heard users share that people use chats for a variety of projects, and that more ways to manage chats would be incredibly helpful. We are releasing two ways to do this:
+- **Chat Management** \- We have heard users share that people use chats for a variety of projects, and that more ways to manage chats would be incredibly helpful. We are releasing a couple ways to do this:
   - **Organize chats into project folders** — Organize multiple chats into a project folder to keep everything together and easily find related chats.
   - **Pin a chat** — Keep your favorite chats at the top of the chat list by pinning them (and unpin them when you finish with them).
 
@@ -157,3 +162,5 @@ We've added a few ways to move around and find what you need.
 
 - **Sidebar** — A collapsible menu on the left side of your screen gives you access to your recent chats and learning resources. Look for the user menu at the bottom to explore guides, learn about the tool, or get in contact with us.
 - **Starting a new chat** — You have options: type directly into the chat window, click the new chat button in the top right, or click the NJ AI Assistant logo.
+
+---
