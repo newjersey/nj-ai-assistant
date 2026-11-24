@@ -2,7 +2,7 @@
 
 ## November 25, 2026
 
-Bugs & Improvements:
+Bug Fixes & Improvements:
 
 - Additional improvements to file truncation — In a previous update, we added a fix to ensure large files can be uploaded without truncation. In some cases, an uploaded large file may exceed the configured token limit and render your chat unusable. We've added a notification that lets you know before that happens and cancels the upload.
 
@@ -10,7 +10,7 @@ Bugs & Improvements:
 
 Note to users:
 
-The New Jersey AI Assistant team is actively managing the tool including upgrades and bug fixes and critical errors. WIth that, we will be pausing active feature development for the near future. We will continue to support users by responding within 2-3 business days to questions and comments that come in through the [contact form](https://forms.cloud.microsoft/pages/responsepage.aspx?id=0cN2UAI4n0uzauCkG9ZCp1twTiQNDpJJvmPRcdiEIL9UMEJaT0lJQUxJNVpBTlpXVUs3Ujk4M0pONy4u&route=shorturl) or email [AI.Assistant@innovation.nj.gov.](mailto:AI.Assistant@innovation.nj.gov)
+The New Jersey AI Assistant team is actively managing the tool, including performing upgrades, fixing bugs, and addressing critical errors. With that, we will be pausing active feature development for the near future. We will continue to support users by responding within 2-3 business days to questions and comments that come in through the [contact form](https://forms.cloud.microsoft/pages/responsepage.aspx?id=0cN2UAI4n0uzauCkG9ZCp1twTiQNDpJJvmPRcdiEIL9UMEJaT0lJQUxJNVpBTlpXVUs3Ujk4M0pONy4u&route=shorturl) or email [AI.Assistant@innovation.nj.gov.](mailto:AI.Assistant@innovation.nj.gov)
 
 Please continue to reach out to us with questions, ideas, and bug reports.
 
@@ -19,11 +19,11 @@ NJ AI Assistant Team
 
 ## November 10, 2026
 
-Features released:
+Features Released:
 
 - **Finished the upgrade to Sonnet 5.5** — We have migrated all existing chats and agents to Sonnet 5.5, so everything on the app uses the newest model.
 
-Bugs & Improvements:
+Bug Fixes & Improvements:
 
 - File truncation — The app was truncating (or cutting off) large files that were uploaded in the chat window. We looked into this and fixed it, so that large files can be uploaded again.
   - Note: We will make more improvements to this in the next release, so stay tuned.
@@ -31,22 +31,22 @@ Bugs & Improvements:
 
 ## October 26, 2026
 
-Features released:
+Features Released:
 
 - **Upgrading to Claude Sonnet 5.5** — All new chats will use this upgraded model.
   - Note: If you continue an existing chat or use an existing custom agent, these will continue to use Sonnet 4.5 automatically. The older model (Sonnet 4.5) will be deprecated in Spring 2027, so we are working on migrating everyone’s chats and agents.
 
-Bugs & Improvements:
+Bug Fixes & Improvements:
 
 - File uploads — The app stopped larger attachments from being uploaded into a chat, even though the context window still had space. We addressed this issue. You should be able to upload 10 files per chat, with an unlimited number of files in a conversation (until the context window limit is reached).
   - Please report any issues via [email](mailto:AI.Assistant@innovation.nj.gov) or the [contact form](https://forms.cloud.microsoft/pages/responsepage.aspx?id=0cN2UAI4n0uzauCkG9ZCp1twTiQNDpJJvmPRcdiEIL9UMEJaT0lJQUxJNVpBTlpXVUs3Ujk4M0pONy4u&route=shorturl). We would like to know if this continues.
 
 ## July 22, 2026
 
-Features released:
+Features Released:
 
 - **Context meter** \- In the chat box, see how much context is left in the conversation (and when you run out of context, the context window ends and you cannot add more information or prompts to a conversation). The context meter also shows how many tokens were used in the most recent prompt and reply. This information will help you decide exactly when to copy and paste key information into a new conversation, so you can keep working, even after the context window ends.
-- **Add to chat** \- easily add a portion of the past conversation into the chat box by highlighting it and clicking “Add to chat.” You can add multiple excerpts from the same conversation into the chat box.
+- **Add to chat** \- Easily add a portion of the past conversation into the chat box by highlighting it and clicking “Add to chat.” You can add multiple excerpts from the same conversation into the chat box.
 
 We also added more analytics data to better understand how agents are used.
 
@@ -56,7 +56,7 @@ Features Released:
 
 - **Agents** — We've heard from many of you that you use NJ AI Assistant for the same types of tasks over and over. Agents let you save instructions and files once, then reuse them anytime — no need to retype the same prompts repeatedly. The agents are easy to use and include useful features that allow you to:
   - **Get started immediately with Platform Agents** — Use [ready-made agents](https://ai-assistant.nj.gov/agents) for common tasks like drafting emails, summarizing meetings, proofreading documents, brainstorming ideas, and improving prompts.
-  - **Build agents for your specific workflow** — Create custom agents using the agent builder in the left sidebar. Add detailed instructions and reference files for tasks you do regularly, like drafting reports using a structured format and align them with specific policies.
+  - **Build agents for your specific workflow** — Create custom agents using the agent builder in the left sidebar. Add detailed instructions and reference files for tasks you do regularly, like drafting reports using a structured format and aligning them with specific policies.
   - **Add multiple files to improve the AI response** — Add files to provide context and direction so your agent produces a high-quality output and saves you time.
   - **Link multiple agents to perform complex tasks** — For complex tasks, you define multiple agents needed for a complex task and link them to work in a specific order. Each agent will do their task and then pass it off to the next agent (called “agent chaining”).
 
@@ -95,7 +95,7 @@ Features Released:
 
 - **A New AI Prompting Guide** — Our team created [this prompting guide](https://innovation.nj.gov/skills/ai-how-tos/prompts-and-context) to walk through how to use prompts and context to improve AI results. This covers how to think about AI tools, general prompt tips, concrete actions to improve the AI response quality and reduce hallucinations, a checklist to review AI outputs, and a troubleshooting guide.
 
-Bugs & Improvements:
+Bug Fixes & Improvements:
 
 - Feature Flags — We added the ability to easily turn features on/off for the team. This will help us build features that are more complex, test them, and release them when ready.
 
@@ -106,7 +106,7 @@ Beyond this, we are working on a couple of big features that will be coming soon
 Features Released:
 
 - **Upgrading to Claude Sonnet 4.6** — All new chats will use this upgraded model.
-  - Note: If you continue an existing chat, these will continue to use Sonnet 4.5 automatically.
+  - Note: If you continue an existing chat, it will continue to use Sonnet 4.5 automatically.
 - **Archiving Chats** — We are automatically archiving chats that are more than 60 days old. You can access archived chats using the bottom left menu
 - **Limit File Size for Uploads** — Files up to 15 MB can be uploaded to the app, and users with files larger than this will get an error message.
   - If you need to upload a file larger than 15 MB, please use our email ([AI.Assistant@innovation.nj.gov](mailto:AI.Assistant@innovation.nj.gov)) or the contact form to let us know.
