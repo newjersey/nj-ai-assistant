@@ -1,6 +1,6 @@
 # **Release notes**
 
-## November 25, 2026
+## November 24, 2026
 
 Bug Fixes & Improvements:
 
