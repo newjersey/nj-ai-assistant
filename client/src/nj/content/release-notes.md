@@ -4,7 +4,7 @@
 
 Bug Fixes & Improvements:
 
-- Additional improvements to file truncation — A previous update resolved an issue that caused files to be prematurely truncated. This release raises the per-file token limit from 100,000 to 175,000 tokens, so large files are less likely to be truncated.
+- Additional improvements to file truncation — A previous update resolved an issue that caused files to be prematurely truncated. This release raises the per-file token limit from 100,000 to 175,000 tokens, so large files are less likely to be cut off.
 - In some cases, large files may exceed the configured token limit and render your chat unusable. To prevent this, the upload is now canceled, and you'll receive a notification explaining why.
 
 ## November 18, 2026
